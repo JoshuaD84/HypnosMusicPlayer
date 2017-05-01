@@ -1,13 +1,13 @@
-import java.io.File;
-
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.tag.FieldKey;
-import org.jaudiotagger.tag.Tag;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -18,6 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -25,9 +26,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import players.DummyPlayer;
+import players.FLACPlayer;
+import players.AudioPlayer;
  
 
 @SuppressWarnings({ "rawtypes", "unchecked" }) //TODO: Maybe get rid of this when I understand things better
@@ -35,30 +38,9 @@ public class MusicPlayer extends Application {
 
 	public static final String PROGRAM_NAME = "Music Player";
 	
-	final static ObservableList <Album> albumListData = FXCollections.observableArrayList(
-    	new Album ("Air", 2009, "Pocket WhateveR" ),	
-    	new Album ("Air", 2008, "Pocket WhateveR" ),
-    	new Album ("Air", 2007, "Pocket WhateveR" ),
-    	new Album ("Air", 2006, "Pocket WhateveR" ),
-    	new Album ("Air", 2005, "Pocket WhateveR" ),
-    	new Album ("Air", 2004, "Pocket WhateveR" ),
-    	new Album ("Josh", 2008, "wefwef" ),
-    	new Album ("EWFEW", 2005, "EEFEFE" ),
-    	new Album ("Maria", 1949, "AAA" ),
-    	new Album ("Thomas", 2000, "DDDDD" ),
-    	new Album ("234234", 1999, "wefwef" ),
-    	new Album ("wefawfasdfs", 2008, "AAAAA" ),
-    	new Album ("qqqqqq", 2008, "VBBBBB" )
-    );
+	static ObservableList <Album> albumListData;
 	
-	final static ObservableList <Track> playlistData = FXCollections.observableArrayList (
-		new Track ( "Air", 2009, "Pocket Whatever", "Johs's Song", 5, 344 ),
-		new Track ( "Air", 2009, "Pocket Whatever", "Song ABC", 1, 1344 ),
-		new Track ( "Air", 2009, "Pocket Whatever", "GGG", 2, 443 ),
-		new Track ( "Air", 2009, "Pocket Whatever", "HLIFJWE", 3, 992 ),
-		new Track ( "Air", 2009, "Pocket Whatever", "Living Free", 4, 116 ),
-		new Track ( "Air", 2009, "Pocket Whatever", "Absbolute", 6, 644 )
-	);
+	final static ObservableList <Track> playlistData = FXCollections.observableArrayList ();
 	
 	static TableView albumTable;
 	static TableView playlistTable;
@@ -69,19 +51,17 @@ public class MusicPlayer extends Application {
 	
 	static VBox transport;
 	
-	
-	
+	AudioPlayer currentPlayer = new DummyPlayer();
+		
     public static void main ( String[] args ) throws Exception {
-
-        /*AudioFile audioFile = AudioFileIO.read( new File ( "song.flac" ) );
-        Tag tag = audioFile.getTag();
-        
-        System.out.println ( tag.getFirst ( FieldKey.ARTIST ) );
-        System.out.println ( tag.getFirst ( FieldKey.ALBUM ) );
-        System.out.println ( tag.getFirst ( FieldKey.TITLE ) );
-        System.out.println ( tag.getFirst ( FieldKey.TRACK ) );
-		*/
-             
+    	
+    	Path startingDirectory = Paths.get ( "/home/joshua/Desktop/music-test/" );
+    	
+    	long startTime = System.currentTimeMillis();
+    	Files.walkFileTree( startingDirectory, new MusicFileVisitor () );
+    	long endTime = System.currentTimeMillis();
+    	
+    	System.out.println ( "To read all music: " + ( endTime - startTime ) );
      
         Application.launch ( args );
         
@@ -89,7 +69,7 @@ public class MusicPlayer extends Application {
     
 	@Override
     public void start ( Stage stage ) {
-    	Scene scene = new Scene ( new Group() );
+    	Scene scene = new Scene ( new Group(), 1024, 768 );
     	 
     	setupAlbumTable();
     	setupAlbumSearchPane();
@@ -124,12 +104,14 @@ public class MusicPlayer extends Application {
             	
     	
         stage.setTitle ( PROGRAM_NAME );
-        stage.setWidth ( 1024 );
-        stage.setHeight ( 768 );
         ((Group) scene.getRoot()).getChildren().addAll( primaryContainer );
-        
         stage.setScene ( scene );
         stage.show();
+
+        artSplitPane.setDividerPosition( 0, .5d );
+        playlistSplitPane.setDividerPosition( 0, .8d );
+        primarySplitPane.setDividerPositions( .5d );
+        
     }
 
 	public void setupTransport() {
@@ -139,6 +121,18 @@ public class MusicPlayer extends Application {
 		Button stopButton = new Button ( "◼" );
 		Button nextButton = new Button ( "⏩" );
 		Button previousButton = new Button ( "⏪" );
+		
+		stopButton.setOnAction(new EventHandler<ActionEvent>() {
+		    @Override public void handle(ActionEvent e) {
+		        currentPlayer.stop();
+		    }
+		});
+		
+		pauseButton.setOnAction(new EventHandler<ActionEvent>() {
+		    @Override public void handle(ActionEvent e) {
+		        currentPlayer.togglePause();
+		    }
+		});
 		
 		Label timeElapsed = new Label ( "2:02" );
 		Label timeRemaining = new Label ( "-1:12" );
@@ -213,16 +207,29 @@ public class MusicPlayer extends Application {
         
         artistColumn.setCellValueFactory ( new PropertyValueFactory <Album, String> ( "Artist" ) );
         yearColumn.setCellValueFactory ( new PropertyValueFactory <Album, Integer> ( "Year" ) );
-        albumColumn.setCellValueFactory ( new PropertyValueFactory <Album, String> ( "Album" ) );
+        albumColumn.setCellValueFactory ( new PropertyValueFactory <Album, String> ( "Title" ) );
         
         artistColumn.setSortType (TableColumn.SortType.ASCENDING );
                 
         albumTable = new TableView();
         albumTable.getColumns().addAll ( artistColumn, yearColumn, albumColumn );
         albumTable.setEditable ( false );
-        albumTable.setItems( albumListData );
+        albumTable.setItems( FXCollections.observableArrayList( new ArrayList <Album> ( MusicFileVisitor.albums ) ) );
         albumTable.getSortOrder().add ( artistColumn );
+        albumTable.getSortOrder().add ( yearColumn );
         albumTable.setColumnResizePolicy ( TableView.CONSTRAINED_RESIZE_POLICY );
+        
+        albumTable.setRowFactory( tv -> {
+            TableRow<Album> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                    Album selectedAlbum = row.getItem();
+                    playlistData.clear();
+                    playlistData.addAll( selectedAlbum.getTracks() );
+                }
+            });
+            return row;
+        });
         
     }
     
@@ -239,14 +246,25 @@ public class MusicPlayer extends Application {
         albumColumn.setCellValueFactory( new PropertyValueFactory <Track, String> ("Album") );
         titleColumn.setCellValueFactory( new PropertyValueFactory <Track, String> ("Title") );
         trackColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer> ("trackNumber") );
-        lengthColumn.setCellValueFactory( new PropertyValueFactory <Track, String> ("Length") );
+        lengthColumn.setCellValueFactory( new PropertyValueFactory <Track, String> ("LengthDisplay") );
                 
         playlistTable = new TableView();
         playlistTable.getColumns().addAll ( trackColumn, artistColumn, yearColumn, albumColumn, titleColumn, lengthColumn );
         playlistTable.setEditable ( false );
         playlistTable.setItems( playlistData );
         playlistTable.setColumnResizePolicy ( TableView.CONSTRAINED_RESIZE_POLICY );
-        
+      
+        playlistTable.setRowFactory( tv -> {
+            TableRow<Track> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                    Track selectedTrack = row.getItem();
+                    currentPlayer = new FLACPlayer( selectedTrack.getPath().toAbsolutePath().toString() );
+                    currentPlayer.play();
+                }
+            });
+            return row;
+        });
     }
 }
 
