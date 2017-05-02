@@ -1,9 +1,11 @@
+package gui;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -28,7 +30,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import players.FLACPlayer;
+import players.JoshPlayer;
  
 
 @SuppressWarnings({ "rawtypes", "unchecked" }) //TODO: Maybe get rid of this when I understand things better
@@ -40,14 +42,21 @@ public class MusicPlayer extends Application {
 	
 	final static ObservableList <Track> playlistData = FXCollections.observableArrayList ();
 	
-	static TableView albumTable;
-	static TableView playlistTable;
+	static TableView <Album> albumTable;
+	static TableView <Track> playlistTable;
 	
 	static BorderPane albumImage;
 	static BorderPane artistImage;
 	static TextField albumSearchPane;
+	static Slider trackPosition;
 	
 	static VBox transport;
+	
+	static JoshPlayer currentPlayingTrack;
+	
+	static Label timeElapsedLabel = new Label ( "2:02" );
+	static Label timeRemainingLabel = new Label ( "-1:12" );
+	static Label trackInfo = new Label ( "" );
 		
 		
     public static void main ( String[] args ) throws Exception {
@@ -61,7 +70,27 @@ public class MusicPlayer extends Application {
     	System.out.println ( "To read all music: " + ( endTime - startTime ) );
      
         Application.launch ( args );
-        
+    }
+    
+    public static void updateTransport ( int timeElapsed, int timeRemaining, double percent ) {
+    	Platform.runLater( new Runnable() {
+    		public void run() {
+	    		trackPosition.setValue( ( trackPosition.getMax() - trackPosition.getMin() ) * percent + trackPosition.getMin() );
+		    	timeElapsedLabel.setText( Utils.getLengthDisplay( timeElapsed ) );
+		    	timeRemainingLabel.setText( Utils.getLengthDisplay( timeRemaining ) );
+    		}
+    	});
+    }
+    
+    public void startTrack ( Track track ) {
+    	if ( currentPlayingTrack != null ) currentPlayingTrack.stop();
+    	currentPlayingTrack = new JoshPlayer( track, trackPosition );
+    	
+    	trackInfo.setText( track.getArtist() + " - " + track.getYear() + " - " + track.getAlbum() + 
+    		" - " + track.getTrackNumber() + " - " + track.getTitle() );
+    	
+    	setAlbumImage ( Utils.getAlbumCoverImagePath ( track ) );
+    	setArtistImage ( Utils.getAlbumArtistImagePath ( track ) );
     }
     
 	@Override
@@ -121,32 +150,56 @@ public class MusicPlayer extends Application {
 		
 		stopButton.setOnAction(new EventHandler<ActionEvent>() {
 		    @Override public void handle(ActionEvent e) {
-		    	//TODO audioPlayer.stop();
+		    	if ( currentPlayingTrack != null ) {
+		    		currentPlayingTrack.stop();
+		    		currentPlayingTrack = null;
+		    	}
 		    }
 		});
 		
 		pauseButton.setOnAction(new EventHandler<ActionEvent>() {
 		    @Override public void handle(ActionEvent e) {
-		    	//TODO audioPlayer.togglePause();
+		    	if ( currentPlayingTrack != null ) {
+		    		currentPlayingTrack.pause();
+		    	}
 		    }
 		});
 		
-		Label timeElapsed = new Label ( "2:02" );
-		Label timeRemaining = new Label ( "-1:12" );
-		//Label transportTitle = 
+		playButton.setOnAction(new EventHandler<ActionEvent>() {
+		    @Override public void handle(ActionEvent e) {
+		    	
+		    	if ( currentPlayingTrack != null && currentPlayingTrack.isPaused() ) {
+		    		currentPlayingTrack.play();
+		    		
+		    	} else {
+                    Track selectedTrack = playlistTable.getSelectionModel().getSelectedItem();
+                    
+                    if ( selectedTrack == null ) {
+                    	selectedTrack = playlistTable.getItems().get( 0 );
+                    }
+                    
+                    startTrack ( selectedTrack );
+                    
+		    	} 
+		    }
+		});
 		
-		Slider trackPosition = new Slider();
+		
+		timeElapsedLabel = new Label ( "" );
+		timeRemainingLabel = new Label ( "" );
+		
+		trackPosition = new Slider();
 		trackPosition.setMin( 0 );
-		trackPosition.setMax( 100 );
-		trackPosition.setValue ( 40 ); //TODO: Delete
+		trackPosition.setMax( 1000 );
+		trackPosition.setValue ( 0 ); 
 		trackPosition.setMaxWidth ( 600 );
 		trackPosition.setMinWidth( 200 );
 		trackPosition.setPrefWidth( 400 );
 
 		HBox sliderPane = new HBox();
-		sliderPane.getChildren().add ( timeElapsed );
+		sliderPane.getChildren().add ( timeElapsedLabel );
 		sliderPane.getChildren().add ( trackPosition );
-		sliderPane.getChildren().add ( timeRemaining );
+		sliderPane.getChildren().add ( timeRemainingLabel );
 		sliderPane.setAlignment( Pos.CENTER );
 		
 		HBox buttons = new HBox();
@@ -165,7 +218,7 @@ public class MusicPlayer extends Application {
 		controls.setAlignment( Pos.CENTER );
 		
 		HBox playingTrackInfo = new HBox();
-		Label trackInfo = new Label ( "Air - 1998 - Moon Safari - 01 - La Femme D'Argent" );
+		trackInfo = new Label ( "" );
 		playingTrackInfo.getChildren().add ( trackInfo );
 		playingTrackInfo.setAlignment( Pos.CENTER );
 		
@@ -179,19 +232,35 @@ public class MusicPlayer extends Application {
 	
 	public void setupAlbumImage() {
 		albumImage = new BorderPane();
-		ImageView view = new ImageView( new Image ( "file:front.jpg" ) );
-		view.fitWidthProperty().set( 250 ); 
-		view.fitHeightProperty().set( 250 ); 
-		albumImage.setCenter( view );
 	}
 	
 	public void setupArtistImage() {
 		artistImage = new BorderPane();
-		ImageView view = new ImageView( new Image ( "file:artist.jpg" ) );
-		view.fitWidthProperty().set( 250 ); 
-		view.fitHeightProperty().set( 250 ); 
-		artistImage.setCenter( view );
 	}
+	
+	public void setAlbumImage ( Path imagePath ) {
+		try {
+			ImageView view = new ImageView( new Image ( imagePath.toUri().toString() ) );
+			view.fitWidthProperty().set( 250 ); 
+			view.fitHeightProperty().set( 250 ); 
+			albumImage.setCenter( view );
+		} catch ( Exception e ) {
+			albumImage.setCenter( null );
+		}
+	}
+	
+	public void setArtistImage ( Path imagePath ) {
+		try {
+			ImageView view = new ImageView( new Image ( imagePath.toUri().toString() ) );
+			view.fitWidthProperty().set( 250 ); 
+			view.fitHeightProperty().set( 250 ); 
+			artistImage.setCenter( view );
+		} catch ( Exception e ) {
+			artistImage.setCenter( null );
+		}
+	}
+	
+
 			
 	public void setupAlbumSearchPane () {
 		albumSearchPane = new TextField();
@@ -215,6 +284,7 @@ public class MusicPlayer extends Application {
         albumTable.getSortOrder().add ( artistColumn );
         albumTable.getSortOrder().add ( yearColumn );
         albumTable.setColumnResizePolicy ( TableView.CONSTRAINED_RESIZE_POLICY );
+        albumTable.setPlaceholder( new Label ( "No albums loaded." ) );
         
         albumTable.setRowFactory( tv -> {
             TableRow<Album> row = new TableRow<>();
@@ -250,14 +320,13 @@ public class MusicPlayer extends Application {
         playlistTable.setEditable ( false );
         playlistTable.setItems( playlistData );
         playlistTable.setColumnResizePolicy ( TableView.CONSTRAINED_RESIZE_POLICY );
+        playlistTable.setPlaceholder( new Label ( "No songs in playlist." ) );
       
         playlistTable.setRowFactory( tv -> {
             TableRow<Track> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
-                    Track selectedTrack = row.getItem();
-                	FLACPlayer audioPlayer = new FLACPlayer();
-                    audioPlayer.playFlac( selectedTrack.getPath() );
+                	startTrack ( row.getItem() );
                 }
             });
             return row;

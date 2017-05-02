@@ -1,3 +1,4 @@
+package gui;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -67,14 +68,6 @@ public class Track {
 	}
 	
 	public String getLengthDisplay () {
-		int hours = getLength() / 3600;
-		int minutes = ( getLength() % 3600 ) / 60;
-		int seconds = getLength() % 60;
-		
-		if ( hours > 0 ) {
-			return String.format ( "%d:%02d:%02d", hours, minutes, seconds );
-		} else {
-			return String.format ( "%d:%02d", minutes, seconds );
-		}
+		return Utils.getLengthDisplay( getLength () );
 	}
 }
