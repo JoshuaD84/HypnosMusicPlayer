@@ -7,5 +7,8 @@
 		</accessrules>
 	</classpathentry>
 	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/jaudiotagger-2.2.6-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/jflac-1.3.jar"/>
+	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/jflac-1.3-jdk1.4.jar"/>
+	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/jflac-1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

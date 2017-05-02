@@ -28,9 +28,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import players.DummyPlayer;
 import players.FLACPlayer;
-import players.AudioPlayer;
  
 
 @SuppressWarnings({ "rawtypes", "unchecked" }) //TODO: Maybe get rid of this when I understand things better
@@ -50,8 +48,7 @@ public class MusicPlayer extends Application {
 	static TextField albumSearchPane;
 	
 	static VBox transport;
-	
-	AudioPlayer currentPlayer = new DummyPlayer();
+		
 		
     public static void main ( String[] args ) throws Exception {
     	
@@ -124,13 +121,13 @@ public class MusicPlayer extends Application {
 		
 		stopButton.setOnAction(new EventHandler<ActionEvent>() {
 		    @Override public void handle(ActionEvent e) {
-		        currentPlayer.stop();
+		    	//TODO audioPlayer.stop();
 		    }
 		});
 		
 		pauseButton.setOnAction(new EventHandler<ActionEvent>() {
 		    @Override public void handle(ActionEvent e) {
-		        currentPlayer.togglePause();
+		    	//TODO audioPlayer.togglePause();
 		    }
 		});
 		
@@ -259,8 +256,8 @@ public class MusicPlayer extends Application {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     Track selectedTrack = row.getItem();
-                    currentPlayer = new FLACPlayer( selectedTrack.getPath().toAbsolutePath().toString() );
-                    currentPlayer.play();
+                	FLACPlayer audioPlayer = new FLACPlayer();
+                    audioPlayer.playFlac( selectedTrack.getPath() );
                 }
             });
             return row;
