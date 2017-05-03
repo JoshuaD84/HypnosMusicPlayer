@@ -1,5 +1,6 @@
 package org.joshuad.musicplayer;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Path;
 
 import org.jaudiotagger.audio.AudioFile;
@@ -15,8 +16,10 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
-public class Track {
+public class Track implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
+
 	public enum Format {
 		FLAC ( "flac" ),
 		MP3 ( "mp3" ),
@@ -46,7 +49,6 @@ public class Track {
 	
 	//TODO: Deal w/ these exceptions right. 
 	Track ( Path trackPath ) throws CannotReadException, IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException {
-		
 		this.trackPath = trackPath;
 		AudioFile audioFile = AudioFileIO.read( trackPath.toFile() );
 		Tag tag = audioFile.getTag();
@@ -65,7 +67,7 @@ public class Track {
 			//if matches 23/<whatever>
 			trackNumber = new SimpleIntegerProperty ( Integer.parseInt( rawTrackText.split("/")[0] ) );
 		} else {
-			System.out.println ( "Invalid track number: " + rawTrackText ) ;
+			System.out.print ( "Invalid track number: '" + rawTrackText + "': " ) ;
 			trackNumber = new SimpleIntegerProperty ( -1 );
 			throw new TagException();
 		}

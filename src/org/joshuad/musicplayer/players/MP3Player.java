@@ -12,6 +12,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.joshuad.musicplayer.MusicPlayerUI;
 import org.joshuad.musicplayer.Track;
+import org.tritonus.share.sampled.file.TAudioFileFormat;
 
 import javafx.scene.control.Slider;
 
@@ -32,12 +33,7 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	private boolean paused = false;
 	
 	private Slider trackPosition;
-	
-    long frameSize;
-    long totalFrames;
-    double sampleRate;
-    
-	
+		
 	public MP3Player ( Track track, Slider trackPosition ) {
 		this.track = track;
 		this.trackPosition = trackPosition;
@@ -58,14 +54,10 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 			AudioFormat decoderFormat = new AudioFormat(
 					AudioFormat.Encoding.PCM_SIGNED, baseFormat.getSampleRate(),
 					16, baseFormat.getChannels(), baseFormat.getChannels() * 2,
-					baseFormat.getSampleRate(), false);
+					baseFormat.getSampleRate(), false );
 			
 			decodedInput = AudioSystem.getAudioInputStream ( decoderFormat, encodedInput );
-
-			frameSize   = decoderFormat.getFrameSize();
-            totalFrames = encodedInput.getFrameLength();
-            sampleRate  = decoderFormat.getSampleRate();
-            
+			
 			audioOutput = getLine ( decoderFormat );
 			audioOutput.start();
 			
@@ -93,21 +85,45 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 			}
 			
 			if ( seekRequestPercent != -1 ) {
+								
+				System.out.println ( "Current Position (ms): " + audioOutput.getMicrosecondPosition() );
+				System.out.println ( "Current Position (Frames): " + framePosition );
+				System.out.println ( "Length of Song (ms): " + track.getLength() * 1000000 );
+				System.out.println ( "Length of song, in frames (decoded): " + decodedInput.getFrameLength() );
+				System.out.println ( "Length of song, in frames (encoded): " + encodedInput.getFrameLength() );
+				System.out.println ( "Frame size: " + decodedInput.getFormat().getFrameSize() );
+				System.out.println ( "Sample Rate: " + decodedInput.getFormat().getSampleRate() );
+				System.out.println ( "Frame Length (property): " +	decodedInput.getFormat().getProperty("mp3.length.frames" ) );
+				
+				
+				//Frames = bytesRead / frameSize
+
+				
+				
 				//TODO: 
 				
 				/* 
 				 * tools:
 				 *
-				 *decodedInput.skip( long n )
+				 *decodedInput.skip( long n ) // Skip n bytes
+				 * audioOutput.getMicrosecondPosition()
+				 * track.getLength() * 1000000 )
 				 */
+				
+				//(double) audioOutput.getMicrosecondPosition() / ( (double) track.getLength() * 1000000 );
+				
+				
+				
+				
+				seekRequestPercent = -1;
 				 
 			}
 			
 			if ( !paused ) {
 				try {
 					byte[] data = new byte[4096];
-					int bytesRead = decodedInput.read(data, 0, data.length);
-															
+					int bytesRead = decodedInput.read ( data, 0, data.length );
+					
 					if ( bytesRead < 0 ) {
 						closeAllResources();
 						MusicPlayerUI.songFinishedPlaying( false );
@@ -115,7 +131,7 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 						
 					} else {
 						audioOutput.write(data, 0, bytesRead);
-						framePosition += bytesRead / frameSize;
+						framePosition += bytesRead / decodedInput.getFormat().getFrameSize();
 					}
 				} catch ( IOException e ) {
 					//TODO: 

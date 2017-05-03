@@ -45,24 +45,33 @@ public class Album {
 	}
 	
 	public ArrayList <Track> getTracks() {
-		
-		ArrayList <Track> retMe = new ArrayList <Track> ();
 		try {
+			ArrayList <Track> retMe = new ArrayList <Track> ();
+		
 			DirectoryStream <Path> albumDirectoryStream = Files.newDirectoryStream ( directoryPath, Utils.musicFileFilter );
 					
-			for (Path trackPath : albumDirectoryStream ) {
-				
-				retMe.add( new Track ( trackPath ) );
+			for ( Path trackPath : albumDirectoryStream ) {
+				try {
+					retMe.add( new Track ( trackPath ) );
+				} catch ( TagException e) {
+					System.out.println ( "Unable to read tags on: " + trackPath.toString() +", skipping." );
+				} catch (CannotReadException e) {
+					System.out.println ( trackPath.toString() );
+					e.printStackTrace();
+				} catch (ReadOnlyFileException e) {
+					System.out.println ( trackPath.toString() +", is read only, unable to edit, skipping." );
+				} catch (InvalidAudioFrameException e) {
+					System.out.println ( trackPath.toString() +", has bad audio fram data, skipping." );
+				}
 			}
 			
 			retMe.sort ( Comparator.comparing( Track::getTrackNumber ) );
 			return retMe;
-
-		} catch (IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException | CannotReadException e) {
-			//TODO
-			e.printStackTrace();
+		} catch ( IOException e) {
+			System.out.println ( "Unable to get list of files in directory: " + directoryPath.toString() + ", skipping album." );
 			return null;
-		}
+
+		} 
 	}
 }
 

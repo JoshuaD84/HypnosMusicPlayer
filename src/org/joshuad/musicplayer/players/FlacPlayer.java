@@ -154,11 +154,13 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 				}
 			}
 			
-			double timePos = ( audioOutput.getMicrosecondPosition() - clipStartTime ) / 1e6;
-			double positionPercent = timePos * decodedInput.sampleRate / decodedInput.numSamples;
-			int timeElapsed = (int)(track.getLength() * positionPercent);
-			int timeRemaining = track.getLength() - timeElapsed;
-			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, positionPercent );
+			if ( seekRequestPercent == -1 && !stopRequested ) {
+				double timePos = ( audioOutput.getMicrosecondPosition() - clipStartTime ) / 1e6;
+				double positionPercent = timePos * decodedInput.sampleRate / decodedInput.numSamples;
+				int timeElapsed = (int)(track.getLength() * positionPercent);
+				int timeRemaining = track.getLength() - timeElapsed;
+				MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, positionPercent );
+			}
 		}
 	}
 	

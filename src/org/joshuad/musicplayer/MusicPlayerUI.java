@@ -10,6 +10,8 @@ import java.util.ListIterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.SwingUtilities;
+
 import org.joshuad.musicplayer.players.AbstractPlayer;
 import org.joshuad.musicplayer.players.FlacPlayer;
 import org.joshuad.musicplayer.players.MP3Player;
@@ -53,6 +55,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
  
@@ -60,7 +63,9 @@ import javafx.stage.Stage;
 @SuppressWarnings({ "rawtypes", "unchecked" }) //TODO: Maybe get rid of this when I understand things better
 public class MusicPlayerUI extends Application {
 	
-	private static final DataFormat SERIALIZED_MIME_TYPE = new DataFormat("application/x-java-serialized-object");
+	
+	private static final DataFormat DRAGGED_TRACK = new DataFormat("application/x-java-track-index");
+	private static final DataFormat DRAGGED_ALBUM = new DataFormat("application/x-java-album-index");
 	
 	public static final String PROGRAM_NAME = "Music Player";
 		
@@ -100,7 +105,7 @@ public class MusicPlayerUI extends Application {
     	
     	long endTime = System.currentTimeMillis();
     	
-    	System.out.println ( "To read all music: " + ( endTime - startTime ) );
+    	System.out.println ( "Time to index all music: " + ( endTime - startTime ) );
      
         Application.launch ( args );
         
@@ -161,6 +166,9 @@ public class MusicPlayerUI extends Application {
     	}
     	
 		playlistTable.refresh();
+		
+		StackPane thumb = (StackPane)trackPositionSlider.lookup(".thumb");
+		thumb.setVisible( true );
     	
     	trackInfo.setText( track.getArtist() + " - " + track.getYear() + " - " + track.getAlbum() + 
     		" - " + track.getTrackNumber() + " - " + track.getTitle() );
@@ -184,13 +192,20 @@ public class MusicPlayerUI extends Application {
     
     
     public static void stopTrack ( ) {
-    	currentPlayingTrack.stop();
-		currentPlayingTrack = null;
-		playlistTable.refresh();
+    	if ( currentPlayingTrack != null ) {
+    		currentPlayingTrack.stop();
+			currentPlayingTrack = null;
+			playlistTable.refresh();
+    	}
+    	
 		trackPositionSlider.setValue( 0 );
 		timeElapsedLabel.setText( "" );
 		timeRemainingLabel.setText( "" );
 		trackInfo.setText( "" );
+		
+		StackPane thumb = (StackPane)trackPositionSlider.lookup(".thumb");
+		thumb.setVisible( false );
+		
     }
     
 	@Override
@@ -233,7 +248,8 @@ public class MusicPlayerUI extends Application {
         ((Group) scene.getRoot()).getChildren().addAll( primaryContainer );
         stage.setScene ( scene );
         stage.show();
-
+        
+		stopTrack();
         artSplitPane.setDividerPosition( 0, .5d );
         playlistSplitPane.setDividerPosition( 0, .8d );
         primarySplitPane.setDividerPositions( .4d );
@@ -300,7 +316,10 @@ public class MusicPlayerUI extends Application {
 		    	} else {
                     Track selectedTrack = playlistTable.getSelectionModel().getSelectedItem();
                     
-                    if ( selectedTrack == null && ! playlistTable.getItems().isEmpty() ) {
+                    if ( selectedTrack != null ) {
+                    	startTrack ( selectedTrack );
+                    	
+                    } else if ( ! playlistTable.getItems().isEmpty() ) {
                 		selectedTrack = playlistTable.getItems().get( 0 );
                         startTrack ( selectedTrack );
                     }
@@ -311,6 +330,12 @@ public class MusicPlayerUI extends Application {
 		
 		timeElapsedLabel = new Label ( "" );
 		timeRemainingLabel = new Label ( "" );
+
+		timeElapsedLabel.setMinWidth( 40 );
+		timeElapsedLabel.setStyle( "" );
+		timeElapsedLabel.setAlignment( Pos.CENTER_RIGHT );
+		
+		timeRemainingLabel.setMinWidth( 40 );
 		
 		trackPositionSlider = new Slider();
 		trackPositionSlider.setMin( 0 );
@@ -346,6 +371,7 @@ public class MusicPlayerUI extends Application {
 		sliderPane.getChildren().add ( trackPositionSlider );
 		sliderPane.getChildren().add ( timeRemainingLabel );
 		sliderPane.setAlignment( Pos.CENTER );
+		sliderPane.setSpacing( 5 );
 		
 		HBox buttons = new HBox();
 		buttons.getChildren().add ( stopButton );
@@ -373,7 +399,6 @@ public class MusicPlayerUI extends Application {
 		transport.getChildren().add ( controls );
 		transport.setPadding( new Insets ( 10, 0, 10, 0 ) );
 		transport.setSpacing ( 5 );
-		
 	}
 	
 	public void setupAlbumImage() {
@@ -466,16 +491,6 @@ public class MusicPlayerUI extends Application {
         albumTable.setColumnResizePolicy ( TableView.CONSTRAINED_RESIZE_POLICY );
         albumTable.setPlaceholder( new Label ( "No albums loaded." ) );
         
-        albumTable.setRowFactory( tv -> {
-            TableRow<Album> row = new TableRow<>();
-            row.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
-                    playAlbum( row.getItem() );
-                }
-            });
-            return row;
-        });
-        
         ContextMenu albumListContextMenu = new ContextMenu();
         MenuItem playMenuItem = new MenuItem("Play");
         MenuItem addMenuItem = new MenuItem("Add to Playlist");
@@ -497,27 +512,47 @@ public class MusicPlayerUI extends Application {
         });
         
         browseMenuItem.setOnAction(new EventHandler<ActionEvent>() {
+        	//TODO: This is the better way, once openjdk and openjfx supports it: getHostServices().showDocument(file.toURI().toString());
             @Override
             public void handle(ActionEvent event) {
-                
-            	Platform.runLater( new Runnable() {
-            		public void run() {
-            			try {
-            				System.out.println ( Desktop.isDesktopSupported() );
-            				//Desktop.getDesktop().open( albumTable.getSelectionModel().getSelectedItem().getPath().toFile() );
-        				} catch (Exception e) {
-        					// TODO Auto-generated catch block
-        					e.printStackTrace();
-        				}
-            		}
-            	});
+				SwingUtilities.invokeLater(new Runnable() {
+				    public void run() {
+				    	try {
+							Desktop.getDesktop().open( albumTable.getSelectionModel().getSelectedItem().getPath().toFile() );
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+				    }
+				});
             }
         });
         
-        
         albumTable.setContextMenu( albumListContextMenu );
         
-        
+        albumTable.setRowFactory( tv -> {
+            TableRow<Album> row = new TableRow<>();
+            
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && ( ! row.isEmpty() ) ) {
+                    playAlbum( row.getItem() );
+                }
+            });
+                        
+            row.setOnDragDetected(event -> {
+                if ( ! row.isEmpty() ) {
+                    Integer index = row.getIndex();
+                    Dragboard db = row.startDragAndDrop ( TransferMode.MOVE );
+                    db.setDragView ( row.snapshot ( null, null ) );
+                    ClipboardContent cc = new ClipboardContent();
+                    cc.put ( DRAGGED_ALBUM, index );
+                    db.setContent ( cc );
+                    event.consume();
+
+                }
+            });
+            
+            return row;
+        });
     }
     
     public void setupPlaylistTable () {
@@ -542,7 +577,6 @@ public class MusicPlayerUI extends Application {
             };
         });
         
-              
         playingColumn.setCellValueFactory ( new PropertyValueFactory <Track, Boolean> ( "IsCurrentTrack" ) );
         artistColumn.setCellValueFactory ( new PropertyValueFactory <Track, String> ( "Artist" ) );
         yearColumn.setCellValueFactory ( new PropertyValueFactory <Track, Integer> ( "Year" ) );
@@ -579,6 +613,34 @@ public class MusicPlayerUI extends Application {
 			}
 		});
       
+		
+		playlistTable.setOnDragOver( event -> {
+	         Dragboard db = event.getDragboard();
+             
+             if ( db.hasContent ( DRAGGED_ALBUM ) ) {
+                 event.acceptTransferModes ( TransferMode.MOVE );
+                 event.consume();
+             }
+		});
+		
+		playlistTable.setOnDragDropped(event -> {
+            Dragboard db = event.getDragboard();
+            if ( db.hasContent( DRAGGED_ALBUM ) ) {
+            	
+            	if ( playlistTable.getItems().isEmpty() ) { //If the list is empty, we handle the drop, otherwise let the rows handle it
+	            	int draggedIndex = (Integer) db.getContent( DRAGGED_ALBUM );
+	                Album draggedAlbum = albumTable.getItems().get( draggedIndex );
+	                
+	                int dropIndex = 0;
+	                playlistTable.getItems().addAll ( dropIndex, draggedAlbum.getTracks() );
+	
+	                event.setDropCompleted(true);
+	                event.consume();
+            	}
+            }
+        });
+			
+		
         playlistTable.setRowFactory( tv -> {
             TableRow<Track> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
@@ -593,17 +655,24 @@ public class MusicPlayerUI extends Application {
                     Dragboard db = row.startDragAndDrop(TransferMode.MOVE);
                     db.setDragView(row.snapshot(null, null));
                     ClipboardContent cc = new ClipboardContent();
-                    cc.put(SERIALIZED_MIME_TYPE, index);
+                    cc.put(DRAGGED_TRACK, index);
                     db.setContent(cc);
                     event.consume();
                 }
             });
 
-            row.setOnDragOver(event -> {
+            row.setOnDragOver ( event -> {
+            	
                 Dragboard db = event.getDragboard();
-                if (db.hasContent(SERIALIZED_MIME_TYPE)) {
-                    if (row.getIndex() != ((Integer)db.getContent(SERIALIZED_MIME_TYPE)).intValue()) {
-                        event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+                
+                if ( db.hasContent(DRAGGED_TRACK ) ) {
+                	if ( row.getIndex() != ((Integer)db.getContent(DRAGGED_TRACK)).intValue() ) {
+                        event.acceptTransferModes ( TransferMode.MOVE );
+                        event.consume();
+                    }
+                } else if ( db.hasContent ( DRAGGED_ALBUM ) ) {
+                	if ( row.getIndex() != ((Integer)db.getContent ( DRAGGED_ALBUM) ).intValue() ) {
+                        event.acceptTransferModes ( TransferMode.MOVE );
                         event.consume();
                     }
                 }
@@ -611,25 +680,26 @@ public class MusicPlayerUI extends Application {
 
             row.setOnDragDropped(event -> {
                 Dragboard db = event.getDragboard();
-                if (db.hasContent(SERIALIZED_MIME_TYPE)) {
-                    int draggedIndex = (Integer) db.getContent(SERIALIZED_MIME_TYPE);
+                if ( db.hasContent ( DRAGGED_TRACK ) ) {
+                    int draggedIndex = (Integer) db.getContent(DRAGGED_TRACK);
                     Track draggedPerson = playlistTable.getItems().remove(draggedIndex);
-
-                    int dropIndex ; 
-
-                    if (row.isEmpty()) {
-                        dropIndex = playlistTable.getItems().size() ;
-                    } else {
-                        dropIndex = row.getIndex();
-                    }
-
+                    int dropIndex = row.isEmpty() ? dropIndex = playlistTable.getItems().size() :row.getIndex();
                     playlistTable.getItems().add(dropIndex, draggedPerson);
 
                     event.setDropCompleted(true);
-                    playlistTable.getSelectionModel().select(dropIndex);
+                    playlistTable.getSelectionModel().clearAndSelect(dropIndex);
                     event.consume();
+                } else if ( db.hasContent( DRAGGED_ALBUM ) ) {
+                	int draggedIndex = (Integer) db.getContent( DRAGGED_ALBUM );
+	                Album draggedAlbum = albumTable.getItems().get( draggedIndex );
+	                int dropIndex = row.getIndex();
+	                ArrayList <Track> droppedTracks = draggedAlbum.getTracks();
+	                if ( droppedTracks != null ) playlistTable.getItems().addAll ( Math.min( dropIndex, playlistTable.getItems().size() ), droppedTracks );
+	                event.setDropCompleted(true);
+	                event.consume();
                 }
             });
+            
             return row;
         });
     }
