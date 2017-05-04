@@ -1,11 +1,19 @@
 package org.joshuad.musicplayer;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.TagException;
 
 public class Utils {
 	
@@ -148,5 +156,52 @@ public class Utils {
 		}
 		
 		return null;
+	}
+	
+	public static ArrayList <Track> getAllTracksInDirectory ( Path startingDirectory ) {
+		
+		TrackFinder finder = new TrackFinder () ;
+		try {
+			Files.walkFileTree( startingDirectory, finder );
+	    	return finder.tracks;
+		} catch (IOException e) {
+			// TODO 
+			e.printStackTrace();
+		}
+		
+		return new ArrayList <Track> ();
+	}
+}
+
+
+class TrackFinder extends SimpleFileVisitor <Path> {
+	
+	ArrayList <Track> tracks = new ArrayList <Track> ();
+	
+	@Override
+	public FileVisitResult visitFile ( Path file, BasicFileAttributes attr ) {
+
+		boolean isMusicFile = Utils.isMusicFile ( file );
+		
+		if ( isMusicFile ) {
+			try {
+				Track track = new Track ( file );
+				tracks.add ( track );
+				
+			} catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
+				//TODO: 				
+			}
+		} 
+		return FileVisitResult.CONTINUE;
+			
+	}
+	
+	@Override
+	public FileVisitResult postVisitDirectory( Path dir, IOException exc ) {
+		return FileVisitResult.CONTINUE;
+	}
+	
+	public FileVisitResult visitFileFailed( Path file, IOException exc ) {
+		return FileVisitResult.CONTINUE;
 	}
 }

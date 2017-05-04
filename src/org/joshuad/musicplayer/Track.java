@@ -43,6 +43,8 @@ public class Track implements Serializable {
 	private SimpleStringProperty title;
 	private SimpleIntegerProperty trackNumber;
 	private SimpleIntegerProperty length;
+	private SimpleStringProperty disc;
+	private SimpleStringProperty discCount;
 	private Path trackPath;
 	
 	private SimpleBooleanProperty isCurrentTrack = new SimpleBooleanProperty ( false );
@@ -57,17 +59,18 @@ public class Track implements Serializable {
 		year = new SimpleStringProperty ( tag.getFirst ( FieldKey.YEAR ) );
 		album = new SimpleStringProperty ( tag.getFirst ( FieldKey.ALBUM ) );
 		title = new SimpleStringProperty ( tag.getFirst ( FieldKey.TITLE ) );
+		discCount = new SimpleStringProperty ( tag.getFirst ( FieldKey.DISC_TOTAL ) );
 		
 		String rawTrackText = tag.getFirst ( FieldKey.TRACK );
 		
 		if ( rawTrackText.matches( "\\d+" ) ) { // 0, 01, 1010, 2134141, etc.
 			trackNumber = new SimpleIntegerProperty ( Integer.parseInt( rawTrackText ) );
 			
-		} else if ( rawTrackText.matches("\\d+/*") ) {
+		} else if ( rawTrackText.matches("\\d+/.*") ) {
 			//if matches 23/<whatever>
 			trackNumber = new SimpleIntegerProperty ( Integer.parseInt( rawTrackText.split("/")[0] ) );
 		} else {
-			System.out.print ( "Invalid track number: '" + rawTrackText + "': " ) ;
+			System.out.println ( "Invalid track number: " + rawTrackText );
 			trackNumber = new SimpleIntegerProperty ( -1 );
 			throw new TagException();
 		}
@@ -92,6 +95,14 @@ public class Track implements Serializable {
 	}
 	
 	public String getAlbum () {
+		
+		try {
+			if ( disc != null && discCount != null && disc.get().length() > 0 && discCount.get().length() > 0 && Integer.parseInt( discCount.get() ) > 1 ) {
+				return album.get() + " (disc " + disc.get() + ")";
+			} 
+		} catch ( NumberFormatException e ) {
+		}
+
 		return album.get();
 	}		
 	

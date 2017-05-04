@@ -10,6 +10,5 @@
 	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/jl1.0.1.jar"/>
 	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/mp3spi1.9.5.jar"/>
 	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/tritonus_share.jar"/>
-	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/basicplayer3.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

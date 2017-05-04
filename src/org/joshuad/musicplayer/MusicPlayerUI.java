@@ -1,5 +1,6 @@
 package org.joshuad.musicplayer;
 import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,6 +13,10 @@ import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.TagException;
 import org.joshuad.musicplayer.players.AbstractPlayer;
 import org.joshuad.musicplayer.players.FlacPlayer;
 import org.joshuad.musicplayer.players.MP3Player;
@@ -95,8 +100,8 @@ public class MusicPlayerUI extends Application {
     	
     	Logger.getLogger ("org.jaudiotagger").setLevel( Level.OFF );
     	
-    	//Path startingDirectory = Paths.get ( "/home/joshua/Desktop/music-test/" );
-    	Path startingDirectory = Paths.get ( "/d/music/" );
+    	Path startingDirectory = Paths.get ( "/home/joshua/Desktop/music-test/" );
+    	//Path startingDirectory = Paths.get ( "/d/music/" );
     	
     	long startTime = System.currentTimeMillis();
     	Files.walkFileTree( startingDirectory, new MusicFileVisitor () );
@@ -108,7 +113,6 @@ public class MusicPlayerUI extends Application {
     	System.out.println ( "Time to index all music: " + ( endTime - startTime ) );
      
         Application.launch ( args );
-        
     }
         
     public static void updateTransport ( int timeElapsed, int timeRemaining, double percent ) {
@@ -620,6 +624,8 @@ public class MusicPlayerUI extends Application {
              if ( db.hasContent ( DRAGGED_ALBUM ) ) {
                  event.acceptTransferModes ( TransferMode.MOVE );
                  event.consume();
+             } else if ( db.hasFiles() ) {
+             	event.acceptTransferModes ( TransferMode.MOVE );
              }
 		});
 		
@@ -637,7 +643,25 @@ public class MusicPlayerUI extends Application {
 	                event.setDropCompleted(true);
 	                event.consume();
             	}
+            } else if ( db.hasFiles() ) {
+            	ArrayList <Track> tracksToAdd = new ArrayList ();
+                for ( File file:db.getFiles() ) {
+                	Path droppedPath = Paths.get( file.getAbsolutePath() );
+                	if ( Utils.isMusicFile( droppedPath ) ) {
+                		try {
+							playlistTable.getItems().add( new Track ( droppedPath ) );
+						} catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
+							e.printStackTrace();
+						}
+                	} else if ( Files.isDirectory( droppedPath ) ) {
+                		playlistTable.getItems().addAll( Utils.getAllTracksInDirectory( droppedPath ) );
+                	}
+                }
+                
+                event.setDropCompleted(true);
+                event.consume();
             }
+            
         });
 			
 		
@@ -675,6 +699,8 @@ public class MusicPlayerUI extends Application {
                         event.acceptTransferModes ( TransferMode.MOVE );
                         event.consume();
                     }
+                } else if ( db.hasFiles() ) {
+                	event.acceptTransferModes ( TransferMode.MOVE );
                 }
             });
 
@@ -697,6 +723,27 @@ public class MusicPlayerUI extends Application {
 	                if ( droppedTracks != null ) playlistTable.getItems().addAll ( Math.min( dropIndex, playlistTable.getItems().size() ), droppedTracks );
 	                event.setDropCompleted(true);
 	                event.consume();
+                } else if ( db.hasFiles() ) {
+                	ArrayList <Track> tracksToAdd = new ArrayList ();
+                    for ( File file:db.getFiles() ) {
+                    	Path droppedPath = Paths.get( file.getAbsolutePath() );
+                    	if ( Utils.isMusicFile( droppedPath ) ) {
+                    		try {
+								tracksToAdd.add( new Track ( droppedPath ) );
+							} catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
+								e.printStackTrace();
+							}
+                    	} else if ( Files.isDirectory( droppedPath ) ) {
+                    		tracksToAdd.addAll( Utils.getAllTracksInDirectory( droppedPath ) );
+                    	}
+                    }
+                    if ( !tracksToAdd.isEmpty() ) {
+                        int dropIndex = row.getIndex();
+                    	playlistTable.getItems().addAll ( Math.min( dropIndex, playlistTable.getItems().size() ), tracksToAdd );
+                    }
+                    
+                    event.setDropCompleted(true);
+                    event.consume();
                 }
             });
             

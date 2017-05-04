@@ -6,13 +6,9 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.FieldKey;
-import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
 
 public class MusicFileVisitor extends SimpleFileVisitor <Path> {
@@ -27,15 +23,11 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 		
 		if ( isMusicFile ) {
 			try {
-				AudioFile audioFile = AudioFileIO.read( file.toFile() );
-				Tag tag = audioFile.getTag();
+				Track track = new Track ( file );
 		        
-				if ( tag != null ) {
-					//TODO: Expand how we read artist name
-					Album album = new Album ( tag.getFirst ( FieldKey.ARTIST ), tag.getFirst( FieldKey.YEAR ), tag.getFirst( FieldKey.ALBUM ), file.getParent() );
-					albums.add ( album );
-				}
-				
+				Album album = new Album ( track.getArtist(), track.getYear(), track.getAlbum(), file.getParent() );
+				albums.add ( album );
+			
 				return FileVisitResult.SKIP_SIBLINGS;
 				
 			} catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
