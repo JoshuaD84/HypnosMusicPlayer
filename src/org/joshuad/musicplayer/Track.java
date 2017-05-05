@@ -35,7 +35,6 @@ public class Track implements Serializable {
 		}
 	}
 	
-	
 	//TODO: Do these need to be final? 
 	private SimpleStringProperty artist;
 	private SimpleStringProperty year;
@@ -55,11 +54,26 @@ public class Track implements Serializable {
 		AudioFile audioFile = AudioFileIO.read( trackPath.toFile() );
 		Tag tag = audioFile.getTag();
 		//TODO: what to do if no tag present? 
-		artist = new SimpleStringProperty ( tag.getFirst ( FieldKey.ARTIST ) );
-		year = new SimpleStringProperty ( tag.getFirst ( FieldKey.YEAR ) );
-		album = new SimpleStringProperty ( tag.getFirst ( FieldKey.ALBUM ) );
-		title = new SimpleStringProperty ( tag.getFirst ( FieldKey.TITLE ) );
-		discCount = new SimpleStringProperty ( tag.getFirst ( FieldKey.DISC_TOTAL ) );
+		try { 
+			artist = new SimpleStringProperty ( tag.getFirst ( FieldKey.ARTIST ) );
+		} catch ( NullPointerException e ) { throw new TagException( "Cannot read artist tag." ); }
+		
+		try { 
+			year = new SimpleStringProperty ( tag.getFirst ( FieldKey.YEAR ) );
+		} catch ( NullPointerException e ) { throw new TagException( "Cannot read year tag." ); }
+		
+		try { 	
+			album = new SimpleStringProperty ( tag.getFirst ( FieldKey.ALBUM ) );
+		} catch ( NullPointerException e ) { throw new TagException( "Cannot read album tag." ); }
+		
+		try { 
+			title = new SimpleStringProperty ( tag.getFirst ( FieldKey.TITLE ) );
+		} catch ( NullPointerException e ) { throw new TagException( "Cannot read title tag." ); }
+		
+		try { 		
+			discCount = new SimpleStringProperty ( tag.getFirst ( FieldKey.DISC_TOTAL ) );
+		} catch ( NullPointerException e ) { throw new TagException( "Cannot read disc count tag." ); }
+	
 		
 		String rawTrackText = tag.getFirst ( FieldKey.TRACK );
 		
@@ -70,7 +84,7 @@ public class Track implements Serializable {
 			//if matches 23/<whatever>
 			trackNumber = new SimpleIntegerProperty ( Integer.parseInt( rawTrackText.split("/")[0] ) );
 		} else {
-			System.out.println ( "Invalid track number: " + rawTrackText );
+			System.out.println ( "Invalid track number: '" + rawTrackText + "' - " + trackPath.toString() );
 			trackNumber = new SimpleIntegerProperty ( -1 );
 			throw new TagException();
 		}

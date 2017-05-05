@@ -23,6 +23,7 @@ import org.joshuad.musicplayer.players.MP3Player;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -60,9 +61,14 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Callback;
  
 
 @SuppressWarnings({ "rawtypes", "unchecked" }) //TODO: Maybe get rid of this when I understand things better
@@ -74,16 +80,20 @@ public class MusicPlayerUI extends Application {
 	
 	public static final String PROGRAM_NAME = "Music Player";
 		
+	final static ObservableList <Path> musicSearchDirectories  = FXCollections.observableArrayList ();
 	final static ObservableList <Track> playlistData = FXCollections.observableArrayList ();
-	static SortedList <Album> albumListData;
-	static FilteredList <Album> albumListDataFiltered;
+	
+	//These are all three representations of the same data. Add stuff to the Observable List, the other two can't accept add. 
+	static ObservableList <Album> albumListData = FXCollections.observableArrayList( new ArrayList <Album> () );
+	static SortedList <Album> albumListWrapped = new SortedList<Album>( new FilteredList<Album> ( albumListData, p -> true ) );
+	static FilteredList <Album> albumListFiltered;
 	
 	static TableView <Album> albumTable;
 	static TableView <Track> playlistTable;
 	
 	static BorderPane albumImage;
 	static BorderPane artistImage;
-	static TextField albumFilterPane;
+	static HBox albumFilterPane;
 	static Slider trackPositionSlider;
 	static boolean sliderMouseHeld;
 	
@@ -94,25 +104,29 @@ public class MusicPlayerUI extends Application {
 	static Label timeElapsedLabel = new Label ( "2:02" );
 	static Label timeRemainingLabel = new Label ( "-1:12" );
 	static Label trackInfo = new Label ( "" );
-		
+	
+	static Stage mainWindow;
+	static Stage albumListSettingsWindow;
 		
     public static void main ( String[] args ) throws Exception {
     	
     	Logger.getLogger ("org.jaudiotagger").setLevel( Level.OFF );
     	
     	Path startingDirectory = Paths.get ( "/home/joshua/Desktop/music-test/" );
-    	//Path startingDirectory = Paths.get ( "/d/music/" );
-    	
+    	/*
+    	musicSearchDirectories.add ( startingDirectory );
     	long startTime = System.currentTimeMillis();
-    	Files.walkFileTree( startingDirectory, new MusicFileVisitor () );
-    	albumListDataFiltered = new FilteredList<> ( FXCollections.observableArrayList( new ArrayList <Album> ( MusicFileVisitor.albums ) ), p -> true );
-    	albumListData = new SortedList<>( albumListDataFiltered );
+    	
+    	for ( Path searchDirectory : musicSearchDirectories ) {
+	    	Files.walkFileTree( searchDirectory, new MusicFileVisitor ( albumListData ) );
+    	}
     	
     	long endTime = System.currentTimeMillis();
-    	
+
     	System.out.println ( "Time to index all music: " + ( endTime - startTime ) );
-     
+    	*/
         Application.launch ( args );
+        
     }
         
     public static void updateTransport ( int timeElapsed, int timeRemaining, double percent ) {
@@ -214,6 +228,7 @@ public class MusicPlayerUI extends Application {
     
 	@Override
     public void start ( Stage stage ) {
+		mainWindow = stage;
     	Scene scene = new Scene ( new Group(), 1024, 768 );
     	 
     	setupAlbumTable();
@@ -222,6 +237,7 @@ public class MusicPlayerUI extends Application {
     	setupAlbumImage();
     	setupArtistImage();
     	setupTransport();
+    	setupAlbumListSettingsWindow();
     	
     	SplitPane artSplitPane = new SplitPane();
     	artSplitPane.getItems().addAll ( albumImage, artistImage );
@@ -256,16 +272,16 @@ public class MusicPlayerUI extends Application {
 		stopTrack();
         artSplitPane.setDividerPosition( 0, .5d );
         playlistSplitPane.setDividerPosition( 0, .8d );
-        primarySplitPane.setDividerPositions( .4d );
+        primarySplitPane.setDividerPositions( .35d );
     }
 
 	public void setupTransport() {
 
+		Button previousButton = new Button ( "⏪" );
 		Button playButton = new Button ( "▶" );
 		Button pauseButton = new Button ( "𝍪" );
 		Button stopButton = new Button ( "◼" );
 		Button nextButton = new Button ( "⏩" );
-		Button previousButton = new Button ( "⏪" );
 		
 
 		previousButton.setOnAction ( new EventHandler<ActionEvent>() {
@@ -378,10 +394,10 @@ public class MusicPlayerUI extends Application {
 		sliderPane.setSpacing( 5 );
 		
 		HBox buttons = new HBox();
+		buttons.getChildren().add ( previousButton );
 		buttons.getChildren().add ( stopButton );
 		buttons.getChildren().add ( playButton );
 		buttons.getChildren().add ( pauseButton );
-		buttons.getChildren().add ( previousButton );
 		buttons.getChildren().add ( nextButton );
 		buttons.setPadding ( new Insets ( 5 ) );
 		buttons.setSpacing ( 5 );
@@ -403,6 +419,134 @@ public class MusicPlayerUI extends Application {
 		transport.getChildren().add ( controls );
 		transport.setPadding( new Insets ( 10, 0, 10, 0 ) );
 		transport.setSpacing ( 5 );
+	}
+	
+	public void setupAlbumListSettingsWindow() {
+		albumListSettingsWindow = new Stage();
+		albumListSettingsWindow.initModality ( Modality.NONE );
+		albumListSettingsWindow.initOwner ( mainWindow );
+		albumListSettingsWindow.setTitle( "Music Search Locations" );
+		albumListSettingsWindow.setWidth( 350 );
+		Group root = new Group();
+	    Scene scene = new Scene( root );
+		VBox primaryPane = new VBox();
+		
+		TableView <Path> musicSourceList = new TableView();
+		Label emptyLabel = new Label ( "No directories selected, click 'add' to add your music to the library." ) ;
+		musicSourceList.setColumnResizePolicy ( TableView.CONSTRAINED_RESIZE_POLICY );
+		musicSourceList.setPlaceholder ( emptyLabel );
+		musicSourceList.setItems ( musicSearchDirectories );
+		musicSourceList.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
+		
+		musicSourceList.widthProperty().addListener(new ChangeListener<Number>() {
+		    @Override
+		    public void changed ( ObservableValue<? extends Number> source, Number oldWidth, Number newWidth ) {
+		        Pane header = (Pane) musicSourceList.lookup("TableHeaderRow");
+		        if (header.isVisible()){
+		            header.setMaxHeight(0);
+		            header.setMinHeight(0);
+		            header.setPrefHeight(0);
+		            header.setVisible(false);
+		        }
+		    }
+		});
+		
+		emptyLabel.setWrapText( true );
+		emptyLabel.setTextAlignment( TextAlignment.CENTER );
+		
+		TableColumn <Path, String> dirListColumn = new TableColumn( "Location" );
+		dirListColumn.setCellValueFactory( new Callback<TableColumn.CellDataFeatures<Path, String>, ObservableValue<String>>() {
+
+		    @Override
+		    public ObservableValue<String> call( TableColumn.CellDataFeatures<Path, String> p ) {
+		        if (p.getValue() != null) {
+		            return new SimpleStringProperty( p.getValue().toAbsolutePath().toString() );
+		        } else {
+		            return new SimpleStringProperty("<no name>");
+		        }
+		    }
+		});
+		musicSourceList.getColumns().add ( dirListColumn );
+
+		DirectoryChooser chooser = new DirectoryChooser();
+		chooser.setTitle("Music Folder");
+		File defaultDirectory = new File( System.getProperty( "user.home" ) ); //TODO: put windows on desktop maybe. 
+		chooser.setInitialDirectory ( defaultDirectory );
+		
+		Button addButton = new Button( "+ Add" );
+		Button removeButton = new Button( "- Remove" );
+		
+		addButton.setPrefWidth ( 100 );
+		removeButton.setPrefWidth ( 100 );
+		addButton.setMinWidth ( 100 );
+		removeButton.setMinWidth ( 100 );
+		
+		addButton.setOnAction ( new EventHandler<ActionEvent>() {
+		    @Override public void handle(ActionEvent e) {
+		    	File selectedFile = chooser.showDialog ( albumListSettingsWindow ) ;
+		    	if ( selectedFile != null ) {
+		    		Path selectedPath = selectedFile.toPath().toAbsolutePath();
+		    		boolean addSelectedPathToList = true;
+		    		for ( Path alreadyAddedPath : musicSearchDirectories ) {
+		    			try {
+							if ( Files.isSameFile( selectedPath, alreadyAddedPath ) ) {
+								addSelectedPathToList = false;
+							}
+						} catch (IOException e1) {} //Do nothing, assume they don't match. 
+		    		}
+		    		
+		    		if ( addSelectedPathToList ) {
+		    			musicSourceList.getItems().add( selectedPath );
+		    			
+		    			Thread t = new Thread ( new Runnable() {
+		    				public void run() {
+		    					try {
+		    				    	Logger.getLogger ("org.jaudiotagger").setLevel( Level.OFF );
+		    						Files.walkFileTree( selectedPath, new MusicFileVisitor ( albumListData ) );
+		    					} catch ( IOException e ) {
+		    						//TODO
+		    						e.printStackTrace();
+		    					}
+		    				}
+		    			});
+		    			
+		    			t.setDaemon( true );
+		    			t.start();
+		    			
+		    		}
+		    	}
+		    }
+		});
+
+		removeButton.setOnAction ( new EventHandler<ActionEvent>() {
+		    @Override public void handle(ActionEvent e) {
+		    	musicSourceList.getItems().removeAll( musicSourceList.getSelectionModel().getSelectedItems() );
+		    	musicSourceList.getSelectionModel().clearSelection();
+		    }
+		});
+		
+		musicSourceList.setOnKeyPressed ( new EventHandler<KeyEvent>() {
+			@Override
+			public void handle(final KeyEvent keyEvent) {
+				if ( keyEvent.getCode().equals ( KeyCode.DELETE ) ) {
+					musicSourceList.getItems().removeAll( musicSourceList.getSelectionModel().getSelectedItems() );
+			    	musicSourceList.getSelectionModel().clearSelection();
+				}
+			}
+		});
+		
+		HBox controlBox = new HBox();
+		controlBox.getChildren().addAll( addButton, removeButton );
+		controlBox.setAlignment( Pos.CENTER );
+		controlBox.prefWidthProperty().bind( albumListSettingsWindow.widthProperty() );
+		controlBox.setPadding( new Insets ( 5 ) );
+
+		
+		
+
+		primaryPane.getChildren().addAll( musicSourceList, controlBox );
+		root.getChildren().add( primaryPane );
+		albumListSettingsWindow.setScene( scene );
 	}
 	
 	public void setupAlbumImage() {
@@ -438,9 +582,11 @@ public class MusicPlayerUI extends Application {
 	}
 	
 	public void setupAlbumFilterPane () {
-		albumFilterPane = new TextField();
-		albumFilterPane.textProperty().addListener((observable, oldValue, newValue) -> {
-			albumListDataFiltered.setPredicate( album -> {
+		albumFilterPane = new HBox();
+		TextField albumFilterBox = new TextField();
+		albumFilterBox.setPrefWidth( 500000 );
+		albumFilterBox.textProperty().addListener((observable, oldValue, newValue) -> {
+			albumListFiltered.setPredicate( album -> {
                 // If filter text is empty, display all persons.
                 if (newValue == null || newValue.isEmpty()) {
                     return true;
@@ -469,6 +615,20 @@ public class MusicPlayerUI extends Application {
                 return false; // Does not match.
             });
         });
+		
+		Button settingsButton = new Button ( "≡" );
+		settingsButton.setOnAction(new EventHandler<ActionEvent>() {
+		    @Override public void handle(ActionEvent e) {
+		    	if ( albumListSettingsWindow.isShowing() ) {
+		    		albumListSettingsWindow.hide();
+		    	} else {
+		    		albumListSettingsWindow.show();
+		    	}
+		    }
+		});
+		
+		albumFilterPane.getChildren().add( albumFilterBox );
+		albumFilterPane.getChildren().add( settingsButton );
 	}
 	
     public void setupAlbumTable () {
@@ -481,14 +641,17 @@ public class MusicPlayerUI extends Application {
         albumColumn.setCellValueFactory ( new PropertyValueFactory <Album, String> ( "Title" ) );
         
         artistColumn.setSortType (TableColumn.SortType.ASCENDING );
-                
+        
+        artistColumn.setMaxWidth( 45000 );
+        yearColumn.setMaxWidth( 10000 );
+        albumColumn.setMaxWidth( 45000 );
         
         albumTable = new TableView();
         albumTable.getColumns().addAll ( artistColumn, yearColumn, albumColumn );
         albumTable.setEditable ( false );
-        albumTable.setItems( albumListData );
+        albumTable.setItems( albumListWrapped );
 
-    	albumListData.comparatorProperty().bind(albumTable.comparatorProperty());
+    	albumListWrapped.comparatorProperty().bind(albumTable.comparatorProperty());
     	
         albumTable.getSortOrder().add ( artistColumn );
         albumTable.getSortOrder().add ( yearColumn );
@@ -588,6 +751,13 @@ public class MusicPlayerUI extends Application {
         titleColumn.setCellValueFactory ( new PropertyValueFactory <Track, String> ( "Title" ) );
         trackColumn.setCellValueFactory ( new PropertyValueFactory <Track, Integer> ( "TrackNumber" ) );
         lengthColumn.setCellValueFactory ( new PropertyValueFactory <Track, String> ( "LengthDisplay" ) );
+        
+        artistColumn.setMaxWidth( 22000 );
+        trackColumn.setMaxWidth( 4000 );
+        yearColumn.setMaxWidth( 8000 );
+        albumColumn.setMaxWidth( 25000 );
+        titleColumn.setMaxWidth( 25000 );
+        lengthColumn.setMaxWidth( 8000 );
                 
         playlistTable = new TableView();
         playlistTable.getColumns().addAll ( playingColumn, trackColumn, artistColumn, yearColumn, albumColumn, titleColumn, lengthColumn );

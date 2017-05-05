@@ -4,16 +4,21 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
 
 import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.TagException;
 
+import javafx.collections.ObservableList;
+
 public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 	
-	static ArrayList <Album> albums = new ArrayList <Album> ();
+	ObservableList <Album> albums;
+	
+	public MusicFileVisitor ( ObservableList <Album> albums ) {
+		this.albums = albums;
+	}
 	
 	@Override
 	public FileVisitResult visitFile ( Path file, BasicFileAttributes attr ) {
