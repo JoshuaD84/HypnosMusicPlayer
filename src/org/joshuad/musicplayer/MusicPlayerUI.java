@@ -41,8 +41,10 @@ import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Slider;
@@ -55,7 +57,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
@@ -77,6 +78,7 @@ import javafx.util.Callback;
 @SuppressWarnings({ "rawtypes", "unchecked" }) //TODO: Maybe get rid of this when I understand things better
 public class MusicPlayerUI extends Application {
 	
+	//private static final String SYMBOL_REPEAT_ONE_TRACK = "🔂";
 	
 	private static final DataFormat DRAGGED_TRACKS = new DataFormat( "application/x-java-track" );
 	private static final DataFormat DRAGGED_TRACK_INDEX = new DataFormat ( "application/x-java-track-index" );
@@ -106,6 +108,8 @@ public class MusicPlayerUI extends Application {
 	static BorderPane artistImage;
 	static HBox albumFilterPane;
 	static HBox trackFilterPane;
+	static HBox playlistFilterPane;
+	static HBox playlistControls;
 	static Slider trackPositionSlider;
 	static boolean sliderMouseHeld;
 	
@@ -121,8 +125,43 @@ public class MusicPlayerUI extends Application {
 	static Stage albumListSettingsWindow;
 	
 	static Button togglePlayButton;
+	static Button toggleRepeatButton;
+	static Button toggleShuffleButton;
+	
+	static Label currentPlayingListInfo = new Label ( "" );
 	
 	static SplitPane artSplitPane;
+	
+	static ShuffleMode shuffleMode = ShuffleMode.SEQUENTIAL;
+	enum ShuffleMode {
+		SEQUENTIAL ( "⇉" ),
+		SHUFFLE ( "🔀" );
+		
+		String symbol;
+		ShuffleMode ( String symbol ) {
+			this.symbol = symbol;
+		}
+		
+		public String getSymbol () {
+			return symbol;
+		}
+	}
+	
+	
+	static RepeatMode repeatMode = RepeatMode.PLAY_ONCE;
+	enum RepeatMode {
+		PLAY_ONCE ( "⇥" ),
+		REPEAT ( "🔁" );
+		
+		String symbol;
+		RepeatMode ( String symbol ) {
+			this.symbol = symbol;
+		}
+		
+		public String getSymbol () {
+			return symbol;
+		}
+	}
 		
     public static void main ( String[] args ) throws Exception {
     	
@@ -161,9 +200,20 @@ public class MusicPlayerUI extends Application {
     		while ( iterator.hasNext() ) {
     			if ( iterator.next().getIsCurrentTrack() ) {
     				if ( iterator.hasNext() ) {
-    					MusicPlayerUI.playTrack( iterator.next() );
+    					playTrack( iterator.next() );
     				} else {
-    					MusicPlayerUI.stopTrack ();
+    					
+    					
+    					if ( repeatMode == RepeatMode.PLAY_ONCE ) {
+    						stopTrack ();
+    						
+    					} else if ( repeatMode == RepeatMode.REPEAT && playlistData.size () > 0 ) {
+    						playTrack ( playlistData.get ( 0 ) );
+    						
+    					} else {
+    						stopTrack();
+    					}
+    							
     				}
     				break;
     			}
@@ -211,6 +261,8 @@ public class MusicPlayerUI extends Application {
         if ( firstTrack != null ) {
         	playTrack( firstTrack );
         }
+        
+        currentPlayingListInfo.setText ( "Album: " + album.getArtist () + " - " + album.getYear () + " - " +  album.getTitle () );
     }
     
     public static void appendAlbum( Album album ) {
@@ -244,8 +296,10 @@ public class MusicPlayerUI extends Application {
     	setupAlbumTable();
     	setupAlbumFilterPane();
     	setupTrackFilterPane();
+    	setupPlaylistFilterPane();
     	setupCurrentListTable();
     	setupPlaylistTable();
+    	setupCurrentListControlPane();
     	setupTrackTable();
     	setupAlbumImage();
     	setupArtistImage();
@@ -254,10 +308,15 @@ public class MusicPlayerUI extends Application {
     	
     	artSplitPane = new SplitPane();
     	artSplitPane.getItems().addAll ( albumImage, artistImage );
+    	
+        BorderPane currentPlayingPane = new BorderPane();
+        playlistControls.prefWidthProperty().bind ( currentPlayingPane.widthProperty() );
+        currentPlayingPane.setTop ( playlistControls );
+        currentPlayingPane.setCenter ( currentListTable );
             	
-    	SplitPane playlistSplitPane = new SplitPane();
-        playlistSplitPane.setOrientation ( Orientation.VERTICAL );
-        playlistSplitPane.getItems().addAll ( currentListTable, artSplitPane );
+    	SplitPane playingArtSplitPane = new SplitPane();
+        playingArtSplitPane.setOrientation ( Orientation.VERTICAL );
+        playingArtSplitPane.getItems().addAll ( currentPlayingPane, artSplitPane );
         
         BorderPane albumListPane = new BorderPane();
         albumFilterPane.prefWidthProperty().bind ( albumListPane.widthProperty() );
@@ -269,14 +328,19 @@ public class MusicPlayerUI extends Application {
         trackListPane.setTop( trackFilterPane );
         trackListPane.setCenter( trackTable );
         
+        BorderPane playlistPane = new BorderPane();
+        playlistFilterPane.prefWidthProperty().bind ( playlistPane.widthProperty() );
+        playlistPane.setTop( playlistFilterPane );
+        playlistPane.setCenter( playlistTable );
+        
         StretchedTabPane leftTabPane = new StretchedTabPane(); //TODO: I can probably name this better. 
         
         Tab albumListTab = new Tab("Albums");
         albumListTab.setContent( albumListPane );
         albumListTab.setClosable( false );
-       
+        
         Tab playlistTab = new Tab("Playlists");
-        playlistTab.setContent( playlistTable );
+        playlistTab.setContent( playlistPane );
         playlistTab.setClosable( false );   
         
         Tab songListTab = new Tab("Songs");
@@ -287,7 +351,7 @@ public class MusicPlayerUI extends Application {
         leftTabPane.setSide ( Side.BOTTOM );
           
         SplitPane primarySplitPane = new SplitPane();
-        primarySplitPane.getItems().addAll ( leftTabPane, playlistSplitPane );
+        primarySplitPane.getItems().addAll ( leftTabPane, playingArtSplitPane );
         
         final BorderPane primaryContainer = new BorderPane();
 
@@ -308,7 +372,7 @@ public class MusicPlayerUI extends Application {
 		thumb.setVisible( false );
         
         primarySplitPane.setDividerPositions (.35d );
-        playlistSplitPane.setDividerPositions ( .7d );
+        playingArtSplitPane.setDividerPositions ( .7d );
         artSplitPane.setDividerPosition( 0, .51d ); //For some reason .5 doesn't work...
         
 		double width = togglePlayButton.getWidth();
@@ -359,52 +423,55 @@ public class MusicPlayerUI extends Application {
 		Button stopButton = new Button ( "◼" );
 		Button nextButton = new Button ( "⏩" );
 		
-		Insets buttonInsets = new Insets ( 3, 12, 6, 12 );
+		int fontSize = 22;
 		
-		previousButton.setStyle( "-fx-font-size: 24px" );
-		togglePlayButton.setStyle( "-fx-font-size: 24px" );
-		stopButton.setStyle( "-fx-font-size: 24px" );
-		nextButton.setStyle( "-fx-font-size: 24px" );
-		
-		previousButton.setPadding( buttonInsets );
-		togglePlayButton.setPadding( buttonInsets );
-		stopButton.setPadding( buttonInsets );
-		nextButton.setPadding( buttonInsets );
+		previousButton.setStyle ( "-fx-font-size: " + fontSize + "px" );
+		togglePlayButton.setStyle ( "-fx-font-size: " + fontSize + "px" );
+		stopButton.setStyle ( "-fx-font-size: " + fontSize + "px" );
+		nextButton.setStyle ( "-fx-font-size: " + fontSize + "px" );
 
-		previousButton.setOnAction ( new EventHandler<ActionEvent>() {
-		    @Override public void handle ( ActionEvent e ) {
-		    	if ( currentPlayingTrack != null ) {
-		    		Track previousTrack = null;
-		    		for ( Track track : playlistData ) {
-		    			if ( track.getIsCurrentTrack() ) {
-		    				if ( previousTrack != null ) {
-		    					MusicPlayerUI.playTrack( previousTrack );
-		    				} else {
-		    					MusicPlayerUI.playTrack ( track );
-		    				}
-		    				break;
-		    			} else {
-		    				previousTrack = track;
-		    			}
-		    		}
-		    	}
-		    }
+		Insets buttonInsets = new Insets ( 3, 12, 6, 12 );
+		previousButton.setPadding ( buttonInsets );
+		togglePlayButton.setPadding ( buttonInsets );
+		stopButton.setPadding ( buttonInsets );
+		nextButton.setPadding ( buttonInsets );
+
+		previousButton.setOnAction ( new EventHandler <ActionEvent> () {
+			@Override 
+			public void handle ( ActionEvent e ) {
+				if ( currentPlayingTrack != null ) {
+					Track previousTrack = null;
+					for ( Track track : playlistData ) {
+						if ( track.getIsCurrentTrack () ) {
+							if ( previousTrack != null ) {
+								MusicPlayerUI.playTrack ( previousTrack );
+							} else {
+								MusicPlayerUI.playTrack ( track );
+							}
+							break;
+						} else {
+							previousTrack = track;
+						}
+					}
+				}
+			}
 		});
-		
-		nextButton.setOnAction ( new EventHandler<ActionEvent>() {
-		    @Override public void handle ( ActionEvent e ) {
-		    	playNextTrack();
-		    }
-		});
-		
-		
-		stopButton.setOnAction(new EventHandler<ActionEvent>() {
-		    @Override public void handle(ActionEvent e) {
-		    	if ( currentPlayingTrack != null ) {
-		    		stopTrack();
-		    	}
-		    }
-		});
+
+		nextButton.setOnAction ( new EventHandler <ActionEvent> () {
+			@Override
+			public void handle ( ActionEvent e ) {
+				playNextTrack ();
+			}
+		} );
+
+		stopButton.setOnAction ( new EventHandler <ActionEvent> () {
+			@Override
+			public void handle ( ActionEvent e ) {
+				if ( currentPlayingTrack != null ) {
+					stopTrack ();
+				}
+			}
+		} );
 		
 		togglePlayButton.setOnAction(new EventHandler<ActionEvent>() {
 		    @Override public void handle(ActionEvent e) {
@@ -471,23 +538,17 @@ public class MusicPlayerUI extends Application {
 		});
 
 		HBox sliderPane = new HBox();
-		sliderPane.getChildren().add ( timeElapsedLabel );
-		sliderPane.getChildren().add ( trackPositionSlider );
-		sliderPane.getChildren().add ( timeRemainingLabel );
+		sliderPane.getChildren().addAll ( timeElapsedLabel, trackPositionSlider, timeRemainingLabel );
 		sliderPane.setAlignment( Pos.CENTER );
 		sliderPane.setSpacing( 5 );
 		
-		HBox buttons = new HBox();
-		buttons.getChildren().add ( previousButton );
-		buttons.getChildren().add ( togglePlayButton );
-		buttons.getChildren().add ( stopButton );
-		buttons.getChildren().add ( nextButton );
-		buttons.setPadding ( new Insets ( 5 ) );
-		buttons.setSpacing ( 5 );
+		HBox trackControls = new HBox();
+		trackControls.getChildren().addAll ( previousButton, togglePlayButton, stopButton, nextButton );
+		trackControls.setPadding ( new Insets ( 5 ) );
+		trackControls.setSpacing ( 5 );
 		
 		HBox controls = new HBox ();
-		controls.getChildren().add ( buttons );
-		controls.getChildren().add ( sliderPane );
+		controls.getChildren().addAll ( trackControls, sliderPane );
 		controls.setSpacing( 10 );
 		controls.setAlignment( Pos.CENTER );
 		
@@ -663,6 +724,71 @@ public class MusicPlayerUI extends Application {
 		} catch ( Exception e ) {
 			artistImage.setCenter( null );
 		}
+	}
+	
+	public void setupCurrentListControlPane() {
+
+		toggleRepeatButton = new Button ( repeatMode.getSymbol () );
+		toggleShuffleButton = new Button ( shuffleMode.getSymbol () );
+		MenuButton savePlaylistButton = new MenuButton("💾");
+		
+		toggleRepeatButton.setOnAction(new EventHandler<ActionEvent>() {
+		    @Override public void handle(ActionEvent e) {
+		    	if ( repeatMode == RepeatMode.PLAY_ONCE ) {
+		    		repeatMode = RepeatMode.REPEAT;
+		    	} else {
+		    		repeatMode = RepeatMode.PLAY_ONCE;
+		    	}
+		    	
+		    	toggleRepeatButton.setText ( repeatMode.getSymbol () );
+		    	
+		    }
+		});
+		
+		toggleShuffleButton.setOnAction(new EventHandler<ActionEvent>() {
+		    @Override public void handle(ActionEvent e) {
+		    	if ( shuffleMode == ShuffleMode.SEQUENTIAL ) {
+		    		shuffleMode = ShuffleMode.SHUFFLE;
+		    	} else {
+		    		shuffleMode = ShuffleMode.SEQUENTIAL;
+		    	}
+		    	
+		    	toggleShuffleButton.setText ( shuffleMode.getSymbol () );
+		    	
+		    }
+		});
+		
+		savePlaylistButton.getItems ().addAll ( new MenuItem ( "<New Playlist>" ), new MenuItem ( "Favorites" ) );
+
+		currentPlayingListInfo.setAlignment ( Pos.CENTER );
+		
+		playlistControls = new HBox();
+		playlistControls.setAlignment ( Pos.CENTER_RIGHT );
+	
+
+		currentPlayingListInfo.prefWidthProperty().bind ( playlistControls.widthProperty() );
+		
+		playlistControls.getChildren().addAll ( currentPlayingListInfo, toggleRepeatButton, toggleShuffleButton, savePlaylistButton );
+	}
+	
+	public void setupPlaylistFilterPane () {
+		playlistFilterPane = new HBox();
+		TextField filterBox = new TextField();
+		filterBox.setPrefWidth( 500000 );
+				
+		Button settingsButton = new Button ( "≡" );
+		settingsButton.setOnAction(new EventHandler<ActionEvent>() {
+		    @Override public void handle(ActionEvent e) {
+		    	if ( albumListSettingsWindow.isShowing() ) {
+		    		albumListSettingsWindow.hide();
+		    	} else {
+		    		albumListSettingsWindow.show();
+		    	}
+		    }
+		});
+		
+		playlistFilterPane.getChildren().add( filterBox );
+		playlistFilterPane.getChildren().add( settingsButton );
 	}
 	
 	public void setupTrackFilterPane () {
@@ -898,6 +1024,7 @@ public class MusicPlayerUI extends Application {
             	currentListTable.getItems().clear();
 	        	currentListTable.getItems().addAll( trackTable.getSelectionModel().getSelectedItems() );
 	        	playTrack ( trackTable.getSelectionModel().getSelectedItem() );
+	        	currentPlayingListInfo.setText ( "Playlist: New" );
             }
         });
         
@@ -934,6 +1061,7 @@ public class MusicPlayerUI extends Application {
                 	currentListTable.getItems().clear();
                 	currentListTable.getItems().add( trackTable.getSelectionModel().getSelectedItem() );
                 	playTrack ( trackTable.getSelectionModel().getSelectedItem() );
+    	        	currentPlayingListInfo.setText ( "Playlist: New Playlist" );
                 }
             });
                         
