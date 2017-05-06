@@ -15,9 +15,11 @@ import javafx.collections.ObservableList;
 public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 	
 	ObservableList <Album> albums;
+	ObservableList <Track> tracks;
 	
-	public MusicFileVisitor ( ObservableList <Album> albums ) {
+	public MusicFileVisitor ( ObservableList <Album> albums, ObservableList <Track> tracks  ) {
 		this.albums = albums;
+		this.tracks = tracks;
 	}
 	
 	@Override
@@ -32,6 +34,7 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 		        
 				Album album = new Album ( track.getArtist(), track.getYear(), track.getAlbum(), file.getParent() );
 				albums.add ( album );
+				tracks.add ( track );
 			
 				return FileVisitResult.SKIP_SIBLINGS;
 				
