@@ -1,4 +1,5 @@
 package org.joshuad.musicplayer;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -17,7 +18,7 @@ public class Album {
 	private final SimpleStringProperty artist;
 	private final SimpleStringProperty year;
 	private final SimpleStringProperty title;
-	private Path directoryPath;
+	private File directoryPath;
 	
 	
 	
@@ -25,7 +26,7 @@ public class Album {
 		this.artist = new SimpleStringProperty ( artist );
 		this.year = new SimpleStringProperty ( year );
 		this.title = new SimpleStringProperty ( title );
-		this.directoryPath = directoryPath;
+		this.directoryPath = directoryPath.toFile();
 	}
 	
 	public String getArtist () {
@@ -41,14 +42,14 @@ public class Album {
 	}		
 	
 	public Path getPath () {
-		return directoryPath;
+		return directoryPath.toPath();
 	}
 	
 	public ArrayList <Track> getTracks() {
 		try {
 			ArrayList <Track> retMe = new ArrayList <Track> ();
 		
-			DirectoryStream <Path> albumDirectoryStream = Files.newDirectoryStream ( directoryPath, Utils.musicFileFilter );
+			DirectoryStream <Path> albumDirectoryStream = Files.newDirectoryStream ( directoryPath.toPath(), Utils.musicFileFilter );
 					
 			for ( Path trackPath : albumDirectoryStream ) {
 				try {
@@ -72,6 +73,23 @@ public class Album {
 			return null;
 
 		} 
+	}
+	
+	@Override
+	public boolean equals ( Object e ) {
+		
+		if ( ! ( e instanceof Album ) ) return false;
+		
+		Album compareTo = (Album)e;
+		
+		if ( ! compareTo.getPath().equals( this.getPath() ) ) return false;
+		if ( ! compareTo.getTitle().toLowerCase().equals( this.getTitle().toLowerCase() ) ) return false;
+		if ( ! compareTo.getYear().toLowerCase().equals( this.getYear().toLowerCase() ) ) return false;
+		
+		return true;
+		
+		
+		
 	}
 }
 

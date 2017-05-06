@@ -1,4 +1,5 @@
 package org.joshuad.musicplayer;
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Path;
@@ -11,10 +12,6 @@ import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
-
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
 
 public class Track implements Serializable {
 	
@@ -36,104 +33,104 @@ public class Track implements Serializable {
 	}
 	
 	//TODO: Do these need to be final? 
-	private SimpleStringProperty artist;
-	private SimpleStringProperty year;
-	private SimpleStringProperty album;
-	private SimpleStringProperty title;
-	private SimpleIntegerProperty trackNumber;
-	private SimpleIntegerProperty length;
-	private SimpleStringProperty disc;
-	private SimpleStringProperty discCount;
-	private Path trackPath;
+	private String artist;
+	private String year;
+	private String album;
+	private String title;
+	private int trackNumber;
+	private int length;
+	private String disc;
+	private String discCount;
+	private File trackPath;
 	
-	private SimpleBooleanProperty isCurrentTrack = new SimpleBooleanProperty ( false );
+	private boolean isCurrentTrack = false;
 	
 	//TODO: Deal w/ these exceptions right. 
 	Track ( Path trackPath ) throws CannotReadException, IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException {
-		this.trackPath = trackPath;
+		this.trackPath = trackPath.toFile();
 		AudioFile audioFile = AudioFileIO.read( trackPath.toFile() );
 		Tag tag = audioFile.getTag();
 		//TODO: what to do if no tag present? 
 		try { 
-			artist = new SimpleStringProperty ( tag.getFirst ( FieldKey.ARTIST ) );
+			artist = tag.getFirst ( FieldKey.ARTIST );
 		} catch ( NullPointerException e ) { throw new TagException( "Cannot read artist tag." ); }
 		
 		try { 
-			year = new SimpleStringProperty ( tag.getFirst ( FieldKey.YEAR ) );
+			year = tag.getFirst ( FieldKey.YEAR );
 		} catch ( NullPointerException e ) { throw new TagException( "Cannot read year tag." ); }
 		
 		try { 	
-			album = new SimpleStringProperty ( tag.getFirst ( FieldKey.ALBUM ) );
+			album = tag.getFirst ( FieldKey.ALBUM );
 		} catch ( NullPointerException e ) { throw new TagException( "Cannot read album tag." ); }
 		
 		try { 
-			title = new SimpleStringProperty ( tag.getFirst ( FieldKey.TITLE ) );
+			title = tag.getFirst ( FieldKey.TITLE );
 		} catch ( NullPointerException e ) { throw new TagException( "Cannot read title tag." ); }
 		
 		try { 		
-			discCount = new SimpleStringProperty ( tag.getFirst ( FieldKey.DISC_TOTAL ) );
+			discCount = tag.getFirst ( FieldKey.DISC_TOTAL );
 		} catch ( NullPointerException e ) { throw new TagException( "Cannot read disc count tag." ); }
 	
 		
 		String rawTrackText = tag.getFirst ( FieldKey.TRACK );
 		
 		if ( rawTrackText.matches( "\\d+" ) ) { // 0, 01, 1010, 2134141, etc.
-			trackNumber = new SimpleIntegerProperty ( Integer.parseInt( rawTrackText ) );
+			trackNumber = Integer.parseInt( rawTrackText );
 			
 		} else if ( rawTrackText.matches("\\d+/.*") ) {
 			//if matches 23/<whatever>
-			trackNumber = new SimpleIntegerProperty ( Integer.parseInt( rawTrackText.split("/")[0] ) );
+			trackNumber = Integer.parseInt( rawTrackText.split("/")[0] );
 		} else {
 			System.out.println ( "Invalid track number: '" + rawTrackText + "' - " + trackPath.toString() );
-			trackNumber = new SimpleIntegerProperty ( -1 );
+			trackNumber = -1;
 			throw new TagException();
 		}
 					
-		length = new SimpleIntegerProperty ( audioFile.getAudioHeader().getTrackLength() );		
+		length = audioFile.getAudioHeader().getTrackLength();		
 	}
 	
 	public void setIsCurrentTrack ( boolean isCurrentTrack ) {
-		this.isCurrentTrack.set( isCurrentTrack );
+		this.isCurrentTrack = isCurrentTrack;
 	}
 	
 	public boolean getIsCurrentTrack ( ) {
-		return isCurrentTrack.get();
+		return isCurrentTrack;
 	}
 	
 	public String getArtist () {
-		return artist.get();
+		return artist;
 	}
 	
 	public String getYear () {
-		return year.get();
+		return year;
 	}
 	
 	public String getAlbum () {
 		
 		try {
-			if ( disc != null && discCount != null && disc.get().length() > 0 && discCount.get().length() > 0 && Integer.parseInt( discCount.get() ) > 1 ) {
-				return album.get() + " (disc " + disc.get() + ")";
+			if ( disc != null && discCount != null && disc.length() > 0 && discCount.length() > 0 && Integer.parseInt( discCount ) > 1 ) {
+				return album + " (disc " + disc + ")";
 			} 
 		} catch ( NumberFormatException e ) {
 		}
 
-		return album.get();
+		return album;
 	}		
 	
 	public String getTitle () {
-		return title.get();
+		return title;
 	}
 	
 	public int getTrackNumber () {
-		return trackNumber.get();
+		return trackNumber;
 	}	
 	
 	public int getLength () {
-		return length.get();
+		return length;
 	}
 	
 	public Path getPath() {
-		return trackPath;
+		return trackPath.toPath();
 	}
 	
 	public String getLengthDisplay () {

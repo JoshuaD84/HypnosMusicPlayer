@@ -18,7 +18,7 @@ import org.jaudiotagger.tag.TagException;
 public class Utils {
 	
 	private static String[] musicExtStrings = new String[] { "flac", "mp3" };
-	private static String[] imageExtStrings = new String[] { "jpg", "png" };
+	private static String[] imageExtStrings = new String[] { "jpg", "png", "gif" };
 	
 	
 		
@@ -138,8 +138,10 @@ public class Utils {
 		ArrayList <Path> possibleFiles = new ArrayList <Path> ();
 		possibleFiles.add( Paths.get ( track.getPath().getParent().toString(), "artist.jpg" ) );
 		possibleFiles.add( Paths.get ( track.getPath().getParent().toString(), "artist.png" ) );
+		possibleFiles.add( Paths.get ( track.getPath().getParent().toString(), "artist.gif" ) );
 		possibleFiles.add( Paths.get ( track.getPath().getParent().getParent().toString(), "artist.jpg" ) );
 		possibleFiles.add( Paths.get ( track.getPath().getParent().getParent().toString(), "artist.png" ) );
+		possibleFiles.add( Paths.get ( track.getPath().getParent().getParent().toString(), "artist.gif" ) );
 		
 		try {
 			DirectoryStream <Path> artistDirectoryStream = Files.newDirectoryStream ( track.getPath().getParent().getParent(), imageFileFilter );

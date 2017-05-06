@@ -33,10 +33,14 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 				Track track = new Track ( file );
 		        
 				Album album = new Album ( track.getArtist(), track.getYear(), track.getAlbum(), file.getParent() );
-				albums.add ( album );
+				
+				if ( !albums.contains( album ) ) {
+					albums.add ( album );
+				}
+				
 				tracks.add ( track );
 			
-				return FileVisitResult.SKIP_SIBLINGS;
+				return FileVisitResult.CONTINUE;
 				
 			} catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
 				// If we can't read the tags on this file, keep trying. No big deal			
