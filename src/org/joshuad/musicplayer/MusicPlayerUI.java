@@ -7,7 +7,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -41,7 +43,6 @@ import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
@@ -78,6 +79,8 @@ import javafx.util.Callback;
 @SuppressWarnings({ "rawtypes", "unchecked" }) //TODO: Maybe get rid of this when I understand things better
 public class MusicPlayerUI extends Application {
 	
+	private static final int MAX_TRACK_HISTORY = 10000;
+	
 	//private static final String SYMBOL_REPEAT_ONE_TRACK = "🔂";
 	
 	private static final DataFormat DRAGGED_TRACKS = new DataFormat( "application/x-java-track" );
@@ -88,7 +91,7 @@ public class MusicPlayerUI extends Application {
 	public static final String PROGRAM_NAME = "Music Player";
 		
 	final static ObservableList <Path> musicSearchDirectories  = FXCollections.observableArrayList ();
-	final static ObservableList <Track> playlistData = FXCollections.observableArrayList ();
+	final static ObservableList <Track> currentListData = FXCollections.observableArrayList ();
 	
 	//These are all three representations of the same data. Add stuff to the Observable List, the other two can't accept add. 
 	static ObservableList <Album> albumListData = FXCollections.observableArrayList( new ArrayList <Album> () );
@@ -103,6 +106,8 @@ public class MusicPlayerUI extends Application {
 	static TableView <Track> currentListTable;
 	static TableView <Playlist> playlistTable;
 	static TableView <Track> trackTable;
+	
+	static ArrayList <Track> recentlyPlayedTracks = new ArrayList ( MAX_TRACK_HISTORY );
 	
 	static BorderPane albumImage;
 	static BorderPane artistImage;
@@ -131,6 +136,8 @@ public class MusicPlayerUI extends Application {
 	static Label currentPlayingListInfo = new Label ( "" );
 	
 	static SplitPane artSplitPane;
+	
+	static Random randomGenerator = new Random();
 	
 	static ShuffleMode shuffleMode = ShuffleMode.SEQUENTIAL;
 	enum ShuffleMode {
@@ -196,27 +203,66 @@ public class MusicPlayerUI extends Application {
     	
     public static void playNextTrack() {
     	if ( currentPlayingTrack != null ) {
-    		ListIterator <Track> iterator = playlistData.listIterator();
-    		while ( iterator.hasNext() ) {
-    			if ( iterator.next().getIsCurrentTrack() ) {
-    				if ( iterator.hasNext() ) {
-    					playTrack( iterator.next() );
+    		
+    		switch ( shuffleMode ) {
+    			case SEQUENTIAL: {
+		    		ListIterator <Track> iterator = currentListData.listIterator();
+		    		while ( iterator.hasNext() ) {
+		    			if ( iterator.next().getIsCurrentTrack() ) {
+		    				if ( iterator.hasNext() ) {
+		    					playTrack( iterator.next() );
+		    				} else {
+		    					
+		    					
+		    					if ( repeatMode == RepeatMode.PLAY_ONCE ) {
+		    						stopTrack ();
+		    						
+		    					} else if ( repeatMode == RepeatMode.REPEAT && currentListData.size () > 0 ) {
+		    						playTrack ( currentListData.get ( 0 ) );
+		    						
+		    					} else {
+		    						stopTrack();
+		    					}
+		    							
+		    				}
+		    				break;
+		    			}
+		    		}
+    			} break;
+	    		
+    			case SHUFFLE: {
+    				//TODO: I think there may be issues with multithreading here. 
+    				int currentListSize = currentListData.size ();
+    				int collisionWindowSize = currentListSize / 2; //TODO: Fine tune this number? 
+    				int permittedRetries = 2; //TODO: fine tune this number? 
+    				
+    				boolean foundMatch = false;
+    				int retryCount = 0;
+    				Track playMe;
+    				
+    				List <Track> collisionWindow;
+    				
+    				if ( recentlyPlayedTracks.size() >= collisionWindowSize ) {
+    					collisionWindow = recentlyPlayedTracks.subList ( 0, collisionWindowSize );
     				} else {
-    					
-    					
-    					if ( repeatMode == RepeatMode.PLAY_ONCE ) {
-    						stopTrack ();
-    						
-    					} else if ( repeatMode == RepeatMode.REPEAT && playlistData.size () > 0 ) {
-    						playTrack ( playlistData.get ( 0 ) );
-    						
-    					} else {
-    						stopTrack();
-    					}
-    							
+    					collisionWindow = recentlyPlayedTracks;
     				}
-    				break;
-    			}
+
+					System.out.println ( "Size: " + currentListSize + ", windowsize: " + collisionWindowSize );
+    				do { 
+    					playMe = currentListData.get ( randomGenerator.nextInt ( currentListData.size() ) );
+    					if ( !collisionWindow.contains ( playMe ) ) {
+    						foundMatch = true;
+    					} else {
+    						System.out.println ( "Collision: " + playMe.getTitle () ); //TODO
+    						++retryCount;
+    					}
+    				} while ( !foundMatch && retryCount < permittedRetries );
+    				
+    				playTrack ( playMe );
+    				
+    			} break;
+    			
     		}
     	}
     }
@@ -241,6 +287,13 @@ public class MusicPlayerUI extends Application {
 			default:
 				break;
     	}
+
+    	while ( recentlyPlayedTracks.size () >= MAX_TRACK_HISTORY ) {
+    		recentlyPlayedTracks.remove ( recentlyPlayedTracks.size() - 1 );
+    	}
+    	
+    	recentlyPlayedTracks.add ( 0, track );
+    	
     	
 		currentListTable.refresh();
 		
@@ -255,9 +308,9 @@ public class MusicPlayerUI extends Application {
     }
     
     public static void playAlbum( Album album ) {
-        playlistData.clear();
-        playlistData.addAll( album.getTracks() );
-        Track firstTrack = playlistData.get( 0 );
+        currentListData.clear();
+        currentListData.addAll( album.getTracks() );
+        Track firstTrack = currentListData.get( 0 );
         if ( firstTrack != null ) {
         	playTrack( firstTrack );
         }
@@ -266,7 +319,7 @@ public class MusicPlayerUI extends Application {
     }
     
     public static void appendAlbum( Album album ) {
-        playlistData.addAll( album.getTracks() );
+        currentListData.addAll( album.getTracks() );
     }
     
     
@@ -441,7 +494,7 @@ public class MusicPlayerUI extends Application {
 			public void handle ( ActionEvent e ) {
 				if ( currentPlayingTrack != null ) {
 					Track previousTrack = null;
-					for ( Track track : playlistData ) {
+					for ( Track track : currentListData ) {
 						if ( track.getIsCurrentTrack () ) {
 							if ( previousTrack != null ) {
 								MusicPlayerUI.playTrack ( previousTrack );
@@ -758,17 +811,19 @@ public class MusicPlayerUI extends Application {
 		    }
 		});
 		
+		Button loadTracksButton = new Button ( "⏏" );
+		
+		
 		savePlaylistButton.getItems ().addAll ( new MenuItem ( "<New Playlist>" ), new MenuItem ( "Favorites" ) );
 
 		currentPlayingListInfo.setAlignment ( Pos.CENTER );
 		
 		playlistControls = new HBox();
 		playlistControls.setAlignment ( Pos.CENTER_RIGHT );
-	
 
 		currentPlayingListInfo.prefWidthProperty().bind ( playlistControls.widthProperty() );
 		
-		playlistControls.getChildren().addAll ( currentPlayingListInfo, toggleRepeatButton, toggleShuffleButton, savePlaylistButton );
+		playlistControls.getChildren().addAll ( loadTracksButton, currentPlayingListInfo, toggleRepeatButton, toggleShuffleButton, savePlaylistButton );
 	}
 	
 	public void setupPlaylistFilterPane () {
@@ -1209,7 +1264,7 @@ public class MusicPlayerUI extends Application {
         currentListTable.getColumns().addAll ( playingColumn, trackColumn, artistColumn, yearColumn, albumColumn, titleColumn, lengthColumn );
         albumTable.getSortOrder().add ( trackColumn );
         currentListTable.setEditable ( false );
-        currentListTable.setItems ( playlistData );
+        currentListTable.setItems ( currentListData );
         currentListTable.setColumnResizePolicy ( TableView.CONSTRAINED_RESIZE_POLICY );
         currentListTable.setPlaceholder ( new Label ( "No songs in playlist." ) );
         currentListTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
@@ -1256,7 +1311,7 @@ public class MusicPlayerUI extends Application {
 				
 				if ( ! selectedItems.isEmpty() ) {
 					int selectAfterDelete = selectedIndexes.get(0) - 1;
-					playlistData.removeAll( selectedItems );
+					currentListData.removeAll( selectedItems );
 					currentListTable.getSelectionModel().clearAndSelect( selectAfterDelete );
 				}
             }
@@ -1273,7 +1328,7 @@ public class MusicPlayerUI extends Application {
 					
 					if ( ! selectedItems.isEmpty() ) {
 						int selectAfterDelete = selectedIndexes.get(0) - 1;
-						playlistData.removeAll( selectedItems );
+						currentListData.removeAll( selectedItems );
 						currentListTable.getSelectionModel().clearAndSelect( selectAfterDelete );
 					}
 				}
