@@ -309,7 +309,7 @@ public class MusicPlayerUI extends Application {
 							playOnceShuffleTracksPlayedCounter = 1;
 							// TODO: I think there may be issues with
 							// multithreading here.
-							// TODO: Ban the most recent X songs from playing
+							// TODO: Ban the most recent X tracks from playing
 							int currentListSize = currentListData.size();
 							int collisionWindowSize = currentListSize / 3; // TODO:
 																			// Fine
@@ -520,7 +520,7 @@ public class MusicPlayerUI extends Application {
 		playlistTab.setContent( playlistPane );
 		playlistTab.setClosable( false );
 
-		Tab songListTab = new Tab( "Songs" );
+		Tab songListTab = new Tab( "Tracks" );
 		songListTab.setContent( trackListPane );
 		songListTab.setClosable( false );
 
@@ -857,7 +857,7 @@ public class MusicPlayerUI extends Application {
 									long endTime = System.currentTimeMillis();
 
 									System.out.println(
-											"Time to load all songs: " + (endTime - startTime) );
+											"Time to load all tracks: " + (endTime - startTime) );
 								} catch ( IOException e ) {
 									// TODO
 									e.printStackTrace();
@@ -1334,7 +1334,7 @@ public class MusicPlayerUI extends Application {
 		// TODO resizePolicy.registerColumns ( lengthColumn );
 		trackTable.setColumnResizePolicy( resizePolicy );
 		
-		Label placeholder = new Label( "No songs loaded, click on the ≡ menu to setup your library." );
+		Label placeholder = new Label( "No tracks loaded, click on the ≡ menu to setup your library." );
 		placeholder.setPadding( new Insets( 20, 10, 20, 10 ) );
 		placeholder.setWrapText( true );
 		placeholder.setTextAlignment( TextAlignment.CENTER );
@@ -1454,20 +1454,20 @@ public class MusicPlayerUI extends Application {
 	public void setupPlaylistTable () {
 		TableColumn nameColumn = new TableColumn( "Playlist" );
 		TableColumn lengthColumn = new TableColumn( "Length" );
-		TableColumn songsColumn = new TableColumn( "Songs" );
+		TableColumn tracksColumn = new TableColumn( "Tracks" );
 
 		nameColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "Name" ) );
 		lengthColumn.setCellValueFactory( new PropertyValueFactory <Album, Integer>( "LengthDisplay" ) );
-		songsColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "SongCount" ) );
+		tracksColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "SongCount" ) );
 
 		nameColumn.setSortType( TableColumn.SortType.ASCENDING );
 
 		nameColumn.setMaxWidth( 70000 );
 		lengthColumn.setMaxWidth( 15000 );
-		songsColumn.setMaxWidth( 15000 );
+		tracksColumn.setMaxWidth( 15000 );
 
 		playlistTable = new TableView();
-		playlistTable.getColumns().addAll( nameColumn, songsColumn, lengthColumn );
+		playlistTable.getColumns().addAll( nameColumn, tracksColumn, lengthColumn );
 		playlistTable.setEditable( false );
 		playlistTable.setItems( playlistsSorted );
 
@@ -1477,7 +1477,7 @@ public class MusicPlayerUI extends Application {
 		playlistTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
 
 		FixedWidthCustomResizePolicy resizePolicy = new FixedWidthCustomResizePolicy();
-		resizePolicy.registerColumns( songsColumn );
+		resizePolicy.registerColumns( tracksColumn );
 		playlistTable.setColumnResizePolicy( resizePolicy );
 
 		Label emptyLabel = new Label( "You haven't created any playlists, make a playlist on the right and 💾 save it." );
@@ -1634,7 +1634,7 @@ public class MusicPlayerUI extends Application {
 
 		resizePolicy.registerColumns( yearColumn, trackColumn );
 		// TODO: Length column policy
-		currentListTable.setPlaceholder( new Label( "No songs in playlist." ) );
+		currentListTable.setPlaceholder( new Label( "No tracks in playlist." ) );
 		currentListTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 
 		playingColumn.setMaxWidth( 20 );
