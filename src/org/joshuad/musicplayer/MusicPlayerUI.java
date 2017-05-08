@@ -289,13 +289,10 @@ public class MusicPlayerUI extends Application {
 						case PLAY_ONCE: {
 
 							if ( playOnceShuffleTracksPlayedCounter < currentListData.size() ) {
-								List <Track> alreadyPlayed = recentlyPlayedTracks.subList( 0,
-										playOnceShuffleTracksPlayedCounter );
-								ArrayList <Track> viableTracks = new ArrayList <Track>(
-										currentListData );
+								List <Track> alreadyPlayed = recentlyPlayedTracks.subList( 0, playOnceShuffleTracksPlayedCounter );
+								ArrayList <Track> viableTracks = new ArrayList <Track>( currentListData );
 								viableTracks.removeAll( alreadyPlayed );
-								Track playMe = viableTracks
-										.get( randomGenerator.nextInt( viableTracks.size() ) );
+								Track playMe = viableTracks.get( randomGenerator.nextInt( viableTracks.size() ) );
 								playTrack( playMe );
 								++playOnceShuffleTracksPlayedCounter;
 							} else {
@@ -307,17 +304,11 @@ public class MusicPlayerUI extends Application {
 
 						case REPEAT: {
 							playOnceShuffleTracksPlayedCounter = 1;
-							// TODO: I think there may be issues with
-							// multithreading here.
+							// TODO: I think there may be issues with multithreading here.
 							// TODO: Ban the most recent X tracks from playing
 							int currentListSize = currentListData.size();
-							int collisionWindowSize = currentListSize / 3; // TODO:
-																			// Fine
-																			// tune
-																			// this
-																			// amount
-							int permittedRetries = 3; // TODO: fine tune this
-														// number
+							int collisionWindowSize = currentListSize / 3; // TODO: Fine tune this amount
+							int permittedRetries = 3; // TODO: fine tune this number
 
 							boolean foundMatch = false;
 							int retryCount = 0;
@@ -333,8 +324,7 @@ public class MusicPlayerUI extends Application {
 							}
 
 							do {
-								playMe = currentListData
-										.get( randomGenerator.nextInt( currentListData.size() ) );
+								playMe = currentListData.get( randomGenerator.nextInt( currentListData.size() ) );
 								if ( !collisionWindow.contains( playMe ) ) {
 									foundMatch = true;
 								} else {
@@ -348,8 +338,7 @@ public class MusicPlayerUI extends Application {
 							break;
 
 						default: {
-							// TODO: this should never occur. Maybe put in some
-							// default advance just in case? throw an error too?
+							// TODO: this should never occur. Maybe put in some default advance just in case? throw an error too?
 						}
 							break;
 
@@ -411,8 +400,7 @@ public class MusicPlayerUI extends Application {
 		}
 
 		playlistChanged = false;
-		currentPlayingListInfo.setText( "Album: " + album.getArtist() + " - " + album.getYear()
-				+ " - " + album.getTitle() );
+		currentPlayingListInfo.setText( "Album: " + album.getArtist() + " - " + album.getYear() + " - " + album.getTitle() );
 	}
 
 	public static void loadTrack ( Track track ) {
@@ -508,9 +496,7 @@ public class MusicPlayerUI extends Application {
 		playlistPane.setTop( playlistFilterPane );
 		playlistPane.setCenter( playlistTable );
 
-		StretchedTabPane leftTabPane = new StretchedTabPane(); // TODO: I can
-																// probably name
-																// this better.
+		StretchedTabPane leftTabPane = new StretchedTabPane(); // TODO: I can probably name this better.
 
 		Tab albumListTab = new Tab( "Albums" );
 		albumListTab.setContent( albumListPane );
@@ -548,9 +534,8 @@ public class MusicPlayerUI extends Application {
 		thumb.setVisible( false );
 
 		primarySplitPane.setDividerPositions( .35d );
-		playingArtSplitPane.setDividerPositions( .7d );
-		artSplitPane.setDividerPosition( 0, .51d ); // For some reason .5
-													// doesn't work...
+		playingArtSplitPane.setDividerPositions( .65d );
+		artSplitPane.setDividerPosition( 0, .51d ); // For some reason .5 doesn't work...
 
 		double width = togglePlayButton.getWidth();
 		double height = togglePlayButton.getHeight();
