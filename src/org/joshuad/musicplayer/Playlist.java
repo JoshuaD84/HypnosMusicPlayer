@@ -1,19 +1,20 @@
 package org.joshuad.musicplayer;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Playlist {
+public class Playlist implements Serializable {
 	
-	ArrayList <Track> tracks = new ArrayList <Track> ();
+	private ArrayList <Track> tracks;
 	
-	String name;
+	private String name;
 	
 	public Playlist ( String name ) {
 		this ( name, new ArrayList <Track> () );
 	}
 	
 	public Playlist ( String name, ArrayList <Track> tracks ) {
-		this.tracks = tracks;
+		setTracks( tracks );
 		this.name = name;
 	}
 	
@@ -22,7 +23,16 @@ public class Playlist {
 	}
 	
 	public int getLength() {
-		return 545;//TODO
+		int retMe = 0;
+		for ( Track track : tracks ) {
+			retMe += track.getLength ();
+		}
+		
+		return retMe;
+	}
+	
+	public String getLengthDisplay() {
+		return Utils.getLengthDisplay ( getLength() );
 	}
 	
 	public int getSongCount() {
@@ -33,5 +43,8 @@ public class Playlist {
 		return tracks;
 	}
 	
-	
+	public void setTracks( ArrayList <Track> tracks ) {
+		this.tracks = tracks;
+	}
+		
 }

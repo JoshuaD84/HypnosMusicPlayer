@@ -12,7 +12,6 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.joshuad.musicplayer.MusicPlayerUI;
 import org.joshuad.musicplayer.Track;
-import org.tritonus.share.sampled.file.TAudioFileFormat;
 
 import javafx.scene.control.Slider;
 

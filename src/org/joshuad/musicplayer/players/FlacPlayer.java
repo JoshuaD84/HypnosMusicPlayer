@@ -4,7 +4,6 @@ package org.joshuad.musicplayer.players;
 import java.io.*;
 import javax.sound.sampled.*;
 
-import org.joshuad.musicplayer.FlacDecoder;
 import org.joshuad.musicplayer.MusicPlayerUI;
 import org.joshuad.musicplayer.Track;
 

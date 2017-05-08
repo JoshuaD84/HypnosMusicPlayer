@@ -46,7 +46,7 @@ public class Track implements Serializable {
 	private boolean isCurrentTrack = false;
 	
 	//TODO: Deal w/ these exceptions right. 
-	Track ( Path trackPath ) throws CannotReadException, IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException {
+	public Track ( Path trackPath ) throws CannotReadException, IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException {
 		this.trackPath = trackPath.toFile();
 		AudioFile audioFile = AudioFileIO.read( trackPath.toFile() );
 		Tag tag = audioFile.getTag();

@@ -1,4 +1,4 @@
-package org.joshuad.musicplayer;
+package org.joshuad.musicplayer.players;
 
 /* 
  * Simple GUI FLAC player
