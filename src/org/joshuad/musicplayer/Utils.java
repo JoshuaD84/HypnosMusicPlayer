@@ -20,7 +20,6 @@ public class Utils {
 	private static String[] musicExtStrings = new String[] { "flac", "mp3" };
 	private static String[] imageExtStrings = new String[] { "jpg", "png", "gif" };
 	
-	
 		
 	static ArrayList <String> musicExtensions = new ArrayList <String> ( Arrays.asList ( musicExtStrings ) );  
 

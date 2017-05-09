@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 public class Playlist implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
+
 	private ArrayList <Track> tracks;
 	
 	private String name;
