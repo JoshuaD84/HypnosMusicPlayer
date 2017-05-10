@@ -97,7 +97,7 @@ public class MusicPlayerUI extends Application {
 
 	public static final String PROGRAM_NAME = "Hypnos Music Player";
 
-	final static ObservableList <Path> musicSearchPaths = FXCollections.observableArrayList();
+	final static ObservableList <Path> musicSourcePaths = FXCollections.observableArrayList();
 
 	final static ObservableList <Track> currentListData = FXCollections.observableArrayList();
 
@@ -119,6 +119,7 @@ public class MusicPlayerUI extends Application {
 	static TableView <Playlist> playlistTable;
 	static TableView <Track> trackTable;
 	static TableView <Track> currentListTable;
+	TableView <Path> musicSourceList;
 
 	static ArrayList <Track> recentlyPlayedTracks = new ArrayList( MAX_TRACK_HISTORY );
 
@@ -144,7 +145,7 @@ public class MusicPlayerUI extends Application {
 	static Label trackInfo = new Label( "" );
 
 	static Stage mainStage;
-	static Stage albumListSettingsWindow;
+	static Stage libraryWindow;
 
 	static Button togglePlayButton;
 	static Button toggleRepeatButton;
@@ -199,7 +200,7 @@ public class MusicPlayerUI extends Application {
 		Logger.getLogger( "org.jaudiotagger" ).setLevel( Level.OFF );
 		
 		musicLoader = new MusicLoaderDaemon ();
-		musicSearchPaths.addListener( musicLoader );
+		musicSourcePaths.addListener( musicLoader );
 		musicLoader.start();
 
 		Application.launch( args );
@@ -449,7 +450,7 @@ public class MusicPlayerUI extends Application {
 		setupAlbumImage();
 		setupArtistImage();
 		setupTransport();
-		setupAlbumListSettingsWindow();
+		setupLibraryWindow();
 
 		artSplitPane = new SplitPane();
 		artSplitPane.getItems().addAll( albumImage, artistImage );
@@ -724,17 +725,17 @@ public class MusicPlayerUI extends Application {
 		transport.setSpacing( 5 );
 	}
 
-	public void setupAlbumListSettingsWindow () {
-		albumListSettingsWindow = new Stage();
-		albumListSettingsWindow.initModality( Modality.NONE );
-		albumListSettingsWindow.initOwner( mainStage );
-		albumListSettingsWindow.setTitle( "Music Search Locations" );
-		albumListSettingsWindow.setWidth( 350 );
+	public void setupLibraryWindow () {
+		libraryWindow = new Stage();
+		libraryWindow.initModality( Modality.NONE );
+		libraryWindow.initOwner( mainStage );
+		libraryWindow.setTitle( "Music Search Locations" );
+		libraryWindow.setWidth( 350 );
 		Group root = new Group();
 		Scene scene = new Scene( root );
 		VBox primaryPane = new VBox();
 
-		TableView <Path> musicSourceList = new TableView();
+		musicSourceList = new TableView();
 		Label emptyLabel = new Label( "No directories in your library. Either '+ Add' or drop directories here." );
 		emptyLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
 		emptyLabel.setWrapText( true );
@@ -742,7 +743,7 @@ public class MusicPlayerUI extends Application {
 
 		musicSourceList.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
 		musicSourceList.setPlaceholder( emptyLabel );
-		musicSourceList.setItems( musicSearchPaths );
+		musicSourceList.setItems( musicSourcePaths );
 		musicSourceList.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 
 		musicSourceList.widthProperty().addListener( new ChangeListener <Number>() {
@@ -813,42 +814,65 @@ public class MusicPlayerUI extends Application {
 		addButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				File selectedFile = chooser.showDialog( albumListSettingsWindow );
+				File selectedFile = chooser.showDialog( libraryWindow );
 				addSearchLocation ( selectedFile.toPath() );
 			}
-		} );
+		});
 
 		removeButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				musicSourceList.getItems()
-						.removeAll( musicSourceList.getSelectionModel().getSelectedItems() );
-				musicSourceList.getSelectionModel().clearSelection();
+				removeMusicSource ( musicSourceList.getSelectionModel().getSelectedItems() );
 			}
-		} );
+		});
 
 		musicSourceList.setOnKeyPressed( new EventHandler <KeyEvent>() {
 			@Override
 			public void handle ( final KeyEvent keyEvent ) {
 				if ( keyEvent.getCode().equals( KeyCode.DELETE ) ) {
-					musicSourceList.getItems()
-							.removeAll( musicSourceList.getSelectionModel().getSelectedItems() );
-					musicSourceList.getSelectionModel().clearSelection();
+					removeMusicSource ( musicSourceList.getSelectionModel().getSelectedItems() );
 				}
 			}
-		} );
+		});
 
 		HBox controlBox = new HBox();
 		controlBox.getChildren().addAll( addButton, removeButton );
 		controlBox.setAlignment( Pos.CENTER );
-		controlBox.prefWidthProperty().bind( albumListSettingsWindow.widthProperty() );
+		controlBox.prefWidthProperty().bind( libraryWindow.widthProperty() );
 		controlBox.setPadding( new Insets( 5 ) );
 
 		primaryPane.getChildren().addAll( musicSourceList, controlBox );
 		root.getChildren().add( primaryPane );
-		albumListSettingsWindow.setScene( scene );
+		libraryWindow.setScene( scene );
 	}
 	
+	public void removeMusicSource ( List <Path> input ) {
+		ArrayList <Path> sources = new ArrayList ( input ) ;
+		musicSourcePaths.removeAll( sources );
+		musicSourceList.getSelectionModel().clearSelection();	
+
+		ArrayList <Album> albumsCopy = new ArrayList <Album> ( albums );
+
+		for ( Album album : albumsCopy ) {
+			
+			for ( Path sourcePath : sources ) {
+				if ( album.getPath().toAbsolutePath().startsWith( sourcePath ) ) {
+					boolean remove = true;
+					for ( Path otherSourcePath : musicSourcePaths ) {
+						if ( album.getPath().toAbsolutePath().startsWith( otherSourcePath ) ) {
+							remove = false;
+						}
+					}
+					
+					if ( remove ) {
+						albums.remove ( album );
+						tracks.removeAll( album.getTracks() );
+					}
+				}
+			}
+		}
+	}	
+
 	public void addSearchLocation ( Path path ) {
 		if ( path != null ) {
 			path = path.toAbsolutePath();
@@ -856,7 +880,7 @@ public class MusicPlayerUI extends Application {
 			if ( path.toFile().exists() && path.toFile().isDirectory() ) {
 
 				boolean addSelectedPathToList = true;
-				for ( Path alreadyAddedPath : musicSearchPaths ) {
+				for ( Path alreadyAddedPath : musicSourcePaths ) {
 					try {
 						if ( Files.isSameFile( path, alreadyAddedPath ) ) {
 							addSelectedPathToList = false;
@@ -865,7 +889,7 @@ public class MusicPlayerUI extends Application {
 				}
 	
 				if ( addSelectedPathToList ) {
-					musicSearchPaths.add( path );
+					musicSourcePaths.add( path );
 				}
 			}
 		}
@@ -909,7 +933,8 @@ public class MusicPlayerUI extends Application {
 		playlistTable.refresh(); 
 	}
 	
-	public void promptAndSavePlaylist ( List <Track> tracks, boolean isCurrentList ) {
+	public void promptAndSavePlaylist ( List <Track> tracks, boolean isCurrentList ) { 
+	//TODO: I can probably figure out if it's current on my own
 		String defaultName = "";
 		if ( currentPlaylist != null ) {
 			defaultName = currentPlaylist.getName();
@@ -939,6 +964,30 @@ public class MusicPlayerUI extends Application {
 				currentPlaylist = newPlaylist;
 				currentPlayingListInfo.setText( "Playlist: " + newPlaylist.getName() );
 				playlistChanged = false;
+			}
+		}
+	}
+	
+	public void promptAndRenamePlaylist ( Playlist playlist ) {
+		TextInputDialog dialog = new TextInputDialog( playlist.getName() );
+		dialog.setX( mainStage.getX() + mainStage.getWidth() / 2 - 150 );
+		dialog.setY( mainStage.getY() + mainStage.getHeight() / 2 - 100 );
+		dialog.setTitle( "Rename Playlist" );
+		dialog.setHeaderText( null );
+		Optional <String> result = dialog.showAndWait();
+		
+		if ( result.isPresent() ) {
+			Playlist replaceMe = null;
+			String enteredName = result.get();
+
+			playlists.remove( playlist );
+			playlist.setName ( enteredName );
+			playlists.add( playlist );
+			
+			if ( currentPlaylist.equals( playlist ) ) {
+				String title = "Playlist: " + playlist.getName();
+				if ( playlistChanged ) title += " *";
+				currentPlayingListInfo.setText( title );
 			}
 		}
 	}
@@ -1050,10 +1099,10 @@ public class MusicPlayerUI extends Application {
 		settingsButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				if ( albumListSettingsWindow.isShowing() ) {
-					albumListSettingsWindow.hide();
+				if ( libraryWindow.isShowing() ) {
+					libraryWindow.hide();
 				} else {
-					albumListSettingsWindow.show();
+					libraryWindow.show();
 				}
 			}
 		} );
@@ -1101,10 +1150,10 @@ public class MusicPlayerUI extends Application {
 		settingsButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				if ( albumListSettingsWindow.isShowing() ) {
-					albumListSettingsWindow.hide();
+				if ( libraryWindow.isShowing() ) {
+					libraryWindow.hide();
 				} else {
-					albumListSettingsWindow.show();
+					libraryWindow.show();
 				}
 			}
 		} );
@@ -1155,10 +1204,10 @@ public class MusicPlayerUI extends Application {
 		settingsButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				if ( albumListSettingsWindow.isShowing() ) {
-					albumListSettingsWindow.hide();
+				if ( libraryWindow.isShowing() ) {
+					libraryWindow.hide();
 				} else {
-					albumListSettingsWindow.show();
+					libraryWindow.show();
 				}
 			}
 		} );
@@ -1195,7 +1244,7 @@ public class MusicPlayerUI extends Application {
 		resizePolicy.registerColumns( yearColumn );
 		albumTable.setColumnResizePolicy( resizePolicy );
 		
-		Label placeholder = new Label( "No albums loaded, click on the ≡ menu to setup your library." );
+		Label placeholder = new Label( "No albums loaded, click on the ≡ menu, or drop folders here, to add to your library." );
 		placeholder.setPadding( new Insets( 20, 10, 20, 10 ) );
 		placeholder.setWrapText( true );
 		placeholder.setTextAlignment( TextAlignment.CENTER );
@@ -1282,6 +1331,29 @@ public class MusicPlayerUI extends Application {
 				} );
 			}
 		} );
+		
+		albumTable.setOnDragOver( event -> {
+			Dragboard db = event.getDragboard();
+			if ( db.hasFiles() ) {
+				event.acceptTransferModes( TransferMode.MOVE );
+				event.consume();
+
+			}
+		});
+		
+		albumTable.setOnDragDropped( event -> {
+			Dragboard db = event.getDragboard();
+			if ( db.hasFiles() ) {
+				List <File> files = db.getFiles();
+				
+				for ( File file : files ) {
+					addSearchLocation ( file.toPath() );
+				}
+
+				event.setDropCompleted( true );
+				event.consume();
+			}
+		});
 
 		albumTable.setRowFactory( tv -> {
 			TableRow <Album> row = new TableRow <>();
@@ -1293,6 +1365,29 @@ public class MusicPlayerUI extends Application {
 					playAlbum( row.getItem() );
 				}
 			} );
+			
+			row.setOnDragOver( event -> {
+				Dragboard db = event.getDragboard();
+				if ( db.hasFiles() ) {
+					event.acceptTransferModes( TransferMode.MOVE );
+					event.consume();
+
+				}
+			});
+			
+			row.setOnDragDropped( event -> {
+				Dragboard db = event.getDragboard();
+				if ( db.hasFiles() ) {
+					List <File> files = db.getFiles();
+					
+					for ( File file : files ) {
+						addSearchLocation ( file.toPath() );
+					}
+
+					event.setDropCompleted( true );
+					event.consume();
+				}
+			});
 
 			row.setOnDragDetected( event -> {
 				if ( !row.isEmpty() ) {
@@ -1339,7 +1434,7 @@ public class MusicPlayerUI extends Application {
 		// TODO resizePolicy.registerColumns ( lengthColumn );
 		trackTable.setColumnResizePolicy( resizePolicy );
 		
-		Label placeholder = new Label( "No tracks loaded, click on the ≡ menu to setup your library." );
+		Label placeholder = new Label( "No tracks loaded, click on the ≡ menu, or drop folders here, to add to your library." );
 		placeholder.setPadding( new Insets( 20, 10, 20, 10 ) );
 		placeholder.setWrapText( true );
 		placeholder.setTextAlignment( TextAlignment.CENTER );
@@ -1409,6 +1504,29 @@ public class MusicPlayerUI extends Application {
 				} );
 			}
 		} );
+		
+		trackTable.setOnDragOver( event -> {
+			Dragboard db = event.getDragboard();
+			if ( db.hasFiles() ) {
+				event.acceptTransferModes( TransferMode.MOVE );
+				event.consume();
+
+			}
+		});
+		
+		trackTable.setOnDragDropped( event -> {
+			Dragboard db = event.getDragboard();
+			if ( db.hasFiles() ) {
+				List <File> files = db.getFiles();
+				
+				for ( File file : files ) {
+					addSearchLocation ( file.toPath() );
+				}
+
+				event.setDropCompleted( true );
+				event.consume();
+			}
+		});
 
 		trackTable.setRowFactory( tv -> {
 			TableRow <Track> row = new TableRow <>();
@@ -1423,6 +1541,29 @@ public class MusicPlayerUI extends Application {
 					currentPlayingListInfo.setText( "Playlist: New Playlist *" );
 				}
 			} );
+			
+			row.setOnDragOver( event -> {
+				Dragboard db = event.getDragboard();
+				if ( db.hasFiles() ) {
+					event.acceptTransferModes( TransferMode.MOVE );
+					event.consume();
+
+				}
+			});
+			
+			row.setOnDragDropped( event -> {
+				Dragboard db = event.getDragboard();
+				if ( db.hasFiles() ) {
+					List <File> files = db.getFiles();
+					
+					for ( File file : files ) {
+						addSearchLocation ( file.toPath() );
+					}
+
+					event.setDropCompleted( true );
+					event.consume();
+				}
+			});
 
 			row.setOnDragDetected( event -> {
 				if ( !row.isEmpty() ) {
@@ -1470,7 +1611,7 @@ public class MusicPlayerUI extends Application {
 		resizePolicy.registerColumns( tracksColumn );
 		playlistTable.setColumnResizePolicy( resizePolicy );
 
-		Label emptyLabel = new Label( "You haven't created any playlists, make a playlist on the right and 💾 save it." );
+		Label emptyLabel = new Label( "You haven't created any playlists, make a playlist on the right and click 💾 to save it for later." );
 		emptyLabel.setWrapText( true );
 		emptyLabel.setTextAlignment( TextAlignment.CENTER );
 		emptyLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
@@ -1479,22 +1620,30 @@ public class MusicPlayerUI extends Application {
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
+		MenuItem renameMenuItem = new MenuItem( "Rename" );
 		MenuItem removeMenuItem = new MenuItem( "Remove" );
-		contextMenu.getItems().addAll( playMenuItem, enqueueMenuItem, removeMenuItem );
+		contextMenu.getItems().addAll( playMenuItem, enqueueMenuItem, renameMenuItem, removeMenuItem );
 
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
 				playPlaylist( playlistTable.getSelectionModel().getSelectedItem() );
 			}
-		} );
+		});
 
 		enqueueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				MusicPlayerUI.currentListData.addAll( playlistTable.getSelectionModel().getSelectedItem().getTracks() );
+				currentListData.addAll( playlistTable.getSelectionModel().getSelectedItem().getTracks() );
 			}
-		} );
+		});
+		
+		renameMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				promptAndRenamePlaylist ( playlistTable.getSelectionModel().getSelectedItem() );
+			}
+		});
 
 		removeMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			// TODO: This is the better way, once openjdk and openjfx supports
@@ -1503,7 +1652,7 @@ public class MusicPlayerUI extends Application {
 			public void handle ( ActionEvent event ) {
 				playlists.remove( playlistTable.getSelectionModel().getSelectedItem() );
 			}
-		} );
+		});
 
         
 		playlistTable.setRowFactory( tv -> {
@@ -1515,7 +1664,7 @@ public class MusicPlayerUI extends Application {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
 					playPlaylist( row.getItem() );
 				}
-			} );
+			});
 
 			row.setOnDragDetected( event -> {
 				if ( !row.isEmpty() ) {
@@ -1527,7 +1676,7 @@ public class MusicPlayerUI extends Application {
 					db.setContent( cc );
 					event.consume();
 				}
-			} );
+			});
 
 			row.setOnDragOver( event -> {
 
@@ -1538,7 +1687,7 @@ public class MusicPlayerUI extends Application {
 						event.consume();
 					}
 				}
-			} );
+			});
 
 			row.setOnDragDropped( event -> {
 				Dragboard db = event.getDragboard();
@@ -1558,10 +1707,10 @@ public class MusicPlayerUI extends Application {
 						event.consume();
 					}
 				}
-			} );
+			});
 
 			return row;
-		} );
+		});
 	}
 	
 	public void setupCurrentListTable () {

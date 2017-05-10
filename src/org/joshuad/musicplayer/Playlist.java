@@ -24,10 +24,14 @@ public class Playlist implements Serializable {
 		return name;
 	}
 	
+	public void setName ( String newName ) {
+		this.name = newName;
+	}
+	
 	public int getLength() {
 		int retMe = 0;
 		for ( Track track : tracks ) {
-			retMe += track.getLength ();
+			if ( track != null ) retMe += track.getLength ();
 		}
 		
 		return retMe;

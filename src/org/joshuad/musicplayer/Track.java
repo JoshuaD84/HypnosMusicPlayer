@@ -152,4 +152,18 @@ public class Track implements Serializable {
 			return Format.UNKNOWN;
 		}
 	}
+	
+	public boolean equals( Object o ) {
+		if ( !( o instanceof Track ) ) return false;
+		
+		Track compareTo = (Track) o;
+		
+		return ( compareTo.getPath().equals( getPath() ) );
+	}
 }
+
+
+
+
+
+
