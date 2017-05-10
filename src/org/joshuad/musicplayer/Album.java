@@ -20,8 +20,6 @@ public class Album {
 	private final SimpleStringProperty title;
 	private File directoryPath;
 	
-	
-	
 	Album ( String artist, String year, String title, Path directoryPath ) {
 		this.artist = new SimpleStringProperty ( artist );
 		this.year = new SimpleStringProperty ( year );

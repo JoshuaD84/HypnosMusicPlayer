@@ -1,12 +1,23 @@
 package org.joshuad.musicplayer;
 
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static java.nio.file.StandardWatchEventKinds.*;
+import static java.nio.file.LinkOption.*;
 
 import javafx.collections.ListChangeListener;
 
@@ -14,13 +25,41 @@ public class MusicLoaderDaemon implements ListChangeListener <Path> {
 	
 	Vector <Path> loadMe = new Vector <Path> ();
 	Thread loaderThread;
+	private WatchService watcher;
+    private final HashMap<WatchKey,Path> keys;
 	
-	public MusicLoaderDaemon() {}
+	public MusicLoaderDaemon() {
+
+		keys = new HashMap <WatchKey,Path> ();
+		
+		try {
+			watcher = FileSystems.getDefault().newWatchService();
+			
+		} catch ( IOException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void addPath ( Path path ) {
+		loadMe.add( path );
+	}
+
+	@Override
+	public void onChanged ( javafx.collections.ListChangeListener.Change <? extends Path> changes ) {
+		while ( changes.next() ) {
+			if ( changes.wasAdded() ) {
+				List <? extends Path> addedPaths = changes.getAddedSubList();
+				
+				for ( Path path : addedPaths ) {
+					loadMe.add( path );
+				}
+			}
+		}
+	}
 	
 	public void start() {
-		
 		loaderThread = new Thread ( new Runnable() {
-			
 			public void run() {
 				while ( true ) {
 					if ( !loadMe.isEmpty() ) {
@@ -40,11 +79,14 @@ public class MusicLoaderDaemon implements ListChangeListener <Path> {
 	
 						System.out.println( "Time to load all tracks (path: " + selectedPath.toString() + "): " + (endTime - startTime) );
 						
-					} else {
-						try { Thread.sleep( 1000 ); } catch ( InterruptedException e ) { e.printStackTrace(); }
-					}
+						watcherRegisterAll ( selectedPath );
+						
+					} 
+					
+					//TODO: this structure sucks
+					processWatcherEvents();
+					
 				}
-				
 			}
 		});
 		
@@ -52,22 +94,76 @@ public class MusicLoaderDaemon implements ListChangeListener <Path> {
 		loaderThread.start();
 	}
 	
-	public void addPath ( Path path ) {
-		loadMe.add( path );
-	}
-
-	@Override
-	public void onChanged ( javafx.collections.ListChangeListener.Change <? extends Path> changes ) {
-		
-		while ( changes.next() ) {
-			if ( changes.wasAdded() ) {
-				List <? extends Path> addedPaths = changes.getAddedSubList();
-				
-				for ( Path path : addedPaths ) {
-					loadMe.add( path );
+	private void watcherRegisterAll ( final Path start ) {
+		try {
+			Files.walkFileTree( start, new SimpleFileVisitor <Path>() {
+				@Override
+				public FileVisitResult preVisitDirectory ( Path dir, BasicFileAttributes attrs ) throws IOException {
+					watcherRegister( dir );
+					return FileVisitResult.CONTINUE;
 				}
+			});
+		} catch ( IOException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void watcherRegister ( Path dir ) throws IOException {
+		WatchKey key = dir.register( watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY );
+		keys.put( key, dir );
+	}
+	
+	@SuppressWarnings("rawtypes")
+	void processWatcherEvents () {
+		WatchKey key;
+		try {
+			key = watcher.poll( 250, TimeUnit.MILLISECONDS );
+		} catch ( InterruptedException x ) {
+			return;
+		}
+
+		Path dir = keys.get( key );
+		if ( dir == null ) {
+			return;
+		}
+
+		for ( WatchEvent <?> event : key.pollEvents() ) {
+			WatchEvent.Kind kind = event.kind();
+
+			if ( kind == OVERFLOW ) {
+				// TODO: What's this?
+				continue;
+			}
+
+			WatchEvent <Path> ev = cast( event );
+			Path name = ev.context();
+			Path child = dir.resolve( name );
+
+			System.out.format( "%s: %s\n", event.kind().name(), child );
+
+			// if directory is created, and watching recursively, then
+			// register it and its sub-directories
+			if ( kind == ENTRY_CREATE ) {
+				if ( Files.isDirectory( child, NOFOLLOW_LINKS ) ) {
+					watcherRegisterAll( child );
+					loadMe.add( child );
+				}
+			}
+
+			// reset key and remove from set if directory no longer accessible
+			boolean valid = key.reset();
+			if ( !valid ) {
+				keys.remove( key );
 			}
 		}
 	}
+		
+	@SuppressWarnings("unchecked")
+    static <T> WatchEvent<T> cast(WatchEvent<?> event) {
+        return (WatchEvent<T>)event;
+    }
+	
+
 
 }
