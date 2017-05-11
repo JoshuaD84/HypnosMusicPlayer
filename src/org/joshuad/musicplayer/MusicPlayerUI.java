@@ -2,12 +2,17 @@ package org.joshuad.musicplayer;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
@@ -195,7 +200,7 @@ public class MusicPlayerUI extends Application {
 		}
 	}
 
-	public static void main ( String[] args ) throws Exception {
+	public static void main ( String[] args ) {
 
 		Logger.getLogger( "org.jaudiotagger" ).setLevel( Level.OFF );
 		
@@ -204,8 +209,39 @@ public class MusicPlayerUI extends Application {
 		musicLoader.start();
 
 		Application.launch( args );
+		
+		saveData();
+		System.exit ( 0 );
 
 	}
+	
+	public static void loadData() {
+		try (
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream("lists.info"));
+		) {
+			albums.addAll( (ArrayList<Album>) ois.readObject() );
+			tracks.addAll( (ArrayList<Track>) ois.readObject() );
+			playlists.addAll( (ArrayList<Playlist>) ois.readObject() );
+		} catch ( IOException | ClassNotFoundException e ) {
+			//TODO: 
+			e.printStackTrace();
+		}
+	}
+	
+	private static void saveData() {
+		try ( 
+			ObjectOutputStream output = new ObjectOutputStream ( new FileOutputStream ( "lists.info" ) );
+		) {
+			output.writeObject( new ArrayList <Album> ( Arrays.asList( albums.toArray( new Album[ albums.size() ] ) ) ) );
+			output.writeObject( new ArrayList <Track> ( Arrays.asList( tracks.toArray( new Track[ tracks.size() ] ) ) ) );
+			output.writeObject( new ArrayList <Playlist> ( Arrays.asList( playlists.toArray( new Playlist[ playlists.size() ] ) ) ) );
+			output.close();
+		} catch ( IOException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+		
 
 	public static void updateTransport ( int timeElapsed, int timeRemaining, double percent ) {
 		Platform.runLater( new Runnable() {
@@ -508,6 +544,7 @@ public class MusicPlayerUI extends Application {
 		primaryContainer.setTop( transport );
 
 		stage.setTitle( PROGRAM_NAME );
+		
 		((Group) scene.getRoot()).getChildren().addAll( primaryContainer );
 		stage.setScene( scene );
 		stage.show();
@@ -557,7 +594,7 @@ public class MusicPlayerUI extends Application {
 		stage.heightProperty().addListener( listener );
 
 	}
-
+	
 	private void updatePlaylistMenuItems ( ObservableList <MenuItem> items,
 			EventHandler eventHandler ) {
 

@@ -1,6 +1,7 @@
 package org.joshuad.musicplayer;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,31 +13,32 @@ import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.TagException;
 
-import javafx.beans.property.SimpleStringProperty;
-
-public class Album {
-	private final SimpleStringProperty artist;
-	private final SimpleStringProperty year;
-	private final SimpleStringProperty title;
+public class Album implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
+	private final String artist;
+	private final String year;
+	private final String title;
 	private File directoryPath;
 	
 	Album ( String artist, String year, String title, Path directoryPath ) {
-		this.artist = new SimpleStringProperty ( artist );
-		this.year = new SimpleStringProperty ( year );
-		this.title = new SimpleStringProperty ( title );
+		this.artist = artist;
+		this.year = year;
+		this.title = title;
 		this.directoryPath = directoryPath.toFile();
 	}
 	
 	public String getArtist () {
-		return artist.get();
+		return artist;
 	}
 	
 	public String getYear () {
-		return year.get();
+		return year;
 	}
 	
 	public String getTitle () {
-		return title.get();
+		return title;
 	}		
 	
 	public Path getPath () {
@@ -85,9 +87,6 @@ public class Album {
 		if ( ! compareTo.getYear().toLowerCase().equals( this.getYear().toLowerCase() ) ) return false;
 		
 		return true;
-		
-		
-		
 	}
 }
 

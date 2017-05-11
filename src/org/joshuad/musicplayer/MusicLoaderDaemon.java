@@ -61,6 +61,7 @@ public class MusicLoaderDaemon implements ListChangeListener <Path> {
 	public void start() {
 		loaderThread = new Thread ( new Runnable() {
 			public void run() {
+				MusicPlayerUI.loadData();
 				while ( true ) {
 					if ( !loadMe.isEmpty() ) {
 						Path selectedPath = loadMe.remove( 0 );
