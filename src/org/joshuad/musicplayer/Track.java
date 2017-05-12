@@ -32,7 +32,6 @@ public class Track implements Serializable {
 		}
 	}
 	
-	//TODO: Do these need to be final? 
 	private String artist;
 	private String year;
 	private String album;
@@ -43,11 +42,18 @@ public class Track implements Serializable {
 	private String discCount;
 	private File trackPath;
 	
+	private boolean hasAlbum = false;
+	
 	private boolean isCurrentTrack = false;
 	
-	//TODO: Deal w/ these exceptions right. 
 	public Track ( Path trackPath ) throws CannotReadException, IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException {
+		this ( trackPath, false );
+	}
+	
+	//TODO: Deal w/ these exceptions right, don't throw them. Catch them and fill in data as best you can. 
+	public Track ( Path trackPath, boolean hasAlbum ) throws CannotReadException, IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException {
 		this.trackPath = trackPath.toFile();
+		this.hasAlbum = hasAlbum;
 		AudioFile audioFile = AudioFileIO.read( trackPath.toFile() );
 		Tag tag = audioFile.getTag();
 		//TODO: what to do if no tag present? 
@@ -158,7 +164,7 @@ public class Track implements Serializable {
 		
 		Track compareTo = (Track) o;
 		
-		return ( compareTo.getPath().equals( getPath() ) );
+		return ( compareTo.getPath().toAbsolutePath().equals( getPath().toAbsolutePath() ) );
 	}
 }
 

@@ -159,6 +159,36 @@ public class Utils {
 		return null;
 	}
 	
+	public static boolean isAlbumDirectory ( Path path ) {
+		if ( !Files.isDirectory( path ) ) return false;
+		
+		boolean hasChildAlbumDirectory = false;
+		boolean hasChildTrack = false;
+		
+		try ( 
+			DirectoryStream <Path> stream = Files.newDirectoryStream( path ); 
+		) {
+			for ( Path child : stream ) {
+				if ( Files.isDirectory( child ) ) {
+					if ( isAlbumDirectory ( child ) ) {
+						hasChildAlbumDirectory = true;
+					}
+				}
+				
+				if ( Utils.isMusicFile( child ) ) {
+					hasChildTrack = true;
+				}
+			}
+		} catch ( IOException e ) {
+			return false;
+		}
+		
+		if ( hasChildAlbumDirectory ) return false;
+		
+		if ( hasChildTrack ) return true;
+		else return false;
+	}
+	
 	public static ArrayList <Track> getAllTracksInDirectory ( Path startingDirectory ) {
 		
 		TrackFinder finder = new TrackFinder () ;

@@ -1,0 +1,54 @@
+<project name="Hypnos Music Player" default="compile" basedir=".">
+	<description>
+    simple example build file
+  </description>
+
+	<property name="src" location="src"/>
+	<property name="build" location="build"/>
+	<property name="dist" location="dist"/>
+	<property name="jarFile" location="hypnos.jar"/>
+	<property name="stage" location="stage"/>
+
+	<path id="class.path">
+		<fileset dir="lib">
+			<include name="**/*.jar" />
+		</fileset>
+		<pathelement location="${jarFile}" />
+	</path>
+
+	<target name="init">
+		<tstamp/>
+		<mkdir dir="${build}"/>
+	</target>
+
+	<target name="compile" depends="init" description="compile the source">
+		<javac fork="yes" includeantruntime="false" srcdir="${src}" destdir="${build}">
+			<classpath refid="class.path" />
+		</javac>
+	</target>
+
+	<target name="jar" depends="compile" description="Create a jar.">
+		<jar destfile="${stage}/${jarFile}" basedir="${build}">
+			<manifest>
+				<attribute name="Main-Class" value="org.joshuad.musicplayer.MusicPlayerUI" />
+				<attribute name="Class-Path" value="lib/jaudiotagger-2.2.6-SNAPSHOT.jar lib/jl1.0.1.jar lib/mp3spi1.9.5.jar lib/tritonus_share.jar" />
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="run" depends="jar" description="Run in stage for testing while building.">
+		<java dir="${stage}" fork="true" classname="org.joshuad.musicplayer.MusicPlayerUI">
+   			<classpath refid="class.path" />
+      		<jvmarg value="-ea" />
+      		<arg value="logToConsole" />
+      	</java>
+	</target>
+
+	<target name="clean"
+        description="clean up">
+		<delete dir="${build}"/>
+		<delete dir="${dist}"/>
+	</target>
+
+
+</project>

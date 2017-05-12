@@ -1,2 +1,4 @@
 *.class
-/lists.info
+/info.data
+/info.sources
+/info.playlists

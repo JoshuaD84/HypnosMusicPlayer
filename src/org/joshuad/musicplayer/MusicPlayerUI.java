@@ -53,6 +53,7 @@ import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -124,7 +125,7 @@ public class MusicPlayerUI extends Application {
 	static TableView <Playlist> playlistTable;
 	static TableView <Track> trackTable;
 	static TableView <Track> currentListTable;
-	TableView <Path> musicSourceList;
+	static TableView <Path> musicSourceList;
 
 	static ArrayList <Track> recentlyPlayedTracks = new ArrayList( MAX_TRACK_HISTORY );
 
@@ -199,29 +200,33 @@ public class MusicPlayerUI extends Application {
 			return symbol;
 		}
 	}
-
-	public static void main ( String[] args ) {
-
-		Logger.getLogger( "org.jaudiotagger" ).setLevel( Level.OFF );
-		
-		musicLoader = new MusicLoaderDaemon ();
-		musicSourcePaths.addListener( musicLoader );
-		musicLoader.start();
-
-		Application.launch( args );
-		
-		saveData();
-		System.exit ( 0 );
-
-	}
 	
 	public static void loadData() {
 		try (
-			ObjectInputStream ois = new ObjectInputStream(new FileInputStream("lists.info"));
+				ObjectInputStream sourcesIn = new ObjectInputStream( new FileInputStream( "info.sources" ) );
 		) {
-			albums.addAll( (ArrayList<Album>) ois.readObject() );
-			tracks.addAll( (ArrayList<Track>) ois.readObject() );
-			playlists.addAll( (ArrayList<Playlist>) ois.readObject() );
+			ArrayList<String> searchPaths = (ArrayList<String>) sourcesIn.readObject();
+			for ( String pathString : searchPaths ) {
+				musicSourcePaths.add( Paths.get( pathString ) );
+			}
+		} catch ( IOException | ClassNotFoundException e ) {
+			e.printStackTrace(); //TODO: 
+		}
+		
+		try (
+				ObjectInputStream playlistsIn = new ObjectInputStream( new FileInputStream( "info.playlists" ) );
+		) {
+			playlists.addAll( (ArrayList<Playlist>) playlistsIn.readObject() );
+		} catch ( IOException | ClassNotFoundException e ) {
+			//TODO: 
+			e.printStackTrace();
+		}
+		
+		try (
+				ObjectInputStream dataIn = new ObjectInputStream( new FileInputStream( "info.data" ) );
+		) {
+			albums.addAll( (ArrayList<Album>) dataIn.readObject() );
+			tracks.addAll( (ArrayList<Track>) dataIn.readObject() );
 		} catch ( IOException | ClassNotFoundException e ) {
 			//TODO: 
 			e.printStackTrace();
@@ -229,17 +234,44 @@ public class MusicPlayerUI extends Application {
 	}
 	
 	private static void saveData() {
+		
 		try ( 
-			ObjectOutputStream output = new ObjectOutputStream ( new FileOutputStream ( "lists.info" ) );
+				ObjectOutputStream sourcesOut = new ObjectOutputStream ( new FileOutputStream ( "info.sources" ) );
 		) {
-			output.writeObject( new ArrayList <Album> ( Arrays.asList( albums.toArray( new Album[ albums.size() ] ) ) ) );
-			output.writeObject( new ArrayList <Track> ( Arrays.asList( tracks.toArray( new Track[ tracks.size() ] ) ) ) );
-			output.writeObject( new ArrayList <Playlist> ( Arrays.asList( playlists.toArray( new Playlist[ playlists.size() ] ) ) ) );
-			output.close();
+			ArrayList <String> searchPaths = new ArrayList <String> ( musicSourcePaths.size() );
+			for ( Path path : musicSourcePaths ) {
+				searchPaths.add( path.toString() );
+			}
+			sourcesOut.writeObject( searchPaths );
+			sourcesOut.flush();
+			
 		} catch ( IOException e ) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		
+		try ( 
+				ObjectOutputStream playlistsOut = new ObjectOutputStream ( new FileOutputStream ( "info.playlists" ) );
+		) {
+			playlistsOut.writeObject( new ArrayList <Playlist> ( Arrays.asList( playlists.toArray( new Playlist[ playlists.size() ] ) ) ) );
+			playlistsOut.flush();
+		} catch ( IOException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try ( 
+				ObjectOutputStream dataOut = new ObjectOutputStream ( new FileOutputStream ( "info.data" ) );
+		) {
+			dataOut.writeObject( new ArrayList <Album> ( Arrays.asList( albums.toArray( new Album[ albums.size() ] ) ) ) );
+			dataOut.writeObject( new ArrayList <Track> ( Arrays.asList( tracks.toArray( new Track[ tracks.size() ] ) ) ) );
+			dataOut.flush();
+		} catch ( IOException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 		
 
@@ -267,6 +299,61 @@ public class MusicPlayerUI extends Application {
 			}
 		} );
 	}
+	
+	public static void playPreviousTrack() {
+		//TODO: This isn't good
+		if ( currentPlayingTrack != null ) {
+			Track previousTrack = null;
+			for ( Track track : currentListData ) {
+				if ( track.getIsCurrentTrack() ) {
+					if ( previousTrack != null ) {
+						MusicPlayerUI.playTrack( previousTrack );
+					} else {
+						MusicPlayerUI.playTrack( track );
+					}
+					break;
+				} else {
+					previousTrack = track;
+				}
+			}
+		}
+	}
+	
+	public static void togglePause() {
+		if ( currentPlayingTrack != null && !currentPlayingTrack.isPaused() ) {
+			pause();
+
+		} else {
+			play();
+		}
+	}
+	
+	public static void play() {
+		if ( currentPlayingTrack != null && currentPlayingTrack.isPaused() ) {
+			currentPlayingTrack.play();
+			togglePlayButton.setText( "𝍪" );
+			
+		} else {
+			Track selectedTrack = currentListTable.getSelectionModel().getSelectedItem();
+
+			if ( selectedTrack != null ) {
+				playTrack( selectedTrack );
+
+			} else if ( !currentListTable.getItems().isEmpty() ) {
+				selectedTrack = currentListTable.getItems().get( 0 );
+				playTrack( selectedTrack );
+			}
+		}
+	}
+		
+	
+	public static void pause() {
+		if ( currentPlayingTrack != null ) {
+			currentPlayingTrack.pause();
+			togglePlayButton.setText( "▶" );
+		}
+	}
+		
 
 	public static void playNextTrack () {
 		if ( currentPlayingTrack != null ) {
@@ -457,8 +544,9 @@ public class MusicPlayerUI extends Application {
 			currentPlayingTrack.stop();
 			currentPlayingTrack = null;
 			currentListTable.refresh();
-			togglePlayButton.setText( "▶" );
 		}
+
+		togglePlayButton.setText( "▶" );
 
 		trackPositionSlider.setValue( 0 );
 		timeElapsedLabel.setText( "" );
@@ -544,6 +632,8 @@ public class MusicPlayerUI extends Application {
 		primaryContainer.setTop( transport );
 
 		stage.setTitle( PROGRAM_NAME );
+
+		musicLoader.start();
 		
 		((Group) scene.getRoot()).getChildren().addAll( primaryContainer );
 		stage.setScene( scene );
@@ -631,21 +721,7 @@ public class MusicPlayerUI extends Application {
 		previousButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				if ( currentPlayingTrack != null ) {
-					Track previousTrack = null;
-					for ( Track track : currentListData ) {
-						if ( track.getIsCurrentTrack() ) {
-							if ( previousTrack != null ) {
-								MusicPlayerUI.playTrack( previousTrack );
-							} else {
-								MusicPlayerUI.playTrack( track );
-							}
-							break;
-						} else {
-							previousTrack = track;
-						}
-					}
-				}
+				playPreviousTrack();
 			}
 		} );
 
@@ -668,26 +744,7 @@ public class MusicPlayerUI extends Application {
 		togglePlayButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-
-				if ( currentPlayingTrack != null && currentPlayingTrack.isPaused() ) {
-					currentPlayingTrack.play();
-					togglePlayButton.setText( "𝍪" );
-
-				} else if ( currentPlayingTrack != null && !currentPlayingTrack.isPaused() ) {
-					currentPlayingTrack.pause();
-					togglePlayButton.setText( "▶" );
-
-				} else {
-					Track selectedTrack = currentListTable.getSelectionModel().getSelectedItem();
-
-					if ( selectedTrack != null ) {
-						playTrack( selectedTrack );
-
-					} else if ( !currentListTable.getItems().isEmpty() ) {
-						selectedTrack = currentListTable.getItems().get( 0 );
-						playTrack( selectedTrack );
-					}
-				}
+				togglePause();
 			}
 		} );
 
@@ -815,7 +872,7 @@ public class MusicPlayerUI extends Application {
 				List <File> files = db.getFiles();
 				
 				for ( File file : files ) {
-					addSearchLocation ( file.toPath() );
+					addMusicSource ( file.toPath() );
 				}
 
 				event.setDropCompleted( true );
@@ -852,7 +909,9 @@ public class MusicPlayerUI extends Application {
 			@Override
 			public void handle ( ActionEvent e ) {
 				File selectedFile = chooser.showDialog( libraryWindow );
-				addSearchLocation ( selectedFile.toPath() );
+				if ( selectedFile != null ) {
+					addMusicSource ( selectedFile.toPath() );
+				}
 			}
 		});
 
@@ -871,25 +930,30 @@ public class MusicPlayerUI extends Application {
 				}
 			}
 		});
+		
+		//TODO: Fix this
+		CheckBox trackListCheckBox = new CheckBox("Track List: Hide Tracks from Albums");
+		trackListCheckBox.setAlignment( Pos.CENTER );
 
 		HBox controlBox = new HBox();
-		controlBox.getChildren().addAll( addButton, removeButton );
+		controlBox.getChildren().addAll( addButton, removeButton);
 		controlBox.setAlignment( Pos.CENTER );
 		controlBox.prefWidthProperty().bind( libraryWindow.widthProperty() );
 		controlBox.setPadding( new Insets( 5 ) );
 
-		primaryPane.getChildren().addAll( musicSourceList, controlBox );
+		primaryPane.getChildren().addAll( musicSourceList, trackListCheckBox, controlBox );
 		root.getChildren().add( primaryPane );
 		libraryWindow.setScene( scene );
 	}
 	
-	public void removeMusicSource ( List <Path> input ) {
+	public static void removeMusicSource ( List <Path> input ) {
 		ArrayList <Path> sources = new ArrayList ( input ) ;
 		musicSourcePaths.removeAll( sources );
 		musicSourceList.getSelectionModel().clearSelection();	
 
 		ArrayList <Album> albumsCopy = new ArrayList <Album> ( albums );
-
+		
+		//TODO: this code is kinda duplciated in music loader daemon
 		for ( Album album : albumsCopy ) {
 			
 			for ( Path sourcePath : sources ) {
@@ -903,14 +967,17 @@ public class MusicPlayerUI extends Application {
 					
 					if ( remove ) {
 						albums.remove ( album );
-						tracks.removeAll( album.getTracks() );
+						ArrayList <Track> removeMe = album.getTracks();
+						if ( removeMe != null ) {
+							boolean changed = tracks.removeAll( removeMe );
+						}
 					}
 				}
 			}
 		}
-	}	
+	}
 
-	public void addSearchLocation ( Path path ) {
+	public void addMusicSource ( Path path ) {
 		if ( path != null ) {
 			path = path.toAbsolutePath();
 			
@@ -924,7 +991,7 @@ public class MusicPlayerUI extends Application {
 						}
 					} catch ( IOException e1 ) {} // Do nothing, assume they don't match.
 				}
-	
+				
 				if ( addSelectedPathToList ) {
 					musicSourcePaths.add( path );
 				}
@@ -1384,7 +1451,7 @@ public class MusicPlayerUI extends Application {
 				List <File> files = db.getFiles();
 				
 				for ( File file : files ) {
-					addSearchLocation ( file.toPath() );
+					addMusicSource ( file.toPath() );
 				}
 
 				event.setDropCompleted( true );
@@ -1418,7 +1485,7 @@ public class MusicPlayerUI extends Application {
 					List <File> files = db.getFiles();
 					
 					for ( File file : files ) {
-						addSearchLocation ( file.toPath() );
+						addMusicSource ( file.toPath() );
 					}
 
 					event.setDropCompleted( true );
@@ -1464,7 +1531,8 @@ public class MusicPlayerUI extends Application {
 		trackTable.setItems( tracksSorted );
 
 		tracksSorted.comparatorProperty().bind( trackTable.comparatorProperty() );
-
+		
+		trackTable.getSelectionModel().clearSelection();
 		trackTable.getSortOrder().add( artistColumn );
 		trackTable.getSortOrder().add( titleColumn );
 		FixedWidthCustomResizePolicy resizePolicy = new FixedWidthCustomResizePolicy();
@@ -1557,7 +1625,7 @@ public class MusicPlayerUI extends Application {
 				List <File> files = db.getFiles();
 				
 				for ( File file : files ) {
-					addSearchLocation ( file.toPath() );
+					addMusicSource ( file.toPath() );
 				}
 
 				event.setDropCompleted( true );
@@ -1594,7 +1662,7 @@ public class MusicPlayerUI extends Application {
 					List <File> files = db.getFiles();
 					
 					for ( File file : files ) {
-						addSearchLocation ( file.toPath() );
+						addMusicSource ( file.toPath() );
 					}
 
 					event.setDropCompleted( true );
@@ -2122,5 +2190,29 @@ public class MusicPlayerUI extends Application {
 
 			return row;
 		} );
+	}
+	
+	public static void main ( String[] args ) {
+		
+		boolean firstInstance = SingleInstanceController.startCLICommandListener();
+		
+		if ( firstInstance ) {
+	
+			Logger.getLogger( "org.jaudiotagger" ).setLevel( Level.OFF );
+			
+			musicLoader = new MusicLoaderDaemon ();
+			musicSourcePaths.addListener( musicLoader );
+	
+			Application.launch( args );
+			
+			saveData();
+			System.exit ( 0 );
+			
+		} else {
+			CLIParser parser = new CLIParser ( );
+			ArrayList <Integer> commands = parser.parseCommands( args );
+			SingleInstanceController.sendCommands( commands );
+			System.exit ( 0 );
+		}
 	}
 }

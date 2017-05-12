@@ -25,22 +25,29 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 	@Override
 	public FileVisitResult visitFile ( Path file, BasicFileAttributes attr ) {
 
-		
-		boolean isMusicFile = Utils.isMusicFile ( file );
-		
-		if ( isMusicFile ) {
+		if ( Utils.isMusicFile ( file ) ) {
 			try {
-				Track track = new Track ( file );
-		        
-				Album album = new Album ( track.getArtist(), track.getYear(), track.getAlbum(), file.getParent() );
 				
-				if ( !albums.contains( album ) ) {
-					albums.add ( album );
+				if ( Utils.isAlbumDirectory( file.getParent() ) ) {
+					Track track = new Track ( file, true );
+					Album album = new Album ( track.getArtist(), track.getYear(), track.getAlbum(), file.getParent() );
+					
+					if ( !albums.contains( album ) ) {
+						albums.add ( album );
+						tracks.addAll( album.getTracks() );
+					}
+					
+					return FileVisitResult.SKIP_SIBLINGS;
+					
+				} else {
+					Track track = new Track ( file, false );
+					
+					if ( !tracks.contains( track ) ) {
+						tracks.add ( track );
+					}
+					
+					return FileVisitResult.CONTINUE;
 				}
-				
-				tracks.add ( track );
-			
-				return FileVisitResult.CONTINUE;
 				
 			} catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
 				// If we can't read the tags on this file, keep trying. No big deal			
