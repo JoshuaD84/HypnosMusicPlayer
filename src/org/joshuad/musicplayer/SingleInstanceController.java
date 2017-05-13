@@ -18,7 +18,7 @@ public class SingleInstanceController {
 	public static final int TOGGLE_PAUSE = 4;
 	public static final int STOP = 5;
 	
-	static int port = 49487;
+	static int port = 49485;
 	
 	// Return true if the socket is available.
 	public static boolean startCLICommandListener() {
