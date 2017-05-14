@@ -217,6 +217,7 @@ public class Utils {
 	}
 	
 	public static boolean isAlbumDirectory ( Path path ) {
+		//TODO: This doesn't work perfectly. See "misc" folder
 		if ( !Files.isDirectory( path ) ) return false;
 		
 		boolean hasChildAlbumDirectory = false;
