@@ -16,6 +16,7 @@ import org.jaudiotagger.tag.TagException;
 public class Track implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
+	
 
 	public enum Format {
 		FLAC ( "flac" ),
@@ -31,80 +32,243 @@ public class Track implements Serializable {
 			return extension;
 		}
 	}
-	
-	private String artist;
-	private String year;
-	private String album;
-	private String title;
-	private int trackNumber;
-	private int length;
-	private String disc;
-	private String discCount;
-	private File trackPath;
-	
+
+	private int length = 0;
+	private File trackFile;
 	private boolean hasAlbum = false;
 	
-	private boolean isCurrentTrack = false;
+	private String artist = "";
+	private String albumArtist = "";
+	private String title = "";
+	private String album = "";
+	private String year = "";
+	private int trackNumber = -1;
+	private String discSubtitle = null;
+	private Integer discNumber = null;
+	private Integer discCount =  null;
+	private String releaseType = null;
 	
-	public Track ( Path trackPath ) throws CannotReadException, IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException {
+	public Track ( Path trackPath ) {
 		this ( trackPath, false );
 	}
 	
 	//TODO: Deal w/ these exceptions right, don't throw them. Catch them and fill in data as best you can. 
-	public Track ( Path trackPath, boolean hasAlbum ) throws CannotReadException, IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException {
-		this.trackPath = trackPath.toFile();
+	public Track ( Path trackPath, boolean hasAlbum ) {
+
+		this.trackFile = trackPath.toFile();
 		this.hasAlbum = hasAlbum;
-		AudioFile audioFile = AudioFileIO.read( trackPath.toFile() );
-		Tag tag = audioFile.getTag();
-		//TODO: what to do if no tag present? 
-		try { 
-			artist = tag.getFirst ( FieldKey.ARTIST );
-		} catch ( NullPointerException e ) { throw new TagException( "Cannot read artist tag." ); }
 		
-		try { 
-			year = tag.getFirst ( FieldKey.YEAR );
-		} catch ( NullPointerException e ) { throw new TagException( "Cannot read year tag." ); }
-		
-		try { 	
-			album = tag.getFirst ( FieldKey.ALBUM );
-		} catch ( NullPointerException e ) { throw new TagException( "Cannot read album tag." ); }
-		
-		try { 
-			title = tag.getFirst ( FieldKey.TITLE );
-		} catch ( NullPointerException e ) { throw new TagException( "Cannot read title tag." ); }
-		
-		try { 		
-			discCount = tag.getFirst ( FieldKey.DISC_TOTAL );
-		} catch ( NullPointerException e ) { throw new TagException( "Cannot read disc count tag." ); }
-	
-		
-		String rawTrackText = tag.getFirst ( FieldKey.TRACK );
-		
-		if ( rawTrackText.matches( "\\d+" ) ) { // 0, 01, 1010, 2134141, etc.
-			trackNumber = Integer.parseInt( rawTrackText );
-			
-		} else if ( rawTrackText.matches("\\d+/.*") ) {
-			//if matches 23/<whatever>
-			trackNumber = Integer.parseInt( rawTrackText.split("/")[0] );
-		} else {
-			System.out.println ( "Invalid track number: '" + rawTrackText + "' - " + trackPath.toString() );
-			trackNumber = -1;
-			throw new TagException();
+		Tag tag = null;
+		AudioFile audioFile;
+		try {
+			audioFile = AudioFileIO.read( trackPath.toFile() );
+			length = audioFile.getAudioHeader().getTrackLength();
+			tag = audioFile.getTag();
+		} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e1 ) {
+			e1.printStackTrace ( System.out );
 		}
+		
+		parseArtist( tag );
+		parseTitle( tag ); 
+		parseAlbum( tag );
+		parseYear( tag );
+		parseTrackNumber( tag );
+		parseDiscInfo( tag );
+		parseReleaseType( tag );
+		
+		parseFileName();
+	}
+	
+	private void parseFileName () {
+		
+		String fnArtist = "";
+		String fnYear = "";
+		String fnAlbum = "";
+		String fnTrackNumber = "";
+		String fnTitle = "";
+		
+		fnArtist = trackFile.toPath().getParent().getParent().getFileName().toString();
+	
+		String parentName = trackFile.toPath().getParent().getFileName().toString();
+		String[] parentParts = parentName.split( " - " );
+		
+		if ( parentParts.length == 1 ) {
+			fnAlbum = parentParts [ 0 ];
+			
+		} else if ( parentParts.length == 2 ) { 
+			if ( parentParts [ 0 ].matches( "^[0-9]{4}[a-zA-Z]{0,1}" ) ) {
+				fnYear = parentParts [ 0 ];
+				fnAlbum = parentParts [ 1 ];
+			} else if ( parentParts [ 1 ].matches( "^[0-9]{4}[a-zA-Z]{0,1}" ) ) {
+				fnYear = parentParts [ 1 ];
+				fnAlbum = parentParts [ 0 ];
+			} else {
+				fnAlbum = parentName;
+			}
+		}
+		
+		fnTitle = trackFile.toPath().getFileName().toString();
+		
+		try {
+			fnTitle = fnTitle.replaceAll( " - ", "" ).replaceAll( fnArtist, "" )
+									.replaceAll( fnAlbum, "" ).replaceAll( fnYear, "" );
+		} catch ( Exception e ) {}
+		
+		boolean setByFileName = false;
+		
+		//TODO: Some error checking, only do this if we're pretty sure it's good. 
+		if ( artist.equals( "" ) ) { artist = fnArtist; setByFileName = true; }
+		if ( albumArtist.equals( "" ) ) { albumArtist = fnArtist; setByFileName = true; }
+		if ( album.equals( "" ) ) { album = fnAlbum; setByFileName = true; }
+		if ( year.equals( "" ) ) { year = fnYear; setByFileName = true; }
+		if ( title.equals( "" ) ) { title = fnTitle; setByFileName = true; }
+		
+		if ( setByFileName ) {
+			System.out.println ( "Set by filename: " + trackFile );
+		}
+			
+	}
+	
+	private void parseArtist( Tag tag ) {
+		//TODO: Do we want to do antyhing with FieldKey.ARTISTS or .ALBUM_ARTISTS or .ALBUM_ARTIST_SORT?
+		if ( tag != null ) {
+			albumArtist = tag.getFirst ( FieldKey.ALBUM_ARTIST );
+			artist = tag.getFirst ( FieldKey.ARTIST );
+		}
+		
+		if ( albumArtist.equals( "" ) ) {
+			albumArtist = artist;
+		}
+	}
+	
+	private void parseTitle ( Tag tag ) {
+		if ( tag != null ) {
+			title = tag.getFirst ( FieldKey.TITLE );
+			
+			if ( title.equals( "" ) ) {
+				title = tag.getFirst( FieldKey.TITLE_SORT );
+			}
+		}	
+	}
+	
+	private void parseAlbum ( Tag tag ) {
+		if ( tag != null ) {
+			album = tag.getFirst ( FieldKey.ALBUM );
+			if ( album.equals( "" ) ) album = tag.getFirst( FieldKey.ALBUM_SORT );
+		}
+	}
+	
+	private void parseYear ( Tag tag ) {
+		if ( tag != null ) {
+			year = tag.getFirst ( FieldKey.ORIGINAL_YEAR );
+			if ( year.equals( "" ) ) year = tag.getFirst( FieldKey.YEAR );
+		}
+	}
+	
+	private void parseTrackNumber( Tag tag ) {
+		if ( tag != null ) {
+			
+			String rawText = tag.getFirst ( FieldKey.TRACK );
+			String rawNoWhiteSpace = rawText.replaceAll("\\s+","");
+			
+			try { 
+				if ( rawText.matches( "^[0-9]+$" ) ) { // 0, 01, 1010, 2134141, etc.
+					trackNumber = Integer.parseInt( rawText );
 					
-		length = audioFile.getAudioHeader().getTrackLength();		
+				} else if ( rawNoWhiteSpace.matches( "^[0-9]+$" ) ) { 
+					trackNumber = Integer.parseInt( rawNoWhiteSpace );
+					
+				} else if ( rawText.matches("^[0-9]+/.*") ) {
+					trackNumber = Integer.parseInt( rawText.split("/")[0] );
+					System.out.println ( "Bad, but fixable, track numbering: " + rawText + " - " + trackFile.toString() );
+				
+				} else if ( rawNoWhiteSpace.matches("^[0-9]+/.*") ) {
+					trackNumber = Integer.parseInt( rawNoWhiteSpace.split("/")[0] );
+					System.out.println ( "Bad, but fixable, track numbering: " + rawText + " - " + trackFile.toString() );
+					
+				} else {
+					throw new NumberFormatException();
+				}
+				
+			} catch ( NumberFormatException e ) {
+				if ( ! rawNoWhiteSpace.equals( "" ) ) {
+					System.out.println ( "Invalid track number: " + rawText  + " - " + trackFile.toString() );
+				}
+			}
+		}
 	}
 	
-	public void setIsCurrentTrack ( boolean isCurrentTrack ) {
-		this.isCurrentTrack = isCurrentTrack;
+	private void parseDiscInfo ( Tag tag ) {
+		if ( tag != null ) {
+
+			discSubtitle = tag.getFirst ( FieldKey.DISC_SUBTITLE );
+			
+			try {
+				discCount = Integer.valueOf( tag.getFirst ( FieldKey.DISC_TOTAL ) );
+			} catch ( NumberFormatException e ) {
+				if ( ! tag.getFirst ( FieldKey.DISC_TOTAL ).equals( "" ) ) {
+					System.out.println ( "Invalid disc count: " + tag.getFirst ( FieldKey.DISC_TOTAL )  + " - " + trackFile.toString() );
+				}
+			}
+			
+			String rawText = tag.getFirst ( FieldKey.DISC_NO );
+			String rawNoWhiteSpace = rawText.replaceAll("\\s+","");
+			
+			try { 
+				if ( rawText.matches( "^[0-9]+$" ) ) { // 0, 01, 1010, 2134141, etc.
+					discNumber = Integer.parseInt( rawText );
+					
+				} else if ( rawNoWhiteSpace.matches( "^[0-9]+$" ) ) { 
+						discNumber = Integer.parseInt( rawNoWhiteSpace );
+					
+				} else if ( rawText.matches("^[0-9]+/.*") ) {
+					//if matches 23/<whatever>
+					discNumber = Integer.parseInt( rawText.split("/")[0] );
+					
+					if ( discCount == null || discCount.equals( "" ) ) {
+						discCount = Integer.parseInt( rawText.split("/")[1] );
+					}
+						
+					System.out.println ( "Bad, but fixable, disc numbering: " + rawText + " - " + trackFile.toString() );
+				
+				} else if ( rawNoWhiteSpace.matches("^[0-9]+/.*") ) {
+					//if matches 23/<whatever>
+					discNumber = Integer.parseInt( rawNoWhiteSpace.split("/")[0] );
+					
+					if ( discCount == null || discCount.equals( "" ) ) {
+						discCount = Integer.parseInt( rawNoWhiteSpace.split("/")[1] );
+					}
+						
+					System.out.println ( "Bad, but fixable, disc numbering: " + rawText + " - " + trackFile.toString() );
+					
+				} else {
+					throw new NumberFormatException();
+				}
+				
+			} catch ( NumberFormatException e ) {
+				if ( ! rawNoWhiteSpace.equals( "" ) ) {
+					System.out.println ( "Invalid disc number: " + rawText  + " - " + trackFile.toString() );
+				}
+			}
+		}
 	}
 	
-	public boolean getIsCurrentTrack ( ) {
-		return isCurrentTrack;
+	private void parseDiscCount ( Tag tag ) {
+		
 	}
 	
+	private void parseReleaseType ( Tag tag ) {
+		if ( tag != null ) {
+			releaseType = tag.getFirst ( FieldKey.MUSICBRAINZ_RELEASE_TYPE );
+		}
+	}
+		
 	public String getArtist () {
 		return artist;
+	}
+	
+	public String getAlbumArtist() {
+		return albumArtist;
 	}
 	
 	public String getYear () {
@@ -112,22 +276,31 @@ public class Track implements Serializable {
 	}
 	
 	public String getAlbum () {
+		String retMe = album;
 		
-		try {
-			if ( disc != null && discCount != null && disc.length() > 0 && discCount.length() > 0 && Integer.parseInt( discCount ) > 1 ) {
-				return album + " (disc " + disc + ")";
-			} 
-		} catch ( NumberFormatException e ) {
+		if ( releaseType != null && !releaseType.equals("") && !releaseType.matches( "(?i:album)" ) ) {
+			retMe += " [" + Utils.toReleaseTitleCase( releaseType ) + "]";
 		}
-
-		return album;
+		
+		
+		if ( discSubtitle != null && !discSubtitle.equals( "" ) ) {
+			retMe += " (" + discSubtitle + ")";
+			
+		} else if ( discCount != null && discCount > 1 ) {
+			if ( discNumber != null ) retMe += " (Disc " + discNumber + ")";
+			
+		} else if ( discNumber != null && discNumber > 1 ) { 
+			retMe += " (Disc " + discNumber + ")";
+		}
+		
+		return retMe;
 	}		
 	
 	public String getTitle () {
 		return title;
 	}
 	
-	public int getTrackNumber () {
+	public Integer getTrackNumber () {
 		return trackNumber;
 	}	
 	
@@ -136,7 +309,7 @@ public class Track implements Serializable {
 	}
 	
 	public Path getPath() {
-		return trackPath.toPath();
+		return trackFile.toPath();
 	}
 	
 	public String getLengthDisplay () {
@@ -157,6 +330,10 @@ public class Track implements Serializable {
 		} else {
 			return Format.UNKNOWN;
 		}
+	}
+	
+	public boolean hasAlbum() {
+		return hasAlbum;
 	}
 	
 	public boolean equals( Object o ) {

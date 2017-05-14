@@ -9,6 +9,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
@@ -64,6 +65,29 @@ public class Utils {
 				
 	}
 	  
+	public static String toReleaseTitleCase ( String input ) {
+		if ( input.equalsIgnoreCase( "EP" ) ) {
+			return "EP";
+		} else {
+			
+		    StringBuilder titleCase = new StringBuilder();
+		    boolean nextTitleCase = true;
+	
+		    for (char c : input.toCharArray()) {
+		        if (Character.isSpaceChar(c)) {
+		            nextTitleCase = true;
+		        } else if (nextTitleCase) {
+		            c = Character.toTitleCase(c);
+		            nextTitleCase = false;
+		        }
+	
+		        titleCase.append(c);
+		    }
+	
+		    return titleCase.toString();
+		}
+	}
+	
 	public static boolean isMusicFile ( Path testFile ) {
 		String fileName = testFile.getFileName().toString();
 		
@@ -102,6 +126,39 @@ public class Utils {
 		} else {
 			return String.format ( (negative ? "-" : "") + "%d:%02d", minutes, seconds );
 		}
+	}
+	
+	public static ArrayList <CurrentListTrack> convertTrackList ( List <Track> tracks ) {
+		ArrayList <CurrentListTrack> retMe = new ArrayList <CurrentListTrack> ( tracks.size() );
+		
+		for ( Track track : tracks ) {
+			try {
+				retMe.add ( new CurrentListTrack ( track ) );
+			} catch ( TagException e) {
+				System.out.println ( "Unable to read tags on: " + track.getPath().toString() +", skipping." );
+			} catch (CannotReadException e) {
+				System.out.println ( track.getPath().toString() );
+				e.printStackTrace();
+			} catch (ReadOnlyFileException e) {
+				System.out.println ( track.getPath().toString() +", is read only, unable to edit, skipping." );
+			} catch (InvalidAudioFrameException e) {
+				System.out.println ( track.getPath().toString() +", has bad audio fram data, skipping." );
+			} catch ( IOException e ) {
+				e.printStackTrace();
+			}
+		}
+		
+		return retMe;
+	}
+	
+	public static ArrayList <Track> convertCurrentTrackList ( List <CurrentListTrack> tracks ) {
+		ArrayList <Track> retMe = new ArrayList <Track> ( tracks.size() );
+		
+		for ( CurrentListTrack track : tracks ) {
+			retMe.add ( (Track)track );
+		}
+		
+		return retMe;
 	}
 	
 	public static Path getAlbumCoverImagePath ( Track track ) {
@@ -215,13 +272,8 @@ class TrackFinder extends SimpleFileVisitor <Path> {
 		boolean isMusicFile = Utils.isMusicFile ( file );
 		
 		if ( isMusicFile ) {
-			try {
-				Track track = new Track ( file );
-				tracks.add ( track );
-				
-			} catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
-				//TODO: 				
-			}
+			Track track = new Track ( file );
+			tracks.add ( track );
 		} 
 		return FileVisitResult.CONTINUE;
 			

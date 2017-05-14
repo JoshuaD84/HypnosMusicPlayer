@@ -25,14 +25,18 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 	
 	Slider trackPosition;
 	
-	public FlacPlayer ( Track track, Slider trackPositionSlider ) {
+	public FlacPlayer ( Track track, Slider trackPositionSlider, boolean startPaused ) {
 		this.track = track;
 		this.trackPosition = trackPositionSlider;
-		track.setIsCurrentTrack( true );
+		this.pauseRequested = startPaused;
 		
 		Thread t = new Thread ( this );
 		t.setDaemon( true );
 		t.start();
+	}
+	
+	public FlacPlayer ( Track track, Slider trackPositionSlider ) {
+		this ( track, trackPositionSlider, false );
 	}
 	
 	
@@ -53,7 +57,6 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 			//TODO: LineUnavailableException - if AudioSystem.getLine fails
 			
 			e.printStackTrace();
-			track.setIsCurrentTrack( false );
 		}
 
 		while ( true ) {	
@@ -183,13 +186,11 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 	@Override 
 	public void play() {
 		playRequested = true;
-		track.setIsCurrentTrack( true );
 	}
 	
 	@Override 
 	public void stop() {
 		stopRequested = true;
-		track.setIsCurrentTrack( false );
 	}
 	
 	@Override 
@@ -201,9 +202,11 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 	public boolean isPaused() {
 		return paused;
 	}
-	
-	
-		
+
+	@Override
+	public Track getTrack () {
+		return track;
+	}
 }
 	
 	

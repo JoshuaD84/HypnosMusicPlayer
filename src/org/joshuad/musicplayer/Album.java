@@ -8,23 +8,18 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.TagException;
-
 public class Album implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private final String artist;
+	private final String albumArtist;
 	private final String year;
 	private final String title;
 	private File directory;
 	ArrayList <Track> tracks;
 	
-	Album ( String artist, String year, String title, Path directoryPath ) {
-		this.artist = artist;
+	Album ( String albumArtist, String year, String title, Path directoryPath ) {
+		this.albumArtist = albumArtist;
 		this.year = year;
 		this.title = title;
 		this.directory = directoryPath.toFile();
@@ -32,24 +27,14 @@ public class Album implements Serializable {
 
 		tracks = new ArrayList <Track> ();
 		
-		try {
+		try (
+				DirectoryStream <Path> albumDirectoryStream = Files.newDirectoryStream ( directoryPath, Utils.musicFileFilter );	
+		) {
 			tracks = new ArrayList <Track> ();
 		
-			DirectoryStream <Path> albumDirectoryStream = Files.newDirectoryStream ( directoryPath, Utils.musicFileFilter );
 					
 			for ( Path trackPath : albumDirectoryStream ) {
-				try {
-					tracks.add( new Track ( trackPath, true ) );
-				} catch ( TagException e) {
-					System.out.println ( "Unable to read tags on: " + trackPath.toString() +", skipping." );
-				} catch (CannotReadException e) {
-					System.out.println ( trackPath.toString() );
-					e.printStackTrace();
-				} catch (ReadOnlyFileException e) {
-					System.out.println ( trackPath.toString() +", is read only, unable to edit, skipping." );
-				} catch (InvalidAudioFrameException e) {
-					System.out.println ( trackPath.toString() +", has bad audio fram data, skipping." );
-				}
+				tracks.add( new Track ( trackPath, true ) );
 			}
 			
 			tracks.sort ( Comparator.comparing( Track::getTrackNumber ) );
@@ -58,8 +43,8 @@ public class Album implements Serializable {
 		} 
 	}
 	
-	public String getArtist () {
-		return artist;
+	public String getAlbumArtist () {
+		return albumArtist;
 	}
 	
 	public String getYear () {

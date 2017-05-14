@@ -28,7 +28,7 @@
 	</target>
 
 	<target name="jar" depends="compile" description="Create a jar.">
-		<jar destfile="${stage}/${jarFile}" basedir="${build}">
+		<jar destfile="${jarFile}" basedir="${build}">
 			<manifest>
 				<attribute name="Main-Class" value="org.joshuad.musicplayer.MusicPlayerUI" />
 				<attribute name="Class-Path" value="lib/jaudiotagger-2.2.6-SNAPSHOT.jar lib/jl1.0.1.jar lib/mp3spi1.9.5.jar lib/tritonus_share.jar" />

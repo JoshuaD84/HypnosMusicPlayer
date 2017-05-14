@@ -5,11 +5,6 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.TagException;
-
 import javafx.collections.ObservableList;
 
 public class MusicFileVisitor extends SimpleFileVisitor <Path> {
@@ -26,31 +21,25 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 	public FileVisitResult visitFile ( Path file, BasicFileAttributes attr ) {
 
 		if ( Utils.isMusicFile ( file ) ) {
-			try {
 				
-				if ( Utils.isAlbumDirectory( file.getParent() ) ) {
-					Track track = new Track ( file, true );
-					Album album = new Album ( track.getArtist(), track.getYear(), track.getAlbum(), file.getParent() );
-					
-					if ( !albums.contains( album ) ) {
-						albums.add ( album );
-						tracks.addAll( album.getTracks() );
-					}
-					
-					return FileVisitResult.SKIP_SIBLINGS;
-					
-				} else {
-					Track track = new Track ( file, false );
-					
-					if ( !tracks.contains( track ) ) {
-						tracks.add ( track );
-					}
-					
-					return FileVisitResult.CONTINUE;
+			if ( Utils.isAlbumDirectory( file.getParent() ) ) {
+				Track track = new Track ( file, true );
+				Album album = new Album ( track.getAlbumArtist(), track.getYear(), track.getAlbum(), file.getParent() );
+				
+				if ( !albums.contains( album ) ) {
+					albums.add ( album );
+					tracks.addAll( album.getTracks() );
 				}
 				
-			} catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
-				// If we can't read the tags on this file, keep trying. No big deal			
+				return FileVisitResult.SKIP_SIBLINGS;
+				
+			} else {
+				Track track = new Track ( file, false );
+				
+				if ( !tracks.contains( track ) ) {
+					tracks.add ( track );
+				}
+				
 				return FileVisitResult.CONTINUE;
 			}
 	        

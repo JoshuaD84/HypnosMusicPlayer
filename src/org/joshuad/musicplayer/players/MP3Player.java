@@ -32,11 +32,15 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	private boolean paused = false;
 	
 	private Slider trackPosition;
-		
+	
 	public MP3Player ( Track track, Slider trackPosition ) {
+		this ( track, trackPosition, false );
+	}
+	
+	public MP3Player ( Track track, Slider trackPosition, boolean startPaused ) {
 		this.track = track;
 		this.trackPosition = trackPosition;
-		track.setIsCurrentTrack( true );
+		this.pauseRequested = startPaused;
 
 		Thread t = new Thread ( this );
 		t.setDaemon( true );
@@ -183,13 +187,11 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	@Override 
 	public void play() {
 		playRequested = true;
-		track.setIsCurrentTrack( true );
 	}
 	
 	@Override 
 	public void stop() {
 		stopRequested = true;
-		track.setIsCurrentTrack( false );
 	}
 	
 	@Override 
@@ -200,6 +202,11 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	@Override
 	public boolean isPaused() {
 		return paused;
+	}
+	
+	@Override
+	public Track getTrack () {
+		return track;
 	}
 }
 

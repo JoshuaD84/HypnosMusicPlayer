@@ -24,7 +24,7 @@ import static java.nio.file.StandardWatchEventKinds.*;
 
 import javafx.collections.ListChangeListener;
 
-public class MusicLoaderDaemon implements ListChangeListener <Path> {
+public class LibraryLoaderDaemon implements ListChangeListener <Path> {
 	
 	Vector <Path> loadMe = new Vector <Path> ();
 	Vector <Path> removeMe = new Vector <Path> ();
@@ -33,7 +33,7 @@ public class MusicLoaderDaemon implements ListChangeListener <Path> {
 	private WatchService watcher;
     private final HashMap<WatchKey,Path> keys;
 	
-	public MusicLoaderDaemon() {
+	public LibraryLoaderDaemon() {
 
 		keys = new HashMap <WatchKey,Path> ();
 		
@@ -65,7 +65,7 @@ public class MusicLoaderDaemon implements ListChangeListener <Path> {
 	public void start() {
 		loaderThread = new Thread ( new Runnable() {
 			public void run() {
-				MusicPlayerUI.loadData();
+				Persister.loadData();
 				while ( true ) {
 					
 					if ( !loadMe.isEmpty() ) {
@@ -131,7 +131,8 @@ public class MusicLoaderDaemon implements ListChangeListener <Path> {
 			Files.walkFileTree( start, new SimpleFileVisitor <Path>() {
 				@Override
 				public FileVisitResult preVisitDirectory ( Path dir, BasicFileAttributes attrs ) throws IOException {
-					watcherRegister( dir );
+					WatchKey key = dir.register( watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY );
+					keys.put( key, dir );
 					return FileVisitResult.CONTINUE;
 				}
 			});
@@ -139,11 +140,6 @@ public class MusicLoaderDaemon implements ListChangeListener <Path> {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	
-	private void watcherRegister ( Path dir ) throws IOException {
-		WatchKey key = dir.register( watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY );
-		keys.put( key, dir );
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -154,7 +150,7 @@ public class MusicLoaderDaemon implements ListChangeListener <Path> {
 		} catch ( InterruptedException x ) {
 			return;
 		}
-
+		
 		Path dir = keys.get( key );
 		if ( dir == null ) {
 			return;
@@ -172,11 +168,8 @@ public class MusicLoaderDaemon implements ListChangeListener <Path> {
 			Path name = ev.context();
 			Path child = dir.resolve( name );
 
-			System.out.format( "%s: %s\n", event.kind().name(), child );
-
 			if ( kind == ENTRY_CREATE ) {
 				if ( Files.isDirectory( child ) ) {
-					System.out.println ( "is directory" );
 					watcherRegisterAll( child );
 					loadMe.add( child );
 				}
