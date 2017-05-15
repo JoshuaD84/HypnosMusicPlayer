@@ -71,7 +71,6 @@ public class LibraryLoaderDaemon implements ListChangeListener <Path> {
 					if ( !loadMe.isEmpty() ) {
 						Path selectedPath = loadMe.remove( 0 );
 						
-						Logger.getLogger( "org.jaudiotagger" ).setLevel( Level.OFF );
 						long startTime = System.currentTimeMillis();
 						
 						try {

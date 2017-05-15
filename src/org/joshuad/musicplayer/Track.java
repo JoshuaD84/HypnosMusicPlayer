@@ -3,6 +3,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Path;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -55,6 +57,7 @@ public class Track implements Serializable {
 	//TODO: Deal w/ these exceptions right, don't throw them. Catch them and fill in data as best you can. 
 	public Track ( Path trackPath, boolean hasAlbum ) {
 
+		Logger.getLogger( "org.jaudiotagger" ).setLevel( Level.OFF );
 		this.trackFile = trackPath.toFile();
 		this.hasAlbum = hasAlbum;
 		

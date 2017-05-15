@@ -65,6 +65,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.ClipboardContent;
@@ -79,6 +80,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -168,6 +170,7 @@ public class MusicPlayerUI extends Application {
 	static boolean playlistChanged = false;
 	
 	static CheckBox trackListCheckBox;
+	static TextField trackFilterBox;
 
 	static private LibraryLoaderDaemon libraryLoader;
 	
@@ -188,6 +191,7 @@ public class MusicPlayerUI extends Application {
 	}
 
 	static RepeatMode repeatMode = RepeatMode.PLAY_ONCE;
+	
 
 	enum RepeatMode {
 		PLAY_ONCE ( "⇥" ), REPEAT ( "🔁" );
@@ -518,6 +522,7 @@ public class MusicPlayerUI extends Application {
 		Scene scene = new Scene( new Group(), 1024, 768 );
 
 		setupAlbumTable();
+		setupTrackListCheckBox();
 		setupAlbumFilterPane();
 		setupTrackFilterPane();
 		setupQueueWindow();
@@ -547,7 +552,7 @@ public class MusicPlayerUI extends Application {
 		albumFilterPane.prefWidthProperty().bind( albumListPane.widthProperty() );
 		albumListPane.setTop( albumFilterPane );
 		albumListPane.setCenter( albumTable );
-
+		
 		BorderPane trackListPane = new BorderPane();
 		trackFilterPane.prefWidthProperty().bind( trackListPane.widthProperty() );
 		trackListPane.setTop( trackFilterPane );
@@ -981,29 +986,50 @@ public class MusicPlayerUI extends Application {
 			}
 		});
 		
-		//TODO: Fix this
-		trackListCheckBox = new CheckBox("Track List: Hide Tracks from Albums");
-		trackListCheckBox.selectedProperty().addListener( ( observable, oldValue, newValue ) -> {
-			tracksFiltered.setPredicate( track -> {
-				if ( track.hasAlbum() && newValue ) {
-					return false;
-				} else {
-					return true;
-				}
-			});
-		} );
-				
-		trackListCheckBox.setAlignment( Pos.CENTER );
-
 		HBox controlBox = new HBox();
 		controlBox.getChildren().addAll( addButton, removeButton);
 		controlBox.setAlignment( Pos.CENTER );
 		controlBox.prefWidthProperty().bind( libraryWindow.widthProperty() );
 		controlBox.setPadding( new Insets( 5 ) );
 
-		primaryPane.getChildren().addAll( musicSourceTable, trackListCheckBox, controlBox );
+		primaryPane.getChildren().addAll( musicSourceTable, controlBox );
 		root.getChildren().add( primaryPane );
 		libraryWindow.setScene( scene );
+	}
+	
+	private static boolean acceptTrackFromFilterRules ( Track track ) {
+		boolean checkBoxSelected = trackListCheckBox.isSelected();
+		String filterText = trackFilterBox.getText();
+		
+		if ( track.hasAlbum() && checkBoxSelected ) {
+			return false;
+		} 
+		
+		if ( filterText == null || filterText.isEmpty() ) {
+			return true;
+		}
+
+		String[] lowerCaseFilterTokens = filterText.toLowerCase().split( "\\s+" );
+
+		ArrayList <String> matchableText = new ArrayList <String>();
+
+		matchableText.add( Normalizer.normalize( track.getTitle(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+		matchableText.add( track.getTitle().toLowerCase() );
+
+		for ( String token : lowerCaseFilterTokens ) {
+			boolean tokenMatches = false;
+			for ( String test : matchableText ) {
+				if ( test.contains( token ) ) {
+					tokenMatches = true;
+				}
+			}
+
+			if ( !tokenMatches ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 	
 	public static void removeMusicSource ( List <Path> input ) {
@@ -1314,41 +1340,19 @@ public class MusicPlayerUI extends Application {
 
 	public void setupTrackFilterPane () {
 		trackFilterPane = new HBox();
-		TextField filterBox = new TextField();
-		filterBox.setPrefWidth( 500000 );
-		filterBox.textProperty().addListener( ( observable, oldValue, newValue ) -> {
-			tracksFiltered.setPredicate( track -> {
-				
-				if ( newValue == null || newValue.isEmpty() ) {
-					return true;
-				}
-				
-				String[] lowerCaseFilterTokens = newValue.toLowerCase().split( "\\s+" );
+		trackFilterBox = new TextField();
+		trackFilterBox.setPrefWidth( 500000 );
+		
+		trackFilterBox.textProperty().addListener( new ChangeListener <String> () {
 
-				ArrayList <String> matchableText = new ArrayList <String>();
-
-				matchableText.add( Normalizer.normalize( track.getArtist(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-				matchableText.add( track.getArtist().toLowerCase() );
-				matchableText.add( Normalizer.normalize( track.getTitle(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-				matchableText.add( track.getTitle().toLowerCase() );
-
-				for ( String token : lowerCaseFilterTokens ) {
-					boolean tokenMatches = false;
-					for ( String test : matchableText ) {
-						if ( test.contains( token ) ) {
-							tokenMatches = true;
-						}
-					}
-
-					if ( !tokenMatches ) {
-						return false;
-					}
-				}
-
-				return true;
-			} );
-		} );
-
+			@Override
+			public void changed ( ObservableValue <? extends String> observable, String oldValue, String newValue ) {
+				tracksFiltered.setPredicate( track -> {
+					return acceptChange ( track, oldValue, newValue );
+				});
+			}
+		});
+		
 		Button settingsButton = new Button( "≡" );
 		settingsButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -1365,11 +1369,60 @@ public class MusicPlayerUI extends Application {
 		clearButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				filterBox.setText( "" );
+				trackFilterBox.setText( "" );
 			}
 		});
+		
+		HBox checkBoxMargins = new HBox();
+		checkBoxMargins.setPadding( new Insets ( 4, 0, 0, 6 ) );
+		checkBoxMargins.getChildren().add( trackListCheckBox );
+		
+		trackFilterPane.getChildren().addAll( settingsButton, trackFilterBox, clearButton, checkBoxMargins );
+	}
+	
+	public static boolean acceptChange ( Track track, Object oldValue, Object newValueIn ) {
+				
+		String newValue = trackFilterBox.getText();
+		if ( newValueIn instanceof String ) {
+			newValue = (String)newValueIn;
+		}
+		
+		Boolean boxSelected = trackListCheckBox.isSelected();
+		if ( newValueIn instanceof Boolean ) {
+			boxSelected = (Boolean)newValueIn;
+		}
+			
+		if ( track.hasAlbum() && boxSelected ) {
+			return false;
+		} 
+	
+		if ( newValue == null || newValue.isEmpty() ) {
+			return true;
+		}
+		
+		String[] lowerCaseFilterTokens = newValue.toLowerCase().split( "\\s+" );
 
-		trackFilterPane.getChildren().addAll( settingsButton, filterBox, clearButton );
+		ArrayList <String> matchableText = new ArrayList <String>();
+
+		matchableText.add( Normalizer.normalize( track.getArtist(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+		matchableText.add( track.getArtist().toLowerCase() );
+		matchableText.add( Normalizer.normalize( track.getTitle(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+		matchableText.add( track.getTitle().toLowerCase() );
+
+		for ( String token : lowerCaseFilterTokens ) {
+			boolean tokenMatches = false;
+			for ( String test : matchableText ) {
+				if ( test.contains( token ) ) {
+					tokenMatches = true;
+				}
+			}
+
+			if ( !tokenMatches ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	public void setupAlbumFilterPane () {
@@ -1431,6 +1484,23 @@ public class MusicPlayerUI extends Application {
 		});
 
 		albumFilterPane.getChildren().addAll( settingsButton, filterBox, clearButton );
+	}
+
+	public void setupTrackListCheckBox() {
+		trackListCheckBox = new CheckBox( "" );
+		trackListCheckBox.selectedProperty().addListener( new ChangeListener <Boolean> () {
+			@Override
+			public void changed ( ObservableValue <? extends Boolean> observable, Boolean oldValue, Boolean newValue ) {
+				tracksFiltered.setPredicate( track -> {
+					return acceptChange ( track, oldValue, newValue );
+				});
+			}
+		});
+		
+		Tooltip tooltip = new Tooltip( "Unchecked: List all tracks.\nChecked: Hide tracks that are part of an album." );
+		Tooltip.install( new Rectangle( 0, 0, 10, 10 ), tooltip );
+		
+		trackListCheckBox.setTooltip( tooltip );
 	}
 
 	public void setupAlbumTable () {
@@ -2302,17 +2372,17 @@ public class MusicPlayerUI extends Application {
 	
 	public static void main ( String[] args ) {
 		
-		
 		boolean firstInstance = SingleInstanceController.startCLICommandListener();
 		
 		//if ( firstInstance ) {
-		
-			Logger.getLogger( "org.jaudiotagger" ).setLevel( Level.OFF );
-			
 			libraryLoader = new LibraryLoaderDaemon ();
 			musicSourcePaths.addListener( libraryLoader );
 	
 			Application.launch( args );
+			
+			if ( currentPlayer != null ) {
+				currentPlayer.stop();
+			}
 			
 			Persister.saveData();
 			System.exit ( 0 );
