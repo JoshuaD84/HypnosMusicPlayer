@@ -1,5 +1,6 @@
 package org.joshuad.musicplayer.players;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.sound.sampled.AudioFormat;
@@ -10,6 +11,10 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.audio.AudioHeader;
+import org.jaudiotagger.audio.mp3.MP3AudioHeader;
 import org.joshuad.musicplayer.MusicPlayerUI;
 import org.joshuad.musicplayer.Track;
 
@@ -31,6 +36,8 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	
 	private boolean paused = false;
 	
+	private long initialMSPosition = 0;
+	
 	private Slider trackPosition;
 	
 	public MP3Player ( Track track, Slider trackPosition ) {
@@ -49,10 +56,8 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	
 	public void run() {
 
-	    long framePosition = 0;
 		try {
 			encodedInput = AudioSystem.getAudioInputStream( track.getPath().toFile() );
-			
 			AudioFormat baseFormat = encodedInput.getFormat();
 			AudioFormat decoderFormat = new AudioFormat(
 					AudioFormat.Encoding.PCM_SIGNED, baseFormat.getSampleRate(),
@@ -68,6 +73,9 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 			e.printStackTrace();
 		}
 		
+
+	    long bytePosition = 0;
+	    
 		while ( true ) {
 			if ( stopRequested ) {
 				closeAllResources();
@@ -88,37 +96,38 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 			}
 			
 			if ( seekRequestPercent != -1 ) {
-								
-				System.out.println ( "Current Position (ms): " + audioOutput.getMicrosecondPosition() );
-				System.out.println ( "Current Position (Frames): " + framePosition );
-				System.out.println ( "Length of Song (ms): " + track.getLength() * 1000000 );
-				System.out.println ( "Length of song, in frames (decoded): " + decodedInput.getFrameLength() );
-				System.out.println ( "Length of song, in frames (encoded): " + encodedInput.getFrameLength() );
-				System.out.println ( "Frame size: " + decodedInput.getFormat().getFrameSize() );
-				System.out.println ( "Sample Rate: " + decodedInput.getFormat().getSampleRate() );
-				System.out.println ( "Frame Length (property): " +	decodedInput.getFormat().getProperty("mp3.length.frames" ) );
 				
-				
-				//Frames = bytesRead / frameSize
-
-				
-				
-				//TODO: 
-				
-				/* 
-				 * tools:
-				 *
-				 *decodedInput.skip( long n ) // Skip n bytes
-				 * audioOutput.getMicrosecondPosition()
-				 * track.getLength() * 1000000 )
-				 */
-				
-				//(double) audioOutput.getMicrosecondPosition() / ( (double) track.getLength() * 1000000 );
-				
-				
-				
+				//TODO: this code structure sucks, just testing stuff. 
+				try {
+					int seekPositionMS = (int) ( track.getLength() * 1000 * seekRequestPercent );
+					long seekPositionByte = getApproximateBytePositionForMilliseconds ( track.getPath().toFile(), seekPositionMS );
+	
+					closeAllResources();
+					
+					encodedInput = AudioSystem.getAudioInputStream( track.getPath().toFile() );
+	
+					byte[] data = new byte[ (int) seekPositionByte ]; //TODO: better than just casting here
+					int bytesRead = encodedInput.read ( data, 0, data.length );
+					
+					initialMSPosition = seekPositionMS;
+					
+					AudioFormat baseFormat = encodedInput.getFormat();
+					AudioFormat decoderFormat = new AudioFormat(
+							AudioFormat.Encoding.PCM_SIGNED, baseFormat.getSampleRate(),
+							16, baseFormat.getChannels(), baseFormat.getChannels() * 2,
+							baseFormat.getSampleRate(), false );
+					
+					decodedInput = AudioSystem.getAudioInputStream ( decoderFormat, encodedInput );
+					
+					audioOutput = getLine ( decoderFormat );
+					audioOutput.start();
+					 
+				} catch ( UnsupportedAudioFileException | IOException | LineUnavailableException e ) {
+					//TODO: 
+				}
 				
 				seekRequestPercent = -1;
+				updateTransport();
 				 
 			}
 			
@@ -134,7 +143,7 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 						
 					} else {
 						audioOutput.write(data, 0, bytesRead);
-						framePosition += bytesRead / decodedInput.getFormat().getFrameSize();
+						bytePosition += bytesRead;
 					}
 				} catch ( IOException e ) {
 					//TODO: 
@@ -148,12 +157,46 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 				}
 			}
 			
-			double timePos = ( audioOutput.getMicrosecondPosition() - clipStartTime ) / 1e6;
-			
-			double positionPercent = (double) audioOutput.getMicrosecondPosition() / ( (double) track.getLength() * 1000000 );
+			updateTransport();
+		}
+
+	}
+	
+	private void updateTransport() {
+		if ( seekRequestPercent == -1 ) {
+			double positionPercent = (double) ( audioOutput.getMicrosecondPosition() + initialMSPosition * 1000 ) / ( (double) track.getLength() * 1000000 );
 			int timeElapsed = (int)(track.getLength() * positionPercent);
 			int timeRemaining = track.getLength() - timeElapsed;
 			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, positionPercent );
+		}
+	}
+	
+	public static long getApproximateBytePositionForMilliseconds ( File file, long ms ) {
+
+		long bytePosition = -1;
+
+		try {
+
+			AudioFile audioFile = AudioFileIO.read( file );
+			AudioHeader audioHeader = audioFile.getAudioHeader();
+
+			if ( audioHeader instanceof MP3AudioHeader ) {
+				MP3AudioHeader mp3AudioHeader = (MP3AudioHeader) audioHeader;
+				long audioStartByte = mp3AudioHeader.getMp3StartByte();
+				long audioSize = file.length() - audioStartByte;
+				long frameCount = mp3AudioHeader.getNumberOfFrames();
+				long frameSize = audioSize / frameCount;
+
+				double frameDurationInMs = (mp3AudioHeader.getPreciseTrackLength() / (double) frameCount) * 1000;
+				double framesForMs = ms / frameDurationInMs;
+				long bytePositionForMs = (long) (audioStartByte + (framesForMs * frameSize));
+				bytePosition = bytePositionForMs;
+			}
+
+			return bytePosition;
+
+		} catch ( Exception e ) {
+			return bytePosition;
 		}
 
 	}

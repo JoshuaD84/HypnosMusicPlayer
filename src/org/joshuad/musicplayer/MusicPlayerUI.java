@@ -14,8 +14,6 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
@@ -72,6 +70,8 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
@@ -2137,6 +2137,7 @@ public class MusicPlayerUI extends Application {
 
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
+		MenuItem queueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem cropMenuItem = new MenuItem( "Crop" );
 		MenuItem deleteMenuItem = new MenuItem( "Delete" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
@@ -2145,6 +2146,12 @@ public class MusicPlayerUI extends Application {
 		MenuItem newPlaylistButton = new MenuItem( "<New Playlist>" );
 
 		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
+		
+
+		queueMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.Q, KeyCombination.SHIFT_ANY ) );
+		playMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.ENTER ) );
+		cropMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.DELETE, KeyCombination.SHIFT_DOWN ) );
+		deleteMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.DELETE, KeyCombination.SHIFT_ANY ) );
 
 		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -2167,7 +2174,15 @@ public class MusicPlayerUI extends Application {
 
 		updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 
-		contextMenu.getItems().addAll( playMenuItem, browseMenuItem, addToPlaylistMenuItem, cropMenuItem, deleteMenuItem );
+		contextMenu.getItems().addAll( playMenuItem, queueMenuItem, browseMenuItem, addToPlaylistMenuItem, cropMenuItem, deleteMenuItem );
+		
+		queueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				Queue.addAll( currentListTable.getSelectionModel().getSelectedItems() );
+			}
+		});
+		
 
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -2175,6 +2190,7 @@ public class MusicPlayerUI extends Application {
 				playTrack( currentListTable.getSelectionModel().getSelectedItem() );
 			}
 		} );
+		
 
 		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			// TODO: This is the better way, once openjdk and openjfx supports
@@ -2224,6 +2240,7 @@ public class MusicPlayerUI extends Application {
 			}
 		} );
 
+		/*
 		currentListTable.setOnKeyPressed( new EventHandler <KeyEvent>() {
 			@Override
 			public void handle ( final KeyEvent keyEvent ) {
@@ -2243,9 +2260,12 @@ public class MusicPlayerUI extends Application {
 					if ( !selectedItems.isEmpty() ) {
 						Queue.addAll( selectedItems );
 					}
+				} else if ( keyEvent.getCode().equals( KeyCode.ENTER ) ) {
+					playTrack( currentListTable.getSelectionModel().getSelectedItem() );
 				}
 			}
 		});
+		*/
 
 		currentListTable.setRowFactory( tv -> {
 			TableRow <CurrentListTrack> row = new TableRow <>();

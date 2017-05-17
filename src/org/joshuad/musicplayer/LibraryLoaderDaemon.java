@@ -17,8 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 
@@ -26,7 +24,10 @@ import javafx.collections.ListChangeListener;
 
 public class LibraryLoaderDaemon implements ListChangeListener <Path> {
 	
+	public static final boolean SHOW_SCAN_NOTES = false;
+	
 	Vector <Path> loadMe = new Vector <Path> ();
+	Vector <Path> updateMe = new Vector <Path> ();
 	Vector <Path> removeMe = new Vector <Path> ();
 	
 	Thread loaderThread;
