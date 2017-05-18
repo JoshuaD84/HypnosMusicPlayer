@@ -23,6 +23,7 @@ public class Track implements Serializable {
 	public enum Format {
 		FLAC ( "flac" ),
 		MP3 ( "mp3" ),
+		OGG ( "ogg" ),
 		WAV ( "wav" ),
 		UNKNOWN ( "" );
 		
@@ -346,6 +347,9 @@ public class Track implements Serializable {
 		
 		} else if ( testExtension.equals( Format.MP3.getExtension() ) ) {
 			return Format.MP3;
+			
+		} else if ( testExtension.equals( Format.OGG.getExtension() ) ) {
+			return Format.OGG;
 			
 		} else if ( testExtension.equals( Format.WAV.getExtension() ) ) {
 			return Format.WAV;

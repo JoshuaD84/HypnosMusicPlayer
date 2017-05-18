@@ -18,7 +18,7 @@ import org.jaudiotagger.tag.TagException;
 
 public class Utils {
 	
-	private static String[] musicExtStrings = new String[] { "flac", "mp3", "wav" }; //TODO: use Track.Format instead
+	private static String[] musicExtStrings = new String[] { "flac", "mp3", "ogg", "wav" }; //TODO: use Track.Format instead
 	private static String[] imageExtStrings = new String[] { "jpg", "png", "gif" };
 	
 		
@@ -31,7 +31,6 @@ public class Utils {
 		}
 	};
 	
-
 	public static final DirectoryStream.Filter<Path> imageFileFilter = new DirectoryStream.Filter<Path>() {
 		@Override
 		public boolean accept ( Path entry ) throws IOException {

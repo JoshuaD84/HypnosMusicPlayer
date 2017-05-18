@@ -24,6 +24,7 @@ import org.jaudiotagger.tag.TagException;
 import org.joshuad.musicplayer.players.AbstractPlayer;
 import org.joshuad.musicplayer.players.FlacPlayer;
 import org.joshuad.musicplayer.players.MP3Player;
+import org.joshuad.musicplayer.players.OggPlayer;
 import org.joshuad.musicplayer.players.WavPlayer;
 
 import javafx.application.Application;
@@ -415,6 +416,15 @@ public class MusicPlayerUI extends Application {
 				break;
 			case MP3:
 				currentPlayer = new MP3Player( track, trackPositionSlider, startPaused );
+				if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );
+				if ( startPaused ) {
+					togglePlayButton.setText( "▶" );
+				} else {
+					togglePlayButton.setText( "𝍪" );
+				}
+				break;
+			case OGG:
+				currentPlayer = new OggPlayer( track, trackPositionSlider, startPaused );
 				if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );
 				if ( startPaused ) {
 					togglePlayButton.setText( "▶" );

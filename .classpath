@@ -11,5 +11,8 @@
 	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/mp3spi1.9.5.jar"/>
 	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/tritonus_share.jar"/>
 	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/commons-cli-1.4.jar"/>
+	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/vorbisspi1.0.3.jar"/>
+	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/jogg-0.0.7.jar"/>
+	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/jorbis-0.0.15.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
