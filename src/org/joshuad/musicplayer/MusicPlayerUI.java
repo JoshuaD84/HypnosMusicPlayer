@@ -24,6 +24,7 @@ import org.jaudiotagger.tag.TagException;
 import org.joshuad.musicplayer.players.AbstractPlayer;
 import org.joshuad.musicplayer.players.FlacPlayer;
 import org.joshuad.musicplayer.players.MP3Player;
+import org.joshuad.musicplayer.players.WavPlayer;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -421,8 +422,18 @@ public class MusicPlayerUI extends Application {
 					togglePlayButton.setText( "𝍪" );
 				}
 				break;
+			case WAV:
+				currentPlayer = new WavPlayer ( track, trackPositionSlider, startPaused );
+				if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );
+				if ( startPaused ) {
+					togglePlayButton.setText( "▶" );
+				} else {
+					togglePlayButton.setText( "𝍪" );
+				}
+				break;
 			case UNKNOWN:
 			default:
+				System.out.println ( "Unknown music file type" );
 				return;
 		}
 

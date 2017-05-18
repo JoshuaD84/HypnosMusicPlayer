@@ -1,8 +1,6 @@
 package org.joshuad.musicplayer.players;
 
-import java.io.File;
 import java.io.IOException;
-
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -14,37 +12,42 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.AudioHeader;
-import org.jaudiotagger.audio.mp3.MP3AudioHeader;
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.TagException;
 import org.joshuad.musicplayer.MusicPlayerUI;
 import org.joshuad.musicplayer.Track;
 
 import javafx.scene.control.Slider;
 
-public class MP3Player extends AbstractPlayer implements Runnable {
+public class WavPlayer extends AbstractPlayer implements Runnable {
 
 	private Track track;
-	
+
 	private static final int NO_SEEK_REQUESTED = -1;
 
-	AudioInputStream encodedInput;
 	AudioInputStream decodedInput;
 	SourceDataLine audioOutput;
 
 	private boolean pauseRequested = false;
 	private boolean playRequested = false;
 	private boolean stopRequested = false;
-	private double seekRequestPercent = NO_SEEK_REQUESTED;	
+	private double seekRequestPercent = -1;	// -1 means no seek request pending. 
 	private long clipStartTime = 0; //If we seek, we need to remember where we started so we can make the seek bar look right. 
 	
 	private boolean paused = false;
 	
 	private Slider trackPosition;
 	
-	public MP3Player ( Track track, Slider trackPosition ) {
+	private final int EXTERNAL_BUFFER_SIZE = 4096; 
+	
+	
+	public WavPlayer ( Track track, Slider trackPosition ) {
 		this ( track, trackPosition, false );
 	}
-	
-	public MP3Player ( Track track, Slider trackPosition, boolean startPaused ) {
+
+	public WavPlayer ( Track track, Slider trackPosition, boolean startPaused ) {
 		this.track = track;
 		this.trackPosition = trackPosition;
 		this.pauseRequested = startPaused;
@@ -54,19 +57,20 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 		t.start();
 	}
 	
-	public void run() {
+
+	public void run () {
 
 		try {
 			openStreamsAtRequestedOffset ();
-			audioOutput.start(); //TODO: deal with startPaused here instead of where I do it? 
+			audioOutput.start();
 			
-		} catch ( LineUnavailableException | UnsupportedAudioFileException | IOException e ) {
-			//TODO: We should break here; if the thing's not open then it's going to fail later. 
-			e.printStackTrace();
+		} catch ( IOException | UnsupportedAudioFileException | LineUnavailableException e1 ) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
-
-	    long bytePosition = 0;
-	    
+		
+		long bytePosition = 0;
+		
 		while ( true ) {
 			if ( stopRequested ) {
 				closeAllResources();
@@ -104,7 +108,7 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 			
 			if ( !paused ) {
 				try {
-					byte[] data = new byte[4096];
+					byte[] data = new byte[ EXTERNAL_BUFFER_SIZE ];
 					int bytesRead = decodedInput.read ( data, 0, data.length );
 					
 					if ( bytesRead < 0 ) {
@@ -129,10 +133,11 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 			}
 			updateTransport();
 		}
+
 	}
 	
 	private void updateTransport() {
-		if ( seekRequestPercent == NO_SEEK_REQUESTED ) {
+		if ( seekRequestPercent == -1 ) {
 			double positionPercent = (double) ( audioOutput.getMicrosecondPosition() + clipStartTime * 1000 ) / ( (double) track.getLength() * 1000000 );
 			int timeElapsed = (int)(track.getLength() * positionPercent);
 			int timeRemaining = track.getLength() - timeElapsed;
@@ -140,74 +145,52 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 		}
 	}
 	
-
-	//I think these two functions are the only places where codec-specific magic has to happen? 
 	private void openStreamsAtRequestedOffset ( ) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
-		encodedInput = AudioSystem.getAudioInputStream( track.getPath().toFile() );
+		decodedInput = AudioSystem.getAudioInputStream( track.getPath().toFile() );
 		
 		if ( seekRequestPercent != NO_SEEK_REQUESTED ) {
 			int seekPositionMS = (int) ( track.getLength() * 1000 * seekRequestPercent );
-			long seekPositionByte = getBytePosition ( track.getPath().toFile(), seekPositionMS );
-			byte[] data = new byte[ (int) seekPositionByte ]; 
-			int bytesRead = encodedInput.read ( data, 0, data.length ); //For some reason, skip() doesn't work as well. 
+			long bytesRead = decodedInput.skip ( getBytePosition ( seekPositionMS ) );
 			clipStartTime = seekPositionMS;
 		}
 		
-		AudioFormat baseFormat = encodedInput.getFormat();
-		AudioFormat decoderFormat = new AudioFormat(
-				AudioFormat.Encoding.PCM_SIGNED, baseFormat.getSampleRate(),
-				16, baseFormat.getChannels(), baseFormat.getChannels() * 2,
-				baseFormat.getSampleRate(), false );
+		AudioFormat decoderFormat = decodedInput.getFormat();
 		
-		decodedInput = AudioSystem.getAudioInputStream ( decoderFormat, encodedInput );
-		
-		DataLine.Info info = new DataLine.Info ( SourceDataLine.class, decoderFormat );
-		audioOutput = (SourceDataLine) AudioSystem.getLine(info);
+		DataLine.Info info = new DataLine.Info( SourceDataLine.class, decoderFormat );
+		audioOutput = (SourceDataLine) AudioSystem.getLine( info );
 		audioOutput.open( decoderFormat );
+		
 	}
 	
-	public long getBytePosition ( File file, long targetTimeMS ) {
-
-		long bytePosition = -1;
-
+	public long getBytePosition ( long targetTimeMS ) {
+		int headerOffset = 0;
 		try {
-
-			AudioFile audioFile = AudioFileIO.read( file );
+			AudioFile audioFile = AudioFileIO.read( track.getPath().toFile() );
 			AudioHeader audioHeader = audioFile.getAudioHeader();
-
-			if ( audioHeader instanceof MP3AudioHeader ) {
-				MP3AudioHeader mp3AudioHeader = (MP3AudioHeader) audioHeader;
-				long audioStartByte = mp3AudioHeader.getMp3StartByte();
-				long audioSize = file.length() - audioStartByte;
-				long frameCount = mp3AudioHeader.getNumberOfFrames();
-				long frameSize = audioSize / frameCount;
-
-				double frameDurationInMs = (mp3AudioHeader.getPreciseTrackLength() / (double) frameCount) * 1000;
-				double framesForMs = targetTimeMS / frameDurationInMs;
-				long bytePositionForMs = (long) (audioStartByte + (framesForMs * frameSize));
-				bytePosition = bytePositionForMs;
-			}
-
-			return bytePosition;
-
-		} catch ( Exception e ) {
-			return bytePosition;
+		} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
+			//Can't read header, no big deal. Just assume 0. 
 		}
-	}
 
+		double lengthMS = decodedInput.getFrameLength() / decodedInput.getFormat().getFrameRate() * 1000;
+		long lengthBytes = track.getPath().toFile().length();
+		
+		double targetPositionBytes = headerOffset + ( targetTimeMS / lengthMS ) * lengthBytes;
+		
+		return Math.round ( targetPositionBytes );
+	}
+	
 	private void closeAllResources() {
 		try {
 			audioOutput.drain();
 			audioOutput.stop();
 			audioOutput.close();
 			decodedInput.close();
-			encodedInput.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override 
 	public void pause() {
 		pauseRequested = true;
@@ -238,4 +221,3 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 		return track;
 	}
 }
-

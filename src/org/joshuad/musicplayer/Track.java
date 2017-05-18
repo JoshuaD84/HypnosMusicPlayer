@@ -23,6 +23,7 @@ public class Track implements Serializable {
 	public enum Format {
 		FLAC ( "flac" ),
 		MP3 ( "mp3" ),
+		WAV ( "wav" ),
 		UNKNOWN ( "" );
 		
 		final String extension;
@@ -345,6 +346,9 @@ public class Track implements Serializable {
 		
 		} else if ( testExtension.equals( Format.MP3.getExtension() ) ) {
 			return Format.MP3;
+			
+		} else if ( testExtension.equals( Format.WAV.getExtension() ) ) {
+			return Format.WAV;
 		
 		} else {
 			return Format.UNKNOWN;
