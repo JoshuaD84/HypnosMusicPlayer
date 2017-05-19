@@ -14,5 +14,11 @@
 	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/vorbisspi1.0.3.jar"/>
 	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/jogg-0.0.7.jar"/>
 	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/jorbis-0.0.15.jar"/>
+	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/basicplayer3.0.jar"/>
+	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/jl1.0.jar"/>
+	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/jmactritonusspi1.74.jar"/>
+	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/jspeex0.9.7.jar"/>
+	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/kj_dsp1.1.jar"/>
+	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/jflac-1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

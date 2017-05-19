@@ -11,10 +11,6 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.audio.AudioHeader;
-import org.jaudiotagger.audio.mp3.MP3AudioHeader;
 import org.joshuad.musicplayer.MusicPlayerUI;
 import org.joshuad.musicplayer.Track;
 
@@ -140,7 +136,6 @@ public class OggPlayer extends AbstractPlayer implements Runnable {
 		}
 	}
 	
-
 	//I think these two functions are the only places where codec-specific magic has to happen? 
 	private void openStreamsAtRequestedOffset ( ) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
 		encodedInput = AudioSystem.getAudioInputStream( track.getPath().toFile() );
@@ -168,6 +163,7 @@ public class OggPlayer extends AbstractPlayer implements Runnable {
 	
 	public long getBytePosition ( File file, long targetTimeMS ) {
 		//TODO: 
+		return 0;
 	}
 
 	private void closeAllResources() {

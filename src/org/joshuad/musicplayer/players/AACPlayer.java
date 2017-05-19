@@ -14,13 +14,14 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.AudioHeader;
+import org.jaudiotagger.audio.flac.FlacAudioHeader;
 import org.jaudiotagger.audio.mp3.MP3AudioHeader;
 import org.joshuad.musicplayer.MusicPlayerUI;
 import org.joshuad.musicplayer.Track;
 
 import javafx.scene.control.Slider;
 
-public class MP3Player extends AbstractPlayer implements Runnable {
+public class AACPlayer extends AbstractPlayer implements Runnable {
 
 	private Track track;
 	
@@ -40,11 +41,11 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	
 	private Slider trackPosition;
 	
-	public MP3Player ( Track track, Slider trackPosition ) {
+	public AACPlayer ( Track track, Slider trackPosition ) {
 		this ( track, trackPosition, false );
 	}
 	
-	public MP3Player ( Track track, Slider trackPosition, boolean startPaused ) {
+	public AACPlayer ( Track track, Slider trackPosition, boolean startPaused ) {
 		this.track = track;
 		this.trackPosition = trackPosition;
 		this.pauseRequested = startPaused;
@@ -154,10 +155,12 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 		}
 		
 		AudioFormat baseFormat = encodedInput.getFormat();
-		AudioFormat decoderFormat = new AudioFormat (
+		AudioFormat decoderFormat = new AudioFormat(
 				AudioFormat.Encoding.PCM_SIGNED, baseFormat.getSampleRate(),
 				16, baseFormat.getChannels(), baseFormat.getChannels() * 2,
 				baseFormat.getSampleRate(), false );
+		
+		
 		
 		decodedInput = AudioSystem.getAudioInputStream ( decoderFormat, encodedInput );
 		
@@ -170,29 +173,9 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 
 		long bytePosition = -1;
 
-		try {
-
-			AudioFile audioFile = AudioFileIO.read( file );
-			AudioHeader audioHeader = audioFile.getAudioHeader();
-
-			if ( audioHeader instanceof MP3AudioHeader ) {
-				MP3AudioHeader mp3AudioHeader = (MP3AudioHeader) audioHeader;
-				long audioStartByte = mp3AudioHeader.getMp3StartByte();
-				long audioSize = file.length() - audioStartByte;
-				long frameCount = mp3AudioHeader.getNumberOfFrames();
-				long frameSize = audioSize / frameCount;
-
-				double frameDurationInMs = (mp3AudioHeader.getPreciseTrackLength() / (double) frameCount) * 1000;
-				double framesForMs = targetTimeMS / frameDurationInMs;
-				long bytePositionForMs = (long) (audioStartByte + (framesForMs * frameSize));
-				bytePosition = bytePositionForMs;
-			}
-
-			return bytePosition;
-
-		} catch ( Exception e ) {
-			return bytePosition;
-		}
+		//TODO: 
+		
+		return 0;
 	}
 
 	private void closeAllResources() {

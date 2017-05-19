@@ -18,7 +18,7 @@ import org.jaudiotagger.tag.TagException;
 
 public class Utils {
 	
-	private static String[] musicExtStrings = new String[] { "flac", "mp3", "ogg", "wav" }; //TODO: use Track.Format instead
+	private static String[] musicExtStrings = new String[] { "flac", "mp3", "ogg", "m4a", "wav" }; //TODO: use Track.Format instead
 	private static String[] imageExtStrings = new String[] { "jpg", "png", "gif" };
 	
 		

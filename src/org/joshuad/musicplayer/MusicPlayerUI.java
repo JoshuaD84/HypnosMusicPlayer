@@ -21,9 +21,11 @@ import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.TagException;
+import org.joshuad.musicplayer.players.AACPlayer;
 import org.joshuad.musicplayer.players.AbstractPlayer;
-import org.joshuad.musicplayer.players.FlacPlayer;
+import org.joshuad.musicplayer.players.OldFlacPlayer;
 import org.joshuad.musicplayer.players.MP3Player;
+import org.joshuad.musicplayer.players.FlacPlayer;
 import org.joshuad.musicplayer.players.OggPlayer;
 import org.joshuad.musicplayer.players.WavPlayer;
 
@@ -416,6 +418,15 @@ public class MusicPlayerUI extends Application {
 				break;
 			case MP3:
 				currentPlayer = new MP3Player( track, trackPositionSlider, startPaused );
+				if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );
+				if ( startPaused ) {
+					togglePlayButton.setText( "▶" );
+				} else {
+					togglePlayButton.setText( "𝍪" );
+				}
+				break;
+			case AAC:
+				currentPlayer = new AACPlayer( track, trackPositionSlider, startPaused );
 				if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );
 				if ( startPaused ) {
 					togglePlayButton.setText( "▶" );

@@ -25,6 +25,7 @@ public class Track implements Serializable {
 		MP3 ( "mp3" ),
 		OGG ( "ogg" ),
 		WAV ( "wav" ),
+		AAC ( "m4a" ),
 		UNKNOWN ( "" );
 		
 		final String extension;
@@ -350,6 +351,9 @@ public class Track implements Serializable {
 			
 		} else if ( testExtension.equals( Format.OGG.getExtension() ) ) {
 			return Format.OGG;
+			
+		} else if ( testExtension.equals( Format.AAC.getExtension() ) ) {
+			return Format.AAC;
 			
 		} else if ( testExtension.equals( Format.WAV.getExtension() ) ) {
 			return Format.WAV;
