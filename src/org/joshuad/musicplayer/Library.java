@@ -401,7 +401,6 @@ public class Library {
 				//Handled by removeMissingFiles(), can ignore. 
 								
 			} else if ( eventKind == StandardWatchEventKinds.ENTRY_MODIFY ) {
-				System.out.println( "Modified: " + child.toString() ); //TODO: DD
 				if ( Files.isDirectory( child ) ) {
 					modifiedFileDelayedUpdater.addUpdateItem( child );
 				} else {
@@ -444,7 +443,6 @@ class UpdaterThread extends Thread {
 				for ( Path path : copyUpdateItems ) {
 					Library.requestUpdate ( path );
 					updateItems.remove( path );
-					System.out.println( "Updating: " + path.toString() ); //TODO: DD
 				}
 			}
 		}
