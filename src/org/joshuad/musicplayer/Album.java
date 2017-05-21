@@ -31,7 +31,6 @@ public class Album implements Serializable {
 				DirectoryStream <Path> albumDirectoryStream = Files.newDirectoryStream ( directoryPath, Utils.musicFileFilter );	
 		) {
 			tracks = new ArrayList <Track> ();
-		
 					
 			for ( Path trackPath : albumDirectoryStream ) {
 				tracks.add( new Track ( trackPath, true ) );

@@ -39,8 +39,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -105,24 +103,7 @@ public class MusicPlayerUI extends Application {
 
 	public static final String PROGRAM_NAME = "Hypnos Music Player";
 
-	final static ObservableList <Path> musicSourcePaths = FXCollections.observableArrayList();
-	
 	final static ObservableList <CurrentListTrack> currentListData = FXCollections.observableArrayList(); //TODO: rename to currentList
-
-	// These are all three representations of the same data. Add stuff to the
-	// Observable List, the other two can't accept add.
-	final static ObservableList <Album> albums = FXCollections.observableArrayList( new ArrayList <Album>() );
-	final static FilteredList <Album> albumsFiltered = new FilteredList <Album>( albums, p -> true );
-	final static SortedList <Album> albumsSorted = new SortedList <Album>( albumsFiltered );
-
-	final static ObservableList <Track> tracks = FXCollections.observableArrayList( new ArrayList <Track>() );
-	final static FilteredList <Track> tracksFiltered = new FilteredList <Track>( tracks, p -> true );
-	final static SortedList <Track> tracksSorted = new SortedList <Track>( tracksFiltered );
-
-	final static ObservableList <Playlist> playlists = FXCollections.observableArrayList( new ArrayList <Playlist>() );
-	final static FilteredList <Playlist> playlistsFiltered = new FilteredList <Playlist>( playlists, p -> true );
-	final static SortedList <Playlist> playlistsSorted = new SortedList <Playlist>( playlistsFiltered );
-	
 	
 	static TableView <Album> albumTable;
 	static TableView <Playlist> playlistTable;
@@ -549,6 +530,7 @@ public class MusicPlayerUI extends Application {
 	public void start ( Stage stage ) {
 		mainStage = stage;
 		Scene scene = new Scene( new Group(), 1024, 768 );
+		mainStage.getIcons().add(new Image("file:icon.png"));
 
 		setupAlbumTable();
 		setupTrackListCheckBox();
@@ -622,7 +604,7 @@ public class MusicPlayerUI extends Application {
 
 		stage.setTitle( PROGRAM_NAME );
 
-		LibraryLoader.start();
+		Library.startLoader();
 		
 		((Group) scene.getRoot()).getChildren().addAll( primaryContainer );
 		stage.setScene( scene );
@@ -679,7 +661,7 @@ public class MusicPlayerUI extends Application {
 
 		items.remove( 1, items.size() );
 
-		for ( Playlist playlist : playlistsSorted ) {
+		for ( Playlist playlist : Library.playlistsSorted ) {
 			MenuItem newItem = new MenuItem( playlist.getName() );
 			newItem.setUserData( playlist );
 			newItem.setOnAction( eventHandler );
@@ -921,7 +903,7 @@ public class MusicPlayerUI extends Application {
 
 		musicSourceTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
 		musicSourceTable.setPlaceholder( emptyLabel );
-		musicSourceTable.setItems( musicSourcePaths );
+		musicSourceTable.setItems( Library.musicSourcePaths );
 		musicSourceTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 
 		musicSourceTable.widthProperty().addListener( new ChangeListener <Number>() {
@@ -956,7 +938,7 @@ public class MusicPlayerUI extends Application {
 				List <File> files = db.getFiles();
 				
 				for ( File file : files ) {
-					LibraryLoader.addPath( file.toPath() );
+					Library.requestAddSource( file.toPath() );
 				}
 
 				event.setDropCompleted( true );
@@ -994,7 +976,7 @@ public class MusicPlayerUI extends Application {
 			public void handle ( ActionEvent e ) {
 				File selectedFile = chooser.showDialog( libraryWindow );
 				if ( selectedFile != null ) {
-					LibraryLoader.addPath( selectedFile.toPath() );
+					Library.requestAddSource( selectedFile.toPath() );
 				}
 			}
 		});
@@ -1002,7 +984,7 @@ public class MusicPlayerUI extends Application {
 		removeButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				LibraryLoader.removePaths( musicSourceTable.getSelectionModel().getSelectedItems() );
+				Library.requestRemoveSources( musicSourceTable.getSelectionModel().getSelectedItems() );
 				musicSourceTable.getSelectionModel().clearSelection();	
 			}
 		});
@@ -1011,7 +993,7 @@ public class MusicPlayerUI extends Application {
 			@Override
 			public void handle ( final KeyEvent keyEvent ) {
 				if ( keyEvent.getCode().equals( KeyCode.DELETE ) ) {
-					LibraryLoader.removePaths( musicSourceTable.getSelectionModel().getSelectedItems() );
+					Library.requestRemoveSources( musicSourceTable.getSelectionModel().getSelectedItems() );
 				}
 			}
 		});
@@ -1117,15 +1099,15 @@ public class MusicPlayerUI extends Application {
 			Playlist replaceMe = null;
 			String enteredName = result.get();
 
-			for ( Playlist test : playlists ) {
+			for ( Playlist test : Library.playlists ) {
 				if ( test.getName().equals( enteredName ) ) {
-					playlists.remove( test );
+					Library.removePlaylist ( test );
 					break;
 				}
 			}
 
 			Playlist newPlaylist = new Playlist( enteredName, new ArrayList <Track> ( tracks ) );
-			playlists.add( newPlaylist );
+			Library.addPlaylist ( newPlaylist );
 			
 			if ( isCurrentList ) {
 				currentPlaylist = newPlaylist;
@@ -1147,9 +1129,9 @@ public class MusicPlayerUI extends Application {
 			Playlist replaceMe = null;
 			String enteredName = result.get();
 
-			playlists.remove( playlist );
+			Library.removePlaylist( playlist );
 			playlist.setName ( enteredName );
-			playlists.add( playlist );
+			Library.addPlaylist( playlist );
 			
 			if ( currentPlaylist.equals( playlist ) ) {
 				String title = "Playlist: " + playlist.getName();
@@ -1242,7 +1224,7 @@ public class MusicPlayerUI extends Application {
 			public void handle ( ActionEvent event ) {
 				String playlistName = ((Playlist) ((MenuItem) event.getSource()).getUserData()).getName();
 				Playlist playlist = new Playlist( playlistName, new ArrayList <Track>( currentListTable.getItems() ) );
-				playlists.add( playlist );
+				Library.addPlaylist( playlist );
 			}
 		};
 
@@ -1263,7 +1245,7 @@ public class MusicPlayerUI extends Application {
 		filterBox.setPrefWidth( 500000 );
 		
 		filterBox.textProperty().addListener( ( observable, oldValue, newValue ) -> {
-			playlistsFiltered.setPredicate( playlist -> {
+			Library.playlistsFiltered.setPredicate( playlist -> {
 				if ( newValue == null || newValue.isEmpty() ) {
 					return true;
 				}
@@ -1324,7 +1306,7 @@ public class MusicPlayerUI extends Application {
 
 			@Override
 			public void changed ( ObservableValue <? extends String> observable, String oldValue, String newValue ) {
-				tracksFiltered.setPredicate( track -> {
+				Library.tracksFiltered.setPredicate( track -> {
 					return acceptChange ( track, oldValue, newValue );
 				});
 			}
@@ -1407,7 +1389,7 @@ public class MusicPlayerUI extends Application {
 		TextField filterBox = new TextField();
 		filterBox.setPrefWidth( 500000 );
 		filterBox.textProperty().addListener( ( observable, oldValue, newValue ) -> {
-			albumsFiltered.setPredicate( album -> {
+			Library.albumsFiltered.setPredicate( album -> {
 				if ( newValue == null || newValue.isEmpty() ) {
 					return true;
 				}
@@ -1468,7 +1450,7 @@ public class MusicPlayerUI extends Application {
 		trackListCheckBox.selectedProperty().addListener( new ChangeListener <Boolean> () {
 			@Override
 			public void changed ( ObservableValue <? extends Boolean> observable, Boolean oldValue, Boolean newValue ) {
-				tracksFiltered.setPredicate( track -> {
+				Library.tracksFiltered.setPredicate( track -> {
 					return acceptChange ( track, oldValue, newValue );
 				});
 			}
@@ -1496,10 +1478,10 @@ public class MusicPlayerUI extends Application {
 		albumTable = new TableView();
 		albumTable.getColumns().addAll( artistColumn, yearColumn, albumColumn );
 		albumTable.setEditable( false );
-		albumTable.setItems( albumsSorted );
+		albumTable.setItems( Library.albumsSorted );
 		albumTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 
-		albumsSorted.comparatorProperty().bind( albumTable.comparatorProperty() );
+		Library.albumsSorted.comparatorProperty().bind( albumTable.comparatorProperty() );
 
 		albumTable.getSortOrder().add( artistColumn );
 		albumTable.getSortOrder().add( yearColumn );
@@ -1559,7 +1541,7 @@ public class MusicPlayerUI extends Application {
 			}
 		};
 
-		playlistsSorted.addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
+		Library.playlistsSorted.addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
 			updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		} );
 
@@ -1611,7 +1593,7 @@ public class MusicPlayerUI extends Application {
 				List <File> files = db.getFiles();
 				
 				for ( File file : files ) {
-					LibraryLoader.addPath( file.toPath() );
+					Library.requestAddSource( file.toPath() );
 				}
 
 				event.setDropCompleted( true );
@@ -1645,7 +1627,7 @@ public class MusicPlayerUI extends Application {
 					List <File> files = db.getFiles();
 					
 					for ( File file : files ) {
-						LibraryLoader.addPath( file.toPath() );
+						Library.requestAddSource( file.toPath() );
 					}
 
 					event.setDropCompleted( true );
@@ -1688,9 +1670,9 @@ public class MusicPlayerUI extends Application {
 		trackTable = new TableView();
 		trackTable.getColumns().addAll( artistColumn, titleColumn, lengthColumn );
 		trackTable.setEditable( false );
-		trackTable.setItems( tracksSorted );
+		trackTable.setItems( Library.tracksSorted );
 
-		tracksSorted.comparatorProperty().bind( trackTable.comparatorProperty() );
+		Library.tracksSorted.comparatorProperty().bind( trackTable.comparatorProperty() );
 		
 		trackTable.getSelectionModel().clearSelection();
 		trackTable.getSortOrder().add( artistColumn );
@@ -1733,7 +1715,7 @@ public class MusicPlayerUI extends Application {
 			}
 		};
 
-		playlistsSorted.addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
+		Library.playlistsSorted.addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
 			updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		} );
 
@@ -1785,7 +1767,7 @@ public class MusicPlayerUI extends Application {
 				List <File> files = db.getFiles();
 				
 				for ( File file : files ) {
-					LibraryLoader.addPath( file.toPath() );
+					Library.requestAddSource( file.toPath() );
 				}
 
 				event.setDropCompleted( true );
@@ -1827,7 +1809,7 @@ public class MusicPlayerUI extends Application {
 					List <File> files = db.getFiles();
 					
 					for ( File file : files ) {
-						LibraryLoader.addPath( file.toPath() );
+						Library.requestAddSource( file.toPath() );
 					}
 
 					event.setDropCompleted( true );
@@ -1870,9 +1852,9 @@ public class MusicPlayerUI extends Application {
 		playlistTable = new TableView();
 		playlistTable.getColumns().addAll( nameColumn, tracksColumn, lengthColumn );
 		playlistTable.setEditable( false );
-		playlistTable.setItems( playlistsSorted );
+		playlistTable.setItems( Library.playlistsSorted );
 
-		playlistsSorted.comparatorProperty().bind( playlistTable.comparatorProperty() );
+		Library.playlistsSorted.comparatorProperty().bind( playlistTable.comparatorProperty() );
 
 		playlistTable.getSortOrder().add( nameColumn );
 		playlistTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
@@ -1920,7 +1902,7 @@ public class MusicPlayerUI extends Application {
 			// it: getHostServices().showDocument(file.toURI().toString());
 			@Override
 			public void handle ( ActionEvent event ) {
-				playlists.remove( playlistTable.getSelectionModel().getSelectedItem() );
+				Library.removePlaylist( playlistTable.getSelectionModel().getSelectedItem() );
 			}
 		});
 
@@ -2145,7 +2127,7 @@ public class MusicPlayerUI extends Application {
 			}
 		};
 
-		playlistsSorted.addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
+		Library.playlistsSorted.addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
 			updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		} );
 
@@ -2373,7 +2355,7 @@ public class MusicPlayerUI extends Application {
 		
 		//if ( firstInstance ) {
 		
-			LibraryLoader.init();
+			Library.init();
 
 			Persister.loadData();
 	

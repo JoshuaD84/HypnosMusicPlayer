@@ -26,7 +26,7 @@ public class Persister {
 		) {
 			ArrayList<String> searchPaths = (ArrayList<String>) sourcesIn.readObject();
 			for ( String pathString : searchPaths ) {
-				LibraryLoader.updatePath( Paths.get( pathString ) );
+				Library.requestUpdateSource( Paths.get( pathString ) );
 			}
 		} catch ( FileNotFoundException e ) {
 			System.out.println ( "File not found: info.sources, unable to load library source location list, continuing." );
@@ -48,7 +48,7 @@ public class Persister {
 		try (
 				ObjectInputStream playlistsIn = new ObjectInputStream( new FileInputStream( "info.playlists" ) );
 		) {
-			MusicPlayerUI.playlists.addAll( (ArrayList<Playlist>) playlistsIn.readObject() );
+			Library.addPlaylists ( (ArrayList<Playlist>) playlistsIn.readObject() );
 		} catch ( FileNotFoundException e ) {
 			System.out.println ( "File not found: info.playlists, unable to load custom playlist data, continuing." );
 		} catch ( IOException | ClassNotFoundException e ) {
@@ -58,13 +58,12 @@ public class Persister {
 	}
 
 	static void saveData() {
-		//TODO: I should load the album/track data along w/ the sources, to make sure there is never any orphaned albums on the list. 
 		writeDataCompressed();
 		try ( 
 				ObjectOutputStream sourcesOut = new ObjectOutputStream ( new FileOutputStream ( "info.sources" ) );
 		) {
-			ArrayList <String> searchPaths = new ArrayList <String> ( MusicPlayerUI.musicSourcePaths.size() );
-			for ( Path path : MusicPlayerUI.musicSourcePaths ) {
+			ArrayList <String> searchPaths = new ArrayList <String> ( Library.musicSourcePaths.size() );
+			for ( Path path : Library.musicSourcePaths ) {
 				searchPaths.add( path.toString() );
 			}
 			sourcesOut.writeObject( searchPaths );
@@ -90,7 +89,7 @@ public class Persister {
 		try ( 
 				ObjectOutputStream playlistsOut = new ObjectOutputStream ( new FileOutputStream ( "info.playlists" ) );
 		) {
-			playlistsOut.writeObject( new ArrayList <Playlist> ( Arrays.asList( MusicPlayerUI.playlists.toArray( new Playlist[ MusicPlayerUI.playlists.size() ] ) ) ) );
+			playlistsOut.writeObject( new ArrayList <Playlist> ( Arrays.asList( Library.playlists.toArray( new Playlist[ Library.playlists.size() ] ) ) ) );
 			playlistsOut.flush();
 		} catch ( IOException e ) {
 			// TODO Auto-generated catch block
@@ -103,8 +102,9 @@ public class Persister {
 		try (
 				ObjectInputStream dataIn = new ObjectInputStream( new GZIPInputStream ( new FileInputStream( "info.data" ) ) );
 		) {
-			MusicPlayerUI.albums.addAll( (ArrayList<Album>) dataIn.readObject() );
-			MusicPlayerUI.tracks.addAll( (ArrayList<Track>) dataIn.readObject() );
+			//TODO: Maybe do this more carefully, give Library more control over it? 
+			Library.albums.addAll( (ArrayList<Album>) dataIn.readObject() );
+			Library.tracks.addAll( (ArrayList<Track>) dataIn.readObject() );
 		} catch ( FileNotFoundException e ) {
 			System.out.println ( "File not found: info.data, unable to load albuma and song lists, continuing." );
 		} catch ( IOException | ClassNotFoundException e ) {
@@ -126,8 +126,8 @@ public class Persister {
 			ByteArrayOutputStream byteWriter = new ByteArrayOutputStream();
 			ObjectOutputStream bytesOut = new ObjectOutputStream ( byteWriter );
 			
-			bytesOut.writeObject( new ArrayList <Album> ( Arrays.asList( MusicPlayerUI.albums.toArray( new Album[ MusicPlayerUI.albums.size() ] ) ) ) );
-			bytesOut.writeObject( new ArrayList <Track> ( Arrays.asList( MusicPlayerUI.tracks.toArray( new Track[ MusicPlayerUI.tracks.size() ] ) ) ) );
+			bytesOut.writeObject( new ArrayList <Album> ( Arrays.asList( Library.albums.toArray( new Album[ Library.albums.size() ] ) ) ) );
+			bytesOut.writeObject( new ArrayList <Track> ( Arrays.asList( Library.tracks.toArray( new Track[ Library.tracks.size() ] ) ) ) );
 
 			compressedOut.write( byteWriter.toByteArray() );
 			compressedOut.flush();
