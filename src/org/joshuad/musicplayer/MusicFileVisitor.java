@@ -7,10 +7,14 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 import javafx.collections.ObservableList;
 
+/* Note: this class is not designed for repeat uses. */
+
 public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 	
 	ObservableList <Album> albums;
 	ObservableList <Track> tracks;
+	
+	private boolean walkInterrupted = false;
 	
 	public MusicFileVisitor ( ObservableList <Album> albums, ObservableList <Track> tracks  ) {
 		this.albums = albums;
@@ -19,6 +23,10 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 	
 	@Override
 	public FileVisitResult visitFile ( Path file, BasicFileAttributes attr ) {
+		
+		if ( walkInterrupted ) {
+			return FileVisitResult.TERMINATE;
+		}
 
 		if ( Utils.isMusicFile ( file ) ) {
 				
@@ -46,7 +54,6 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 		} else {
 			return FileVisitResult.CONTINUE;
 		}
-			
 	}
 	
 	@Override
@@ -57,6 +64,15 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 	public FileVisitResult visitFileFailed( Path file, IOException exc ) {
 		return FileVisitResult.CONTINUE;
 	}
+	
+	public void interrupt() {
+		walkInterrupted = true;
+	}
+		
+	public boolean getWalkInterrupted() {
+		return walkInterrupted;
+	}
+		
 
 }
 

@@ -130,7 +130,7 @@ public class Track implements Serializable {
 		if ( title.equals( "" ) ) { title = fnTitle; setByFileName = true; }
 		
 		if ( setByFileName ) {
-			if ( LibraryLoaderDaemon.SHOW_SCAN_NOTES ) {
+			if ( LibraryLoader.SHOW_SCAN_NOTES ) {
 				System.out.println ( "Set by filename: " + trackFile );
 			}
 		}
@@ -188,13 +188,13 @@ public class Track implements Serializable {
 					
 				} else if ( rawText.matches("^[0-9]+/.*") ) {
 					trackNumber = Integer.parseInt( rawText.split("/")[0] );
-					if ( LibraryLoaderDaemon.SHOW_SCAN_NOTES ) {
+					if ( LibraryLoader.SHOW_SCAN_NOTES ) {
 						System.out.println ( "Bad, but fixable, track numbering: " + rawText + " - " + trackFile.toString() );
 					}
 				
 				} else if ( rawNoWhiteSpace.matches("^[0-9]+/.*") ) {
 					trackNumber = Integer.parseInt( rawNoWhiteSpace.split("/")[0] );
-					if ( LibraryLoaderDaemon.SHOW_SCAN_NOTES ) {
+					if ( LibraryLoader.SHOW_SCAN_NOTES ) {
 						System.out.println ( "Bad, but fixable, track numbering: " + rawText + " - " + trackFile.toString() );
 					}
 					
@@ -204,7 +204,7 @@ public class Track implements Serializable {
 				
 			} catch ( NumberFormatException e ) {
 				if ( ! rawNoWhiteSpace.equals( "" ) ) {
-					if ( LibraryLoaderDaemon.SHOW_SCAN_NOTES ) {
+					if ( LibraryLoader.SHOW_SCAN_NOTES ) {
 						System.out.println ( "Invalid track number: " + rawText  + " - " + trackFile.toString() );
 					}
 				}
@@ -221,7 +221,7 @@ public class Track implements Serializable {
 				discCount = Integer.valueOf( tag.getFirst ( FieldKey.DISC_TOTAL ) );
 			} catch ( NumberFormatException e ) {
 				if ( ! tag.getFirst ( FieldKey.DISC_TOTAL ).equals( "" ) ) {
-					if ( LibraryLoaderDaemon.SHOW_SCAN_NOTES ) {
+					if ( LibraryLoader.SHOW_SCAN_NOTES ) {
 						System.out.println ( "Invalid disc count: " + tag.getFirst ( FieldKey.DISC_TOTAL )  + " - " + trackFile.toString() );
 					}
 				}
@@ -245,7 +245,7 @@ public class Track implements Serializable {
 						discCount = Integer.parseInt( rawText.split("/")[1] );
 					}
 						
-					if ( LibraryLoaderDaemon.SHOW_SCAN_NOTES ) {	
+					if ( LibraryLoader.SHOW_SCAN_NOTES ) {	
 						System.out.println ( "Bad, but fixable, disc numbering: " + rawText + " - " + trackFile.toString() );
 					}
 				
@@ -257,7 +257,7 @@ public class Track implements Serializable {
 						discCount = Integer.parseInt( rawNoWhiteSpace.split("/")[1] );
 					}
 
-					if ( LibraryLoaderDaemon.SHOW_SCAN_NOTES ) {	
+					if ( LibraryLoader.SHOW_SCAN_NOTES ) {	
 						System.out.println ( "Bad, but fixable, disc numbering: " + rawText + " - " + trackFile.toString() );
 					}
 					
@@ -267,7 +267,7 @@ public class Track implements Serializable {
 				
 			} catch ( NumberFormatException e ) {
 				if ( ! rawNoWhiteSpace.equals( "" ) ) {
-					if ( LibraryLoaderDaemon.SHOW_SCAN_NOTES ) {
+					if ( LibraryLoader.SHOW_SCAN_NOTES ) {
 						System.out.println ( "Invalid disc number: " + rawText  + " - " + trackFile.toString() );
 					}
 				}

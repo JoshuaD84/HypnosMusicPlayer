@@ -23,7 +23,6 @@ import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.TagException;
 import org.joshuad.musicplayer.players.AACPlayer;
 import org.joshuad.musicplayer.players.AbstractPlayer;
-import org.joshuad.musicplayer.players.OldFlacPlayer;
 import org.joshuad.musicplayer.players.MP3Player;
 import org.joshuad.musicplayer.players.FlacPlayer;
 import org.joshuad.musicplayer.players.OggPlayer;
@@ -176,8 +175,6 @@ public class MusicPlayerUI extends Application {
 	static CheckBox trackListCheckBox;
 	static TextField trackFilterBox;
 
-	static private LibraryLoaderDaemon libraryLoader;
-	
 	static ShuffleMode shuffleMode = ShuffleMode.SEQUENTIAL;
 
 	enum ShuffleMode {
@@ -625,7 +622,7 @@ public class MusicPlayerUI extends Application {
 
 		stage.setTitle( PROGRAM_NAME );
 
-		libraryLoader.start();
+		LibraryLoader.start();
 		
 		((Group) scene.getRoot()).getChildren().addAll( primaryContainer );
 		stage.setScene( scene );
@@ -959,7 +956,7 @@ public class MusicPlayerUI extends Application {
 				List <File> files = db.getFiles();
 				
 				for ( File file : files ) {
-					addMusicSource ( file.toPath() );
+					LibraryLoader.addPath( file.toPath() );
 				}
 
 				event.setDropCompleted( true );
@@ -997,7 +994,7 @@ public class MusicPlayerUI extends Application {
 			public void handle ( ActionEvent e ) {
 				File selectedFile = chooser.showDialog( libraryWindow );
 				if ( selectedFile != null ) {
-					addMusicSource ( selectedFile.toPath() );
+					LibraryLoader.addPath( selectedFile.toPath() );
 				}
 			}
 		});
@@ -1005,7 +1002,8 @@ public class MusicPlayerUI extends Application {
 		removeButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				removeMusicSource ( musicSourceTable.getSelectionModel().getSelectedItems() );
+				LibraryLoader.removePaths( musicSourceTable.getSelectionModel().getSelectedItems() );
+				musicSourceTable.getSelectionModel().clearSelection();	
 			}
 		});
 
@@ -1013,7 +1011,7 @@ public class MusicPlayerUI extends Application {
 			@Override
 			public void handle ( final KeyEvent keyEvent ) {
 				if ( keyEvent.getCode().equals( KeyCode.DELETE ) ) {
-					removeMusicSource ( musicSourceTable.getSelectionModel().getSelectedItems() );
+					LibraryLoader.removePaths( musicSourceTable.getSelectionModel().getSelectedItems() );
 				}
 			}
 		});
@@ -1064,59 +1062,6 @@ public class MusicPlayerUI extends Application {
 		return true;
 	}
 	
-	public static void removeMusicSource ( List <Path> input ) {
-		ArrayList <Path> sources = new ArrayList ( input ) ;
-		musicSourcePaths.removeAll( sources );
-		musicSourceTable.getSelectionModel().clearSelection();	
-
-		ArrayList <Album> albumsCopy = new ArrayList <Album> ( albums );
-		
-		//TODO: this code is kinda duplciated in music loader daemon
-		for ( Album album : albumsCopy ) {
-			
-			for ( Path sourcePath : sources ) {
-				if ( album.getPath().toAbsolutePath().startsWith( sourcePath ) ) {
-					boolean remove = true;
-					for ( Path otherSourcePath : musicSourcePaths ) {
-						if ( album.getPath().toAbsolutePath().startsWith( otherSourcePath ) ) {
-							remove = false;
-						}
-					}
-					
-					if ( remove ) {
-						albums.remove ( album );
-						ArrayList <Track> removeMe = album.getTracks();
-						if ( removeMe != null ) {
-							boolean changed = tracks.removeAll( removeMe );
-						}
-					}
-				}
-			}
-		}
-	}
-
-	public void addMusicSource ( Path path ) {
-		if ( path != null ) {
-			path = path.toAbsolutePath();
-			
-			if ( path.toFile().exists() && path.toFile().isDirectory() ) {
-
-				boolean addSelectedPathToList = true;
-				for ( Path alreadyAddedPath : musicSourcePaths ) {
-					try {
-						if ( Files.isSameFile( path, alreadyAddedPath ) ) {
-							addSelectedPathToList = false;
-						}
-					} catch ( IOException e1 ) {} // Do nothing, assume they don't match.
-				}
-				
-				if ( addSelectedPathToList ) {
-					musicSourcePaths.add( path );
-				}
-			}
-		}
-	}
-
 	public void setupAlbumImage () {
 		albumImage = new BorderPane();
 	}
@@ -1666,7 +1611,7 @@ public class MusicPlayerUI extends Application {
 				List <File> files = db.getFiles();
 				
 				for ( File file : files ) {
-					addMusicSource ( file.toPath() );
+					LibraryLoader.addPath( file.toPath() );
 				}
 
 				event.setDropCompleted( true );
@@ -1700,7 +1645,7 @@ public class MusicPlayerUI extends Application {
 					List <File> files = db.getFiles();
 					
 					for ( File file : files ) {
-						addMusicSource ( file.toPath() );
+						LibraryLoader.addPath( file.toPath() );
 					}
 
 					event.setDropCompleted( true );
@@ -1840,7 +1785,7 @@ public class MusicPlayerUI extends Application {
 				List <File> files = db.getFiles();
 				
 				for ( File file : files ) {
-					addMusicSource ( file.toPath() );
+					LibraryLoader.addPath( file.toPath() );
 				}
 
 				event.setDropCompleted( true );
@@ -1882,7 +1827,7 @@ public class MusicPlayerUI extends Application {
 					List <File> files = db.getFiles();
 					
 					for ( File file : files ) {
-						addMusicSource ( file.toPath() );
+						LibraryLoader.addPath( file.toPath() );
 					}
 
 					event.setDropCompleted( true );
@@ -2427,8 +2372,10 @@ public class MusicPlayerUI extends Application {
 		boolean firstInstance = SingleInstanceController.startCLICommandListener();
 		
 		//if ( firstInstance ) {
-			libraryLoader = new LibraryLoaderDaemon ();
-			musicSourcePaths.addListener( libraryLoader );
+		
+			LibraryLoader.init();
+
+			Persister.loadData();
 	
 			Application.launch( args );
 			

@@ -31,7 +31,10 @@
 		<jar destfile="${jarFile}" basedir="${build}">
 			<manifest>
 				<attribute name="Main-Class" value="org.joshuad.musicplayer.MusicPlayerUI" />
-				<attribute name="Class-Path" value="lib/jaudiotagger-2.2.6-SNAPSHOT.jar lib/jl1.0.1.jar lib/mp3spi1.9.5.jar lib/tritonus_share.jar" />
+				<attribute name="Class-Path" value="lib/basicplayer3.0.jar lib/commons-cli-1.4.jar lib/jaudiotagger-2.2.6-SNAPSHOT.jar
+													lib/jflac-1.2.jar lib/jflac-1.3.jar lib/jl1.0.1.jar lib/jl1.0.jar lib/jmactritonussspi1.74.jar
+													lib/jogg-0.0.7.jar lib/jorbis-0.0.15.jar lib/jspeex0.9.7.jar lib/kj_dsp1.1.jar
+													lib/mp3spi1.9.5.jar lib/tritonus_share.jar lib/vorbisspi1.0.3.jar" />
 			</manifest>
 		</jar>
 	</target>

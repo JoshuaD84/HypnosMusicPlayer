@@ -20,13 +20,13 @@ public class Persister {
 	@SuppressWarnings("unchecked")
 	public static void loadData() {
 
-		long startTime = System.currentTimeMillis();
+		readDataCompressed();
 		try (
 				ObjectInputStream sourcesIn = new ObjectInputStream( new FileInputStream( "info.sources" ) );
 		) {
 			ArrayList<String> searchPaths = (ArrayList<String>) sourcesIn.readObject();
 			for ( String pathString : searchPaths ) {
-				MusicPlayerUI.musicSourcePaths.add( Paths.get( pathString ) );
+				LibraryLoader.updatePath( Paths.get( pathString ) );
 			}
 		} catch ( FileNotFoundException e ) {
 			System.out.println ( "File not found: info.sources, unable to load library source location list, continuing." );
@@ -55,12 +55,11 @@ public class Persister {
 			//TODO: 
 			e.printStackTrace();
 		}
-		
-		readDataCompressed();
-		System.out.println ( "Read time: " + (System.currentTimeMillis() - startTime ) );
 	}
 
 	static void saveData() {
+		//TODO: I should load the album/track data along w/ the sources, to make sure there is never any orphaned albums on the list. 
+		writeDataCompressed();
 		try ( 
 				ObjectOutputStream sourcesOut = new ObjectOutputStream ( new FileOutputStream ( "info.sources" ) );
 		) {
@@ -97,10 +96,6 @@ public class Persister {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		long startTime = System.currentTimeMillis();
-		writeDataCompressed();
-		System.out.println ( "Write Compressed: " + (System.currentTimeMillis() - startTime ) );
 	}
 	
 	@SuppressWarnings("unchecked")
