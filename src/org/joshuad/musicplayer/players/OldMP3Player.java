@@ -14,13 +14,13 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.AudioHeader;
-import org.jaudiotagger.audio.flac.FlacAudioHeader;
+import org.jaudiotagger.audio.mp3.MP3AudioHeader;
 import org.joshuad.musicplayer.MusicPlayerUI;
 import org.joshuad.musicplayer.Track;
 
 import javafx.scene.control.Slider;
 
-public class FlacPlayer extends AbstractPlayer implements Runnable {
+public class OldMP3Player extends AbstractPlayer implements Runnable {
 
 	private Track track;
 	
@@ -40,11 +40,11 @@ public class FlacPlayer extends AbstractPlayer implements Runnable {
 	
 	private Slider trackPosition;
 	
-	public FlacPlayer ( Track track, Slider trackPosition ) {
+	public OldMP3Player ( Track track, Slider trackPosition ) {
 		this ( track, trackPosition, false );
 	}
 	
-	public FlacPlayer ( Track track, Slider trackPosition, boolean startPaused ) {
+	public OldMP3Player ( Track track, Slider trackPosition, boolean startPaused ) {
 		this.track = track;
 		this.trackPosition = trackPosition;
 		this.pauseRequested = startPaused;
@@ -95,7 +95,7 @@ public class FlacPlayer extends AbstractPlayer implements Runnable {
 					audioOutput.start();
 					 
 				} catch ( UnsupportedAudioFileException | IOException | LineUnavailableException e ) {
-					e.printStackTrace ( System.out ); //TODO: 
+					//TODO: 
 				}
 				
 				seekRequestPercent = NO_SEEK_REQUESTED;
@@ -117,13 +117,14 @@ public class FlacPlayer extends AbstractPlayer implements Runnable {
 						bytePosition += bytesRead;
 					}
 				} catch ( IOException e ) {
-					e.printStackTrace ( System.out ); //TODO: 
+					//TODO: 
 				}
 			} else {
 				try {
 					Thread.sleep ( 5 );
 				} catch (InterruptedException e) {
-					e.printStackTrace ( System.out ); //TODO: 
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 			updateTransport();
@@ -132,15 +133,10 @@ public class FlacPlayer extends AbstractPlayer implements Runnable {
 	
 	private void updateTransport() {
 		if ( seekRequestPercent == NO_SEEK_REQUESTED ) {
-			//System.out.println ( "Clip start time: " + clipStartTime );
 			double positionPercent = (double) ( audioOutput.getMicrosecondPosition() + clipStartTime * 1000 ) / ( (double) track.getLength() * 1000000 );
 			int timeElapsed = (int)(track.getLength() * positionPercent);
 			int timeRemaining = track.getLength() - timeElapsed;
 			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, positionPercent );
-		} else {
-			int timeElapsed = (int)(track.getLength() * seekRequestPercent);
-			int timeRemaining = track.getLength() - timeElapsed;
-			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, seekRequestPercent );
 		}
 	}
 	
@@ -149,54 +145,53 @@ public class FlacPlayer extends AbstractPlayer implements Runnable {
 	private void openStreamsAtRequestedOffset ( ) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
 		encodedInput = AudioSystem.getAudioInputStream( track.getPath().toFile() );
 		
+		if ( seekRequestPercent != NO_SEEK_REQUESTED ) {
+			int seekPositionMS = (int) ( track.getLength() * 1000 * seekRequestPercent );
+			long seekPositionByte = getBytePosition ( track.getPath().toFile(), seekPositionMS );
+			byte[] data = new byte[ (int) seekPositionByte ]; 
+			int bytesRead = encodedInput.read ( data, 0, data.length ); //For some reason, skip() doesn't work as well. 
+			clipStartTime = seekPositionMS;
+		}
+		
 		AudioFormat baseFormat = encodedInput.getFormat();
-		AudioFormat decoderFormat = new AudioFormat(
+		AudioFormat decoderFormat = new AudioFormat (
 				AudioFormat.Encoding.PCM_SIGNED, baseFormat.getSampleRate(),
 				16, baseFormat.getChannels(), baseFormat.getChannels() * 2,
 				baseFormat.getSampleRate(), false );
-
-		decodedInput = AudioSystem.getAudioInputStream ( decoderFormat, encodedInput );
 		
-		if ( seekRequestPercent != NO_SEEK_REQUESTED ) {
-			long seekPositionByte = getBytePosition ( track.getPath().toFile(), seekRequestPercent );
-			int bytesRead = 0;
-
-			byte[] skippedData = new byte[ 256 ];
-			while ( bytesRead < seekPositionByte ) {
-				int bytesSkipped = decodedInput.read ( skippedData );
-				bytesRead += bytesSkipped;
-			}
-			
-			clipStartTime = (long)(track.getLength() * seekRequestPercent) * 1000;
-		}
-
+		decodedInput = AudioSystem.getAudioInputStream ( decoderFormat, encodedInput );
 		
 		DataLine.Info info = new DataLine.Info ( SourceDataLine.class, decoderFormat );
 		audioOutput = (SourceDataLine) AudioSystem.getLine(info);
 		audioOutput.open( decoderFormat );
 	}
 	
-	public long getBytePosition ( File file, double requestPercent ) {
+	public long getBytePosition ( File file, long targetTimeMS ) {
+
+		long bytePosition = -1;
+
 		try {
 
 			AudioFile audioFile = AudioFileIO.read( file );
 			AudioHeader audioHeader = audioFile.getAudioHeader();
-			
-			if ( audioHeader instanceof FlacAudioHeader ) {
-				FlacAudioHeader flacAudioHeader = (FlacAudioHeader) audioHeader;
-				
-				long decodedLengthBytes = flacAudioHeader.getNoOfSamples() * flacAudioHeader.getBitsPerSample() / 8  * 2;
-				double lengthMS = flacAudioHeader.getPreciseTrackLength() * 1000;
-				int byteTarget = (int)(requestPercent * decodedLengthBytes);
-				
-				return byteTarget;
+
+			if ( audioHeader instanceof MP3AudioHeader ) {
+				MP3AudioHeader mp3AudioHeader = (MP3AudioHeader) audioHeader;
+				long audioStartByte = mp3AudioHeader.getMp3StartByte();
+				long audioSize = file.length() - audioStartByte;
+				long frameCount = mp3AudioHeader.getNumberOfFrames();
+				long frameSize = audioSize / frameCount;
+
+				double frameDurationInMs = (mp3AudioHeader.getPreciseTrackLength() / (double) frameCount) * 1000;
+				double framesForMs = targetTimeMS / frameDurationInMs;
+				long bytePositionForMs = (long) (audioStartByte + (framesForMs * frameSize));
+				bytePosition = bytePositionForMs;
 			}
 
-			return 0;
+			return bytePosition;
 
 		} catch ( Exception e ) {
-			e.printStackTrace( System.out );
-			return 0;
+			return bytePosition;
 		}
 	}
 
@@ -231,7 +226,6 @@ public class FlacPlayer extends AbstractPlayer implements Runnable {
 	@Override 
 	public void seek ( double positionPercent ) {
 		seekRequestPercent = positionPercent;
-		updateTransport();
 	}
 
 	@Override

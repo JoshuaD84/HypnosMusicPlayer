@@ -1,15 +1,9 @@
 package org.joshuad.musicplayer.players;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.SourceDataLine;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -19,26 +13,35 @@ import org.joshuad.musicplayer.MusicPlayerUI;
 import org.joshuad.musicplayer.Track;
 
 import javafx.scene.control.Slider;
+import javazoom.jl.decoder.Bitstream;
+import javazoom.jl.decoder.BitstreamException;
+import javazoom.jl.decoder.Decoder;
+import javazoom.jl.decoder.Header;
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.decoder.SampleBuffer;
+import javazoom.jl.player.AudioDevice;
+import javazoom.jl.player.FactoryRegistry;
 
 public class MP3Player extends AbstractPlayer implements Runnable {
+	
+	private Bitstream encodedInput;
+	private Decoder decoder;
+	private AudioDevice audioOut;
 
 	private Track track;
 	
 	private static final int NO_SEEK_REQUESTED = -1;
-
-	AudioInputStream encodedInput;
-	AudioInputStream decodedInput;
-	SourceDataLine audioOutput;
-
+	
 	private boolean pauseRequested = false;
 	private boolean playRequested = false;
 	private boolean stopRequested = false;
 	private double seekRequestPercent = NO_SEEK_REQUESTED;	
-	private long clipStartTime = 0; //If we seek, we need to remember where we started so we can make the seek bar look right. 
+	private long clipStartTimeMS = 0; //If we seek, we need to remember where we started so we can make the seek bar look right. 
 	
 	private boolean paused = false;
 	
 	private Slider trackPosition;
+
 	
 	public MP3Player ( Track track, Slider trackPosition ) {
 		this ( track, trackPosition, false );
@@ -57,10 +60,9 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	public void run() {
 
 		try {
-			openStreamsAtRequestedOffset ();
-			audioOutput.start(); //TODO: deal with startPaused here instead of where I do it? 
-			
-		} catch ( LineUnavailableException | UnsupportedAudioFileException | IOException e ) {
+			openStreamsAtRequestedOffset();
+						
+		} catch ( IOException | JavaLayerException e ) {
 			//TODO: We should break here; if the thing's not open then it's going to fail later. 
 			e.printStackTrace();
 		}
@@ -69,20 +71,20 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	    
 		while ( true ) {
 			if ( stopRequested ) {
-				closeAllResources();
+				//closeAllResources();
 				MusicPlayerUI.songFinishedPlaying( true );
 				stopRequested = false;
 				return;
 			}				
 				
 			if ( pauseRequested ) {
-				audioOutput.stop();
+				//TODO: Do we need to do anything to pause other than stop writing? 
 				pauseRequested = false;
 				paused = true;
 			}
 			
 			if ( playRequested ) {
-				audioOutput.start();
+				//TODO: Do we need to do anything to pause other than stop writing? 
 				playRequested = false;
 				paused = false;
 			}
@@ -92,10 +94,10 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 				try {
 					closeAllResources();
 					openStreamsAtRequestedOffset();
-					audioOutput.start();
 					 
-				} catch ( UnsupportedAudioFileException | IOException | LineUnavailableException e ) {
-					//TODO: 
+				} catch ( JavaLayerException | IOException e ) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 				
 				seekRequestPercent = NO_SEEK_REQUESTED;
@@ -104,20 +106,20 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 			
 			if ( !paused ) {
 				try {
-					byte[] data = new byte[4096];
-					int bytesRead = decodedInput.read ( data, 0, data.length );
-					
-					if ( bytesRead < 0 ) {
-						closeAllResources();
-						MusicPlayerUI.songFinishedPlaying( false );
-						return;
-						
-					} else {
-						audioOutput.write(data, 0, bytesRead);
-						bytePosition += bytesRead;
+					Header header = encodedInput.readFrame();
+					if ( header == null ) {
+						// last frame, ensure all data flushed to the audio device.
+						if ( audioOut != null ) {
+							audioOut.flush();
+						}
+						break; // We reached the end of the file. 
 					}
-				} catch ( IOException e ) {
-					//TODO: 
+	
+					SampleBuffer output = (SampleBuffer) decoder.decodeFrame( header, encodedInput );
+					audioOut.write( output.getBuffer(), 0, output.getBufferLength() );
+					encodedInput.closeFrame();
+				} catch ( JavaLayerException e ) {
+					e.printStackTrace();
 				}
 			} else {
 				try {
@@ -133,39 +135,35 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	
 	private void updateTransport() {
 		if ( seekRequestPercent == NO_SEEK_REQUESTED ) {
-			double positionPercent = (double) ( audioOutput.getMicrosecondPosition() + clipStartTime * 1000 ) / ( (double) track.getLength() * 1000000 );
+			//System.out.println ( "Clip start time: " + clipStartTime );
+			double positionPercent = (double) ( audioOut.getPosition() + clipStartTimeMS * 1000 ) / ( (double) track.getLength() * 1000000 );
 			int timeElapsed = (int)(track.getLength() * positionPercent);
 			int timeRemaining = track.getLength() - timeElapsed;
 			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, positionPercent );
+		} else {
+			int timeElapsed = (int)(track.getLength() * seekRequestPercent);
+			int timeRemaining = track.getLength() - timeElapsed;
+			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, seekRequestPercent );
 		}
 	}
 	
-
-	//I think these two functions are the only places where codec-specific magic has to happen? 
-	private void openStreamsAtRequestedOffset ( ) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
-		encodedInput = AudioSystem.getAudioInputStream( track.getPath().toFile() );
+	public void openStreamsAtRequestedOffset () throws IOException, JavaLayerException {
+		FileInputStream fis = new FileInputStream( track.getPath().toFile() );
+        BufferedInputStream bis = new BufferedInputStream(fis);
 		
 		if ( seekRequestPercent != NO_SEEK_REQUESTED ) {
 			int seekPositionMS = (int) ( track.getLength() * 1000 * seekRequestPercent );
 			long seekPositionByte = getBytePosition ( track.getPath().toFile(), seekPositionMS );
-			byte[] data = new byte[ (int) seekPositionByte ]; 
-			int bytesRead = encodedInput.read ( data, 0, data.length ); //For some reason, skip() doesn't work as well. 
-			clipStartTime = seekPositionMS;
+			bis.skip( seekPositionByte ); 
+			clipStartTimeMS = seekPositionMS;
 		}
 		
-		AudioFormat baseFormat = encodedInput.getFormat();
-		AudioFormat decoderFormat = new AudioFormat (
-				AudioFormat.Encoding.PCM_SIGNED, baseFormat.getSampleRate(),
-				16, baseFormat.getChannels(), baseFormat.getChannels() * 2,
-				baseFormat.getSampleRate(), false );
-		
-		decodedInput = AudioSystem.getAudioInputStream ( decoderFormat, encodedInput );
-		
-		DataLine.Info info = new DataLine.Info ( SourceDataLine.class, decoderFormat );
-		audioOutput = (SourceDataLine) AudioSystem.getLine(info);
-		audioOutput.open( decoderFormat );
+		encodedInput = new Bitstream( bis );
+		audioOut = FactoryRegistry.systemRegistry().createAudioDevice();
+		decoder = new Decoder();
+		audioOut.open( decoder );
 	}
-	
+
 	public long getBytePosition ( File file, long targetTimeMS ) {
 
 		long bytePosition = -1;
@@ -194,20 +192,28 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 			return bytePosition;
 		}
 	}
-
+	
 	private void closeAllResources() {
 		try {
-			audioOutput.drain();
-			audioOutput.stop();
-			audioOutput.close();
-			decodedInput.close();
+			audioOut.flush();
+			audioOut.close();
 			encodedInput.close();
-		} catch (IOException e) {
+		} catch ( BitstreamException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
+	protected boolean decodeFrame () throws JavaLayerException {
+		try {
+
+			
+		} catch ( RuntimeException ex ) {
+			throw new JavaLayerException( "Exception decoding audio frame", ex );
+		}
+		return true;
+	}
+
 	@Override 
 	public void pause() {
 		pauseRequested = true;
@@ -226,6 +232,7 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	@Override 
 	public void seek ( double positionPercent ) {
 		seekRequestPercent = positionPercent;
+		updateTransport();
 	}
 
 	@Override
@@ -238,4 +245,3 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 		return track;
 	}
 }
-

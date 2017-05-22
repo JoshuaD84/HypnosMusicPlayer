@@ -153,8 +153,12 @@ public class Track implements Serializable {
 		if ( tag != null ) {
 			title = tag.getFirst ( FieldKey.TITLE );
 			
-			if ( title.equals( "" ) ) {
-				title = tag.getFirst( FieldKey.TITLE_SORT );
+			try { 
+				if ( title.equals( "" ) ) {
+					title = tag.getFirst( FieldKey.TITLE_SORT );
+				}
+			} catch ( UnsupportedOperationException e ) {
+				//No problem, it doesn't exist for this file format
 			}
 		}	
 	}
@@ -162,13 +166,21 @@ public class Track implements Serializable {
 	private void parseAlbum ( Tag tag ) {
 		if ( tag != null ) {
 			album = tag.getFirst ( FieldKey.ALBUM );
-			if ( album.equals( "" ) ) album = tag.getFirst( FieldKey.ALBUM_SORT );
+			try { 
+				if ( album.equals( "" ) ) album = tag.getFirst( FieldKey.ALBUM_SORT );
+			} catch ( UnsupportedOperationException e ) {
+				//No problem, it doesn't exist for this file format
+			}
 		}
 	}
 	
 	private void parseYear ( Tag tag ) {
 		if ( tag != null ) {
-			year = tag.getFirst ( FieldKey.ORIGINAL_YEAR );
+			try { 
+				year = tag.getFirst ( FieldKey.ORIGINAL_YEAR );
+			} catch ( UnsupportedOperationException e ) {
+				//No problem, it doesn't exist for this file format
+			}
 			if ( year.equals( "" ) ) year = tag.getFirst( FieldKey.YEAR );
 		}
 	}
@@ -214,9 +226,11 @@ public class Track implements Serializable {
 	
 	private void parseDiscInfo ( Tag tag ) {
 		if ( tag != null ) {
-
-			discSubtitle = tag.getFirst ( FieldKey.DISC_SUBTITLE );
-			
+			try {
+				discSubtitle = tag.getFirst ( FieldKey.DISC_SUBTITLE );
+			} catch ( UnsupportedOperationException e ) {
+				//No problem, it doesn't exist for this file format
+			}
 			try {
 				discCount = Integer.valueOf( tag.getFirst ( FieldKey.DISC_TOTAL ) );
 			} catch ( NumberFormatException e ) {
@@ -225,12 +239,16 @@ public class Track implements Serializable {
 						System.out.println ( "Invalid disc count: " + tag.getFirst ( FieldKey.DISC_TOTAL )  + " - " + trackFile.toString() );
 					}
 				}
+			} catch ( UnsupportedOperationException e ) {
+				//No problem, it doesn't exist for this file format
 			}
 			
-			String rawText = tag.getFirst ( FieldKey.DISC_NO );
-			String rawNoWhiteSpace = rawText.replaceAll("\\s+","");
+			String rawText = "";
+			String rawNoWhiteSpace = "";
+			try {
+				rawText = tag.getFirst ( FieldKey.DISC_NO );
+				rawNoWhiteSpace = rawText.replaceAll("\\s+","");
 			
-			try { 
 				if ( rawText.matches( "^[0-9]+$" ) ) { // 0, 01, 1010, 2134141, etc.
 					discNumber = Integer.parseInt( rawText );
 					
@@ -271,6 +289,8 @@ public class Track implements Serializable {
 						System.out.println ( "Invalid disc number: " + rawText  + " - " + trackFile.toString() );
 					}
 				}
+			} catch ( UnsupportedOperationException e ) {
+				//No problem, it doesn't exist for this file format
 			}
 		}
 	}
@@ -281,7 +301,11 @@ public class Track implements Serializable {
 	
 	private void parseReleaseType ( Tag tag ) {
 		if ( tag != null ) {
-			releaseType = tag.getFirst ( FieldKey.MUSICBRAINZ_RELEASE_TYPE );
+			try {
+				releaseType = tag.getFirst ( FieldKey.MUSICBRAINZ_RELEASE_TYPE );
+			} catch ( UnsupportedOperationException e ) {
+				//No problem, it doesn't exist for this file format
+			}
 		}
 	}
 		
@@ -357,6 +381,15 @@ public class Track implements Serializable {
 			
 		} else if ( testExtension.equals( Format.WAV.getExtension() ) ) {
 			return Format.WAV;
+			
+		} else if ( testExtension.equals( "m4b" ) ) { //TODO: do this right
+			return Format.AAC;
+			
+		} else if ( testExtension.equals( "m4r" ) ) { //TODO: do this right
+			return Format.AAC;
+			
+		} else if ( testExtension.equals( "aac" ) ) { //TODO: do this right
+			return Format.AAC;
 		
 		} else {
 			return Format.UNKNOWN;

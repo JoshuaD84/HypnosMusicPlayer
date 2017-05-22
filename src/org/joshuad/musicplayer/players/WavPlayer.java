@@ -137,11 +137,17 @@ public class WavPlayer extends AbstractPlayer implements Runnable {
 	}
 	
 	private void updateTransport() {
-		if ( seekRequestPercent == -1 ) {
+		
+		if ( seekRequestPercent == NO_SEEK_REQUESTED ) {
+			//System.out.println ( "Clip start time: " + clipStartTime );
 			double positionPercent = (double) ( audioOutput.getMicrosecondPosition() + clipStartTime * 1000 ) / ( (double) track.getLength() * 1000000 );
 			int timeElapsed = (int)(track.getLength() * positionPercent);
 			int timeRemaining = track.getLength() - timeElapsed;
 			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, positionPercent );
+		} else {
+			int timeElapsed = (int)(track.getLength() * seekRequestPercent);
+			int timeRemaining = track.getLength() - timeElapsed;
+			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, seekRequestPercent );
 		}
 	}
 	
@@ -209,6 +215,7 @@ public class WavPlayer extends AbstractPlayer implements Runnable {
 	@Override 
 	public void seek ( double positionPercent ) {
 		seekRequestPercent = positionPercent;
+		updateTransport();
 	}
 
 	@Override

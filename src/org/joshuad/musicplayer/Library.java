@@ -9,8 +9,8 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.nio.file.WatchKey;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -171,19 +171,24 @@ public class Library {
 		}
 	}
 	
-	public static void addAlbum ( Album album ) {
-		removeAlbum( album );
-		albums.add ( album );
+	static void addAlbum ( Album album ) {
+		int currentIndex = albums.indexOf( album );
+		
+		if ( currentIndex != -1 ) {
+			albums.set( currentIndex, album );
+		} else {
+			albums.add ( album );
+		}
 		addTracks( album.getTracks() );
 	}
 	
-	public static void removeAlbums ( ArrayList<Album> albums ) {
+	static void removeAlbums ( ArrayList<Album> albums ) {
 		for ( Album album : albums ) {
 			removeAlbum ( album );
 		}
 	}
 	
-	public static void removeAlbum ( Album album ) {
+	static void removeAlbum ( Album album ) {
 		albums.remove( album );
 		removeTracks ( album.tracks );
 	}
@@ -192,24 +197,29 @@ public class Library {
 		return tracks.contains( track );
 	}
 	
-	public static void addTracks ( ArrayList<Track> tracks ) {
+	static void addTracks ( ArrayList<Track> tracks ) {
 		for ( Track track : tracks ) {
 			addTrack ( track );
 		}
 	}
 	
-	public static void addTrack ( Track track ) {
-		removeTrack ( track );
-		tracks.add ( track );
+	static void addTrack ( Track track ) {
+		int currentIndex = tracks.indexOf( track );
+		
+		if ( currentIndex != -1 ) {
+			tracks.set( currentIndex, track );
+		} else {
+			tracks.add ( track );
+		}
 	}
 	
-	public static void removeTracks ( ArrayList<Track> tracks ) {
+	static void removeTracks ( ArrayList<Track> tracks ) {
 		for ( Track track : tracks ) {
 			removeTrack ( track );
 		}
 	}
 	
-	public static void removeTrack ( Track track ) {
+	static void removeTrack ( Track track ) {
 		tracks.remove( track );
 	}
 	
@@ -231,10 +241,10 @@ public class Library {
 		Path sourcePath = removeMe.remove( 0 ).toAbsolutePath();
 		
 		if ( Files.isDirectory( sourcePath ) ) {
-			ArrayList <Album> albumsCopy = new ArrayList <Album> ( Library.albums );
+			ArrayList <Album> albumsCopy = new ArrayList <Album> ( albums );
 			for ( Album album : albumsCopy ) {
 				if ( album.getPath().toAbsolutePath().startsWith( sourcePath ) ) {
-					Library.albums.remove ( album );
+					removeAlbum ( album );
 					ArrayList <Track> tracks = album.getTracks();
 					if ( tracks != null ) {
 						tracks.removeAll( tracks );
@@ -245,7 +255,7 @@ public class Library {
 			ArrayList <Track> tracksCopy = new ArrayList <Track> ( tracks );
 			for ( Track track : tracksCopy ) {
 				if ( track.getPath().toAbsolutePath().startsWith( sourcePath ) ) {
-					tracks.remove ( track );
+					removeTrack ( track );
 				}
 			}
 		}
@@ -317,7 +327,7 @@ public class Library {
 	}
 	
 	private static void purgeOrphans () {
-		ArrayList <Album> albumsCopy = new ArrayList <Album> ( Library.albums );
+		ArrayList <Album> albumsCopy = new ArrayList <Album> ( albums );
 		for ( Album album : albumsCopy ) {
 			boolean hasParent = false;
 			for ( Path sourcePath : Library.musicSourcePaths ) {
@@ -374,7 +384,7 @@ public class Library {
 	private static boolean processWatcherEvents () {
 		WatchKey key;
 		try {
-			key = watcher.poll( 10, TimeUnit.MILLISECONDS );
+			key = watcher.poll( 20, TimeUnit.MILLISECONDS );
 		} catch ( InterruptedException e ) {
 			return false;
 		}
