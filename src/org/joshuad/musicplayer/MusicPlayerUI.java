@@ -2448,9 +2448,6 @@ public class MusicPlayerUI extends Application {
 	
 			Application.launch( args );
 			
-			System.out.println ( "Application Launch: " + ( System.currentTimeMillis() - startTime ) );
-			startTime = System.currentTimeMillis();
-			
 			if ( currentPlayer != null ) {
 				currentPlayer.stop();
 			}

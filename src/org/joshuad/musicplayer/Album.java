@@ -12,9 +12,9 @@ public class Album implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private final String albumArtist;
-	private final String year;
-	private final String title;
+	private String albumArtist;
+	private String year;
+	private String title;
 	private File directory;
 	ArrayList <Track> tracks;
 	

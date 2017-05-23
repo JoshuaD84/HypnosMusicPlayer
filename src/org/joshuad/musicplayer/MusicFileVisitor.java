@@ -20,6 +20,13 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 			return FileVisitResult.TERMINATE;
 		}
 
+		try {
+			Thread.sleep( 10 );
+		} catch ( InterruptedException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		if ( Utils.isMusicFile ( file ) ) {
 				
 			if ( Utils.isAlbumDirectory( file.getParent() ) ) {

@@ -72,6 +72,7 @@ public class Library {
 	
 	public static void startLoader() {
 		loaderThread = new Thread ( new Runnable() {
+			boolean purged = false;
 			public void run() {
 				while ( true ) {
 					
@@ -81,14 +82,23 @@ public class Library {
 					} else if ( !loadMe.isEmpty() ) {
 						loadOneSource();
 						
-					} else if ( !updateMe.isEmpty() ) {
-						updateOneSource();
-						
-					} else {
+					} else if ( !purged ) {
 						purgeOrphans();
 						purgeMissingFiles();
-						//TODO: Purge files that don't exist anymore
+						purged = true;
+						
+					} else if ( !updateMe.isEmpty() ) {
+						updateOneSource();
+					
+					} else {
 						processWatcherEvents();
+						
+					}
+					try {
+						Thread.sleep( 50 );
+					} catch ( InterruptedException e ) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 				}
 			}
@@ -384,7 +394,7 @@ public class Library {
 	private static boolean processWatcherEvents () {
 		WatchKey key;
 		try {
-			key = watcher.poll( 20, TimeUnit.MILLISECONDS );
+			key = watcher.poll( 100, TimeUnit.MILLISECONDS );
 		} catch ( InterruptedException e ) {
 			return false;
 		}
@@ -434,20 +444,22 @@ public class Library {
 }
 
 class UpdaterThread extends Thread {
-	public static final int DELAY_LENGTH_MS = 80; 
+	public static final int DELAY_LENGTH_MS = 500; 
 	public int counter = DELAY_LENGTH_MS;
 	
 	Vector <Path> updateItems = new Vector <Path> ();
 	
 	public void run() {
 		while ( true ) {
+			long startSleepTime = System.currentTimeMillis();
+			try { 
+				Thread.sleep ( 20 ); 
+			} catch ( InterruptedException e ) {} //TODO: Is this OK to do? Feels dangerous.
+
+			long sleepTime = System.currentTimeMillis() - startSleepTime;
+			
 			if ( counter > 0 ) {
-				try { 
-					long startSleepTime = System.currentTimeMillis();
-					Thread.sleep ( 20 ); 
-					long sleepTime = System.currentTimeMillis() - startSleepTime;
-					counter -= sleepTime;
-				} catch ( InterruptedException e ) {} //TODO: Is this OK to do? Feels dangerous. 
+				counter -= sleepTime; 
 			} else {
 				Vector <Path> copyUpdateItems = new Vector<Path> ( updateItems );
 				for ( Path path : copyUpdateItems ) {

@@ -67,10 +67,24 @@ public class Track implements Serializable {
 		Tag tag = null;
 		AudioFile audioFile;
 		try {
-			audioFile = AudioFileIO.read( trackPath.toFile() );
+			int i = trackPath.toString().lastIndexOf('.');
+			String extension = "";
+			if( i > 0 ) {
+			    extension = trackPath.toString().substring(i+1).toLowerCase();
+			}
+			
+			if ( extension.matches( "aac" ) || extension.matches( "m4r" ) ) {
+				audioFile = AudioFileIO.readAs( trackPath.toFile(), "m4a" );
+				
+			} else {
+				audioFile = AudioFileIO.read( trackPath.toFile() );
+			}
+			
 			length = audioFile.getAudioHeader().getTrackLength();
 			tag = audioFile.getTag();
+
 		} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e1 ) {
+			//TODO: 
 			e1.printStackTrace ( System.out );
 		}
 		
