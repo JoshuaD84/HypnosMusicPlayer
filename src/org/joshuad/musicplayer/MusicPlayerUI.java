@@ -20,6 +20,7 @@ import javax.swing.SwingUtilities;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.TagException;
 import org.joshuad.musicplayer.players.AACPlayer;
 import org.joshuad.musicplayer.players.AbstractPlayer;
@@ -138,6 +139,7 @@ public class MusicPlayerUI extends Application {
 	static Stage mainStage;
 	static Stage libraryWindow;
 	static Stage queueWindow;
+	static TagWindow tagWindow;
 
 	static Button togglePlayButton;
 	static Button toggleRepeatButton;
@@ -599,6 +601,7 @@ public class MusicPlayerUI extends Application {
 		startTime = System.currentTimeMillis();
 		
 		setupLibraryWindow();
+		tagWindow = new TagWindow ( mainStage );
 		
 		System.out.println ( "Setup Library Window: " + ( System.currentTimeMillis() - startTime ) );
 		startTime = System.currentTimeMillis();
@@ -729,7 +732,6 @@ public class MusicPlayerUI extends Application {
 		
 		System.out.println ( "Start Library Loader " + ( System.currentTimeMillis() - startTime ) );
 		startTime = System.currentTimeMillis();
-
 	}
 	
 	private void updatePlaylistMenuItems ( ObservableList <MenuItem> items,
@@ -864,6 +866,7 @@ public class MusicPlayerUI extends Application {
 		transport.setPadding( new Insets( 10, 0, 10, 0 ) );
 		transport.setSpacing( 5 );
 	}
+	
 	
 	public void setupQueueWindow () {
 		queueWindow = new Stage();
@@ -1035,8 +1038,7 @@ public class MusicPlayerUI extends Application {
 
 		DirectoryChooser chooser = new DirectoryChooser();
 		chooser.setTitle( "Music Folder" );
-		File defaultDirectory = new File( System.getProperty( "user.home" ) ); 
-		// TODO: put windows on desktop maybe.
+		File defaultDirectory = new File( System.getProperty( "user.home" ) ); // TODO: start windows on desktop maybe.
 		chooser.setInitialDirectory( defaultDirectory );
 
 		Button addButton = new Button( "+ Add" );
@@ -1576,10 +1578,11 @@ public class MusicPlayerUI extends Application {
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem addMenuItem = new MenuItem( "Append" );
+		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		
-		contextMenu.getItems().addAll( playMenuItem, addMenuItem, browseMenuItem, addToPlaylistMenuItem );
+		contextMenu.getItems().addAll( playMenuItem, addMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem );
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
@@ -1636,6 +1639,21 @@ public class MusicPlayerUI extends Application {
 				appendAlbum( albumTable.getSelectionModel().getSelectedItem() );
 			}
 		} );
+		
+		editTagMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				List<Album> albums = albumTable.getSelectionModel().getSelectedItems();
+				ArrayList<Track> editMe = new ArrayList<Track>();
+				
+				for ( Album album : albums ) {
+					editMe.addAll( album.getTracks() );
+				}
+				
+				tagWindow.setTracks( editMe, albums, FieldKey.TRACK, FieldKey.TITLE );
+				tagWindow.show();
+			}
+		});
 
 		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			// TODO: This is the better way, once openjdk and openjfx supports
@@ -1768,9 +1786,10 @@ public class MusicPlayerUI extends Application {
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem addMenuItem = new MenuItem( "Append" );
+		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
-		contextMenu.getItems().addAll( playMenuItem, addMenuItem, browseMenuItem, addToPlaylistMenuItem );
+		contextMenu.getItems().addAll( playMenuItem, addMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem );
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
@@ -1810,6 +1829,16 @@ public class MusicPlayerUI extends Application {
 				currentListTable.getItems().addAll( Utils.convertTrackList( trackTable.getSelectionModel().getSelectedItems() ) );
 			}
 		} );
+		
+		editTagMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				List<Track> tracks = trackTable.getSelectionModel().getSelectedItems();
+				
+				tagWindow.setTracks( tracks, null );
+				tagWindow.show();
+			}
+		});
 
 		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			// TODO: This is the better way, once openjdk and openjfx supports
@@ -2171,6 +2200,7 @@ public class MusicPlayerUI extends Application {
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem queueMenuItem = new MenuItem( "Enqueue" );
+		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem cropMenuItem = new MenuItem( "Crop" );
 		MenuItem deleteMenuItem = new MenuItem( "Delete" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
@@ -2180,7 +2210,7 @@ public class MusicPlayerUI extends Application {
 
 		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
 		
-
+		//TODO: These don't work right
 		queueMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.Q, KeyCombination.SHIFT_ANY ) );
 		playMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.ENTER ) );
 		cropMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.DELETE, KeyCombination.SHIFT_DOWN ) );
@@ -2207,7 +2237,7 @@ public class MusicPlayerUI extends Application {
 
 		updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 
-		contextMenu.getItems().addAll( playMenuItem, queueMenuItem, browseMenuItem, addToPlaylistMenuItem, cropMenuItem, deleteMenuItem );
+		contextMenu.getItems().addAll( playMenuItem, queueMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem, cropMenuItem, deleteMenuItem );
 		
 		queueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -2216,6 +2246,14 @@ public class MusicPlayerUI extends Application {
 			}
 		});
 		
+		editTagMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				
+				tagWindow.setTracks( (List<Track>)(List<?>)currentListTable.getSelectionModel().getSelectedItems(), null );
+				tagWindow.show();
+			}
+		});
 
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -2223,7 +2261,6 @@ public class MusicPlayerUI extends Application {
 				playTrack( currentListTable.getSelectionModel().getSelectedItem() );
 			}
 		} );
-		
 
 		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			// TODO: This is the better way, once openjdk and openjfx supports

@@ -18,10 +18,7 @@ public class Album implements Serializable {
 	private File directory;
 	ArrayList <Track> tracks;
 	
-	Album ( String albumArtist, String year, String title, Path directoryPath ) {
-		this.albumArtist = albumArtist;
-		this.year = year;
-		this.title = title;
+	Album ( Path directoryPath ) {
 		this.directory = directoryPath.toFile();
 		
 
@@ -40,6 +37,18 @@ public class Album implements Serializable {
 		} catch ( IOException e) {
 			e.printStackTrace(); 
 		} 
+		
+		refreshTagData();
+	}
+	
+	public void refreshTagData () {
+		synchronized ( tracks ) {
+			if ( tracks.size() > 0 ) {
+				this.albumArtist = tracks.get( 0 ).getAlbumArtist();
+				this.year = tracks.get( 0 ).getYear();
+				this.title = tracks.get( 0 ).getAlbum();
+			}
+		}
 	}
 	
 	public String getAlbumArtist () {

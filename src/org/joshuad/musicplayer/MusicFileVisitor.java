@@ -30,8 +30,8 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 		if ( Utils.isMusicFile ( file ) ) {
 				
 			if ( Utils.isAlbumDirectory( file.getParent() ) ) {
-				Track track = new Track ( file, true );
-				Album album = new Album ( track.getAlbumArtist(), track.getYear(), track.getAlbum(), file.getParent() );
+				Track track = new Track ( file, true ); //This track is discarded. 
+				Album album = new Album ( file.getParent() );
 			
 				Library.addAlbum( album );
 				Library.addTracks( album.getTracks() );

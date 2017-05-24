@@ -19,7 +19,6 @@ public class Track implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-
 	public enum Format {
 		FLAC ( "flac" ),
 		MP3 ( "mp3" ),
@@ -64,20 +63,24 @@ public class Track implements Serializable {
 		this.trackFile = trackPath.toFile();
 		this.hasAlbum = hasAlbum;
 		
+		refreshTagData();
+	}
+	
+	public void refreshTagData() {
 		Tag tag = null;
 		AudioFile audioFile;
 		try {
-			int i = trackPath.toString().lastIndexOf('.');
+			int i = trackFile.toString().lastIndexOf('.');
 			String extension = "";
 			if( i > 0 ) {
-			    extension = trackPath.toString().substring(i+1).toLowerCase();
+			    extension = trackFile.toString().substring(i+1).toLowerCase();
 			}
 			
 			if ( extension.matches( "aac" ) || extension.matches( "m4r" ) ) {
-				audioFile = AudioFileIO.readAs( trackPath.toFile(), "m4a" );
+				audioFile = AudioFileIO.readAs( trackFile, "m4a" );
 				
 			} else {
-				audioFile = AudioFileIO.read( trackPath.toFile() );
+				audioFile = AudioFileIO.read( trackFile );
 			}
 			
 			length = audioFile.getAudioHeader().getTrackLength();
