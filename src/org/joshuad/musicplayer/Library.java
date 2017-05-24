@@ -61,17 +61,17 @@ public class Library {
 	
 	private static boolean updateUIPending = false;
 	
-	private static ArrayList <Album> albumsToAdd = new ArrayList<Album> ();
-	private static ArrayList <Album> albumsToRemove = new ArrayList<Album> ();
-	private static ArrayList <Album> albumsToUpdate = new ArrayList<Album> ();
+	private static Vector <Album> albumsToAdd = new Vector<Album> ();
+	private static Vector <Album> albumsToRemove = new Vector<Album> ();
+	private static Vector <Album> albumsToUpdate = new Vector<Album> ();
 	
-	private static ArrayList <Track> tracksToAdd = new ArrayList<Track> ();
-	private static ArrayList <Track> tracksToRemove = new ArrayList<Track> ();
-	private static ArrayList <Track> tracksToUpdate = new ArrayList<Track> ();
+	private static Vector <Track> tracksToAdd = new Vector<Track> ();
+	private static Vector <Track> tracksToRemove = new Vector<Track> ();
+	private static Vector <Track> tracksToUpdate = new Vector<Track> ();
 	
-	private static ArrayList <Playlist> playlistsToAdd = new ArrayList<Playlist> ();
-	private static ArrayList <Playlist> playlistsToRemove = new ArrayList<Playlist> ();
-	private static ArrayList <Playlist> playlistsToUpdate = new ArrayList<Playlist> ();
+	private static Vector <Playlist> playlistsToAdd = new Vector<Playlist> ();
+	private static Vector <Playlist> playlistsToRemove = new Vector<Playlist> ();
+	private static Vector <Playlist> playlistsToUpdate = new Vector<Playlist> ();
 	
 	public static void init() {
 		
@@ -89,34 +89,45 @@ public class Library {
 			uiUpdaterThread.start();
 		}
 	}
-	
-	synchronized static void updateUI () {
+
+	static void updateUI () {
 		if ( !albumsToAdd.isEmpty() || !albumsToRemove.isEmpty() || !albumsToUpdate.isEmpty() ) {
 			Platform.runLater( new Runnable() {
 				@Override public void run() {
-					albums.removeAll( albumsToRemove );
-					albumsToRemove.clear();
 					
-					albums.addAll( albumsToAdd );
-					albumsToAdd.clear();
+					synchronized ( albumsToRemove ) {
+						albums.removeAll( albumsToRemove );
+						albumsToRemove.clear();
+					}
+					
+					synchronized ( albumsToAdd ) {
+						albums.addAll( albumsToAdd );
+						albumsToAdd.clear();
+					}
 					
 					//TODO: Update albums
 					
-					tracks.removeAll( tracksToRemove );
-					tracksToRemove.clear();
+					synchronized ( tracksToRemove ) {
+						tracks.removeAll( tracksToRemove );
+						tracksToRemove.clear();
+					}
 					
-					tracks.addAll( tracksToAdd );
-					tracksToAdd.clear();
+					synchronized ( tracksToAdd ) {
+						tracks.addAll( tracksToAdd );
+						tracksToAdd.clear();
+					}
 					
 					//TODO: Update tracks
 					
-					playlists.removeAll( playlistsToRemove );
-					playlistsToRemove.clear();
+					synchronized ( playlistsToRemove ) {
+						playlists.removeAll( playlistsToRemove );
+						playlistsToRemove.clear();
+					}
 					
-					playlists.addAll( playlistsToAdd );
-					playlistsToAdd.clear();
-					
-					
+					synchronized ( playlistsToAdd ) {
+						playlists.addAll( playlistsToAdd );
+						playlistsToAdd.clear();
+					}
 					
 					MusicPlayerUI.albumTable.refresh();
 				}
@@ -227,7 +238,7 @@ public class Library {
 		requestRemoveSources ( Arrays.asList( path ) );
 	}
 	
-	synchronized public static boolean containsAlbum ( Album album ) {
+	public static boolean containsAlbum ( Album album ) {
 		if ( albumsToRemove.contains ( album ) ) return false;
 		else if ( albums.contains( album ) ) return true;
 		else if ( albumsToAdd.contains( album ) ) return true;
@@ -240,7 +251,7 @@ public class Library {
 		}
 	}
 	
-	synchronized static void addAlbum ( Album album ) {
+	static void addAlbum ( Album album ) {
 		if ( containsAlbum( album ) ) {
 			albumsToUpdate.add ( album );
 		} else {
@@ -256,13 +267,13 @@ public class Library {
 		}
 	}
 	
-	synchronized static void removeAlbum ( Album album ) {
+	static void removeAlbum ( Album album ) {
 		albumsToRemove.add ( album );
 		removeTracks ( album.tracks );
 	}
 	
 	
-	synchronized public static boolean containsTrack ( Track track ) {
+	public static boolean containsTrack ( Track track ) {
 		if ( tracksToRemove.contains ( track ) ) return false;
 		else if ( tracks.contains( track ) ) return true;
 		else if ( tracksToAdd.contains( track ) ) return true;
