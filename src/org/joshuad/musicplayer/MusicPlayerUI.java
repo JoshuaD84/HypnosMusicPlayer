@@ -1581,7 +1581,7 @@ public class MusicPlayerUI extends Application {
 		
 		contextMenu.getItems().addAll( playMenuItem, addMenuItem, browseMenuItem, addToPlaylistMenuItem );
 		
-		MenuItem newPlaylistButton = new MenuItem( "<New Playlist>" );
+		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
 		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
 
@@ -1772,7 +1772,7 @@ public class MusicPlayerUI extends Application {
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		contextMenu.getItems().addAll( playMenuItem, addMenuItem, browseMenuItem, addToPlaylistMenuItem );
 		
-		MenuItem newPlaylistButton = new MenuItem( "<New Playlist>" );
+		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
 		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
 
@@ -1974,8 +1974,6 @@ public class MusicPlayerUI extends Application {
 		});
 
 		removeMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			// TODO: This is the better way, once openjdk and openjfx supports
-			// it: getHostServices().showDocument(file.toURI().toString());
 			@Override
 			public void handle ( ActionEvent event ) {
 				Library.removePlaylist( playlistTable.getSelectionModel().getSelectedItem() );
@@ -2178,7 +2176,7 @@ public class MusicPlayerUI extends Application {
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 
-		MenuItem newPlaylistButton = new MenuItem( "<New Playlist>" );
+		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
 		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
 		

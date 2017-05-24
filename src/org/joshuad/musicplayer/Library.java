@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -29,9 +30,9 @@ public class Library {
 	
 	public static final boolean SHOW_SCAN_NOTES = false;
 	
-	private static Vector <Path> loadMe = new Vector <Path> ();
-	private static Vector <Path> updateMe = new Vector <Path> ();
-	private static Vector <Path> removeMe = new Vector <Path> ();
+	private static Vector <Path> sourceToLoad = new Vector <Path> ();
+	private static Vector <Path> sourceToUpdate = new Vector <Path> ();
+	private static Vector <Path> sourceToRemove = new Vector <Path> ();
 	
 	private static Thread loaderThread;
 	private static WatchService watcher;
@@ -55,9 +56,25 @@ public class Library {
 	final static FilteredList <Playlist> playlistsFiltered = new FilteredList <Playlist>( playlists, p -> true );
 	final static SortedList <Playlist> playlistsSorted = new SortedList <Playlist>( playlistsFiltered );
 	
-	final static UpdaterThread modifiedFileDelayedUpdater = new UpdaterThread();
+	final static ModifiedFileUpdaterThread modifiedFileDelayedUpdater = new ModifiedFileUpdaterThread();
+	final static UIUpdaterThread uiUpdaterThread = new UIUpdaterThread();
+	
+	private static boolean updateUIPending = false;
+	
+	private static ArrayList <Album> albumsToAdd = new ArrayList<Album> ();
+	private static ArrayList <Album> albumsToRemove = new ArrayList<Album> ();
+	private static ArrayList <Album> albumsToUpdate = new ArrayList<Album> ();
+	
+	private static ArrayList <Track> tracksToAdd = new ArrayList<Track> ();
+	private static ArrayList <Track> tracksToRemove = new ArrayList<Track> ();
+	private static ArrayList <Track> tracksToUpdate = new ArrayList<Track> ();
+	
+	private static ArrayList <Playlist> playlistsToAdd = new ArrayList<Playlist> ();
+	private static ArrayList <Playlist> playlistsToRemove = new ArrayList<Playlist> ();
+	private static ArrayList <Playlist> playlistsToUpdate = new ArrayList<Playlist> ();
 	
 	public static void init() {
+		
 		if ( watcher == null ) {
 			try {
 				watcher = FileSystems.getDefault().newWatchService();
@@ -67,19 +84,58 @@ public class Library {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			uiUpdaterThread.setDaemon( true );
+			uiUpdaterThread.start();
+		}
+	}
+	
+	synchronized static void updateUI () {
+		if ( !albumsToAdd.isEmpty() || !albumsToRemove.isEmpty() || !albumsToUpdate.isEmpty() ) {
+			Platform.runLater( new Runnable() {
+				@Override public void run() {
+					albums.removeAll( albumsToRemove );
+					albumsToRemove.clear();
+					
+					albums.addAll( albumsToAdd );
+					albumsToAdd.clear();
+					
+					//TODO: Update albums
+					
+					tracks.removeAll( tracksToRemove );
+					tracksToRemove.clear();
+					
+					tracks.addAll( tracksToAdd );
+					tracksToAdd.clear();
+					
+					//TODO: Update tracks
+					
+					playlists.removeAll( playlistsToRemove );
+					playlistsToRemove.clear();
+					
+					playlists.addAll( playlistsToAdd );
+					playlistsToAdd.clear();
+					
+					
+					
+					MusicPlayerUI.albumTable.refresh();
+				}
+			});
 		}
 	}
 	
 	public static void startLoader() {
 		loaderThread = new Thread ( new Runnable() {
 			boolean purged = false;
+			
+			@Override
 			public void run() {
 				while ( true ) {
 					
-					if ( !removeMe.isEmpty() ) {
+					if ( !sourceToRemove.isEmpty() ) {
 						removeOneSource();
 						
-					} else if ( !loadMe.isEmpty() ) {
+					} else if ( !sourceToLoad.isEmpty() ) {
 						loadOneSource();
 						
 					} else if ( !purged ) {
@@ -87,7 +143,7 @@ public class Library {
 						purgeMissingFiles();
 						purged = true;
 						
-					} else if ( !updateMe.isEmpty() ) {
+					} else if ( !sourceToUpdate.isEmpty() ) {
 						updateOneSource();
 					
 					} else {
@@ -109,7 +165,7 @@ public class Library {
 	}
 	
 	public static void requestUpdateSources ( List<Path> paths ) {
-		updateMe.addAll( paths );
+		sourceToUpdate.addAll( paths );
 		for ( Path path : paths ) {
 			Library.musicSourcePaths.add( path );
 		}
@@ -132,7 +188,7 @@ public class Library {
 					}
 					
 					if ( addSelectedPathToList ) {
-						loadMe.add ( path );
+						sourceToLoad.add ( path );
 						Library.musicSourcePaths.add( path );
 						if ( fileWalker != null ) {
 							fileWalker.interrupt();
@@ -144,11 +200,11 @@ public class Library {
 	}	
 	
 	public static void requestRemoveSources ( List<Path> paths ) {
-		removeMe.addAll ( paths );
+		sourceToRemove.addAll ( paths );
 		for ( Path path : paths ) {
 			Library.musicSourcePaths.remove( path );
-			updateMe.remove( path );
-			loadMe.remove( path );
+			sourceToUpdate.remove( path );
+			sourceToLoad.remove( path );
 		}
 		if ( fileWalker != null ) {
 			fileWalker.interrupt();
@@ -156,7 +212,7 @@ public class Library {
 	}
 	
 	public static void requestUpdate ( Path path ) {
-		updateMe.add( path );
+		sourceToUpdate.add( path );
 	}
 	
 	public static void requestUpdateSource ( Path path ) {
@@ -171,8 +227,11 @@ public class Library {
 		requestRemoveSources ( Arrays.asList( path ) );
 	}
 	
-	public static boolean containsAlbum ( Album album ) {
-		return albums.contains( album );
+	synchronized public static boolean containsAlbum ( Album album ) {
+		if ( albumsToRemove.contains ( album ) ) return false;
+		else if ( albums.contains( album ) ) return true;
+		else if ( albumsToAdd.contains( album ) ) return true;
+		else return false;
 	}
 	
 	public static void addAlbums ( ArrayList<Album> albums ) {
@@ -181,14 +240,13 @@ public class Library {
 		}
 	}
 	
-	static void addAlbum ( Album album ) {
-		int currentIndex = albums.indexOf( album );
-		
-		if ( currentIndex != -1 ) {
-			albums.set( currentIndex, album );
+	synchronized static void addAlbum ( Album album ) {
+		if ( containsAlbum( album ) ) {
+			albumsToUpdate.add ( album );
 		} else {
-			albums.add ( album );
+			albumsToAdd.add ( album );
 		}
+	
 		addTracks( album.getTracks() );
 	}
 	
@@ -198,13 +256,17 @@ public class Library {
 		}
 	}
 	
-	static void removeAlbum ( Album album ) {
-		albums.remove( album );
+	synchronized static void removeAlbum ( Album album ) {
+		albumsToRemove.add ( album );
 		removeTracks ( album.tracks );
 	}
 	
-	public static boolean containsTrack ( Track track ) {
-		return tracks.contains( track );
+	
+	synchronized public static boolean containsTrack ( Track track ) {
+		if ( tracksToRemove.contains ( track ) ) return false;
+		else if ( tracks.contains( track ) ) return true;
+		else if ( tracksToAdd.contains( track ) ) return true;
+		else return false;
 	}
 	
 	static void addTracks ( ArrayList<Track> tracks ) {
@@ -214,12 +276,10 @@ public class Library {
 	}
 	
 	static void addTrack ( Track track ) {
-		int currentIndex = tracks.indexOf( track );
-		
-		if ( currentIndex != -1 ) {
-			tracks.set( currentIndex, track );
+		if ( containsTrack( track ) ) {
+			tracksToUpdate.add ( track );
 		} else {
-			tracks.add ( track );
+			tracksToAdd.add ( track );
 		}
 	}
 	
@@ -230,7 +290,7 @@ public class Library {
 	}
 	
 	static void removeTrack ( Track track ) {
-		tracks.remove( track );
+		tracksToRemove.add( track );
 	}
 	
 	public static void addPlaylists ( ArrayList<Playlist> playlists ) {
@@ -240,15 +300,16 @@ public class Library {
 	}
 	
 	public static void addPlaylist ( Playlist playlist ) {
-		playlists.add( playlist );
+		//TODO: name checking? 
+		playlistsToAdd.add( playlist );
 	}
 	
 	public static void removePlaylist ( Playlist playlist ) {
-		playlists.remove( playlist );
+		playlistsToRemove.add( playlist );
 	}
 	
 	private static void removeOneSource() {
-		Path sourcePath = removeMe.remove( 0 ).toAbsolutePath();
+		Path sourcePath = sourceToRemove.remove( 0 ).toAbsolutePath();
 		
 		if ( Files.isDirectory( sourcePath ) ) {
 			ArrayList <Album> albumsCopy = new ArrayList <Album> ( albums );
@@ -272,7 +333,7 @@ public class Library {
 	}
 	
 	private static void loadOneSource() {
-		Path selectedPath = loadMe.get( 0 );
+		Path selectedPath = sourceToLoad.get( 0 );
 		fileWalker = new MusicFileVisitor( );
 		try {
 
@@ -284,7 +345,7 @@ public class Library {
 			);
 			
 			if ( !fileWalker.getWalkInterrupted() ) {
-				loadMe.remove( selectedPath );
+				sourceToLoad.remove( selectedPath );
 				watcherRegisterAll ( selectedPath );
 			}
 			
@@ -295,7 +356,7 @@ public class Library {
 	}
 	
 	private static void updateOneSource() {
-		Path selectedPath = updateMe.get( 0 );
+		Path selectedPath = sourceToUpdate.get( 0 );
 		fileWalker = new MusicFileVisitor( );
 		try {
 			Files.walkFileTree ( 
@@ -306,7 +367,7 @@ public class Library {
 			);
 			
 			if ( !fileWalker.getWalkInterrupted() ) {
-				updateMe.remove( selectedPath );
+				sourceToUpdate.remove( selectedPath );
 			}
 			
 			
@@ -347,7 +408,7 @@ public class Library {
 			}
 			
 			if ( !hasParent ) {
-				Library.albums.remove ( album );
+				removeAlbum ( album );
 				ArrayList <Track> tracks = album.getTracks();
 				if ( tracks != null ) {
 					tracks.removeAll( tracks );
@@ -412,9 +473,9 @@ public class Library {
 
 			if ( eventKind == StandardWatchEventKinds.ENTRY_CREATE ) {
 				if ( Files.isDirectory( child ) ) {
-					loadMe.add( child );
+					sourceToLoad.add( child );
 				} else {
-					loadMe.add( child.getParent() );
+					sourceToLoad.add( child.getParent() );
 				}
 				
 			} else if ( eventKind == StandardWatchEventKinds.ENTRY_DELETE ) {
@@ -429,7 +490,7 @@ public class Library {
 			
 			} else if ( eventKind == StandardWatchEventKinds.OVERFLOW ) {
 				for ( Path path : musicSourcePaths ) {
-					updateMe.add( path );
+					sourceToUpdate.add( path );
 				}
 			}
 
@@ -443,7 +504,21 @@ public class Library {
 	}
 }
 
-class UpdaterThread extends Thread {
+class UIUpdaterThread extends Thread {
+	@Override public void run () {
+		while ( true ) {
+				Library.updateUI();
+			
+			try {
+				Thread.sleep ( 500 );
+			} catch ( InterruptedException e ) {
+				e.printStackTrace();
+			}
+		}
+	}
+}
+
+class ModifiedFileUpdaterThread extends Thread {
 	public static final int DELAY_LENGTH_MS = 500; 
 	public int counter = DELAY_LENGTH_MS;
 	
