@@ -225,18 +225,56 @@ public class MusicPlayerUI extends Application {
 		
 		boolean isPaused = currentPlayer.isPaused();
 		
-		Track previousTrackInList = null;
-		for ( CurrentListTrack track : currentListData ) {
-			if ( track.getIsCurrentTrack() ) {
-				if ( previousTrackInList != null ) {
-					playTrack( previousTrackInList, isPaused );
-				} else {
-					playTrack( track, isPaused );
-				}
-				break;
-			} else {
-				previousTrackInList = track;
+
+		Track previousTrack = null;
+		
+		while ( !recentlyPlayedTracks.isEmpty() && previousTrack == null ) {
+			Track candidate;
+			synchronized ( recentlyPlayedTracks ) {
+				candidate = recentlyPlayedTracks.remove( 0 );
 			}
+			
+			if ( currentListData.contains( candidate ) ) {
+				previousTrack = candidate;
+			}
+		}
+		
+		if ( previousTrack != null ) {
+			playTrack ( previousTrack, isPaused, false );
+			
+		} else if ( shuffleMode == ShuffleMode.SEQUENTIAL && repeatMode == RepeatMode.PLAY_ONCE ) {
+			Track previousTrackInList = null;
+			for ( CurrentListTrack track : currentListData ) {
+				if ( track.getIsCurrentTrack() ) {
+					if ( previousTrackInList != null ) {
+						playTrack( previousTrackInList, isPaused );
+					} else {
+						playTrack( track, isPaused );
+					}
+					break;
+				} else {
+					previousTrackInList = track;
+				}
+			}
+		} else if ( shuffleMode == ShuffleMode.SEQUENTIAL && repeatMode == RepeatMode.REPEAT ) {
+			Track previousTrackInList = null;
+			for ( CurrentListTrack track : currentListData ) {
+				if ( track.getIsCurrentTrack() ) {
+					if ( previousTrackInList != null ) {
+						playTrack( previousTrackInList, isPaused );
+					} else {
+						playTrack( currentListData.get( currentListData.size() - 1 ), isPaused );
+					}
+					break;
+				} else {
+					previousTrackInList = track;
+				}
+			}
+		} else if ( shuffleMode == ShuffleMode.SHUFFLE && repeatMode == RepeatMode.PLAY_ONCE ) {
+			MusicPlayerUI.stopTrack();
+			
+		} else if ( shuffleMode == ShuffleMode.SHUFFLE && repeatMode == RepeatMode.REPEAT ) {
+			MusicPlayerUI.stopTrack();
 		}
 	}
 	
@@ -314,61 +352,51 @@ public class MusicPlayerUI extends Application {
 					}
 				}
 				
-			} else if ( shuffleMode == ShuffleMode.SHUFFLE ) {
-				switch ( repeatMode ) {
-					case PLAY_ONCE: {
+			} else if ( shuffleMode == ShuffleMode.SHUFFLE && repeatMode == RepeatMode.PLAY_ONCE ) {
 
-						if ( playOnceShuffleTracksPlayedCounter < currentListData.size() ) {
-							List <Track> alreadyPlayed = recentlyPlayedTracks.subList( 0, playOnceShuffleTracksPlayedCounter );
-							ArrayList <Track> viableTracks = new ArrayList <Track>( currentListData );
-							viableTracks.removeAll( alreadyPlayed );
-							Track playMe = viableTracks.get( randomGenerator.nextInt( viableTracks.size() ) );
-							playTrack( playMe );
-							++playOnceShuffleTracksPlayedCounter;
-						} else {
-							stopTrack();
-						}
-
-					} break;
-
-					case REPEAT: {
-						playOnceShuffleTracksPlayedCounter = 1;
-						// TODO: I think there may be issues with multithreading here.
-						// TODO: Ban the most recent X tracks from playing
-						int currentListSize = currentListData.size();
-						int collisionWindowSize = currentListSize / 3; // TODO: Fine tune this amount
-						int permittedRetries = 3; // TODO: fine tune this number
-
-						boolean foundMatch = false;
-						int retryCount = 0;
-						Track playMe;
-
-						List <Track> collisionWindow;
-
-						if ( recentlyPlayedTracks.size() >= collisionWindowSize ) {
-							collisionWindow = recentlyPlayedTracks.subList( 0,
-									collisionWindowSize );
-						} else {
-							collisionWindow = recentlyPlayedTracks;
-						}
-
-						do {
-							playMe = currentListData.get( randomGenerator.nextInt( currentListData.size() ) );
-							if ( !collisionWindow.contains( playMe ) ) {
-								foundMatch = true;
-							} else {
-								++retryCount;
-							}
-						} while ( !foundMatch && retryCount < permittedRetries );
-
-						playTrack( playMe );
-
-					} break;
-
-					default: {
-						// TODO: this should never occur. Maybe put in some default advance just in case? throw an error too?
-					} break;
+				if ( playOnceShuffleTracksPlayedCounter < currentListData.size() ) {
+					List <Track> alreadyPlayed = recentlyPlayedTracks.subList( 0, playOnceShuffleTracksPlayedCounter );
+					ArrayList <Track> viableTracks = new ArrayList <Track>( currentListData );
+					viableTracks.removeAll( alreadyPlayed );
+					Track playMe = viableTracks.get( randomGenerator.nextInt( viableTracks.size() ) );
+					playTrack( playMe );
+					++playOnceShuffleTracksPlayedCounter;
+				} else {
+					stopTrack();
 				}
+
+			} else if ( shuffleMode == ShuffleMode.SHUFFLE && repeatMode == RepeatMode.REPEAT ) {
+
+				playOnceShuffleTracksPlayedCounter = 1;
+				// TODO: I think there may be issues with multithreading here.
+				// TODO: Ban the most recent X tracks from playing
+				int currentListSize = currentListData.size();
+				int collisionWindowSize = currentListSize / 3; // TODO: Fine tune this amount
+				int permittedRetries = 3; // TODO: fine tune this number
+
+				boolean foundMatch = false;
+				int retryCount = 0;
+				Track playMe;
+
+				List <Track> collisionWindow;
+
+				if ( recentlyPlayedTracks.size() >= collisionWindowSize ) {
+					collisionWindow = recentlyPlayedTracks.subList( 0,
+							collisionWindowSize );
+				} else {
+					collisionWindow = recentlyPlayedTracks;
+				}
+
+				do {
+					playMe = currentListData.get( randomGenerator.nextInt( currentListData.size() ) );
+					if ( !collisionWindow.contains( playMe ) ) {
+						foundMatch = true;
+					} else {
+						++retryCount;
+					}
+				} while ( !foundMatch && retryCount < permittedRetries );
+
+				playTrack( playMe );
 			}
 		}
 	}
@@ -378,6 +406,10 @@ public class MusicPlayerUI extends Application {
 	}
 	
 	private static void playTrack ( Track track, boolean startPaused ) {
+		playTrack ( track, startPaused, true );
+	}
+	                                                                 
+	private static void playTrack ( Track track, boolean startPaused, boolean addToHistory ) {
 		if ( currentPlayer != null ) {
 			currentPlayer.stop();
 			if ( currentPlayer.getTrack() instanceof CurrentListTrack ) {
@@ -438,11 +470,14 @@ public class MusicPlayerUI extends Application {
 				return;
 		}
 
-		while ( recentlyPlayedTracks.size() >= MAX_TRACK_HISTORY ) {
-			recentlyPlayedTracks.remove( recentlyPlayedTracks.size() - 1 );
-		}
 
-		recentlyPlayedTracks.add( 0, track );
+		if ( addToHistory ) {
+			while ( recentlyPlayedTracks.size() >= MAX_TRACK_HISTORY ) {
+				recentlyPlayedTracks.remove( recentlyPlayedTracks.size() - 1 );
+			}
+			
+			recentlyPlayedTracks.add( 0, track );
+		}
 
 		currentListTable.refresh();
 
@@ -2475,8 +2510,6 @@ public class MusicPlayerUI extends Application {
 			
 			System.out.println ( "Library Init: " + ( System.currentTimeMillis() - startTime ) );
 			startTime = System.currentTimeMillis();
-
-//			Persister.loadData();
 			
 			System.out.println ( "Persister Load " + ( System.currentTimeMillis() - startTime ) );
 			startTime = System.currentTimeMillis();

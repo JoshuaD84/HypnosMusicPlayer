@@ -1,7 +1,6 @@
 package org.joshuad.musicplayer;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -120,6 +119,7 @@ public class TagWindow extends Stage {
 			@Override
 			public void handle ( ActionEvent e ) {
 				saveCurrentTags();
+				close();
 			}
 		});
 		

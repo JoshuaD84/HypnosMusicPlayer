@@ -90,11 +90,15 @@ public class Library {
 		}
 	}
 
-	static void updateUI () {
-		if ( !albumsToAdd.isEmpty() || !albumsToRemove.isEmpty() || !albumsToUpdate.isEmpty() ) {
-			Platform.runLater( new Runnable() {
+	static void updateUI () { 
+		if (  !albumsToAdd.isEmpty() || !albumsToRemove.isEmpty() || !albumsToUpdate.isEmpty() 
+		   || !tracksToAdd.isEmpty() || !tracksToRemove.isEmpty() || !tracksToUpdate.isEmpty() 	
+		   || !playlistsToAdd.isEmpty() || !playlistsToRemove.isEmpty() || !playlistsToUpdate.isEmpty() 
+		   ){
+			
+			Platform.runLater( new Runnable() { //TODO: This is firing too often. 
 				@Override public void run() {
-					
+
 					synchronized ( albumsToRemove ) {
 						albums.removeAll( albumsToRemove );
 						albumsToRemove.clear();
@@ -106,6 +110,7 @@ public class Library {
 					}
 					
 					//TODO: Update albums
+					albumsToUpdate.clear();
 					
 					synchronized ( tracksToRemove ) {
 						tracks.removeAll( tracksToRemove );
@@ -117,6 +122,7 @@ public class Library {
 						tracksToAdd.clear();
 					}
 					
+					tracksToUpdate.clear();
 					//TODO: Update tracks
 					
 					synchronized ( playlistsToRemove ) {
@@ -128,6 +134,8 @@ public class Library {
 						playlists.addAll( playlistsToAdd );
 						playlistsToAdd.clear();
 					}
+					
+					playlistsToUpdate.clear();
 					
 					MusicPlayerUI.albumTable.refresh();
 				}
@@ -306,7 +314,7 @@ public class Library {
 	
 	public static void addPlaylists ( ArrayList<Playlist> playlists ) {
 		for ( Playlist playlist : playlists ) {
-			removePlaylist ( playlist );
+			addPlaylist ( playlist );
 		}
 	}
 	

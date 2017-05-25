@@ -19,6 +19,8 @@ public class Track implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
+	private static transient final Logger LOGGER = Logger.getLogger( Track.class.getName() );
+
 	public enum Format {
 		FLAC ( "flac" ),
 		MP3 ( "mp3" ),
@@ -85,19 +87,18 @@ public class Track implements Serializable {
 			
 			length = audioFile.getAudioHeader().getTrackLength();
 			tag = audioFile.getTag();
+			
+			parseArtist( tag );
+			parseTitle( tag ); 
+			parseAlbum( tag );
+			parseYear( tag );
+			parseTrackNumber( tag );
+			parseDiscInfo( tag );
+			parseReleaseType( tag );
 
 		} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e1 ) {
-			//TODO: 
-			e1.printStackTrace ( System.out );
+			LOGGER.log( Level.INFO, e1.getClass().toString() + " while read tags on file: " + trackFile.toString() + ", using file name." );
 		}
-		
-		parseArtist( tag );
-		parseTitle( tag ); 
-		parseAlbum( tag );
-		parseYear( tag );
-		parseTrackNumber( tag );
-		parseDiscInfo( tag );
-		parseReleaseType( tag );
 		
 		parseFileName();
 	}
