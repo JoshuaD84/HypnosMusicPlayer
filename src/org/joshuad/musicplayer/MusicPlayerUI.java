@@ -2462,6 +2462,9 @@ public class MusicPlayerUI extends Application {
 					Playlist draggedPlaylist = (Playlist) db.getContent( DRAGGED_PLAYLIST_INDEX );
 
 					int dropIndex = row.getIndex();
+					if ( dropIndex >= currentListTable.getItems().size() ) {
+						dropIndex = currentListTable.getItems().size();
+					}
 					currentListTable.getItems().addAll( dropIndex, Utils.convertTrackList( draggedPlaylist.getTracks() ) );
 
 					event.setDropCompleted( true );
