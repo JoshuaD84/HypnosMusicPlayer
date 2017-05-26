@@ -18,6 +18,7 @@ import org.jaudiotagger.tag.TagException;
 public class Track implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
+	public static final int NO_TRACK_NUMBER = -885533;
 	
 	private static transient final Logger LOGGER = Logger.getLogger( Track.class.getName() );
 
@@ -48,7 +49,7 @@ public class Track implements Serializable {
 	private String title = "";
 	private String album = "";
 	private String year = "";
-	private int trackNumber = -1;
+	private int trackNumber = NO_TRACK_NUMBER;
 	private String discSubtitle = null;
 	private Integer discNumber = null;
 	private Integer discCount =  null;

@@ -232,6 +232,7 @@ public class MusicPlayerUI extends Application {
 			Track candidate;
 			synchronized ( recentlyPlayedTracks ) {
 				candidate = recentlyPlayedTracks.remove( 0 );
+				if ( playOnceShuffleTracksPlayedCounter > 0 ) playOnceShuffleTracksPlayedCounter--;
 			}
 			
 			if ( currentListData.contains( candidate ) ) {
@@ -242,7 +243,8 @@ public class MusicPlayerUI extends Application {
 		if ( previousTrack != null ) {
 			playTrack ( previousTrack, isPaused, false );
 			
-		} else if ( shuffleMode == ShuffleMode.SEQUENTIAL && repeatMode == RepeatMode.PLAY_ONCE ) {
+		} else if ( repeatMode == RepeatMode.PLAY_ONCE ) {
+			playOnceShuffleTracksPlayedCounter = 1;
 			Track previousTrackInList = null;
 			for ( CurrentListTrack track : currentListData ) {
 				if ( track.getIsCurrentTrack() ) {
@@ -256,7 +258,7 @@ public class MusicPlayerUI extends Application {
 					previousTrackInList = track;
 				}
 			}
-		} else if ( shuffleMode == ShuffleMode.SEQUENTIAL && repeatMode == RepeatMode.REPEAT ) {
+		} else if ( repeatMode == RepeatMode.REPEAT ) {
 			Track previousTrackInList = null;
 			for ( CurrentListTrack track : currentListData ) {
 				if ( track.getIsCurrentTrack() ) {
@@ -270,11 +272,6 @@ public class MusicPlayerUI extends Application {
 					previousTrackInList = track;
 				}
 			}
-		} else if ( shuffleMode == ShuffleMode.SHUFFLE && repeatMode == RepeatMode.PLAY_ONCE ) {
-			MusicPlayerUI.stopTrack();
-			
-		} else if ( shuffleMode == ShuffleMode.SHUFFLE && repeatMode == RepeatMode.REPEAT ) {
-			MusicPlayerUI.stopTrack();
 		}
 	}
 	
@@ -550,7 +547,9 @@ public class MusicPlayerUI extends Application {
 			currentPlayer = null;
 			currentListTable.refresh();
 		}
-
+		
+		playOnceShuffleTracksPlayedCounter = 0;
+		
 		togglePlayButton.setText( "▶" );
 
 		trackPositionSlider.setValue( 0 );
@@ -2126,6 +2125,22 @@ public class MusicPlayerUI extends Application {
 		titleColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "title" ) );
 		trackColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, Integer>( "trackNumber" ) );
 		lengthColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "lengthDisplay" ) );
+		
+		trackColumn.setCellFactory( column -> {
+			return new TableCell <Track, Integer>() {
+				@Override
+				protected void updateItem ( Integer value, boolean empty ) {
+					super.updateItem( value, empty );
+
+					if ( value == null || value.equals( Track.NO_TRACK_NUMBER ) || empty ) {
+						setText( null );
+						setStyle( "" );
+					} else {
+						setText( value.toString() );
+					}
+				}
+			};
+		} );
 
 		currentListTable = new TableView();
 		currentListTable.getColumns().addAll( playingColumn, trackColumn, artistColumn, yearColumn, albumColumn, titleColumn, lengthColumn );
