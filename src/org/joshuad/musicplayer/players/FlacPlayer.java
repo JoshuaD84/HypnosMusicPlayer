@@ -132,7 +132,6 @@ public class FlacPlayer extends AbstractPlayer implements Runnable {
 	
 	private void updateTransport() {
 		if ( seekRequestPercent == NO_SEEK_REQUESTED ) {
-			//System.out.println ( "Clip start time: " + clipStartTime );
 			double positionPercent = (double) ( audioOutput.getMicrosecondPosition() + clipStartTime * 1000 ) / ( (double) track.getLength() * 1000000 );
 			int timeElapsed = (int)(track.getLength() * positionPercent);
 			int timeRemaining = track.getLength() - timeElapsed;
@@ -150,12 +149,26 @@ public class FlacPlayer extends AbstractPlayer implements Runnable {
 		encodedInput = AudioSystem.getAudioInputStream( track.getPath().toFile() );
 		
 		AudioFormat baseFormat = encodedInput.getFormat();
-		AudioFormat decoderFormat = new AudioFormat(
-				AudioFormat.Encoding.PCM_SIGNED, baseFormat.getSampleRate(),
-				16, baseFormat.getChannels(), baseFormat.getChannels() * 2,
-				baseFormat.getSampleRate(), false );
+		AudioFormat decoderFormat;
+		
+		if ( baseFormat.getEncoding() != AudioFormat.Encoding.PCM_SIGNED ) {
+			
+			decoderFormat = new AudioFormat(
+                AudioFormat.Encoding.PCM_SIGNED, 
+                baseFormat.getSampleRate(),
+                (baseFormat.getSampleSizeInBits() > 0) ? baseFormat.getSampleSizeInBits() : 16,
+                baseFormat.getChannels(),
+                (baseFormat.getSampleSizeInBits() > 0) ? baseFormat.getChannels() * baseFormat.getSampleSizeInBits() / 8 : baseFormat.getChannels() * 2,
+                baseFormat.getSampleRate(),
+                false
+            );
 
-		decodedInput = AudioSystem.getAudioInputStream ( decoderFormat, encodedInput );
+			decodedInput = AudioSystem.getAudioInputStream ( decoderFormat, encodedInput );
+			
+		} else {
+			decodedInput = encodedInput;
+			decoderFormat = baseFormat;
+		}
 		
 		if ( seekRequestPercent != NO_SEEK_REQUESTED ) {
 			long seekPositionByte = getBytePosition ( track.getPath().toFile(), seekRequestPercent );
