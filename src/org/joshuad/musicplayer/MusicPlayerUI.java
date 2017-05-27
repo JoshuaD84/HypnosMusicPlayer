@@ -424,7 +424,7 @@ public class MusicPlayerUI extends Application {
 				try {
 					currentPlayer = new AltFlacPlayer( track, trackPositionSlider, startPaused );
 				} catch ( Exception e ) {
-					LOGGER.log( Level.INFO, "Using backup flac decoder for: " + track.getPath() );
+					LOGGER.log( Level.WARNING, "Using backup flac decoder for: " + track.getPath() );
 					currentPlayer = new FlacPlayer ( track, trackPositionSlider, startPaused );
 				}
 				if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );

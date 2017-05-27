@@ -48,7 +48,8 @@ public class Track implements Serializable {
 	private String albumArtist = "";
 	private String title = "";
 	private String album = "";
-	private String year = "";
+	private String date = "";
+	private String originalDate = "";
 	private int trackNumber = NO_TRACK_NUMBER;
 	private String discSubtitle = null;
 	private Integer discNumber = null;
@@ -92,7 +93,7 @@ public class Track implements Serializable {
 			parseArtist( tag );
 			parseTitle( tag ); 
 			parseAlbum( tag );
-			parseYear( tag );
+			parseDate( tag );
 			parseTrackNumber( tag );
 			parseDiscInfo( tag );
 			parseReleaseType( tag );
@@ -145,7 +146,7 @@ public class Track implements Serializable {
 		if ( artist.equals( "" ) ) { artist = fnArtist; setByFileName = true; }
 		if ( albumArtist.equals( "" ) ) { albumArtist = fnArtist; setByFileName = true; }
 		if ( album.equals( "" ) ) { album = fnAlbum; setByFileName = true; }
-		if ( year.equals( "" ) ) { year = fnYear; setByFileName = true; }
+		if ( date.equals( "" ) ) { date = fnYear; setByFileName = true; }
 		if ( title.equals( "" ) ) { title = fnTitle; setByFileName = true; }
 		
 		if ( setByFileName ) {
@@ -187,20 +188,19 @@ public class Track implements Serializable {
 			album = tag.getFirst ( FieldKey.ALBUM );
 			try { 
 				if ( album.equals( "" ) ) album = tag.getFirst( FieldKey.ALBUM_SORT );
-			} catch ( UnsupportedOperationException e ) {
-				//No problem, it doesn't exist for this file format
-			}
+			} catch ( UnsupportedOperationException e ) {}
 		}
 	}
 	
-	private void parseYear ( Tag tag ) {
+	private void parseDate ( Tag tag ) {
 		if ( tag != null ) {
 			try { 
-				year = tag.getFirst ( FieldKey.ORIGINAL_YEAR );
-			} catch ( UnsupportedOperationException e ) {
-				//No problem, it doesn't exist for this file format
-			}
-			if ( year.equals( "" ) ) year = tag.getFirst( FieldKey.YEAR );
+				originalDate = tag.getFirst ( FieldKey.ORIGINAL_YEAR );
+			} catch ( UnsupportedOperationException e ) {}
+
+			try { 
+				date = tag.getFirst( FieldKey.YEAR );
+			} catch ( UnsupportedOperationException e ) {}
 		}
 	}
 	
@@ -337,7 +337,11 @@ public class Track implements Serializable {
 	}
 	
 	public String getYear () {
-		return year;
+		if ( !originalDate.isEmpty() ) {
+			return originalDate;
+		} else {
+			return date;
+		}
 	}
 	
 	public String getAlbum () {
