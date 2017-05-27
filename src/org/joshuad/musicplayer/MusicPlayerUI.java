@@ -26,9 +26,9 @@ import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.TagException;
 import org.joshuad.musicplayer.players.MP4Player;
 import org.joshuad.musicplayer.players.AbstractPlayer;
-import org.joshuad.musicplayer.players.AltFlacPlayer;
-import org.joshuad.musicplayer.players.MP3Player;
 import org.joshuad.musicplayer.players.FlacPlayer;
+import org.joshuad.musicplayer.players.MP3Player;
+import org.joshuad.musicplayer.players.JFlacPlayer;
 import org.joshuad.musicplayer.players.OggPlayer;
 import org.joshuad.musicplayer.players.WavPlayer;
 
@@ -422,10 +422,10 @@ public class MusicPlayerUI extends Application {
 		switch ( track.getFormat() ) {
 			case FLAC:
 				try {
-					currentPlayer = new AltFlacPlayer( track, trackPositionSlider, startPaused );
+					currentPlayer = new FlacPlayer( track, trackPositionSlider, startPaused );
 				} catch ( Exception e ) {
 					LOGGER.log( Level.WARNING, "Using backup flac decoder for: " + track.getPath() );
-					currentPlayer = new FlacPlayer ( track, trackPositionSlider, startPaused );
+					currentPlayer = new JFlacPlayer ( track, trackPositionSlider, startPaused );
 				}
 				if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );
 				if ( startPaused ) {
