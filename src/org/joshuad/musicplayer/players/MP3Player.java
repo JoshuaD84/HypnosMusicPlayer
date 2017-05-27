@@ -135,8 +135,7 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	
 	private void updateTransport() {
 		if ( seekRequestPercent == NO_SEEK_REQUESTED ) {
-			//System.out.println ( "Clip start time: " + clipStartTime );
-			double positionPercent = (double) ( audioOut.getPosition() + clipStartTimeMS * 1000 ) / ( (double) track.getLength() * 1000000 );
+			double positionPercent = (double) ( audioOut.getPosition() + clipStartTimeMS ) / ( (double) track.getLength() * 1000 );
 			int timeElapsed = (int)(track.getLength() * positionPercent);
 			int timeRemaining = track.getLength() - timeElapsed;
 			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, positionPercent );

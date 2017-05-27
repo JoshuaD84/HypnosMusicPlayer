@@ -2523,7 +2523,7 @@ public class MusicPlayerUI extends Application {
 		System.out.println ( "CLI Listener: " + ( System.currentTimeMillis() - startTime ) );
 		startTime = System.currentTimeMillis();
 		
-		//if ( firstInstance ) {
+//		if ( firstInstance ) {
 			Library.init();
 			
 			System.out.println ( "Library Init: " + ( System.currentTimeMillis() - startTime ) );
@@ -2541,12 +2541,12 @@ public class MusicPlayerUI extends Application {
 			Persister.saveData();
 			System.exit ( 0 );
 			
-		/*} else {
-			CLIParser parser = new CLIParser ( );
-			ArrayList <Integer> commands = parser.parseCommands( args );
-			SingleInstanceController.sendCommands( commands );
-			System.exit ( 0 );
-		}*/
+//		} else {
+//			CLIParser parser = new CLIParser ( );
+//			ArrayList <Integer> commands = parser.parseCommands( args );
+//			SingleInstanceController.sendCommands( commands );
+//			System.exit ( 0 );
+//		}
 	}
 }
 

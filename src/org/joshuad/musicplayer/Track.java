@@ -347,7 +347,6 @@ public class Track implements Serializable {
 			retMe += " [" + Utils.toReleaseTitleCase( releaseType ) + "]";
 		}
 		
-		
 		if ( discSubtitle != null && !discSubtitle.equals( "" ) ) {
 			retMe += " (" + discSubtitle + ")";
 			
