@@ -14,6 +14,8 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
@@ -24,6 +26,7 @@ import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.TagException;
 import org.joshuad.musicplayer.players.MP4Player;
 import org.joshuad.musicplayer.players.AbstractPlayer;
+import org.joshuad.musicplayer.players.AltFlacPlayer;
 import org.joshuad.musicplayer.players.MP3Player;
 import org.joshuad.musicplayer.players.FlacPlayer;
 import org.joshuad.musicplayer.players.OggPlayer;
@@ -92,6 +95,7 @@ import javafx.util.Callback;
 
 @SuppressWarnings({ "rawtypes", "unchecked" }) // TODO: Maybe get rid of this when I understand things better
 public class MusicPlayerUI extends Application {
+	private static transient final Logger LOGGER = Logger.getLogger( MusicPlayerUI.class.getName() );
 
 	private static final int MAX_TRACK_HISTORY = 10000;
 
@@ -417,7 +421,12 @@ public class MusicPlayerUI extends Application {
 
 		switch ( track.getFormat() ) {
 			case FLAC:
-				currentPlayer = new FlacPlayer( track, trackPositionSlider, startPaused );
+				try {
+					currentPlayer = new AltFlacPlayer( track, trackPositionSlider, startPaused );
+				} catch ( Exception e ) {
+					LOGGER.log( Level.INFO, "Using backup flac decoder for: " + track.getPath() );
+					currentPlayer = new FlacPlayer ( track, trackPositionSlider, startPaused );
+				}
 				if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );
 				if ( startPaused ) {
 					togglePlayButton.setText( "▶" );
