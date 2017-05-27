@@ -22,7 +22,7 @@ import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.TagException;
-import org.joshuad.musicplayer.players.AACPlayer;
+import org.joshuad.musicplayer.players.MP4Player;
 import org.joshuad.musicplayer.players.AbstractPlayer;
 import org.joshuad.musicplayer.players.MP3Player;
 import org.joshuad.musicplayer.players.FlacPlayer;
@@ -435,7 +435,7 @@ public class MusicPlayerUI extends Application {
 				}
 				break;
 			case AAC:
-				currentPlayer = new AACPlayer( track, trackPositionSlider, startPaused );
+				currentPlayer = new MP4Player( track, trackPositionSlider, startPaused );
 				if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );
 				if ( startPaused ) {
 					togglePlayButton.setText( "▶" );

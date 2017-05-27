@@ -12,7 +12,7 @@
 	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/jogg-0.0.7.jar"/>
 	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/jorbis-0.0.15.jar"/>
 	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/vorbisspi1.0.3.jar"/>
-	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/jaad-0.8.4.jar"/>
+	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/jaad-0.8.4-nospi.jar"/>
 	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/lib/jflac-1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
