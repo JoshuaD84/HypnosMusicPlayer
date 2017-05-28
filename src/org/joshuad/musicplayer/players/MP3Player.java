@@ -78,13 +78,11 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 			}				
 				
 			if ( pauseRequested ) {
-				//TODO: Do we need to do anything to pause other than stop writing? 
 				pauseRequested = false;
 				paused = true;
 			}
 			
 			if ( playRequested ) {
-				//TODO: Do we need to do anything to pause other than stop writing? 
 				playRequested = false;
 				paused = false;
 			}

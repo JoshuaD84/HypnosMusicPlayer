@@ -8,6 +8,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
@@ -2342,17 +2344,20 @@ public class MusicPlayerUI extends Application {
 			}
 		} );
 
-		// TODO: right click delete and key delete are same code....
 		deleteMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
 
 				ObservableList <Integer> selectedIndexes = currentListTable.getSelectionModel().getSelectedIndices();
-				ObservableList <CurrentListTrack> selectedItems = currentListTable.getSelectionModel().getSelectedItems();
+				
+				List<Integer> removeMe = new ArrayList ( selectedIndexes );
+				
+				if ( !removeMe.isEmpty() ) {
 
-				if ( !selectedItems.isEmpty() ) {
 					int selectAfterDelete = selectedIndexes.get( 0 ) - 1;
-					currentListData.removeAll( selectedItems );
+					for ( int k = removeMe.size() - 1; k >= 0; k-- ) {
+						currentListData.remove ( removeMe.get( k ).intValue() );
+					}
 					currentListTable.getSelectionModel().clearAndSelect( selectAfterDelete );
 				}
 			}
@@ -2363,11 +2368,20 @@ public class MusicPlayerUI extends Application {
 			public void handle ( ActionEvent event ) {
 
 				ObservableList <Integer> selectedIndexes = currentListTable.getSelectionModel().getSelectedIndices();
-				ObservableList <CurrentListTrack> selectedItems = currentListTable.getSelectionModel().getSelectedItems();
+				
+				ArrayList <Integer> removeMe = new ArrayList<Integer> ();
+				
+				for ( int k = 0; k < currentListTable.getItems().size(); k++ ) {
+					if ( !selectedIndexes.contains( k ) ) {
+						removeMe.add ( k );
+					}
+				}
+				
+				if ( !removeMe.isEmpty() ) {
+					for ( int k = removeMe.size() - 1; k >= 0; k-- ) {
+						currentListData.remove ( removeMe.get( k ).intValue() );
+					}
 
-				if ( !selectedItems.isEmpty() ) {
-					int selectAfterDelete = selectedIndexes.get( 0 ) - 1;
-					currentListData.retainAll( selectedItems );
 					currentListTable.getSelectionModel().clearSelection();
 				}
 			}
