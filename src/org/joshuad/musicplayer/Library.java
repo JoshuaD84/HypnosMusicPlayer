@@ -35,7 +35,7 @@ public class Library {
     private static MusicFileVisitor fileWalker = null; //YOU MUST SET THIS TO NULL AFTER IT WALKS
     
 	private static Thread loaderThread;
-	final static ModifiedFileUpdaterThread modifiedFileDelayedUpdater = new ModifiedFileUpdaterThread();
+	private final static ModifiedFileUpdaterThread modifiedFileDelayedUpdater = new ModifiedFileUpdaterThread();
 	// These are all three representations of the same data. Add stuff to the
 	// Observable List, the other two can't accept add.
 	final static ObservableList <Album> albums = FXCollections.observableArrayList( new ArrayList <Album>() );
@@ -105,6 +105,7 @@ public class Library {
 					} else if ( purgeOrphansAndMissing && albumsToRemove.isEmpty() && tracksToRemove.isEmpty() ) {
 						purgeMissingFiles();
 						purgeOrphans();
+						purgeOrphansAndMissing = false;
 					
 					} else {
 						processWatcherEvents();
