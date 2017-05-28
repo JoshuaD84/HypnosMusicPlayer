@@ -71,7 +71,7 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	    
 		while ( true ) {
 			if ( stopRequested ) {
-				//closeAllResources();
+				closeAllResources();
 				MusicPlayerUI.songFinishedPlaying( true );
 				stopRequested = false;
 				return;
@@ -112,6 +112,8 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 						if ( audioOut != null ) {
 							audioOut.flush();
 						}
+
+						MusicPlayerUI.songFinishedPlaying( false );
 						break; // We reached the end of the file. 
 					}
 	
