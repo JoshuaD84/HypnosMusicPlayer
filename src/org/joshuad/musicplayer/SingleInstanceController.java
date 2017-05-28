@@ -9,6 +9,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import javafx.application.Platform;
+
 public class SingleInstanceController {
 	
 	public static final int NEXT = 0;
@@ -34,26 +36,7 @@ public class SingleInstanceController {
 							BufferedReader in = new BufferedReader( new InputStreamReader( clientSocket.getInputStream() ) );
 							int command;
 							while ( (command = in.read()) != -1 ) {
-								switch ( command ) {
-									case NEXT: 
-										MusicPlayerUI.playNextTrack();
-										break;
-									case PREVIOUS:
-										MusicPlayerUI.playPreviousTrack();
-										break;
-									case PAUSE:
-										MusicPlayerUI.pause();
-										break;
-									case PLAY:
-										MusicPlayerUI.play();
-										break;
-									case TOGGLE_PAUSE:
-										MusicPlayerUI.togglePause();
-										break;
-									case STOP:
-										MusicPlayerUI.stopTrack();
-										break;
-								}
+								giveCommandToUI ( command );
 							}
 
 						} catch ( IOException e ) {
@@ -77,6 +60,33 @@ public class SingleInstanceController {
 		} catch ( IOException e ) {
 			return false;
 		}
+	}
+	
+	private static void giveCommandToUI ( final int command ) {
+		Platform.runLater( new Runnable() {
+			@Override public void run() {
+				switch ( command ) {
+					case NEXT: 
+						MusicPlayerUI.playNextTrack();
+						break;
+					case PREVIOUS:
+						MusicPlayerUI.playPreviousTrack();
+						break;
+					case PAUSE:
+						MusicPlayerUI.pause();
+						break;
+					case PLAY:
+						MusicPlayerUI.play();
+						break;
+					case TOGGLE_PAUSE:
+						MusicPlayerUI.togglePause();
+						break;
+					case STOP:
+						MusicPlayerUI.stopTrack();
+						break;
+				}
+			}
+		});	
 	}
 	
 	public static void sendCommands( ArrayList <Integer> commands ) {
