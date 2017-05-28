@@ -56,12 +56,12 @@ public class Track implements Serializable {
 	private Integer discCount =  null;
 	private String releaseType = null;
 	
-	public Track ( Path trackPath ) {
+	public Track ( Path trackPath ) throws IOException {
 		this ( trackPath, false );
 	}
 	
 	//TODO: Deal w/ these exceptions right, don't throw them. Catch them and fill in data as best you can. 
-	public Track ( Path trackPath, boolean hasAlbum ) {
+	public Track ( Path trackPath, boolean hasAlbum ) throws IOException {
 
 		Logger.getLogger( "org.jaudiotagger" ).setLevel( Level.OFF );
 		this.trackFile = trackPath.toFile();
@@ -70,7 +70,7 @@ public class Track implements Serializable {
 		refreshTagData();
 	}
 	
-	public void refreshTagData() {
+	public void refreshTagData() throws IOException {
 		Tag tag = null;
 		AudioFile audioFile;
 		try {
@@ -96,9 +96,9 @@ public class Track implements Serializable {
 			parseDate( tag );
 			parseTrackNumber( tag );
 			parseDiscInfo( tag );
-			parseReleaseType( tag );
-
-		} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e1 ) {
+			parseReleaseType( tag );	
+			
+		} catch ( CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e1 ) {
 			LOGGER.log( Level.INFO, e1.getClass().toString() + " while read tags on file: " + trackFile.toString() + ", using file name." );
 		}
 		

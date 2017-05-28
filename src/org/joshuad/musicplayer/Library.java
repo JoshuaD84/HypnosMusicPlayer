@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -28,20 +27,15 @@ import javafx.collections.transformation.SortedList;
 
 public class Library {
 	
-	public static final boolean SHOW_SCAN_NOTES = false;
+	public static final boolean SHOW_SCAN_NOTES = false; //TODO: use logging, put this at the appropriate level
 	
-	private static Vector <Path> sourceToLoad = new Vector <Path> ();
-	private static Vector <Path> sourceToUpdate = new Vector <Path> ();
-	private static Vector <Path> sourceToRemove = new Vector <Path> ();
-	
-	private static Thread loaderThread;
 	private static WatchService watcher;
     private static final HashMap<WatchKey,Path> keys = new HashMap <WatchKey,Path> ();
     
-    private static MusicFileVisitor fileWalker = null;
-
-	final static ObservableList <Path> musicSourcePaths = FXCollections.observableArrayList();
-	
+    private static MusicFileVisitor fileWalker = null; //YOU MUST SET THIS TO NULL AFTER IT WALKS
+    
+	private static Thread loaderThread;
+	final static ModifiedFileUpdaterThread modifiedFileDelayedUpdater = new ModifiedFileUpdaterThread();
 	// These are all three representations of the same data. Add stuff to the
 	// Observable List, the other two can't accept add.
 	final static ObservableList <Album> albums = FXCollections.observableArrayList( new ArrayList <Album>() );
@@ -55,23 +49,26 @@ public class Library {
 	final static ObservableList <Playlist> playlists = FXCollections.observableArrayList( new ArrayList <Playlist>() );
 	final static FilteredList <Playlist> playlistsFiltered = new FilteredList <Playlist>( playlists, p -> true );
 	final static SortedList <Playlist> playlistsSorted = new SortedList <Playlist>( playlistsFiltered );
+
+	final static ObservableList <Path> musicSourcePaths = FXCollections.observableArrayList();
 	
-	final static ModifiedFileUpdaterThread modifiedFileDelayedUpdater = new ModifiedFileUpdaterThread();
-	final static UIUpdaterThread uiUpdaterThread = new UIUpdaterThread();
+	static Vector <Album> albumsToAdd = new Vector <Album>();
+	static Vector <Album> albumsToRemove = new Vector <Album>();
+	static Vector <Album> albumsToUpdate = new Vector <Album>();
+
+	static Vector <Track> tracksToAdd = new Vector <Track>();
+	static Vector <Track> tracksToRemove = new Vector <Track>();
+	static Vector <Track> tracksToUpdate = new Vector <Track>();
+
+	static Vector <Playlist> playlistsToAdd = new Vector <Playlist>();
+	static Vector <Playlist> playlistsToRemove = new Vector <Playlist>();
+	static Vector <Playlist> playlistsToUpdate = new Vector <Playlist>();
+
+	private static Vector <Path> sourceToAdd = new Vector <Path>();
+	private static Vector <Path> sourceToRemove = new Vector <Path>();
+	private static Vector <Path> sourceToUpdate = new Vector <Path>();
 	
-	private static boolean updateUIPending = false;
-	
-	private static Vector <Album> albumsToAdd = new Vector<Album> ();
-	private static Vector <Album> albumsToRemove = new Vector<Album> ();
-	private static Vector <Album> albumsToUpdate = new Vector<Album> ();
-	
-	private static Vector <Track> tracksToAdd = new Vector<Track> ();
-	private static Vector <Track> tracksToRemove = new Vector<Track> ();
-	private static Vector <Track> tracksToUpdate = new Vector<Track> ();
-	
-	private static Vector <Playlist> playlistsToAdd = new Vector<Playlist> ();
-	private static Vector <Playlist> playlistsToRemove = new Vector<Playlist> ();
-	private static Vector <Playlist> playlistsToUpdate = new Vector<Playlist> ();
+	private static boolean purgeOrphansAndMissing = true;
 	
 	public static void init() {
 		
@@ -84,93 +81,43 @@ public class Library {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			uiUpdaterThread.setDaemon( true );
-			uiUpdaterThread.start();
 		}
 	}
 
-	static void updateUI () { 
-		if (  !albumsToAdd.isEmpty() || !albumsToRemove.isEmpty() || !albumsToUpdate.isEmpty() 
-		   || !tracksToAdd.isEmpty() || !tracksToRemove.isEmpty() || !tracksToUpdate.isEmpty() 	
-		   || !playlistsToAdd.isEmpty() || !playlistsToRemove.isEmpty() || !playlistsToUpdate.isEmpty() 
-		   ){
-			
-			Platform.runLater( new Runnable() { //TODO: This is firing too often. 
-				@Override public void run() {
-
-					synchronized ( albumsToRemove ) {
-						albums.removeAll( albumsToRemove );
-						albumsToRemove.clear();
-					}
-					
-					synchronized ( albumsToAdd ) {
-						albums.addAll( albumsToAdd );
-						albumsToAdd.clear();
-					}
-					
-					//TODO: Update albums
-					albumsToUpdate.clear();
-					
-					synchronized ( tracksToRemove ) {
-						tracks.removeAll( tracksToRemove );
-						tracksToRemove.clear();
-					}
-					
-					synchronized ( tracksToAdd ) {
-						tracks.addAll( tracksToAdd );
-						tracksToAdd.clear();
-					}
-					
-					tracksToUpdate.clear();
-					//TODO: Update tracks
-					
-					synchronized ( playlistsToRemove ) {
-						playlists.removeAll( playlistsToRemove );
-						playlistsToRemove.clear();
-					}
-					
-					synchronized ( playlistsToAdd ) {
-						playlists.addAll( playlistsToAdd );
-						playlistsToAdd.clear();
-					}
-					
-					playlistsToUpdate.clear();
-					
-					MusicPlayerUI.albumTable.refresh();
-				}
-			});
-		}
-	}
-	
 	public static void startLoader() {
+		
 		loaderThread = new Thread ( new Runnable() {
-			boolean purged = false;
 			
 			@Override
 			public void run() {
+				int purgeCounter = 0;
 				while ( true ) {
 					
 					if ( !sourceToRemove.isEmpty() ) {
 						removeOneSource();
 						
-					} else if ( !sourceToLoad.isEmpty() ) {
+					} else if ( !sourceToAdd.isEmpty() ) {
 						loadOneSource();
-						
-					} else if ( !purged ) {
-						purgeOrphans();
-						purgeMissingFiles();
-						purged = true;
 						
 					} else if ( !sourceToUpdate.isEmpty() ) {
 						updateOneSource();
+						
+					} else if ( purgeOrphansAndMissing && albumsToRemove.isEmpty() && tracksToRemove.isEmpty() ) {
+						purgeMissingFiles();
+						purgeOrphans();
 					
 					} else {
 						processWatcherEvents();
-						
 					}
 					try {
 						Thread.sleep( 50 );
+						purgeCounter++;
+						if ( purgeCounter > 20 ) {
+							//TODO: This is a hack because things aren't setup right. Get all these threads and arraylists coordinating properly. 
+							purgeOrphansAndMissing = true;
+							purgeCounter = 0;
+						}
+						
 					} catch ( InterruptedException e ) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -186,7 +133,7 @@ public class Library {
 	public static void requestUpdateSources ( List<Path> paths ) {
 		sourceToUpdate.addAll( paths );
 		for ( Path path : paths ) {
-			Library.musicSourcePaths.add( path );
+			musicSourcePaths.add( path );
 		}
 	}
 	
@@ -207,7 +154,7 @@ public class Library {
 					}
 					
 					if ( addSelectedPathToList ) {
-						sourceToLoad.add ( path );
+						sourceToAdd.add ( path );
 						Library.musicSourcePaths.add( path );
 						if ( fileWalker != null ) {
 							fileWalker.interrupt();
@@ -220,13 +167,13 @@ public class Library {
 	
 	public static void requestRemoveSources ( List<Path> paths ) {
 		sourceToRemove.addAll ( paths );
-		for ( Path path : paths ) {
-			Library.musicSourcePaths.remove( path );
-			sourceToUpdate.remove( path );
-			sourceToLoad.remove( path );
-		}
+		
 		if ( fileWalker != null ) {
 			fileWalker.interrupt();
+		}
+		
+		for ( Path path : paths ) {
+			musicSourcePaths.remove( path );
 		}
 	}
 	
@@ -261,7 +208,7 @@ public class Library {
 	
 	static void addAlbum ( Album album ) {
 		if ( containsAlbum( album ) ) {
-			albumsToUpdate.add ( album );
+			albumsToUpdate.add ( album ); 
 		} else {
 			albumsToAdd.add ( album );
 		}
@@ -276,8 +223,10 @@ public class Library {
 	}
 	
 	static void removeAlbum ( Album album ) {
-		albumsToRemove.add ( album );
-		removeTracks ( album.tracks );
+		if ( !albumsToRemove.contains( album ) ) {
+			albumsToRemove.add ( album );
+			removeTracks ( album.tracks );
+		}
 	}
 	
 	
@@ -309,7 +258,9 @@ public class Library {
 	}
 	
 	static void removeTrack ( Track track ) {
-		tracksToRemove.add( track );
+		if ( !tracksToRemove.contains( track ) ) {
+			tracksToRemove.add( track );
+		}
 	}
 	
 	public static void addPlaylists ( ArrayList<Playlist> playlists ) {
@@ -328,31 +279,36 @@ public class Library {
 	}
 	
 	private static void removeOneSource() {
-		Path sourcePath = sourceToRemove.remove( 0 ).toAbsolutePath();
-		
-		if ( Files.isDirectory( sourcePath ) ) {
-			ArrayList <Album> albumsCopy = new ArrayList <Album> ( albums );
-			for ( Album album : albumsCopy ) {
-				if ( album.getPath().toAbsolutePath().startsWith( sourcePath ) ) {
-					removeAlbum ( album );
-					ArrayList <Track> tracks = album.getTracks();
-					if ( tracks != null ) {
-						tracks.removeAll( tracks );
-					}
-				}
-			}
+
+		while ( fileWalker != null ) {
+			try {
+				Thread.sleep( 20 );
+			} catch ( InterruptedException e ) {}
+		}
 			
-			ArrayList <Track> tracksCopy = new ArrayList <Track> ( tracks );
-			for ( Track track : tracksCopy ) {
-				if ( track.getPath().toAbsolutePath().startsWith( sourcePath ) ) {
-					removeTrack ( track );
-				}
+		Path removeMeSource = sourceToRemove.remove( 0 );
+
+		sourceToUpdate.remove( removeMeSource );
+		sourceToAdd.remove( removeMeSource );
+		musicSourcePaths.remove( removeMeSource );
+		
+		ArrayList <Album> albumsCopy = new ArrayList <Album> ( albums );
+		for ( Album album : albumsCopy ) {
+			if ( album.getPath().toAbsolutePath().startsWith( removeMeSource ) ) {
+				removeAlbum ( album );
+			}
+		}
+		
+		ArrayList <Track> tracksCopy = new ArrayList <Track> ( tracks );
+		for ( Track track : tracksCopy ) {
+			if ( track.getPath().toAbsolutePath().startsWith( removeMeSource ) ) {
+				removeTrack( track );
 			}
 		}
 	}
 	
 	private static void loadOneSource() {
-		Path selectedPath = sourceToLoad.get( 0 );
+		Path selectedPath = sourceToAdd.get( 0 );
 		fileWalker = new MusicFileVisitor( );
 		try {
 
@@ -364,7 +320,7 @@ public class Library {
 			);
 			
 			if ( !fileWalker.getWalkInterrupted() ) {
-				sourceToLoad.remove( selectedPath );
+				sourceToAdd.remove( selectedPath );
 				watcherRegisterAll ( selectedPath );
 			}
 			
@@ -372,6 +328,7 @@ public class Library {
 			System.out.println ("Unable to load some files in path: " + selectedPath.toString() );
 			e.printStackTrace();
 		}
+		fileWalker = null;
 	}
 	
 	private static void updateOneSource() {
@@ -428,9 +385,9 @@ public class Library {
 			
 			if ( !hasParent ) {
 				removeAlbum ( album );
-				ArrayList <Track> tracks = album.getTracks();
-				if ( tracks != null ) {
-					tracks.removeAll( tracks );
+				ArrayList <Track> albumTracks = album.getTracks();
+				if ( albumTracks != null ) {
+					tracksToRemove.addAll( albumTracks );
 				}
 			}
 		}
@@ -445,25 +402,33 @@ public class Library {
 			}
 			
 			if ( !hasParent ) {
-				tracks.remove ( track );
+				tracksToRemove.add( track );
 			}
 		}
 	}
 	
 	private static void watcherRegisterAll ( final Path start ) {
 		try {
-			Files.walkFileTree( start, new SimpleFileVisitor <Path>() {
-				@Override
-				public FileVisitResult preVisitDirectory ( Path dir, BasicFileAttributes attrs ) throws IOException {
-					WatchKey key = dir.register( watcher, 
+			Files.walkFileTree( 
+				start, 
+				EnumSet.of( FileVisitOption.FOLLOW_LINKS ), 
+				Integer.MAX_VALUE,
+				new SimpleFileVisitor <Path>() {
+					@Override
+					public FileVisitResult preVisitDirectory ( Path dir, BasicFileAttributes attrs ) throws IOException {
+						WatchKey key = dir.register( 
+							watcher, 
 							StandardWatchEventKinds.ENTRY_CREATE, 
 							StandardWatchEventKinds.ENTRY_DELETE, 
-							StandardWatchEventKinds.ENTRY_MODIFY );
-					
-					keys.put( key, dir );
-					return FileVisitResult.CONTINUE;
+							StandardWatchEventKinds.ENTRY_MODIFY 
+						);
+						
+						keys.put( key, dir );
+						return FileVisitResult.CONTINUE;
+					}
 				}
-			});
+			);
+		
 		} catch ( IOException e ) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -474,7 +439,7 @@ public class Library {
 	private static boolean processWatcherEvents () {
 		WatchKey key;
 		try {
-			key = watcher.poll( 100, TimeUnit.MILLISECONDS );
+			key = watcher.poll( 250, TimeUnit.MILLISECONDS );
 		} catch ( InterruptedException e ) {
 			return false;
 		}
@@ -492,13 +457,15 @@ public class Library {
 
 			if ( eventKind == StandardWatchEventKinds.ENTRY_CREATE ) {
 				if ( Files.isDirectory( child ) ) {
-					sourceToLoad.add( child );
+					sourceToAdd.add( child ); //TODO: is this the right function call? 
 				} else {
-					sourceToLoad.add( child.getParent() );
+					sourceToAdd.add( child.getParent() );
 				}
 				
 			} else if ( eventKind == StandardWatchEventKinds.ENTRY_DELETE ) {
-				//Handled by removeMissingFiles(), can ignore. 
+				purgeOrphans();
+				purgeMissingFiles();
+				
 								
 			} else if ( eventKind == StandardWatchEventKinds.ENTRY_MODIFY ) {
 				if ( Files.isDirectory( child ) ) {
@@ -523,22 +490,8 @@ public class Library {
 	}
 }
 
-class UIUpdaterThread extends Thread {
-	@Override public void run () {
-		while ( true ) {
-				Library.updateUI();
-			
-			try {
-				Thread.sleep ( 500 );
-			} catch ( InterruptedException e ) {
-				e.printStackTrace();
-			}
-		}
-	}
-}
-
 class ModifiedFileUpdaterThread extends Thread {
-	public static final int DELAY_LENGTH_MS = 500; 
+	public static final int DELAY_LENGTH_MS = 1000; 
 	public int counter = DELAY_LENGTH_MS;
 	
 	Vector <Path> updateItems = new Vector <Path> ();
@@ -547,7 +500,7 @@ class ModifiedFileUpdaterThread extends Thread {
 		while ( true ) {
 			long startSleepTime = System.currentTimeMillis();
 			try { 
-				Thread.sleep ( 20 ); 
+				Thread.sleep ( 50 ); 
 			} catch ( InterruptedException e ) {} //TODO: Is this OK to do? Feels dangerous.
 
 			long sleepTime = System.currentTimeMillis() - startSleepTime;

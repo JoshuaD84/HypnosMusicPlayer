@@ -169,7 +169,11 @@ public class TagWindow extends Stage {
 						try {
 							audioFile.setTag( tag );
 							AudioFileIO.write( audioFile );
-							track.refreshTagData();
+							try {
+								track.refreshTagData();
+							} catch ( IOException e ) {
+								//TODO: I don't think we need to do anything here?
+							}
 							MusicPlayerUI.currentListTable.refresh();
 						} catch ( CannotWriteException e ) {
 							e.printStackTrace(); //TODO: 

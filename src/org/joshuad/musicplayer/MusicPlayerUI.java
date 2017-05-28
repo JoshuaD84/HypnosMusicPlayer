@@ -1304,7 +1304,11 @@ public class MusicPlayerUI extends Application {
 				
 				ArrayList <Track> tracks = new ArrayList <Track> ();
 				for ( File file : selectedFiles ) {
-					tracks.add( new Track ( file.toPath() ) );
+					try {
+						tracks.add( new Track ( file.toPath() ) );
+					} catch ( IOException ioex ) {
+						LOGGER.log( Level.INFO, "Unable to load track", ioex );
+					}
 				}
 				
 				loadTracks ( tracks );
@@ -2534,6 +2538,7 @@ public class MusicPlayerUI extends Application {
 		
 //		if ( firstInstance ) {
 			Library.init();
+			UIUpdater.init();
 			
 			System.out.println ( "Library Init: " + ( System.currentTimeMillis() - startTime ) );
 			startTime = System.currentTimeMillis();

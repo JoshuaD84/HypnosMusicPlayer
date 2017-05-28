@@ -1,4 +1,5 @@
 package org.joshuad.musicplayer;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileVisitResult;
@@ -10,6 +11,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
@@ -17,6 +20,8 @@ import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.TagException;
 
 public class Utils {
+
+	private static transient final Logger LOGGER = Logger.getLogger( Utils.class.getName() );
 	
 	private static String[] musicExtStrings = new String[] { "flac", "mp3", "ogg", "m4a", "m4b", "m4r", "aac", "wav" }; //TODO: use Track.Format instead
 	private static String[] imageExtStrings = new String[] { "jpg", "png", "gif" };
@@ -142,6 +147,8 @@ public class Utils {
 				System.out.println ( track.getPath().toString() +", is read only, unable to edit, skipping." );
 			} catch (InvalidAudioFrameException e) {
 				System.out.println ( track.getPath().toString() +", has bad audio fram data, skipping." );
+			} catch ( FileNotFoundException e ) {
+				LOGGER.log( Level.INFO, "Unable to load track: " + track.getPath().toString() );
 			} catch ( IOException e ) {
 				e.printStackTrace();
 			}
@@ -263,6 +270,8 @@ public class Utils {
 
 
 class TrackFinder extends SimpleFileVisitor <Path> {
+
+	private static transient final Logger LOGGER = Logger.getLogger( TrackFinder.class.getName() );
 	
 	ArrayList <Track> tracks = new ArrayList <Track> ();
 	
@@ -272,8 +281,12 @@ class TrackFinder extends SimpleFileVisitor <Path> {
 		boolean isMusicFile = Utils.isMusicFile ( file );
 		
 		if ( isMusicFile ) {
-			Track track = new Track ( file );
-			tracks.add ( track );
+			try {
+				Track track = new Track ( file );
+				tracks.add ( track );
+			} catch ( IOException e ) {
+				LOGGER.log( Level.INFO, "Unable to load track", e );
+			}
 		} 
 		return FileVisitResult.CONTINUE;
 			
