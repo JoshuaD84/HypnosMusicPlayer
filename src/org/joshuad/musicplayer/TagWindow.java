@@ -198,7 +198,6 @@ public class TagWindow extends Stage {
 		});
 	}
 	
-	//TODO: handle things when there's no tag.
 	public void setTracks ( List <Track> tracks, List <Album> albumsToRefresh, FieldKey ... hiddenTags ) { 
 		tagPairs.clear();
 		this.hiddenTagsList = Arrays.asList( hiddenTags );

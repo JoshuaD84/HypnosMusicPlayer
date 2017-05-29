@@ -467,7 +467,6 @@ public class Library {
 				purgeOrphans();
 				purgeMissingFiles();
 				
-								
 			} else if ( eventKind == StandardWatchEventKinds.ENTRY_MODIFY ) {
 				if ( Files.isDirectory( child ) ) {
 					modifiedFileDelayedUpdater.addUpdateItem( child );

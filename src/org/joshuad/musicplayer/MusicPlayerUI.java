@@ -106,7 +106,7 @@ public class MusicPlayerUI extends Application {
 	private static final DataFormat DRAGGED_ALBUM_INDICES = new DataFormat( "application/x-java-album-indices" );
 	private static final DataFormat DRAGGED_PLAYLIST_INDEX = new DataFormat( "application/x-java-playlist-index" );
 
-	public static final String PROGRAM_NAME = "Hypnos Music Player";
+	public static final String PROGRAM_NAME = "Hypnos";
 
 	final static ObservableList <CurrentListTrack> currentListData = FXCollections.observableArrayList(); //TODO: rename to currentList
 	
@@ -490,8 +490,7 @@ public class MusicPlayerUI extends Application {
 		StackPane thumb = (StackPane) trackPositionSlider.lookup( ".thumb" );
 		thumb.setVisible( true );
 
-		trackInfo.setText( track.getArtist() + " - " + track.getYear() + " - " + track.getAlbum()
-				+ " - " + track.getTrackNumber() + " - " + track.getTitle() );
+		trackInfo.setText( track.getArtist() + " - " + track.getTitle() );
 
 		setAlbumImage( Utils.getAlbumCoverImagePath( track ) );
 		setArtistImage( Utils.getAlbumArtistImagePath( track ) );
@@ -2165,8 +2164,12 @@ public class MusicPlayerUI extends Application {
 			@Override
 			public void invalidated ( Observable arg0 ) {
 				if ( !playlistChanged ) {
-					currentPlayingListInfo.setText( currentPlayingListInfo.getText() + " *" );
-					playlistChanged = true;
+					if ( currentListData.isEmpty() ) {
+						currentPlayingListInfo.setText( "" );
+					} else {
+						currentPlayingListInfo.setText( "Playlist: New Playlist *" );
+						playlistChanged = true;
+					}
 				}
 			}
 		});
@@ -2566,7 +2569,6 @@ public class MusicPlayerUI extends Application {
 			
 			Persister.saveData();
 			System.exit ( 0 );
-			
 //		} else {
 //			CLIParser parser = new CLIParser ( );
 //			ArrayList <Integer> commands = parser.parseCommands( args );
