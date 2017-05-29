@@ -537,7 +537,7 @@ public class MusicPlayerUI extends Application {
 		loadTracks ( loadMe );
 	}
 
-	public static void loadTracks ( ArrayList <Track> tracks ) {
+	public static void loadTracks ( List <Track> tracks ) {
 		currentListTable.getItems().clear();
 		currentListTable.getItems().addAll( Utils.convertTrackList( tracks ) );
 		currentPlayingListInfo.setText( "Playlist: New" );
@@ -1200,6 +1200,8 @@ public class MusicPlayerUI extends Application {
 		});
 		
 		queueTable.setOnKeyPressed( new EventHandler <KeyEvent>() {
+			//TODO: is there a better way to do this? 
+			//TODO: is this code buggy? 
 			@Override
 			public void handle ( final KeyEvent keyEvent ) {
 				if ( keyEvent.getCode().equals( KeyCode.DELETE ) ) {
@@ -1250,6 +1252,117 @@ public class MusicPlayerUI extends Application {
 		titleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
 		
 		queueTable.getColumns().addAll( numberColumn, artistColumn, titleColumn );
+		
+		
+		ContextMenu contextMenu = new ContextMenu();
+		MenuItem playMenuItem = new MenuItem( "Play" );
+		MenuItem apendMenuItem = new MenuItem( "Append" );
+		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
+		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
+		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
+		MenuItem removeMenuItem = new MenuItem( "Remove from Queue" );
+		contextMenu.getItems().addAll( playMenuItem, apendMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem, removeMenuItem );
+		
+		MenuItem newPlaylistButton = new MenuItem( "<New>" );
+
+		queueTable.setRowFactory( tv -> {
+			TableRow <Track> row = new TableRow <>();
+			row.setContextMenu( contextMenu );
+			
+			row.setOnMouseClicked( event -> {
+				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
+					currentListTable.getItems().clear();
+					try {
+						currentListTable.getItems().add( new CurrentListTrack ( queueTable.getSelectionModel().getSelectedItem() ) );
+					} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e1 ) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					playTrack( queueTable.getSelectionModel().getSelectedItem() );
+					currentPlayingListInfo.setText( "Playlist: New Playlist *" );
+				}
+			} );
+			
+			row.setOnDragDetected( event -> {
+				if ( !row.isEmpty() ) {
+					ArrayList <Track> tracks = new ArrayList <Track>( queueTable.getSelectionModel().getSelectedItems() );
+					Dragboard db = row.startDragAndDrop( TransferMode.MOVE );
+					db.setDragView( row.snapshot( null, null ) );
+					ClipboardContent cc = new ClipboardContent();
+					cc.put( DRAGGED_TRACKS, tracks );
+					db.setContent( cc );
+					event.consume();
+
+				}
+			} );
+			
+			return row;
+		});
+
+		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
+
+		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent e ) {
+				promptAndSavePlaylist ( queueTable.getSelectionModel().getSelectedItems(), false );
+			}
+		});
+
+		EventHandler addToPlaylistHandler = new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				Playlist playlist = (Playlist) ((MenuItem) event.getSource()).getUserData();
+				addToPlaylist ( queueTable.getSelectionModel().getSelectedItems(), playlist );
+			}
+		};
+		
+		//TODO: I don't know if this is right; 
+		Library.playlistsSorted.addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
+			updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
+		});
+
+		updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
+		
+		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				loadTracks( queueTable.getSelectionModel().getSelectedItems() );
+			}
+		});
+
+		apendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				currentListTable.getItems().addAll( Utils.convertTrackList( queueTable.getSelectionModel().getSelectedItems() ) );
+			}
+		});
+		
+		editTagMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				List<Track> tracks = queueTable.getSelectionModel().getSelectedItems();
+				
+				tagWindow.setTracks( tracks, null );
+				tagWindow.show();
+			}
+		});
+		
+
+		removeMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				synchronized ( history ) {
+					List<Integer> selectedIndices = queueTable.getSelectionModel().getSelectedIndices();
+					
+					ArrayList<Integer> removeMeIndices = new ArrayList ( selectedIndices );
+					
+					for ( int k = removeMeIndices.size() - 1; k >= 0 ; k-- ) {
+						Queue.remove( removeMeIndices.get( k ).intValue() );
+					}
+				}
+			}
+		});
+		
 
 		queueTable.prefWidthProperty().bind( queueWindow.widthProperty() );
 		queueTable.prefHeightProperty().bind( queueWindow.heightProperty() );
