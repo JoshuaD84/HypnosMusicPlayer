@@ -2568,7 +2568,7 @@ public class MusicPlayerUI extends Application {
 		MenuItem shuffleMenuItem = new MenuItem( "Shuffle Current List" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem cropMenuItem = new MenuItem( "Crop" );
-		MenuItem deleteMenuItem = new MenuItem( "Delete" );
+		MenuItem removeMenuItem = new MenuItem( "Remove" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 
@@ -2580,9 +2580,8 @@ public class MusicPlayerUI extends Application {
 		queueMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.Q, KeyCombination.SHIFT_ANY ) );
 		playMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.ENTER ) );
 		cropMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.DELETE, KeyCombination.SHIFT_DOWN ) );
-		deleteMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.DELETE, KeyCombination.SHIFT_ANY ) );
-		contextMenu.getItems().addAll( playMenuItem, queueMenuItem, shuffleMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem, cropMenuItem, deleteMenuItem );
-		
+		removeMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.DELETE, KeyCombination.SHIFT_ANY ) );
+		contextMenu.getItems().addAll( playMenuItem, queueMenuItem, shuffleMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem, cropMenuItem, removeMenuItem );
 		
 		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -2653,7 +2652,7 @@ public class MusicPlayerUI extends Application {
 			}
 		} );
 
-		deleteMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+		removeMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
 
