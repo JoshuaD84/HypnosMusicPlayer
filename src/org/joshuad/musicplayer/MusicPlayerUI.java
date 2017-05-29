@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
@@ -2266,6 +2267,7 @@ public class MusicPlayerUI extends Application {
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem queueMenuItem = new MenuItem( "Enqueue" );
+		MenuItem shuffleMenuItem = new MenuItem( "Shuffle Current List" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem cropMenuItem = new MenuItem( "Crop" );
 		MenuItem deleteMenuItem = new MenuItem( "Delete" );
@@ -2281,7 +2283,9 @@ public class MusicPlayerUI extends Application {
 		playMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.ENTER ) );
 		cropMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.DELETE, KeyCombination.SHIFT_DOWN ) );
 		deleteMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.DELETE, KeyCombination.SHIFT_ANY ) );
-
+		contextMenu.getItems().addAll( playMenuItem, queueMenuItem, shuffleMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem, cropMenuItem, deleteMenuItem );
+		
+		
 		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
@@ -2303,12 +2307,18 @@ public class MusicPlayerUI extends Application {
 
 		updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 
-		contextMenu.getItems().addAll( playMenuItem, queueMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem, cropMenuItem, deleteMenuItem );
 		
 		queueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
 				Queue.addAll( currentListTable.getSelectionModel().getSelectedItems() );
+			}
+		});
+		
+		shuffleMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				Collections.shuffle( currentListTable.getItems() );
 			}
 		});
 		
