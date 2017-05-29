@@ -117,8 +117,9 @@ public class MusicPlayerUI extends Application {
 	static TableView <CurrentListTrack> currentListTable;
 	static TableView <Path> musicSourceTable;
 	static TableView <Track> queueTable;
-	
-	static ArrayList <Track> recentlyPlayedTracks = new ArrayList( MAX_TRACK_HISTORY );
+	static TableView <Track> historyTable;
+
+	final static ObservableList <Track> history = FXCollections.observableArrayList( new ArrayList <Track>(MAX_TRACK_HISTORY) );
 
 	static BorderPane albumImage;
 	static BorderPane artistImage;
@@ -144,6 +145,7 @@ public class MusicPlayerUI extends Application {
 	static Stage mainStage;
 	static Stage libraryWindow;
 	static Stage queueWindow;
+	static Stage historyWindow;
 	static TagWindow tagWindow;
 
 	static Button togglePlayButton;
@@ -233,10 +235,10 @@ public class MusicPlayerUI extends Application {
 
 		Track previousTrack = null;
 		
-		while ( !recentlyPlayedTracks.isEmpty() && previousTrack == null ) {
+		while ( !history.isEmpty() && previousTrack == null ) {
 			Track candidate;
-			synchronized ( recentlyPlayedTracks ) {
-				candidate = recentlyPlayedTracks.remove( 0 );
+			synchronized ( history ) {
+				candidate = history.remove( 0 );
 				if ( playOnceShuffleTracksPlayedCounter > 0 ) playOnceShuffleTracksPlayedCounter--;
 			}
 			
@@ -357,7 +359,7 @@ public class MusicPlayerUI extends Application {
 			} else if ( shuffleMode == ShuffleMode.SHUFFLE && repeatMode == RepeatMode.PLAY_ONCE ) {
 
 				if ( playOnceShuffleTracksPlayedCounter < currentListData.size() ) {
-					List <Track> alreadyPlayed = recentlyPlayedTracks.subList( 0, playOnceShuffleTracksPlayedCounter );
+					List <Track> alreadyPlayed = history.subList( 0, playOnceShuffleTracksPlayedCounter );
 					ArrayList <Track> viableTracks = new ArrayList <Track>( currentListData );
 					viableTracks.removeAll( alreadyPlayed );
 					Track playMe = viableTracks.get( randomGenerator.nextInt( viableTracks.size() ) );
@@ -382,11 +384,11 @@ public class MusicPlayerUI extends Application {
 
 				List <Track> collisionWindow;
 
-				if ( recentlyPlayedTracks.size() >= collisionWindowSize ) {
-					collisionWindow = recentlyPlayedTracks.subList( 0,
+				if ( history.size() >= collisionWindowSize ) {
+					collisionWindow = history.subList( 0,
 							collisionWindowSize );
 				} else {
-					collisionWindow = recentlyPlayedTracks;
+					collisionWindow = history;
 				}
 
 				do {
@@ -479,11 +481,11 @@ public class MusicPlayerUI extends Application {
 
 
 		if ( addToHistory ) {
-			while ( recentlyPlayedTracks.size() >= MAX_TRACK_HISTORY ) {
-				recentlyPlayedTracks.remove( recentlyPlayedTracks.size() - 1 );
+			while ( history.size() >= MAX_TRACK_HISTORY ) {
+				history.remove( history.size() - 1 );
 			}
 			
-			recentlyPlayedTracks.add( 0, track );
+			history.add( 0, track );
 		}
 
 		currentListTable.refresh();
@@ -605,6 +607,10 @@ public class MusicPlayerUI extends Application {
 		
 		setupQueueWindow();
 		System.out.println ( "Setup Queue Window: " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();
+		
+		setupHistoryWindow();
+		System.out.println ( "Setup History Window: " + ( System.currentTimeMillis() - startTime ) );
 		startTime = System.currentTimeMillis();
 		
 		setupPlaylistFilterPane();
@@ -910,6 +916,103 @@ public class MusicPlayerUI extends Application {
 		transport.setSpacing( 5 );
 	}
 	
+	public void setupHistoryWindow () {
+		historyWindow = new Stage();
+		historyWindow.initModality( Modality.NONE );
+		historyWindow.initOwner( mainStage );
+		historyWindow.setTitle( "History" );
+		historyWindow.setWidth( 500 );
+		historyWindow.setHeight ( 400 );
+		Group root = new Group();
+		Scene scene = new Scene( root );
+		VBox primaryPane = new VBox();
+
+		historyTable = new TableView();
+		Label emptyLabel = new Label( "History is empty." );
+		emptyLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
+		emptyLabel.setWrapText( true );
+		emptyLabel.setTextAlignment( TextAlignment.CENTER );
+
+		historyTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
+		historyTable.setPlaceholder( emptyLabel );
+		historyTable.setItems( history );
+		historyTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
+
+		historyTable.widthProperty().addListener( new ChangeListener <Number>() {
+			@Override
+			public void changed ( ObservableValue <? extends Number> source, Number oldWidth, Number newWidth ) {
+				Pane header = (Pane) historyTable.lookup( "TableHeaderRow" );
+				if ( header.isVisible() ) {
+					header.setMaxHeight( 0 );
+					header.setMinHeight( 0 );
+					header.setPrefHeight( 0 );
+					header.setVisible( false );
+				}
+			}
+		});
+		
+		historyTable.setOnKeyPressed( new EventHandler <KeyEvent>() {
+			@Override
+			public void handle ( final KeyEvent keyEvent ) {
+				if ( keyEvent.getCode().equals( KeyCode.DELETE ) ) {
+					ObservableList <Integer> indexes = historyTable.getSelectionModel().getSelectedIndices();
+					for ( int index : indexes ) { //TODO: removeAll
+						Queue.remove( index );
+					}
+				}
+			}
+		});
+
+		TableColumn numberColumn = new TableColumn ( "#" );
+		TableColumn artistColumn = new TableColumn( "Artist" );
+		TableColumn albumColumn = new TableColumn( "Album" );
+		TableColumn titleColumn = new TableColumn( "Title" );
+		
+		numberColumn.setMaxWidth( 10000 );
+		artistColumn.setMaxWidth( 30000 );
+		albumColumn.setMaxWidth ( 30000 );
+		titleColumn.setMaxWidth ( 30000 );
+		
+		numberColumn.setCellValueFactory( new Callback <CellDataFeatures <Track, Track>, ObservableValue <Track>>() {
+			@Override
+			public ObservableValue <Track> call ( CellDataFeatures <Track, Track> p ) {
+				return new ReadOnlyObjectWrapper( p.getValue() );
+			}
+		});
+
+		numberColumn.setCellFactory( new Callback <TableColumn <Track, Track>, TableCell <Track, Track>>() {
+			@Override
+			public TableCell <Track, Track> call ( TableColumn <Track, Track> param ) {
+				return new TableCell <Track, Track>() {
+					@Override
+					protected void updateItem ( Track item, boolean empty ) {
+						super.updateItem( item, empty );
+
+						if ( this.getTableRow() != null && item != null ) {
+							setText( this.getTableRow().getIndex() + 1 + "" );
+						} else {
+							setText( "" );
+						}
+					}
+				};
+			}
+		});
+		numberColumn.setSortable(false);
+		
+		artistColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Artist" ) );
+		titleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
+		albumColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Album" ) );
+		
+		historyTable.getColumns().addAll( numberColumn, artistColumn, titleColumn );
+
+		historyTable.prefWidthProperty().bind( historyWindow.widthProperty() );
+		historyTable.prefHeightProperty().bind( historyWindow.heightProperty() );
+		
+		primaryPane.getChildren().addAll( historyTable );
+		root.getChildren().add( primaryPane );
+		historyWindow.setScene( scene );
+	}
+	
 	
 	public void setupQueueWindow () {
 		queueWindow = new Stage();
@@ -993,8 +1096,8 @@ public class MusicPlayerUI extends Application {
 		numberColumn.setSortable(false);
 		
 		
-		artistColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "Artist" ) );
-		titleColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "Title" ) );
+		artistColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Artist" ) );
+		titleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
 		
 		queueTable.getColumns().addAll( numberColumn, artistColumn, titleColumn );
 
@@ -1267,19 +1370,34 @@ public class MusicPlayerUI extends Application {
 		toggleRepeatButton = new Button( repeatMode.getSymbol() );
 		toggleShuffleButton = new Button( shuffleMode.getSymbol() );
 		Button showQueueButton = new Button ( "Q" );
+		Button showHistoryButton = new Button ( "H" );
 		Button loadTracksButton = new Button( "⏏" );
 		Button savePlaylistButton = new Button( "💾" );
+		Button clearButton = new Button ( "✘" );
 		
 		showQueueButton.setOnAction ( new EventHandler <ActionEvent>() {
 			public void handle ( ActionEvent e ) {
 				queueWindow.show();
 			}
-		} );
+		});
+		
+		showHistoryButton.setOnAction ( new EventHandler <ActionEvent>() {
+			public void handle ( ActionEvent e ) {
+				historyWindow.show();
+			}
+		});
 
 		savePlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
 				promptAndSavePlaylist( new ArrayList <Track>( currentListData ), true );
+			}
+		});
+		
+		clearButton.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent e ) {
+				currentListData.clear();
 			}
 		});
 		
@@ -1360,8 +1478,8 @@ public class MusicPlayerUI extends Application {
 
 		currentPlayingListInfo.prefWidthProperty().bind( playlistControls.widthProperty() );
 
-		playlistControls.getChildren().addAll( toggleRepeatButton, toggleShuffleButton, showQueueButton,
-				currentPlayingListInfo, loadTracksButton, savePlaylistButton );
+		playlistControls.getChildren().addAll( toggleRepeatButton, toggleShuffleButton, showQueueButton, showHistoryButton,
+				currentPlayingListInfo, loadTracksButton, savePlaylistButton, clearButton );
 	}
 
 	public void setupPlaylistFilterPane () {
