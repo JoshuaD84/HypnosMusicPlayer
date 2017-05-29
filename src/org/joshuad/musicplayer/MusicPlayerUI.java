@@ -982,11 +982,15 @@ public class MusicPlayerUI extends Application {
 		ContextMenu trackContextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem apendMenuItem = new MenuItem( "Append" );
+		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		MenuItem removeMenuItem = new MenuItem( "Remove from History" );
-		trackContextMenu.getItems().addAll( playMenuItem, apendMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem, removeMenuItem );
+		trackContextMenu.getItems().addAll( 
+			playMenuItem, apendMenuItem, enqueueMenuItem,
+			editTagMenuItem, browseMenuItem, addToPlaylistMenuItem, removeMenuItem 
+		);
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
@@ -1044,7 +1048,7 @@ public class MusicPlayerUI extends Application {
 		//TODO: I don't know if this is right; 
 		Library.playlistsSorted.addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
 			updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
-		} );
+		});
 
 		updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		
@@ -1053,14 +1057,21 @@ public class MusicPlayerUI extends Application {
 			public void handle ( ActionEvent event ) {
 				loadTrack( historyTable.getSelectionModel().getSelectedItem() );
 			}
-		} );
+		});
+		
+		enqueueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				Queue.addAllTracks( historyTable.getSelectionModel().getSelectedItems() );
+			}
+		});
 
 		apendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
 				currentListTable.getItems().addAll( Utils.convertTrackList( historyTable.getSelectionModel().getSelectedItems() ) );
 			}
-		} );
+		});
 		
 		editTagMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -1883,12 +1894,13 @@ public class MusicPlayerUI extends Application {
 
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
-		MenuItem addMenuItem = new MenuItem( "Append" );
+		MenuItem apendMenuItem = new MenuItem( "Append" );
+		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		
-		contextMenu.getItems().addAll( playMenuItem, addMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem );
+		contextMenu.getItems().addAll( playMenuItem, apendMenuItem, enqueueMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem );
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
@@ -1935,16 +1947,25 @@ public class MusicPlayerUI extends Application {
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
+				//TODO: Handle multiple selections
 				playAlbum( albumTable.getSelectionModel().getSelectedItem() );
 			}
 		} );
 
-		addMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+		apendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
+				//TODO: Handle multiple selections
 				appendAlbum( albumTable.getSelectionModel().getSelectedItem() );
 			}
 		} );
+
+		enqueueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				Queue.addAllAlbums( albumTable.getSelectionModel().getSelectedItems() );
+			}
+		});
 		
 		editTagMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -2091,11 +2112,12 @@ public class MusicPlayerUI extends Application {
 
 		ContextMenu trackContextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
-		MenuItem addMenuItem = new MenuItem( "Append" );
+		MenuItem apendMenuItem = new MenuItem( "Append" );
+		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
-		trackContextMenu.getItems().addAll( playMenuItem, addMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem );
+		trackContextMenu.getItems().addAll( playMenuItem, apendMenuItem, enqueueMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem );
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
@@ -2129,12 +2151,19 @@ public class MusicPlayerUI extends Application {
 			}
 		} );
 
-		addMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+		apendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
 				currentListTable.getItems().addAll( Utils.convertTrackList( trackTable.getSelectionModel().getSelectedItems() ) );
 			}
 		} );
+		
+		enqueueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				Queue.addAllTracks( trackTable.getSelectionModel().getSelectedItems() );
+			}
+		});
 		
 		editTagMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -2285,10 +2314,11 @@ public class MusicPlayerUI extends Application {
 
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
-		MenuItem appendMenuItem = new MenuItem( "Append" );
+		MenuItem appendMenuItem = new MenuItem( "Append" );		
+		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem renameMenuItem = new MenuItem( "Rename" );
 		MenuItem removeMenuItem = new MenuItem( "Remove" );
-		contextMenu.getItems().addAll( playMenuItem, appendMenuItem, renameMenuItem, removeMenuItem );
+		contextMenu.getItems().addAll( playMenuItem, appendMenuItem, enqueueMenuItem, renameMenuItem, removeMenuItem );
 
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -2301,6 +2331,13 @@ public class MusicPlayerUI extends Application {
 			@Override
 			public void handle ( ActionEvent event ) {
 				currentListData.addAll( Utils.convertTrackList( playlistTable.getSelectionModel().getSelectedItem().getTracks() ) );
+			}
+		});
+		
+		enqueueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				Queue.addAllPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 		
@@ -2318,7 +2355,6 @@ public class MusicPlayerUI extends Application {
 			}
 		});
 
-        
 		playlistTable.setRowFactory( tv -> {
 			TableRow <Playlist> row = new TableRow <>();
 			
@@ -2573,7 +2609,7 @@ public class MusicPlayerUI extends Application {
 		queueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				Queue.addAll( currentListTable.getSelectionModel().getSelectedItems() );
+				Queue.addAllTracks( currentListTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 		

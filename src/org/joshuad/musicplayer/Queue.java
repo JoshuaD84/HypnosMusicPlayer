@@ -10,7 +10,7 @@ public class Queue {
 
 	final private static ObservableList <Track> queue = FXCollections.observableArrayList ( new ArrayList <Track>() );
 	
-	public synchronized static void add ( Track track ) {
+	public synchronized static void addTrack ( Track track ) {
 		queue.add( track );
 		
 		if ( track instanceof CurrentListTrack ) {
@@ -18,9 +18,27 @@ public class Queue {
 		}
 	}
 	
-	public synchronized static void addAll ( List<? extends Track> tracks ) {
+	public synchronized static void addAllAlbums ( List<? extends Album> albums ) {
+		for ( Album album : albums ) {
+			for ( Track track : album.getTracks() ) {
+				addTrack ( track );
+			}
+		}
+	}
+
+	public synchronized static void addAllPlaylists ( List<? extends Playlist> playlists ) {
+		for ( Playlist playlist : playlists ) {
+			for ( Track track : playlist.getTracks() ) {
+				addTrack ( track );
+			}
+		}
+	}
+
+	
+	public synchronized static void addAllTracks ( List<? extends Track> tracks ) {
+		
 		for ( Track track : tracks ) {
-			add ( track );
+			addTrack ( track );
 		}
 	}
 	
