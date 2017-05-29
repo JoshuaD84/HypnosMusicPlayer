@@ -26,6 +26,7 @@ import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.TagException;
 import org.joshuad.musicplayer.players.MP4Player;
+import org.joshuad.musicplayer.DraggedTrackContainer.DragSource;
 import org.joshuad.musicplayer.players.AbstractPlayer;
 import org.joshuad.musicplayer.players.FlacPlayer;
 import org.joshuad.musicplayer.players.MP3Player;
@@ -103,10 +104,7 @@ public class MusicPlayerUI extends Application {
 
 	// private static final String SYMBOL_REPEAT_ONE_TRACK = "🔂";
 
-	private static final DataFormat DRAGGED_TRACKS = new DataFormat( "application/x-java-track" );
-	private static final DataFormat DRAGGED_TRACK_INDICES = new DataFormat( "application/x-java-track-indices" );
-	private static final DataFormat DRAGGED_ALBUM_INDICES = new DataFormat( "application/x-java-album-indices" );
-	private static final DataFormat DRAGGED_PLAYLIST_INDEX = new DataFormat( "application/x-java-playlist-index" );
+	private static final DataFormat DRAGGED_TRACKS = new DataFormat( "application/x-java-track-new" );
 
 	public static final String PROGRAM_NAME = "Hypnos";
 
@@ -1014,11 +1012,13 @@ public class MusicPlayerUI extends Application {
 			
 			row.setOnDragDetected( event -> {
 				if ( !row.isEmpty() ) {
+					ArrayList <Integer> indices = new ArrayList <Integer>( historyTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( historyTable.getSelectionModel().getSelectedItems() );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, DragSource.HISTORY );
 					Dragboard db = row.startDragAndDrop( TransferMode.MOVE );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
-					cc.put( DRAGGED_TRACKS, tracks );
+					cc.put( DRAGGED_TRACKS, dragObject );
 					db.setContent( cc );
 					event.consume();
 
@@ -1285,19 +1285,190 @@ public class MusicPlayerUI extends Application {
 			
 			row.setOnDragDetected( event -> {
 				if ( !row.isEmpty() ) {
+					ArrayList <Integer> indices = new ArrayList <Integer>( queueTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( queueTable.getSelectionModel().getSelectedItems() );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, DragSource.QUEUE );
 					Dragboard db = row.startDragAndDrop( TransferMode.MOVE );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
-					cc.put( DRAGGED_TRACKS, tracks );
+					cc.put( DRAGGED_TRACKS, dragObject );
 					db.setContent( cc );
 					event.consume();
+				}
+			});
+			
+			row.setOnDragOver( event -> {
 
+				Dragboard db = event.getDragboard();
+				if (  db.hasContent( DRAGGED_TRACKS ) || db.hasFiles() ) {
+					event.acceptTransferModes( TransferMode.MOVE );
+					event.consume();
 				}
 			} );
+
+			row.setOnDragDropped( event -> {
+				Dragboard db = event.getDragboard();
+				if ( db.hasContent( DRAGGED_TRACKS ) ) {
+					
+					DraggedTrackContainer container = (DraggedTrackContainer) db.getContent( DRAGGED_TRACKS );
+					List <Integer> draggedIndices = container.getIndices();
+					int dropIndex = row.isEmpty() ? dropIndex = queueTable.getItems().size() : row.getIndex();
+					
+					switch ( container.getSource() ) {
+
+						case ALBUM_LIST:
+						case PLAYLIST_LIST:
+						case HISTORY: 
+						case TRACK_LIST: {
+							List <Track> tracksToCopy = container.getTracks();
+							queueTable.getItems().addAll( dropIndex, tracksToCopy );
+							
+						} break;
+						case CURRENT_LIST: {
+							synchronized ( currentListData ) {
+								ArrayList <CurrentListTrack> tracksToCopy = new ArrayList <CurrentListTrack> ( draggedIndices.size() );
+								for ( int index : draggedIndices ) {
+									if ( index >= 0 && index < currentListData.size() ) {
+										tracksToCopy.add( currentListData.get( index ) );
+									}
+									queueTable.getItems().addAll( dropIndex, tracksToCopy );
+								}
+							}
+						} break;
+						
+												
+						case QUEUE: {
+							ArrayList <Track> tracksToMove = new ArrayList <Track> ( draggedIndices.size() );
+							for ( int index : draggedIndices ) {
+								if ( index >= 0 && index < queueTable.getItems().size() ) {
+									tracksToMove.add( queueTable.getItems().get( index ) );
+								}
+							}
+							
+							for ( int k = draggedIndices.size() - 1; k >= 0; k-- ) {
+								int index = draggedIndices.get( k ).intValue();
+								if ( index >= 0 && index < queueTable.getItems().size() ) {
+									queueTable.getItems().remove ( index );
+								}
+							}
+							
+							dropIndex = Math.min( queueTable.getItems().size(), row.getIndex() );
+							
+							queueTable.getItems().addAll( dropIndex, tracksToMove );
+							
+							queueTable.getSelectionModel().clearSelection();
+							for ( int k = 0; k < draggedIndices.size(); k++ ) {
+								queueTable.getSelectionModel().select( dropIndex + k );
+							}
+							
+							Queue.updateQueueIndexes( null );
+							
+						} break;
+					}
+
+					Queue.updateQueueIndexes( null );
+					event.setDropCompleted( true );
+					event.consume();
+
+				} else if ( db.hasFiles() ) {
+					ArrayList <Track> tracksToAdd = new ArrayList();
+					for ( File file : db.getFiles() ) {
+						Path droppedPath = Paths.get( file.getAbsolutePath() );
+						if ( Utils.isMusicFile( droppedPath ) ) {
+							try {
+								tracksToAdd.add( new Track( droppedPath ) );
+							} catch ( IOException e ) {
+								e.printStackTrace();
+							}
+						} else if ( Files.isDirectory( droppedPath ) ) {
+							tracksToAdd.addAll( Utils.getAllTracksInDirectory( droppedPath ) );
+						}
+					}
+					if ( !tracksToAdd.isEmpty() ) {
+						int dropIndex = row.isEmpty() ? dropIndex = currentListTable.getItems().size() : row.getIndex();
+						queueTable.getItems().addAll( Math.min( dropIndex, currentListTable.getItems().size() ), tracksToAdd );
+					}
+
+					event.setDropCompleted( true );
+					event.consume();
+				}
+			});
 			
 			return row;
 		});
+		
+		queueTable.setOnDragOver( event -> {
+			Dragboard db = event.getDragboard();
+
+			if ( db.hasContent( DRAGGED_TRACKS ) || db.hasFiles() ) {
+
+				event.acceptTransferModes( TransferMode.MOVE );
+				event.consume();
+
+			}
+		} );
+
+		queueTable.setOnDragDropped( event -> {
+			Dragboard db = event.getDragboard();
+
+			if ( db.hasContent( DRAGGED_TRACKS ) ) {
+				
+				DraggedTrackContainer container = (DraggedTrackContainer) db.getContent( DRAGGED_TRACKS );
+				List <Integer> draggedIndices = container.getIndices();
+				
+				switch ( container.getSource() ) {
+					
+					case ALBUM_LIST:
+					case PLAYLIST_LIST:
+					case HISTORY: 
+					case TRACK_LIST: {
+						List <Track> tracksToCopy = container.getTracks();
+						queueTable.getItems().addAll( tracksToCopy );
+						
+					} break;
+					case CURRENT_LIST: {
+						synchronized ( currentListData ) {
+							ArrayList <CurrentListTrack> tracksToCopy = new ArrayList <CurrentListTrack> ( draggedIndices.size() );
+							for ( int index : draggedIndices ) {
+								if ( index >= 0 && index < currentListData.size() ) {
+									tracksToCopy.add( currentListData.get( index ) );
+								}
+								queueTable.getItems().addAll( tracksToCopy );
+							}
+						}
+					} break;
+					
+					case QUEUE: {
+						//This can't happen. 
+						
+					} break;
+				}
+				
+				Queue.updateQueueIndexes( null );
+				event.setDropCompleted( true );
+				event.consume();
+	
+			} else if ( db.hasFiles() ) {
+				ArrayList <Track> tracksToAdd = new ArrayList();
+				for ( File file : db.getFiles() ) {
+					Path droppedPath = Paths.get( file.getAbsolutePath() );
+					if ( Utils.isMusicFile( droppedPath ) ) {
+						try {
+							queueTable.getItems().add( new CurrentListTrack( droppedPath ) );
+						} catch ( CannotReadException | IOException | TagException 
+						| ReadOnlyFileException | InvalidAudioFrameException e ) {
+							e.printStackTrace();
+						}
+					} else if ( Files.isDirectory( droppedPath ) ) {
+						queueTable.getItems().addAll( Utils.convertTrackList( Utils.getAllTracksInDirectory( droppedPath ) ) );
+					}
+				}
+
+				event.setDropCompleted( true );
+				event.consume();
+			}
+
+		} );
 
 		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
 
@@ -1316,7 +1487,6 @@ public class MusicPlayerUI extends Application {
 			}
 		};
 		
-		//TODO: I don't know if this is right; 
 		Library.playlistsSorted.addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
 			updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		});
@@ -1365,7 +1535,6 @@ public class MusicPlayerUI extends Application {
 		
 
 		queueTable.prefWidthProperty().bind( queueWindow.widthProperty() );
-		queueTable.prefHeightProperty().bind( queueWindow.heightProperty() );
 		
 		primaryPane.getChildren().addAll( queueTable );
 		root.getChildren().add( primaryPane );
@@ -2171,13 +2340,25 @@ public class MusicPlayerUI extends Application {
 
 			row.setOnDragDetected( event -> {
 				if ( !row.isEmpty() ) {
-					ArrayList <Integer> index = new ArrayList ( albumTable.getSelectionModel().getSelectedIndices() );
+					
+					ArrayList <Integer> indices = new ArrayList <Integer>( albumTable.getSelectionModel().getSelectedIndices() );
+					ArrayList <Album> albums = new ArrayList <Album>( albumTable.getSelectionModel().getSelectedItems() );
+					
+					ArrayList <Track> tracks = new ArrayList <Track> ();
+					
+					for ( Album album : albums ) {
+						tracks.addAll( album.getTracks() );
+					}
+					
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( null, tracks, DragSource.ALBUM_LIST );
 					Dragboard db = row.startDragAndDrop( TransferMode.MOVE );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
-					cc.put( DRAGGED_ALBUM_INDICES, index );
+					cc.put( DRAGGED_TRACKS, dragObject );
 					db.setContent( cc );
 					event.consume();
+					
+				
 
 				}
 			} );
@@ -2375,11 +2556,14 @@ public class MusicPlayerUI extends Application {
 
 			row.setOnDragDetected( event -> {
 				if ( !row.isEmpty() ) {
+					
+					ArrayList <Integer> indices = new ArrayList <Integer>( trackTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( trackTable.getSelectionModel().getSelectedItems() );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, DragSource.TRACK_LIST );
 					Dragboard db = row.startDragAndDrop( TransferMode.MOVE );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
-					cc.put( DRAGGED_TRACKS, tracks );
+					cc.put( DRAGGED_TRACKS, dragObject );
 					db.setContent( cc );
 					event.consume();
 
@@ -2481,20 +2665,28 @@ public class MusicPlayerUI extends Application {
 
 			row.setOnDragDetected( event -> {
 				if ( !row.isEmpty() ) {
-					Playlist playlist = row.getItem();
+					List <Playlist> selectedPlaylists = playlistTable.getSelectionModel().getSelectedItems();
+					List <Track> tracks = new ArrayList <Track> ();
+					
+					for ( Playlist playlist : selectedPlaylists ) {
+						tracks.addAll ( playlist.getTracks() );
+					}
+					
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( null, tracks, DragSource.PLAYLIST_LIST );
 					Dragboard db = row.startDragAndDrop( TransferMode.MOVE );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
-					cc.put( DRAGGED_PLAYLIST_INDEX, playlist );
+					cc.put( DRAGGED_TRACKS, dragObject );
 					db.setContent( cc );
 					event.consume();
+				
 				}
 			});
 
 			row.setOnDragOver( event -> {
 
 				Dragboard db = event.getDragboard();
-				if ( db.hasContent( DRAGGED_TRACK_INDICES ) ) {
+				if ( db.hasContent( DRAGGED_TRACKS ) ) {
 					if ( !row.isEmpty() ) {
 						event.acceptTransferModes( TransferMode.MOVE );
 						event.consume();
@@ -2504,17 +2696,11 @@ public class MusicPlayerUI extends Application {
 
 			row.setOnDragDropped( event -> {
 				Dragboard db = event.getDragboard();
-				if ( db.hasContent( DRAGGED_TRACK_INDICES ) ) {
+				if ( db.hasContent( DRAGGED_TRACKS ) ) {
 					if ( !row.isEmpty() ) {
-						ArrayList <Integer> draggedIndexes = (ArrayList <Integer>) db.getContent( DRAGGED_TRACK_INDICES );
-						ArrayList <Track> draggedTracks = new ArrayList <Track>( draggedIndexes.size() );
-
-						for ( int index : draggedIndexes ) {
-							draggedTracks.add( currentListData.get( index ) );
-						}
-
+						DraggedTrackContainer container = (DraggedTrackContainer) db.getContent( DRAGGED_TRACKS );
 						Playlist playlist = row.getItem();
-						playlist.getTracks().addAll( draggedTracks );
+						addToPlaylist( container.getTracks(), playlist );
 						playlistTable.refresh();
 						event.setDropCompleted( true );
 						event.consume();
@@ -2600,59 +2786,85 @@ public class MusicPlayerUI extends Application {
 		currentListTable.setOnDragOver( event -> {
 			Dragboard db = event.getDragboard();
 
-			if ( db.hasContent( DRAGGED_TRACKS ) 
-			|| db.hasContent( DRAGGED_ALBUM_INDICES ) 
-			|| db.hasContent( DRAGGED_PLAYLIST_INDEX ) 
-			|| db.hasFiles() ) {
-
+			if ( db.hasContent( DRAGGED_TRACKS ) || db.hasFiles() ) {
 				event.acceptTransferModes( TransferMode.MOVE );
 				event.consume();
-
 			}
-		} );
+		});
 
 		currentListTable.setOnDragDropped( event -> {
 			Dragboard db = event.getDragboard();
 
 			if ( db.hasContent( DRAGGED_TRACKS ) ) {
-				ArrayList <Track> draggedTracks = (ArrayList <Track>) db.getContent( DRAGGED_TRACKS );
-				currentListTable.getItems().addAll( Utils.convertTrackList( draggedTracks ) );
+				//TODO: This code is duplicated below. Put it in a function. 
 
+				DraggedTrackContainer container = (DraggedTrackContainer) db.getContent( DRAGGED_TRACKS );
+				
+				switch ( container.getSource() ) {
+					case ALBUM_LIST:
+					case PLAYLIST_LIST:
+					case TRACK_LIST:
+					case HISTORY: {
+						List <Track> tracksToCopy = container.getTracks();
+						currentListTable.getItems().addAll( Utils.convertTrackList( tracksToCopy ) );
+					
+					} break;
+					
+					case CURRENT_LIST: {
+						List <Integer> draggedIndices = container.getIndices();
+						ArrayList <CurrentListTrack> tracksToMove = new ArrayList <CurrentListTrack> ( draggedIndices.size() );
+						for ( int index : draggedIndices ) {
+							if ( index >= 0 && index < currentListTable.getItems().size() ) {
+								tracksToMove.add( currentListTable.getItems().get( index ) );
+							}
+						}
+						
+						for ( int k = draggedIndices.size() - 1; k >= 0; k-- ) {
+							int index = draggedIndices.get( k ).intValue();
+							if ( index >= 0 && index < currentListTable.getItems().size() ) {
+								currentListTable.getItems().remove ( index );
+							}
+						}
+						
+						currentListTable.getItems().addAll( tracksToMove );
+						currentListTable.getSelectionModel().clearSelection();
+						
+					} break;
+					
+					case QUEUE: {
+						synchronized ( queueTable.getItems() ) {
+							List <Integer> draggedIndices = container.getIndices();
+							ArrayList <CurrentListTrack> tracksToCopy = new ArrayList <CurrentListTrack> ( draggedIndices.size() );
+							for ( int index : draggedIndices ) {
+								if ( index >= 0 && index < queueTable.getItems().size() ) {
+									Track addMe = queueTable.getItems().get( index );
+									if ( addMe instanceof CurrentListTrack ) {
+										tracksToCopy.add( (CurrentListTrack)addMe );
+									} else {
+										try {
+											CurrentListTrack newAddMe = new CurrentListTrack ( addMe );
+											queueTable.getItems().remove ( index );
+											queueTable.getItems().add( index, newAddMe );
+											tracksToCopy.add( newAddMe );
+											
+										} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e1 ) {
+											LOGGER.log( Level.WARNING, "Unable to convert queue track to CurrentListTrack, not adding to current list" );
+										}
+									}
+								}
+								currentListTable.getItems().addAll( tracksToCopy );
+							}
+						}
+						
+					} break;
+				}
+
+				Queue.updateQueueIndexes( null );
 				event.setDropCompleted( true );
-				currentListTable.getSelectionModel().clearSelection();
 				event.consume();
 
-			} else if ( db.hasContent( DRAGGED_ALBUM_INDICES ) ) {
-				if ( currentListTable.getItems().isEmpty() ) {
-					// If the list is empty, we handle the drop, otherwise let
-					// the rows handle it
-					ArrayList <Integer> draggedIndices = (ArrayList<Integer>) db.getContent( DRAGGED_ALBUM_INDICES );
-					
-					ArrayList <Track> addMe = new ArrayList <Track> ();
-					
-					for ( int index : draggedIndices ) {
-						addMe.addAll ( albumTable.getItems().get( index ).getTracks() );
-					}
 
-					int dropIndex = 0;
-					currentListTable.getItems().addAll( dropIndex, Utils.convertTrackList( addMe ) );
-
-					event.setDropCompleted( true );
-					event.consume();
-				}
-
-			} else if ( db.hasContent( DRAGGED_PLAYLIST_INDEX ) ) {
-				if ( currentListTable.getItems().isEmpty() ) {
-					// If the list is empty, we handle the drop, otherwise let the rows handle it
-					Playlist draggedPlaylist = (Playlist) db.getContent( DRAGGED_PLAYLIST_INDEX );
-
-					int dropIndex = 0;
-					currentListTable.getItems().addAll( dropIndex, Utils.convertTrackList( draggedPlaylist.getTracks() ) );
-
-					event.setDropCompleted( true );
-					event.consume();
-				}
-
+		
 			} else if ( db.hasFiles() ) {
 				ArrayList <Track> tracksToAdd = new ArrayList();
 				for ( File file : db.getFiles() ) {
@@ -2808,33 +3020,6 @@ public class MusicPlayerUI extends Application {
 			}
 		} );
 
-		/*
-		currentListTable.setOnKeyPressed( new EventHandler <KeyEvent>() {
-			@Override
-			public void handle ( final KeyEvent keyEvent ) {
-				if ( keyEvent.getCode().equals( KeyCode.DELETE ) ) {
-					ObservableList <Integer> selectedIndexes = currentListTable.getSelectionModel().getSelectedIndices();
-					ObservableList <CurrentListTrack> selectedItems = currentListTable.getSelectionModel().getSelectedItems();
-
-					if ( !selectedItems.isEmpty() ) {
-						int selectAfterDelete = selectedIndexes.get( 0 ) - 1;
-						currentListData.removeAll( selectedItems );
-						currentListTable.getSelectionModel().clearAndSelect( selectAfterDelete );
-					}
-				} else if ( keyEvent.getCode().equals ( KeyCode.Q ) ) {
-					ObservableList <Integer> selectedIndexes = currentListTable.getSelectionModel().getSelectedIndices();
-					ObservableList <CurrentListTrack> selectedItems = currentListTable.getSelectionModel().getSelectedItems();
-
-					if ( !selectedItems.isEmpty() ) {
-						Queue.addAll( selectedItems );
-					}
-				} else if ( keyEvent.getCode().equals( KeyCode.ENTER ) ) {
-					playTrack( currentListTable.getSelectionModel().getSelectedItem() );
-				}
-			}
-		});
-		*/
-
 		currentListTable.setRowFactory( tv -> {
 			TableRow <CurrentListTrack> row = new TableRow <>();
 
@@ -2848,25 +3033,21 @@ public class MusicPlayerUI extends Application {
 
 			row.setOnDragDetected( event -> {
 				if ( !row.isEmpty() ) {
-
-					ArrayList <Integer> indexes = new ArrayList( currentListTable.getSelectionModel().getSelectedIndices() );
+					ArrayList <Integer> indices = new ArrayList <Integer>( currentListTable.getSelectionModel().getSelectedIndices() );
+					ArrayList <Track> tracks = new ArrayList <Track>( currentListTable.getSelectionModel().getSelectedItems() );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, DragSource.CURRENT_LIST );
 					Dragboard db = row.startDragAndDrop( TransferMode.MOVE );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
-					cc.put( DRAGGED_TRACK_INDICES, indexes );
+					cc.put( DRAGGED_TRACKS, dragObject );
 					db.setContent( cc );
 					event.consume();
 				}
-			} );
+			});
 
 			row.setOnDragOver( event -> {
-
 				Dragboard db = event.getDragboard();
-				if ( db.hasContent( DRAGGED_TRACK_INDICES ) 
-				|| db.hasContent( DRAGGED_TRACKS )
-				|| db.hasContent( DRAGGED_ALBUM_INDICES )
-				|| db.hasContent( DRAGGED_PLAYLIST_INDEX )
-				|| db.hasFiles() ) {
+				if ( db.hasContent( DRAGGED_TRACKS ) || db.hasFiles() ) {
 					event.acceptTransferModes( TransferMode.MOVE );
 					event.consume();
 				}
@@ -2874,62 +3055,76 @@ public class MusicPlayerUI extends Application {
 
 			row.setOnDragDropped( event -> {
 				Dragboard db = event.getDragboard();
-				if ( db.hasContent( DRAGGED_TRACK_INDICES ) ) {
-					ArrayList <Integer> draggedIndexes = (ArrayList <Integer>) db.getContent( DRAGGED_TRACK_INDICES );
-					ArrayList <CurrentListTrack> tracksToMove = new ArrayList( draggedIndexes.size() );
-					for ( int index : draggedIndexes ) {
-						tracksToMove.add( currentListTable.getItems().get( index ) );
-					}
-					currentListTable.getItems().removeAll( tracksToMove );
+				if ( db.hasContent( DRAGGED_TRACKS ) ) {
 
-					int dropIndex = row.isEmpty() ? dropIndex = currentListTable.getItems().size() : row.getIndex();
-					currentListTable.getItems().addAll( dropIndex, tracksToMove );
-
-					event.setDropCompleted( true );
-					currentListTable.getSelectionModel().clearSelection();
-
-					for ( int k = 0; k < tracksToMove.size(); k++ ) {
-						currentListTable.getSelectionModel().select( dropIndex + k );
-					}
-					event.consume();
-
-				} else if ( db.hasContent( DRAGGED_TRACKS ) ) {
-
-					ArrayList <Track> draggedTracks = (ArrayList <Track>) db.getContent( DRAGGED_TRACKS );
-					int dropIndex = row.isEmpty() ? dropIndex = currentListTable.getItems().size() : row.getIndex();
-					currentListTable.getItems().addAll( dropIndex, Utils.convertTrackList ( draggedTracks ) );
-					
-
-					event.setDropCompleted( true );
-					event.consume();
-
-				} else if ( db.hasContent( DRAGGED_ALBUM_INDICES ) ) {
-					
-					ArrayList <Integer> draggedIndices = (ArrayList<Integer>) db.getContent( DRAGGED_ALBUM_INDICES );
-					
-					ArrayList <Track> addMe = new ArrayList <Track> ();
-					
-					for ( int index : draggedIndices ) {
-						addMe.addAll ( albumTable.getItems().get( index ).getTracks() );
-					}
-
+					DraggedTrackContainer container = (DraggedTrackContainer) db.getContent( DRAGGED_TRACKS );
 					int dropIndex = row.isEmpty() ? dropIndex = currentListTable.getItems().size() : row.getIndex();
 					
-					if ( !addMe.isEmpty() ) {
-						currentListTable.getItems().addAll( Math.min( dropIndex, currentListTable.getItems().size() ), Utils.convertTrackList( addMe ) );
+					switch ( container.getSource() ) {
+						case ALBUM_LIST:
+						case PLAYLIST_LIST:
+						case TRACK_LIST:
+						case HISTORY: {
+							List <Track> tracksToCopy = container.getTracks();
+							currentListTable.getItems().addAll( dropIndex, Utils.convertTrackList( tracksToCopy ) );
+						
+						} break;
+						
+						case CURRENT_LIST: {
+							List <Integer> draggedIndices = container.getIndices();
+							ArrayList <CurrentListTrack> tracksToMove = new ArrayList <CurrentListTrack> ( draggedIndices.size() );
+							for ( int index : draggedIndices ) {
+								if ( index >= 0 && index < currentListTable.getItems().size() ) {
+									tracksToMove.add( currentListTable.getItems().get( index ) );
+								}
+							}
+							
+							for ( int k = draggedIndices.size() - 1; k >= 0; k-- ) {
+								int index = draggedIndices.get( k ).intValue();
+								if ( index >= 0 && index < currentListTable.getItems().size() ) {
+									currentListTable.getItems().remove ( index );
+								}
+							}
+							
+							dropIndex = Math.min( currentListTable.getItems().size(), row.getIndex() );
+							
+							currentListTable.getItems().addAll( dropIndex, tracksToMove );
+							
+							currentListTable.getSelectionModel().clearSelection();
+							for ( int k = 0; k < draggedIndices.size(); k++ ) {
+								currentListTable.getSelectionModel().select( dropIndex + k );
+							}
+						} break;
+						
+						case QUEUE: {
+							synchronized ( queueTable.getItems() ) {
+								List <Integer> draggedIndices = container.getIndices();
+								ArrayList <CurrentListTrack> tracksToCopy = new ArrayList <CurrentListTrack> ( draggedIndices.size() );
+								for ( int index : draggedIndices ) {
+									if ( index >= 0 && index < queueTable.getItems().size() ) {
+										Track addMe = queueTable.getItems().get( index );
+										if ( addMe instanceof CurrentListTrack ) {
+											tracksToCopy.add( (CurrentListTrack)addMe );
+										} else {
+											try {
+												CurrentListTrack newAddMe = new CurrentListTrack ( addMe );
+												queueTable.getItems().remove ( index );
+												queueTable.getItems().add( index, newAddMe );
+												tracksToCopy.add( newAddMe );
+												
+											} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e1 ) {
+												LOGGER.log( Level.WARNING, "Unable to convert queue track to CurrentListTrack, not adding to current list" );
+											}
+										}
+									}
+									currentListTable.getItems().addAll( dropIndex, tracksToCopy );
+								}
+							}
+							
+						} break;
 					}
-					event.setDropCompleted( true );
-					event.consume();
 
-				} else if ( db.hasContent( DRAGGED_PLAYLIST_INDEX ) ) {
-					Playlist draggedPlaylist = (Playlist) db.getContent( DRAGGED_PLAYLIST_INDEX );
-
-					int dropIndex = row.getIndex();
-					if ( dropIndex >= currentListTable.getItems().size() ) {
-						dropIndex = currentListTable.getItems().size();
-					}
-					currentListTable.getItems().addAll( dropIndex, Utils.convertTrackList( draggedPlaylist.getTracks() ) );
-
+					Queue.updateQueueIndexes( null );
 					event.setDropCompleted( true );
 					event.consume();
 

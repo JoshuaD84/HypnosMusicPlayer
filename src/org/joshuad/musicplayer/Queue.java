@@ -58,7 +58,7 @@ public class Queue {
 			if ( queue.get( k ) instanceof CurrentListTrack ) {
 				CurrentListTrack track = (CurrentListTrack)queue.get( k );
 				track.addQueueIndex( k + 1 );
-			}
+			} 
 		}
 	}
 	

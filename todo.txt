@@ -1,0 +1,32 @@
+Decoders
+	Ogg
+
+	AAC
+
+	m4b - Double speed play for some reason
+
+	Can we get flacplayer.java to play things that we need jflac for:
+		Adrian Orange
+		A Perfect Circle - Mer de noms
+		<Any others?>
+
+	Wav:
+		No line matching interface SourceDataLine supporting format PCM_FLOAT 44100.0 Hz, 32 bit, stereo, 8 bytes/frame,  is supported.
+
+Make History and Queue Tables fit window properly
+
+Queue delete key not working right. (right click works)
+
+Tray icon
+
+Redesign the transport
+
+Re-architect the current playing info box
+
+Artwork drag and drop
+
+Re-sort album list after editing tags
+
+right click album / track / playlist > info
+
+When you close the program and re-open it, queue display #'s' don't update properly for the current list on the main screen. 

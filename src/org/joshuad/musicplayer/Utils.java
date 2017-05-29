@@ -136,21 +136,25 @@ public class Utils {
 		ArrayList <CurrentListTrack> retMe = new ArrayList <CurrentListTrack> ( tracks.size() );
 		
 		for ( Track track : tracks ) {
-			try {
-				retMe.add ( new CurrentListTrack ( track ) );
-			} catch ( TagException e) {
-				System.out.println ( "Unable to read tags on: " + track.getPath().toString() +", skipping." );
-			} catch (CannotReadException e) {
-				System.out.println ( track.getPath().toString() );
-				e.printStackTrace();
-			} catch (ReadOnlyFileException e) {
-				System.out.println ( track.getPath().toString() +", is read only, unable to edit, skipping." );
-			} catch (InvalidAudioFrameException e) {
-				System.out.println ( track.getPath().toString() +", has bad audio fram data, skipping." );
-			} catch ( FileNotFoundException e ) {
-				LOGGER.log( Level.INFO, "Unable to load track: " + track.getPath().toString() );
-			} catch ( IOException e ) {
-				e.printStackTrace();
+			if ( track instanceof CurrentListTrack ) {
+				retMe.add ( (CurrentListTrack)track );
+			} else {
+				try {
+					retMe.add ( new CurrentListTrack ( track ) );
+				} catch ( TagException e) {
+					System.out.println ( "Unable to read tags on: " + track.getPath().toString() +", skipping." );
+				} catch (CannotReadException e) {
+					System.out.println ( track.getPath().toString() );
+					e.printStackTrace();
+				} catch (ReadOnlyFileException e) {
+					System.out.println ( track.getPath().toString() +", is read only, unable to edit, skipping." );
+				} catch (InvalidAudioFrameException e) {
+					System.out.println ( track.getPath().toString() +", has bad audio fram data, skipping." );
+				} catch ( FileNotFoundException e ) {
+					LOGGER.log( Level.INFO, "Unable to load track: " + track.getPath().toString() );
+				} catch ( IOException e ) {
+					e.printStackTrace();
+				}
 			}
 		}
 		
