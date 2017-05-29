@@ -98,7 +98,8 @@ import javafx.util.Callback;
 public class MusicPlayerUI extends Application {
 	private static transient final Logger LOGGER = Logger.getLogger( MusicPlayerUI.class.getName() );
 
-	private static final int MAX_TRACK_HISTORY = 10000;
+	private static final int MAX_PREVIOUS_NEXT_STACK_SIZE = 10000;
+	private static final int MAX_HISTORY_SIZE = 100;
 
 	// private static final String SYMBOL_REPEAT_ONE_TRACK = "🔂";
 
@@ -119,7 +120,8 @@ public class MusicPlayerUI extends Application {
 	static TableView <Track> queueTable;
 	static TableView <Track> historyTable;
 
-	final static ObservableList <Track> history = FXCollections.observableArrayList( new ArrayList <Track>(MAX_TRACK_HISTORY) );
+	final static ArrayList <Track> previousNextStack = new ArrayList <Track>(MAX_PREVIOUS_NEXT_STACK_SIZE);
+	final static ObservableList <Track> history = FXCollections.observableArrayList( new ArrayList <Track>(MAX_HISTORY_SIZE) );
 
 	static BorderPane albumImage;
 	static BorderPane artistImage;
@@ -185,7 +187,7 @@ public class MusicPlayerUI extends Application {
 	
 
 	enum RepeatMode {
-		PLAY_ONCE ( "⇥" ), REPEAT ( "🔁" );
+		PLAY_ONCE ( "⇥" ), REPEAT ( "🔁" ), REPEAT_ONE_TRACK ( "🔂" );
 
 		String symbol;
 
@@ -217,7 +219,11 @@ public class MusicPlayerUI extends Application {
 		Platform.runLater( new Runnable() {
 			public void run () {
 				if ( !userRequested ) {
-					playNextTrack();
+					if ( repeatMode == RepeatMode.REPEAT_ONE_TRACK && currentPlayer != null ) {
+						playTrack ( currentPlayer.getTrack() );
+					} else {
+						playNextTrack();
+					}
 				}
 			}
 		} );
@@ -235,11 +241,16 @@ public class MusicPlayerUI extends Application {
 
 		Track previousTrack = null;
 		
-		while ( !history.isEmpty() && previousTrack == null ) {
+		while ( !previousNextStack.isEmpty() && previousTrack == null ) {
 			Track candidate;
-			synchronized ( history ) {
-				candidate = history.remove( 0 );
+			synchronized ( previousNextStack ) {
+				candidate = previousNextStack.remove( 0 );
 				if ( playOnceShuffleTracksPlayedCounter > 0 ) playOnceShuffleTracksPlayedCounter--;
+				
+				if ( currentPlayer != null && candidate.equals( currentPlayer.getTrack() ) ) {
+					candidate = previousNextStack.remove( 0 );
+					if ( playOnceShuffleTracksPlayedCounter > 0 ) playOnceShuffleTracksPlayedCounter--;
+				}
 			}
 			
 			if ( currentListData.contains( candidate ) ) {
@@ -256,9 +267,9 @@ public class MusicPlayerUI extends Application {
 			for ( CurrentListTrack track : currentListData ) {
 				if ( track.getIsCurrentTrack() ) {
 					if ( previousTrackInList != null ) {
-						playTrack( previousTrackInList, isPaused );
+						playTrack( previousTrackInList, isPaused, false );
 					} else {
-						playTrack( track, isPaused );
+						playTrack( track, isPaused, false );
 					}
 					break;
 				} else {
@@ -270,9 +281,9 @@ public class MusicPlayerUI extends Application {
 			for ( CurrentListTrack track : currentListData ) {
 				if ( track.getIsCurrentTrack() ) {
 					if ( previousTrackInList != null ) {
-						playTrack( previousTrackInList, isPaused );
+						playTrack( previousTrackInList, isPaused, false );
 					} else {
-						playTrack( currentListData.get( currentListData.size() - 1 ), isPaused );
+						playTrack( currentListData.get( currentListData.size() - 1 ), isPaused, false );
 					}
 					break;
 				} else {
@@ -359,7 +370,7 @@ public class MusicPlayerUI extends Application {
 			} else if ( shuffleMode == ShuffleMode.SHUFFLE && repeatMode == RepeatMode.PLAY_ONCE ) {
 
 				if ( playOnceShuffleTracksPlayedCounter < currentListData.size() ) {
-					List <Track> alreadyPlayed = history.subList( 0, playOnceShuffleTracksPlayedCounter );
+					List <Track> alreadyPlayed = previousNextStack.subList( 0, playOnceShuffleTracksPlayedCounter );
 					ArrayList <Track> viableTracks = new ArrayList <Track>( currentListData );
 					viableTracks.removeAll( alreadyPlayed );
 					Track playMe = viableTracks.get( randomGenerator.nextInt( viableTracks.size() ) );
@@ -384,11 +395,11 @@ public class MusicPlayerUI extends Application {
 
 				List <Track> collisionWindow;
 
-				if ( history.size() >= collisionWindowSize ) {
-					collisionWindow = history.subList( 0,
+				if ( previousNextStack.size() >= collisionWindowSize ) {
+					collisionWindow = previousNextStack.subList( 0,
 							collisionWindowSize );
 				} else {
-					collisionWindow = history;
+					collisionWindow = previousNextStack;
 				}
 
 				do {
@@ -413,7 +424,7 @@ public class MusicPlayerUI extends Application {
 		playTrack ( track, startPaused, true );
 	}
 	                                                                 
-	private static void playTrack ( Track track, boolean startPaused, boolean addToHistory ) {
+	private static void playTrack ( Track track, boolean startPaused, boolean addToPreviousNextStack ) {
 		if ( currentPlayer != null ) {
 			currentPlayer.stop();
 			if ( currentPlayer.getTrack() instanceof CurrentListTrack ) {
@@ -480,8 +491,16 @@ public class MusicPlayerUI extends Application {
 		}
 
 
-		if ( addToHistory ) {
-			while ( history.size() >= MAX_TRACK_HISTORY ) {
+		if ( addToPreviousNextStack ) {
+			while ( previousNextStack.size() >= MAX_PREVIOUS_NEXT_STACK_SIZE ) {
+				previousNextStack.remove( previousNextStack.size() - 1 );
+			}
+			
+			previousNextStack.add( 0, track );
+		}
+		
+		if ( history.size() == 0 || !history.get( 0 ).equals( track ) ) {
+			while ( history.size() >= MAX_HISTORY_SIZE ) {
 				history.remove( history.size() - 1 );
 			}
 			
@@ -921,7 +940,7 @@ public class MusicPlayerUI extends Application {
 		historyWindow.initModality( Modality.NONE );
 		historyWindow.initOwner( mainStage );
 		historyWindow.setTitle( "History" );
-		historyWindow.setWidth( 500 );
+		historyWindow.setWidth( 600 );
 		historyWindow.setHeight ( 400 );
 		Group root = new Group();
 		Scene scene = new Scene( root );
@@ -938,19 +957,6 @@ public class MusicPlayerUI extends Application {
 		historyTable.setItems( history );
 		historyTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 
-		historyTable.widthProperty().addListener( new ChangeListener <Number>() {
-			@Override
-			public void changed ( ObservableValue <? extends Number> source, Number oldWidth, Number newWidth ) {
-				Pane header = (Pane) historyTable.lookup( "TableHeaderRow" );
-				if ( header.isVisible() ) {
-					header.setMaxHeight( 0 );
-					header.setMinHeight( 0 );
-					header.setPrefHeight( 0 );
-					header.setVisible( false );
-				}
-			}
-		});
-		
 		historyTable.setOnKeyPressed( new EventHandler <KeyEvent>() {
 			@Override
 			public void handle ( final KeyEvent keyEvent ) {
@@ -972,6 +978,136 @@ public class MusicPlayerUI extends Application {
 		artistColumn.setMaxWidth( 30000 );
 		albumColumn.setMaxWidth ( 30000 );
 		titleColumn.setMaxWidth ( 30000 );
+		
+		ContextMenu trackContextMenu = new ContextMenu();
+		MenuItem playMenuItem = new MenuItem( "Play" );
+		MenuItem apendMenuItem = new MenuItem( "Append" );
+		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
+		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
+		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
+		MenuItem removeMenuItem = new MenuItem( "Remove from History" );
+		trackContextMenu.getItems().addAll( playMenuItem, apendMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem, removeMenuItem );
+		
+		MenuItem newPlaylistButton = new MenuItem( "<New>" );
+
+		historyTable.setRowFactory( tv -> {
+			TableRow <Track> row = new TableRow <>();
+			row.setContextMenu( trackContextMenu );
+			
+			row.setOnMouseClicked( event -> {
+				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
+					currentListTable.getItems().clear();
+					try {
+						currentListTable.getItems().add( new CurrentListTrack ( historyTable.getSelectionModel().getSelectedItem() ) );
+					} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e1 ) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					playTrack( historyTable.getSelectionModel().getSelectedItem() );
+					currentPlayingListInfo.setText( "Playlist: New Playlist *" );
+				}
+			} );
+			
+			row.setOnDragDetected( event -> {
+				if ( !row.isEmpty() ) {
+					ArrayList <Track> tracks = new ArrayList <Track>( historyTable.getSelectionModel().getSelectedItems() );
+					Dragboard db = row.startDragAndDrop( TransferMode.MOVE );
+					db.setDragView( row.snapshot( null, null ) );
+					ClipboardContent cc = new ClipboardContent();
+					cc.put( DRAGGED_TRACKS, tracks );
+					db.setContent( cc );
+					event.consume();
+
+				}
+			} );
+			
+			return row;
+		});
+
+		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
+
+		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent e ) {
+				promptAndSavePlaylist ( historyTable.getSelectionModel().getSelectedItems(), false );
+			}
+		});
+
+		EventHandler addToPlaylistHandler = new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				Playlist playlist = (Playlist) ((MenuItem) event.getSource()).getUserData();
+				addToPlaylist ( historyTable.getSelectionModel().getSelectedItems(), playlist );
+			}
+		};
+		
+		//TODO: I don't know if this is right; 
+		Library.playlistsSorted.addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
+			updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
+		} );
+
+		updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
+		
+		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				loadTrack( historyTable.getSelectionModel().getSelectedItem() );
+			}
+		} );
+
+		apendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				currentListTable.getItems().addAll( Utils.convertTrackList( historyTable.getSelectionModel().getSelectedItems() ) );
+			}
+		} );
+		
+		editTagMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				List<Track> tracks = historyTable.getSelectionModel().getSelectedItems();
+				
+				tagWindow.setTracks( tracks, null );
+				tagWindow.show();
+			}
+		});
+		
+
+		removeMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				synchronized ( history ) {
+					List<Integer> selectedIndices = historyTable.getSelectionModel().getSelectedIndices();
+					
+					ArrayList<Integer> removeMeIndices = new ArrayList ( selectedIndices );
+					
+					for ( int k = removeMeIndices.size() - 1; k >= 0 ; k-- ) {
+						history.remove( removeMeIndices.get( k ).intValue() );
+					}
+				}
+			}
+		});
+
+		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			// TODO: This is the better way, once openjdk and openjfx supports
+			// it: getHostServices().showDocument(file.toURI().toString());
+			@Override
+			public void handle ( ActionEvent event ) {
+				SwingUtilities.invokeLater( new Runnable() {
+					public void run () {
+						try {
+							Track selectedTrack = historyTable.getSelectionModel().getSelectedItem();
+							if ( selectedTrack != null ) {
+								Desktop.getDesktop().open( selectedTrack.getPath().getParent().toFile() );
+							}
+						} catch ( IOException e ) {
+							e.printStackTrace();
+						}
+					}
+				} );
+			}
+		} );
+		
 		
 		numberColumn.setCellValueFactory( new Callback <CellDataFeatures <Track, Track>, ObservableValue <Track>>() {
 			@Override
@@ -998,12 +1134,15 @@ public class MusicPlayerUI extends Application {
 			}
 		});
 		numberColumn.setSortable(false);
+		artistColumn.setSortable(false);
+		albumColumn.setSortable(false);
+		titleColumn.setSortable(false);
 		
 		artistColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Artist" ) );
 		titleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
 		albumColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Album" ) );
 		
-		historyTable.getColumns().addAll( numberColumn, artistColumn, titleColumn );
+		historyTable.getColumns().addAll( numberColumn, artistColumn, albumColumn, titleColumn );
 
 		historyTable.prefWidthProperty().bind( historyWindow.widthProperty() );
 		historyTable.prefHeightProperty().bind( historyWindow.heightProperty() );
@@ -1439,6 +1578,8 @@ public class MusicPlayerUI extends Application {
 			public void handle ( ActionEvent e ) {
 				if ( repeatMode == RepeatMode.PLAY_ONCE ) {
 					repeatMode = RepeatMode.REPEAT;
+				} else if ( repeatMode == RepeatMode.REPEAT ) {
+					repeatMode = RepeatMode.REPEAT_ONE_TRACK;
 				} else {
 					repeatMode = RepeatMode.PLAY_ONCE;
 				}
@@ -1948,13 +2089,13 @@ public class MusicPlayerUI extends Application {
 		
 		trackTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 
-		ContextMenu contextMenu = new ContextMenu();
+		ContextMenu trackContextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem addMenuItem = new MenuItem( "Append" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
-		contextMenu.getItems().addAll( playMenuItem, addMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem );
+		trackContextMenu.getItems().addAll( playMenuItem, addMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem );
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
@@ -2013,7 +2154,10 @@ public class MusicPlayerUI extends Application {
 				SwingUtilities.invokeLater( new Runnable() {
 					public void run () {
 						try {
-							Desktop.getDesktop().open( trackTable.getSelectionModel().getSelectedItem().getPath().getParent().toFile() );
+							Track selectedTrack = trackTable.getSelectionModel().getSelectedItem();
+							if ( selectedTrack != null ) {
+								Desktop.getDesktop().open( trackTable.getSelectionModel().getSelectedItem().getPath().getParent().toFile() );
+							}
 						} catch ( IOException e ) {
 							e.printStackTrace();
 						}
@@ -2048,7 +2192,7 @@ public class MusicPlayerUI extends Application {
 		trackTable.setRowFactory( tv -> {
 			TableRow <Track> row = new TableRow <>();
 			
-			row.setContextMenu( contextMenu );
+			row.setContextMenu( trackContextMenu );
 			
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
