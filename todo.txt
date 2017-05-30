@@ -30,3 +30,7 @@ Re-sort album list after editing tags
 right click album / track / playlist > info
 
 When you close the program and re-open it, queue display #'s' don't update properly for the current list on the main screen. 
+
+When you delete multiple sources in teh window, only one deletes. 
+
+UIUpdaterThread is too aggressive. Causing lag on my computer

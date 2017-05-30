@@ -151,6 +151,7 @@ public class MusicPlayerUI extends Application {
 	static Stage queueWindow;
 	static Stage historyWindow;
 	static TagWindow tagWindow;
+	static InfoWindow infoWindow;
 
 	static Button togglePlayButton;
 	static Button toggleRepeatButton;
@@ -672,8 +673,9 @@ public class MusicPlayerUI extends Application {
 		
 		setupLibraryWindow();
 		tagWindow = new TagWindow ( mainStage );
+		infoWindow = new InfoWindow ( mainStage );
 		
-		System.out.println ( "Setup Library Window: " + ( System.currentTimeMillis() - startTime ) );
+		System.out.println ( "Setup Child Windows: " + ( System.currentTimeMillis() - startTime ) );
 		startTime = System.currentTimeMillis();
 
 		artSplitPane = new SplitPane();
@@ -2187,8 +2189,12 @@ public class MusicPlayerUI extends Application {
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
+		MenuItem infoMenuItem = new MenuItem( "Info" );
 		
-		contextMenu.getItems().addAll( playMenuItem, apendMenuItem, enqueueMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem );
+		contextMenu.getItems().addAll( 
+			playMenuItem, apendMenuItem, enqueueMenuItem, editTagMenuItem, 
+			browseMenuItem, addToPlaylistMenuItem, infoMenuItem
+		);
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
@@ -2211,7 +2217,6 @@ public class MusicPlayerUI extends Application {
 		EventHandler addToPlaylistHandler = new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-
 				
 				Playlist playlist = (Playlist) ((MenuItem) event.getSource()).getUserData();
 				
@@ -2232,60 +2237,49 @@ public class MusicPlayerUI extends Application {
 
 		updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		
-		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				//TODO: Handle multiple selections
-				playAlbum( albumTable.getSelectionModel().getSelectedItem() );
-			}
-		} );
+		playMenuItem.setOnAction( event -> {
+			//TODO: Handle multiple selections
+			playAlbum( albumTable.getSelectionModel().getSelectedItem() );
+		});
 
-		apendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				//TODO: Handle multiple selections
-				appendAlbum( albumTable.getSelectionModel().getSelectedItem() );
-			}
-		} );
+		apendMenuItem.setOnAction( event -> {
+			//TODO: Handle multiple selections
+			appendAlbum( albumTable.getSelectionModel().getSelectedItem() );
+		});
 
-		enqueueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				Queue.addAllAlbums( albumTable.getSelectionModel().getSelectedItems() );
-			}
+		enqueueMenuItem.setOnAction( event -> {
+			Queue.addAllAlbums( albumTable.getSelectionModel().getSelectedItems() );
 		});
 		
-		editTagMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				List<Album> albums = albumTable.getSelectionModel().getSelectedItems();
-				ArrayList<Track> editMe = new ArrayList<Track>();
-				
-				for ( Album album : albums ) {
-					editMe.addAll( album.getTracks() );
-				}
-				
-				tagWindow.setTracks( editMe, albums, FieldKey.TRACK, FieldKey.TITLE );
-				tagWindow.show();
+		editTagMenuItem.setOnAction( event -> {
+			List<Album> albums = albumTable.getSelectionModel().getSelectedItems();
+			ArrayList<Track> editMe = new ArrayList<Track>();
+			
+			for ( Album album : albums ) {
+				editMe.addAll( album.getTracks() );
 			}
+			
+			tagWindow.setTracks( editMe, albums, FieldKey.TRACK, FieldKey.TITLE );
+			tagWindow.show();
+		});
+		
+		infoMenuItem.setOnAction( event -> {
+			//TODO: look at the row we right clicked on instead of selectedItem
+			infoWindow.setAlbum( albumTable.getSelectionModel().getSelectedItem() );
+			infoWindow.show();
 		});
 
-		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			// TODO: This is the better way, once openjdk and openjfx supports
-			// it: getHostServices().showDocument(file.toURI().toString());
-			@Override
-			public void handle ( ActionEvent event ) {
-				SwingUtilities.invokeLater( new Runnable() {
-					public void run () {
-						try {
-							Desktop.getDesktop().open( albumTable.getSelectionModel().getSelectedItem().getPath().toFile() );
-						} catch ( IOException e ) {
-							e.printStackTrace();
-						}
+		browseMenuItem.setOnAction( event -> {
+			SwingUtilities.invokeLater( new Runnable() {
+				public void run () {
+					try {
+						Desktop.getDesktop().open( albumTable.getSelectionModel().getSelectedItem().getPath().toFile() );
+					} catch ( IOException e ) {
+						e.printStackTrace();
 					}
-				} );
-			}
-		} );
+				}
+			});
+		});
 		
 		albumTable.setOnDragOver( event -> {
 			Dragboard db = event.getDragboard();

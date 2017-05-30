@@ -56,6 +56,13 @@ public class Track implements Serializable {
 	private Integer discCount =  null;
 	private String releaseType = null;
 	
+	private boolean isLossless;
+	private long bitRate;
+	private int sampleRate;
+	private boolean isVBR;
+	private String encodingType;
+	private String format;
+	
 	public Track ( Path trackPath ) throws IOException {
 		this ( trackPath, false );
 	}
@@ -81,6 +88,7 @@ public class Track implements Serializable {
 			}
 			
 			if ( extension.matches( "aac" ) || extension.matches( "m4r" ) ) {
+				//TODO: Do this better
 				audioFile = AudioFileIO.readAs( trackFile, "m4a" );
 				
 			} else {
@@ -90,6 +98,13 @@ public class Track implements Serializable {
 			length = audioFile.getAudioHeader().getTrackLength();
 			tag = audioFile.getTag();
 			
+			isLossless = audioFile.getAudioHeader().isLossless();
+			bitRate = audioFile.getAudioHeader().getBitRateAsNumber();
+			sampleRate = audioFile.getAudioHeader().getSampleRateAsNumber();
+			isVBR = audioFile.getAudioHeader().isVariableBitRate();
+			encodingType = audioFile.getAudioHeader().getEncodingType();
+			format = audioFile.getAudioHeader().getFormat();
+
 			parseArtist( tag );
 			parseTitle( tag ); 
 			parseAlbum( tag );
@@ -380,8 +395,33 @@ public class Track implements Serializable {
 		return trackFile.toPath();
 	}
 	
+	public String getFilename() {
+		return trackFile.getName();
+	}
+	
 	public String getLengthDisplay () {
 		return Utils.getLengthDisplay( getLength () );
+	}
+	
+	public String getShortEncodingString() {
+		if ( encodingType.toLowerCase().matches( "mp3" ) ) {
+			if ( isVBR ) {
+				return "MP3 VBR";
+			} else {
+				return "MP3 " + bitRate;
+			}
+		} else if ( encodingType.toLowerCase().matches( "flac" ) ) {
+			return encodingType;
+		} else if ( encodingType.toLowerCase().matches( "aac" ) ) {			
+			if ( isVBR ) {
+				return "AAC VBR";
+			} else {
+				return "AAC " + bitRate;
+			}
+		} else {
+			//TODO: probably worth logging this
+			return encodingType;
+		}
 	}
 	
 	public Format getFormat () {
