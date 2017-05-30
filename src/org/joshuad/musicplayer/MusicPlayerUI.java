@@ -3,6 +3,7 @@ package org.joshuad.musicplayer;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,6 +35,8 @@ import org.joshuad.musicplayer.players.JFlacPlayer;
 import org.joshuad.musicplayer.players.OggPlayer;
 import org.joshuad.musicplayer.players.WavPlayer;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -94,6 +97,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import javafx.util.Duration;
 
 @SuppressWarnings({ "rawtypes", "unchecked" }) // TODO: Maybe get rid of this when I understand things better
 public class MusicPlayerUI extends Application {
@@ -798,6 +802,8 @@ public class MusicPlayerUI extends Application {
 		
 		System.out.println ( "Start Library Loader " + ( System.currentTimeMillis() - startTime ) );
 		startTime = System.currentTimeMillis();
+		
+		hackTooltipStartTiming();
 	}
 	
 	private void updatePlaylistMenuItems ( ObservableList <MenuItem> items,
@@ -3154,6 +3160,24 @@ public class MusicPlayerUI extends Application {
 
 			return row;
 		} );
+	}
+	
+	public static void hackTooltipStartTiming() {
+	    try {
+	    	Tooltip tooltip = new Tooltip ();
+	        Field fieldBehavior = tooltip.getClass().getDeclaredField("BEHAVIOR");
+	        fieldBehavior.setAccessible(true);
+	        Object objBehavior = fieldBehavior.get(tooltip);
+
+	        Field fieldTimer = objBehavior.getClass().getDeclaredField("activationTimer");
+	        fieldTimer.setAccessible(true);
+	        Timeline objTimer = (Timeline) fieldTimer.get(objBehavior);
+
+	        objTimer.getKeyFrames().clear();
+	        objTimer.getKeyFrames().add(new KeyFrame(new Duration(350)));
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
 	}
 	
 	public static void main ( String[] args ) {

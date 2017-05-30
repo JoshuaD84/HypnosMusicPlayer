@@ -32,7 +32,7 @@ import java.io.RandomAccessFile;
 import java.util.Arrays;
 
 
-public final class FlacDecoder {
+final class FlacDecoder {
 	
 	private Stream input;
 	private long metadataEndPos;
