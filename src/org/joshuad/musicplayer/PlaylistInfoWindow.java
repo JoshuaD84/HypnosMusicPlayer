@@ -38,12 +38,12 @@ public class PlaylistInfoWindow extends Stage {
 		this.initModality( Modality.NONE );
 		this.initOwner( owner );
 		this.setTitle( "Album Info" );
-		this.setWidth( 700 );
+		this.setWidth( 500 );
 		Group root = new Group();
 		Scene scene = new Scene( root );
 		VBox primaryPane = new VBox();
 		
-		setupAlbumTable();
+		setupPlaylistTable();
 
 		primaryPane.getChildren().addAll( trackTable );
 		root.getChildren().add( primaryPane );
@@ -52,38 +52,33 @@ public class PlaylistInfoWindow extends Stage {
 
 	public void setPlaylist ( Playlist playlist ) { 
 		this.playlist = playlist;
-		trackTable.setItems( FXCollections.observableArrayList ( playlist.getTracks() ) );
+		if ( playlist != null ) {
+			trackTable.setItems( FXCollections.observableArrayList ( playlist.getTracks() ) );
+			this.setTitle( "Playlist Info: " + playlist.getName() );
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void setupAlbumTable () {
+	private void setupPlaylistTable () {
 		
 		TableColumn<Track, Integer> trackNumberColumn = new TableColumn<Track, Integer>( "#" );
 		TableColumn<Track, String> titleColumn = new TableColumn<Track, String>( "Title" );
 		TableColumn<Track, Integer> lengthColumn = new TableColumn<Track, Integer>( "Length" );
-		TableColumn<Track, String> fileColumn = new TableColumn<Track, String>( "Filename" );
-		TableColumn<Track, String> encodingColumn = new TableColumn<Track, String>( "Encoding" );
 		
 		trackNumberColumn.setMaxWidth( 70000 );
 		titleColumn.setMaxWidth( 500000 );
 		lengthColumn.setMaxWidth( 90000 );
-		fileColumn.setMaxWidth( 500000 );
-		encodingColumn.setMaxWidth( 180000 );
 		
 		trackNumberColumn.setEditable( false );
 		titleColumn.setEditable( false );
 		lengthColumn.setEditable( false );
-		fileColumn.setEditable( false );
-		encodingColumn.setEditable( false );
 		
 		trackNumberColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "trackNumber" ) );
 		titleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
 		lengthColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "LengthDisplay" ) );
-		fileColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Filename" ) );
-		encodingColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "ShortEncodingString" ) );
 		
 		trackTable = new TableView<Track> ();
-		trackTable.getColumns().addAll( trackNumberColumn, titleColumn, lengthColumn, fileColumn, encodingColumn );
+		trackTable.getColumns().addAll( trackNumberColumn, titleColumn, lengthColumn );
 		trackTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
 		trackTable.setEditable( true );
 		

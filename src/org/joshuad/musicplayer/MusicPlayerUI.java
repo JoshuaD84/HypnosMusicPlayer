@@ -151,7 +151,8 @@ public class MusicPlayerUI extends Application {
 	static Stage queueWindow;
 	static Stage historyWindow;
 	static TagWindow tagWindow;
-	static AlbumInfoWindow infoWindow;
+	static PlaylistInfoWindow playlistInfoWindow;
+	static AlbumInfoWindow albumInfoWindow;
 
 	static Button togglePlayButton;
 	static Button toggleRepeatButton;
@@ -673,7 +674,8 @@ public class MusicPlayerUI extends Application {
 		
 		setupLibraryWindow();
 		tagWindow = new TagWindow ( mainStage );
-		infoWindow = new AlbumInfoWindow ( mainStage );
+		albumInfoWindow = new AlbumInfoWindow ( mainStage );
+		playlistInfoWindow = new PlaylistInfoWindow ( mainStage );
 		
 		System.out.println ( "Setup Child Windows: " + ( System.currentTimeMillis() - startTime ) );
 		startTime = System.currentTimeMillis();
@@ -2268,8 +2270,8 @@ public class MusicPlayerUI extends Application {
 		
 		infoMenuItem.setOnAction( event -> {
 			//TODO: look at the row we right clicked on instead of selectedItem
-			infoWindow.setAlbum( albumTable.getSelectionModel().getSelectedItem() );
-			infoWindow.show();
+			albumInfoWindow.setAlbum( albumTable.getSelectionModel().getSelectedItem() );
+			albumInfoWindow.show();
 		});
 
 		browseMenuItem.setOnAction( event -> {
@@ -2617,8 +2619,9 @@ public class MusicPlayerUI extends Application {
 		MenuItem appendMenuItem = new MenuItem( "Append" );		
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem renameMenuItem = new MenuItem( "Rename" );
+		MenuItem infoMenuItem = new MenuItem( "Info" );
 		MenuItem removeMenuItem = new MenuItem( "Remove" );
-		contextMenu.getItems().addAll( playMenuItem, appendMenuItem, enqueueMenuItem, renameMenuItem, removeMenuItem );
+		contextMenu.getItems().addAll( playMenuItem, appendMenuItem, enqueueMenuItem, renameMenuItem, infoMenuItem, removeMenuItem );
 
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -2645,6 +2648,14 @@ public class MusicPlayerUI extends Application {
 			@Override
 			public void handle ( ActionEvent event ) {
 				promptAndRenamePlaylist ( playlistTable.getSelectionModel().getSelectedItem() );
+			}
+		});
+		
+		infoMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				playlistInfoWindow.setPlaylist ( playlistTable.getSelectionModel().getSelectedItem() );
+				playlistInfoWindow.show();
 			}
 		});
 
