@@ -2393,6 +2393,21 @@ public class MusicPlayerUI extends Application {
 		albumColumn.setMaxWidth( 45000 );
 		trackColumn.setMaxWidth( 15000 );
 
+		trackColumn.setCellFactory( column -> {
+			return new TableCell <Track, Integer>() {
+				@Override
+				protected void updateItem ( Integer value, boolean empty ) {
+					super.updateItem( value, empty );
+
+					if ( value == null || value.equals( Track.NO_TRACK_NUMBER ) || empty ) {
+						setText( null );
+						setStyle( "" );
+					} else {
+						setText( value.toString() );
+					}
+				}
+			};
+		} );
 		trackTable = new TableView();
 		trackTable.getColumns().addAll( artistColumn, albumColumn, trackColumn, titleColumn, lengthColumn );
 		trackTable.setEditable( false );
