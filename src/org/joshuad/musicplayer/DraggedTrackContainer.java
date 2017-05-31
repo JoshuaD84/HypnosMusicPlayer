@@ -10,6 +10,7 @@ public class DraggedTrackContainer implements Serializable {
 	public enum DragSource {
 		CURRENT_LIST,
 		ALBUM_LIST,
+		ALBUM_INFO,
 		TRACK_LIST,
 		PLAYLIST_LIST,
 		QUEUE,

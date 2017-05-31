@@ -108,7 +108,7 @@ public class MusicPlayerUI extends Application {
 
 	// private static final String SYMBOL_REPEAT_ONE_TRACK = "🔂";
 
-	private static final DataFormat DRAGGED_TRACKS = new DataFormat( "application/x-java-track-new" );
+	public static final DataFormat DRAGGED_TRACKS = new DataFormat( "application/x-java-track-new" );
 
 	public static final String PROGRAM_NAME = "Hypnos";
 
@@ -151,7 +151,7 @@ public class MusicPlayerUI extends Application {
 	static Stage queueWindow;
 	static Stage historyWindow;
 	static TagWindow tagWindow;
-	static InfoWindow infoWindow;
+	static AlbumInfoWindow infoWindow;
 
 	static Button togglePlayButton;
 	static Button toggleRepeatButton;
@@ -419,15 +419,15 @@ public class MusicPlayerUI extends Application {
 		}
 	}
 	
-	private static void playTrack ( Track track ) {
+	public static void playTrack ( Track track ) {
 		playTrack ( track, false );
 	}
 	
-	private static void playTrack ( Track track, boolean startPaused ) {
+	public static void playTrack ( Track track, boolean startPaused ) {
 		playTrack ( track, startPaused, true );
 	}
 	                                                                 
-	private static void playTrack ( Track track, boolean startPaused, boolean addToPreviousNextStack ) {
+	public static void playTrack ( Track track, boolean startPaused, boolean addToPreviousNextStack ) {
 		if ( currentPlayer != null ) {
 			currentPlayer.stop();
 			if ( currentPlayer.getTrack() instanceof CurrentListTrack ) {
@@ -673,7 +673,7 @@ public class MusicPlayerUI extends Application {
 		
 		setupLibraryWindow();
 		tagWindow = new TagWindow ( mainStage );
-		infoWindow = new InfoWindow ( mainStage );
+		infoWindow = new AlbumInfoWindow ( mainStage );
 		
 		System.out.println ( "Setup Child Windows: " + ( System.currentTimeMillis() - startTime ) );
 		startTime = System.currentTimeMillis();
@@ -808,7 +808,7 @@ public class MusicPlayerUI extends Application {
 		hackTooltipStartTiming();
 	}
 	
-	private void updatePlaylistMenuItems ( ObservableList <MenuItem> items,
+	public static void updatePlaylistMenuItems ( ObservableList <MenuItem> items,
 			EventHandler eventHandler ) {
 
 		items.remove( 1, items.size() );
@@ -1327,6 +1327,7 @@ public class MusicPlayerUI extends Application {
 						case ALBUM_LIST:
 						case PLAYLIST_LIST:
 						case HISTORY: 
+						case ALBUM_INFO:
 						case TRACK_LIST: {
 							List <Track> tracksToCopy = container.getTracks();
 							queueTable.getItems().addAll( dropIndex, tracksToCopy );
@@ -1429,6 +1430,7 @@ public class MusicPlayerUI extends Application {
 					case ALBUM_LIST:
 					case PLAYLIST_LIST:
 					case HISTORY: 
+					case ALBUM_INFO:
 					case TRACK_LIST: {
 						List <Track> tracksToCopy = container.getTracks();
 						queueTable.getItems().addAll( tracksToCopy );
@@ -1738,7 +1740,8 @@ public class MusicPlayerUI extends Application {
 		}
 	}
 	
-	public void addToPlaylist ( List <Track> tracks, Playlist playlist ) {
+	//TODO: This function probably belongs in Library
+	public static void addToPlaylist ( List <Track> tracks, Playlist playlist ) {
 		playlist.getTracks().addAll( tracks );
 		if ( currentPlaylist != null && currentPlaylist.getName().equals( playlist.getName() ) ) {
 			currentListData.addAll( Utils.convertTrackList( tracks ) );
@@ -1746,7 +1749,7 @@ public class MusicPlayerUI extends Application {
 		playlistTable.refresh(); 
 	}
 	
-	public void promptAndSavePlaylist ( List <Track> tracks, boolean isCurrentList ) { 
+	public static void promptAndSavePlaylist ( List <Track> tracks, boolean isCurrentList ) { 
 	//TODO: I can probably figure out if it's current on my own
 		String defaultName = "";
 		if ( currentPlaylist != null ) {
@@ -2804,6 +2807,7 @@ public class MusicPlayerUI extends Application {
 					case ALBUM_LIST:
 					case PLAYLIST_LIST:
 					case TRACK_LIST:
+					case ALBUM_INFO:
 					case HISTORY: {
 						List <Track> tracksToCopy = container.getTracks();
 						currentListTable.getItems().addAll( Utils.convertTrackList( tracksToCopy ) );
@@ -3064,6 +3068,7 @@ public class MusicPlayerUI extends Application {
 						case ALBUM_LIST:
 						case PLAYLIST_LIST:
 						case TRACK_LIST:
+						case ALBUM_INFO:
 						case HISTORY: {
 							List <Track> tracksToCopy = container.getTracks();
 							currentListTable.getItems().addAll( dropIndex, Utils.convertTrackList( tracksToCopy ) );
