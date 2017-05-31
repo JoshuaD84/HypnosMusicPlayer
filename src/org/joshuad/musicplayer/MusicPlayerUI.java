@@ -2375,20 +2375,26 @@ public class MusicPlayerUI extends Application {
 	public void setupTrackTable () {
 		TableColumn artistColumn = new TableColumn( "Artist" );
 		TableColumn lengthColumn = new TableColumn( "Length" );
+		TableColumn trackColumn = new TableColumn( "#" );
+		TableColumn albumColumn = new TableColumn( "Album" );
 		TableColumn titleColumn = new TableColumn( "Title" );
 
 		artistColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Artist" ) );
 		titleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
 		lengthColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "LengthDisplay" ) );
+		trackColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "TrackNumber" ) );
+		albumColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "Album" ) );
 
 		artistColumn.setSortType( TableColumn.SortType.ASCENDING );
 
 		artistColumn.setMaxWidth( 45000 );
 		titleColumn.setMaxWidth( 45000 );
-		lengthColumn.setMaxWidth( 10000 );
+		lengthColumn.setMaxWidth( 15000 );
+		albumColumn.setMaxWidth( 45000 );
+		trackColumn.setMaxWidth( 15000 );
 
 		trackTable = new TableView();
-		trackTable.getColumns().addAll( artistColumn, titleColumn, lengthColumn );
+		trackTable.getColumns().addAll( artistColumn, albumColumn, trackColumn, titleColumn, lengthColumn );
 		trackTable.setEditable( false );
 		trackTable.setItems( Library.tracksSorted );
 
@@ -2396,7 +2402,8 @@ public class MusicPlayerUI extends Application {
 		
 		trackTable.getSelectionModel().clearSelection();
 		trackTable.getSortOrder().add( artistColumn );
-		trackTable.getSortOrder().add( titleColumn );
+		trackTable.getSortOrder().add( albumColumn );
+		trackTable.getSortOrder().add( trackColumn );
 		FixedWidthCustomResizePolicy resizePolicy = new FixedWidthCustomResizePolicy();
 		// TODO resizePolicy.registerColumns ( lengthColumn );
 		trackTable.setColumnResizePolicy( resizePolicy );
@@ -3200,7 +3207,7 @@ public class MusicPlayerUI extends Application {
 		System.out.println ( "CLI Listener: " + ( System.currentTimeMillis() - startTime ) );
 		startTime = System.currentTimeMillis();
 		
-		if ( firstInstance ) {
+//		if ( firstInstance ) {
 			Library.init();
 			UIUpdater.init();
 			
@@ -3218,12 +3225,12 @@ public class MusicPlayerUI extends Application {
 			
 			Persister.saveData();
 			System.exit ( 0 );
-		} else {
-			CLIParser parser = new CLIParser ( );
-			ArrayList <Integer> commands = parser.parseCommands( args );
-			SingleInstanceController.sendCommands( commands );
-			System.exit ( 0 );
-		}
+//		} else {
+//			CLIParser parser = new CLIParser ( );
+//			ArrayList <Integer> commands = parser.parseCommands( args );
+//			SingleInstanceController.sendCommands( commands );
+//			System.exit ( 0 );
+//		}
 	}
 }
 
