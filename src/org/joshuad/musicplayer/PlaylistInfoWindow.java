@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -77,6 +78,21 @@ public class PlaylistInfoWindow extends Stage {
 		titleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
 		lengthColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "LengthDisplay" ) );
 		
+		trackNumberColumn.setCellFactory( column -> {
+			return new TableCell <Track, Integer>() {
+				@Override
+				protected void updateItem ( Integer value, boolean empty ) {
+					super.updateItem( value, empty );
+
+					if ( value == null || value.equals( Track.NO_TRACK_NUMBER ) || empty ) {
+						setText( null );
+						setStyle( "" );
+					} else {
+						setText( value.toString() );
+					}
+				}
+			};
+		} );
 		trackTable = new TableView<Track> ();
 		trackTable.getColumns().addAll( trackNumberColumn, titleColumn, lengthColumn );
 		trackTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );

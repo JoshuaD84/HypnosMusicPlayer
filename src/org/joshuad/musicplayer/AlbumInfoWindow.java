@@ -22,6 +22,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -129,6 +130,21 @@ public class AlbumInfoWindow extends Stage {
 		fileColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Filename" ) );
 		encodingColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "ShortEncodingString" ) );
 		
+		trackNumberColumn.setCellFactory( column -> {
+			return new TableCell <Track, Integer>() {
+				@Override
+				protected void updateItem ( Integer value, boolean empty ) {
+					super.updateItem( value, empty );
+
+					if ( value == null || value.equals( Track.NO_TRACK_NUMBER ) || empty ) {
+						setText( null );
+						setStyle( "" );
+					} else {
+						setText( value.toString() );
+					}
+				}
+			};
+		} );
 		trackTable = new TableView<Track> ();
 		trackTable.getColumns().addAll( trackNumberColumn, titleColumn, lengthColumn, fileColumn, encodingColumn );
 		trackTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
