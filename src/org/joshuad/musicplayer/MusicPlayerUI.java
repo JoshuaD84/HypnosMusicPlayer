@@ -88,9 +88,9 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -1183,7 +1183,6 @@ public class MusicPlayerUI extends Application {
 		queueWindow.setHeight ( 400 );
 		Group root = new Group();
 		Scene scene = new Scene( root );
-		VBox primaryPane = new VBox();
 
 		queueTable = new TableView();
 		Label emptyLabel = new Label( "Queue is empty." );
@@ -1209,16 +1208,20 @@ public class MusicPlayerUI extends Application {
 			}
 		});
 		
-		queueTable.setOnKeyPressed( new EventHandler <KeyEvent>() {
-			//TODO: is there a better way to do this? 
-			//TODO: is this code buggy? 
-			@Override
-			public void handle ( final KeyEvent keyEvent ) {
-				if ( keyEvent.getCode().equals( KeyCode.DELETE ) ) {
-					ObservableList <Integer> indexes = queueTable.getSelectionModel().getSelectedIndices();
-					for ( int index : indexes ) { //TODO: removeAll
-						Queue.remove( index );
+		queueTable.setOnKeyPressed( keyEvent -> {
+
+			if ( keyEvent.getCode().equals( KeyCode.DELETE ) ) {
+				ObservableList <Integer> selectedIndexes = queueTable.getSelectionModel().getSelectedIndices();
+				
+				List<Integer> removeMe = new ArrayList ( selectedIndexes );
+				
+				if ( !removeMe.isEmpty() ) {
+	
+					int selectAfterDelete = selectedIndexes.get( 0 ) - 1;
+					for ( int k = removeMe.size() - 1; k >= 0; k-- ) {
+						queueTable.getItems().remove ( removeMe.get( k ).intValue() );
 					}
+					queueTable.getSelectionModel().clearAndSelect( selectAfterDelete );
 				}
 			}
 		});
@@ -1270,8 +1273,11 @@ public class MusicPlayerUI extends Application {
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
+		MenuItem cropMenuItem = new MenuItem( "Crop" );
 		MenuItem removeMenuItem = new MenuItem( "Remove from Queue" );
-		contextMenu.getItems().addAll( playMenuItem, apendMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem, removeMenuItem );
+		contextMenu.getItems().addAll( 
+			playMenuItem, apendMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem, cropMenuItem, removeMenuItem 
+		);
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
@@ -1325,25 +1331,24 @@ public class MusicPlayerUI extends Application {
 					int dropIndex = row.isEmpty() ? dropIndex = queueTable.getItems().size() : row.getIndex();
 					
 					switch ( container.getSource() ) {
-
 						case ALBUM_LIST:
 						case PLAYLIST_LIST:
 						case HISTORY: 
 						case ALBUM_INFO:
 						case TRACK_LIST: {
 							List <Track> tracksToCopy = container.getTracks();
-							queueTable.getItems().addAll( dropIndex, tracksToCopy );
+							Queue.addAllTracks( dropIndex, tracksToCopy );
 							
 						} break;
 						case CURRENT_LIST: {
 							synchronized ( currentListData ) {
-								ArrayList <CurrentListTrack> tracksToCopy = new ArrayList <CurrentListTrack> ( draggedIndices.size() );
+								ArrayList <CurrentListTrack> tracksToCopy = new ArrayList <CurrentListTrack> (  );
 								for ( int index : draggedIndices ) {
 									if ( index >= 0 && index < currentListData.size() ) {
 										tracksToCopy.add( currentListData.get( index ) );
 									}
-									queueTable.getItems().addAll( dropIndex, tracksToCopy );
 								}
+								Queue.addAllTracks( dropIndex, tracksToCopy );
 							}
 						} break;
 						
@@ -1359,13 +1364,13 @@ public class MusicPlayerUI extends Application {
 							for ( int k = draggedIndices.size() - 1; k >= 0; k-- ) {
 								int index = draggedIndices.get( k ).intValue();
 								if ( index >= 0 && index < queueTable.getItems().size() ) {
-									queueTable.getItems().remove ( index );
+									Queue.remove ( index );
 								}
 							}
 							
-							dropIndex = Math.min( queueTable.getItems().size(), row.getIndex() );
+							dropIndex = Math.min( Queue.size(), row.getIndex() );
 							
-							queueTable.getItems().addAll( dropIndex, tracksToMove );
+							Queue.addAllTracks( dropIndex, tracksToMove );
 							
 							queueTable.getSelectionModel().clearSelection();
 							for ( int k = 0; k < draggedIndices.size(); k++ ) {
@@ -1421,59 +1426,82 @@ public class MusicPlayerUI extends Application {
 
 		queueTable.setOnDragDropped( event -> {
 			Dragboard db = event.getDragboard();
-
 			if ( db.hasContent( DRAGGED_TRACKS ) ) {
 				
 				DraggedTrackContainer container = (DraggedTrackContainer) db.getContent( DRAGGED_TRACKS );
 				List <Integer> draggedIndices = container.getIndices();
 				
 				switch ( container.getSource() ) {
-					
+
 					case ALBUM_LIST:
 					case PLAYLIST_LIST:
 					case HISTORY: 
 					case ALBUM_INFO:
 					case TRACK_LIST: {
 						List <Track> tracksToCopy = container.getTracks();
-						queueTable.getItems().addAll( tracksToCopy );
+						Queue.addAllTracks( tracksToCopy );
 						
 					} break;
 					case CURRENT_LIST: {
 						synchronized ( currentListData ) {
-							ArrayList <CurrentListTrack> tracksToCopy = new ArrayList <CurrentListTrack> ( draggedIndices.size() );
+							ArrayList <CurrentListTrack> tracksToCopy = new ArrayList <CurrentListTrack> (  );
 							for ( int index : draggedIndices ) {
 								if ( index >= 0 && index < currentListData.size() ) {
 									tracksToCopy.add( currentListData.get( index ) );
 								}
-								queueTable.getItems().addAll( tracksToCopy );
 							}
+							Queue.addAllTracks( tracksToCopy );
 						}
 					} break;
 					
+											
 					case QUEUE: {
-						//This can't happen. 
+						ArrayList <Track> tracksToMove = new ArrayList <Track> ( draggedIndices.size() );
+						for ( int index : draggedIndices ) {
+							if ( index >= 0 && index < queueTable.getItems().size() ) {
+								tracksToMove.add( queueTable.getItems().get( index ) );
+							}
+						}
+						
+						for ( int k = draggedIndices.size() - 1; k >= 0; k-- ) {
+							int index = draggedIndices.get( k ).intValue();
+							if ( index >= 0 && index < queueTable.getItems().size() ) {
+								Queue.remove ( index );
+							}
+						}
+						
+						Queue.addAllTracks( tracksToMove );
+						
+						queueTable.getSelectionModel().clearSelection();
+						for ( int k = 0; k < draggedIndices.size(); k++ ) {
+							queueTable.getSelectionModel().select( k );
+						}
+						
+						Queue.updateQueueIndexes( null );
 						
 					} break;
 				}
-				
+
 				Queue.updateQueueIndexes( null );
 				event.setDropCompleted( true );
 				event.consume();
-	
+
 			} else if ( db.hasFiles() ) {
 				ArrayList <Track> tracksToAdd = new ArrayList();
 				for ( File file : db.getFiles() ) {
 					Path droppedPath = Paths.get( file.getAbsolutePath() );
 					if ( Utils.isMusicFile( droppedPath ) ) {
 						try {
-							queueTable.getItems().add( new CurrentListTrack( droppedPath ) );
-						} catch ( CannotReadException | IOException | TagException 
-						| ReadOnlyFileException | InvalidAudioFrameException e ) {
+							tracksToAdd.add( new Track( droppedPath ) );
+						} catch ( IOException e ) {
 							e.printStackTrace();
 						}
 					} else if ( Files.isDirectory( droppedPath ) ) {
-						queueTable.getItems().addAll( Utils.convertTrackList( Utils.getAllTracksInDirectory( droppedPath ) ) );
+						tracksToAdd.addAll( Utils.getAllTracksInDirectory( droppedPath ) );
 					}
+				}
+				if ( !tracksToAdd.isEmpty() ) {
+					queueTable.getItems().addAll( tracksToAdd );
 				}
 
 				event.setDropCompleted( true );
@@ -1528,7 +1556,31 @@ public class MusicPlayerUI extends Application {
 				tagWindow.show();
 			}
 		});
-		
+
+		cropMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+
+				ObservableList <Integer> selectedIndexes = queueTable.getSelectionModel().getSelectedIndices();
+				
+				ArrayList <Integer> removeMe = new ArrayList<Integer> ();
+				
+				for ( int k = 0; k < queueTable.getItems().size(); k++ ) {
+					if ( !selectedIndexes.contains( k ) ) {
+						removeMe.add ( k );
+					}
+				}
+				
+				if ( !removeMe.isEmpty() ) {
+					for ( int k = removeMe.size() - 1; k >= 0; k-- ) {
+						Queue.remove ( removeMe.get( k ).intValue() );
+					}
+
+					queueTable.getSelectionModel().clearSelection();
+				}
+			}
+		} );
+
 
 		removeMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -1547,12 +1599,11 @@ public class MusicPlayerUI extends Application {
 		
 
 		queueTable.prefWidthProperty().bind( queueWindow.widthProperty() );
+		queueTable.prefHeightProperty().bind( queueWindow.heightProperty() );
 		
-		primaryPane.getChildren().addAll( queueTable );
-		root.getChildren().add( primaryPane );
+		root.getChildren().add( queueTable );
 		queueWindow.setScene( scene );
 	}
-	
 
 	public void setupLibraryWindow () {
 		libraryWindow = new Stage();
@@ -1820,6 +1871,14 @@ public class MusicPlayerUI extends Application {
 		Button savePlaylistButton = new Button( "💾" );
 		Button clearButton = new Button ( "✘" );
 		
+		toggleRepeatButton.setTooltip( new Tooltip( "Toggle Repeat Type" ) );
+		toggleShuffleButton.setTooltip( new Tooltip( "Toggle Shuffle" ) );
+		showQueueButton.setTooltip( new Tooltip( "Show Queue" ) );
+		showHistoryButton.setTooltip( new Tooltip( "Show Play History" ) );
+		loadTracksButton.setTooltip( new Tooltip( "Load tracks from the filesystem" ) );
+		savePlaylistButton.setTooltip( new Tooltip( "Save this playlist" ) );
+		clearButton.setTooltip( new Tooltip( "Clear the current list" ) );
+		
 		showQueueButton.setOnAction ( new EventHandler <ActionEvent>() {
 			public void handle ( ActionEvent e ) {
 				queueWindow.show();
@@ -1983,6 +2042,11 @@ public class MusicPlayerUI extends Application {
 				filterBox.setText( "" );
 			}
 		});
+		
+
+		settingsButton.setTooltip( new Tooltip( "Add or Remove Music Folders" ) );
+		filterBox.setTooltip ( new Tooltip ( "Filter/Search playlists" ) );
+		clearButton.setTooltip( new Tooltip( "Clear the filter text" ) );
 
 		playlistFilterPane.getChildren().addAll( settingsButton, filterBox, clearButton );
 	}
@@ -2021,6 +2085,10 @@ public class MusicPlayerUI extends Application {
 				trackFilterBox.setText( "" );
 			}
 		});
+
+		settingsButton.setTooltip( new Tooltip( "Add or Remove Music Folders" ) );
+		trackFilterBox.setTooltip ( new Tooltip ( "Filter/Search tracks" ) );
+		clearButton.setTooltip( new Tooltip( "Clear the filter text" ) );
 		
 		HBox checkBoxMargins = new HBox();
 		checkBoxMargins.setPadding( new Insets ( 4, 0, 0, 6 ) );
@@ -2131,6 +2199,11 @@ public class MusicPlayerUI extends Application {
 				filterBox.setText( "" );
 			}
 		});
+		
+
+		settingsButton.setTooltip( new Tooltip( "Add or Remove Music Folders" ) );
+		filterBox.setTooltip ( new Tooltip ( "Filter/Search albums" ) );
+		clearButton.setTooltip( new Tooltip( "Clear the filter text" ) );
 
 		albumFilterPane.getChildren().addAll( settingsButton, filterBox, clearButton );
 	}
@@ -2146,10 +2219,7 @@ public class MusicPlayerUI extends Application {
 			}
 		});
 		
-		Tooltip tooltip = new Tooltip( "Unchecked: List all tracks.\nChecked: Hide tracks that are part of an album." );
-		Tooltip.install( new Rectangle( 0, 0, 10, 10 ), tooltip );
-		
-		trackListCheckBox.setTooltip( tooltip );
+		trackListCheckBox.setTooltip( new Tooltip( "" ) );
 	}
 
 	public void setupAlbumTable () {

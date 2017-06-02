@@ -15,8 +15,6 @@ Decoders
 
 Make History and Queue Tables fit window properly
 
-Queue delete key not working right. (right click works)
-
 Tray icon
 
 Redesign the transport
@@ -27,10 +25,8 @@ Artwork drag and drop
 
 Re-sort album list after editing tags
 
-right click album / track / playlist > info
-
 When you close the program and re-open it, queue display #'s' don't update properly for the current list on the main screen. 
 
-When you delete multiple sources in teh window, only one deletes. 
+When you delete multiple sources in the window, only one deletes. 
 
 UIUpdaterThread is too aggressive. Causing lag on my computer
