@@ -25,8 +25,11 @@ public class Persister {
 		//TODO: I'm sure this needs fine tuning. I don't love putting it in a static block, either 
 		String osString = System.getProperty( "os.name" ).toLowerCase();
 		String home = System.getProperty( "user.home" );
-
-		if ( osString.indexOf( "win" ) >= 0 ) {
+		
+		if ( MusicPlayerUI.IS_STANDALONE ) {
+			configDirectory = MusicPlayerUI.ROOT.resolve( "config" ).toFile();
+			
+		} else if ( osString.indexOf( "win" ) >= 0 ) {
 			if ( osString.indexOf( "xp" ) >= 0 ) {
 				configDirectory = new File( 
 					home + File.separator + 

@@ -24,6 +24,11 @@ public class SingleInstanceController {
 	
 	// Return true if the socket is available.
 	public static boolean startCLICommandListener() {
+		
+		if ( MusicPlayerUI.IS_DEVELOPING ) {
+			port = 49486;
+		} 
+		
 		try {
 			@SuppressWarnings("resource")
 			ServerSocket serverSocket = new ServerSocket ( port, 0, InetAddress.getByName(null) );

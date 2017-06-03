@@ -1,7 +1,5 @@
 *.class
-/info.data
-/info.sources
-/info.playlists
-/info.current
+/stage/config
+/stage/config/*
 hypnos.jar
 /bin/

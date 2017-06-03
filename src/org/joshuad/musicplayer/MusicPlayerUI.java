@@ -2,8 +2,12 @@ package org.joshuad.musicplayer;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -76,6 +80,7 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
@@ -100,14 +105,17 @@ import javafx.util.Duration;
 
 @SuppressWarnings({ "rawtypes", "unchecked" }) // TODO: Maybe get rid of this when I understand things better
 public class MusicPlayerUI extends Application {
-	private static transient final Logger LOGGER = Logger.getLogger( MusicPlayerUI.class.getName() );
+	
+	public static boolean IS_STANDALONE = false;
+	public static boolean IS_DEVELOPING = false;
+	public static Path ROOT;
+	
+	private static final Logger LOGGER = Logger.getLogger( MusicPlayerUI.class.getName() );
 
 	private static final int MAX_PREVIOUS_NEXT_STACK_SIZE = 10000;
 	private static final int MAX_HISTORY_SIZE = 100;
 
-	// private static final String SYMBOL_REPEAT_ONE_TRACK = "🔂";
-
-	public static final DataFormat DRAGGED_TRACKS = new DataFormat( "application/x-java-track-new" );
+	public static final DataFormat DRAGGED_TRACKS = new DataFormat( "application/x-java-track" );
 
 	public static final String PROGRAM_NAME = "Hypnos";
 
@@ -126,6 +134,9 @@ public class MusicPlayerUI extends Application {
 
 	static BorderPane albumImage;
 	static BorderPane artistImage;
+	
+	static ImageView playImage;
+	static ImageView pauseImage;
 
 	static HBox albumFilterPane;
 	static HBox trackFilterPane;
@@ -308,7 +319,7 @@ public class MusicPlayerUI extends Application {
 	public static void play() {
 		if ( currentPlayer != null && currentPlayer.isPaused() ) {
 			currentPlayer.play();
-			togglePlayButton.setText( "𝍪" );
+			togglePlayButton.setGraphic( pauseImage );
 			
 		} else if ( Queue.hasNext() ) {
 			playTrack ( Queue.getNextTrack() );
@@ -330,7 +341,7 @@ public class MusicPlayerUI extends Application {
 	public static void pause() {
 		if ( currentPlayer != null ) {
 			currentPlayer.pause();
-			togglePlayButton.setText( "▶" );
+			togglePlayButton.setGraphic( playImage );
 		}
 	}
 		
@@ -433,7 +444,7 @@ public class MusicPlayerUI extends Application {
 			if ( currentPlayer.getTrack() instanceof CurrentListTrack ) {
 				((CurrentListTrack)currentPlayer.getTrack()).setIsCurrentTrack( false );
 			}
-			togglePlayButton.setText( "▶" );
+			togglePlayButton.setGraphic( playImage );
 		}
 
 		switch ( track.getFormat() ) {
@@ -446,45 +457,45 @@ public class MusicPlayerUI extends Application {
 				}
 				if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );
 				if ( startPaused ) {
-					togglePlayButton.setText( "▶" );
+					togglePlayButton.setGraphic( playImage );
 				} else {
-					togglePlayButton.setText( "𝍪" );
+					togglePlayButton.setGraphic( pauseImage );
 				}
 				break;
 			case MP3:
 				currentPlayer = new MP3Player( track, trackPositionSlider, startPaused );
 				if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );
 				if ( startPaused ) {
-					togglePlayButton.setText( "▶" );
+					togglePlayButton.setGraphic( playImage );
 				} else {
-					togglePlayButton.setText( "𝍪" );
+					togglePlayButton.setGraphic( pauseImage );
 				}
 				break;
 			case AAC:
 				currentPlayer = new MP4Player( track, trackPositionSlider, startPaused );
 				if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );
 				if ( startPaused ) {
-					togglePlayButton.setText( "▶" );
+					togglePlayButton.setGraphic( playImage );
 				} else {
-					togglePlayButton.setText( "𝍪" );
+					togglePlayButton.setGraphic( pauseImage );
 				}
 				break;
 			case OGG:
 				currentPlayer = new OggPlayer( track, trackPositionSlider, startPaused );
 				if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );
 				if ( startPaused ) {
-					togglePlayButton.setText( "▶" );
+					togglePlayButton.setGraphic( playImage );
 				} else {
-					togglePlayButton.setText( "𝍪" );
+					togglePlayButton.setGraphic( pauseImage );
 				}
 				break;
 			case WAV:
 				currentPlayer = new WavPlayer ( track, trackPositionSlider, startPaused );
 				if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );
 				if ( startPaused ) {
-					togglePlayButton.setText( "▶" );
+					togglePlayButton.setGraphic( playImage );
 				} else {
-					togglePlayButton.setText( "𝍪" );
+					togglePlayButton.setGraphic( pauseImage );
 				}
 				break;
 			case UNKNOWN:
@@ -582,8 +593,8 @@ public class MusicPlayerUI extends Application {
 		}
 		
 		playOnceShuffleTracksPlayedCounter = 0;
-		
-		togglePlayButton.setText( "▶" );
+
+		togglePlayButton.setGraphic( playImage );
 
 		trackPositionSlider.setValue( 0 );
 		timeElapsedLabel.setText( "" );
@@ -602,7 +613,14 @@ public class MusicPlayerUI extends Application {
 		
 		mainStage = stage;
 		Scene scene = new Scene( new Group(), 1024, 768 );
-		mainStage.getIcons().add(new Image("file:icon.png"));
+		//TODO: If we launch the jar from a different directory, it doesn't shwo the icon
+		//we need to get the directory of the jar and load the image from there, not just from the current directory
+		
+		try {
+			mainStage.getIcons().add( new Image( new FileInputStream ( ROOT.resolve( "icons/icon.png" ).toFile() ) ) );
+		} catch ( FileNotFoundException e ) {
+			System.out.println ( "Unable to load program icon: icons/icon.png" );
+		}
 
 		System.out.println ( "Setup Stage: " + ( System.currentTimeMillis() - startTime ) );
 		startTime = System.currentTimeMillis();
@@ -757,14 +775,6 @@ public class MusicPlayerUI extends Application {
 		playingArtSplitPane.setDividerPositions( .65d );
 		artSplitPane.setDividerPosition( 0, .51d ); // For some reason .5 doesn't work...
 
-		double width = togglePlayButton.getWidth();
-		double height = togglePlayButton.getHeight();
-
-		togglePlayButton.setMaxWidth( width );
-		togglePlayButton.setMinWidth( width );
-		togglePlayButton.setMaxHeight( height );
-		togglePlayButton.setMinHeight( height );
-
 		// TODO: This is such a crappy hack
 		final ChangeListener <Number> listener = new ChangeListener <Number>() {
 			final Timer timer = new Timer();
@@ -823,25 +833,77 @@ public class MusicPlayerUI extends Application {
 	}
 
 	public void setupTransport () {
-
-		Button previousButton = new Button( "⏪" );
-		togglePlayButton = new Button( "▶" );
-		Button stopButton = new Button( "◼" );
-		Button nextButton = new Button( "⏩" );
-
-		int fontSize = 22;
-
-		previousButton.setStyle( "-fx-font-size: " + fontSize + "px" );
-		togglePlayButton.setStyle( "-fx-font-size: " + fontSize + "px" );
-		stopButton.setStyle( "-fx-font-size: " + fontSize + "px" );
-		nextButton.setStyle( "-fx-font-size: " + fontSize + "px" );
-
-		Insets buttonInsets = new Insets( 3, 12, 6, 12 );
-		previousButton.setPadding( buttonInsets );
-		togglePlayButton.setPadding( buttonInsets );
-		stopButton.setPadding( buttonInsets );
-		nextButton.setPadding( buttonInsets );
-
+	
+		playImage = null;
+		pauseImage = null;
+		
+		try {
+			playImage = new ImageView ( new Image( new FileInputStream ( ROOT.resolve( "icons/play.png" ).toFile() ) ) );
+			playImage.setFitHeight( 18 );
+			playImage.setFitWidth( 18 );
+		} catch ( FileNotFoundException e ) {
+			System.out.println ( "Unable to load play icon: icons/play.png" );
+		}
+		
+		try {
+			pauseImage = new ImageView ( new Image( new FileInputStream ( ROOT.resolve( "icons/pause.png" ).toFile() ) ) );
+			pauseImage.setFitHeight( 18 );
+			pauseImage.setFitWidth( 18 );
+		} catch ( FileNotFoundException e ) {
+			System.out.println ( "Unable to load pause icon: icons/pause.png" );
+		}
+		
+		togglePlayButton = new Button ( "" );
+		togglePlayButton.setGraphic( playImage );
+		togglePlayButton.setPrefSize( 42, 35 );
+		togglePlayButton.setMinSize( 42, 35 );
+		togglePlayButton.setMaxSize( 42, 35 );
+		
+		ImageView previousImage = null;
+		try {
+			previousImage = new ImageView ( new Image( new FileInputStream ( ROOT.resolve( "icons/previous.png" ).toFile() ) ) );
+			previousImage.setFitHeight( 18 );
+			previousImage.setFitWidth( 18 );
+		} catch ( FileNotFoundException e ) {
+			System.out.println ( "Unable to load previous icon: icons/previous.png" );
+		}
+		
+		Button previousButton = new Button ( "" );
+		previousButton.setGraphic( previousImage );
+		previousButton.setPrefSize( 42, 35 );
+		previousButton.setMinSize( 42, 35 );
+		previousButton.setMaxSize( 42, 35 );
+		
+		ImageView nextImage = null;
+		try {
+			nextImage = new ImageView ( new Image( new FileInputStream ( ROOT.resolve( "icons/next.png" ).toFile() ) ) );
+			nextImage.setFitHeight( 18 );
+			nextImage.setFitWidth( 18 );
+		} catch ( FileNotFoundException e ) {
+			System.out.println ( "Unable to load previous icon: icons/next.png" );
+		}
+		
+		Button nextButton = new Button ( "" );
+		nextButton.setGraphic( nextImage );
+		nextButton.setPrefSize( 42, 35 );
+		nextButton.setMinSize( 42, 35 );
+		nextButton.setMaxSize( 42, 35 );
+		
+		ImageView stopImage = null;
+		try {
+			stopImage = new ImageView ( new Image( new FileInputStream ( ROOT.resolve( "icons/stop.png" ).toFile() ) ) );
+			stopImage.setFitHeight( 18 );
+			stopImage.setFitWidth( 18 );
+		} catch ( FileNotFoundException e ) {
+			System.out.println ( "Unable to load previous icon: icons/stop.png" );
+		}
+		
+		Button stopButton = new Button ( "" );
+		stopButton.setGraphic( stopImage );
+		stopButton.setPrefSize( 42, 35 );
+		stopButton.setMinSize( 42, 35 );
+		nextButton.setMaxSize( 42, 35 );
+		
 		previousButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
@@ -1869,6 +1931,14 @@ public class MusicPlayerUI extends Application {
 		Button loadTracksButton = new Button( "⏏" );
 		Button savePlaylistButton = new Button( "💾" );
 		Button clearButton = new Button ( "✘" );
+
+		toggleRepeatButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
+		toggleShuffleButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
+		showQueueButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
+		showHistoryButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );;
+		loadTracksButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
+		savePlaylistButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
+		clearButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
 		
 		toggleRepeatButton.setTooltip( new Tooltip( "Toggle Repeat Type" ) );
 		toggleShuffleButton.setTooltip( new Tooltip( "Toggle Shuffle" ) );
@@ -2023,6 +2093,7 @@ public class MusicPlayerUI extends Application {
 		});
 		
 		Button settingsButton = new Button( "≡" );
+		settingsButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
 		settingsButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
@@ -2035,6 +2106,7 @@ public class MusicPlayerUI extends Application {
 		});
 		
 		Button clearButton = new Button ( "✘" );
+		clearButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
 		clearButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
@@ -2066,6 +2138,7 @@ public class MusicPlayerUI extends Application {
 		});
 		
 		Button settingsButton = new Button( "≡" );
+		settingsButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
 		settingsButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
@@ -2078,6 +2151,7 @@ public class MusicPlayerUI extends Application {
 		} );
 		
 		Button clearButton = new Button ( "✘" );
+		clearButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
 		clearButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
@@ -2180,6 +2254,7 @@ public class MusicPlayerUI extends Application {
 		} );
 
 		Button settingsButton = new Button( "≡" );
+		settingsButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
 		settingsButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
@@ -2191,7 +2266,8 @@ public class MusicPlayerUI extends Application {
 			}
 		} );
 
-		Button clearButton = new Button ( "✘" );
+		Button clearButton = new Button( "✘" );
+		clearButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
 		clearButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
@@ -3281,24 +3357,55 @@ public class MusicPlayerUI extends Application {
 	    }
 	}
 	
-	public static void main ( String[] args ) {
+	public static void parseSystemProperties() {
+		IS_STANDALONE = Boolean.getBoolean( "hypnos.standalone" );
+		IS_DEVELOPING = Boolean.getBoolean( "hypnos.developing" );
 		
+		if ( IS_STANDALONE ) System.out.println ( "Running as standalone" );
+		if ( IS_DEVELOPING ) System.out.println ( "Running on development port" );
+	}
+	
+	public static void setupRootDirectory () {
+		String path = MusicPlayerUI.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+		
+		try {
+			String decodedPath = URLDecoder.decode(path, "UTF-8");
+			ROOT = Paths.get( decodedPath ).getParent();
+			
+		} catch ( UnsupportedEncodingException e ) {
+			ROOT = Paths.get( path ).getParent();
+		}
+		
+		System.out.println ( "Root: " + ROOT.toString() );
+		
+	}
+	
+	public static void main ( String[] args ) {
+				
 		long startTime = System.currentTimeMillis();
+		
+		parseSystemProperties();
+				
+		System.out.println ( "Parse System Properties " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();
+		
+		setupRootDirectory(); 
+	
+		System.out.println ( "Setup Root Directory " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();
+		
 		boolean firstInstance = SingleInstanceController.startCLICommandListener();
 		
 		System.out.println ( "CLI Listener: " + ( System.currentTimeMillis() - startTime ) );
 		startTime = System.currentTimeMillis();
 		
-//		if ( firstInstance ) {
+		if ( firstInstance ) {
 			Library.init();
 			UIUpdater.init();
 			
 			System.out.println ( "Library Init: " + ( System.currentTimeMillis() - startTime ) );
 			startTime = System.currentTimeMillis();
 			
-			System.out.println ( "Persister Load " + ( System.currentTimeMillis() - startTime ) );
-			startTime = System.currentTimeMillis();
-	
 			Application.launch( args );
 			
 			if ( currentPlayer != null ) {
@@ -3307,12 +3414,13 @@ public class MusicPlayerUI extends Application {
 			
 			Persister.saveData();
 			System.exit ( 0 );
-//		} else {
-//			CLIParser parser = new CLIParser ( );
-//			ArrayList <Integer> commands = parser.parseCommands( args );
-//			SingleInstanceController.sendCommands( commands );
-//			System.exit ( 0 );
-//		}
+			
+		} else {
+			CLIParser parser = new CLIParser ( );
+			ArrayList <Integer> commands = parser.parseCommands( args );
+			SingleInstanceController.sendCommands( commands );
+			System.exit ( 0 );
+		}
 	}
 }
 

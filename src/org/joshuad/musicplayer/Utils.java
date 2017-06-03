@@ -1,4 +1,5 @@
 package org.joshuad.musicplayer;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -42,6 +43,10 @@ public class Utils {
 			return isImageFile ( entry );			
 		}
 	};
+	
+	public static boolean isImageFile ( File testFile ) {
+		return isImageFile ( testFile.toPath() );
+	}
 	  
 	public static boolean isImageFile ( Path testFile ) {
 		String fileName = testFile.getFileName().toString();

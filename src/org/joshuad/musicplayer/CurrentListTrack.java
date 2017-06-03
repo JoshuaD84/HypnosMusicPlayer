@@ -1,6 +1,7 @@
 package org.joshuad.musicplayer;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
@@ -80,5 +81,11 @@ import javafx.beans.property.StringProperty;
 		
 		public StringProperty displayProperty () {
 			return display;
+		}
+		
+		private void readObject ( ObjectInputStream in ) throws IOException, ClassNotFoundException {
+			in.defaultReadObject();
+			display = new SimpleStringProperty ( "" );
+			updateDisplayString();
 		}
 	}

@@ -1,16 +1,40 @@
-Artwork drag and drop
+Packaging
+	Linux 32 Bit - Ubuntu
+		sudo apt-get install openjdk-8-jre
+		sudo apt-get install openjfx
+		
+		Works
+	
+	Linux 64 Bit
+		sudo apt-get install openjdk-8-jre
+		sudo apt-get install openjfx
+		
+		Works
+	
 
-Read artwork from tags if available. 
+	Windows 7
+		UTF Icons look wrong
+		Need .exe wrapper
+	
+	
+	OSX
+	
+Move Log file to right directory
+	
+	
+	
 
-Re-sort album list after editing tags
-
-
-When you close the program and re-open it, queue display #'s' don't update properly for the current list on the main screen. 
 
 
 
 
 Later
+
+	If there are tracks loaded but there's a filter on, chang the empty table label
+
+	Read artwork from tags if available. 
+	
+	Artwork drag and drop
 
 	Redesign the transport
 
@@ -35,3 +59,17 @@ Later
 		Wav:
 			No line matching interface SourceDataLine supporting format PCM_FLOAT 44100.0 Hz, 32 bit, stereo, 8 bytes/frame,  is supported.
 		
+		
+		
+		
+		
+		
+		
+		
+		
+		ImageView playImage = new ImageView ( new Image( Paths.get("icons/play.png").toUri().toString() ) );
+		playImage.setFitHeight( 20 );
+		playImage.setFitWidth( 20 );
+		togglePlayButton.setGraphic( playImage );
+		togglePlayButton.setPrefSize( 35, 35 );
+		button.setContentDisplay(ContentDisplay.TOP);

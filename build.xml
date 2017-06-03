@@ -1,37 +1,61 @@
-	<project name="Hypnos Music Player" default="compile" basedir=".">
-		
-		<property name="src" location="src"/>
-		<property name="build" location="bin"/>
-		<property name="jarFile" location="hypnos.jar"/>
+<project name="Hypnos Music Player" default="compile" basedir=".">
 	
-		<path id="class.path">
-			<fileset dir="lib">
-				<include name="**/*.jar" />
-			</fileset>
-			<pathelement location="${jarFile}" />
-		</path>
+	<property name="version" value="alpha1" />
 	
-		<target name="init">
-			<tstamp/>
-			<mkdir dir="${build}"/>
-		</target>
+	<property name="src" location="src"/>
+	<property name="build" location="bin"/>
+	<property name="stage" location="stage" />
 	
-		<target name="compile" depends="init" description="compile the source">
-			<javac fork="yes" target="1.8" source ="1.8" includeantruntime="false" srcdir="${src}" destdir="${build}">
-				<classpath refid="class.path" />
-			</javac>
-		</target>
 	
-		<target name="jar" depends="compile" description="Create a jar.">
-			<jar destfile="${jarFile}" basedir="${build}">
-				<manifest>
-					<attribute name="Main-Class" value="org.joshuad.musicplayer.MusicPlayerUI" />
-					<attribute name="Class-Path" value="lib/commons-cli-1.4.jar lib/jaad-0.8.4-nospi.jar
-														lib/jaudiotagger-2.2.6-SNAPSHOT.jar lib/jflac-1.2.jar
-														lib/jl1.0.1.jar lib/jogg-0.0.7.jar lib/jorbis-0.0.15.jar
-														lib/vorbisspi1.0.3.jar" />
-				</manifest>
-			</jar>
-		</target>
 	
-	</project>
+	<property name="jarFile" location="${stage}/hypnos.jar"/>
+
+	<path id="class.path">
+		<fileset dir="${stage}/lib">
+			<include name="**/*.jar" />
+		</fileset>
+		<pathelement location="${jarFile}" />
+	</path>
+
+	<target name="init">
+		<tstamp/>
+		<mkdir dir="${build}"/>
+	</target>
+
+	<target name="compile" depends="init" description="compile the source">
+		<javac fork="yes" target="1.8" source ="1.8" includeantruntime="false" srcdir="." destdir="${build}">
+			<classpath refid="class.path" />
+		</javac>
+	</target>
+
+    <target name="run" depends="jar" description="Run Hypnos">
+      	<java jar="${jarFile}" fork="true">
+      		<sysproperty key="hypnos.standalone" value="true" />
+      		<sysproperty key="hypnos.developing" value="true" />
+      	</java>
+    </target>
+	
+    <!--target name="run" depends="jar" description="Run Hypnos">
+      	<java dir="${stage}" fork="true" classname="org.joshuad.musicplayer.MusicPlayerUI">
+   			<classpath refid="class.path" />
+      		<jvmarg value="-ea" />     
+      		<sysproperty key="hypnos.standalone" value="true" />
+      		<sysproperty key="hypnos.developing" value="true" />
+      	</java>
+    </target-->
+	
+	
+
+	<target name="jar" depends="compile" description="Create a jar.">
+		<jar destfile="${jarFile}" basedir="${build}">
+			<manifest>
+				<attribute name="Main-Class" value="org.joshuad.musicplayer.MusicPlayerUI" />
+				<attribute name="Class-Path" value="lib/commons-cli-1.4.jar lib/jaad-0.8.4-nospi.jar
+													lib/jaudiotagger-2.2.6-SNAPSHOT.jar lib/jflac-1.2.jar
+													lib/jl1.0.1.jar lib/jogg-0.0.7.jar lib/jorbis-0.0.15.jar
+													lib/vorbisspi1.0.3.jar" />
+			</manifest>
+		</jar>
+	</target>
+
+</project>
