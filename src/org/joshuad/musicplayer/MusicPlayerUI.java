@@ -88,7 +88,6 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
@@ -950,7 +949,7 @@ public class MusicPlayerUI extends Application {
 		historyWindow.setTitle( "History" );
 		historyWindow.setWidth( 600 );
 		historyWindow.setHeight ( 400 );
-		Group root = new Group();
+		Pane root = new Pane();
 		Scene scene = new Scene( root );
 		VBox primaryPane = new VBox();
 
@@ -1165,8 +1164,8 @@ public class MusicPlayerUI extends Application {
 		
 		historyTable.getColumns().addAll( numberColumn, artistColumn, albumColumn, titleColumn );
 
-		historyTable.prefWidthProperty().bind( historyWindow.widthProperty() );
-		historyTable.prefHeightProperty().bind( historyWindow.heightProperty() );
+		historyTable.prefWidthProperty().bind( root.widthProperty() );
+		historyTable.prefHeightProperty().bind( root.heightProperty() );
 		
 		primaryPane.getChildren().addAll( historyTable );
 		root.getChildren().add( primaryPane );
@@ -1181,7 +1180,7 @@ public class MusicPlayerUI extends Application {
 		queueWindow.setTitle( "Queue" );
 		queueWindow.setWidth( 500 );
 		queueWindow.setHeight ( 400 );
-		Group root = new Group();
+		Pane root = new Pane();
 		Scene scene = new Scene( root );
 
 		queueTable = new TableView();
@@ -1598,8 +1597,8 @@ public class MusicPlayerUI extends Application {
 		});
 		
 
-		queueTable.prefWidthProperty().bind( queueWindow.widthProperty() );
-		queueTable.prefHeightProperty().bind( queueWindow.heightProperty() );
+		queueTable.prefWidthProperty().bind( root.widthProperty() );
+		queueTable.prefHeightProperty().bind( root.heightProperty() );
 		
 		root.getChildren().add( queueTable );
 		queueWindow.setScene( scene );
@@ -3284,9 +3283,7 @@ public class MusicPlayerUI extends Application {
 	
 	public static void main ( String[] args ) {
 		
-		System.out.println( "Init stats: " );
 		long startTime = System.currentTimeMillis();
-		
 		boolean firstInstance = SingleInstanceController.startCLICommandListener();
 		
 		System.out.println ( "CLI Listener: " + ( System.currentTimeMillis() - startTime ) );

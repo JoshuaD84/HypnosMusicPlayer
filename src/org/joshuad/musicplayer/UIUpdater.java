@@ -4,7 +4,7 @@ import javafx.application.Platform;
 
 public class UIUpdater {
 
-	private static final int MAX_CHANGES_PER_REQUEST = 1000;
+	private static final int MAX_CHANGES_PER_REQUEST = 250;
 
 	private static boolean runLaterPending = false;
 	

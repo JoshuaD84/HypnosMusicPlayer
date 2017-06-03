@@ -15,7 +15,6 @@ import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
@@ -32,6 +31,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -49,7 +49,7 @@ public class AlbumInfoWindow extends Stage {
 		this.initOwner( owner );
 		this.setTitle( "Album Info" );
 		this.setWidth( 700 );
-		Group root = new Group();
+		Pane root = new Pane();
 		Scene scene = new Scene( root );
 		VBox primaryPane = new VBox();
 		
@@ -91,8 +91,9 @@ public class AlbumInfoWindow extends Stage {
 		locationBox.getChildren().addAll( label, locationField, browseButton );
 		label.prefHeightProperty().bind( locationBox.heightProperty() );
 		locationBox.prefWidthProperty().bind( primaryPane.widthProperty() );
-		
+	
 		primaryPane.getChildren().addAll( locationBox, trackTable );
+	
 		root.getChildren().add( primaryPane );
 		setScene( scene );
 	}
