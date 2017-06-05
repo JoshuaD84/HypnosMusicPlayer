@@ -6,8 +6,10 @@
 	<property name="build" location="bin"/>
 	<property name="stage" location="stage" />
 	
-	
-	
+	<property name="dist" location="distribution/" />
+	<property name="temp" location="temp" />
+	<property name="packaging" location="packaging/" />
+		
 	<property name="jarFile" location="${stage}/hypnos.jar"/>
 
 	<path id="class.path">
@@ -27,6 +29,27 @@
 			<classpath refid="class.path" />
 		</javac>
 	</target>
+	
+	<target name="jar" depends="compile" description="Create a jar.">
+		<jar destfile="${jarFile}" basedir="${build}">
+			<manifest>
+				<attribute name="Main-Class" value="net.joshuad.musicplayer.MusicPlayerUI" />
+				<attribute name="Class-Path" value="lib/commons-cli-1.4.jar lib/jaad-0.8.4-nospi.jar
+													lib/jaudiotagger-2.2.6-SNAPSHOT.jar lib/jflac-1.2.jar
+													lib/jl1.0.1.jar lib/jogg-0.0.7.jar lib/jorbis-0.0.15.jar
+													lib/vorbisspi1.0.3.jar" />
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="clean" description="Clean the workspace" >
+		<delete dir="${stage}/config" />
+		<delete dir="${build}" />
+		<delete dir="${dist}" />
+		<delete>
+			<fileset dir="${stage}" includes="*.jar" />
+		</delete>
+	</target>
 
     <target name="run" depends="jar" description="Run Hypnos">
       	<java jar="${jarFile}" fork="true">
@@ -35,27 +58,103 @@
       	</java>
     </target>
 	
-    <!--target name="run" depends="jar" description="Run Hypnos">
-      	<java dir="${stage}" fork="true" classname="org.joshuad.musicplayer.MusicPlayerUI">
-   			<classpath refid="class.path" />
-      		<jvmarg value="-ea" />     
-      		<sysproperty key="hypnos.standalone" value="true" />
-      		<sysproperty key="hypnos.developing" value="true" />
-      	</java>
-    </target-->
-	
-	
+	<target name="dist-nix" description="Make a .tar.gz without a JRE for linux distribution">
+		<sequential>
+			<delete dir="${temp}" />
+			<mkdir dir="${temp}/Hypnos" />
+			
+			<copy todir="${temp}/Hypnos" >
+				<fileset dir="stage" >
+					<exclude name="**/config/**" />
+				</fileset>
+			</copy>
 
-	<target name="jar" depends="compile" description="Create a jar.">
-		<jar destfile="${jarFile}" basedir="${build}">
-			<manifest>
-				<attribute name="Main-Class" value="org.joshuad.musicplayer.MusicPlayerUI" />
-				<attribute name="Class-Path" value="lib/commons-cli-1.4.jar lib/jaad-0.8.4-nospi.jar
-													lib/jaudiotagger-2.2.6-SNAPSHOT.jar lib/jflac-1.2.jar
-													lib/jl1.0.1.jar lib/jogg-0.0.7.jar lib/jorbis-0.0.15.jar
-													lib/vorbisspi1.0.3.jar" />
-			</manifest>
-		</jar>
+			<copy file="${packaging}/nix/hypnos" tofile="${temp}/Hypnos/hypnos" />
+			
+			<tar destfile="${dist}/hypnos-${version}-nix.tgz" longfile="gnu" compression="gzip">
+	
+				<tarfileset dir="${temp}" filemode="755">
+					<include name="**/hypnos" />
+				</tarfileset>
+				
+				<tarfileset dir="${temp}">
+					<include name="**/*" />
+					<exclude name="**/hypnos" />
+				</tarfileset>
+			</tar>
+	
+			<delete dir="${temp}" />
+		</sequential>
 	</target>
+	
+	<property name="launch4j.dir" location="/home/joshua/.local/opt/launch4j" />
+	<taskdef 
+		name="launch4j" 
+		classname="net.sf.launch4j.ant.Launch4jTask" 
+		classpath="${launch4j.dir}/launch4j.jar:${launch4j.dir}/lib/xstream.jar"  
+	/>
+			
+	<target name="dist-win" depends="jar" description="Make a .zip with an embedded JRE for windows.">
+		
+		<delete dir="${temp}" />
+		<mkdir dir="${temp}/Hypnos/" />
+		
+		<launch4j jarPath="${jarFile}" configFile="${packaging}/l4j-hypnos.xml" outfile="${temp}/Hypnos/Hypnos.exe" />
+				
+		<copy todir="${temp}/Hypnos/" >
+			<fileset dir="stage" >
+				<exclude name="**/config/**" />
+			</fileset>
+			<mappedresources>
+				<fileset dir="${packaging}/jres/win" />
+				<globmapper from="*" to="jre/*" />
+			</mappedresources>
+		</copy>
+		
+		<zip destfile="${dist}/hypnos-${version}-win.zip">
+			<fileset dir="${temp}" />
+		</zip>
+		
+		<delete dir="${temp}" />
+		
+	</target>
+	
+	<target name="dist-osx" depends="jar" description="Make a .tgz for OSX." >			
+		<delete dir="${temp}" />
+		<mkdir dir="${temp}/" />
+		
+		<copy todir="${temp}/Hypnos.app" >
+			<fileset dir="packaging/Hypnos.app" />
+		</copy>	
+		
+		<copy todir="${temp}/Hypnos.app/Contents/Hypnos" >
+			<fileset dir="stage" >
+				<exclude name="**/config/**" />
+			</fileset>
+		</copy>
+		
+		<copy todir="${temp}/Hypnos.app/Contents/Hypnos/jre" >
+			<fileset dir="packaging/jres/osx" />
+		</copy>
+		
+		
+		<tar destfile="${dist}/hypnos-${version}-osx.tgz" longfile="gnu" compression="gzip">
+
+			<tarfileset dir="${temp}" filemode="755">
+				<include name="**/Hypnos" />
+				<include name="**/bin/java" />
+			</tarfileset>
+			
+			<tarfileset dir="${temp}">
+				<include name="**/*" />
+				<exclude name="**/Hypnos" />
+				<exclude name="**/bin/java" />
+			</tarfileset>
+		</tar>
+
+		<delete dir="${temp}" />
+		
+	</target>
+
 
 </project>

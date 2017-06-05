@@ -3,3 +3,5 @@
 /stage/config/*
 hypnos.jar
 /bin/
+/distribution
+/packaging

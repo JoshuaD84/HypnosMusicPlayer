@@ -1,4 +1,4 @@
-Packaging
+Packaging	
 	Linux 32 Bit - Ubuntu
 		sudo apt-get install openjdk-8-jre
 		sudo apt-get install openjfx
@@ -14,11 +14,16 @@ Packaging
 
 	Windows 7
 		UTF Icons look wrong
-		Need .exe wrapper
-	
-	
+		Works
+		
+	Windows 10
+		Works
+		
 	OSX
-	
+		Not yet tested
+		
+		
+		
 Move Log file to right directory
 	
 	
@@ -29,7 +34,12 @@ Move Log file to right directory
 
 
 Later
-
+	Make sure artist image isn't also used for album image
+	
+	Make sure horizontal scroll bars never appear
+	
+	Lyrics?
+	
 	If there are tracks loaded but there's a filter on, chang the empty table label
 
 	Read artwork from tags if available. 
@@ -62,14 +72,3 @@ Later
 		
 		
 		
-		
-		
-		
-		
-		
-		ImageView playImage = new ImageView ( new Image( Paths.get("icons/play.png").toUri().toString() ) );
-		playImage.setFitHeight( 20 );
-		playImage.setFitWidth( 20 );
-		togglePlayButton.setGraphic( playImage );
-		togglePlayButton.setPrefSize( 35, 35 );
-		button.setContentDisplay(ContentDisplay.TOP);
