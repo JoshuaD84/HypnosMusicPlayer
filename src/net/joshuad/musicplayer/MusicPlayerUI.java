@@ -103,6 +103,7 @@ import net.joshuad.musicplayer.players.MP4Player;
 import net.joshuad.musicplayer.players.OggPlayer;
 import net.joshuad.musicplayer.players.WavPlayer;
 
+
 @SuppressWarnings({ "rawtypes", "unchecked" }) // TODO: Maybe get rid of this when I understand things better
 public class MusicPlayerUI extends Application {
 	
@@ -182,6 +183,8 @@ public class MusicPlayerUI extends Application {
 	static TextField trackFilterBox;
 
 	static ShuffleMode shuffleMode = ShuffleMode.SEQUENTIAL;
+	
+	static boolean uiLoaded = false;
 
 	enum ShuffleMode {
 		SEQUENTIAL ( "⇉" ), SHUFFLE ( "🔀" );
@@ -546,7 +549,7 @@ public class MusicPlayerUI extends Application {
 	}
 	
 	public static void loadTrack ( Track track ) {
-		ArrayList loadMe = new ArrayList <Track> ( 1 );
+		ArrayList<Track> loadMe = new ArrayList <Track> ( 1 );
 		loadMe.add ( track );
 		loadTracks ( loadMe );
 	}
@@ -803,24 +806,19 @@ public class MusicPlayerUI extends Application {
 		stage.widthProperty().addListener( listener );
 		stage.heightProperty().addListener( listener );
 		
+		hackTooltipStartTiming();
 		
 		System.out.println ( "Misc UI Adjustments " + ( System.currentTimeMillis() - startTime ) );
 		startTime = System.currentTimeMillis();	
-		
-		
+
 		Persister.loadData();
-		System.out.println ( "Load Data " + ( System.currentTimeMillis() - startTime ) );
-		
-		Library.startLoader();
-		
-		System.out.println ( "Start Library Loader " + ( System.currentTimeMillis() - startTime ) );
+		System.out.println ( "Load Persisted Data " + ( System.currentTimeMillis() - startTime ) );
 		startTime = System.currentTimeMillis();
 		
-		hackTooltipStartTiming();
+		uiLoaded = true;
 	}
 	
-	public static void updatePlaylistMenuItems ( ObservableList <MenuItem> items,
-			EventHandler eventHandler ) {
+	public static void updatePlaylistMenuItems ( ObservableList <MenuItem> items, EventHandler <ActionEvent> eventHandler ) {
 
 		items.remove( 1, items.size() );
 
@@ -1038,7 +1036,7 @@ public class MusicPlayerUI extends Application {
 			}
 		});
 
-		TableColumn numberColumn = new TableColumn ( "#" );
+		TableColumn numberColumn = new TableColumn( "#" );
 		TableColumn artistColumn = new TableColumn( "Artist" );
 		TableColumn albumColumn = new TableColumn( "Album" );
 		TableColumn titleColumn = new TableColumn( "Title" );
@@ -1830,6 +1828,27 @@ public class MusicPlayerUI extends Application {
 
 	public void setupArtistImage () {
 		artistImage = new BorderPane();
+		artistImage.setOnDragOver( event -> {
+			//TODO: Become more discerning -- if ( db.hasFiles() ) {
+			Dragboard db = event.getDragboard();
+			event.acceptTransferModes( TransferMode.MOVE );
+			event.consume();
+		});
+		
+		artistImage.setOnDragDropped( event -> {
+			Dragboard db = event.getDragboard();
+			if ( db.hasFiles() ) {
+				File file = db.getFiles().get( 0 );
+				
+				if ( Utils.isImageFile( file ) ) {
+					//TODO: Prompt for how they want us to save it. 
+				}
+			}
+			
+			for ( DataFormat format : db.getContentTypes() ) {
+				System.out.println( "-" + format.toString() );
+			}
+		});
 	}
 
 	public static void setAlbumImage ( Path imagePath ) {
@@ -3378,9 +3397,39 @@ public class MusicPlayerUI extends Application {
 		}
 	}
 	
-	public static void main ( String[] args ) {
+	public static void setCurrentList( List<Path> paths ) {
+		
+		ArrayList<CurrentListTrack> newList = new ArrayList<CurrentListTrack>();
+		
+		for ( Path path : paths ) {
+			try {
+				newList.add( new CurrentListTrack ( path ) );
+			} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
+				System.out.println ( "Unable to load file: " + path.toString() );
+			}
+		}
+		
+		if ( newList.size() > 0 ) {
+			Platform.runLater( () -> {
+				currentListData.clear();
+				currentListData.addAll( newList );
 				
+			});
+		}
+	}
+	
+	//TODO: I'm not supposed to depend on main() in javafx programs. What's up w/ that? 
+	public static void main ( String[] args ) {
+		System.out.println ( "Current Dir: " + System.getProperty("user.dir") );
+
 		long startTime = System.currentTimeMillis();
+		
+		CLIParser parser = new CLIParser( );
+		ArrayList <Integer> commands = parser.parseCommands( args );
+		ArrayList <Path> filesToOpen = parser.parseFiles( args );
+		
+		System.out.println ( "Parse arguments: " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();
 		
 		parseSystemProperties();
 				
@@ -3400,22 +3449,42 @@ public class MusicPlayerUI extends Application {
 		if ( firstInstance ) {
 			Library.init();
 			UIUpdater.init();
-			
+
 			System.out.println ( "Library Init: " + ( System.currentTimeMillis() - startTime ) );
 			startTime = System.currentTimeMillis();
 			
-			Application.launch( args );
+			Thread uiThread = new Thread (() -> {
+				
+				Application.launch( args );
+				
+				if ( currentPlayer != null ) {
+					currentPlayer.stop();
+				}
+				
+				Persister.saveData();
+				System.exit ( 0 );
+			});
 			
-			if ( currentPlayer != null ) {
-				currentPlayer.stop();
+			uiThread.start();
+			
+			while ( !uiLoaded ) {
+				try {
+					Thread.sleep( 50 );
+				} catch ( InterruptedException e ) {
+					System.out.println ( "InterruptedException in ui wait block, MusicPlayerUI.main()" );
+				}
 			}
 			
-			Persister.saveData();
-			System.exit ( 0 );
+			setCurrentList ( filesToOpen );
+
+			SingleInstanceController.sendCommands( commands );
+			
+			Library.startLoader();
+			
+			System.out.println ( "Start Library Loader " + ( System.currentTimeMillis() - startTime ) );
+			startTime = System.currentTimeMillis();
 			
 		} else {
-			CLIParser parser = new CLIParser ( );
-			ArrayList <Integer> commands = parser.parseCommands( args );
 			SingleInstanceController.sendCommands( commands );
 			System.exit ( 0 );
 		}

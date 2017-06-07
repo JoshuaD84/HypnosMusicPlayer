@@ -1,5 +1,7 @@
 package net.joshuad.musicplayer;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import org.apache.commons.cli.CommandLine;
@@ -36,6 +38,24 @@ public class CLIParser {
 		
 		parser = new DefaultParser();
 		
+	}
+	
+	public ArrayList <Path> parseFiles ( String [] args ) {
+		
+		ArrayList<Path> retMe = new ArrayList<Path> ();
+		
+		try {
+			CommandLine line = parser.parse( options, args );
+			
+			for ( String leftOverArgument : line.getArgList() ) {
+				retMe.add( Paths.get( leftOverArgument ) );
+			}
+
+		} catch ( ParseException e ) {
+			System.out.println ( "Error parsing commandline options, continuing." );
+		}
+
+		return retMe;
 	}
 	
 	public ArrayList <Integer> parseCommands ( String[] args ) {

@@ -33,27 +33,25 @@ public class SingleInstanceController {
 			@SuppressWarnings("resource")
 			ServerSocket serverSocket = new ServerSocket ( port, 0, InetAddress.getByName(null) );
 	
-			Thread t = new Thread ( new Runnable() {
-				public void run() {
-					while ( true ) {
-						try {
-							Socket clientSocket = serverSocket.accept(); //It blocks here while listening
-							BufferedReader in = new BufferedReader( new InputStreamReader( clientSocket.getInputStream() ) );
-							int command;
-							while ( (command = in.read()) != -1 ) {
-								giveCommandToUI ( command );
-							}
+			Thread t = new Thread ( () -> {
+				while ( true ) {
+					try {
+						Socket clientSocket = serverSocket.accept(); //It blocks here while listening
+						BufferedReader in = new BufferedReader( new InputStreamReader( clientSocket.getInputStream() ) );
+						int command;
+						while ( (command = in.read()) != -1 ) {
+							giveCommandToUI ( command );
+						}
 
-						} catch ( IOException e ) {
-							System.err.println ( "Read error at commandline parser" );
-							e.printStackTrace();
-						}
-						
-						try {
-							Thread.sleep( 50 );
-						} catch ( InterruptedException e ) {
-							e.printStackTrace();
-						}
+					} catch ( IOException e ) {
+						System.err.println ( "Read error at commandline parser" );
+						e.printStackTrace();
+					}
+					
+					try {
+						Thread.sleep( 50 );
+					} catch ( InterruptedException e ) {
+						e.printStackTrace();
 					}
 				}
 			});
@@ -68,28 +66,26 @@ public class SingleInstanceController {
 	}
 	
 	private static void giveCommandToUI ( final int command ) {
-		Platform.runLater( new Runnable() {
-			@Override public void run() {
-				switch ( command ) {
-					case NEXT: 
-						MusicPlayerUI.playNextTrack();
-						break;
-					case PREVIOUS:
-						MusicPlayerUI.playPreviousTrack();
-						break;
-					case PAUSE:
-						MusicPlayerUI.pause();
-						break;
-					case PLAY:
-						MusicPlayerUI.play();
-						break;
-					case TOGGLE_PAUSE:
-						MusicPlayerUI.togglePause();
-						break;
-					case STOP:
-						MusicPlayerUI.stopTrack();
-						break;
-				}
+		Platform.runLater( () -> {
+			switch ( command ) {
+				case NEXT: 
+					MusicPlayerUI.playNextTrack();
+					break;
+				case PREVIOUS:
+					MusicPlayerUI.playPreviousTrack();
+					break;
+				case PAUSE:
+					MusicPlayerUI.pause();
+					break;
+				case PLAY:
+					MusicPlayerUI.play();
+					break;
+				case TOGGLE_PAUSE:
+					MusicPlayerUI.togglePause();
+					break;
+				case STOP:
+					MusicPlayerUI.stopTrack();
+					break;
 			}
 		});	
 	}

@@ -128,41 +128,47 @@ public class Track implements Serializable {
 		String fnTrackNumber = "";
 		String fnTitle = "";
 		
-		fnArtist = trackFile.toPath().getParent().getParent().getFileName().toString();
-	
-		String parentName = trackFile.toPath().getParent().getFileName().toString();
-		String[] parentParts = parentName.split( " - " );
-		
-		if ( parentParts.length == 1 ) {
-			fnAlbum = parentParts [ 0 ];
-			
-		} else if ( parentParts.length == 2 ) { 
-			if ( parentParts [ 0 ].matches( "^[0-9]{4}[a-zA-Z]{0,1}" ) ) {
-				fnYear = parentParts [ 0 ];
-				fnAlbum = parentParts [ 1 ];
-			} else if ( parentParts [ 1 ].matches( "^[0-9]{4}[a-zA-Z]{0,1}" ) ) {
-				fnYear = parentParts [ 1 ];
-				fnAlbum = parentParts [ 0 ];
-			} else {
-				fnAlbum = parentName;
-			}
+		try {
+			fnArtist = trackFile.toPath().getParent().getParent().getFileName().toString();
+		} catch ( Exception e ) { 
+			System.out.println ( "Unable to parse artist name from directory structure: " + trackFile.toString() );
 		}
 		
-		fnTitle = trackFile.toPath().getFileName().toString();
-		
 		try {
+			String parentName = trackFile.toPath().getParent().getFileName().toString();
+			String[] parentParts = parentName.split( " - " );
+			
+			if ( parentParts.length == 1 ) {
+				fnAlbum = parentParts [ 0 ];
+				
+			} else if ( parentParts.length == 2 ) { 
+				if ( parentParts [ 0 ].matches( "^[0-9]{4}[a-zA-Z]{0,1}" ) ) {
+					fnYear = parentParts [ 0 ];
+					fnAlbum = parentParts [ 1 ];
+				} else if ( parentParts [ 1 ].matches( "^[0-9]{4}[a-zA-Z]{0,1}" ) ) {
+					fnYear = parentParts [ 1 ];
+					fnAlbum = parentParts [ 0 ];
+				} else {
+					fnAlbum = parentName;
+				}
+			}
+			
+			fnTitle = trackFile.toPath().getFileName().toString();
+			
 			fnTitle = fnTitle.replaceAll( " - ", "" ).replaceAll( fnArtist, "" )
-									.replaceAll( fnAlbum, "" ).replaceAll( fnYear, "" );
-		} catch ( Exception e ) {}
-		
+										.replaceAll( fnAlbum, "" ).replaceAll( fnYear, "" );
+			
+		} catch ( Exception e ) { 
+			System.out.println( "Unable to parse album info from directory structure: " + trackFile.toString() );
+		}
+
 		boolean setByFileName = false;
-		
 		//TODO: Some error checking, only do this if we're pretty sure it's good. 
-		if ( artist.equals( "" ) ) { artist = fnArtist; setByFileName = true; }
-		if ( albumArtist.equals( "" ) ) { albumArtist = fnArtist; setByFileName = true; }
-		if ( album.equals( "" ) ) { album = fnAlbum; setByFileName = true; }
-		if ( date.equals( "" ) ) { date = fnYear; setByFileName = true; }
-		if ( title.equals( "" ) ) { title = fnTitle; setByFileName = true; }
+		if ( artist.equals( "" ) && !fnArtist.equals( "" ) ) { artist = fnArtist; setByFileName = true; }
+		if ( albumArtist.equals( "" ) && !fnArtist.equals( "" ) ) { albumArtist = fnArtist; setByFileName = true; }
+		if ( album.equals( "" ) && !fnAlbum.equals( "" ) ) { album = fnAlbum; setByFileName = true; }
+		if ( date.equals( "" ) && !fnYear.equals( "" ) ) { date = fnYear; setByFileName = true; }
+		if ( title.equals( "" ) && !fnTitle.equals( "" )  ) { title = fnTitle; setByFileName = true; }
 		
 		if ( setByFileName ) {
 			if ( Library.SHOW_SCAN_NOTES ) {

@@ -110,8 +110,8 @@ public class Persister {
 	@SuppressWarnings("unchecked")
 	public static void loadData() {
 		createNecessaryFolders();
-
 		readDataCompressed();
+
 		try (
 				ObjectInputStream sourcesIn = new ObjectInputStream( new FileInputStream( sourcesFile ) );
 		) {

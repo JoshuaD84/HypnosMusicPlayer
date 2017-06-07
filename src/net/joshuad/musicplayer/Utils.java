@@ -97,6 +97,10 @@ public class Utils {
 		}
 	}
 	
+	public static boolean isMusicFile ( String testFile ) {
+		return isMusicFile ( Paths.get( testFile ) );
+	}
+	
 	public static boolean isMusicFile ( Path testFile ) {
 		String fileName = testFile.getFileName().toString();
 		
@@ -178,8 +182,10 @@ public class Utils {
 	
 	public static Path getAlbumCoverImagePath ( Track track ) {
 		
+		if ( track.getPath().getParent() == null ) return null;
 		
 		ArrayList <Path> possibleFiles = new ArrayList <Path> ();
+		
 		possibleFiles.add( Paths.get ( track.getPath().getParent().toString(), "front.jpg" ) );
 		possibleFiles.add( Paths.get ( track.getPath().getParent().toString(), "front.png" ) );
 		possibleFiles.add( Paths.get ( track.getPath().getParent().toString(), "cover.jpg" ) );
@@ -205,6 +211,8 @@ public class Utils {
 	}
 	
 	public static Path getAlbumArtistImagePath ( Track track ) {
+
+		if ( track.getPath().getParent() == null ) return null;
 		
 		ArrayList <Path> possibleFiles = new ArrayList <Path> ();
 		possibleFiles.add( Paths.get ( track.getPath().getParent().toString(), "artist.jpg" ) );

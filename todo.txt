@@ -1,74 +1,70 @@
-Packaging	
-	Linux 32 Bit - Ubuntu
-		sudo apt-get install openjdk-8-jre
-		sudo apt-get install openjfx
-		
-		Works
-	
-	Linux 64 Bit
-		sudo apt-get install openjdk-8-jre
-		sudo apt-get install openjfx
-		
-		Works
-	
-
-	Windows 7
-		UTF Icons look wrong
-		Works
-		
-	Windows 10
-		Works
-		
-	OSX
-		Not yet tested
-		
-		
-		
-Move Log file to right directory
-	
-	
-	
+Ability to accept a file as an argument, open-with shell integration
 
 
+Log files
 
+Builds
+	linux64-bit embedded jre
+	linux32-bit embedded jre build
+	windows no jre
+	windows jre
+	osx jre
+	osx no-jre
 
+Installers
+	windows installer - allow standalone or system integrated
+	debian installer
+	osx .dmg
 
-Later
-	Make sure artist image isn't also used for album image
-	
-	Make sure horizontal scroll bars never appear
-	
-	Lyrics?
-	
-	If there are tracks loaded but there's a filter on, chang the empty table label
+Linux - use a compiled launcher rather than a script - it allows shell double click, which is nice. 
 
-	Read artwork from tags if available. 
-	
-	Artwork drag and drop
+track buffering, so there's a cushion in case reading becomes spotty
 
-	Redesign the transport
+Make sure artist image isn't also used for album image
 
-	Re-architect the current playing info box
-	
-	UIUpdaterThread is too aggressive. Causing lag on my computer
-	
-	Tray icon
-	
-	Decoders
-		Ogg
-	
-		AAC
-	
-		m4b - Double speed play for some reason
-	
-		Can we get flacplayer.java to play things that we need jflac for:
-			Adrian Orange
-			A Perfect Circle - Mer de noms
-			<Any others?>
-	
-		Wav:
-			No line matching interface SourceDataLine supporting format PCM_FLOAT 44100.0 Hz, 32 bit, stereo, 8 bytes/frame,  is supported.
+Make sure horizontal scroll bars never appear
+
+Lyrics?
+
+If there are tracks loaded but there's a filter on, chang the empty table label
+
+Read artwork from tags if available. 
+
+Artwork drag and drop
+
+Read ID3 tags for images
+
+Parse discogs tags?
+
+Redesign the transport
+
+Re-architect the current playing info box
+
+UIUpdaterThread is too aggressive. Causing lag on my computer
+
+Tray icon
+
+Decoders
+	Ogg
+	m4b - Double speed play for some reason
+	Can we get flacplayer.java to play things that we need jflac for:
+		Adrian Orange
+		A Perfect Circle - Mer de noms
+		<Any others?>
+		Pink Floyd - Pulse (disc 1)
 		
-		
-		
-		
+	Wav:
+		No line matching interface SourceDataLine supporting format PCM_FLOAT 44100.0 Hz, 32 bit, stereo, 8 bytes/frame,  is supported.
+
+m3u support
+Better serialization for playlists -- I think I'm OK with the way I serialize the other data, but playlists shouldn't risk being lost. 
+
+
+	
+Volume control
+
+
+
+
+	
+	

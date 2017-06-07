@@ -2,6 +2,7 @@
 /stage/config
 /stage/config/*
 hypnos.jar
+/stage/bin/
 /bin/
 /distribution
 /packaging
