@@ -1,3 +1,4 @@
+
 Windows
 	Open-with shell integration
 	Installer
@@ -24,7 +25,7 @@ Make sure horizontal scroll bars never appear
 
 Lyrics?
 
-If there are tracks loaded but there's a filter on, chang the empty table label
+Hot Keys
 
 Read artwork from tags if available. 
 
@@ -52,7 +53,7 @@ Decoders
 		Pink Floyd - Pulse (disc 1)
 		
 	Wav:
-		No line matching interface SourceDataLine supporting format PCM_FLOAT 44100.0 Hz, 32 bit, stereo, 8 bytes/frame,  is supported.
+		No line matching interface SourceDataLine supporting format PCM_FLOAT 44100.0 Hz, 32 bit, stereo, 8 bytes/frame
 
 m3u support
 

@@ -156,6 +156,19 @@ public class MusicPlayerUI extends Application {
 	static Label timeRemainingLabel = new Label( "" );
 	static Label currentPlayingListInfo = new Label( "" );
 	static Label trackInfo = new Label( "" );
+	
+	static Label emptyPlaylistLabel = new Label( 
+		"You haven't created any playlists, make a playlist on the right and click 💾 to save it for later." );
+
+	static Label emptyTrackListLabel = new Label( 
+		"No tracks loaded, click on the ≡ menu, or drop folders here, to add to your library." );
+	
+	static Label emptyAlbumListLabel = new Label(
+		"No albums loaded, click on the ≡ menu, or drop folders here, to add to your library." );
+	
+	static Label filteredAlbumListLabel = new Label( "No albums match." );
+	static Label filteredTrackListLabel = new Label( "No tracks match." );
+	static Label filteredPlaylistLabel = new Label( "No playlists match." );
 
 	static Stage mainStage;
 	static Stage libraryWindow;
@@ -609,215 +622,6 @@ public class MusicPlayerUI extends Application {
 
 	}
 
-	@Override
-	public void start ( Stage stage ) {
-		
-		long startTime = System.currentTimeMillis();
-		
-		mainStage = stage;
-		Scene scene = new Scene( new Group(), 1024, 768 );
-		//TODO: If we launch the jar from a different directory, it doesn't shwo the icon
-		//we need to get the directory of the jar and load the image from there, not just from the current directory
-		
-		try {
-			mainStage.getIcons().add( new Image( new FileInputStream ( ROOT.resolve( "icons/icon.png" ).toFile() ) ) );
-		} catch ( FileNotFoundException e ) {
-			System.out.println ( "Unable to load program icon: icons/icon.png" );
-		}
-
-		System.out.println ( "Setup Stage: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-
-		setupAlbumTable();
-		
-		System.out.println ( "Setup Album Table: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
-		setupTrackListCheckBox();
-		
-		System.out.println ( "Track list Check Box: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
-		setupAlbumFilterPane();
-		
-		System.out.println ( "Setup Album Filter Paine: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
-		setupTrackFilterPane();
-		
-		System.out.println ( "Setup Track Filter Pane: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
-		setupQueueWindow();
-		System.out.println ( "Setup Queue Window: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
-		setupHistoryWindow();
-		System.out.println ( "Setup History Window: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
-		setupPlaylistFilterPane();
-		
-		System.out.println ( "Setup Playlist Filter: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
-		setupCurrentListTable();
-		
-		System.out.println ( "Setup Current List: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
-		setupPlaylistTable();
-		
-		System.out.println ( "Setup Playlist Table: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
-		setupCurrentListControlPane();
-		
-		System.out.println ( "Setup Current List Controllers " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
-		setupTrackTable();
-
-		System.out.println ( "Setup track table: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
-		setupAlbumImage();
-		setupArtistImage();
-		
-		System.out.println ( "Setup image sections: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
-		setupTransport();
-		
-		System.out.println ( "Setup Transport: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
-		setupLibraryWindow();
-		tagWindow = new TagWindow ( mainStage );
-		albumInfoWindow = new AlbumInfoWindow ( mainStage );
-		playlistInfoWindow = new PlaylistInfoWindow ( mainStage );
-		
-		System.out.println ( "Setup Child Windows: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-
-		artSplitPane = new SplitPane();
-		artSplitPane.getItems().addAll( albumImage, artistImage );
-
-		BorderPane currentPlayingPane = new BorderPane();
-		playlistControls.prefWidthProperty().bind( currentPlayingPane.widthProperty() );
-		currentPlayingPane.setTop( playlistControls );
-		currentPlayingPane.setCenter( currentListTable );
-
-		SplitPane playingArtSplitPane = new SplitPane();
-		playingArtSplitPane.setOrientation( Orientation.VERTICAL );
-		playingArtSplitPane.getItems().addAll( currentPlayingPane, artSplitPane );
-
-		BorderPane albumListPane = new BorderPane();
-		albumFilterPane.prefWidthProperty().bind( albumListPane.widthProperty() );
-		albumListPane.setTop( albumFilterPane );
-		albumListPane.setCenter( albumTable );
-		
-		BorderPane trackListPane = new BorderPane();
-		trackFilterPane.prefWidthProperty().bind( trackListPane.widthProperty() );
-		trackListPane.setTop( trackFilterPane );
-		trackListPane.setCenter( trackTable );
-
-		BorderPane playlistPane = new BorderPane();
-		playlistFilterPane.prefWidthProperty().bind( playlistPane.widthProperty() );
-		playlistPane.setTop( playlistFilterPane );
-		playlistPane.setCenter( playlistTable );
-
-		StretchedTabPane leftTabPane = new StretchedTabPane(); // TODO: I can probably name this better.
-
-		Tab albumListTab = new Tab( "Albums" );
-		albumListTab.setContent( albumListPane );
-		albumListTab.setClosable( false );
-
-		Tab playlistTab = new Tab( "Playlists" );
-		playlistTab.setContent( playlistPane );
-		playlistTab.setClosable( false );
-
-		Tab songListTab = new Tab( "Tracks" );
-		songListTab.setContent( trackListPane );
-		songListTab.setClosable( false );
-
-		leftTabPane.getTabs().addAll( albumListTab, songListTab, playlistTab );
-		leftTabPane.setSide( Side.BOTTOM );
-
-		SplitPane primarySplitPane = new SplitPane();
-		primarySplitPane.getItems().addAll( leftTabPane, playingArtSplitPane );
-
-		final BorderPane primaryContainer = new BorderPane();
-
-		System.out.println ( "Setup highlevel panels: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-
-		primaryContainer.prefWidthProperty().bind( scene.widthProperty() );
-		primaryContainer.prefHeightProperty().bind( scene.heightProperty() );
-		primaryContainer.setPadding( new Insets( 0 ) ); // TODO:
-		primaryContainer.setCenter( primarySplitPane );
-		primaryContainer.setTop( transport );
-
-		stage.setTitle( PROGRAM_NAME );
-
-		System.out.println ( "bind stuff " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
-		((Group) scene.getRoot()).getChildren().addAll( primaryContainer );
-		stage.setScene( scene );
-		stage.show();
-		
-		System.out.println ( "set scene " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-
-		// This stuff has to be done after setScene
-		StackPane thumb = (StackPane) trackPositionSlider.lookup( ".thumb" );
-		thumb.setVisible( false );
-
-		primarySplitPane.setDividerPositions( .35d );
-		playingArtSplitPane.setDividerPositions( .65d );
-		artSplitPane.setDividerPosition( 0, .51d ); // For some reason .5 doesn't work...
-
-		// TODO: This is such a crappy hack
-		final ChangeListener <Number> listener = new ChangeListener <Number>() {
-			final Timer timer = new Timer();
-
-			TimerTask task = null;
-
-			final long delayTime = 500;
-
-			@Override
-			public void changed ( ObservableValue <? extends Number> observable, Number oldValue,
-					final Number newValue ) {
-				if ( task != null ) {
-					task.cancel();
-				}
-
-				task = new TimerTask() {
-					@Override
-					public void run () {
-						SplitPane.setResizableWithParent( artSplitPane, false );
-					}
-				};
-				timer.schedule( task, delayTime );
-			}
-		};
-
-		stage.widthProperty().addListener( listener );
-		stage.heightProperty().addListener( listener );
-		
-		hackTooltipStartTiming();
-		
-		System.out.println ( "Misc UI Adjustments " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();	
-
-		Persister.loadData();
-		System.out.println ( "Load Persisted Data " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
-		uiLoaded = true;
-	}
-	
 	public static void updatePlaylistMenuItems ( ObservableList <MenuItem> items, EventHandler <ActionEvent> eventHandler ) {
 
 		items.remove( 1, items.size() );
@@ -2344,12 +2148,15 @@ public class MusicPlayerUI extends Application {
 		resizePolicy.registerColumns( yearColumn );
 		albumTable.setColumnResizePolicy( resizePolicy );
 		
-		Label placeholder = new Label( "No albums loaded, click on the ≡ menu, or drop folders here, to add to your library." );
-		placeholder.setPadding( new Insets( 20, 10, 20, 10 ) );
-		placeholder.setWrapText( true );
-		placeholder.setTextAlignment( TextAlignment.CENTER );
+		emptyAlbumListLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
+		emptyAlbumListLabel.setWrapText( true );
+		emptyAlbumListLabel.setTextAlignment( TextAlignment.CENTER );
 		
-		albumTable.setPlaceholder( placeholder );
+		filteredAlbumListLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
+		filteredAlbumListLabel.setWrapText( true );
+		filteredAlbumListLabel.setTextAlignment( TextAlignment.CENTER );
+		
+		albumTable.setPlaceholder( emptyAlbumListLabel );
 
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
@@ -2587,11 +2394,10 @@ public class MusicPlayerUI extends Application {
 		// TODO resizePolicy.registerColumns ( lengthColumn );
 		trackTable.setColumnResizePolicy( resizePolicy );
 		
-		Label placeholder = new Label( "No tracks loaded, click on the ≡ menu, or drop folders here, to add to your library." );
-		placeholder.setPadding( new Insets( 20, 10, 20, 10 ) );
-		placeholder.setWrapText( true );
-		placeholder.setTextAlignment( TextAlignment.CENTER );
-		trackTable.setPlaceholder( placeholder );
+		emptyTrackListLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
+		emptyTrackListLabel.setWrapText( true );
+		emptyTrackListLabel.setTextAlignment( TextAlignment.CENTER );
+		trackTable.setPlaceholder( emptyTrackListLabel );
 		
 		trackTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 
@@ -2794,11 +2600,10 @@ public class MusicPlayerUI extends Application {
 		resizePolicy.registerColumns( tracksColumn );
 		playlistTable.setColumnResizePolicy( resizePolicy );
 
-		Label emptyLabel = new Label( "You haven't created any playlists, make a playlist on the right and click 💾 to save it for later." );
-		emptyLabel.setWrapText( true );
-		emptyLabel.setTextAlignment( TextAlignment.CENTER );
-		emptyLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
-		playlistTable.setPlaceholder( emptyLabel );
+		emptyPlaylistLabel.setWrapText( true );
+		emptyPlaylistLabel.setTextAlignment( TextAlignment.CENTER );
+		emptyPlaylistLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
+		playlistTable.setPlaceholder( emptyPlaylistLabel );
 
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
@@ -3395,6 +3200,259 @@ public class MusicPlayerUI extends Application {
 		} catch ( UnsupportedEncodingException e ) {
 			ROOT = Paths.get( path ).getParent();
 		}
+	}
+	
+
+	public static void updateAlbumListPlaceholder() {
+
+		if ( Library.albums.isEmpty() ) {
+			if ( albumTable.getPlaceholder() != emptyAlbumListLabel ) {
+				albumTable.setPlaceholder( emptyAlbumListLabel );
+			}
+		} else {
+			if ( MusicPlayerUI.albumTable.getPlaceholder() != MusicPlayerUI.filteredAlbumListLabel ) {
+				MusicPlayerUI.albumTable.setPlaceholder( MusicPlayerUI.filteredAlbumListLabel );
+			}
+		}
+	}
+	
+	public static void updateTrackListPlaceholder() {
+
+		if ( Library.tracks.isEmpty() ) {
+			if ( trackTable.getPlaceholder() != emptyTrackListLabel ) {
+				trackTable.setPlaceholder( emptyTrackListLabel );
+			}
+		} else {
+			if ( MusicPlayerUI.trackTable.getPlaceholder() != MusicPlayerUI.filteredTrackListLabel ) {
+				MusicPlayerUI.trackTable.setPlaceholder( MusicPlayerUI.filteredTrackListLabel );
+			}
+		}
+	}
+	
+	public static void updatePlaylistPlaceholder() {
+
+		if ( Library.playlists.isEmpty() ) {
+			if ( playlistTable.getPlaceholder() != emptyPlaylistLabel ) {
+				playlistTable.setPlaceholder( emptyPlaylistLabel );
+			}
+		} else {
+			if ( MusicPlayerUI.playlistTable.getPlaceholder() != MusicPlayerUI.filteredPlaylistLabel ) {
+				MusicPlayerUI.playlistTable.setPlaceholder( MusicPlayerUI.filteredPlaylistLabel );
+			}
+		}
+	}
+	
+	@Override
+	public void start ( Stage stage ) {
+		
+		long startTime = System.currentTimeMillis();
+		
+		mainStage = stage;
+		Scene scene = new Scene( new Group(), 1024, 768 );
+		//TODO: If we launch the jar from a different directory, it doesn't shwo the icon
+		//we need to get the directory of the jar and load the image from there, not just from the current directory
+		
+		try {
+			mainStage.getIcons().add( new Image( new FileInputStream ( ROOT.resolve( "icons/icon.png" ).toFile() ) ) );
+		} catch ( FileNotFoundException e ) {
+			System.out.println ( "Unable to load program icon: icons/icon.png" );
+		}
+
+		System.out.println ( "Setup Stage: " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();
+
+		setupAlbumTable();
+		
+		System.out.println ( "Setup Album Table: " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();
+		
+		setupTrackListCheckBox();
+		
+		System.out.println ( "Track list Check Box: " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();
+		
+		setupAlbumFilterPane();
+		
+		System.out.println ( "Setup Album Filter Paine: " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();
+		
+		setupTrackFilterPane();
+		
+		System.out.println ( "Setup Track Filter Pane: " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();
+		
+		setupQueueWindow();
+		System.out.println ( "Setup Queue Window: " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();
+		
+		setupHistoryWindow();
+		System.out.println ( "Setup History Window: " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();
+		
+		setupPlaylistFilterPane();
+		
+		System.out.println ( "Setup Playlist Filter: " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();
+		
+		setupCurrentListTable();
+		
+		System.out.println ( "Setup Current List: " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();
+		
+		setupPlaylistTable();
+		
+		System.out.println ( "Setup Playlist Table: " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();
+		
+		setupCurrentListControlPane();
+		
+		System.out.println ( "Setup Current List Controllers " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();
+		
+		setupTrackTable();
+
+		System.out.println ( "Setup track table: " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();
+		
+		setupAlbumImage();
+		setupArtistImage();
+		
+		System.out.println ( "Setup image sections: " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();
+		
+		setupTransport();
+		
+		System.out.println ( "Setup Transport: " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();
+		
+		setupLibraryWindow();
+		tagWindow = new TagWindow ( mainStage );
+		albumInfoWindow = new AlbumInfoWindow ( mainStage );
+		playlistInfoWindow = new PlaylistInfoWindow ( mainStage );
+		
+		System.out.println ( "Setup Child Windows: " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();
+
+		artSplitPane = new SplitPane();
+		artSplitPane.getItems().addAll( albumImage, artistImage );
+
+		BorderPane currentPlayingPane = new BorderPane();
+		playlistControls.prefWidthProperty().bind( currentPlayingPane.widthProperty() );
+		currentPlayingPane.setTop( playlistControls );
+		currentPlayingPane.setCenter( currentListTable );
+
+		SplitPane playingArtSplitPane = new SplitPane();
+		playingArtSplitPane.setOrientation( Orientation.VERTICAL );
+		playingArtSplitPane.getItems().addAll( currentPlayingPane, artSplitPane );
+
+		BorderPane albumListPane = new BorderPane();
+		albumFilterPane.prefWidthProperty().bind( albumListPane.widthProperty() );
+		albumListPane.setTop( albumFilterPane );
+		albumListPane.setCenter( albumTable );
+		
+		BorderPane trackListPane = new BorderPane();
+		trackFilterPane.prefWidthProperty().bind( trackListPane.widthProperty() );
+		trackListPane.setTop( trackFilterPane );
+		trackListPane.setCenter( trackTable );
+
+		BorderPane playlistPane = new BorderPane();
+		playlistFilterPane.prefWidthProperty().bind( playlistPane.widthProperty() );
+		playlistPane.setTop( playlistFilterPane );
+		playlistPane.setCenter( playlistTable );
+
+		StretchedTabPane leftTabPane = new StretchedTabPane(); // TODO: I can probably name this better.
+
+		Tab albumListTab = new Tab( "Albums" );
+		albumListTab.setContent( albumListPane );
+		albumListTab.setClosable( false );
+
+		Tab playlistTab = new Tab( "Playlists" );
+		playlistTab.setContent( playlistPane );
+		playlistTab.setClosable( false );
+
+		Tab songListTab = new Tab( "Tracks" );
+		songListTab.setContent( trackListPane );
+		songListTab.setClosable( false );
+
+		leftTabPane.getTabs().addAll( albumListTab, songListTab, playlistTab );
+		leftTabPane.setSide( Side.BOTTOM );
+
+		SplitPane primarySplitPane = new SplitPane();
+		primarySplitPane.getItems().addAll( leftTabPane, playingArtSplitPane );
+
+		final BorderPane primaryContainer = new BorderPane();
+
+		System.out.println ( "Setup highlevel panels: " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();
+
+		primaryContainer.prefWidthProperty().bind( scene.widthProperty() );
+		primaryContainer.prefHeightProperty().bind( scene.heightProperty() );
+		primaryContainer.setPadding( new Insets( 0 ) ); // TODO:
+		primaryContainer.setCenter( primarySplitPane );
+		primaryContainer.setTop( transport );
+
+		stage.setTitle( PROGRAM_NAME );
+
+		System.out.println ( "bind stuff " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();
+		
+		((Group) scene.getRoot()).getChildren().addAll( primaryContainer );
+		stage.setScene( scene );
+		stage.show();
+		
+		System.out.println ( "set scene " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();
+
+		// This stuff has to be done after setScene
+		StackPane thumb = (StackPane) trackPositionSlider.lookup( ".thumb" );
+		thumb.setVisible( false );
+
+		primarySplitPane.setDividerPositions( .35d );
+		playingArtSplitPane.setDividerPositions( .65d );
+		artSplitPane.setDividerPosition( 0, .51d ); // For some reason .5 doesn't work...
+
+		// TODO: This is such a crappy hack
+		final ChangeListener <Number> listener = new ChangeListener <Number>() {
+			final Timer timer = new Timer();
+
+			TimerTask task = null;
+
+			final long delayTime = 500;
+
+			@Override
+			public void changed ( ObservableValue <? extends Number> observable, Number oldValue,
+					final Number newValue ) {
+				if ( task != null ) {
+					task.cancel();
+				}
+
+				task = new TimerTask() {
+					@Override
+					public void run () {
+						SplitPane.setResizableWithParent( artSplitPane, false );
+					}
+				};
+				timer.schedule( task, delayTime );
+			}
+		};
+
+		stage.widthProperty().addListener( listener );
+		stage.heightProperty().addListener( listener );
+		
+		hackTooltipStartTiming();
+		
+		System.out.println ( "Misc UI Adjustments " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();	
+
+		Persister.loadData();
+		System.out.println ( "Load Persisted Data " + ( System.currentTimeMillis() - startTime ) );
+		startTime = System.currentTimeMillis();
+
+		updateAlbumListPlaceholder();
+		updateTrackListPlaceholder();
+		updatePlaylistPlaceholder();
+		
+		uiLoaded = true;
 	}
 		
 	//TODO: I'm not supposed to depend on main() in javafx programs. What's up w/ that? 

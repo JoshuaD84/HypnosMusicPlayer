@@ -49,6 +49,9 @@ public class UIUpdater {
 								Library.albums.remove( Library.albumsToRemove.remove( 0 ) );
 								changeCount++;
 							}
+							
+							MusicPlayerUI.updateAlbumListPlaceholder();
+
 							if ( changeCount >= MAX_CHANGES_PER_REQUEST ) {
 								MusicPlayerUI.albumTable.refresh(); //TODO: this may not be necessary. 
 								return;
@@ -62,6 +65,9 @@ public class UIUpdater {
 								Library.albums.add( Library.albumsToAdd.remove( 0 ) );
 								changeCount++;
 							}
+							
+							MusicPlayerUI.updateAlbumListPlaceholder();
+
 							if ( changeCount >= MAX_CHANGES_PER_REQUEST ) {
 								MusicPlayerUI.albumTable.refresh(); //TODO: this may not be necessary. 
 								return;
@@ -82,6 +88,7 @@ public class UIUpdater {
 								}
 								changeCount += 2; //We charge two here because this is a costly transaction
  							}
+							
 							if ( changeCount >= MAX_CHANGES_PER_REQUEST ) {
 								MusicPlayerUI.albumTable.refresh(); //TODO: this may not be necessary. 
 								return;
@@ -98,6 +105,10 @@ public class UIUpdater {
 									changeCount++;
 								}
 							}
+
+
+							MusicPlayerUI.updateTrackListPlaceholder();
+							
 							if ( changeCount >= MAX_CHANGES_PER_REQUEST ) {
 								MusicPlayerUI.trackTable.refresh(); //TODO: this may not be necessary. 
 								return;
@@ -111,6 +122,10 @@ public class UIUpdater {
 								Library.tracks.add( Library.tracksToAdd.remove( 0 ) );
 								changeCount++;
 							}
+
+
+							MusicPlayerUI.updateTrackListPlaceholder();
+							
 							if ( changeCount >= MAX_CHANGES_PER_REQUEST ) {
 								MusicPlayerUI.trackTable.refresh(); //TODO: this may not be necessary. 
 								return;
@@ -125,6 +140,8 @@ public class UIUpdater {
 					synchronized ( Library.playlistsToRemove ) {
 						Library.playlists.removeAll( Library.playlistsToRemove );
 						Library.playlistsToRemove.clear();
+
+						MusicPlayerUI.updatePlaylistPlaceholder();
 					}
 				
 					synchronized ( Library.playlistsToAdd ) {
@@ -133,6 +150,8 @@ public class UIUpdater {
 					}
 					
 					Library.playlistsToUpdate.clear();
+
+					MusicPlayerUI.updatePlaylistPlaceholder();
 					
 				} finally {
 					runLaterPending = false;
