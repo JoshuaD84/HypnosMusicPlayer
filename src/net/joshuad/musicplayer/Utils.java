@@ -214,16 +214,19 @@ public class Utils {
 
 		if ( track.getPath().getParent() == null ) return null;
 		
+		Path targetPath = track.getPath().toAbsolutePath();
+
+		
 		ArrayList <Path> possibleFiles = new ArrayList <Path> ();
-		possibleFiles.add( Paths.get ( track.getPath().getParent().toString(), "artist.jpg" ) );
-		possibleFiles.add( Paths.get ( track.getPath().getParent().toString(), "artist.png" ) );
-		possibleFiles.add( Paths.get ( track.getPath().getParent().toString(), "artist.gif" ) );
-		possibleFiles.add( Paths.get ( track.getPath().getParent().getParent().toString(), "artist.jpg" ) );
-		possibleFiles.add( Paths.get ( track.getPath().getParent().getParent().toString(), "artist.png" ) );
-		possibleFiles.add( Paths.get ( track.getPath().getParent().getParent().toString(), "artist.gif" ) );
+		possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.jpg" ) );
+		possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.png" ) );
+		possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.gif" ) );
+		possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.jpg" ) );
+		possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.png" ) );
+		possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.gif" ) );
 		
 		try {
-			DirectoryStream <Path> artistDirectoryStream = Files.newDirectoryStream ( track.getPath().getParent().getParent(), imageFileFilter );
+			DirectoryStream <Path> artistDirectoryStream = Files.newDirectoryStream ( targetPath.getParent().getParent(), imageFileFilter );
 			for ( Path imagePath : artistDirectoryStream ) { possibleFiles.add( imagePath ); }
 		
 		} catch ( IOException e ) {

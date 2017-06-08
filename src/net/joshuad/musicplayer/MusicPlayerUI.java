@@ -3396,28 +3396,7 @@ public class MusicPlayerUI extends Application {
 			ROOT = Paths.get( path ).getParent();
 		}
 	}
-	
-	public static void setCurrentList( List<Path> paths ) {
 		
-		ArrayList<CurrentListTrack> newList = new ArrayList<CurrentListTrack>();
-		
-		for ( Path path : paths ) {
-			try {
-				newList.add( new CurrentListTrack ( path ) );
-			} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
-				System.out.println ( "Unable to load file: " + path.toString() );
-			}
-		}
-		
-		if ( newList.size() > 0 ) {
-			Platform.runLater( () -> {
-				currentListData.clear();
-				currentListData.addAll( newList );
-				
-			});
-		}
-	}
-	
 	//TODO: I'm not supposed to depend on main() in javafx programs. What's up w/ that? 
 	public static void main ( String[] args ) {
 		System.out.println ( "Current Dir: " + System.getProperty("user.dir") );
@@ -3425,8 +3404,7 @@ public class MusicPlayerUI extends Application {
 		long startTime = System.currentTimeMillis();
 		
 		CLIParser parser = new CLIParser( );
-		ArrayList <Integer> commands = parser.parseCommands( args );
-		ArrayList <Path> filesToOpen = parser.parseFiles( args );
+		ArrayList <SocketCommand> commands = parser.parseCommands( args );
 		
 		System.out.println ( "Parse arguments: " + ( System.currentTimeMillis() - startTime ) );
 		startTime = System.currentTimeMillis();
@@ -3474,10 +3452,8 @@ public class MusicPlayerUI extends Application {
 					System.out.println ( "InterruptedException in ui wait block, MusicPlayerUI.main()" );
 				}
 			}
-			
-			setCurrentList ( filesToOpen );
 
-			SingleInstanceController.sendCommands( commands );
+			SingleInstanceController.giveCommandToUI( commands );
 			
 			Library.startLoader();
 			
@@ -3485,7 +3461,7 @@ public class MusicPlayerUI extends Application {
 			startTime = System.currentTimeMillis();
 			
 		} else {
-			SingleInstanceController.sendCommands( commands );
+			SingleInstanceController.sendCommandsThroughSocket( commands );
 			System.exit ( 0 );
 		}
 	}

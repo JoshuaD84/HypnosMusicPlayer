@@ -1,6 +1,6 @@
 package net.joshuad.musicplayer;
 
-import java.nio.file.Path;
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
@@ -40,27 +40,9 @@ public class CLIParser {
 		
 	}
 	
-	public ArrayList <Path> parseFiles ( String [] args ) {
-		
-		ArrayList<Path> retMe = new ArrayList<Path> ();
-		
-		try {
-			CommandLine line = parser.parse( options, args );
-			
-			for ( String leftOverArgument : line.getArgList() ) {
-				retMe.add( Paths.get( leftOverArgument ) );
-			}
-
-		} catch ( ParseException e ) {
-			System.out.println ( "Error parsing commandline options, continuing." );
-		}
-
-		return retMe;
-	}
-	
-	public ArrayList <Integer> parseCommands ( String[] args ) {
+	public ArrayList <SocketCommand> parseCommands ( String[] args ) {
 		 
-		ArrayList <Integer> retMe = new ArrayList <Integer> ();
+		ArrayList <SocketCommand> retMe = new ArrayList <SocketCommand> ();
 		
 		try {
 			CommandLine line = parser.parse( options, args );
@@ -70,31 +52,41 @@ public class CLIParser {
 				formatter.printHelp( "Hypnos Music Player <options>", options );
 				System.exit( 0 );
 			}
+
+			if ( line.hasOption( PLAY ) ) {
+				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SingleInstanceController.PLAY ) );
+			}
 			
 			if ( line.hasOption( NEXT ) ) {
-				retMe.add( SingleInstanceController.NEXT );
+				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SingleInstanceController.NEXT ) );
 			}
 			
 			if ( line.hasOption( PREVIOUS ) ) {
-				retMe.add( SingleInstanceController.PREVIOUS );
-			}
-			
-			if ( line.hasOption( PAUSE ) ) {
-				retMe.add( SingleInstanceController.PAUSE );
-			}
-			
-			if ( line.hasOption( PLAY ) ) {
-				retMe.add( SingleInstanceController.PLAY );
+				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SingleInstanceController.PREVIOUS ) );
 			}
 			
 			if ( line.hasOption( TOGGLE_PAUSE ) ) {
-				retMe.add( SingleInstanceController.TOGGLE_PAUSE );
+				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SingleInstanceController.TOGGLE_PAUSE ) );
+			}
+
+			
+			if ( line.hasOption( PAUSE ) ) {
+				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SingleInstanceController.PAUSE ) );
 			}
 			
 			if ( line.hasOption( STOP ) ) {
-				retMe.add( SingleInstanceController.STOP );
+				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SingleInstanceController.STOP ) );
 			}
 			
+			ArrayList<File> filesToLoad = new ArrayList<File> ();
+			for ( String leftOverArgument : line.getArgList() ) {
+				filesToLoad.add( Paths.get( leftOverArgument ).toFile() );
+			}
+			
+			if ( filesToLoad.size() > 0 ) {
+				retMe.add( new SocketCommand ( SocketCommand.CommandType.LOAD_TRACKS, filesToLoad ) );
+			}
+		
 		} catch ( ParseException e ) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

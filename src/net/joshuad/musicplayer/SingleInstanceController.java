@@ -1,18 +1,25 @@
 package net.joshuad.musicplayer;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
+
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.TagException;
 
 import javafx.application.Platform;
 
 public class SingleInstanceController {
 	
+	//TODO: Maybe change these to enums
 	public static final int NEXT = 0;
 	public static final int PREVIOUS = 1;
 	public static final int PAUSE = 2;
@@ -33,17 +40,21 @@ public class SingleInstanceController {
 			@SuppressWarnings("resource")
 			ServerSocket serverSocket = new ServerSocket ( port, 0, InetAddress.getByName(null) );
 	
+			@SuppressWarnings("unchecked")
 			Thread t = new Thread ( () -> {
 				while ( true ) {
 					try {
 						Socket clientSocket = serverSocket.accept(); //It blocks here while listening
-						BufferedReader in = new BufferedReader( new InputStreamReader( clientSocket.getInputStream() ) );
-						int command;
-						while ( (command = in.read()) != -1 ) {
-							giveCommandToUI ( command );
+						ObjectInputStream in = new ObjectInputStream( clientSocket.getInputStream() );
+						
+						Object dataIn = in.readObject();
+						System.out.println ( "Read object from socket." ); //TODO: DD
+						
+						if ( dataIn instanceof ArrayList ) {
+							giveCommandToUI ( (ArrayList <SocketCommand>) dataIn );
 						}
 
-					} catch ( IOException e ) {
+					} catch ( IOException | ClassNotFoundException e ) {
 						System.err.println ( "Read error at commandline parser" );
 						e.printStackTrace();
 					}
@@ -65,43 +76,74 @@ public class SingleInstanceController {
 		}
 	}
 	
-	private static void giveCommandToUI ( final int command ) {
-		Platform.runLater( () -> {
-			switch ( command ) {
-				case NEXT: 
-					MusicPlayerUI.playNextTrack();
-					break;
-				case PREVIOUS:
-					MusicPlayerUI.playPreviousTrack();
-					break;
-				case PAUSE:
-					MusicPlayerUI.pause();
-					break;
-				case PLAY:
-					MusicPlayerUI.play();
-					break;
-				case TOGGLE_PAUSE:
-					MusicPlayerUI.togglePause();
-					break;
-				case STOP:
-					MusicPlayerUI.stopTrack();
-					break;
+	@SuppressWarnings("unchecked")
+	public static void giveCommandToUI ( final ArrayList <SocketCommand> commands ) {
+		Platform.runLater( new Runnable() { public void run() {
+			for ( SocketCommand command : commands ) {
+				if ( command.getType() == SocketCommand.CommandType.LOAD_TRACKS ) {
+					System.out.println ( "Load tracks heard." ); //TODO: DD
+					ArrayList<CurrentListTrack> newList = new ArrayList<CurrentListTrack>();
+					
+					for ( File file : (List<File>) command.getObject() ) {
+						try {
+							newList.add( new CurrentListTrack ( file.toPath() ) );
+							System.out.println ( "loading file: " + file.toString() );
+						} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
+							System.out.println ( "Unable to load file: " + file.toString() );
+						}
+					}
+					
+					if ( newList.size() > 0 ) {
+						MusicPlayerUI.currentListData.clear();
+						MusicPlayerUI.currentListData.addAll( newList );
+					}
+				}
 			}
-		});	
+	
+			for ( SocketCommand command : commands ) {
+				if ( command.getType() == SocketCommand.CommandType.CONTROL ) {
+					int action = (Integer)command.getObject();
+	
+					System.out.println ( "Action being sent to UI: " + action ); //TODO: DD
+					switch ( action ) {
+						case NEXT: 
+							MusicPlayerUI.playNextTrack();
+							break;
+						case PREVIOUS:
+							MusicPlayerUI.playPreviousTrack();
+							break;
+						case PAUSE:
+							MusicPlayerUI.pause();
+							break;
+						case PLAY:
+							MusicPlayerUI.play();
+							break;
+						case TOGGLE_PAUSE:
+							MusicPlayerUI.togglePause();
+							break;
+						case STOP:
+							MusicPlayerUI.stopTrack();
+							break;
+					}
+				} 
+			}
+		}});
 	}
 	
-	public static void sendCommands( ArrayList <Integer> commands ) {
+	public static void sendCommandsThroughSocket( ArrayList <SocketCommand> commands ) {
 		try (
 			Socket clientSocket = new Socket( InetAddress.getByName(null), port );
-			DataOutputStream out = new DataOutputStream( clientSocket.getOutputStream() );
+			ObjectOutputStream out = new ObjectOutputStream( clientSocket.getOutputStream() );
 		){
-			for ( int command : commands ) {
-				out.write( command );
-			}
+			System.out.println ( "Sending command out over socket." ); //TODO: DD
+			out.writeObject( commands );
 		} catch ( IOException e ) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-
 }
+
+			
+			
+			

@@ -1,22 +1,20 @@
-Ability to accept a file as an argument, open-with shell integration
+Windows
+	Open-with shell integration
+	Installer
+	
+Linux
+	Open-with shell integration
+	Debian Installer
+	use a compiled launcher rather than a script -- it allows shell double click. 
+	Build - Linux64 embedded JRE
+	Build - Linux32 embedded JRE
 
+OSX
+	Does our package work? 
+	Open-with shell integration
+	.DMG installer
 
-Log files
-
-Builds
-	linux64-bit embedded jre
-	linux32-bit embedded jre build
-	windows no jre
-	windows jre
-	osx jre
-	osx no-jre
-
-Installers
-	windows installer - allow standalone or system integrated
-	debian installer
-	osx .dmg
-
-Linux - use a compiled launcher rather than a script - it allows shell double click, which is nice. 
+Log files are messy, not handled right. 
 
 track buffering, so there's a cushion in case reading becomes spotty
 
@@ -57,9 +55,8 @@ Decoders
 		No line matching interface SourceDataLine supporting format PCM_FLOAT 44100.0 Hz, 32 bit, stereo, 8 bytes/frame,  is supported.
 
 m3u support
-Better serialization for playlists -- I think I'm OK with the way I serialize the other data, but playlists shouldn't risk being lost. 
 
-
+Better serialization for playlists -- I think I'm OK with using serializable for other data, but playlists shouldn't risk being lost. 
 	
 Volume control
 
