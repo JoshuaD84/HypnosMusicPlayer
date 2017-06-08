@@ -1,4 +1,3 @@
-
 Windows
 	Open-with shell integration
 	Installer

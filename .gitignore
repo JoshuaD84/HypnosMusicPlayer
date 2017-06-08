@@ -7,3 +7,7 @@ hypnos.jar
 /distribution
 /packaging
 *.flac
+*.mp3
+*.wav
+*.ogg
+*.m4a

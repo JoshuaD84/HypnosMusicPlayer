@@ -25,6 +25,7 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 	Slider trackPosition;
 	
 	public FlacPlayer ( Track track, Slider trackPositionSlider, boolean startPaused ) throws IOException, LineUnavailableException {
+		System.out.println ( "In constructor" ); //TODO: DD
 		this.track = track;
 		this.trackPosition = trackPositionSlider;
 		this.pauseRequested = startPaused;
@@ -33,9 +34,10 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 		if (decodedInput.numSamples == 0) throw new FlacDecoder.FormatException("Unknown audio length");
 		
 		AudioFormat outputFormat = new AudioFormat ( decodedInput.sampleRate, decodedInput.sampleDepth, decodedInput.numChannels, true, false );
-		
+
 		audioOutput = (SourceDataLine)AudioSystem.getLine( new DataLine.Info( SourceDataLine.class, outputFormat ) );
-		audioOutput.open ( outputFormat );
+		
+		audioOutput.open ( outputFormat ); 
 		clipStartTime = 0;
 		
 		Thread t = new Thread ( this );

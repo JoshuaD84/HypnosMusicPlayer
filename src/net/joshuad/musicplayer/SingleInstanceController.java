@@ -51,7 +51,7 @@ public class SingleInstanceController {
 						System.out.println ( "Read object from socket." ); //TODO: DD
 						
 						if ( dataIn instanceof ArrayList ) {
-							giveCommandToUI ( (ArrayList <SocketCommand>) dataIn );
+							sendCommandToUI ( (ArrayList <SocketCommand>) dataIn );
 						}
 
 					} catch ( IOException | ClassNotFoundException e ) {
@@ -77,19 +77,17 @@ public class SingleInstanceController {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static void giveCommandToUI ( final ArrayList <SocketCommand> commands ) {
+	public static void sendCommandToUI ( final ArrayList <SocketCommand> commands ) {
 		Platform.runLater( new Runnable() { public void run() {
 			for ( SocketCommand command : commands ) {
 				if ( command.getType() == SocketCommand.CommandType.LOAD_TRACKS ) {
-					System.out.println ( "Load tracks heard." ); //TODO: DD
 					ArrayList<CurrentListTrack> newList = new ArrayList<CurrentListTrack>();
 					
 					for ( File file : (List<File>) command.getObject() ) {
 						try {
 							newList.add( new CurrentListTrack ( file.toPath() ) );
-							System.out.println ( "loading file: " + file.toString() );
 						} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
-							System.out.println ( "Unable to load file: " + file.toString() );
+							System.out.println ( "Unable to load file specified by user: " + file.toString() );
 						}
 					}
 					
@@ -107,10 +105,10 @@ public class SingleInstanceController {
 					System.out.println ( "Action being sent to UI: " + action ); //TODO: DD
 					switch ( action ) {
 						case NEXT: 
-							MusicPlayerUI.playNextTrack();
+							MusicPlayerUI.nextTrack();
 							break;
 						case PREVIOUS:
-							MusicPlayerUI.playPreviousTrack();
+							MusicPlayerUI.previousTrack();
 							break;
 						case PAUSE:
 							MusicPlayerUI.pause();
@@ -125,6 +123,13 @@ public class SingleInstanceController {
 							MusicPlayerUI.stopTrack();
 							break;
 					}
+				} 
+				
+				try {
+					Thread.sleep( 5 ); //We have to do this because too many quick calls to any SourceDataLine.open() locks up
+				} catch ( InterruptedException e ) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				} 
 			}
 		}});

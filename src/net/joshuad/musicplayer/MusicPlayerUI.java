@@ -252,15 +252,14 @@ public class MusicPlayerUI extends Application {
 					if ( repeatMode == RepeatMode.REPEAT_ONE_TRACK && currentPlayer != null ) {
 						playTrack ( currentPlayer.getTrack() );
 					} else {
-						playNextTrack();
+						nextTrack();
 					}
 				}
 			}
 		} );
 	}
 	
-	public static void playPreviousTrack() {
-
+	public static void previousTrack() {
 		if ( currentPlayer == null ) {
 			currentListTable.getSelectionModel().clearAndSelect( currentListTable.getSelectionModel().getSelectedIndex() - 1 );
 			return;
@@ -268,26 +267,28 @@ public class MusicPlayerUI extends Application {
 		
 		boolean isPaused = currentPlayer.isPaused();
 		
-
 		Track previousTrack = null;
-		
-		while ( !previousNextStack.isEmpty() && previousTrack == null ) {
-			Track candidate;
-			synchronized ( previousNextStack ) {
-				candidate = previousNextStack.remove( 0 );
+
+		synchronized ( previousNextStack ) {
+			while ( !previousNextStack.isEmpty() && previousTrack == null ) {
+				Track candidate = previousNextStack.remove( 0 );
 				if ( playOnceShuffleTracksPlayedCounter > 0 ) playOnceShuffleTracksPlayedCounter--;
 				
 				if ( currentPlayer != null && candidate.equals( currentPlayer.getTrack() ) ) {
-					candidate = previousNextStack.remove( 0 );
-					if ( playOnceShuffleTracksPlayedCounter > 0 ) playOnceShuffleTracksPlayedCounter--;
+					if ( !previousNextStack.isEmpty() ) {
+						candidate = previousNextStack.remove( 0 );
+						if ( playOnceShuffleTracksPlayedCounter > 0 ) playOnceShuffleTracksPlayedCounter--;
+					} else {
+						candidate = null;
+					}
+				}
+				
+				if ( currentListData.contains( candidate ) ) {
+					previousTrack = candidate;
 				}
 			}
-			
-			if ( currentListData.contains( candidate ) ) {
-				previousTrack = candidate;
-			}
 		}
-		
+
 		if ( previousTrack != null ) {
 			playTrack ( previousTrack, isPaused, false );
 			
@@ -352,7 +353,6 @@ public class MusicPlayerUI extends Application {
 			}
 		}
 	}
-		
 	
 	public static void pause() {
 		if ( currentPlayer != null ) {
@@ -361,7 +361,7 @@ public class MusicPlayerUI extends Application {
 		}
 	}
 		
-	public static void playNextTrack () {
+	public static void nextTrack () {
 		if ( currentPlayer == null ) {
 			currentListTable.getSelectionModel().clearAndSelect( currentListTable.getSelectionModel().getSelectedIndex() + 1 );
 		} else {
@@ -465,12 +465,14 @@ public class MusicPlayerUI extends Application {
 
 		switch ( track.getFormat() ) {
 			case FLAC:
+
 				try {
 					currentPlayer = new FlacPlayer( track, trackPositionSlider, startPaused );
 				} catch ( Exception e ) {
 					LOGGER.log( Level.WARNING, "Using backup flac decoder for: " + track.getPath() );
 					currentPlayer = new JFlacPlayer ( track, trackPositionSlider, startPaused );
 				}
+
 				if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );
 				if ( startPaused ) {
 					togglePlayButton.setGraphic( playImage );
@@ -519,7 +521,6 @@ public class MusicPlayerUI extends Application {
 				System.out.println ( "Unknown music file type" );
 				return;
 		}
-
 
 		if ( addToPreviousNextStack ) {
 			while ( previousNextStack.size() >= MAX_PREVIOUS_NEXT_STACK_SIZE ) {
@@ -709,14 +710,14 @@ public class MusicPlayerUI extends Application {
 		previousButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				playPreviousTrack();
+				previousTrack();
 			}
 		} );
 
 		nextButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				playNextTrack();
+				nextTrack();
 			}
 		} );
 
@@ -3511,7 +3512,7 @@ public class MusicPlayerUI extends Application {
 				}
 			}
 
-			SingleInstanceController.giveCommandToUI( commands );
+			SingleInstanceController.sendCommandToUI( commands );
 			
 			Library.startLoader();
 			
