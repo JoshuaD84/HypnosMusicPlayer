@@ -26,6 +26,7 @@ public class SingleInstanceController {
 	public static final int PLAY = 3;
 	public static final int TOGGLE_PAUSE = 4;
 	public static final int STOP = 5;
+	public static final int TOGGLE_MINIMIZED = 6;
 	
 	static int port = 49485;
 	
@@ -48,7 +49,6 @@ public class SingleInstanceController {
 						ObjectInputStream in = new ObjectInputStream( clientSocket.getInputStream() );
 						
 						Object dataIn = in.readObject();
-						System.out.println ( "Read object from socket." ); //TODO: DD
 						
 						if ( dataIn instanceof ArrayList ) {
 							sendCommandToUI ( (ArrayList <SocketCommand>) dataIn );
@@ -102,7 +102,6 @@ public class SingleInstanceController {
 				if ( command.getType() == SocketCommand.CommandType.CONTROL ) {
 					int action = (Integer)command.getObject();
 	
-					System.out.println ( "Action being sent to UI: " + action ); //TODO: DD
 					switch ( action ) {
 						case NEXT: 
 							MusicPlayerUI.nextTrack();
@@ -122,6 +121,9 @@ public class SingleInstanceController {
 						case STOP:
 							MusicPlayerUI.stopTrack();
 							break;
+						case TOGGLE_MINIMIZED:
+							MusicPlayerUI.toggleMinimized();
+							break;
 					}
 				} 
 				
@@ -140,7 +142,6 @@ public class SingleInstanceController {
 			Socket clientSocket = new Socket( InetAddress.getByName(null), port );
 			ObjectOutputStream out = new ObjectOutputStream( clientSocket.getOutputStream() );
 		){
-			System.out.println ( "Sending command out over socket." ); //TODO: DD
 			out.writeObject( commands );
 		} catch ( IOException e ) {
 			// TODO Auto-generated catch block

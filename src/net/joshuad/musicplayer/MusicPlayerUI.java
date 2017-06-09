@@ -241,7 +241,11 @@ public class MusicPlayerUI extends Application {
 				timeElapsedLabel.setText( Utils.getLengthDisplay( timeElapsed ) );
 				timeRemainingLabel.setText( Utils.getLengthDisplay( timeRemaining ) );
 			}
-		} );
+		});
+	}
+	
+	public static void toggleMinimized() {
+		mainStage.setIconified( !mainStage.isIconified() );
 	}
 
 	// This is called by the various players
@@ -332,6 +336,7 @@ public class MusicPlayerUI extends Application {
 			play();
 		}
 	}
+	
 	
 	public static void play() {
 		if ( currentPlayer != null && currentPlayer.isPaused() ) {

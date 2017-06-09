@@ -13,6 +13,7 @@ import org.apache.commons.cli.ParseException;
 
 public class CLIParser {
 	
+	//TODO: Combine these into an Enum with the things in SingleInstanceController and the strings in constructor below. 
 	private static final String HELP = "help";
 	private static final String NEXT = "next";
 	private static final String PREVIOUS = "previous";
@@ -20,6 +21,7 @@ public class CLIParser {
 	private static final String PLAY = "play";
 	private static final String TOGGLE_PAUSE = "play-pause";
 	private static final String STOP = "stop";
+	private static final String TOGGLE_MINIMIZED = "toggle-window";
 	
 	CommandLineParser parser;
 	Options options;
@@ -35,6 +37,7 @@ public class CLIParser {
 		options.addOption( null, PLAY, false, "Start Playback" );
 		options.addOption( null, TOGGLE_PAUSE, false, "Toggle play/pause mode" );
 		options.addOption( null, STOP, false, "Stop playback" );
+		options.addOption( null, TOGGLE_MINIMIZED, false, "Toggle the minimized state" );
 		
 		parser = new DefaultParser();
 		
@@ -76,6 +79,10 @@ public class CLIParser {
 			
 			if ( line.hasOption( STOP ) ) {
 				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SingleInstanceController.STOP ) );
+			}
+			
+			if ( line.hasOption( TOGGLE_MINIMIZED ) ) {
+				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SingleInstanceController.TOGGLE_MINIMIZED ) );
 			}
 			
 			ArrayList<File> filesToLoad = new ArrayList<File> ();
