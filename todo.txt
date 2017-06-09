@@ -1,3 +1,60 @@
+Better serialization for playlists -- I think I'm OK with using serializable for other data, but playlists shouldn't risk being lost. 
+
+Embed and use a font with all needed UTF glyphs
+
+Persist the rest of the UI
+	Shuffle / Repeat
+	Windows Size
+	Internal divider positions
+	sort orders?
+	Track-album checkbox
+
+Log files are messy, not handled right. 
+
+track buffering, so there's a cushion in case reading becomes spotty
+
+Make sure artist image isn't also used for album image
+
+Make sure horizontal scroll bars never appear
+	6/9 - Can't find anything on google.
+	
+Lyrics?
+
+Hot Keys
+
+Read artwork from tags if available. 
+
+Artwork drag and drop
+
+Parse discogs tags?
+
+Redesign the transport
+
+Re-architect the current playing info box
+
+UIUpdaterThread is too aggressive. Causing lag on my computer
+
+Tray icon
+	Gnome 3 doesn't support. Code works but is really bad. Need to make it toggleable
+	What other systems don't? How to handle? 
+	
+m3u support
+
+Volume control
+
+Decoders
+	Ogg
+	m4b - Double speed play for some reason
+	Can we get flacplayer.java to play things that we need jflac for:
+		Adrian Orange
+		A Perfect Circle - Mer de noms
+		<Any others?>
+		Pink Floyd - Pulse (disc 1)
+		
+	Wav:
+		No line matching interface SourceDataLine supporting format PCM_FLOAT 44100.0 Hz, 32 bit, stereo, 8 bytes/frame
+
+
 Windows
 	Open-with shell integration
 	Installer
@@ -14,54 +71,9 @@ OSX
 	Open-with shell integration
 	.DMG installer
 
-Log files are messy, not handled right. 
-
-track buffering, so there's a cushion in case reading becomes spotty
-
-Make sure artist image isn't also used for album image
-
-Make sure horizontal scroll bars never appear
-
-Lyrics?
-
-Hot Keys
-
-Read artwork from tags if available. 
-
-Artwork drag and drop
-
-Read ID3 tags for images
-
-Parse discogs tags?
-
-Redesign the transport
-
-Re-architect the current playing info box
-
-UIUpdaterThread is too aggressive. Causing lag on my computer
-
-Tray icon
-
-Decoders
-	Ogg
-	m4b - Double speed play for some reason
-	Can we get flacplayer.java to play things that we need jflac for:
-		Adrian Orange
-		A Perfect Circle - Mer de noms
-		<Any others?>
-		Pink Floyd - Pulse (disc 1)
-		
-	Wav:
-		No line matching interface SourceDataLine supporting format PCM_FLOAT 44100.0 Hz, 32 bit, stereo, 8 bytes/frame
-
-m3u support
-
-Better serialization for playlists -- I think I'm OK with using serializable for other data, but playlists shouldn't risk being lost. 
-	
-Volume control
 
 
 
 
-	
-	
+Useful UTF Characters
+	≡✘⏏💾⇉🔀⇥🔁🔂

@@ -161,10 +161,10 @@ public class MusicPlayerUI extends Application {
 		"You haven't created any playlists, make a playlist on the right and click 💾 to save it for later." );
 
 	static Label emptyTrackListLabel = new Label( 
-		"No tracks loaded, click on the ≡ menu, or drop folders here, to add to your library." );
+		"No tracks loaded, click on the + button, or drop folders here, to add to your library." );
 	
 	static Label emptyAlbumListLabel = new Label(
-		"No albums loaded, click on the ≡ menu, or drop folders here, to add to your library." );
+		"No albums loaded, click on the + button, or drop folders here, to add to your library." );
 	
 	static Label filteredAlbumListLabel = new Label( "No albums match." );
 	static Label filteredTrackListLabel = new Label( "No tracks match." );
@@ -545,8 +545,8 @@ public class MusicPlayerUI extends Application {
 
 		trackInfo.setText( track.getArtist() + " - " + track.getTitle() );
 
-		setAlbumImage( Utils.getAlbumCoverImagePath( track ) );
-		setArtistImage( Utils.getAlbumArtistImagePath( track ) );
+		setAlbumImage( track.getAlbumCoverImage() );
+		setArtistImage( track.getAlbumArtistImagePath( ) );
 	}
 
 	public static void playAlbum ( Album album ) {
@@ -1656,10 +1656,9 @@ public class MusicPlayerUI extends Application {
 		});
 	}
 
-	public static void setAlbumImage ( Path imagePath ) {
+	public static void setAlbumImage ( Image image ) {
 		try {
-			ResizableImageView view = new ResizableImageView(
-					new Image( imagePath.toUri().toString() ) );
+			ResizableImageView view = new ResizableImageView( image );
 			view.setPreserveRatio( true );
 			albumImage.setCenter( view );
 		} catch ( Exception e ) {
@@ -1667,10 +1666,9 @@ public class MusicPlayerUI extends Application {
 		}
 	}
 
-	public static void setArtistImage ( Path imagePath ) {
+	public static void setArtistImage ( Image image ) {
 		try {
-			ResizableImageView view = new ResizableImageView(
-					new Image( imagePath.toUri().toString() ) );
+			ResizableImageView view = new ResizableImageView( image );
 			view.setPreserveRatio( true );
 			artistImage.setCenter( view );
 		} catch ( Exception e ) {
@@ -1916,7 +1914,7 @@ public class MusicPlayerUI extends Application {
 			});
 		});
 		
-		Button settingsButton = new Button( "≡" );
+		Button settingsButton = new Button( "+" );
 		settingsButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
 		settingsButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -1961,7 +1959,7 @@ public class MusicPlayerUI extends Application {
 			}
 		});
 		
-		Button settingsButton = new Button( "≡" );
+		Button settingsButton = new Button( "+" );
 		settingsButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
 		settingsButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -2077,7 +2075,7 @@ public class MusicPlayerUI extends Application {
 			} );
 		} );
 
-		Button settingsButton = new Button( "≡" );
+		Button settingsButton = new Button( "+" );
 		settingsButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
 		settingsButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override

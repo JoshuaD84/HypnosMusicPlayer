@@ -37,13 +37,6 @@ public class Utils {
 		}
 	};
 	
-	public static final DirectoryStream.Filter<Path> imageFileFilter = new DirectoryStream.Filter<Path>() {
-		@Override
-		public boolean accept ( Path entry ) throws IOException {
-			return isImageFile ( entry );			
-		}
-	};
-	
 	public static boolean isImageFile ( File testFile ) {
 		return isImageFile ( testFile.toPath() );
 	}
@@ -178,68 +171,6 @@ public class Utils {
 		}
 		
 		return retMe;
-	}
-	
-	public static Path getAlbumCoverImagePath ( Track track ) {
-		
-		if ( track.getPath().getParent() == null ) return null;
-		
-		ArrayList <Path> possibleFiles = new ArrayList <Path> ();
-		
-		possibleFiles.add( Paths.get ( track.getPath().getParent().toString(), "front.jpg" ) );
-		possibleFiles.add( Paths.get ( track.getPath().getParent().toString(), "front.png" ) );
-		possibleFiles.add( Paths.get ( track.getPath().getParent().toString(), "cover.jpg" ) );
-		possibleFiles.add( Paths.get ( track.getPath().getParent().toString(), "cover.png" ) );
-		possibleFiles.add( Paths.get ( track.getPath().getParent().toString(), "album.jpg" ) );
-		possibleFiles.add( Paths.get ( track.getPath().getParent().toString(), "album.png" ) );
-		
-		try {
-			DirectoryStream <Path> albumDirectoryStream = Files.newDirectoryStream ( track.getPath().getParent(), imageFileFilter );
-			for ( Path imagePath : albumDirectoryStream ) { possibleFiles.add( imagePath ); }
-		
-		} catch ( IOException e ) {
-			//TODO: I think we can ignore this one. 
-		}
-		
-		for ( Path test : possibleFiles ) {
-			if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
-				return test;
-			}
-		}
-		
-		return null;
-	}
-	
-	public static Path getAlbumArtistImagePath ( Track track ) {
-
-		if ( track.getPath().getParent() == null ) return null;
-		
-		Path targetPath = track.getPath().toAbsolutePath();
-
-		
-		ArrayList <Path> possibleFiles = new ArrayList <Path> ();
-		possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.jpg" ) );
-		possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.png" ) );
-		possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.gif" ) );
-		possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.jpg" ) );
-		possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.png" ) );
-		possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.gif" ) );
-		
-		try {
-			DirectoryStream <Path> artistDirectoryStream = Files.newDirectoryStream ( targetPath.getParent().getParent(), imageFileFilter );
-			for ( Path imagePath : artistDirectoryStream ) { possibleFiles.add( imagePath ); }
-		
-		} catch ( IOException e ) {
-			//TODO: I think we can ignore this one. 
-		}
-		
-		for ( Path test : possibleFiles ) {
-			if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
-				return test;
-			}
-		}
-		
-		return null;
 	}
 	
 	public static boolean isAlbumDirectory ( Path path ) {

@@ -1,8 +1,14 @@
 package net.joshuad.musicplayer;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,6 +20,10 @@ import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
+import org.jaudiotagger.tag.images.Artwork;
+
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.Image;
 
 public class Track implements Serializable {
 	
@@ -63,6 +73,13 @@ public class Track implements Serializable {
 	private String encodingType;
 	private String format;
 	
+	public static final DirectoryStream.Filter<Path> imageFileFilter = new DirectoryStream.Filter<Path>() {
+		@Override
+		public boolean accept ( Path entry ) throws IOException {
+			return Utils.isImageFile ( entry );			
+		}
+	};
+	
 	public Track ( Path trackPath ) throws IOException {
 		this ( trackPath, false );
 	}
@@ -77,23 +94,11 @@ public class Track implements Serializable {
 		refreshTagData();
 	}
 	
+	//TODO: Why does it catch all other exceptions but throw IO? 
 	public void refreshTagData() throws IOException {
 		Tag tag = null;
-		AudioFile audioFile;
 		try {
-			int i = trackFile.toString().lastIndexOf('.');
-			String extension = "";
-			if( i > 0 ) {
-			    extension = trackFile.toString().substring(i+1).toLowerCase();
-			}
-			
-			if ( extension.matches( "aac" ) || extension.matches( "m4r" ) ) {
-				//TODO: Do this better
-				audioFile = AudioFileIO.readAs( trackFile, "m4a" );
-				
-			} else {
-				audioFile = AudioFileIO.read( trackFile );
-			}
+			AudioFile audioFile = getAudioFile();
 			
 			length = audioFile.getAudioHeader().getTrackLength();
 			tag = audioFile.getTag();
@@ -118,6 +123,23 @@ public class Track implements Serializable {
 		}
 		
 		parseFileName();
+	}
+	
+	private AudioFile getAudioFile() throws IOException, CannotReadException, TagException, ReadOnlyFileException, InvalidAudioFrameException {
+		int i = trackFile.toString().lastIndexOf('.');
+		String extension = "";
+		if( i > 0 ) {
+		    extension = trackFile.toString().substring(i+1).toLowerCase();
+		}
+		
+		if ( extension.matches( "aac" ) || extension.matches( "m4r" ) ) {
+			//TODO: Do this better
+			return AudioFileIO.readAs( trackFile, "m4a" );
+			
+		} else {
+			return AudioFileIO.read( trackFile );
+		}
+		
 	}
 	
 	private void parseFileName () {
@@ -474,6 +496,145 @@ public class Track implements Serializable {
 		Track compareTo = (Track) o;
 		
 		return ( compareTo.getPath().toAbsolutePath().equals( getPath().toAbsolutePath() ) );
+	}
+	
+	//TODO: Move this to track.GetAlbumCover()
+	public Image getAlbumCoverImage ( ) {
+		
+		if ( this.getPath().getParent() == null ) return null;
+		
+		ArrayList <Path> preferredFiles = new ArrayList <Path> ();
+		
+		preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "front.jpg" ) );
+		preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "front.png" ) );
+		preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "cover.jpg" ) );
+		preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "cover.png" ) );
+		preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "album.jpg" ) );
+		preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "album.png" ) );
+		
+		for ( Path test : preferredFiles ) {
+			if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
+				return new Image( test.toUri().toString() );
+			}
+		}
+		
+		Image coverImage = null;
+		Image backImage = null;
+		Image otherImage = null;
+		Image mediaImage = null;
+		
+		try {
+			List<Artwork> artworkList = getAudioFile().getTag().getArtworkList();
+			if ( artworkList != null ) {
+				for ( Artwork artwork : artworkList ) {
+					if ( artwork.getPictureType() == 3 ) {	
+						coverImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
+					} else if ( artwork.getPictureType() == 0 ) {
+						otherImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
+					} else if ( artwork.getPictureType() == 4 ) {
+						backImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
+					} else if ( artwork.getPictureType() == 6 ) {
+						mediaImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
+					}
+				}
+			}			
+			
+		} catch ( IOException | CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if ( coverImage != null ) return coverImage;
+		if ( mediaImage != null ) return mediaImage;
+		if ( otherImage != null ) return otherImage;
+
+		ArrayList<Path> otherFiles = new ArrayList<Path>();
+		try {
+			DirectoryStream <Path> albumDirectoryStream = Files.newDirectoryStream ( this.getPath().getParent(), imageFileFilter );
+			for ( Path imagePath : albumDirectoryStream ) { otherFiles.add( imagePath ); }
+		
+		} catch ( IOException e ) {
+			//TODO: I think we can ignore this one. 
+		}
+		
+		for ( Path test : otherFiles ) {
+			if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
+				return new Image( test.toUri().toString() );
+			}
+		}
+		
+		if ( backImage != null ) return backImage; //TODO: Do we really want this, I don't know man. 
+		
+		return null;
+	}
+	
+	
+
+	public Image getAlbumArtistImagePath ( ) {
+
+		if ( this.getPath().getParent() == null ) return null;
+		
+		Path targetPath = this.getPath().toAbsolutePath();
+
+		
+		ArrayList <Path> possibleFiles = new ArrayList <Path> ();
+		possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.jpg" ) );
+		possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.png" ) );
+		possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.gif" ) );
+		possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.jpg" ) );
+		possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.png" ) );
+		possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.gif" ) );
+		
+		for ( Path test : possibleFiles ) {
+			if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
+				return new Image( test.toUri().toString() );
+			}
+		}
+		
+		//TODO: it would be nice to test this code (the stuff that loads these four images). 
+		Image leadArtistImage = null;
+		Image artistImage = null;
+		Image writerImage = null;
+		Image logoImage = null;
+		
+		try {
+			List<Artwork> artworkList = getAudioFile().getTag().getArtworkList();
+			if ( artworkList != null ) {
+				for ( Artwork artwork : artworkList ) {
+					if ( artwork.getPictureType() == 7 ) {	
+						leadArtistImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
+					} else if ( artwork.getPictureType() == 8 ) {
+						artistImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
+					} else if ( artwork.getPictureType() == 12 ) {
+						writerImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
+					} else if ( artwork.getPictureType() == 13 ) {
+						logoImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
+					}
+				}
+			}			
+			
+		} catch ( IOException | CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if ( leadArtistImage != null ) return leadArtistImage;
+		if ( artistImage != null ) return artistImage;
+		if ( writerImage != null ) return writerImage;
+		if ( logoImage != null ) return logoImage;
+		
+
+		ArrayList <Path> otherFiles = new ArrayList <Path> ();
+		try {
+			DirectoryStream <Path> artistDirectoryStream = Files.newDirectoryStream ( targetPath.getParent().getParent(), imageFileFilter );
+			for ( Path imagePath : artistDirectoryStream ) { otherFiles.add( imagePath ); }
+		
+		} catch ( IOException e ) {
+			//TODO: I think we can ignore this one. 
+		}
+
+		
+		return null;
 	}
 }
 
