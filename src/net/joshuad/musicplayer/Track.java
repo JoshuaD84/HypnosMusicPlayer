@@ -551,7 +551,11 @@ public class Track implements Serializable {
 		ArrayList<Path> otherFiles = new ArrayList<Path>();
 		try {
 			DirectoryStream <Path> albumDirectoryStream = Files.newDirectoryStream ( this.getPath().getParent(), imageFileFilter );
-			for ( Path imagePath : albumDirectoryStream ) { otherFiles.add( imagePath ); }
+			for ( Path imagePath : albumDirectoryStream ) { 
+				if ( !imagePath.toString().toLowerCase().matches( ".*artist\\.\\w{3,6}$" ) ) {
+					otherFiles.add( imagePath ); 
+				}
+			}
 		
 		} catch ( IOException e ) {
 			//TODO: I think we can ignore this one. 

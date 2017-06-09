@@ -13,16 +13,12 @@ Log files are messy, not handled right.
 
 track buffering, so there's a cushion in case reading becomes spotty
 
-Make sure artist image isn't also used for album image
-
 Make sure horizontal scroll bars never appear
 	6/9 - Can't find anything on google.
 	
 Lyrics?
 
 Hot Keys
-
-Read artwork from tags if available. 
 
 Artwork drag and drop
 
@@ -35,8 +31,9 @@ Re-architect the current playing info box
 UIUpdaterThread is too aggressive. Causing lag on my computer
 
 Tray icon
-	Gnome 3 doesn't support. Code works but is really bad. Need to make it toggleable
-	What other systems don't? How to handle? 
+	Gnome 3 doesn't support. Code works but creates a bad entry on taskbar.
+	What systems do support? 
+	What other systems don't support? How to handle? 
 	
 m3u support
 
@@ -70,9 +67,6 @@ OSX
 	Does our package work? 
 	Open-with shell integration
 	.DMG installer
-
-
-
 
 
 Useful UTF Characters
