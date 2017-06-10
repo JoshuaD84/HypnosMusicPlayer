@@ -128,9 +128,9 @@ public class OggPlayer extends AbstractPlayer implements Runnable {
 	
 	private void updateTransport() {
 		if ( seekRequestPercent == NO_SEEK_REQUESTED ) {
-			double positionPercent = (double) ( audioOutput.getMicrosecondPosition() + clipStartTime * 1000 ) / ( (double) track.getLength() * 1000000 );
-			int timeElapsed = (int)(track.getLength() * positionPercent);
-			int timeRemaining = track.getLength() - timeElapsed;
+			double positionPercent = (double) ( audioOutput.getMicrosecondPosition() + clipStartTime * 1000 ) / ( (double) track.getLengthS() * 1000000 );
+			int timeElapsed = (int)(track.getLengthS() * positionPercent);
+			int timeRemaining = track.getLengthS() - timeElapsed;
 			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, positionPercent );
 		}
 	}
@@ -140,7 +140,7 @@ public class OggPlayer extends AbstractPlayer implements Runnable {
 		encodedInput = AudioSystem.getAudioInputStream( track.getPath().toFile() );
 		
 		if ( seekRequestPercent != NO_SEEK_REQUESTED ) {
-			int seekPositionMS = (int) ( track.getLength() * 1000 * seekRequestPercent );
+			int seekPositionMS = (int) ( track.getLengthS() * 1000 * seekRequestPercent );
 			long seekPositionByte = getBytePosition ( track.getPath().toFile(), seekPositionMS );
 			byte[] data = new byte[ (int) seekPositionByte ]; 
 			int bytesRead = encodedInput.read ( data, 0, data.length ); //For some reason, skip() doesn't work as well. 
@@ -178,6 +178,11 @@ public class OggPlayer extends AbstractPlayer implements Runnable {
 		}
 	}
 	
+	@Override
+	public long getPositionMS() {
+		return (long)( audioOutput.getMicrosecondPosition() / 1e6 );
+	}
+	
 	@Override 
 	public void pause() {
 		pauseRequested = true;
@@ -194,8 +199,13 @@ public class OggPlayer extends AbstractPlayer implements Runnable {
 	}
 	
 	@Override 
-	public void seek ( double positionPercent ) {
+	public void seekPercent ( double positionPercent ) {
 		seekRequestPercent = positionPercent;
+	}
+	
+	@Override 
+	public void seekMS ( long milliseconds ) {
+		seekRequestPercent = milliseconds / ( track.getLengthS() * 1000 );
 	}
 
 	@Override

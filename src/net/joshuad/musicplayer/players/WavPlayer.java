@@ -140,13 +140,13 @@ public class WavPlayer extends AbstractPlayer implements Runnable {
 		
 		if ( seekRequestPercent == NO_SEEK_REQUESTED ) {
 			//System.out.println ( "Clip start time: " + clipStartTime );
-			double positionPercent = (double) ( audioOutput.getMicrosecondPosition() + clipStartTime * 1000 ) / ( (double) track.getLength() * 1000000 );
-			int timeElapsed = (int)(track.getLength() * positionPercent);
-			int timeRemaining = track.getLength() - timeElapsed;
+			double positionPercent = (double) ( audioOutput.getMicrosecondPosition() + clipStartTime * 1000 ) / ( (double) track.getLengthS() * 1000000 );
+			int timeElapsed = (int)(track.getLengthS() * positionPercent);
+			int timeRemaining = track.getLengthS() - timeElapsed;
 			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, positionPercent );
 		} else {
-			int timeElapsed = (int)(track.getLength() * seekRequestPercent);
-			int timeRemaining = track.getLength() - timeElapsed;
+			int timeElapsed = (int)(track.getLengthS() * seekRequestPercent);
+			int timeRemaining = track.getLengthS() - timeElapsed;
 			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, seekRequestPercent );
 		}
 	}
@@ -155,7 +155,7 @@ public class WavPlayer extends AbstractPlayer implements Runnable {
 		decodedInput = AudioSystem.getAudioInputStream( track.getPath().toFile() );
 		
 		if ( seekRequestPercent != NO_SEEK_REQUESTED ) {
-			int seekPositionMS = (int) ( track.getLength() * 1000 * seekRequestPercent );
+			int seekPositionMS = (int) ( track.getLengthS() * 1000 * seekRequestPercent );
 			long bytesRead = decodedInput.skip ( getBytePosition ( seekPositionMS ) );
 			clipStartTime = seekPositionMS;
 		}
@@ -196,6 +196,12 @@ public class WavPlayer extends AbstractPlayer implements Runnable {
 			e.printStackTrace();
 		}
 	}
+	
+	@Override
+	public long getPositionMS() {
+		return (long)( audioOutput.getMicrosecondPosition() / 1e6 );
+	}
+	
 
 	@Override 
 	public void pause() {
@@ -213,9 +219,14 @@ public class WavPlayer extends AbstractPlayer implements Runnable {
 	}
 	
 	@Override 
-	public void seek ( double positionPercent ) {
+	public void seekPercent ( double positionPercent ) {
 		seekRequestPercent = positionPercent;
 		updateTransport();
+	}
+	
+	@Override 
+	public void seekMS ( long milliseconds ) {
+		seekRequestPercent = milliseconds / ( track.getLengthS() * 1000 );
 	}
 
 	@Override

@@ -120,13 +120,13 @@ public class MP4Player extends AbstractPlayer implements Runnable {
 	
 	private void updateTransport() {
 		if ( seekRequestPercent == NO_SEEK_REQUESTED ) {
-			double positionPercent = (double) ( audioOutput.getMicrosecondPosition() + clipStartTime * 1000 ) / ( (double) track.getLength() * 1000000 );
-			int timeElapsed = (int)(track.getLength() * positionPercent);
-			int timeRemaining = track.getLength() - timeElapsed;
+			double positionPercent = (double) ( audioOutput.getMicrosecondPosition() + clipStartTime * 1000 ) / ( (double) track.getLengthS() * 1000000 );
+			int timeElapsed = (int)(track.getLengthS() * positionPercent);
+			int timeRemaining = track.getLengthS() - timeElapsed;
 			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, positionPercent );
 		} else {
-			int timeElapsed = (int)(track.getLength() * seekRequestPercent);
-			int timeRemaining = track.getLength() - timeElapsed;
+			int timeElapsed = (int)(track.getLengthS() * seekRequestPercent);
+			int timeRemaining = track.getLengthS() - timeElapsed;
 			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, seekRequestPercent );
 		}
 	}
@@ -188,6 +188,12 @@ public class MP4Player extends AbstractPlayer implements Runnable {
 		audioOutput.close();
 	}
 	
+	
+	@Override
+	public long getPositionMS() {
+		return (long)( audioOutput.getMicrosecondPosition() / 1e6 );
+	}
+	
 	@Override 
 	public void pause() {
 		pauseRequested = true;
@@ -204,9 +210,14 @@ public class MP4Player extends AbstractPlayer implements Runnable {
 	}
 	
 	@Override 
-	public void seek ( double positionPercent ) {
+	public void seekPercent ( double positionPercent ) {
 		seekRequestPercent = positionPercent;
 		updateTransport();
+	}
+	
+	@Override 
+	public void seekMS ( long milliseconds ) {
+		seekRequestPercent = milliseconds / ( track.getLengthS() * 1000 );
 	}
 
 	@Override

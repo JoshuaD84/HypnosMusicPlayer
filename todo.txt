@@ -2,16 +2,11 @@ Better serialization for playlists -- I think I'm OK with using serializable for
 
 Embed and use a font with all needed UTF glyphs
 
-Persist the rest of the UI
-	Shuffle / Repeat
-	Windows Size
-	Internal divider positions
-	sort orders?
-	Track-album checkbox
-
 Log files are messy, not handled right. 
 
 track buffering, so there's a cushion in case reading becomes spotty
+
+CurrentListSplitPane starts at 100% divider position when window is maximized
 
 Make sure horizontal scroll bars never appear
 	6/9 - Can't find anything on google.
@@ -22,13 +17,15 @@ Hot Keys
 
 Artwork drag and drop
 
-Parse discogs tags?
+Any other tags we should look at? Does discogs have special tags like musicbrainz? 
 
 Redesign the transport
 
 Re-architect the current playing info box
 
 UIUpdaterThread is too aggressive. Causing lag on my computer
+
+Have a single thread handle playing all tracks. Have it be the same thread that accepts requests rather than spawning new threads off UI actions. 
 
 Tray icon
 	Gnome 3 doesn't support. Code works but creates a bad entry on taskbar.
@@ -38,6 +35,12 @@ Tray icon
 m3u support
 
 Volume control
+
+Persist the History? I think it might be better to just make it for this session
+
+Refactor / organize my code. 
+   Separate player / ui systems. 
+   
 
 Decoders
 	Ogg

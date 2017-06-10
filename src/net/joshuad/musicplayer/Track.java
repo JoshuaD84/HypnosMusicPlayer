@@ -415,7 +415,7 @@ public class Track implements Serializable {
 		return trackNumber;
 	}	
 	
-	public int getLength () {
+	public int getLengthS () {
 		return length;
 	}
 	
@@ -428,7 +428,7 @@ public class Track implements Serializable {
 	}
 	
 	public String getLengthDisplay () {
-		return Utils.getLengthDisplay( getLength () );
+		return Utils.getLengthDisplay( getLengthS () );
 	}
 	
 	public String getShortEncodingString() {

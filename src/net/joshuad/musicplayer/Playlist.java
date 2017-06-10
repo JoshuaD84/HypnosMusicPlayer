@@ -31,7 +31,7 @@ public class Playlist implements Serializable {
 	public int getLength() {
 		int retMe = 0;
 		for ( Track track : tracks ) {
-			if ( track != null ) retMe += track.getLength ();
+			if ( track != null ) retMe += track.getLengthS ();
 		}
 		
 		return retMe;

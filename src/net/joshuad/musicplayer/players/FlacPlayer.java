@@ -25,7 +25,6 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 	Slider trackPosition;
 	
 	public FlacPlayer ( Track track, Slider trackPositionSlider, boolean startPaused ) throws IOException, LineUnavailableException {
-		System.out.println ( "In constructor" ); //TODO: DD
 		this.track = track;
 		this.trackPosition = trackPositionSlider;
 		this.pauseRequested = startPaused;
@@ -154,11 +153,15 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 			if ( seekRequestPercent == -1 && !stopRequested ) {
 				double timePos = ( audioOutput.getMicrosecondPosition() - clipStartTime ) / 1e6;
 				double positionPercent = timePos * decodedInput.sampleRate / decodedInput.numSamples;
-				int timeElapsed = (int)(track.getLength() * positionPercent);
-				int timeRemaining = track.getLength() - timeElapsed;
+				int timeElapsed = (int)(track.getLengthS() * positionPercent);
+				int timeRemaining = track.getLengthS() - timeElapsed;
 				MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, positionPercent );
 			}
 		}
+	}
+	
+	public long getPositionMS() {
+		return (long)( audioOutput.getMicrosecondPosition() / 1e6 );
 	}
 	
 	private void closeAllResources()  {
@@ -189,8 +192,13 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 	}
 	
 	@Override 
-	public void seek ( double positionPercent ) {
+	public void seekPercent ( double positionPercent ) {
 		seekRequestPercent = positionPercent;
+	}
+	
+	@Override 
+	public void seekMS ( long milliseconds ) {
+		seekRequestPercent = milliseconds / ( track.getLengthS() * 1000 );
 	}
 	
 	@Override 

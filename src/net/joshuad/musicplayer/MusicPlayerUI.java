@@ -136,6 +136,9 @@ public class MusicPlayerUI extends Application {
 	static BorderPane albumImage;
 	static BorderPane artistImage;
 	
+	static SplitPane primarySplitPane;
+	static SplitPane currentListSplitPane;
+	
 	static ImageView playImage;
 	static ImageView pauseImage;
 
@@ -568,17 +571,40 @@ public class MusicPlayerUI extends Application {
 	}
 	
 	public static void loadTrack ( Track track ) {
+		loadTrack ( track, false );
+	}
+	
+	public static void loadTrack ( Track track, boolean startPaused ) {
 		ArrayList<Track> loadMe = new ArrayList <Track> ( 1 );
 		loadMe.add ( track );
-		loadTracks ( loadMe );
+		loadTracks ( loadMe, startPaused );
+	}
+	
+	public static void loadTrack ( String trackFile ) {
+		loadTrack ( trackFile, false );
+	}
+	
+	public static void loadTrack ( String trackFile, boolean startPaused ) {
+		try {
+			ArrayList<Track> loadMe = new ArrayList <Track> ( 1 );
+			loadMe.add ( new Track ( Paths.get( trackFile ) ) );
+			loadTracks ( loadMe, startPaused );
+		} catch ( IOException e ) {
+			System.out.println( "Unable to load track: " + trackFile + ", continuing." );
+			System.out.println( e.getMessage() );
+		}
+	}
+	
+	public static void loadTracks ( List <Track> tracks ) {
+		loadTracks ( tracks, false );
 	}
 
-	public static void loadTracks ( List <Track> tracks ) {
+	public static void loadTracks ( List <Track> tracks, boolean startPaused ) {
 		currentListTable.getItems().clear();
 		currentListTable.getItems().addAll( Utils.convertTrackList( tracks ) );
 		currentPlayingListInfo.setText( "Playlist: New" );
 		if ( !currentListTable.getItems().isEmpty() ) {
-			playTrack( currentListTable.getItems().get( 0 ) );
+			playTrack( currentListTable.getItems().get( 0 ), startPaused );
 		}
 		currentPlaylist = null;
 	}
@@ -764,7 +790,7 @@ public class MusicPlayerUI extends Application {
 					Boolean isNowChanging ) {
 				if ( !isNowChanging ) {
 					if ( currentPlayer != null ) {
-						currentPlayer.seek(
+						currentPlayer.seekPercent(
 								trackPositionSlider.getValue() / trackPositionSlider.getMax() );
 					}
 				}
@@ -778,7 +804,7 @@ public class MusicPlayerUI extends Application {
 		trackPositionSlider.setOnMouseReleased( ( MouseEvent e ) -> {
 			sliderMouseHeld = false;
 			if ( currentPlayer != null ) {
-				currentPlayer.seek( trackPositionSlider.getValue() / trackPositionSlider.getMax() );
+				currentPlayer.seekPercent( trackPositionSlider.getValue() / trackPositionSlider.getMax() );
 			}
 		} );
 
@@ -3246,6 +3272,65 @@ public class MusicPlayerUI extends Application {
 		}
 	}
 	
+
+	public static void setShuffleMode ( final ShuffleMode newMode ) {
+		Platform.runLater( () -> {
+			shuffleMode = newMode;
+			toggleShuffleButton.setText( shuffleMode.getSymbol() );
+		});
+	}
+	
+	public static void setRepeatMode ( final RepeatMode newMode ) {
+		Platform.runLater( () -> {
+			repeatMode = newMode;
+			toggleRepeatButton.setText( repeatMode.getSymbol() );
+		});
+	}
+	
+	public static void setShowAlbumTracks ( final boolean newValue ) {
+		Platform.runLater( () -> {
+			trackListCheckBox.setSelected( newValue );
+		});
+	}
+	
+	public static double getPrimarySplitPercent() {
+		return primarySplitPane.getDividerPositions()[0];
+	}
+	
+	public static void setPrimarySplitPercent ( double value ) {
+		Platform.runLater( () -> {
+			primarySplitPane.setDividerPosition( 0, value );
+		});
+	}
+	
+	public static double getCurrentListSplitPercent() {
+		return currentListSplitPane.getDividerPositions()[0];
+	}
+	
+	public static void setCurrentListSplitPercent ( double value ) {
+		Platform.runLater( () -> {
+			currentListSplitPane.setDividerPosition( 0, value );
+		});
+	}
+	
+	public static double getArtSplitPercent() {
+		return artSplitPane.getDividerPositions()[0];
+	}
+	
+	public static void setArtSplitPercent ( double value ) {
+		Platform.runLater( () -> {
+			artSplitPane.setDividerPosition( 0, value );
+		});
+	}
+	
+	public static boolean isMaximized () {
+		return mainStage.isMaximized();
+	}
+	
+	public static void setMaximized( boolean value ) {
+		mainStage.setMaximized( value );
+	}
+	
 	@Override
 	public void start ( Stage stage ) {
 		
@@ -3345,9 +3430,9 @@ public class MusicPlayerUI extends Application {
 		currentPlayingPane.setTop( playlistControls );
 		currentPlayingPane.setCenter( currentListTable );
 
-		SplitPane playingArtSplitPane = new SplitPane();
-		playingArtSplitPane.setOrientation( Orientation.VERTICAL );
-		playingArtSplitPane.getItems().addAll( currentPlayingPane, artSplitPane );
+		currentListSplitPane = new SplitPane();
+		currentListSplitPane.setOrientation( Orientation.VERTICAL );
+		currentListSplitPane.getItems().addAll( currentPlayingPane, artSplitPane );
 
 		BorderPane albumListPane = new BorderPane();
 		albumFilterPane.prefWidthProperty().bind( albumListPane.widthProperty() );
@@ -3381,8 +3466,8 @@ public class MusicPlayerUI extends Application {
 		leftTabPane.getTabs().addAll( albumListTab, songListTab, playlistTab );
 		leftTabPane.setSide( Side.BOTTOM );
 
-		SplitPane primarySplitPane = new SplitPane();
-		primarySplitPane.getItems().addAll( leftTabPane, playingArtSplitPane );
+		primarySplitPane = new SplitPane();
+		primarySplitPane.getItems().addAll( leftTabPane, currentListSplitPane );
 
 		final BorderPane primaryContainer = new BorderPane();
 
@@ -3412,7 +3497,7 @@ public class MusicPlayerUI extends Application {
 		thumb.setVisible( false );
 
 		primarySplitPane.setDividerPositions( .35d );
-		playingArtSplitPane.setDividerPositions( .65d );
+		currentListSplitPane.setDividerPositions( .65d );
 		artSplitPane.setDividerPosition( 0, .51d ); // For some reason .5 doesn't work...
 
 		// TODO: This is such a crappy hack

@@ -1,14 +1,19 @@
 package net.joshuad.musicplayer;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -92,7 +97,10 @@ public class Persister {
 	static File sourcesFile = new File ( configDirectory + File.separator + "sources" );
 	static File playlistsFile = new File ( configDirectory + File.separator + "playlists" );
 	static File currentFile = new File ( configDirectory + File.separator + "current" );
+	static File queueFile = new File ( configDirectory + File.separator + "queue" );
+	static File historyFile = new File ( configDirectory + File.separator + "history" );
 	static File dataFile = new File ( configDirectory + File.separator + "data" );
+	static File settingsFile = new File ( configDirectory + File.separator + "setting" );
 	
 	
 	private static void createNecessaryFolders() {	
@@ -120,7 +128,7 @@ public class Persister {
 				Library.requestUpdateSource( Paths.get( pathString ) );
 			}
 		} catch ( FileNotFoundException e ) {
-			System.out.println ( "File not found: info.sources, unable to load library source location list, continuing." );
+			System.out.println ( "File not found: sources, unable to load library source location list, continuing." );
 		} catch ( IOException | ClassNotFoundException e ) {
 			e.printStackTrace(); //TODO: 
 		}
@@ -130,22 +138,37 @@ public class Persister {
 		) {
 			MusicPlayerUI.currentListData.addAll( (ArrayList<CurrentListTrack>) currentListIn.readObject() );
 		} catch ( FileNotFoundException e ) {
-			System.out.println ( "File not found: info.current, unable to load current playlist, continuing." );
+			System.out.println ( "File not found: current, unable to load current playlist, continuing." );
 		} catch ( IOException | ClassNotFoundException e ) {
 			//TODO: 
 			e.printStackTrace();
 		}
 		
 		try (
-				ObjectInputStream playlistsIn = new ObjectInputStream( new FileInputStream( playlistsFile ) );
+				ObjectInputStream queueIn = new ObjectInputStream( new FileInputStream( queueFile ) );
 		) {
-			Library.addPlaylists ( (ArrayList<Playlist>) playlistsIn.readObject() );
+			Queue.addAllTracks( (ArrayList<Track>) queueIn.readObject() );
 		} catch ( FileNotFoundException e ) {
-			System.out.println ( "File not found: info.playlists, unable to load custom playlist data, continuing." );
+			System.out.println ( "File not found: current, unable to load queue, continuing." );
 		} catch ( IOException | ClassNotFoundException e ) {
 			//TODO: 
 			e.printStackTrace();
 		}
+		
+		//TODO: link any tracks that are in the queue and also in the current list. 
+		
+		try (
+				ObjectInputStream playlistsIn = new ObjectInputStream( new FileInputStream( playlistsFile ) );
+		) {
+			Library.addPlaylists ( (ArrayList<Playlist>) playlistsIn.readObject() );
+		} catch ( FileNotFoundException e ) {
+			System.out.println ( "File not found: playlists, unable to load custom playlist data, continuing." );
+		} catch ( IOException | ClassNotFoundException e ) {
+			//TODO: 
+			e.printStackTrace();
+		}
+		
+		readSettings();
 	}
 
 	static void saveData() {
@@ -187,6 +210,16 @@ public class Persister {
 			e.printStackTrace();
 		}
 		
+		try ( 
+				ObjectOutputStream queueListOut = new ObjectOutputStream ( new FileOutputStream ( queueFile ) );
+		) {
+			queueListOut.writeObject( new ArrayList <Track> ( Arrays.asList( Queue.getData().toArray( new Track[ Queue.getData().size() ] ) ) ) );
+			queueListOut.flush();
+			
+		} catch ( IOException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		try ( 
 				ObjectOutputStream playlistsOut = new ObjectOutputStream ( new FileOutputStream ( playlistsFile ) );
@@ -197,6 +230,8 @@ public class Persister {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		saveSettings();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -239,4 +274,136 @@ public class Persister {
 			e.printStackTrace();
 		}
 	}
+	
+	//TODO: Move these up top
+	private static final String SETTING_TAG_SHUFFLE = "Shuffle";
+	private static final String SETTING_TAG_REPEAT = "Repeat";
+	private static final String SETTING_TAG_HIDE_ALBUM_TRACKS = "HideAlbumTracks";
+	private static final String SETTING_TAG_WINDOW_MAXIMIZED = "WindowMaximized";
+	private static final String SETTING_TAG_PRIMARY_SPLIT_PERCENT = "PrimaryPaneSplitPercent";
+	private static final String SETTING_TAG_CURRENT_LIST_SPLIT_PERCENT = "CurrentListPaneSplitPercent";
+	private static final String SETTING_TAG_ART_SPLIT_PERCENT = "ArtPaneSplitPercent";
+	private static final String SETTING_TAG_WINDOW_X_POSITION = "WindowX";
+	private static final String SETTING_TAG_WINDOW_Y_POSITION = "WindowY";
+	private static final String SETTING_TAG_WINDOW_WIDTH = "WindowWidth";
+	private static final String SETTING_TAG_WINDOW_HEIGHT = "WindowHeight";
+	private static final String SETTING_TAG_TRACK = "CurrentTrack";
+	private static final String SETTING_TAG_TRACK_POSITION = "CurrentTrackPosition";
+	
+	
+	private static void saveSettings() {
+		try ( 
+				FileWriter fileWriter = new FileWriter( settingsFile );
+		) {
+			PrintWriter settingsOut = new PrintWriter( new BufferedWriter( fileWriter ) );
+			
+			if ( MusicPlayerUI.currentPlayer != null ) {
+				settingsOut.printf( "%s: %s\n", SETTING_TAG_TRACK, MusicPlayerUI.currentPlayer.getTrack().getPath().toString() );
+				settingsOut.printf( "%s: %s\n", SETTING_TAG_TRACK_POSITION, MusicPlayerUI.currentPlayer.getPositionMS() );
+			} 
+			
+			settingsOut.printf( "%s: %s\n", SETTING_TAG_SHUFFLE, MusicPlayerUI.shuffleMode.toString() );
+			settingsOut.printf( "%s: %s\n", SETTING_TAG_REPEAT, MusicPlayerUI.repeatMode.toString() );
+			settingsOut.printf( "%s: %b\n", SETTING_TAG_HIDE_ALBUM_TRACKS, MusicPlayerUI.trackListCheckBox.isSelected() );
+			settingsOut.printf( "%s: %b\n", SETTING_TAG_WINDOW_MAXIMIZED, MusicPlayerUI.isMaximized() );
+			settingsOut.printf( "%s: %f\n", SETTING_TAG_WINDOW_X_POSITION, MusicPlayerUI.mainStage.getX() );
+			settingsOut.printf( "%s: %f\n", SETTING_TAG_WINDOW_Y_POSITION, MusicPlayerUI.mainStage.getY() );
+			settingsOut.printf( "%s: %f\n", SETTING_TAG_WINDOW_WIDTH, MusicPlayerUI.mainStage.getWidth() );
+			settingsOut.printf( "%s: %f\n", SETTING_TAG_WINDOW_HEIGHT, MusicPlayerUI.mainStage.getHeight() );
+			settingsOut.printf( "%s: %f\n", SETTING_TAG_PRIMARY_SPLIT_PERCENT, MusicPlayerUI.getPrimarySplitPercent() );
+			settingsOut.printf( "%s: %f\n", SETTING_TAG_CURRENT_LIST_SPLIT_PERCENT, MusicPlayerUI.getCurrentListSplitPercent() );
+			settingsOut.printf( "%s: %f\n", SETTING_TAG_ART_SPLIT_PERCENT, MusicPlayerUI.getArtSplitPercent() );
+			
+			settingsOut.flush();
+			
+		} catch ( IOException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private static void readSettings() {
+
+		try (
+				FileReader fileReader = new FileReader( settingsFile );
+		) {
+
+			BufferedReader settingsIn = new BufferedReader ( fileReader );
+			
+			for ( String line; (line = settingsIn.readLine()) != null; ) {
+				String tag = line.split(":\\s+")[0];
+				System.out.println ( "Tag: " + tag );
+				String value = line.split(":\\s+")[1];
+				
+				try {
+					switch ( tag ) {
+						case SETTING_TAG_TRACK:
+							MusicPlayerUI.loadTrack( value, true );
+							break;
+							
+						case SETTING_TAG_TRACK_POSITION:
+							if ( MusicPlayerUI.currentPlayer != null ) {
+								MusicPlayerUI.currentPlayer.seekMS( Long.parseLong( value ) );
+							}
+							break;
+							
+						case SETTING_TAG_SHUFFLE:
+							MusicPlayerUI.setShuffleMode ( MusicPlayerUI.ShuffleMode.valueOf( value ) );
+							break;
+							
+						case SETTING_TAG_REPEAT:
+							MusicPlayerUI.setRepeatMode ( MusicPlayerUI.RepeatMode.valueOf( value ) );
+							break;
+							
+						case SETTING_TAG_HIDE_ALBUM_TRACKS:
+							MusicPlayerUI.setShowAlbumTracks ( Boolean.valueOf( value ) );
+							break;		
+							
+						case SETTING_TAG_WINDOW_X_POSITION:
+							MusicPlayerUI.mainStage.setX( Double.valueOf( value ) );
+							break;
+							
+						case SETTING_TAG_WINDOW_Y_POSITION:
+							MusicPlayerUI.mainStage.setY( Double.valueOf( value ) );
+							break;
+							
+						case SETTING_TAG_WINDOW_WIDTH:
+							MusicPlayerUI.mainStage.setWidth( Double.valueOf( value ) );
+							break;
+							
+						case SETTING_TAG_WINDOW_HEIGHT:
+							MusicPlayerUI.mainStage.setHeight( Double.valueOf( value ) );
+							break;
+							
+						case SETTING_TAG_WINDOW_MAXIMIZED:
+							MusicPlayerUI.setMaximized ( Boolean.valueOf( value ) );
+							break;
+							
+						case SETTING_TAG_PRIMARY_SPLIT_PERCENT:
+							MusicPlayerUI.setPrimarySplitPercent ( Double.valueOf( value ) );
+							break;
+							
+						case SETTING_TAG_CURRENT_LIST_SPLIT_PERCENT:
+							MusicPlayerUI.setCurrentListSplitPercent ( Double.valueOf( value ) );
+							break;
+							
+						case SETTING_TAG_ART_SPLIT_PERCENT:
+							MusicPlayerUI.setArtSplitPercent ( Double.valueOf( value ) );
+							break;
+							
+					}
+				} catch ( Exception e ) {
+					e.printStackTrace( System.out );
+					System.out.println ( "Unable to parse settings tag: " + tag + ", continuing." );
+				}
+			}
+			
+		} catch ( FileNotFoundException e ) {
+			System.out.println ( "File not found: settings, unable to load user settings, using defaults. Continuing." );
+		} catch ( IOException e ) {
+			//TODO: 
+			e.printStackTrace();
+		}
+	}
+		
 }

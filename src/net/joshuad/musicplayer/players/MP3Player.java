@@ -135,13 +135,13 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	
 	private void updateTransport() {
 		if ( seekRequestPercent == NO_SEEK_REQUESTED ) {
-			double positionPercent = (double) ( audioOut.getPosition() + clipStartTimeMS ) / ( (double) track.getLength() * 1000 );
-			int timeElapsed = (int)(track.getLength() * positionPercent);
-			int timeRemaining = track.getLength() - timeElapsed;
+			double positionPercent = (double) ( audioOut.getPosition() + clipStartTimeMS ) / ( (double) track.getLengthS() * 1000 );
+			int timeElapsed = (int)(track.getLengthS() * positionPercent);
+			int timeRemaining = track.getLengthS() - timeElapsed;
 			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, positionPercent );
 		} else {
-			int timeElapsed = (int)(track.getLength() * seekRequestPercent);
-			int timeRemaining = track.getLength() - timeElapsed;
+			int timeElapsed = (int)(track.getLengthS() * seekRequestPercent);
+			int timeRemaining = track.getLengthS() - timeElapsed;
 			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, seekRequestPercent );
 		}
 	}
@@ -151,7 +151,7 @@ public class MP3Player extends AbstractPlayer implements Runnable {
         BufferedInputStream bis = new BufferedInputStream(fis);
 		
 		if ( seekRequestPercent != NO_SEEK_REQUESTED ) {
-			int seekPositionMS = (int) ( track.getLength() * 1000 * seekRequestPercent );
+			int seekPositionMS = (int) ( track.getLengthS() * 1000 * seekRequestPercent );
 			long seekPositionByte = getBytePosition ( track.getPath().toFile(), seekPositionMS );
 			bis.skip( seekPositionByte ); 
 			clipStartTimeMS = seekPositionMS;
@@ -212,7 +212,12 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 		}
 		return true;
 	}
-
+	
+	@Override
+	public long getPositionMS() {
+		return audioOut.getPosition() + clipStartTimeMS;
+	}
+	
 	@Override 
 	public void pause() {
 		pauseRequested = true;
@@ -229,9 +234,16 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	}
 	
 	@Override 
-	public void seek ( double positionPercent ) {
+	public void seekPercent ( double positionPercent ) {
 		seekRequestPercent = positionPercent;
 		updateTransport();
+	}
+	
+	@Override 
+	public void seekMS ( long milliseconds ) {
+		seekRequestPercent = milliseconds / (double)( track.getLengthS() * 1000 );	
+		System.out.println ( "\t" + milliseconds +"  / " + ( track.getLengthS() * 1000 ) );
+
 	}
 
 	@Override
