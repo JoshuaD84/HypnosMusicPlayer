@@ -292,37 +292,8 @@ public class Persister {
 				DirectoryStream <Path> stream = Files.newDirectoryStream( playlistsDirectory.toPath() ); 
 		) {
 			for ( Path child : stream ) {
-				if ( child.toString().toLowerCase().endsWith( ".m3u" ) ) {
-					
-					Playlist playlist = new Playlist( "NoName" );
-					
-					try (
-							FileReader fileReader = new FileReader( child.toFile() );
-					) {
-						BufferedReader m3uIn = new BufferedReader ( fileReader );
-						for ( String line; (line = m3uIn.readLine()) != null; ) {
-							if ( line.startsWith( "#Name:" ) ) {
-								String name = line.split( ":" )[1]; //TODO: OOB error checking on index
-								playlist.setName( name );
-							} else if ( line.isEmpty() ) {
-								//Do nothing
-								
-							} else if ( !line.startsWith( "#" ) ) {
-								try {
-									playlist.addTrack ( new Track ( Paths.get ( line ) ) );
-								} catch ( Exception e ) {
-									System.out.println ( "Error parsing line in playlist: " + child.toString() );
-									System.out.println ( "\tLine: " + line );
-								}
-							}
-								
-								
-						}
-					} catch ( Exception e ) {
-						System.out.println ( "Error loading: " + child.toString() );
-						e.printStackTrace();
-					}
-					
+				Playlist playlist = Playlist.loadPlaylist( child );
+				if ( playlist != null ) {
 					Library.addPlaylist( playlist );
 				}
 			}

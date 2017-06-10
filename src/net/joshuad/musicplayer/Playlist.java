@@ -1,6 +1,10 @@
 package net.joshuad.musicplayer;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.Serializable;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class Playlist implements Serializable {
@@ -18,6 +22,43 @@ public class Playlist implements Serializable {
 	public Playlist ( String name, ArrayList <Track> tracks ) {
 		setTracks( tracks );
 		this.name = name;
+	}
+
+	public static Playlist loadPlaylist ( Path path ) {
+		if ( path.toString().toLowerCase().endsWith( ".m3u" ) ) {
+			
+			Playlist playlist = new Playlist( "NoName" );
+			
+			try (
+					FileReader fileReader = new FileReader( path.toFile() );
+			) {
+				BufferedReader m3uIn = new BufferedReader ( fileReader );
+				for ( String line; (line = m3uIn.readLine()) != null; ) {
+					if ( line.startsWith( "#Name:" ) ) {
+						String name = line.split( ":" )[1]; //TODO: OOB error checking on index
+						playlist.setName( name );
+					} else if ( line.isEmpty() ) {
+						//Do nothing
+						
+					} else if ( !line.startsWith( "#" ) ) {
+						try {
+							playlist.addTrack ( new Track ( Paths.get ( line ) ) );
+						} catch ( Exception e ) {
+							System.out.println ( "Error parsing line in playlist: " + path.toString() + ", continuing." );
+							System.out.println ( "\tLine: " + line );
+						}
+					}
+						
+						
+				}
+			} catch ( Exception e ) {
+				System.out.println ( "Error loading: " + path.toString() );
+				e.printStackTrace();
+				return null;
+			}
+			return playlist;
+		}
+		return null;
 	}
 	
 	public String getName() {
@@ -57,5 +98,4 @@ public class Playlist implements Serializable {
 		if ( tracks == null ) tracks = new ArrayList <Track> ();
 		if ( track != null ) tracks.add ( track );
 	}
-		
 }

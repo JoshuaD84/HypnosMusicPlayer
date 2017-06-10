@@ -1,3 +1,5 @@
+Consider changing a lot of TransferMode.MOVE to TransferMode.COPY
+
 Load window position before showing window
 
 Embed and use a font with all needed UTF glyphs
@@ -9,6 +11,8 @@ Log files are messy, not handled right. Proper logging throughout program
 track buffering, so there's a cushion in case reading becomes spotty
 
 CurrentListSplitPane starts at 100% divider position when window is maximized
+
+Load folders to current list at CLI
 
 Make sure horizontal scroll bars never appear
 	6/9 - Can't find anything on google.
@@ -31,8 +35,6 @@ Tray icon
 	Gnome 3 doesn't support. Code works but creates a bad entry on taskbar.
 	What systems do support? 
 	What other systems don't support? How to handle? 
-	
-m3u support
 
 Volume control
 

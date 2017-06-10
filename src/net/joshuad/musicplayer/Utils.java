@@ -26,7 +26,7 @@ public class Utils {
 	
 	private static String[] musicExtStrings = new String[] { "flac", "mp3", "ogg", "m4a", "m4b", "m4r", "aac", "wav" }; //TODO: use Track.Format instead
 	private static String[] imageExtStrings = new String[] { "jpg", "png", "gif" };
-	
+	private static String[] playlistExtStrings = new String[] { "m3u" };
 		
 	static ArrayList <String> musicExtensions = new ArrayList <String> ( Arrays.asList ( musicExtStrings ) );  
 
@@ -117,7 +117,31 @@ public class Utils {
 		}
 		
 		return false;
-				
+	}
+	
+	public static boolean isPlaylistFile ( Path testFile ) {
+		String fileName = testFile.getFileName().toString();
+		
+		if ( !Files.exists( testFile ) ) {
+			return false;		
+		
+		} else if ( !Files.isRegularFile( testFile ) ) {
+			return false;
+		
+		} else if ( fileName.lastIndexOf(".") == -1 || fileName.lastIndexOf(".") == 0 ) {
+			return false;
+			
+		} 
+		
+		String testExtension = fileName.substring ( fileName.lastIndexOf( "." ) + 1 ).toLowerCase();
+		
+		for ( String playlistExtension : playlistExtStrings ) {
+			if ( playlistExtension.toLowerCase().equals( testExtension ) ) { 
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	public static String getLengthDisplay ( int lengthSeconds ) {

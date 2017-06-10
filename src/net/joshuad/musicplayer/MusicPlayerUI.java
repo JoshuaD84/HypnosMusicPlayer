@@ -116,7 +116,7 @@ public class MusicPlayerUI extends Application {
 	private static final int MAX_PREVIOUS_NEXT_STACK_SIZE = 10000;
 	private static final int MAX_HISTORY_SIZE = 100;
 
-	public static final DataFormat DRAGGED_TRACKS = new DataFormat( "application/x-java-track" );
+	public static final DataFormat DRAGGED_TRACKS = new DataFormat( "application/hypnos-java-track" );
 
 	public static final String PROGRAM_NAME = "Hypnos";
 
@@ -2687,6 +2687,40 @@ public class MusicPlayerUI extends Application {
 			}
 		});
 
+		playlistTable.setOnDragOver( event -> {
+			Dragboard db = event.getDragboard();
+			if ( db.hasFiles() ) {
+				//TODO: I can check for file extensions...
+				event.acceptTransferModes( TransferMode.COPY );
+				event.consume();
+			}
+		});
+		
+		playlistTable.setOnDragDropped( event -> {
+			Dragboard db = event.getDragboard();
+			if ( db.hasFiles() ) {
+				ArrayList <Playlist> playlistsToAdd = new ArrayList <Playlist> ();
+				
+				for ( File file : db.getFiles() ) {
+					Path droppedPath = Paths.get( file.getAbsolutePath() );
+					if ( Utils.isPlaylistFile ( droppedPath ) ) {
+						Playlist playlist = Playlist.loadPlaylist( droppedPath );
+						if ( playlist != null ) {
+							playlistsToAdd.add( playlist );
+						}
+					}
+				}
+				
+				if ( !playlistsToAdd.isEmpty() ) {
+					Library.playlists.addAll( playlistsToAdd );
+				}
+
+				event.setDropCompleted( true );
+				event.consume();
+			}
+			
+		});
+		
 		playlistTable.setRowFactory( tv -> {
 			TableRow <Playlist> row = new TableRow <>();
 			
@@ -2726,6 +2760,10 @@ public class MusicPlayerUI extends Application {
 						event.acceptTransferModes( TransferMode.MOVE );
 						event.consume();
 					}
+				} else if ( db.hasFiles() ) {
+					//TODO: I can check for file extensions...
+					event.acceptTransferModes( TransferMode.COPY );
+					event.consume();
 				}
 			});
 
@@ -2740,6 +2778,26 @@ public class MusicPlayerUI extends Application {
 						event.setDropCompleted( true );
 						event.consume();
 					}
+				} else if ( db.hasFiles() ) {
+					ArrayList <Playlist> playlistsToAdd = new ArrayList <Playlist> ();
+					
+					for ( File file : db.getFiles() ) {
+						Path droppedPath = Paths.get( file.getAbsolutePath() );
+						if ( Utils.isPlaylistFile ( droppedPath ) ) {
+							Playlist playlist = Playlist.loadPlaylist( droppedPath );
+							if ( playlist != null ) {
+								playlistsToAdd.add( playlist );
+							}
+						}
+					}
+					
+					if ( !playlistsToAdd.isEmpty() ) {
+						int dropIndex = row.isEmpty() ? dropIndex = Library.playlists.size() : row.getIndex();
+						Library.playlists.addAll( Math.min( dropIndex, Library.playlists.size() ), playlistsToAdd );
+					}
+
+					event.setDropCompleted( true );
+					event.consume();
 				}
 			});
 
@@ -2912,9 +2970,17 @@ public class MusicPlayerUI extends Application {
 						| ReadOnlyFileException | InvalidAudioFrameException e ) {
 							e.printStackTrace();
 						}
+					
 					} else if ( Files.isDirectory( droppedPath ) ) {
 						currentListTable.getItems().addAll( Utils.convertTrackList( Utils.getAllTracksInDirectory( droppedPath ) ) );
+					
+					} else if ( Utils.isPlaylistFile ( droppedPath ) ) {
+						Playlist playlist = Playlist.loadPlaylist( droppedPath );
+						if ( playlist != null ) {
+							currentListTable.getItems().addAll( Utils.convertTrackList( playlist.getTracks() ) );
+						}
 					}
+						
 				}
 
 				event.setDropCompleted( true );
@@ -3167,6 +3233,7 @@ public class MusicPlayerUI extends Application {
 
 				} else if ( db.hasFiles() ) {
 					ArrayList <CurrentListTrack> tracksToAdd = new ArrayList();
+					
 					for ( File file : db.getFiles() ) {
 						Path droppedPath = Paths.get( file.getAbsolutePath() );
 						if ( Utils.isMusicFile( droppedPath ) ) {
@@ -3175,10 +3242,18 @@ public class MusicPlayerUI extends Application {
 							} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
 								e.printStackTrace();
 							}
+						
 						} else if ( Files.isDirectory( droppedPath ) ) {
 							tracksToAdd.addAll( Utils.convertTrackList( Utils.getAllTracksInDirectory( droppedPath ) ) );
+						
+						} else if ( Utils.isPlaylistFile ( droppedPath ) ) {
+							Playlist playlist = Playlist.loadPlaylist( droppedPath );
+							if ( playlist != null ) {
+								tracksToAdd.addAll( Utils.convertTrackList( playlist.getTracks() ) );
+							}
 						}
 					}
+					
 					if ( !tracksToAdd.isEmpty() ) {
 						int dropIndex = row.isEmpty() ? dropIndex = currentListTable.getItems().size() : row.getIndex();
 						currentListTable.getItems().addAll( Math.min( dropIndex, currentListTable.getItems().size() ), tracksToAdd );
