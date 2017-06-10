@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -95,12 +97,12 @@ public class Persister {
 	}
 	
 	static File sourcesFile = new File ( configDirectory + File.separator + "sources" );
-	static File playlistsFile = new File ( configDirectory + File.separator + "playlists" );
+	static File playlistsDirectory = new File ( configDirectory + File.separator + "playlists" );
 	static File currentFile = new File ( configDirectory + File.separator + "current" );
 	static File queueFile = new File ( configDirectory + File.separator + "queue" );
 	static File historyFile = new File ( configDirectory + File.separator + "history" );
 	static File dataFile = new File ( configDirectory + File.separator + "data" );
-	static File settingsFile = new File ( configDirectory + File.separator + "setting" );
+	static File settingsFile = new File ( configDirectory + File.separator + "settings" );
 	
 	
 	private static void createNecessaryFolders() {	
@@ -111,6 +113,10 @@ public class Persister {
 		
 		if ( !configDirectory.isDirectory() ) {
 			//TODO: 
+		}
+		
+		if ( !playlistsDirectory.exists() ) {
+			boolean playlistDir = playlistsDirectory.mkdirs();
 		}
 	}
 		
@@ -149,24 +155,26 @@ public class Persister {
 		) {
 			Queue.addAllTracks( (ArrayList<Track>) queueIn.readObject() );
 		} catch ( FileNotFoundException e ) {
-			System.out.println ( "File not found: current, unable to load queue, continuing." );
+			System.out.println ( "File not found: queue, unable to load queue, continuing." );
+		} catch ( IOException | ClassNotFoundException e ) {
+			//TODO: 
+			e.printStackTrace();
+		}
+		
+		try (
+				ObjectInputStream historyIn = new ObjectInputStream( new FileInputStream( historyFile ) );
+		) {
+			MusicPlayerUI.history.addAll( (ArrayList<Track>) historyIn.readObject() );
+		} catch ( FileNotFoundException e ) {
+			System.out.println ( "File not found: history, unable to load queue, continuing." );
 		} catch ( IOException | ClassNotFoundException e ) {
 			//TODO: 
 			e.printStackTrace();
 		}
 		
 		//TODO: link any tracks that are in the queue and also in the current list. 
-		
-		try (
-				ObjectInputStream playlistsIn = new ObjectInputStream( new FileInputStream( playlistsFile ) );
-		) {
-			Library.addPlaylists ( (ArrayList<Playlist>) playlistsIn.readObject() );
-		} catch ( FileNotFoundException e ) {
-			System.out.println ( "File not found: playlists, unable to load custom playlist data, continuing." );
-		} catch ( IOException | ClassNotFoundException e ) {
-			//TODO: 
-			e.printStackTrace();
-		}
+
+		loadPlaylists();
 		
 		readSettings();
 	}
@@ -222,14 +230,17 @@ public class Persister {
 		}
 		
 		try ( 
-				ObjectOutputStream playlistsOut = new ObjectOutputStream ( new FileOutputStream ( playlistsFile ) );
+				ObjectOutputStream historyListOut = new ObjectOutputStream ( new FileOutputStream ( historyFile ) );
 		) {
-			playlistsOut.writeObject( new ArrayList <Playlist> ( Arrays.asList( Library.playlists.toArray( new Playlist[ Library.playlists.size() ] ) ) ) );
-			playlistsOut.flush();
+			historyListOut.writeObject( new ArrayList <Track> ( Arrays.asList( MusicPlayerUI.history.toArray( new Track[ MusicPlayerUI.history.size() ] ) ) ) );
+			historyListOut.flush();
+			
 		} catch ( IOException e ) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		savePlaylists();
 		
 		saveSettings();
 	}
@@ -274,6 +285,83 @@ public class Persister {
 			e.printStackTrace();
 		}
 	}
+	
+	public static void loadPlaylists() {
+		
+		try ( 
+				DirectoryStream <Path> stream = Files.newDirectoryStream( playlistsDirectory.toPath() ); 
+		) {
+			for ( Path child : stream ) {
+				if ( child.toString().toLowerCase().endsWith( ".m3u" ) ) {
+					
+					Playlist playlist = new Playlist( "NoName" );
+					
+					try (
+							FileReader fileReader = new FileReader( child.toFile() );
+					) {
+						BufferedReader m3uIn = new BufferedReader ( fileReader );
+						for ( String line; (line = m3uIn.readLine()) != null; ) {
+							if ( line.startsWith( "#Name:" ) ) {
+								String name = line.split( ":" )[1]; //TODO: OOB error checking on index
+								playlist.setName( name );
+							} else if ( line.isEmpty() ) {
+								//Do nothing
+								
+							} else if ( !line.startsWith( "#" ) ) {
+								try {
+									playlist.addTrack ( new Track ( Paths.get ( line ) ) );
+								} catch ( Exception e ) {
+									System.out.println ( "Error parsing line in playlist: " + child.toString() );
+									System.out.println ( "\tLine: " + line );
+								}
+							}
+								
+								
+						}
+					} catch ( Exception e ) {
+						System.out.println ( "Error loading: " + child.toString() );
+						e.printStackTrace();
+					}
+					
+					Library.addPlaylist( playlist );
+				}
+			}
+			
+		} catch ( IOException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public static void savePlaylists() {
+		ArrayList <Playlist> playlists = new ArrayList <Playlist> ( Library.playlists );
+		
+		int playlistIndex = 1;
+		for ( Playlist playlist : playlists ) {
+			try (
+					FileWriter fileWriter = new FileWriter ( Paths.get( playlistsDirectory.toString(), playlistIndex + ".m3u" ).toFile() );
+			) {
+				PrintWriter playlistOut = new PrintWriter( new BufferedWriter( fileWriter ) );
+				playlistOut.println ( "#EXTM3U" );
+				playlistOut.printf ( "#Name: %s\n", playlist.getName() );
+				playlistOut.println();
+				
+				for ( Track track : playlist.getTracks() ) {
+					playlistOut.printf( "#EXTINF:%d,%s - %s\n", track.getLengthS(), track.getArtist(), track.getTitle() );
+					playlistOut.println( track.getPath().toString() );
+					playlistOut.println();
+				}
+				
+				playlistOut.flush();
+			} catch ( IOException e ) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			playlistIndex++;
+		}
+	}
+	
+	
 	
 	//TODO: Move these up top
 	private static final String SETTING_TAG_SHUFFLE = "Shuffle";
@@ -332,7 +420,6 @@ public class Persister {
 			
 			for ( String line; (line = settingsIn.readLine()) != null; ) {
 				String tag = line.split(":\\s+")[0];
-				System.out.println ( "Tag: " + tag );
 				String value = line.split(":\\s+")[1];
 				
 				try {

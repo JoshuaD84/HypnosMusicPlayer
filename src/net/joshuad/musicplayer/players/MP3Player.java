@@ -242,7 +242,6 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	@Override 
 	public void seekMS ( long milliseconds ) {
 		seekRequestPercent = milliseconds / (double)( track.getLengthS() * 1000 );	
-		System.out.println ( "\t" + milliseconds +"  / " + ( track.getLengthS() * 1000 ) );
 
 	}
 

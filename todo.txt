@@ -1,8 +1,10 @@
-Better serialization for playlists -- I think I'm OK with using serializable for other data, but playlists shouldn't risk being lost. 
+Load window position before showing window
 
 Embed and use a font with all needed UTF glyphs
 
-Log files are messy, not handled right. 
+Save data to disk at key times, rather than just when we're closing
+
+Log files are messy, not handled right. Proper logging throughout program
 
 track buffering, so there's a cushion in case reading becomes spotty
 
@@ -21,8 +23,6 @@ Any other tags we should look at? Does discogs have special tags like musicbrain
 
 Redesign the transport
 
-Re-architect the current playing info box
-
 UIUpdaterThread is too aggressive. Causing lag on my computer
 
 Have a single thread handle playing all tracks. Have it be the same thread that accepts requests rather than spawning new threads off UI actions. 
@@ -36,12 +36,10 @@ m3u support
 
 Volume control
 
-Persist the History? I think it might be better to just make it for this session
-
 Refactor / organize my code. 
    Separate player / ui systems. 
+   Re-design the code for the current playing info box above the current list.
    
-
 Decoders
 	Ogg
 	m4b - Double speed play for some reason
@@ -58,13 +56,16 @@ Decoders
 Windows
 	Open-with shell integration
 	Installer
+   Standalone build (32-bit)
 	
 Linux
 	Open-with shell integration
 	Debian Installer
+   redhat installer
+   pacman installer
 	use a compiled launcher rather than a script -- it allows shell double click. 
-	Build - Linux64 embedded JRE
-	Build - Linux32 embedded JRE
+	Standalone build - Linux64 embedded JRE
+	Standalone build - Linux32 embedded JRE
 
 OSX
 	Does our package work? 

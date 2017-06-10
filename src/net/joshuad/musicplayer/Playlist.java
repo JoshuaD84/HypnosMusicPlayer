@@ -52,5 +52,10 @@ public class Playlist implements Serializable {
 	public void setTracks( ArrayList <Track> tracks ) {
 		this.tracks = tracks;
 	}
+
+	public void addTrack ( Track track ) {
+		if ( tracks == null ) tracks = new ArrayList <Track> ();
+		if ( track != null ) tracks.add ( track );
+	}
 		
 }
