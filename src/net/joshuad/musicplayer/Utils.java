@@ -230,10 +230,11 @@ public class Utils {
 	
 	public static ArrayList <Track> getAllTracksInDirectory ( Path startingDirectory ) {
 		
-		TrackFinder finder = new TrackFinder () ;
+		TrackFinder finder = new TrackFinder ();
 		try {
 			Files.walkFileTree( startingDirectory, finder );
 	    	return finder.tracks;
+	    	
 		} catch (IOException e) {
 			// TODO 
 			e.printStackTrace();

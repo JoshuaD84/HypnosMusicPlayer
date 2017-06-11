@@ -1,8 +1,4 @@
-Consider changing a lot of TransferMode.MOVE to TransferMode.COPY
-
-Load window position before showing window
-
-Embed and use a font with all needed UTF glyphs
+Embed and use a font with all needed UTF glyphsLoad window position before showing window
 
 Save data to disk at key times, rather than just when we're closing
 
@@ -18,8 +14,6 @@ Make sure horizontal scroll bars never appear
 	6/9 - Can't find anything on google.
 	
 Lyrics?
-
-Hot Keys
 
 Artwork drag and drop
 
@@ -41,7 +35,9 @@ Volume control
 Refactor / organize my code. 
    Separate player / ui systems. 
    Re-design the code for the current playing info box above the current list.
-   
+
+Hot Keys
+  
 Decoders
 	Ogg
 	m4b - Double speed play for some reason

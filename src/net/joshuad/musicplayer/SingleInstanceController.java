@@ -84,10 +84,14 @@ public class SingleInstanceController {
 					ArrayList<CurrentListTrack> newList = new ArrayList<CurrentListTrack>();
 					
 					for ( File file : (List<File>) command.getObject() ) {
-						try {
-							newList.add( new CurrentListTrack ( file.toPath() ) );
-						} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
-							System.out.println ( "Unable to load file specified by user: " + file.toString() );
+						if ( file.isDirectory() ) {
+							newList.addAll( Utils.convertTrackList( Utils.getAllTracksInDirectory( file.toPath() ) ) );
+						} else {
+							try {
+								newList.add( new CurrentListTrack ( file.toPath() ) );
+							} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
+								System.out.println ( "Unable to load file specified by user: " + file.toString() );
+							}
 						}
 					}
 					

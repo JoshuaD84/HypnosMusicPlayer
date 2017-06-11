@@ -222,7 +222,7 @@ public class AlbumInfoWindow extends Stage {
 					ArrayList <Integer> indices = new ArrayList <Integer>( trackTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( trackTable.getSelectionModel().getSelectedItems() );
 					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, DragSource.ALBUM_INFO );
-					Dragboard db = row.startDragAndDrop( TransferMode.MOVE );
+					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
 					cc.put( MusicPlayerUI.DRAGGED_TRACKS, dragObject );

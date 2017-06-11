@@ -87,6 +87,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -828,6 +829,7 @@ public class MusicPlayerUI extends Application {
 		HBox playingTrackInfo = new HBox();
 		trackInfo = new Label( "" );
 		trackInfo.setStyle( "-fx-font-weight: bold; -fx-font-size: 16" );
+			
 		playingTrackInfo.getChildren().add( trackInfo );
 		playingTrackInfo.setAlignment( Pos.CENTER );
 
@@ -920,7 +922,7 @@ public class MusicPlayerUI extends Application {
 					ArrayList <Integer> indices = new ArrayList <Integer>( historyTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( historyTable.getSelectionModel().getSelectedItems() );
 					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, DragSource.HISTORY );
-					Dragboard db = row.startDragAndDrop( TransferMode.MOVE );
+					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
 					cc.put( DRAGGED_TRACKS, dragObject );
@@ -1199,7 +1201,7 @@ public class MusicPlayerUI extends Application {
 					ArrayList <Integer> indices = new ArrayList <Integer>( queueTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( queueTable.getSelectionModel().getSelectedItems() );
 					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, DragSource.QUEUE );
-					Dragboard db = row.startDragAndDrop( TransferMode.MOVE );
+					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
 					cc.put( DRAGGED_TRACKS, dragObject );
@@ -1212,7 +1214,7 @@ public class MusicPlayerUI extends Application {
 
 				Dragboard db = event.getDragboard();
 				if (  db.hasContent( DRAGGED_TRACKS ) || db.hasFiles() ) {
-					event.acceptTransferModes( TransferMode.MOVE );
+					event.acceptTransferModes( TransferMode.COPY );
 					event.consume();
 				}
 			} );
@@ -1313,7 +1315,7 @@ public class MusicPlayerUI extends Application {
 
 			if ( db.hasContent( DRAGGED_TRACKS ) || db.hasFiles() ) {
 
-				event.acceptTransferModes( TransferMode.MOVE );
+				event.acceptTransferModes( TransferMode.COPY );
 				event.consume();
 
 			}
@@ -1566,7 +1568,7 @@ public class MusicPlayerUI extends Application {
 		musicSourceTable.setOnDragOver( event -> {
 			Dragboard db = event.getDragboard();
 			if ( db.hasFiles() ) {
-				event.acceptTransferModes( TransferMode.MOVE );
+				event.acceptTransferModes( TransferMode.COPY );
 				event.consume();
 
 			}
@@ -1667,7 +1669,7 @@ public class MusicPlayerUI extends Application {
 		artistImage.setOnDragOver( event -> {
 			//TODO: Become more discerning -- if ( db.hasFiles() ) {
 			Dragboard db = event.getDragboard();
-			event.acceptTransferModes( TransferMode.MOVE );
+			event.acceptTransferModes( TransferMode.COPY );
 			event.consume();
 		});
 		
@@ -2290,7 +2292,7 @@ public class MusicPlayerUI extends Application {
 		albumTable.setOnDragOver( event -> {
 			Dragboard db = event.getDragboard();
 			if ( db.hasFiles() ) {
-				event.acceptTransferModes( TransferMode.MOVE );
+				event.acceptTransferModes( TransferMode.COPY );
 				event.consume();
 
 			}
@@ -2324,7 +2326,7 @@ public class MusicPlayerUI extends Application {
 			row.setOnDragOver( event -> {
 				Dragboard db = event.getDragboard();
 				if ( db.hasFiles() ) {
-					event.acceptTransferModes( TransferMode.MOVE );
+					event.acceptTransferModes( TransferMode.COPY );
 					event.consume();
 
 				}
@@ -2357,7 +2359,7 @@ public class MusicPlayerUI extends Application {
 					}
 					
 					DraggedTrackContainer dragObject = new DraggedTrackContainer( null, tracks, DragSource.ALBUM_LIST );
-					Dragboard db = row.startDragAndDrop( TransferMode.MOVE );
+					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
 					cc.put( DRAGGED_TRACKS, dragObject );
@@ -2519,7 +2521,7 @@ public class MusicPlayerUI extends Application {
 		trackTable.setOnDragOver( event -> {
 			Dragboard db = event.getDragboard();
 			if ( db.hasFiles() ) {
-				event.acceptTransferModes( TransferMode.MOVE );
+				event.acceptTransferModes( TransferMode.COPY );
 				event.consume();
 
 			}
@@ -2561,7 +2563,7 @@ public class MusicPlayerUI extends Application {
 			row.setOnDragOver( event -> {
 				Dragboard db = event.getDragboard();
 				if ( db.hasFiles() ) {
-					event.acceptTransferModes( TransferMode.MOVE );
+					event.acceptTransferModes( TransferMode.COPY );
 					event.consume();
 
 				}
@@ -2587,7 +2589,7 @@ public class MusicPlayerUI extends Application {
 					ArrayList <Integer> indices = new ArrayList <Integer>( trackTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( trackTable.getSelectionModel().getSelectedItems() );
 					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, DragSource.TRACK_LIST );
-					Dragboard db = row.startDragAndDrop( TransferMode.MOVE );
+					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
 					cc.put( DRAGGED_TRACKS, dragObject );
@@ -2742,7 +2744,7 @@ public class MusicPlayerUI extends Application {
 					}
 					
 					DraggedTrackContainer dragObject = new DraggedTrackContainer( null, tracks, DragSource.PLAYLIST_LIST );
-					Dragboard db = row.startDragAndDrop( TransferMode.MOVE );
+					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
 					cc.put( DRAGGED_TRACKS, dragObject );
@@ -2757,7 +2759,7 @@ public class MusicPlayerUI extends Application {
 				Dragboard db = event.getDragboard();
 				if ( db.hasContent( DRAGGED_TRACKS ) ) {
 					if ( !row.isEmpty() ) {
-						event.acceptTransferModes( TransferMode.MOVE );
+						event.acceptTransferModes( TransferMode.COPY );
 						event.consume();
 					}
 				} else if ( db.hasFiles() ) {
@@ -2880,7 +2882,7 @@ public class MusicPlayerUI extends Application {
 			Dragboard db = event.getDragboard();
 
 			if ( db.hasContent( DRAGGED_TRACKS ) || db.hasFiles() ) {
-				event.acceptTransferModes( TransferMode.MOVE );
+				event.acceptTransferModes( TransferMode.COPY );
 				event.consume();
 			}
 		});
@@ -3138,7 +3140,7 @@ public class MusicPlayerUI extends Application {
 					ArrayList <Integer> indices = new ArrayList <Integer>( currentListTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( currentListTable.getSelectionModel().getSelectedItems() );
 					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, DragSource.CURRENT_LIST );
-					Dragboard db = row.startDragAndDrop( TransferMode.MOVE );
+					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
 					cc.put( DRAGGED_TRACKS, dragObject );
@@ -3150,7 +3152,7 @@ public class MusicPlayerUI extends Application {
 			row.setOnDragOver( event -> {
 				Dragboard db = event.getDragboard();
 				if ( db.hasContent( DRAGGED_TRACKS ) || db.hasFiles() ) {
-					event.acceptTransferModes( TransferMode.MOVE );
+					event.acceptTransferModes( TransferMode.COPY );
 					event.consume();
 				}
 			} );
