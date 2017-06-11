@@ -36,6 +36,7 @@ public class Library {
     
 	private static Thread loaderThread;
 	private final static ModifiedFileUpdaterThread modifiedFileDelayedUpdater = new ModifiedFileUpdaterThread();
+	
 	// These are all three representations of the same data. Add stuff to the
 	// Observable List, the other two can't accept add.
 	final static ObservableList <Album> albums = FXCollections.observableArrayList( new ArrayList <Album>() );
@@ -86,7 +87,11 @@ public class Library {
 
 	public static void startLoader() {
 		
+		
 		loaderThread = new Thread ( new Runnable() {
+
+			long lastSaveTime = System.currentTimeMillis();
+			boolean albumTrackDataChangedSinceLastSave = false;
 			
 			@Override
 			public void run() {
@@ -95,12 +100,15 @@ public class Library {
 					
 					if ( !sourceToRemove.isEmpty() ) {
 						removeOneSource();
+						albumTrackDataChangedSinceLastSave = true;
 						
 					} else if ( !sourceToAdd.isEmpty() ) {
 						loadOneSource();
+						albumTrackDataChangedSinceLastSave = true;
 						
 					} else if ( !sourceToUpdate.isEmpty() ) {
 						updateOneSource();
+						albumTrackDataChangedSinceLastSave = true;
 						
 					} else if ( purgeOrphansAndMissing && albumsToRemove.isEmpty() && tracksToRemove.isEmpty() ) {
 						purgeMissingFiles();
@@ -110,9 +118,29 @@ public class Library {
 					} else {
 						processWatcherEvents();
 					}
+
+					if ( System.currentTimeMillis() - lastSaveTime > 10000 ) {
+						if ( albumTrackDataChangedSinceLastSave ) {
+							Persister.saveAlbumsAndTracks();
+							albumTrackDataChangedSinceLastSave = false;
+							System.out.println ( "Saving Album data" ); //TODO: DD
+						}
+						
+						Persister.saveSources();
+						Persister.saveCurrentList();
+						Persister.saveQueue();
+						Persister.saveHistory();
+						Persister.savePlaylists();
+						Persister.saveSettings();
+						
+						System.out.println ( "Saving settings" ); //TODO: DD
+						lastSaveTime = System.currentTimeMillis();
+					}
+										
 					try {
 						Thread.sleep( 50 );
 						purgeCounter++;
+						
 						if ( purgeCounter > 20 ) {
 							//TODO: This is a hack because things aren't setup right. Get all these threads and arraylists coordinating properly. 
 							purgeOrphansAndMissing = true;
@@ -123,6 +151,8 @@ public class Library {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					
+				
 				}
 			}
 		});

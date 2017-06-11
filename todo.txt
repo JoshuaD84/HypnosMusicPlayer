@@ -1,14 +1,10 @@
 Embed and use a font with all needed UTF glyphsLoad window position before showing window
 
-Save data to disk at key times, rather than just when we're closing
-
 Log files are messy, not handled right. Proper logging throughout program
 
 track buffering, so there's a cushion in case reading becomes spotty
 
 CurrentListSplitPane starts at 100% divider position when window is maximized
-
-Load folders to current list at CLI
 
 Make sure horizontal scroll bars never appear
 	6/9 - Can't find anything on google.
@@ -16,8 +12,6 @@ Make sure horizontal scroll bars never appear
 Lyrics?
 
 Artwork drag and drop
-
-Any other tags we should look at? Does discogs have special tags like musicbrainz? 
 
 Redesign the transport
 

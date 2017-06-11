@@ -124,7 +124,7 @@ public class Persister {
 	@SuppressWarnings("unchecked")
 	public static void loadData() {
 		createNecessaryFolders();
-		readDataCompressed();
+		loadAlbumsAndTracks();
 
 		try (
 				ObjectInputStream sourcesIn = new ObjectInputStream( new FileInputStream( sourcesFile ) );
@@ -176,22 +176,23 @@ public class Persister {
 
 		loadPlaylists();
 		
-		readSettings();
+		loadSettings();
 	}
 
-	static void saveData() {
+	public static void saveData() {
+	
 		createNecessaryFolders();
-		
-		if ( !configDirectory.exists() ) {
-			boolean created = configDirectory.mkdirs();
-			//TODO: check created
-		}
-		
-		if ( !configDirectory.isDirectory() ) {
-			//TODO: 
-		}
-		
-		writeDataCompressed();
+			
+		saveAlbumsAndTracks();
+		saveSources();
+		saveCurrentList();
+		saveQueue();
+		saveHistory();
+		savePlaylists();
+		saveSettings();
+	}
+	
+	public static void saveSources() {
 		try ( 
 				ObjectOutputStream sourcesOut = new ObjectOutputStream ( new FileOutputStream ( sourcesFile ) );
 		) {
@@ -206,7 +207,9 @@ public class Persister {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+	}
+	
+	public static void saveCurrentList() {
 		try ( 
 				ObjectOutputStream currentListOut = new ObjectOutputStream ( new FileOutputStream ( currentFile ) );
 		) {
@@ -217,6 +220,9 @@ public class Persister {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public static void saveQueue() {
 		
 		try ( 
 				ObjectOutputStream queueListOut = new ObjectOutputStream ( new FileOutputStream ( queueFile ) );
@@ -228,7 +234,9 @@ public class Persister {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+	}
+	
+	public static void saveHistory() {
 		try ( 
 				ObjectOutputStream historyListOut = new ObjectOutputStream ( new FileOutputStream ( historyFile ) );
 		) {
@@ -239,14 +247,10 @@ public class Persister {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		savePlaylists();
-		
-		saveSettings();
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static void readDataCompressed() {
+	public static void loadAlbumsAndTracks() {
 		try (
 				ObjectInputStream dataIn = new ObjectInputStream( new GZIPInputStream ( new FileInputStream( dataFile ) ) );
 		) {
@@ -261,7 +265,7 @@ public class Persister {
 		}
 	}
 	
-	private static void writeDataCompressed() {
+	public static void saveAlbumsAndTracks() {
 		/* Some notes for future Josh (2017/05/14):
 		 * 1. For some reason, keeping the ByteArrayOutputStream in the middle makes things take ~2/3 the amount of time.
 		 * 2. I tried removing tracks that have albums (since they're being written twice) but it didn't create any savings. I guess compression is handling that
@@ -350,7 +354,7 @@ public class Persister {
 	private static final String SETTING_TAG_TRACK_POSITION = "CurrentTrackPosition";
 	
 	
-	private static void saveSettings() {
+	public static void saveSettings() {
 		try ( 
 				FileWriter fileWriter = new FileWriter( settingsFile );
 		) {
@@ -381,8 +385,7 @@ public class Persister {
 		}
 	}
 	
-	private static void readSettings() {
-
+	public static void loadSettings() {
 		try (
 				FileReader fileReader = new FileReader( settingsFile );
 		) {
