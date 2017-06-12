@@ -15,8 +15,6 @@ Artwork drag and drop
 
 Redesign the transport
 
-UIUpdaterThread is too aggressive. Causing lag on my computer
-
 Have a single thread handle playing all tracks. Have it be the same thread that accepts requests rather than spawning new threads off UI actions. 
 
 Tray icon
@@ -24,11 +22,12 @@ Tray icon
 	What systems do support? 
 	What other systems don't support? How to handle? 
 
+
 Volume control
 
 Refactor / organize my code. 
-   Separate player / ui systems. 
-   Re-design the code for the current playing info box above the current list.
+ 	Separate player / ui systems. 
+ 	Re-design the code for the current playing info box above the current list.
 
 Hot Keys
   
@@ -48,13 +47,13 @@ Decoders
 Windows
 	Open-with shell integration
 	Installer
-   Standalone build (32-bit)
+    Standalone build (32-bit)
 	
 Linux
 	Open-with shell integration
 	Debian Installer
-   redhat installer
-   pacman installer
+    redhat installer
+    pacman installer
 	use a compiled launcher rather than a script -- it allows shell double click. 
 	Standalone build - Linux64 embedded JRE
 	Standalone build - Linux32 embedded JRE

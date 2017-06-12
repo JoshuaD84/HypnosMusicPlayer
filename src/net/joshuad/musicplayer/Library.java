@@ -123,7 +123,6 @@ public class Library {
 						if ( albumTrackDataChangedSinceLastSave ) {
 							Persister.saveAlbumsAndTracks();
 							albumTrackDataChangedSinceLastSave = false;
-							System.out.println ( "Saving Album data" ); //TODO: DD
 						}
 						
 						Persister.saveSources();
@@ -133,7 +132,6 @@ public class Library {
 						Persister.savePlaylists();
 						Persister.saveSettings();
 						
-						System.out.println ( "Saving settings" ); //TODO: DD
 						lastSaveTime = System.currentTimeMillis();
 					}
 										
