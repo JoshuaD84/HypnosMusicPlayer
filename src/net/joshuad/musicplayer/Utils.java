@@ -236,8 +236,7 @@ public class Utils {
 	    	return finder.tracks;
 	    	
 		} catch (IOException e) {
-			// TODO 
-			e.printStackTrace();
+			System.out.println ( "Read error while traversing directory, some files may not have been loaded: " + startingDirectory.toString() );
 		}
 		
 		return new ArrayList <Track> ();

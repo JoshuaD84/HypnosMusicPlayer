@@ -1,6 +1,5 @@
 package net.joshuad.musicplayer.players;
 
-//TODO: get rid of these *'s
 import java.io.*;
 import javax.sound.sampled.*;
 

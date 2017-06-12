@@ -2271,7 +2271,6 @@ public class MusicPlayerUI extends Application {
 		});
 		
 		infoMenuItem.setOnAction( event -> {
-			//TODO: look at the row we right clicked on instead of selectedItem
 			albumInfoWindow.setAlbum( albumTable.getSelectionModel().getSelectedItem() );
 			albumInfoWindow.show();
 		});
