@@ -1,17 +1,16 @@
 Embed and use a font with all needed UTF glyphsLoad window position before showing window
 
-Log files are messy, not handled right. Proper logging throughout program
+Artwork drag and drop
 
 track buffering, so there's a cushion in case reading becomes spotty
 
-CurrentListSplitPane starts at 100% divider position when window is maximized
+Log files are messy, not handled right. Proper logging throughout program
 
 Make sure horizontal scroll bars never appear
 	6/9 - Can't find anything on google.
 	
 Lyrics?
 
-Artwork drag and drop
 
 Redesign the transport
 
@@ -21,7 +20,6 @@ Tray icon
 	Gnome 3 doesn't support. Code works but creates a bad entry on taskbar.
 	What systems do support? 
 	What other systems don't support? How to handle? 
-
 
 Volume control
 
@@ -33,8 +31,11 @@ Hot Keys
   
 Decoders
 	Ogg
+	
 	m4b - Double speed play for some reason
-	Can we get flacplayer.java to play things that we need jflac for:
+	
+	Flac
+		Can we get flacplayer.java to play things that we need jflac for:
 		Adrian Orange
 		A Perfect Circle - Mer de noms
 		<Any others?>

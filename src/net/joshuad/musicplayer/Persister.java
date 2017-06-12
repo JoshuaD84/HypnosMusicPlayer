@@ -26,8 +26,16 @@ import java.util.zip.GZIPOutputStream;
 public class Persister {
 	
 	static File configDirectory;
+	static File sourcesFile;
+	static File playlistsDirectory;
+	static File currentFile;
+	static File queueFile;
+	static File historyFile;
+	static File dataFile;
+	static File settingsFile;
 	
-	static { 
+	
+	public static void init() {
 		//TODO: We might want to make a few fall-throughs if these locations don't exist. 
 		//TODO: I'm sure this needs fine tuning. I don't love putting it in a static block, either 
 		String osString = System.getProperty( "os.name" ).toLowerCase();
@@ -94,16 +102,15 @@ public class Persister {
 		} else {
 			configDirectory = new File( home + File.separator + ".hypnos" );
 		}
+		
+		sourcesFile = new File ( configDirectory + File.separator + "sources" );
+		playlistsDirectory = new File ( configDirectory + File.separator + "playlists" );
+		currentFile = new File ( configDirectory + File.separator + "current" );
+		queueFile = new File ( configDirectory + File.separator + "queue" );
+		historyFile = new File ( configDirectory + File.separator + "history" );
+		dataFile = new File ( configDirectory + File.separator + "data" );
+		settingsFile = new File ( configDirectory + File.separator + "settings" );
 	}
-	
-	static File sourcesFile = new File ( configDirectory + File.separator + "sources" );
-	static File playlistsDirectory = new File ( configDirectory + File.separator + "playlists" );
-	static File currentFile = new File ( configDirectory + File.separator + "current" );
-	static File queueFile = new File ( configDirectory + File.separator + "queue" );
-	static File historyFile = new File ( configDirectory + File.separator + "history" );
-	static File dataFile = new File ( configDirectory + File.separator + "data" );
-	static File settingsFile = new File ( configDirectory + File.separator + "settings" );
-	
 	
 	private static void createNecessaryFolders() {	
 		if ( !configDirectory.exists() ) {
@@ -121,11 +128,33 @@ public class Persister {
 	}
 		
 	
-	@SuppressWarnings("unchecked")
-	public static void loadData() {
-		createNecessaryFolders();
+	public static void loadDataBeforeShowWindow() {
+		loadPreWindowSettings();
+	}
+	
+	public static void loadDataAfterShowWindow() {
 		loadAlbumsAndTracks();
+		loadSources();
+		loadCurrentList();
+		loadQueue();
+		loadHistory();
+		loadPlaylists();
+		loadPostWindowSettings();
+	}
 
+	public static void saveAllData() {
+		createNecessaryFolders();
+		saveAlbumsAndTracks();
+		saveSources();
+		saveCurrentList();
+		saveQueue();
+		saveHistory();
+		savePlaylists();
+		saveSettings();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static void loadSources() {
 		try (
 				ObjectInputStream sourcesIn = new ObjectInputStream( new FileInputStream( sourcesFile ) );
 		) {
@@ -138,7 +167,10 @@ public class Persister {
 		} catch ( IOException | ClassNotFoundException e ) {
 			e.printStackTrace(); //TODO: 
 		}
-		
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static void loadCurrentList() {
 		try (
 				ObjectInputStream currentListIn = new ObjectInputStream( new FileInputStream( currentFile ) );
 		) {
@@ -149,6 +181,10 @@ public class Persister {
 			//TODO: 
 			e.printStackTrace();
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static void loadQueue() {
 		
 		try (
 				ObjectInputStream queueIn = new ObjectInputStream( new FileInputStream( queueFile ) );
@@ -160,7 +196,10 @@ public class Persister {
 			//TODO: 
 			e.printStackTrace();
 		}
-		
+	}
+
+	@SuppressWarnings("unchecked")
+	public static void loadHistory() {
 		try (
 				ObjectInputStream historyIn = new ObjectInputStream( new FileInputStream( historyFile ) );
 		) {
@@ -171,25 +210,6 @@ public class Persister {
 			//TODO: 
 			e.printStackTrace();
 		}
-		
-		//TODO: link any tracks that are in the queue and also in the current list. 
-
-		loadPlaylists();
-		
-		loadSettings();
-	}
-
-	public static void saveData() {
-	
-		createNecessaryFolders();
-			
-		saveAlbumsAndTracks();
-		saveSources();
-		saveCurrentList();
-		saveQueue();
-		saveHistory();
-		savePlaylists();
-		saveSettings();
 	}
 	
 	public static void saveSources() {
@@ -385,7 +405,7 @@ public class Persister {
 		}
 	}
 	
-	public static void loadSettings() {
+	public static void loadPreWindowSettings() {
 		try (
 				FileReader fileReader = new FileReader( settingsFile );
 		) {
@@ -398,16 +418,6 @@ public class Persister {
 				
 				try {
 					switch ( tag ) {
-						case SETTING_TAG_TRACK:
-							MusicPlayerUI.loadTrack( value, true );
-							break;
-							
-						case SETTING_TAG_TRACK_POSITION:
-							if ( MusicPlayerUI.currentPlayer != null ) {
-								MusicPlayerUI.currentPlayer.seekMS( Long.parseLong( value ) );
-							}
-							break;
-							
 						case SETTING_TAG_SHUFFLE:
 							MusicPlayerUI.setShuffleMode ( MusicPlayerUI.ShuffleMode.valueOf( value ) );
 							break;
@@ -466,5 +476,41 @@ public class Persister {
 			e.printStackTrace();
 		}
 	}
-		
+	
+	public static void loadPostWindowSettings() {
+		try (
+				FileReader fileReader = new FileReader( settingsFile );
+		) {
+
+			BufferedReader settingsIn = new BufferedReader ( fileReader );
+			
+			for ( String line; (line = settingsIn.readLine()) != null; ) {
+				String tag = line.split(":\\s+")[0];
+				String value = line.split(":\\s+")[1];
+				
+				try {
+					switch ( tag ) {
+						case SETTING_TAG_TRACK:
+							MusicPlayerUI.loadTrack( value, true );
+							break;
+							
+						case SETTING_TAG_TRACK_POSITION:
+							if ( MusicPlayerUI.currentPlayer != null ) {
+								MusicPlayerUI.currentPlayer.seekMS( Long.parseLong( value ) );
+							}
+							break;
+					}
+				} catch ( Exception e ) {
+					e.printStackTrace( System.out );
+					System.out.println ( "Unable to parse settings tag: " + tag + ", continuing." );
+				}
+			}
+			
+		} catch ( FileNotFoundException e ) {
+			System.out.println ( "File not found: settings, unable to load user settings, using defaults. Continuing." );
+		} catch ( IOException e ) {
+			//TODO: 
+			e.printStackTrace();
+		}
+	}
 }

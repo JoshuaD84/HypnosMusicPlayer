@@ -3410,8 +3410,6 @@ public class MusicPlayerUI extends Application {
 	@Override
 	public void start ( Stage stage ) {
 		
-		long startTime = System.currentTimeMillis();
-		
 		mainStage = stage;
 		Scene scene = new Scene( new Group(), 1024, 768 );
 		//TODO: If we launch the jar from a different directory, it doesn't shwo the icon
@@ -3423,80 +3421,25 @@ public class MusicPlayerUI extends Application {
 			System.out.println ( "Unable to load program icon: icons/icon.png" );
 		}
 
-		System.out.println ( "Setup Stage: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-
 		setupAlbumTable();
-		
-		System.out.println ( "Setup Album Table: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
 		setupTrackListCheckBox();
-		
-		System.out.println ( "Track list Check Box: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
 		setupAlbumFilterPane();
-		
-		System.out.println ( "Setup Album Filter Paine: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
 		setupTrackFilterPane();
-		
-		System.out.println ( "Setup Track Filter Pane: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
 		setupQueueWindow();
-		System.out.println ( "Setup Queue Window: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
 		setupHistoryWindow();
-		System.out.println ( "Setup History Window: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
 		setupPlaylistFilterPane();
-		
-		System.out.println ( "Setup Playlist Filter: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
 		setupCurrentListTable();
-		
-		System.out.println ( "Setup Current List: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
 		setupPlaylistTable();
-		
-		System.out.println ( "Setup Playlist Table: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
 		setupCurrentListControlPane();
-		
-		System.out.println ( "Setup Current List Controllers " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
 		setupTrackTable();
-
-		System.out.println ( "Setup track table: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
 		setupAlbumImage();
 		setupArtistImage();
-		
-		System.out.println ( "Setup image sections: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
 		setupTransport();
-		
-		System.out.println ( "Setup Transport: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
 		setupLibraryWindow();
+		
 		tagWindow = new TagWindow ( mainStage );
 		albumInfoWindow = new AlbumInfoWindow ( mainStage );
 		playlistInfoWindow = new PlaylistInfoWindow ( mainStage );
-		
-		System.out.println ( "Setup Child Windows: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
 
 		artSplitPane = new SplitPane();
 		artSplitPane.getItems().addAll( albumImage, artistImage );
@@ -3547,9 +3490,6 @@ public class MusicPlayerUI extends Application {
 
 		final BorderPane primaryContainer = new BorderPane();
 
-		System.out.println ( "Setup highlevel panels: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-
 		primaryContainer.prefWidthProperty().bind( scene.widthProperty() );
 		primaryContainer.prefHeightProperty().bind( scene.heightProperty() );
 		primaryContainer.setPadding( new Insets( 0 ) ); // TODO:
@@ -3557,16 +3497,12 @@ public class MusicPlayerUI extends Application {
 		primaryContainer.setTop( transport );
 
 		stage.setTitle( PROGRAM_NAME );
-
-		System.out.println ( "bind stuff " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
+		
+		Persister.loadDataBeforeShowWindow();
 		
 		((Group) scene.getRoot()).getChildren().addAll( primaryContainer );
 		stage.setScene( scene );
 		stage.show();
-		
-		System.out.println ( "set scene " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
 
 		// This stuff has to be done after setScene
 		StackPane thumb = (StackPane) trackPositionSlider.lookup( ".thumb" );
@@ -3605,13 +3541,8 @@ public class MusicPlayerUI extends Application {
 		stage.heightProperty().addListener( listener );
 		
 		hackTooltipStartTiming();
-		
-		System.out.println ( "Misc UI Adjustments " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();	
 
-		Persister.loadData();
-		System.out.println ( "Load Persisted Data " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
+		Persister.loadDataAfterShowWindow();
 
 		updateAlbumListPlaceholder();
 		updateTrackListPlaceholder();
@@ -3622,37 +3553,17 @@ public class MusicPlayerUI extends Application {
 		
 	//TODO: I'm not supposed to depend on main() in javafx programs. What's up w/ that? 
 	public static void main ( String[] args ) {
-		System.out.println ( "Current Dir: " + System.getProperty("user.dir") );
-
-		long startTime = System.currentTimeMillis();
-		
-		CLIParser parser = new CLIParser( );
-		ArrayList <SocketCommand> commands = parser.parseCommands( args );
-		
-		System.out.println ( "Parse arguments: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
 		
 		parseSystemProperties();
-				
-		System.out.println ( "Parse System Properties " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
 		setupRootDirectory(); 
-	
-		System.out.println ( "Setup Root Directory " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
-		
+		Persister.init();
+		CLIParser parser = new CLIParser( );
+		ArrayList <SocketCommand> commands = parser.parseCommands( args );
 		boolean firstInstance = SingleInstanceController.startCLICommandListener();
-		
-		System.out.println ( "CLI Listener: " + ( System.currentTimeMillis() - startTime ) );
-		startTime = System.currentTimeMillis();
 		
 		if ( firstInstance ) {
 			Library.init();
 			UIUpdater.init();
-
-			System.out.println ( "Library Init: " + ( System.currentTimeMillis() - startTime ) );
-			startTime = System.currentTimeMillis();
 			
 			Thread uiThread = new Thread (() -> {
 				
@@ -3662,7 +3573,7 @@ public class MusicPlayerUI extends Application {
 					currentPlayer.stop();
 				}
 				
-				Persister.saveData();
+				Persister.saveAllData();
 				System.exit ( 0 );
 			});
 			
@@ -3679,9 +3590,6 @@ public class MusicPlayerUI extends Application {
 			SingleInstanceController.sendCommandToUI( commands );
 			
 			Library.startLoader();
-			
-			System.out.println ( "Start Library Loader " + ( System.currentTimeMillis() - startTime ) );
-			startTime = System.currentTimeMillis();
 			
 		} else {
 			SingleInstanceController.sendCommandsThroughSocket( commands );
