@@ -1624,41 +1624,6 @@ public class MusicPlayerUI extends Application {
 		libraryWindow.setScene( scene );
 	}
 	
-	private static boolean acceptTrackFromFilterRules ( Track track ) {
-		boolean checkBoxSelected = trackListCheckBox.isSelected();
-		String filterText = trackFilterBox.getText();
-		
-		if ( track.hasAlbum() && checkBoxSelected ) {
-			return false;
-		} 
-		
-		if ( filterText == null || filterText.isEmpty() ) {
-			return true;
-		}
-
-		String[] lowerCaseFilterTokens = filterText.toLowerCase().split( "\\s+" );
-
-		ArrayList <String> matchableText = new ArrayList <String>();
-
-		matchableText.add( Normalizer.normalize( track.getTitle(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-		matchableText.add( track.getTitle().toLowerCase() );
-
-		for ( String token : lowerCaseFilterTokens ) {
-			boolean tokenMatches = false;
-			for ( String test : matchableText ) {
-				if ( test.contains( token ) ) {
-					tokenMatches = true;
-				}
-			}
-
-			if ( !tokenMatches ) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-	
 	public void setupAlbumImage () {
 		albumImage = new BorderPane();
 	}
@@ -2052,6 +2017,8 @@ public class MusicPlayerUI extends Application {
 		matchableText.add( track.getArtist().toLowerCase() );
 		matchableText.add( Normalizer.normalize( track.getTitle(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
 		matchableText.add( track.getTitle().toLowerCase() );
+		matchableText.add( Normalizer.normalize( track.getAlbum(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+		matchableText.add( track.getAlbum().toLowerCase() );
 
 		for ( String token : lowerCaseFilterTokens ) {
 			boolean tokenMatches = false;
