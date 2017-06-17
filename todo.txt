@@ -11,6 +11,9 @@ Make sure horizontal scroll bars never appear
 	
 Lyrics?
 
+Show total length on currentlist somewhere.  
+
+Rename java process to Hypnos
 
 Redesign the transport
 

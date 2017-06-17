@@ -100,7 +100,7 @@ import net.joshuad.musicplayer.players.FlacPlayer;
 import net.joshuad.musicplayer.players.JFlacPlayer;
 import net.joshuad.musicplayer.players.MP3Player;
 import net.joshuad.musicplayer.players.MP4Player;
-import net.joshuad.musicplayer.players.OggPlayer;
+import net.joshuad.musicplayer.players.NewOggPlayer;
 import net.joshuad.musicplayer.players.WavPlayer;
 
 
@@ -473,7 +473,6 @@ public class MusicPlayerUI extends Application {
 
 		switch ( track.getFormat() ) {
 			case FLAC:
-
 				try {
 					currentPlayer = new FlacPlayer( track, trackPositionSlider, startPaused );
 				} catch ( Exception e ) {
@@ -507,7 +506,7 @@ public class MusicPlayerUI extends Application {
 				}
 				break;
 			case OGG:
-				currentPlayer = new OggPlayer( track, trackPositionSlider, startPaused );
+				currentPlayer = new NewOggPlayer( track, trackPositionSlider, startPaused );
 				if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );
 				if ( startPaused ) {
 					togglePlayButton.setGraphic( playImage );

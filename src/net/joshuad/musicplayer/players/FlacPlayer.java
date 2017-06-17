@@ -29,7 +29,7 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 		this.pauseRequested = startPaused;
 		
 		decodedInput = new FlacDecoder ( track.getPath().toAbsolutePath().toFile() );
-		if (decodedInput.numSamples == 0) throw new FlacDecoder.FormatException("Unknown audio length");
+		if ( decodedInput.numSamples == 0 ) throw new FlacDecoder.FormatException("Unknown audio length");
 		
 		AudioFormat outputFormat = new AudioFormat ( decodedInput.sampleRate, decodedInput.sampleDepth, decodedInput.numChannels, true, false );
 
@@ -87,6 +87,7 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 						return;
 					}
 					
+					//TODO: Why are we doing thi shere? looks wrong. 
 					// Convert samples to channel-interleaved bytes in little endian
 					int bytesPerSample = decodedInput.sampleDepth / 8;
 					byte[] sampleBytes = new byte[samples[0].length * samples.length * bytesPerSample];
@@ -159,16 +160,20 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 		}
 	}
 	
+	@Override
 	public long getPositionMS() {
-		return (long)( audioOutput.getMicrosecondPosition() / 1e6 );
+		return (long)( audioOutput.getMicrosecondPosition() / 1e3 );
 	}
 	
 	private void closeAllResources()  {
+		audioOutput.drain();
+		audioOutput.stop();
+		audioOutput.close();
+		
 		try {
-			audioOutput.drain();
-			audioOutput.stop();
-			audioOutput.close();
-			decodedInput.close();
+			if ( decodedInput != null ) {
+				decodedInput.close();
+			}
 		} catch ( IOException e) {
 			//TODO: 
 			e.printStackTrace();

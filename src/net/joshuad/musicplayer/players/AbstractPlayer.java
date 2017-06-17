@@ -3,6 +3,9 @@ package net.joshuad.musicplayer.players;
 import net.joshuad.musicplayer.Track;
 
 public abstract class AbstractPlayer {
+
+	static final int NO_SEEK_REQUESTED = -1;
+	
 	public abstract void pause();
 	public abstract void play();
 	public abstract void stop();

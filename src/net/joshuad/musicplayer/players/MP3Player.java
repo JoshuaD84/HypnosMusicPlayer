@@ -30,8 +30,6 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 
 	private Track track;
 	
-	private static final int NO_SEEK_REQUESTED = -1;
-	
 	private boolean pauseRequested = false;
 	private boolean playRequested = false;
 	private boolean stopRequested = false;
