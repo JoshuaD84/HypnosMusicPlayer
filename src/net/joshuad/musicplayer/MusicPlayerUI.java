@@ -506,14 +506,20 @@ public class MusicPlayerUI extends Application {
 				}
 				break;
 			case OGG:
-				currentPlayer = new NewOggPlayer( track, trackPositionSlider, startPaused );
-				if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );
-				if ( startPaused ) {
-					togglePlayButton.setGraphic( playImage );
-				} else {
-					togglePlayButton.setGraphic( pauseImage );
+				try {
+					currentPlayer = new NewOggPlayer( track, trackPositionSlider, startPaused );
+					if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );
+					if ( startPaused ) {
+						togglePlayButton.setGraphic( playImage );
+					} else {
+						togglePlayButton.setGraphic( pauseImage );
+					}
+				} catch ( IOException e ) {
+					//TODO: 
+					e.printStackTrace();
 				}
 				break;
+				
 			case WAV:
 				currentPlayer = new WavPlayer ( track, trackPositionSlider, startPaused );
 				if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );

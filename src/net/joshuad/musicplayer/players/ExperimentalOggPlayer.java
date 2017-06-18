@@ -4,7 +4,9 @@ import javafx.scene.control.Slider;
 import net.joshuad.musicplayer.MusicPlayerUI;
 import net.joshuad.musicplayer.Track;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
@@ -12,9 +14,13 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
-public class NewOggPlayer extends AbstractPlayer implements Runnable {
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.generic.GenericAudioHeader;
+import org.jaudiotagger.audio.ogg.util.OggInfoReader;
+
+public class ExperimentalOggPlayer extends AbstractPlayer implements Runnable {
 	
-	OggDecoder decoder;
+	OggInputStream decodedInput;
 	
 	private Track track;
 	
@@ -30,7 +36,7 @@ public class NewOggPlayer extends AbstractPlayer implements Runnable {
 	
 	private SourceDataLine audioOutput = null;
 
-	public NewOggPlayer ( Track track, Slider trackPositionSlider, boolean startPaused  ) throws IOException {
+	public ExperimentalOggPlayer ( Track track, Slider trackPositionSlider, boolean startPaused  ) throws IOException {
 		this.track = track;
 		this.trackPosition = trackPositionSlider;
 		this.pauseRequested = startPaused;
@@ -39,7 +45,7 @@ public class NewOggPlayer extends AbstractPlayer implements Runnable {
 		playerThread.start();
 	}
 	
-	public NewOggPlayer ( Track track, Slider trackPositionSlider ) throws IOException {
+	public ExperimentalOggPlayer ( Track track, Slider trackPositionSlider ) throws IOException {
 		this ( track, trackPositionSlider, false );
 	}
 	
@@ -52,10 +58,8 @@ public class NewOggPlayer extends AbstractPlayer implements Runnable {
 			e1.printStackTrace();
 			return;
 		}
-		
-		boolean needMoreData = true;
 
-		while ( needMoreData ) {
+		while ( true ) {
 			
 			if ( stopRequested ) {
 				closeAllResources();
@@ -91,8 +95,22 @@ public class NewOggPlayer extends AbstractPlayer implements Runnable {
 			}
 			
 			if ( !paused ) {
-				needMoreData = decoder.processSomeFrames( audioOutput );			
-				updateTransport();
+				byte[] dataIn = new byte [ 1024 ];
+				
+				int bytesReadCount = 0;
+				try {
+					bytesReadCount = decodedInput.read( dataIn );
+					if ( bytesReadCount <= 0 ) {
+						break;
+					}
+
+					audioOutput.write( dataIn, 0, dataIn.length );
+					updateTransport();
+					
+				} catch ( IOException e ) {
+					e.printStackTrace();
+					break;
+				}
 				
 			} else {
 				try {
@@ -103,8 +121,7 @@ public class NewOggPlayer extends AbstractPlayer implements Runnable {
 				}
 			}
 		}
-		
-		MusicPlayerUI.songFinishedPlaying( false );
+
 		closeAllResources();
 	}
 	
@@ -124,12 +141,8 @@ public class NewOggPlayer extends AbstractPlayer implements Runnable {
 
 	private void openStreamsAtRequestedOffset() throws IOException {
 
-		decoder = new OggDecoder ( track.getPath().toFile() );
-		
-		int channels = decoder.getChannels();
-		int rate = decoder.getRate();
-
-		AudioFormat outputFormat = new AudioFormat( (float) rate, 16, channels, true, false );
+		decodedInput = new OggInputStream( new FileInputStream( track.getPath().toFile() ) );
+		AudioFormat outputFormat = new AudioFormat( (float) decodedInput.getRate(), 16, decodedInput.getChannels(), true, false );
 		DataLine.Info datalineInfo = new DataLine.Info( SourceDataLine.class, outputFormat, AudioSystem.NOT_SPECIFIED );
 
 		try {
@@ -148,14 +161,28 @@ public class NewOggPlayer extends AbstractPlayer implements Runnable {
 			System.err.println( exception );
 			return;
 		}
-
-		audioOutput.start();
 		
 		if ( seekRequestPercent != NO_SEEK_REQUESTED ) {
-			decoder.skipToPercent( seekRequestPercent ); 
-			int seekPositionMS = (int) ( track.getLengthS() * 1000 * seekRequestPercent );
-			clipStartTimeMS = seekPositionMS;
+			
+			try {
+				OggInfoReader reader = new OggInfoReader();
+				GenericAudioHeader header = reader.read ( new RandomAccessFile ( track.getPath().toFile(), "r" ) );
+				
+				System.out.println ( "Number of samples: " + header.getNoOfSamples() );
+				System.out.println ( "Format: " + header.getFormat() );
+				System.out.println ( "start: " + header.getAudioDataStartPosition() );
+				System.out.println ( "end: " + header.getAudioDataEndPosition() );
+				
+			} catch ( CannotReadException e ) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			clipStartTimeMS = (int)(track.getLengthS() * seekRequestPercent * 1000);
+				
 		}
+
+		audioOutput.start();
 	}
 	
 	@Override
@@ -168,8 +195,12 @@ public class NewOggPlayer extends AbstractPlayer implements Runnable {
 		audioOutput.drain();
 		audioOutput.stop();
 		audioOutput.close();
-		decoder.close();
-		
+		try {
+			decodedInput.close();
+		} catch ( IOException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	@Override 
