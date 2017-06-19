@@ -12,7 +12,7 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
-public class NewOggPlayer extends AbstractPlayer implements Runnable {
+public class OggPlayer extends AbstractPlayer implements Runnable {
 	
 	OggDecoder decoder;
 	
@@ -28,9 +28,7 @@ public class NewOggPlayer extends AbstractPlayer implements Runnable {
 	
 	Slider trackPosition;
 	
-	private SourceDataLine audioOutput = null;
-
-	public NewOggPlayer ( Track track, Slider trackPositionSlider, boolean startPaused  ) throws IOException {
+	public OggPlayer ( Track track, Slider trackPositionSlider, boolean startPaused  ) throws IOException {
 		this.track = track;
 		this.trackPosition = trackPositionSlider;
 		this.pauseRequested = startPaused;
@@ -39,7 +37,7 @@ public class NewOggPlayer extends AbstractPlayer implements Runnable {
 		playerThread.start();
 	}
 	
-	public NewOggPlayer ( Track track, Slider trackPositionSlider ) throws IOException {
+	public OggPlayer ( Track track, Slider trackPositionSlider ) throws IOException {
 		this ( track, trackPositionSlider, false );
 	}
 	

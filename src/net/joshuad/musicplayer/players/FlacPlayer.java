@@ -11,7 +11,6 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 	
 	private Track track;
 	private FlacDecoder decodedInput;
-	private SourceDataLine audioOutput;
 	
 	private boolean pauseRequested = false;
 	private boolean playRequested = false;
@@ -32,7 +31,7 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 		if ( decodedInput.numSamples == 0 ) throw new FlacDecoder.FormatException("Unknown audio length");
 		
 		AudioFormat outputFormat = new AudioFormat ( decodedInput.sampleRate, decodedInput.sampleDepth, decodedInput.numChannels, true, false );
-
+		
 		audioOutput = (SourceDataLine)AudioSystem.getLine( new DataLine.Info( SourceDataLine.class, outputFormat ) );
 		
 		audioOutput.open ( outputFormat ); 
@@ -46,7 +45,6 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 	public FlacPlayer ( Track track, Slider trackPositionSlider ) throws IOException, LineUnavailableException {
 		this ( track, trackPositionSlider, false );
 	}
-	
 	
 	public void run() {
 
@@ -158,11 +156,6 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 				MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, positionPercent );
 			}
 		}
-	}
-	
-	@Override
-	public long getPositionMS() {
-		return (long)( audioOutput.getMicrosecondPosition() / 1e3 );
 	}
 	
 	private void closeAllResources()  {

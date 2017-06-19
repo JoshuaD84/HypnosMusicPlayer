@@ -100,7 +100,7 @@ import net.joshuad.musicplayer.players.FlacPlayer;
 import net.joshuad.musicplayer.players.JFlacPlayer;
 import net.joshuad.musicplayer.players.MP3Player;
 import net.joshuad.musicplayer.players.MP4Player;
-import net.joshuad.musicplayer.players.NewOggPlayer;
+import net.joshuad.musicplayer.players.OggPlayer;
 import net.joshuad.musicplayer.players.WavPlayer;
 
 
@@ -477,6 +477,7 @@ public class MusicPlayerUI extends Application {
 					currentPlayer = new FlacPlayer( track, trackPositionSlider, startPaused );
 				} catch ( Exception e ) {
 					LOGGER.log( Level.WARNING, "Using backup flac decoder for: " + track.getPath() );
+					e.printStackTrace();
 					currentPlayer = new JFlacPlayer ( track, trackPositionSlider, startPaused );
 				}
 
@@ -507,7 +508,7 @@ public class MusicPlayerUI extends Application {
 				break;
 			case OGG:
 				try {
-					currentPlayer = new NewOggPlayer( track, trackPositionSlider, startPaused );
+					currentPlayer = new OggPlayer( track, trackPositionSlider, startPaused );
 					if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );
 					if ( startPaused ) {
 						togglePlayButton.setGraphic( playImage );
@@ -795,12 +796,11 @@ public class MusicPlayerUI extends Application {
 					Boolean isNowChanging ) {
 				if ( !isNowChanging ) {
 					if ( currentPlayer != null ) {
-						currentPlayer.seekPercent(
-								trackPositionSlider.getValue() / trackPositionSlider.getMax() );
+						currentPlayer.seekPercent( trackPositionSlider.getValue() / trackPositionSlider.getMax() );
 					}
 				}
 			}
-		} );
+		});
 
 		trackPositionSlider.setOnMousePressed( ( MouseEvent e ) -> {
 			sliderMouseHeld = true;
@@ -811,22 +811,58 @@ public class MusicPlayerUI extends Application {
 			if ( currentPlayer != null ) {
 				currentPlayer.seekPercent( trackPositionSlider.getValue() / trackPositionSlider.getMax() );
 			}
-		} );
+		});
+		
 
-		HBox sliderPane = new HBox();
-		sliderPane.getChildren().addAll( timeElapsedLabel, trackPositionSlider,
-				timeRemainingLabel );
-		sliderPane.setAlignment( Pos.CENTER );
-		sliderPane.setSpacing( 5 );
+		Label volumeLabel = new Label ( "🔊" );
+		volumeLabel.setStyle( "-fx-font-size: 22px" );
+		volumeLabel.setMinWidth( 30 );
+		
+		Slider volumeSlider = new Slider();
+		volumeSlider.setMin( 0 );
+		volumeSlider.setMax( 100 );
+		volumeSlider.setValue( 100 );
+		volumeSlider.setPrefWidth( 100 );
+		
+		volumeSlider.setOnMouseDragged( ( MouseEvent e ) -> {
+			if ( currentPlayer != null ) {
+				double min = volumeSlider.getMin();
+				double max = volumeSlider.getMax();
+				double percent = (volumeSlider.getValue() - min) / (max - min);
+				currentPlayer.setVolumePercent( percent ); //Note: this works because min is 0 
+				
+				if ( percent == 0 ) {
+					volumeLabel.setText ( "🔇" );
+				} else if ( percent > 0 && percent <= .33f ) {
+					volumeLabel.setText ( "🔈" );
+				} else if ( percent > .33f && percent <= .66f ) {
+					volumeLabel.setText ( "🔉" );
+				} else if ( percent > .66f ) {
+					volumeLabel.setText ( "🔊" );
+				}
+			}
+		});
+		
+		HBox volumePane = new HBox();
+		volumePane.getChildren().addAll( volumeLabel, volumeSlider );
+		volumePane.setAlignment( Pos.CENTER );
+		volumePane.setSpacing( 5 );
+		
+		HBox positionSliderPane = new HBox();
+		positionSliderPane.getChildren().addAll( timeElapsedLabel, trackPositionSlider, timeRemainingLabel );
+		positionSliderPane.setAlignment( Pos.CENTER );
+		positionSliderPane.setSpacing( 5 );
 
 		HBox trackControls = new HBox();
-		trackControls.getChildren().addAll( previousButton, togglePlayButton, stopButton,
-				nextButton );
+		trackControls.getChildren().addAll( previousButton, togglePlayButton, stopButton, nextButton );
 		trackControls.setPadding( new Insets( 5 ) );
 		trackControls.setSpacing( 5 );
+		
+		VBox whatever = new VBox(); //TODO: Rename me
+		whatever.getChildren().addAll ( volumePane, trackControls );
 
 		HBox controls = new HBox();
-		controls.getChildren().addAll( trackControls, sliderPane );
+		controls.getChildren().addAll( whatever, positionSliderPane, volumePane );
 		controls.setSpacing( 10 );
 		controls.setAlignment( Pos.CENTER );
 
@@ -3376,6 +3412,11 @@ public class MusicPlayerUI extends Application {
 	
 	public static void setMaximized( boolean value ) {
 		mainStage.setMaximized( value );
+	}
+	
+	@Override
+	public void stop(){
+		//TODO: Use this to get rid of main
 	}
 	
 	@Override

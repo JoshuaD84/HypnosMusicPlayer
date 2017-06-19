@@ -524,7 +524,7 @@ public class Track implements Serializable {
 		Image mediaImage = null;
 		
 		try {
-			List<Artwork> artworkList = getAudioFile().getTag().getArtworkList();
+			List<Artwork> artworkList = getAudioFile().getTag().getArtworkList();//TODO: This line can throw a NPE
 			if ( artworkList != null ) {
 				for ( Artwork artwork : artworkList ) {
 					if ( artwork.getPictureType() == 3 ) {	
@@ -542,6 +542,8 @@ public class Track implements Serializable {
 		} catch ( IOException | CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch ( NullPointerException e ) {
+			//TODO:
 		}
 		
 		if ( coverImage != null ) return coverImage;
@@ -602,7 +604,7 @@ public class Track implements Serializable {
 		Image logoImage = null;
 		
 		try {
-			List<Artwork> artworkList = getAudioFile().getTag().getArtworkList();
+			List<Artwork> artworkList = getAudioFile().getTag().getArtworkList(); //TODO: This line can throw a NPE
 			if ( artworkList != null ) {
 				for ( Artwork artwork : artworkList ) {
 					if ( artwork.getPictureType() == 7 ) {	
@@ -620,6 +622,8 @@ public class Track implements Serializable {
 		} catch ( IOException | CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch ( NullPointerException e ) {
+			//TODO:
 		}
 		
 		if ( leadArtistImage != null ) return leadArtistImage;

@@ -28,7 +28,6 @@ public class JFlacPlayer extends AbstractPlayer implements Runnable {
 
 	AudioInputStream encodedInput;
 	AudioInputStream decodedInput;
-	SourceDataLine audioOutput;
 
 	private boolean pauseRequested = false;
 	private boolean playRequested = false;

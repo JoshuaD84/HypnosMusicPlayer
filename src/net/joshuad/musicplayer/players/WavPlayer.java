@@ -28,7 +28,6 @@ public class WavPlayer extends AbstractPlayer implements Runnable {
 	private static final int NO_SEEK_REQUESTED = -1;
 
 	AudioInputStream decodedInput;
-	SourceDataLine audioOutput;
 
 	private boolean pauseRequested = false;
 	private boolean playRequested = false;

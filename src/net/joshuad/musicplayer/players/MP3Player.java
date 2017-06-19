@@ -4,13 +4,16 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.AudioHeader;
 import org.jaudiotagger.audio.mp3.MP3AudioHeader;
 
+import javafx.animation.Timeline;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Tooltip;
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.BitstreamException;
 import javazoom.jl.decoder.Decoder;
@@ -19,6 +22,7 @@ import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.decoder.SampleBuffer;
 import javazoom.jl.player.AudioDevice;
 import javazoom.jl.player.FactoryRegistry;
+import javazoom.jl.player.JavaSoundAudioDevice;
 import net.joshuad.musicplayer.MusicPlayerUI;
 import net.joshuad.musicplayer.Track;
 
@@ -26,7 +30,7 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	
 	private Bitstream encodedInput;
 	private Decoder decoder;
-	private AudioDevice audioOut;
+	private AudioDevice audioDevice;
 
 	private Track track;
 	
@@ -105,8 +109,8 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 					Header header = encodedInput.readFrame();
 					if ( header == null ) {
 						// last frame, ensure all data flushed to the audio device.
-						if ( audioOut != null ) {
-							audioOut.flush();
+						if ( audioDevice != null ) {
+							audioDevice.flush();
 						}
 
 						MusicPlayerUI.songFinishedPlaying( false );
@@ -114,7 +118,7 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 					}
 	
 					SampleBuffer output = (SampleBuffer) decoder.decodeFrame( header, encodedInput );
-					audioOut.write( output.getBuffer(), 0, output.getBufferLength() );
+					audioDevice.write( output.getBuffer(), 0, output.getBufferLength() );
 					encodedInput.closeFrame();
 				} catch ( JavaLayerException e ) {
 					e.printStackTrace();
@@ -133,7 +137,7 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	
 	private void updateTransport() {
 		if ( seekRequestPercent == NO_SEEK_REQUESTED ) {
-			double positionPercent = (double) ( audioOut.getPosition() + clipStartTimeMS ) / ( (double) track.getLengthS() * 1000 );
+			double positionPercent = (double) ( audioDevice.getPosition() + clipStartTimeMS ) / ( (double) track.getLengthS() * 1000 );
 			int timeElapsed = (int)(track.getLengthS() * positionPercent);
 			int timeRemaining = track.getLengthS() - timeElapsed;
 			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, positionPercent );
@@ -156,9 +160,10 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 		}
 		
 		encodedInput = new Bitstream( bis );
-		audioOut = FactoryRegistry.systemRegistry().createAudioDevice();
+		audioDevice = FactoryRegistry.systemRegistry().createAudioDevice();
+			
 		decoder = new Decoder();
-		audioOut.open( decoder );
+		audioDevice.open( decoder );
 	}
 
 	public long getBytePosition ( File file, long targetTimeMS ) {
@@ -192,8 +197,8 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	
 	private void closeAllResources() {
 		try {
-			audioOut.flush();
-			audioOut.close();
+			audioDevice.flush();
+			audioDevice.close();
 			encodedInput.close();
 		} catch ( BitstreamException e) {
 			// TODO Auto-generated catch block
@@ -213,7 +218,7 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	
 	@Override
 	public long getPositionMS() {
-		return audioOut.getPosition() + clipStartTimeMS;
+		return audioDevice.getPosition() + clipStartTimeMS;
 	}
 	
 	@Override 

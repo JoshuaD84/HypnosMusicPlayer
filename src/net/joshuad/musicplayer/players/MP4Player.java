@@ -7,7 +7,6 @@ import java.util.List;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.SourceDataLine;
 
 import javafx.scene.control.Slider;
 import net.joshuad.musicplayer.MusicPlayerUI;
@@ -25,13 +24,10 @@ public class MP4Player extends AbstractPlayer implements Runnable {
 	
 	private static final int NO_SEEK_REQUESTED = -1;
 
-	SourceDataLine audioOutput;
-	
 	Decoder decoder;
 	AudioTrack audioTrack;
 	SampleBuffer buffer;
 	
-
 	private boolean pauseRequested = false;
 	private boolean playRequested = false;
 	private boolean stopRequested = false;

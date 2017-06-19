@@ -11,7 +11,12 @@ Make sure horizontal scroll bars never appear
 	
 Lyrics?
 
+If i close the program with a single track playing from a playlist, it loads w/ only that track on the list. 
+
 Show total length on currentlist somewhere.  
+
+Remember windowed-width even if maximized
+	https://stackoverflow.com/questions/44636866/save-and-set-the-not-maximized-window-size?noredirect=1#comment76260490_44636866
 
 Rename java process to Hypnos
 
@@ -25,6 +30,9 @@ Tray icon
 	What other systems don't support? How to handle? 
 
 Volume control
+	Working mostly
+	MP3 - not working
+	Leonard Cohen - You want it darker - not working
 
 Refactor / organize my code. 
  	Separate player / ui systems. 
@@ -34,7 +42,8 @@ Hot Keys
   
 Decoders
 	Ogg
-	
+		Works, seeking is done using read() instead of skip(), so it's a little slow.
+		
 	m4b - Double speed play for some reason
 	
 	Flac
