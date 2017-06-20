@@ -33,7 +33,7 @@
 	<target name="jar" depends="compile" description="Create a jar.">
 		<jar destfile="${jarFile}" basedir="${build}">
 			<manifest>
-				<attribute name="Main-Class" value="net.joshuad.musicplayer.MusicPlayerUI" />
+				<attribute name="Main-Class" value="net.joshuad.hypnos.MusicPlayerUI" />
 				<attribute name="Class-Path" value="lib/commons-cli-1.4.jar lib/jaad-0.8.4-nospi.jar
 													lib/jaudiotagger-2.2.6-SNAPSHOT.jar lib/jflac-1.2.jar
 													lib/jl1.0.1.jar lib/jogg-0.0.7.jar lib/jorbis-0.0.15.jar

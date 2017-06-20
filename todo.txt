@@ -13,8 +13,6 @@ Lyrics?
 
 Some way to get the file name corresponding to a file in the current list. 
 
-change net.joshuad.musicplayer to net.joshuad.hypnos
-
 If i close the program with a single track playing from a playlist, it loads w/ only that track on the list. 
 
 Show total length on currentlist somewhere.  
