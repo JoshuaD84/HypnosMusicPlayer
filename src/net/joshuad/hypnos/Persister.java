@@ -491,7 +491,8 @@ public class Persister {
 				try {
 					switch ( tag ) {
 						case SETTING_TAG_TRACK:
-							MusicPlayerUI.loadTrack( value, true );
+							Track track = new Track ( Paths.get( value ), false );
+							MusicPlayerUI.playTrack( track, true );
 							break;
 							
 						case SETTING_TAG_TRACK_POSITION:
