@@ -6,14 +6,33 @@ track buffering, so there's a cushion in case reading becomes spotty
 
 Log files are messy, not handled right. Proper logging throughout program
 
+Mulit-select on playlist tab
+
+Changing tag information doesn't update all the proper places.
+	Changing disc info on album list
+	changing album info when the album is loaded in current list. 
+
+Playlist Info window
+	Can't drag and drop from it to current list
+	
 Make sure horizontal scroll bars never appear
 	6/9 - Can't find anything on google.
 	
-Lyrics?
-
+Lyrics
+	http://lyrics.wikia.com	- No API
+	https://www.musixmatch.com/ - Charges a fee, can we scrape?
+	https://github.com/jkiddo/gmusic.api
+	
 Some way to get the file name corresponding to a file in the current list. 
+	Use album info window or something like it? 
 
-Show total length on currentlist somewhere.  
+Why do tracks that "don't have an album" have an album listed in the album column?
+
+Show total length of currentlist somewhere.  
+
+Maybe show current playing track info, like bitrate, etc. This would probably go in a status bar at the bottom. 
+
+link the persisted current playing file w/ the current list if it's on there
 
 Remember windowed-width even if maximized
 	https://stackoverflow.com/questions/44636866/save-and-set-the-not-maximized-window-size?noredirect=1#comment76260490_44636866
@@ -22,22 +41,17 @@ Rename java process to Hypnos
 
 Redesign the transport
 
-Have a single thread handle playing all tracks. Have it be the same thread that accepts requests rather than spawning new threads off UI actions. 
-
-
 Tray icon
 	Gnome 3 doesn't support. Code works but creates a bad entry on taskbar.
 	What systems do support? 
 	What other systems don't support? How to handle? 
 
-Volume control
-	Working mostly
-	MP3 - not working
-	Leonard Cohen - You want it darker - not working
-
 Refactor / organize my code. 
  	Separate player / ui systems. 
+ 	
  	Re-design the code for the current playing info box above the current list.
+ 	
+ 	Have a single thread handle playing all tracks. Have it be the same thread that accepts requests rather than spawning new threads off UI actions. 
 
 Hot Keys
   
@@ -49,15 +63,10 @@ Decoders
 	
 	Flac
 		Can we get flacplayer.java to play things that we need jflac for:
-		Adrian Orange
-		A Perfect Circle - Mer de noms
-		<Any others?>
-		Pink Floyd - Pulse (disc 1)
+			Adrian Orange
+			A Perfect Circle - Mer de noms
+			Pink Floyd - Pulse (disc 1)
 		
-	Wav:
-		No line matching interface SourceDataLine supporting format PCM_FLOAT 44100.0 Hz, 32 bit, stereo, 8 bytes/frame
-
-
 	Test Cases
 		organfinale.wav
 			No line matching interface SourceDataLine supporting format PCM_FLOAT 44100.0 Hz, 32 bit, stereo, 8 bytes/frame,  is supported.
@@ -100,6 +109,9 @@ Linux
 	use a compiled launcher rather than a script -- it allows shell double click. 
 	Standalone build - Linux64 embedded JRE
 	Standalone build - Linux32 embedded JRE
+	
+	Gnome3 
+		Right click -> Open with -- loads the files to current list, but doesn't start playing. 
 
 OSX
 	Does our package work? 
@@ -107,5 +119,5 @@ OSX
 	.DMG installer
 
 
-Useful UTF Characters
-	≡✘⏏💾⇉🔀⇥🔁🔂
+Useful UTF Glyphs
+	≡✘⏏💾⇉🔀⇥🔁🔂🔊🔇🔈🔉🔊
