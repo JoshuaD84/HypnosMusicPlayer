@@ -14,19 +14,7 @@ import javax.sound.sampled.SourceDataLine;
 
 public class OggPlayer extends AbstractPlayer implements Runnable {
 	
-	OggDecoder decoder;
-	
-	private Track track;
-	
-	private boolean pauseRequested = false;
-	private boolean playRequested = false;
-	private boolean stopRequested = false;
-	private double seekRequestPercent = NO_SEEK_REQUESTED;
-	private long clipStartTimeMS = 0; //If we seek, we need to remember where we started so we can make the seek bar look right. 
-	
-	private boolean paused = false;
-	
-	Slider trackPosition;
+	OggDecoderLogic decoder;
 	
 	public OggPlayer ( Track track, Slider trackPositionSlider, boolean startPaused  ) throws IOException {
 		this.track = track;
@@ -105,24 +93,10 @@ public class OggPlayer extends AbstractPlayer implements Runnable {
 		MusicPlayerUI.songFinishedPlaying( false );
 		closeAllResources();
 	}
-	
-	private void updateTransport() {
-		if ( seekRequestPercent == NO_SEEK_REQUESTED ) {
-
-			double positionPercent = (double) ( getPositionMS() + clipStartTimeMS ) / ( (double) track.getLengthS() * 1000 );
-			int timeElapsed = (int)(track.getLengthS() * positionPercent);
-			int timeRemaining = track.getLengthS() - timeElapsed;
-			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, positionPercent );
-		} else {
-			int timeElapsed = (int)(track.getLengthS() * seekRequestPercent);
-			int timeRemaining = track.getLengthS() - timeElapsed;
-			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, seekRequestPercent );
-		}
-	}
 
 	private void openStreamsAtRequestedOffset() throws IOException {
 
-		decoder = new OggDecoder ( track.getPath().toFile() );
+		decoder = new OggDecoderLogic ( track.getPath().toFile() );
 		
 		int channels = decoder.getChannels();
 		int rate = decoder.getRate();
@@ -156,11 +130,6 @@ public class OggPlayer extends AbstractPlayer implements Runnable {
 		}
 	}
 	
-	@Override
-	public long getPositionMS() {
-		return (long)( audioOutput.getMicrosecondPosition() / 1e3 );
-	}
-	
 	private void closeAllResources () {
 
 		audioOutput.drain();
@@ -168,40 +137,5 @@ public class OggPlayer extends AbstractPlayer implements Runnable {
 		audioOutput.close();
 		decoder.close();
 		
-	}
-	
-	@Override 
-	public void pause() {
-		pauseRequested = true;
-	}
-	
-	@Override 
-	public void play() {
-		playRequested = true;
-	}
-	
-	@Override 
-	public void stop() {
-		stopRequested = true;
-	}
-	
-	@Override 
-	public void seekPercent ( double positionPercent ) {
-		seekRequestPercent = positionPercent;
-	}
-	
-	@Override 
-	public void seekMS ( long milliseconds ) {
-		seekRequestPercent = milliseconds / ( track.getLengthS() * 1000 );
-	}
-	
-	@Override 
-	public boolean isPaused() {
-		return paused;
-	}
-
-	@Override
-	public Track getTrack () {
-		return track;
 	}
 }

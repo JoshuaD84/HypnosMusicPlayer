@@ -96,13 +96,6 @@ import javafx.util.Callback;
 import javafx.util.Duration;
 import net.joshuad.musicplayer.DraggedTrackContainer.DragSource;
 import net.joshuad.musicplayer.players.AbstractPlayer;
-import net.joshuad.musicplayer.players.FlacPlayer;
-import net.joshuad.musicplayer.players.JFlacPlayer;
-import net.joshuad.musicplayer.players.MP3Player;
-import net.joshuad.musicplayer.players.MP4Player;
-import net.joshuad.musicplayer.players.OggPlayer;
-import net.joshuad.musicplayer.players.WavPlayer;
-
 
 @SuppressWarnings({ "rawtypes", "unchecked" }) // TODO: Maybe get rid of this when I understand things better
 public class MusicPlayerUI extends Application {
@@ -470,72 +463,21 @@ public class MusicPlayerUI extends Application {
 			}
 			togglePlayButton.setGraphic( playImage );
 		}
-
-		switch ( track.getFormat() ) {
-			case FLAC:
-				try {
-					currentPlayer = new FlacPlayer( track, trackPositionSlider, startPaused );
-				} catch ( Exception e ) {
-					LOGGER.log( Level.WARNING, "Using backup flac decoder for: " + track.getPath() );
-					e.printStackTrace();
-					currentPlayer = new JFlacPlayer ( track, trackPositionSlider, startPaused );
-				}
-
-				if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );
-				if ( startPaused ) {
-					togglePlayButton.setGraphic( playImage );
-				} else {
-					togglePlayButton.setGraphic( pauseImage );
-				}
-				break;
-			case MP3:
-				currentPlayer = new MP3Player( track, trackPositionSlider, startPaused );
-				if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );
-				if ( startPaused ) {
-					togglePlayButton.setGraphic( playImage );
-				} else {
-					togglePlayButton.setGraphic( pauseImage );
-				}
-				break;
-			case AAC:
-				currentPlayer = new MP4Player( track, trackPositionSlider, startPaused );
-				if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );
-				if ( startPaused ) {
-					togglePlayButton.setGraphic( playImage );
-				} else {
-					togglePlayButton.setGraphic( pauseImage );
-				}
-				break;
-			case OGG:
-				try {
-					currentPlayer = new OggPlayer( track, trackPositionSlider, startPaused );
-					if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );
-					if ( startPaused ) {
-						togglePlayButton.setGraphic( playImage );
-					} else {
-						togglePlayButton.setGraphic( pauseImage );
-					}
-				} catch ( IOException e ) {
-					//TODO: 
-					e.printStackTrace();
-				}
-				break;
-				
-			case WAV:
-				currentPlayer = new WavPlayer ( track, trackPositionSlider, startPaused );
-				if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( true );
-				if ( startPaused ) {
-					togglePlayButton.setGraphic( playImage );
-				} else {
-					togglePlayButton.setGraphic( pauseImage );
-				}
-				break;
-			case UNKNOWN:
-			default:
-				System.out.println ( "Unknown music file type" );
-				return;
+		
+		currentPlayer = AbstractPlayer.getPlayer( track, trackPositionSlider, startPaused );
+		
+		if ( currentPlayer == null ) return;
+		
+		if ( track instanceof CurrentListTrack ) {
+			((CurrentListTrack)track).setIsCurrentTrack( true );
 		}
-
+		
+		if ( startPaused ) {
+			togglePlayButton.setGraphic( playImage );
+		} else {
+			togglePlayButton.setGraphic( pauseImage );
+		}
+		
 		if ( addToPreviousNextStack ) {
 			while ( previousNextStack.size() >= MAX_PREVIOUS_NEXT_STACK_SIZE ) {
 				previousNextStack.remove( previousNextStack.size() - 1 );

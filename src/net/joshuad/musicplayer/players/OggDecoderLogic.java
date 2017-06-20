@@ -16,7 +16,7 @@ import com.jcraft.jorbis.Comment;
 import com.jcraft.jorbis.DspState;
 import com.jcraft.jorbis.Info;
 
-public class OggDecoder {
+public class OggDecoderLogic {
 	
 	private InputStream encodedInput = null;
 	private File file;
@@ -40,7 +40,7 @@ public class OggDecoder {
 	
 	private int totalBytesInStream = 0;
 	
-	public OggDecoder ( File file ) throws IOException {
+	public OggDecoderLogic ( File file ) throws IOException {
 		this.file = file;
 		encodedInput = new FileInputStream ( file );
 

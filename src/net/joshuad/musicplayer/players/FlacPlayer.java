@@ -9,33 +9,22 @@ import net.joshuad.musicplayer.Track;
 
 public final class FlacPlayer extends AbstractPlayer implements Runnable {
 	
-	private Track track;
-	private FlacDecoder decodedInput;
-	
-	private boolean pauseRequested = false;
-	private boolean playRequested = false;
-	private boolean stopRequested = false;
-	private double seekRequestPercent = -1;	// -1 means no seek request pending. 
-	private long clipStartTime = 0; //If we seek, we need to remember where we started so we can make the seek bar look right. 
-	
-	private boolean paused = false;
-	
-	Slider trackPosition;
+	private FlacDecoderLogic decodedInput;
 	
 	public FlacPlayer ( Track track, Slider trackPositionSlider, boolean startPaused ) throws IOException, LineUnavailableException {
 		this.track = track;
 		this.trackPosition = trackPositionSlider;
 		this.pauseRequested = startPaused;
 		
-		decodedInput = new FlacDecoder ( track.getPath().toAbsolutePath().toFile() );
-		if ( decodedInput.numSamples == 0 ) throw new FlacDecoder.FormatException("Unknown audio length");
+		decodedInput = new FlacDecoderLogic ( track.getPath().toAbsolutePath().toFile() );
+		if ( decodedInput.numSamples == 0 ) throw new FlacDecoderLogic.FormatException("Unknown audio length");
 		
 		AudioFormat outputFormat = new AudioFormat ( decodedInput.sampleRate, decodedInput.sampleDepth, decodedInput.numChannels, true, false );
 		
 		audioOutput = (SourceDataLine)AudioSystem.getLine( new DataLine.Info( SourceDataLine.class, outputFormat ) );
 		
 		audioOutput.open ( outputFormat ); 
-		clipStartTime = 0;
+		clipStartTimeMS = 0;
 		
 		Thread t = new Thread ( this );
 		t.setDaemon( true );
@@ -76,7 +65,7 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 	
 					long[][] samples = decodedInput.seekAndReadBlock ( samplePos );
 					audioOutput.flush();
-					clipStartTime = audioOutput.getMicrosecondPosition() - Math.round(samplePos * 1e6 / decodedInput.sampleRate);
+					clipStartTimeMS = audioOutput.getMicrosecondPosition() - Math.round(samplePos * 1e6 / decodedInput.sampleRate);
 				
 					seekRequestPercent = -1;
 					
@@ -149,7 +138,7 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 			}
 			
 			if ( seekRequestPercent == -1 && !stopRequested ) {
-				double timePos = ( audioOutput.getMicrosecondPosition() - clipStartTime ) / 1e6;
+				double timePos = ( audioOutput.getMicrosecondPosition() - clipStartTimeMS ) / 1e6;
 				double positionPercent = timePos * decodedInput.sampleRate / decodedInput.numSamples;
 				int timeElapsed = (int)(track.getLengthS() * positionPercent);
 				int timeRemaining = track.getLengthS() - timeElapsed;
@@ -171,41 +160,6 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 			//TODO: 
 			e.printStackTrace();
 		}
-	}
-	
-	@Override 
-	public void pause() {
-		pauseRequested = true;
-	}
-	
-	@Override 
-	public void play() {
-		playRequested = true;
-	}
-	
-	@Override 
-	public void stop() {
-		stopRequested = true;
-	}
-	
-	@Override 
-	public void seekPercent ( double positionPercent ) {
-		seekRequestPercent = positionPercent;
-	}
-	
-	@Override 
-	public void seekMS ( long milliseconds ) {
-		seekRequestPercent = milliseconds / ( track.getLengthS() * 1000 );
-	}
-	
-	@Override 
-	public boolean isPaused() {
-		return paused;
-	}
-
-	@Override
-	public Track getTrack () {
-		return track;
 	}
 }
 	

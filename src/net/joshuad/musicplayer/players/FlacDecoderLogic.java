@@ -32,7 +32,7 @@ import java.io.RandomAccessFile;
 import java.util.Arrays;
 
 
-final class FlacDecoder {
+public final class FlacDecoderLogic {
 	
 	private Stream input;
 	private long metadataEndPos;
@@ -43,7 +43,7 @@ final class FlacDecoder {
 	public long numSamples = -1;
 	public int constantBlockSize = -1;
 	
-	public FlacDecoder ( File file ) throws IOException {
+	public FlacDecoderLogic ( File file ) throws IOException {
 		input = new Stream(file);
 		int magicString = input.readUint(32);
 		/*if ( magicString != 0x664C6143 ) {
@@ -161,7 +161,7 @@ final class FlacDecoder {
 		if (input.readUint(1) != 0)
 			throw new FormatException("Reserved bit");
 		int blockStrategy = input.readUint(1);
-		
+
 		// Read numerous header fields, and ignore some of them
 		int blockSizeCode = input.readUint(4);
 		int sampleRateCode = input.readUint(4);
@@ -187,7 +187,7 @@ final class FlacDecoder {
 			for (int i = 0; i < rawPosNumBytes; i++)
 				rawPosition = (rawPosition << 6) | (input.readUint(8) & 0x3F);
 		}
-		
+
 		int blockSize;
 		if (blockSizeCode == 1)
 			blockSize = 192;
@@ -213,6 +213,7 @@ final class FlacDecoder {
 		long[][] samples = decodeSubframes(blockSize, sampleDepth, chanAsgn);
 		input.alignToByte();
 		input.readUint(16);
+
 		return new Object[]{samples, rawPosition * (blockStrategy == 0 ? constantBlockSize : 1)};
 	}
 	

@@ -11,6 +11,10 @@ Make sure horizontal scroll bars never appear
 	
 Lyrics?
 
+Some way to get the file name corresponding to a file in the current list. 
+
+change net.joshuad.musicplayer to net.joshuad.hypnos
+
 If i close the program with a single track playing from a playlist, it loads w/ only that track on the list. 
 
 Show total length on currentlist somewhere.  
@@ -23,6 +27,7 @@ Rename java process to Hypnos
 Redesign the transport
 
 Have a single thread handle playing all tracks. Have it be the same thread that accepts requests rather than spawning new threads off UI actions. 
+
 
 Tray icon
 	Gnome 3 doesn't support. Code works but creates a bad entry on taskbar.
@@ -57,6 +62,35 @@ Decoders
 		No line matching interface SourceDataLine supporting format PCM_FLOAT 44100.0 Hz, 32 bit, stereo, 8 bytes/frame
 
 
+	Test Cases
+		organfinale.wav
+			No line matching interface SourceDataLine supporting format PCM_FLOAT 44100.0 Hz, 32 bit, stereo, 8 bytes/frame,  is supported.
+			at javax.sound.sampled.AudioSystem.getLine(AudioSystem.java:479)
+			at net.joshuad.musicplayer.players.WavPlayer.openStreamsAtRequestedOffset(WavPlayer.java:133)
+		
+		Leonard Cohen - You want it Darker
+			No volume control
+			
+		*.m4b
+			Double play speed
+			
+		three-silver.ogg
+			Long files take a long time to seek
+			Long load time
+			
+		normal.wav
+			Slow seek
+			
+		c304-2.wav
+			Slow load, slow seek
+		
+		long.m4a
+			No load
+
+		normal.ogg
+			Trouble seeking
+			
+			
 Windows
 	Open-with shell integration
 	Installer

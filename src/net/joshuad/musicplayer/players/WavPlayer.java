@@ -22,25 +22,8 @@ import net.joshuad.musicplayer.MusicPlayerUI;
 import net.joshuad.musicplayer.Track;
 
 public class WavPlayer extends AbstractPlayer implements Runnable {
-
-	private Track track;
-
-	private static final int NO_SEEK_REQUESTED = -1;
-
+	
 	AudioInputStream decodedInput;
-
-	private boolean pauseRequested = false;
-	private boolean playRequested = false;
-	private boolean stopRequested = false;
-	private double seekRequestPercent = -1;	// -1 means no seek request pending. 
-	private long clipStartTime = 0; //If we seek, we need to remember where we started so we can make the seek bar look right. 
-	
-	private boolean paused = false;
-	
-	private Slider trackPosition;
-	
-	private final int EXTERNAL_BUFFER_SIZE = 4096; 
-	
 	
 	public WavPlayer ( Track track, Slider trackPosition ) {
 		this ( track, trackPosition, false );
@@ -107,7 +90,7 @@ public class WavPlayer extends AbstractPlayer implements Runnable {
 			
 			if ( !paused ) {
 				try {
-					byte[] data = new byte[ EXTERNAL_BUFFER_SIZE ];
+					byte[] data = new byte[ 4096 ];
 					int bytesRead = decodedInput.read ( data, 0, data.length );
 					
 					if ( bytesRead < 0 ) {
@@ -135,28 +118,13 @@ public class WavPlayer extends AbstractPlayer implements Runnable {
 
 	}
 	
-	private void updateTransport() {
-		
-		if ( seekRequestPercent == NO_SEEK_REQUESTED ) {
-			//System.out.println ( "Clip start time: " + clipStartTime );
-			double positionPercent = (double) ( audioOutput.getMicrosecondPosition() + clipStartTime * 1000 ) / ( (double) track.getLengthS() * 1000000 );
-			int timeElapsed = (int)(track.getLengthS() * positionPercent);
-			int timeRemaining = track.getLengthS() - timeElapsed;
-			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, positionPercent );
-		} else {
-			int timeElapsed = (int)(track.getLengthS() * seekRequestPercent);
-			int timeRemaining = track.getLengthS() - timeElapsed;
-			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, seekRequestPercent );
-		}
-	}
-	
 	private void openStreamsAtRequestedOffset ( ) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
 		decodedInput = AudioSystem.getAudioInputStream( track.getPath().toFile() );
 		
 		if ( seekRequestPercent != NO_SEEK_REQUESTED ) {
 			int seekPositionMS = (int) ( track.getLengthS() * 1000 * seekRequestPercent );
 			long bytesRead = decodedInput.skip ( getBytePosition ( seekPositionMS ) );
-			clipStartTime = seekPositionMS;
+			clipStartTimeMS = seekPositionMS;
 		}
 		
 		AudioFormat decoderFormat = decodedInput.getFormat();
@@ -194,47 +162,5 @@ public class WavPlayer extends AbstractPlayer implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	
-	@Override
-	public long getPositionMS() {
-		return (long)( audioOutput.getMicrosecondPosition() / 1e6 );
-	}
-	
-
-	@Override 
-	public void pause() {
-		pauseRequested = true;
-	}
-	
-	@Override 
-	public void play() {
-		playRequested = true;
-	}
-	
-	@Override 
-	public void stop() {
-		stopRequested = true;
-	}
-	
-	@Override 
-	public void seekPercent ( double positionPercent ) {
-		seekRequestPercent = positionPercent;
-		updateTransport();
-	}
-	
-	@Override 
-	public void seekMS ( long milliseconds ) {
-		seekRequestPercent = milliseconds / ( track.getLengthS() * 1000 );
-	}
-
-	@Override
-	public boolean isPaused() {
-		return paused;
-	}
-	
-	@Override
-	public Track getTrack () {
-		return track;
 	}
 }

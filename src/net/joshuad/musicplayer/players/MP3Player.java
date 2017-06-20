@@ -4,25 +4,25 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
+
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.SourceDataLine;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.AudioHeader;
 import org.jaudiotagger.audio.mp3.MP3AudioHeader;
 
-import javafx.animation.Timeline;
 import javafx.scene.control.Slider;
-import javafx.scene.control.Tooltip;
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.BitstreamException;
 import javazoom.jl.decoder.Decoder;
 import javazoom.jl.decoder.Header;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.decoder.SampleBuffer;
-import javazoom.jl.player.AudioDevice;
-import javazoom.jl.player.FactoryRegistry;
-import javazoom.jl.player.JavaSoundAudioDevice;
 import net.joshuad.musicplayer.MusicPlayerUI;
 import net.joshuad.musicplayer.Track;
 
@@ -30,21 +30,7 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	
 	private Bitstream encodedInput;
 	private Decoder decoder;
-	private AudioDevice audioDevice;
 
-	private Track track;
-	
-	private boolean pauseRequested = false;
-	private boolean playRequested = false;
-	private boolean stopRequested = false;
-	private double seekRequestPercent = NO_SEEK_REQUESTED;	
-	private long clipStartTimeMS = 0; //If we seek, we need to remember where we started so we can make the seek bar look right. 
-	
-	private boolean paused = false;
-	
-	private Slider trackPosition;
-
-	
 	public MP3Player ( Track track, Slider trackPosition ) {
 		this ( track, trackPosition, false );
 	}
@@ -108,18 +94,20 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 				try {
 					Header header = encodedInput.readFrame();
 					if ( header == null ) {
-						// last frame, ensure all data flushed to the audio device.
-						if ( audioDevice != null ) {
-							audioDevice.flush();
-						}
 
 						MusicPlayerUI.songFinishedPlaying( false );
 						break; // We reached the end of the file. 
 					}
 	
 					SampleBuffer output = (SampleBuffer) decoder.decodeFrame( header, encodedInput );
-					audioDevice.write( output.getBuffer(), 0, output.getBufferLength() );
+					
+					byte[] writeMe = convertToBytes ( output.getBuffer() );
+					
+					audioOutput.write( writeMe, 0, writeMe.length );
+					
+					
 					encodedInput.closeFrame();
+					
 				} catch ( JavaLayerException e ) {
 					e.printStackTrace();
 				}
@@ -135,17 +123,20 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 		}
 	}
 	
-	private void updateTransport() {
-		if ( seekRequestPercent == NO_SEEK_REQUESTED ) {
-			double positionPercent = (double) ( audioDevice.getPosition() + clipStartTimeMS ) / ( (double) track.getLengthS() * 1000 );
-			int timeElapsed = (int)(track.getLengthS() * positionPercent);
-			int timeRemaining = track.getLengthS() - timeElapsed;
-			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, positionPercent );
-		} else {
-			int timeElapsed = (int)(track.getLengthS() * seekRequestPercent);
-			int timeRemaining = track.getLengthS() - timeElapsed;
-			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, seekRequestPercent );
+	private byte[] convertToBytes ( short[] samples ) {
+		
+		byte[] b = new byte[ samples.length*2];
+		int idx = 0;
+		short s;
+		int len = samples.length;
+		int offs = 0;
+		while ( len-- > 0)
+		{
+			s = samples[offs++];
+			b[idx++] = (byte)s;
+			b[idx++] = (byte)(s>>>8);
 		}
+		return b;
 	}
 	
 	public void openStreamsAtRequestedOffset () throws IOException, JavaLayerException {
@@ -160,10 +151,30 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 		}
 		
 		encodedInput = new Bitstream( bis );
-		audioDevice = FactoryRegistry.systemRegistry().createAudioDevice();
 			
 		decoder = new Decoder();
-		audioDevice.open( decoder );
+		
+		AudioFormat outputFormat = new AudioFormat( 44100, 16, 2, true, false ); //TODO: Do we need to generalize this? 
+		DataLine.Info datalineInfo = new DataLine.Info( SourceDataLine.class, outputFormat, AudioSystem.NOT_SPECIFIED );
+
+		try {
+			audioOutput = (SourceDataLine) AudioSystem.getLine( datalineInfo );
+			audioOutput.open( outputFormat );
+		} catch ( LineUnavailableException exception ) {
+			System.out.println( "The audio output line could not be opened due to resource restrictions." );
+			System.err.println( exception );
+			return;
+		} catch ( IllegalStateException exception ) {
+			System.out.println( "The audio output line is already open." );
+			System.err.println( exception );
+			return;
+		} catch ( SecurityException exception ) {
+			System.out.println( "The audio output line could not be opened due to security restrictions." );
+			System.err.println( exception );
+			return;
+		}
+
+		audioOutput.start();
 	}
 
 	public long getBytePosition ( File file, long targetTimeMS ) {
@@ -197,8 +208,8 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	
 	private void closeAllResources() {
 		try {
-			audioDevice.flush();
-			audioDevice.close();
+			audioOutput.flush();
+			audioOutput.close();
 			encodedInput.close();
 		} catch ( BitstreamException e) {
 			// TODO Auto-generated catch block
@@ -214,47 +225,5 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 			throw new JavaLayerException( "Exception decoding audio frame", ex );
 		}
 		return true;
-	}
-	
-	@Override
-	public long getPositionMS() {
-		return audioDevice.getPosition() + clipStartTimeMS;
-	}
-	
-	@Override 
-	public void pause() {
-		pauseRequested = true;
-	}
-	
-	@Override 
-	public void play() {
-		playRequested = true;
-	}
-	
-	@Override 
-	public void stop() {
-		stopRequested = true;
-	}
-	
-	@Override 
-	public void seekPercent ( double positionPercent ) {
-		seekRequestPercent = positionPercent;
-		updateTransport();
-	}
-	
-	@Override 
-	public void seekMS ( long milliseconds ) {
-		seekRequestPercent = milliseconds / (double)( track.getLengthS() * 1000 );	
-
-	}
-
-	@Override
-	public boolean isPaused() {
-		return paused;
-	}
-	
-	@Override
-	public Track getTrack () {
-		return track;
 	}
 }

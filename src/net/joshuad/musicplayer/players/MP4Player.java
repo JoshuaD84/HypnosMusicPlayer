@@ -20,23 +20,9 @@ import net.sourceforge.jaad.mp4.api.Movie;
 
 public class MP4Player extends AbstractPlayer implements Runnable {
 
-	private Track track;
-	
-	private static final int NO_SEEK_REQUESTED = -1;
-
 	Decoder decoder;
 	AudioTrack audioTrack;
 	SampleBuffer buffer;
-	
-	private boolean pauseRequested = false;
-	private boolean playRequested = false;
-	private boolean stopRequested = false;
-	private double seekRequestPercent = NO_SEEK_REQUESTED;	
-	private long clipStartTime = 0; //If we seek, we need to remember where we started so we can make the seek bar look right. 
-	
-	private boolean paused = false;
-	
-	private Slider trackPosition;
 	
 	public MP4Player ( Track track, Slider trackPosition ) {
 		this ( track, trackPosition, false );
@@ -114,20 +100,6 @@ public class MP4Player extends AbstractPlayer implements Runnable {
 		}
 	}
 	
-	private void updateTransport() {
-		if ( seekRequestPercent == NO_SEEK_REQUESTED ) {
-			double positionPercent = (double) ( audioOutput.getMicrosecondPosition() + clipStartTime * 1000 ) / ( (double) track.getLengthS() * 1000000 );
-			int timeElapsed = (int)(track.getLengthS() * positionPercent);
-			int timeRemaining = track.getLengthS() - timeElapsed;
-			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, positionPercent );
-		} else {
-			int timeElapsed = (int)(track.getLengthS() * seekRequestPercent);
-			int timeRemaining = track.getLengthS() - timeElapsed;
-			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, seekRequestPercent );
-		}
-	}
-	
-
 	private void openStreamsAtRequestedOffset() {
 		try {
 			RandomAccessFile input = new RandomAccessFile( track.getPath().toFile(), "r" );
@@ -136,7 +108,7 @@ public class MP4Player extends AbstractPlayer implements Runnable {
 			final Movie movie = cont.getMovie();
 			final List <net.sourceforge.jaad.mp4.api.Track> tracks = movie.getTracks( AudioTrack.AudioCodec.AAC );
 			if ( tracks.isEmpty() ) {
-				//TODO: 
+				//TODO: This happens in Test Cases/last-minstrel.m4a
 			}
 			audioTrack = (AudioTrack) tracks.get( 0 );
 			
@@ -169,7 +141,7 @@ public class MP4Player extends AbstractPlayer implements Runnable {
 					audioTrack.readNextFrame();
 				}
 			
-				clipStartTime = (long)(lengthMS * seekRequestPercent);
+				clipStartTimeMS = (long)(lengthMS * seekRequestPercent);
 			}
 		
 		} catch ( IOException | LineUnavailableException e ) {
@@ -182,48 +154,6 @@ public class MP4Player extends AbstractPlayer implements Runnable {
 		audioOutput.drain();
 		audioOutput.stop();
 		audioOutput.close();
-	}
-	
-	
-	@Override
-	public long getPositionMS() {
-		return (long)( audioOutput.getMicrosecondPosition() / 1e6 );
-	}
-	
-	@Override 
-	public void pause() {
-		pauseRequested = true;
-	}
-	
-	@Override 
-	public void play() {
-		playRequested = true;
-	}
-	
-	@Override 
-	public void stop() {
-		stopRequested = true;
-	}
-	
-	@Override 
-	public void seekPercent ( double positionPercent ) {
-		seekRequestPercent = positionPercent;
-		updateTransport();
-	}
-	
-	@Override 
-	public void seekMS ( long milliseconds ) {
-		seekRequestPercent = milliseconds / ( track.getLengthS() * 1000 );
-	}
-
-	@Override
-	public boolean isPaused() {
-		return paused;
-	}
-	
-	@Override
-	public Track getTrack () {
-		return track;
 	}
 }
 
