@@ -1,5 +1,6 @@
 package net.joshuad.hypnos.players;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -18,7 +19,7 @@ import com.jcraft.jorbis.Info;
 
 public class OggDecoderLogic {
 	
-	private InputStream encodedInput = null;
+	private BufferedInputStream encodedInput = null;
 	private File file;
 	
 	private int bufferSize = 2048;
@@ -42,7 +43,7 @@ public class OggDecoderLogic {
 	
 	public OggDecoderLogic ( File file ) throws IOException {
 		this.file = file;
-		encodedInput = new FileInputStream ( file );
+		encodedInput = new BufferedInputStream ( new FileInputStream ( file ) );
 
 		joggSyncState.init();
 		joggSyncState.buffer( bufferSize );

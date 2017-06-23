@@ -8,8 +8,6 @@ Styles
 	Light
 		File stylesheet = new File ( "style.css" );
 		scene.getStylesheets().add( "file:///" + stylesheet.getAbsolutePath().replace( "\\", "/" ) ); //TODO: DD
-		
-track buffering, so there's a cushion in case reading becomes spotty
 
 Log files are messy, not handled right. Proper logging throughout program
 
@@ -54,6 +52,9 @@ Refactor / organize my code.
 Hot Keys
   
 Decoders
+	Mp4
+		buffered input stream on the random access File stream
+		
 	Ogg
 		Works, seeking is done using read() instead of skip(), so it's a little slow.
 		
@@ -64,6 +65,8 @@ Decoders
 			Adrian Orange
 			A Perfect Circle - Mer de noms
 			Pink Floyd - Pulse (disc 1)
+			
+		buffered input stream on the random access File stream
 		
 	Test Cases
 		organfinale.wav
@@ -92,7 +95,9 @@ Decoders
 
 		normal.ogg
 			Trouble seeking
-			
+		
+	Wav
+		BufferedInputStream
 			
 Windows
 	Open-with shell integration
