@@ -35,8 +35,7 @@ Show total length of currentlist somewhere.
 Maybe show current playing track info, like bitrate, etc. This would probably go in a status bar at the bottom. 
 
 Remember windowed-width even if maximized
-	https://stackoverflow.com/questions/44636866/save-and-set-the-not-maximized-window-size?noredirect=1#comment76260490_44636866
-
+	https://stackoverflow.com/questions/44636866/save-and-set-the-not-maximized-window-size
 
 Redesign the transport
 

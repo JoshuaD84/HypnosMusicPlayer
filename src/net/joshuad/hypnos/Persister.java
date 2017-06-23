@@ -374,7 +374,6 @@ public class Persister {
 	private static final String SETTING_TAG_TRACK_POSITION = "CurrentTrackPosition";
 	private static final String SETTING_TAG_TRACK_NUMBER = "CurrentTrackNumber";
 	
-	
 	public static void saveSettings() {
 		try ( 
 				FileWriter fileWriter = new FileWriter( settingsFile );
@@ -390,11 +389,18 @@ public class Persister {
 			settingsOut.printf( "%s: %s\n", SETTING_TAG_SHUFFLE, MusicPlayerUI.shuffleMode.toString() );
 			settingsOut.printf( "%s: %s\n", SETTING_TAG_REPEAT, MusicPlayerUI.repeatMode.toString() );
 			settingsOut.printf( "%s: %b\n", SETTING_TAG_HIDE_ALBUM_TRACKS, MusicPlayerUI.trackListCheckBox.isSelected() );
-			settingsOut.printf( "%s: %b\n", SETTING_TAG_WINDOW_MAXIMIZED, MusicPlayerUI.isMaximized() );
-			settingsOut.printf( "%s: %f\n", SETTING_TAG_WINDOW_X_POSITION, MusicPlayerUI.mainStage.getX() );
-			settingsOut.printf( "%s: %f\n", SETTING_TAG_WINDOW_Y_POSITION, MusicPlayerUI.mainStage.getY() );
-			settingsOut.printf( "%s: %f\n", SETTING_TAG_WINDOW_WIDTH, MusicPlayerUI.mainStage.getWidth() );
-			settingsOut.printf( "%s: %f\n", SETTING_TAG_WINDOW_HEIGHT, MusicPlayerUI.mainStage.getHeight() );
+			
+			boolean isMaximized = MusicPlayerUI.isMaximized();
+			settingsOut.printf( "%s: %b\n", SETTING_TAG_WINDOW_MAXIMIZED, isMaximized );
+			settingsOut.printf( "%s: %f\n", SETTING_TAG_WINDOW_X_POSITION, MusicPlayerUI.mainStage.getX() ); //So we are on the right monitor
+			
+			if ( !isMaximized ) {
+				settingsOut.printf( "%s: %f\n", SETTING_TAG_WINDOW_X_POSITION, MusicPlayerUI.mainStage.getX() );
+				settingsOut.printf( "%s: %f\n", SETTING_TAG_WINDOW_Y_POSITION, MusicPlayerUI.mainStage.getY() );
+				settingsOut.printf( "%s: %f\n", SETTING_TAG_WINDOW_WIDTH, MusicPlayerUI.mainStage.getWidth() );
+				settingsOut.printf( "%s: %f\n", SETTING_TAG_WINDOW_HEIGHT, MusicPlayerUI.mainStage.getHeight() );
+			}
+			
 			settingsOut.printf( "%s: %f\n", SETTING_TAG_PRIMARY_SPLIT_PERCENT, MusicPlayerUI.getPrimarySplitPercent() );
 			settingsOut.printf( "%s: %f\n", SETTING_TAG_CURRENT_LIST_SPLIT_PERCENT, MusicPlayerUI.getCurrentListSplitPercent() );
 			settingsOut.printf( "%s: %f\n", SETTING_TAG_ART_SPLIT_PERCENT, MusicPlayerUI.getArtSplitPercent() );
