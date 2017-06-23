@@ -1,6 +1,9 @@
 Embed and use a font with all needed UTF glyphs
+	≡✘⏏💾⇉🔀⇥🔁🔂🔊🔇🔈🔉🔊
 
 Artwork drag and drop
+
+Playlists aren't saving to disk or loading properly. 
 
 track buffering, so there's a cushion in case reading becomes spotty
 
@@ -26,8 +29,6 @@ Lyrics
 Some way to get the file name corresponding to a file in the current list. 
 	Use album info window or something like it? 
 
-Why do tracks that "don't have an album" have an album listed in the album column?
-
 Show total length of currentlist somewhere.  
 
 Maybe show current playing track info, like bitrate, etc. This would probably go in a status bar at the bottom. 
@@ -37,7 +38,6 @@ link the persisted current playing file w/ the current list if it's on there
 Remember windowed-width even if maximized
 	https://stackoverflow.com/questions/44636866/save-and-set-the-not-maximized-window-size?noredirect=1#comment76260490_44636866
 
-Rename java process to Hypnos
 
 Redesign the transport
 
@@ -100,6 +100,7 @@ Windows
 	Open-with shell integration
 	Installer
     Standalone build (32-bit)
+	Rename java process to Hypnos
 	
 Linux
 	Open-with shell integration
@@ -109,6 +110,7 @@ Linux
 	use a compiled launcher rather than a script -- it allows shell double click. 
 	Standalone build - Linux64 embedded JRE
 	Standalone build - Linux32 embedded JRE
+	Rename java process to Hypnos
 	
 	Gnome3 
 		Right click -> Open with -- loads the files to current list, but doesn't start playing. 
@@ -117,7 +119,4 @@ OSX
 	Does our package work? 
 	Open-with shell integration
 	.DMG installer
-
-
-Useful UTF Glyphs
-	≡✘⏏💾⇉🔀⇥🔁🔂🔊🔇🔈🔉🔊
+	Rename java process to Hypnos ?

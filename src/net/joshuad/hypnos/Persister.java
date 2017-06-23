@@ -372,6 +372,7 @@ public class Persister {
 	private static final String SETTING_TAG_WINDOW_HEIGHT = "WindowHeight";
 	private static final String SETTING_TAG_TRACK = "CurrentTrack";
 	private static final String SETTING_TAG_TRACK_POSITION = "CurrentTrackPosition";
+	private static final String SETTING_TAG_TRACK_NUMBER = "CurrentTrackNumber";
 	
 	
 	public static void saveSettings() {
@@ -383,6 +384,9 @@ public class Persister {
 			if ( MusicPlayerUI.currentPlayer != null ) {
 				settingsOut.printf( "%s: %s\n", SETTING_TAG_TRACK, MusicPlayerUI.currentPlayer.getTrack().getPath().toString() );
 				settingsOut.printf( "%s: %s\n", SETTING_TAG_TRACK_POSITION, MusicPlayerUI.currentPlayer.getPositionMS() );
+				settingsOut.printf( "%s: %d\n", SETTING_TAG_TRACK_NUMBER, MusicPlayerUI.getCurrentTrackNumber() );
+
+				System.out.println ( "Saving to: " + MusicPlayerUI.currentPlayer.getPositionMS() ); //TODO: DD
 			} 
 			
 			settingsOut.printf( "%s: %s\n", SETTING_TAG_SHUFFLE, MusicPlayerUI.shuffleMode.toString() );
@@ -498,7 +502,20 @@ public class Persister {
 						case SETTING_TAG_TRACK_POSITION:
 							if ( MusicPlayerUI.currentPlayer != null ) {
 								MusicPlayerUI.currentPlayer.seekMS( Long.parseLong( value ) );
+								System.out.println ( "Seeking to: " + Long.parseLong( value ) + ", " + value );//TODO: DD
 							}
+							break;
+							
+						case SETTING_TAG_TRACK_NUMBER:
+							try {
+								int tracklistNumber = Integer.parseInt( value );
+								if ( tracklistNumber != -1 ) {
+									MusicPlayerUI.currentListData.get( tracklistNumber ).setIsCurrentTrack( true );
+								}
+							} catch ( Exception e ) {
+								System.out.println ( "Error loading current list track number: " + e.getMessage() );
+							}
+							
 							break;
 					}
 				} catch ( Exception e ) {

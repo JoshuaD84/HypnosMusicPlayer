@@ -17,7 +17,7 @@ import javafx.beans.property.StringProperty;
 		
 		private static final long serialVersionUID = 1L;
 		
-		transient boolean isCurrentTrack = false;
+		transient boolean isCurrentTrack = false; //TODO: Make this private
 		
 		transient ArrayList <Integer> queueIndex = new ArrayList <Integer> ();
 		

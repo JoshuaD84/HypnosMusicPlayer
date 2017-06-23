@@ -3356,6 +3356,16 @@ public class MusicPlayerUI extends Application {
 		mainStage.setMaximized( value );
 	}
 	
+	public static int getCurrentTrackNumber() {
+		for ( int k = 0 ; k < currentListData.size(); k++ ) {
+			if ( currentListData.get( k ).isCurrentTrack ) {
+				return k;
+			}
+		}
+		
+		return -1;
+	}
+	
 	@Override
 	public void stop(){
 		//TODO: Use this to get rid of main

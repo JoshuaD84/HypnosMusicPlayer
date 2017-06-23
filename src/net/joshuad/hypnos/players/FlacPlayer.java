@@ -16,16 +16,6 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 		this.trackPosition = trackPositionSlider;
 		this.pauseRequested = startPaused;
 		
-		decodedInput = new FlacDecoderLogic ( track.getPath().toAbsolutePath().toFile() );
-		if ( decodedInput.numSamples == 0 ) throw new FlacDecoderLogic.FormatException("Unknown audio length");
-		
-		AudioFormat outputFormat = new AudioFormat ( decodedInput.sampleRate, decodedInput.sampleDepth, decodedInput.numChannels, true, false );
-		
-		audioOutput = (SourceDataLine)AudioSystem.getLine( new DataLine.Info( SourceDataLine.class, outputFormat ) );
-		
-		audioOutput.open ( outputFormat ); 
-		clipStartTimeMS = 0;
-		
 		Thread t = new Thread ( this );
 		t.setDaemon( true );
 		t.start();
@@ -37,8 +27,12 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 	
 	public void run() {
 
-		audioOutput.start();
-
+		boolean streamsOpen = openStreamsAtRequestedOffset();
+		if ( !streamsOpen ) {
+			//TODO: Logging
+			System.out.println ( "Unable to open audio stream, not playing track." );
+		}
+		
 		while ( true ) {	
 			if ( stopRequested ) {
 				closeAllResources();
@@ -60,38 +54,15 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 			
 			if ( seekRequestPercent != -1 ) {
 				
-				try {
-					long samplePos = Math.round ( seekRequestPercent * decodedInput.numSamples );
-	
-					long[][] samples = decodedInput.seekAndReadBlock ( samplePos );
-					audioOutput.flush();
-					clipStartTimeMS = audioOutput.getMicrosecondPosition() - Math.round(samplePos * 1e6 / decodedInput.sampleRate);
-				
-					seekRequestPercent = -1;
-					
-					if (samples == null) {
-						MusicPlayerUI.songFinishedPlaying( false );
-						return;
-					}
-					
-					//TODO: Why are we doing thi shere? looks wrong. 
-					// Convert samples to channel-interleaved bytes in little endian
-					int bytesPerSample = decodedInput.sampleDepth / 8;
-					byte[] sampleBytes = new byte[samples[0].length * samples.length * bytesPerSample];
-					for (int i = 0, k = 0; i < samples[0].length; i++) {
-						for (int ch = 0; ch < samples.length; ch++) {
-							for (int j = 0; j < bytesPerSample; j++, k++) {
-								sampleBytes[k] = (byte)(samples[ch][i] >>> (j << 3));
-							}
-						}
-					}
-					
-					audioOutput.write ( sampleBytes, 0, sampleBytes.length );
-					
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				closeAllResources();
+				boolean streamsOpen = openStreamsAtRequestedOffset();
+				if ( !streamsOpen ) {
+					//TODO: Logging
+					System.out.println ( "Unable to open audio stream, not playing track." );
 				}
+				
+				seekRequestPercent = NO_SEEK_REQUESTED;
+				updateTransport();
 			}
 									
 			if ( !paused ) {
@@ -138,15 +109,65 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 			}
 			
 			if ( seekRequestPercent == -1 && !stopRequested ) {
-				double timePos = ( audioOutput.getMicrosecondPosition() - clipStartTimeMS ) / 1e6;
-				double positionPercent = timePos * decodedInput.sampleRate / decodedInput.numSamples;
-				int timeElapsed = (int)(track.getLengthS() * positionPercent);
-				int timeRemaining = track.getLengthS() - timeElapsed;
-				MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, positionPercent );
+				updateTransport();
 			}
 		}
 	}
 	
+	public boolean openStreamsAtRequestedOffset () {
+		try {
+
+			decodedInput = new FlacDecoderLogic ( track.getPath().toAbsolutePath().toFile() );
+			if ( decodedInput.numSamples == 0 ) throw new FlacDecoderLogic.FormatException("Unknown audio length");
+			
+			AudioFormat outputFormat = new AudioFormat ( decodedInput.sampleRate, decodedInput.sampleDepth, decodedInput.numChannels, true, false );
+			DataLine.Info datalineInfo = new DataLine.Info( SourceDataLine.class, outputFormat );
+
+			try {
+				audioOutput = (SourceDataLine) AudioSystem.getLine( datalineInfo );
+				audioOutput.open( outputFormat );
+			} catch ( LineUnavailableException exception ) {
+				System.out.println( "The audio output line could not be opened due to resource restrictions." );
+				System.err.println( exception );
+				return false;
+			} catch ( IllegalStateException exception ) {
+				System.out.println( "The audio output line is already open." );
+				System.err.println( exception );
+				return false;
+			} catch ( SecurityException exception ) {
+				System.out.println( "The audio output line could not be opened due to security restrictions." );
+				System.err.println( exception );
+				return false;
+			}
+			
+			
+			clipStartTimeMS = 0;
+			
+			if ( seekRequestPercent != NO_SEEK_REQUESTED ) {
+				long samplePos = Math.round ( seekRequestPercent * decodedInput.numSamples );
+	
+				long[][] samples = decodedInput.seekAndReadBlock ( samplePos );
+				clipStartTimeMS = (long)( ( track.getLengthS() * 1000 ) * seekRequestPercent );
+
+				seekRequestPercent = NO_SEEK_REQUESTED;
+				
+				if (samples == null) {
+					//TODO: This is a problem, since it doesn't break teh loop up above now. 
+					MusicPlayerUI.songFinishedPlaying( false );
+					return false;
+				}
+			}
+
+			audioOutput.start();
+		
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return true;
+	}
+		
 	private void closeAllResources()  {
 		audioOutput.drain();
 		audioOutput.stop();

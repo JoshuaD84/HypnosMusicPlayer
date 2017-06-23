@@ -107,7 +107,8 @@ public class AbstractPlayer {
 	}
 	
 	public long getPositionMS() {
-		return (long)( audioOutput.getMicrosecondPosition() / 1e3 );
+		System.out.println ( ( audioOutput.getMicrosecondPosition() / 1e3 ) + " + " + clipStartTimeMS );
+		return (long)( audioOutput.getMicrosecondPosition() / 1e3 ) + clipStartTimeMS;
 	}
 	
 	public void pause() {
@@ -142,7 +143,7 @@ public class AbstractPlayer {
 	
 	void updateTransport() {
 		if ( seekRequestPercent == NO_SEEK_REQUESTED ) {
-			double positionPercent = (double) ( getPositionMS() + clipStartTimeMS ) / ( (double) track.getLengthS() * 1000 );
+			double positionPercent = (double) getPositionMS() / ( (double) track.getLengthS() * 1000 );
 			int timeElapsed = (int)(track.getLengthS() * positionPercent);
 			int timeRemaining = track.getLengthS() - timeElapsed;
 			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, positionPercent );
