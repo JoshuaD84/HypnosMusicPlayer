@@ -107,7 +107,6 @@ public class AbstractPlayer {
 	}
 	
 	public long getPositionMS() {
-		System.out.println ( ( audioOutput.getMicrosecondPosition() / 1e3 ) + " + " + clipStartTimeMS );
 		return (long)( audioOutput.getMicrosecondPosition() / 1e3 ) + clipStartTimeMS;
 	}
 	
@@ -130,7 +129,6 @@ public class AbstractPlayer {
 	
 	public void seekMS ( long milliseconds ) {
 		seekRequestPercent = milliseconds / (double)( track.getLengthS() * 1000 );	
-
 	}
 
 	public boolean isPaused() {

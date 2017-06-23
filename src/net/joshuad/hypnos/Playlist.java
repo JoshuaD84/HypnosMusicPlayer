@@ -35,7 +35,7 @@ public class Playlist implements Serializable {
 				BufferedReader m3uIn = new BufferedReader ( fileReader );
 				for ( String line; (line = m3uIn.readLine()) != null; ) {
 					if ( line.startsWith( "#Name:" ) ) {
-						String name = line.split( ":" )[1]; //TODO: OOB error checking on index
+						String name = line.split( ":" )[1].trim(); //TODO: OOB error checking on index
 						playlist.setName( name );
 					} else if ( line.isEmpty() ) {
 						//Do nothing

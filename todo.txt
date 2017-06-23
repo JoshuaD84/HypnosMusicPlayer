@@ -3,13 +3,9 @@ Embed and use a font with all needed UTF glyphs
 
 Artwork drag and drop
 
-Playlists aren't saving to disk or loading properly. 
-
 track buffering, so there's a cushion in case reading becomes spotty
 
 Log files are messy, not handled right. Proper logging throughout program
-
-Mulit-select on playlist tab
 
 Changing tag information doesn't update all the proper places.
 	Changing disc info on album list
@@ -32,8 +28,6 @@ Some way to get the file name corresponding to a file in the current list.
 Show total length of currentlist somewhere.  
 
 Maybe show current playing track info, like bitrate, etc. This would probably go in a status bar at the bottom. 
-
-link the persisted current playing file w/ the current list if it's on there
 
 Remember windowed-width even if maximized
 	https://stackoverflow.com/questions/44636866/save-and-set-the-not-maximized-window-size?noredirect=1#comment76260490_44636866

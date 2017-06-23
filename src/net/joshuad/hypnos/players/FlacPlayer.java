@@ -55,7 +55,7 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 			if ( seekRequestPercent != -1 ) {
 				
 				closeAllResources();
-				boolean streamsOpen = openStreamsAtRequestedOffset();
+				streamsOpen = openStreamsAtRequestedOffset();
 				if ( !streamsOpen ) {
 					//TODO: Logging
 					System.out.println ( "Unable to open audio stream, not playing track." );

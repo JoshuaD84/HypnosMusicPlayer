@@ -1680,7 +1680,7 @@ public class MusicPlayerUI extends Application {
 		Optional <String> result = dialog.showAndWait();
 		if ( result.isPresent() ) {
 			Playlist replaceMe = null;
-			String enteredName = result.get();
+			String enteredName = result.get().trim();
 
 			for ( Playlist test : Library.playlists ) {
 				if ( test.getName().equals( enteredName ) ) {
@@ -1710,7 +1710,7 @@ public class MusicPlayerUI extends Application {
 		
 		if ( result.isPresent() ) {
 			Playlist replaceMe = null;
-			String enteredName = result.get();
+			String enteredName = result.get().trim();
 
 			Library.removePlaylist( playlist );
 			playlist.setName ( enteredName );
@@ -2569,13 +2569,14 @@ public class MusicPlayerUI extends Application {
 		playlistTable = new TableView();
 		playlistTable.getColumns().addAll( nameColumn, tracksColumn, lengthColumn );
 		playlistTable.setEditable( false );
+		playlistTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 		playlistTable.setItems( Library.playlistsSorted );
 
 		Library.playlistsSorted.comparatorProperty().bind( playlistTable.comparatorProperty() );
 
 		playlistTable.getSortOrder().add( nameColumn );
 		playlistTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
-
+		
 		FixedWidthCustomResizePolicy resizePolicy = new FixedWidthCustomResizePolicy();
 		resizePolicy.registerColumns( tracksColumn );
 		playlistTable.setColumnResizePolicy( resizePolicy );
