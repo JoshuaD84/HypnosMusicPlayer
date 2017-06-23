@@ -19,6 +19,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -149,6 +150,7 @@ public class AlbumInfoWindow extends Stage {
 		trackTable.getColumns().addAll( trackNumberColumn, titleColumn, lengthColumn, fileColumn, encodingColumn );
 		trackTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
 		trackTable.setEditable( true );
+		trackTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 		
 		trackTable.prefWidthProperty().bind( this.widthProperty() );
 		

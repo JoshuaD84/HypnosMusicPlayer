@@ -3,6 +3,12 @@ Embed and use a font with all needed UTF glyphs
 
 Artwork drag and drop
 
+Styles
+	Dark
+	Light
+		File stylesheet = new File ( "style.css" );
+		scene.getStylesheets().add( "file:///" + stylesheet.getAbsolutePath().replace( "\\", "/" ) ); //TODO: DD
+		
 track buffering, so there's a cushion in case reading becomes spotty
 
 Log files are messy, not handled right. Proper logging throughout program
@@ -11,12 +17,11 @@ Changing tag information doesn't update all the proper places.
 	Changing disc info on album list
 	changing album info when the album is loaded in current list. 
 
-Playlist Info window
-	Can't drag and drop from it to current list
-	
 Make sure horizontal scroll bars never appear
 	6/9 - Can't find anything on google.
-	
+
+Allow drag and drop to playlist info window
+
 Lyrics
 	http://lyrics.wikia.com	- No API
 	https://www.musixmatch.com/ - Charges a fee, can we scrape?

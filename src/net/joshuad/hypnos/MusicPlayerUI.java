@@ -620,19 +620,19 @@ public class MusicPlayerUI extends Application {
 		pauseImage = null;
 		
 		try {
-			playImage = new ImageView ( new Image( new FileInputStream ( ROOT.resolve( "icons/play.png" ).toFile() ) ) );
+			playImage = new ImageView ( new Image( new FileInputStream ( ROOT.resolve( "resources/play.png" ).toFile() ) ) );
 			playImage.setFitHeight( 18 );
 			playImage.setFitWidth( 18 );
 		} catch ( FileNotFoundException e ) {
-			System.out.println ( "Unable to load play icon: icons/play.png" );
+			System.out.println ( "Unable to load play icon: resources/play.png" );
 		}
 		
 		try {
-			pauseImage = new ImageView ( new Image( new FileInputStream ( ROOT.resolve( "icons/pause.png" ).toFile() ) ) );
+			pauseImage = new ImageView ( new Image( new FileInputStream ( ROOT.resolve( "resources/pause.png" ).toFile() ) ) );
 			pauseImage.setFitHeight( 18 );
 			pauseImage.setFitWidth( 18 );
 		} catch ( FileNotFoundException e ) {
-			System.out.println ( "Unable to load pause icon: icons/pause.png" );
+			System.out.println ( "Unable to load pause icon: resources/pause.png" );
 		}
 		
 		togglePlayButton = new Button ( "" );
@@ -643,11 +643,11 @@ public class MusicPlayerUI extends Application {
 		
 		ImageView previousImage = null;
 		try {
-			previousImage = new ImageView ( new Image( new FileInputStream ( ROOT.resolve( "icons/previous.png" ).toFile() ) ) );
+			previousImage = new ImageView ( new Image( new FileInputStream ( ROOT.resolve( "resources/previous.png" ).toFile() ) ) );
 			previousImage.setFitHeight( 18 );
 			previousImage.setFitWidth( 18 );
 		} catch ( FileNotFoundException e ) {
-			System.out.println ( "Unable to load previous icon: icons/previous.png" );
+			System.out.println ( "Unable to load previous icon: resources/previous.png" );
 		}
 		
 		Button previousButton = new Button ( "" );
@@ -658,11 +658,11 @@ public class MusicPlayerUI extends Application {
 		
 		ImageView nextImage = null;
 		try {
-			nextImage = new ImageView ( new Image( new FileInputStream ( ROOT.resolve( "icons/next.png" ).toFile() ) ) );
+			nextImage = new ImageView ( new Image( new FileInputStream ( ROOT.resolve( "resources/next.png" ).toFile() ) ) );
 			nextImage.setFitHeight( 18 );
 			nextImage.setFitWidth( 18 );
 		} catch ( FileNotFoundException e ) {
-			System.out.println ( "Unable to load previous icon: icons/next.png" );
+			System.out.println ( "Unable to load previous icon: resources/next.png" );
 		}
 		
 		Button nextButton = new Button ( "" );
@@ -673,11 +673,11 @@ public class MusicPlayerUI extends Application {
 		
 		ImageView stopImage = null;
 		try {
-			stopImage = new ImageView ( new Image( new FileInputStream ( ROOT.resolve( "icons/stop.png" ).toFile() ) ) );
+			stopImage = new ImageView ( new Image( new FileInputStream ( ROOT.resolve( "resources/stop.png" ).toFile() ) ) );
 			stopImage.setFitHeight( 18 );
 			stopImage.setFitWidth( 18 );
 		} catch ( FileNotFoundException e ) {
-			System.out.println ( "Unable to load previous icon: icons/stop.png" );
+			System.out.println ( "Unable to load previous icon: resources/stop.png" );
 		}
 		
 		Button stopButton = new Button ( "" );
@@ -2828,9 +2828,11 @@ public class MusicPlayerUI extends Application {
 		playingColumn.setMinWidth( 28 );
 
 		currentListTable.setOnDragOver( event -> {
+			
 			Dragboard db = event.getDragboard();
-
+			
 			if ( db.hasContent( DRAGGED_TRACKS ) || db.hasFiles() ) {
+				System.out.println ( "Drag accepted" ); //TODO: DD
 				event.acceptTransferModes( TransferMode.COPY );
 				event.consume();
 			}
@@ -3381,9 +3383,9 @@ public class MusicPlayerUI extends Application {
 		//we need to get the directory of the jar and load the image from there, not just from the current directory
 		
 		try {
-			mainStage.getIcons().add( new Image( new FileInputStream ( ROOT.resolve( "icons/icon.png" ).toFile() ) ) );
+			mainStage.getIcons().add( new Image( new FileInputStream ( ROOT.resolve( "resources/icon.png" ).toFile() ) ) );
 		} catch ( FileNotFoundException e ) {
-			System.out.println ( "Unable to load program icon: icons/icon.png" );
+			System.out.println ( "Unable to load program icon: resources/icon.png" );
 		}
 
 		setupAlbumTable();

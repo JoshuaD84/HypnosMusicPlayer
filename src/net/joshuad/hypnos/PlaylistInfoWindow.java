@@ -12,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -95,6 +96,7 @@ public class PlaylistInfoWindow extends Stage {
 		trackTable.getColumns().addAll( trackNumberColumn, titleColumn, lengthColumn );
 		trackTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
 		trackTable.setEditable( true );
+		trackTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 		
 		trackTable.prefWidthProperty().bind( this.widthProperty() );
 		
@@ -162,13 +164,14 @@ public class PlaylistInfoWindow extends Stage {
 					MusicPlayerUI.playTrack( row.getItem() );
 				}
 			} );
-
+			
 			row.setOnDragDetected( event -> {
 				if ( !row.isEmpty() ) {
+					System.out.println ( "Drag started" ); //TODO: DD
 					ArrayList <Integer> indices = new ArrayList <Integer>( trackTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( trackTable.getSelectionModel().getSelectedItems() );
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, DragSource.ALBUM_INFO );
-					Dragboard db = row.startDragAndDrop( TransferMode.MOVE );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, DragSource.PLAYLIST_LIST );
+					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
 					cc.put( MusicPlayerUI.DRAGGED_TRACKS, dragObject );
@@ -176,6 +179,7 @@ public class PlaylistInfoWindow extends Stage {
 					event.consume();
 				}
 			});
+		
 
 			return row;
 		});
