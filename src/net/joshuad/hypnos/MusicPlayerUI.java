@@ -2833,7 +2833,6 @@ public class MusicPlayerUI extends Application {
 			Dragboard db = event.getDragboard();
 			
 			if ( db.hasContent( DRAGGED_TRACKS ) || db.hasFiles() ) {
-				System.out.println ( "Drag accepted" ); //TODO: DD
 				event.acceptTransferModes( TransferMode.COPY );
 				event.consume();
 			}

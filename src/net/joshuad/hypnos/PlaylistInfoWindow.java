@@ -177,7 +177,6 @@ public class PlaylistInfoWindow extends Stage {
 			
 			row.setOnDragDetected( event -> {
 				if ( !row.isEmpty() ) {
-					System.out.println ( "Drag started" ); //TODO: DD
 					ArrayList <Integer> indices = new ArrayList <Integer>( trackTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( trackTable.getSelectionModel().getSelectedItems() );
 					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, DragSource.PLAYLIST_LIST );

@@ -1,54 +1,53 @@
-Artwork drag and drop
+New Features
+	Artwork drag and drop
 
-Styles
-	Dark
-	Light
-		File stylesheet = new File ( "style.css" );
-		scene.getStylesheets().add( "file:///" + stylesheet.getAbsolutePath().replace( "\\", "/" ) ); //TODO: DD
+	Styles
+		Dark
+		Light
+			File stylesheet = new File ( "style.css" );
+			scene.getStylesheets().add( "file:///" + stylesheet.getAbsolutePath().replace( "\\", "/" ) ); //TODO: DD
 
-Log files are messy, not handled right. Proper logging throughout program
+	Lyrics
+		http://lyrics.wikia.com	- No API
+		https://www.musixmatch.com/ - Charges a fee, can we scrape?
+		https://github.com/jkiddo/gmusic.api
+		
+	Hot Keys
+		
+	Error notifications	
+		Make a shim that takes all errors, puts all to error log, and can decide to show some to the user via popups. 
+		Have there be an in-program way to view error log? Or at least, view it using the system text editor. 
 
-Error notifications
-
-Changing tag information doesn't update all the proper places.
-	Changing disc info on album list
-	changing album info when the album is loaded in current list. 
-
-Make sure horizontal scroll bars never appear
-	6/9 - Can't find anything on google.
-
-Lyrics
-	http://lyrics.wikia.com	- No API
-	https://www.musixmatch.com/ - Charges a fee, can we scrape?
-	https://github.com/jkiddo/gmusic.api
+	Some way to get the file name corresponding to a file in the current list. 
+		Use album info window or something like it? 
 	
-Some way to get the file name corresponding to a file in the current list. 
-	Use album info window or something like it? 
+	Current List Info
+		Show total length of currentlist somewhere.  
+		Maybe show current playing track info, like bitrate, etc. This would probably go in a status bar at the bottom. 
 
-Show total length of currentlist somewhere.  
 
-Maybe show current playing track info, like bitrate, etc. This would probably go in a status bar at the bottom. 
+Bug Fixes / Incremental Improvements
+	
+	Changing tag information doesn't update all the proper places.
+		Changing disc info on album list
+		changing album info when the album is loaded in current list. 
+	
+	Make sure horizontal scroll bars never appear
+		6/9 - Can't find anything on google.
 
-Remember windowed-width even if maximized
-	https://stackoverflow.com/questions/44636866/save-and-set-the-not-maximized-window-size
-
-Redesign the transport
-
-Tray icon
-	Gnome 3 doesn't support. Code works but creates a bad entry on taskbar.
-	What systems do support? 
-	What other systems don't support? How to handle? 
-	https://stackoverflow.com/questions/29995727/java-systemtray-icon-does-not-always-work
+	Remember windowed-width even if maximized
+		https://stackoverflow.com/questions/44636866/save-and-set-the-not-maximized-window-size
+		
+	Redesign the transport	
+		Do I even need to do this anymore? I kinda like it. Maybe shuffle / repeat, but I'm pretty hapy with UI. 
 
 Refactor / organize my code. 
  	Separate player / ui systems. 
- 	
+ 
  	Re-design the code for the current playing info box above the current list.
- 	
+
  	Have a single thread handle playing all tracks. Have it be the same thread that accepts requests rather than spawning new threads off UI actions. 
 
-Hot Keys
-  
 Decoders
 	Mp4
 		buffered input stream on the random access File stream
@@ -96,58 +95,65 @@ Decoders
 		
 	Wav
 		BufferedInputStream
-			
-Windows
-	Open-with shell integration
-	Installer
-    Standalone build (32-bit)
-	Rename java process to Hypnos
-	Always use embedded calibri?
-	
-Linux
-	Open-with shell integration
-	Debian Installer
-    redhat installer
-    pacman installer
-	use a compiled launcher rather than a script -- it allows shell double click. 
-	Standalone build - Linux64 embedded JRE
-	Standalone build - Linux32 embedded JRE
-	Rename java process to Hypnos
-	
-	Gnome3 
-		Right click -> Open with -- loads the files to current list, but doesn't start playing. 
-		
-	Always use Dejavu? 
 
-OSX
-	Does our package work? 
-	Open-with shell integration
-	.DMG installer
-	Rename java process to Hypnos ?
+OS Specific		
+	Windows
+		Open-with shell integration
+		Installer
+	    Standalone build (32-bit)
+		Rename java process to Hypnos
+		Always use embedded calibri?
+		
+	Linux
+		Open-with shell integration
+		Debian Installer
+	    redhat installer
+	    pacman installer
+		use a compiled launcher rather than a script -- it allows shell double click. 
+		Standalone build - Linux64 embedded JRE
+		Standalone build - Linux32 embedded JRE
+		Rename java process to Hypnos
+		
+		Gnome3 
+			Right click -> Open with -- loads the files to current list, but doesn't start playing. 
+			
+		Always use Dejavu? 
 	
-	Always use LucidaGrande?
-	
-	
-Embed and use a font with all needed UTF glyphs
-	≡✘⏏💾⇉🔀⇥🔁🔂🔊🔇🔈🔉🔊
-	
-	DejaVu Sans - The thing I'm using on nix
-	Calibri - Windows
-	Lucida Grande - OSX
-	
-		try { 
-		    Font.loadFont(new FileInputStream(new File("stage/font/dejavu/DejaVuSans.ttf")), 12);
-		    Font.loadFont(new FileInputStream(new File("stage/font/dejavu/DejaVuSans-Bold.ttf")), 12);
-			File stylesheet = new File ( "stage/font/font.css" );
-		    scene.getStylesheets().add( "file:///" + stylesheet.getAbsolutePath().replace( "\\", "/" ) ); 
-	    } catch (FileNotFoundException e) {
-	    	//TODO: 
-	    	e.printStackTrace();
-	    }
-	 	
-	
-	
+	OSX
+		Does our package work? 
+		Open-with shell integration
+		.DMG installer
+		Rename java process to Hypnos ?
+		
+		Always use LucidaGrande?
+		
+	Tray icon
+		Gnome 3 doesn't support. Code works but creates a bad entry on taskbar.
+		What systems do support? 
+		What other systems don't support? How to handle? 
+		https://stackoverflow.com/questions/29995727/java-systemtray-icon-does-not-always-work
+		
+	Embed and use a font with all needed UTF glyphs
+		≡✘⏏💾⇉🔀⇥🔁🔂🔊🔇🔈🔉🔊
+		
+		DejaVu Sans - The thing I'm using on nix
+		Calibri - Windows
+		Lucida Grande - OSX
+		
+			try { 
+			    Font.loadFont(new FileInputStream(new File("stage/font/dejavu/DejaVuSans.ttf")), 12);
+			    Font.loadFont(new FileInputStream(new File("stage/font/dejavu/DejaVuSans-Bold.ttf")), 12);
+				File stylesheet = new File ( "stage/font/font.css" );
+			    scene.getStylesheets().add( "file:///" + stylesheet.getAbsolutePath().replace( "\\", "/" ) ); 
+		    } catch (FileNotFoundException e) {
+		    	//TODO: 
+		    	e.printStackTrace();
+		    }
+		 	
 	
 	
 Note
 	You can increase the sldier button size by increasing the font size.
+
+	
+
