@@ -1,7 +1,17 @@
 package net.joshuad.hypnos;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.TagException;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -179,10 +189,111 @@ public class PlaylistInfoWindow extends Stage {
 					event.consume();
 				}
 			});
+			
+			row.setOnDragOver( event -> {
+				Dragboard db = event.getDragboard();
+				if ( db.hasContent( MusicPlayerUI.DRAGGED_TRACKS ) || db.hasFiles() ) {
+					event.acceptTransferModes( TransferMode.COPY );
+					event.consume();
+				}
+			} );
+
+			row.setOnDragDropped( event -> {
+				Dragboard db = event.getDragboard();
+				if ( db.hasContent( MusicPlayerUI.DRAGGED_TRACKS ) ) {
+
+					DraggedTrackContainer container = (DraggedTrackContainer) db.getContent( MusicPlayerUI.DRAGGED_TRACKS );
+					int dropIndex = row.isEmpty() ? dropIndex = trackTable.getItems().size() : row.getIndex();
+					
+					switch ( container.getSource() ) {
+						case ALBUM_LIST:
+						case TRACK_LIST:
+						case ALBUM_INFO:
+						case HISTORY: 
+						case CURRENT_LIST:
+						case QUEUE: {
+							List <Track> tracksToCopy = container.getTracks();
+							trackTable.getItems().addAll( dropIndex, tracksToCopy );
+							
+							Playlist newList = new Playlist ( playlist.getName(), new ArrayList <Track> ( trackTable.getItems() ) );
+							Library.removePlaylist( playlist );
+							Library.addPlaylist( newList );
+							
+							playlist = newList;
+							
+						} break;
+						
+						case PLAYLIST_LIST: {
+							List <Integer> draggedIndices = container.getIndices();
+							ArrayList <Track> tracksToMove = new ArrayList <Track> ( draggedIndices.size() );
+							for ( int index : draggedIndices ) {
+								if ( index >= 0 && index < trackTable.getItems().size() ) {
+									tracksToMove.add( trackTable.getItems().get( index ) );
+								}
+							}
+							
+							for ( int k = draggedIndices.size() - 1; k >= 0; k-- ) {
+								int index = draggedIndices.get( k ).intValue();
+								if ( index >= 0 && index < trackTable.getItems().size() ) {
+									trackTable.getItems().remove ( index );
+								}
+							}
+							
+							dropIndex = Math.min( trackTable.getItems().size(), row.getIndex() );
+							
+							trackTable.getItems().addAll( dropIndex, tracksToMove );
+							
+							trackTable.getSelectionModel().clearSelection();
+							for ( int k = 0; k < draggedIndices.size(); k++ ) {
+								trackTable.getSelectionModel().select( dropIndex + k );
+							}
+
+							playlist.setTracks( new ArrayList <Track> ( trackTable.getItems() ) );
+						} break;
+					}
+
+					event.setDropCompleted( true );
+					event.consume();
+
+				} else if ( db.hasFiles() ) {
+					ArrayList <CurrentListTrack> tracksToAdd = new ArrayList <CurrentListTrack>();
+					
+					for ( File file : db.getFiles() ) {
+						Path droppedPath = Paths.get( file.getAbsolutePath() );
+						if ( Utils.isMusicFile( droppedPath ) ) {
+							try {
+								tracksToAdd.add( new CurrentListTrack( droppedPath ) );
+							} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
+								e.printStackTrace();
+							}
+						
+						} else if ( Files.isDirectory( droppedPath ) ) {
+							tracksToAdd.addAll( Utils.convertTrackList( Utils.getAllTracksInDirectory( droppedPath ) ) );
+						
+						} else if ( Utils.isPlaylistFile ( droppedPath ) ) {
+							Playlist playlist = Playlist.loadPlaylist( droppedPath );
+							if ( playlist != null ) {
+								tracksToAdd.addAll( Utils.convertTrackList( playlist.getTracks() ) );
+							}
+						}
+					}
+					
+					if ( !tracksToAdd.isEmpty() ) {
+						int dropIndex = row.isEmpty() ? dropIndex = trackTable.getItems().size() : row.getIndex();
+						trackTable.getItems().addAll( Math.min( dropIndex, trackTable.getItems().size() ), tracksToAdd );
+					}
+
+					event.setDropCompleted( true );
+					event.consume();
+				}
+			} );
 		
 
 			return row;
 		});
 	}
 }
+
+
+
 

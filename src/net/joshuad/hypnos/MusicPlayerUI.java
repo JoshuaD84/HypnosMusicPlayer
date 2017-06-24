@@ -166,6 +166,7 @@ public class MusicPlayerUI extends Application {
 	static Label filteredTrackListLabel = new Label( "No tracks match." );
 	static Label filteredPlaylistLabel = new Label( "No playlists match." );
 
+	Scene scene;
 	static Stage mainStage;
 	static Stage libraryWindow;
 	static Stage queueWindow;
@@ -3378,10 +3379,10 @@ public class MusicPlayerUI extends Application {
 	public void start ( Stage stage ) {
 		
 		mainStage = stage;
-		Scene scene = new Scene( new Group(), 1024, 768 );
+		scene = new Scene( new Group(), 1024, 768 );
+		
 		//TODO: If we launch the jar from a different directory, it doesn't shwo the icon
 		//we need to get the directory of the jar and load the image from there, not just from the current directory
-		
 		try {
 			mainStage.getIcons().add( new Image( new FileInputStream ( ROOT.resolve( "resources/icon.png" ).toFile() ) ) );
 		} catch ( FileNotFoundException e ) {
@@ -3560,6 +3561,7 @@ public class MusicPlayerUI extends Application {
 			
 		} else {
 			SingleInstanceController.sendCommandsThroughSocket( commands );
+			System.out.println ( "Not first instance, sent commands, now exiting." ); //TODO: Better loggings
 			System.exit ( 0 );
 		}
 	}

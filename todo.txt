@@ -1,6 +1,3 @@
-Embed and use a font with all needed UTF glyphs
-	≡✘⏏💾⇉🔀⇥🔁🔂🔊🔇🔈🔉🔊
-
 Artwork drag and drop
 
 Styles
@@ -11,14 +8,14 @@ Styles
 
 Log files are messy, not handled right. Proper logging throughout program
 
+Error notifications
+
 Changing tag information doesn't update all the proper places.
 	Changing disc info on album list
 	changing album info when the album is loaded in current list. 
 
 Make sure horizontal scroll bars never appear
 	6/9 - Can't find anything on google.
-
-Allow drag and drop to playlist info window
 
 Lyrics
 	http://lyrics.wikia.com	- No API
@@ -41,6 +38,7 @@ Tray icon
 	Gnome 3 doesn't support. Code works but creates a bad entry on taskbar.
 	What systems do support? 
 	What other systems don't support? How to handle? 
+	https://stackoverflow.com/questions/29995727/java-systemtray-icon-does-not-always-work
 
 Refactor / organize my code. 
  	Separate player / ui systems. 
@@ -104,6 +102,7 @@ Windows
 	Installer
     Standalone build (32-bit)
 	Rename java process to Hypnos
+	Always use embedded calibri?
 	
 Linux
 	Open-with shell integration
@@ -117,9 +116,38 @@ Linux
 	
 	Gnome3 
 		Right click -> Open with -- loads the files to current list, but doesn't start playing. 
+		
+	Always use Dejavu? 
 
 OSX
 	Does our package work? 
 	Open-with shell integration
 	.DMG installer
 	Rename java process to Hypnos ?
+	
+	Always use LucidaGrande?
+	
+	
+Embed and use a font with all needed UTF glyphs
+	≡✘⏏💾⇉🔀⇥🔁🔂🔊🔇🔈🔉🔊
+	
+	DejaVu Sans - The thing I'm using on nix
+	Calibri - Windows
+	Lucida Grande - OSX
+	
+		try { 
+		    Font.loadFont(new FileInputStream(new File("stage/font/dejavu/DejaVuSans.ttf")), 12);
+		    Font.loadFont(new FileInputStream(new File("stage/font/dejavu/DejaVuSans-Bold.ttf")), 12);
+			File stylesheet = new File ( "stage/font/font.css" );
+		    scene.getStylesheets().add( "file:///" + stylesheet.getAbsolutePath().replace( "\\", "/" ) ); 
+	    } catch (FileNotFoundException e) {
+	    	//TODO: 
+	    	e.printStackTrace();
+	    }
+	 	
+	
+	
+	
+	
+Note
+	You can increase the sldier button size by increasing the font size.
