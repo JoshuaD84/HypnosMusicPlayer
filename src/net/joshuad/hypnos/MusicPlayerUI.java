@@ -973,7 +973,7 @@ public class MusicPlayerUI extends Application {
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				loadTrack( historyTable.getSelectionModel().getSelectedItem() );
+				loadTracks( historyTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 		
