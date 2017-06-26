@@ -148,6 +148,25 @@ public class ListInfoUpdater {
 		mode = Mode.PLAYLIST;
 	}
 	
+	public void playlistsLoaded ( List<Playlist> playlists ) {
+		if ( playlists == null ) {
+			LOGGER.log( Level.FINE, "Recieved an null playlist list." );
+			return;
+		}
+		
+		if ( playlists.size() == 0 ) {
+			LOGGER.log( Level.FINE, "Recieved an empty playlists list." );
+			return;
+			
+		} else if ( playlists.size() == 1 ) {
+			playlistLoaded ( playlists.get( 0 ) );
+			return;
+			
+		} else {
+			tracksLoaded();
+		}
+	}
+	
 	public void listCleared () {
 		label.setText( EMPTY_LIST_NAME );
 		mode = Mode.EMPTY;

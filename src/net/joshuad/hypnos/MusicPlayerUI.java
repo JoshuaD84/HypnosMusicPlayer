@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
@@ -522,6 +523,20 @@ public class MusicPlayerUI extends Application {
 		listInfoUpdater.albumLoaded( album );
 	}
 	
+	public static void playAlbums ( List<Album> albums ) {
+		currentPlaylist = null;
+		currentList.clear();
+		for ( Album album : albums ) {
+			currentList.addAll( Utils.convertTrackList( album.getTracks() ) );
+		}
+		Track firstTrack = currentList.get( 0 );
+		if ( firstTrack != null ) {
+			playTrack( firstTrack );
+		}
+
+		listInfoUpdater.albumsLoaded( albums );
+	}
+	
 	public static void loadTrack ( Track track ) {
 		loadTrack ( track, false );
 	}
@@ -562,10 +577,18 @@ public class MusicPlayerUI extends Application {
 	}
 
 	public static void playPlaylist ( Playlist playlist ) {
+		playPlaylists ( Arrays.asList( playlist ) );
+		currentPlaylist = playlist;
+	}
+	
+	public static void playPlaylists ( List<Playlist> playlists ) {
 
 		stopTrack();
 		currentList.clear();
-		currentList.addAll( Utils.convertTrackList( playlist.getTracks() ) );
+		for ( Playlist playlist : playlists ) {
+			currentList.addAll( Utils.convertTrackList( playlist.getTracks() ) );
+		}
+		
 		if ( !currentList.isEmpty() ) {
 			Track firstTrack = currentList.get( 0 );
 			if ( firstTrack != null ) {
@@ -573,10 +596,10 @@ public class MusicPlayerUI extends Application {
 			}
 
 		}
-		currentPlaylist = playlist;
 
-		listInfoUpdater.playlistLoaded ( playlist );
+		listInfoUpdater.playlistsLoaded ( playlists );
 	}
+
 
 	public static void appendAlbum ( Album album ) {
 		currentList.addAll( Utils.convertTrackList( album.getTracks() ) );
@@ -2185,7 +2208,7 @@ public class MusicPlayerUI extends Application {
 		
 		playMenuItem.setOnAction( event -> {
 			//TODO: Handle multiple selections
-			playAlbum( albumTable.getSelectionModel().getSelectedItem() );
+			playAlbums( albumTable.getSelectionModel().getSelectedItems() );
 		});
 
 		apendMenuItem.setOnAction( event -> {
@@ -2409,7 +2432,7 @@ public class MusicPlayerUI extends Application {
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				loadTrack( trackTable.getSelectionModel().getSelectedItem() );
+				loadTracks( trackTable.getSelectionModel().getSelectedItems() );
 			}
 		} );
 
@@ -2593,7 +2616,7 @@ public class MusicPlayerUI extends Application {
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				playPlaylist( playlistTable.getSelectionModel().getSelectedItem() );
+				playPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 

@@ -18,9 +18,7 @@ New Features
 		Maybe show current playing track info, like bitrate, etc. This would probably go in a status bar at the bottom. 
 
 
-Bug Fixes / Incremental Improvements
-	Select two albums on album list, right click -> play - Only plays one of the albums. 
-	
+Bug Fixes / Incremental Improvements	
 	Changing tag information doesn't update all the proper places.
 		Changing disc info on album list
 		changing album info when the album is loaded in current list. 
@@ -150,7 +148,7 @@ OS Specific
 	
 	
 Note
-	You can increase the sldier button size by increasing the font size.
+	You can increase the slider button size by increasing the font size.
 
 	
 
