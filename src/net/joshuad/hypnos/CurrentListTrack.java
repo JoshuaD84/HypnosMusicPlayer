@@ -5,11 +5,6 @@ import java.io.ObjectInputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
-import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.TagException;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -23,12 +18,12 @@ import javafx.beans.property.StringProperty;
 		
 		private transient StringProperty display = new SimpleStringProperty ( "" );
 		
-		public CurrentListTrack ( Path source ) throws CannotReadException, IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException {
+		public CurrentListTrack ( Path source ) throws IOException {
 			super ( source );
 			updateDisplayString();
 		}
 	
-		public CurrentListTrack ( Track source ) throws CannotReadException, IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException {
+		public CurrentListTrack ( Track source ) throws IOException {
 			super ( source.getPath() );
 			updateDisplayString();
 		}

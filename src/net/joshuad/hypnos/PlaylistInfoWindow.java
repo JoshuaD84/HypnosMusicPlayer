@@ -8,11 +8,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.TagException;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
@@ -179,7 +174,7 @@ public class PlaylistInfoWindow extends Stage {
 				if ( !row.isEmpty() ) {
 					ArrayList <Integer> indices = new ArrayList <Integer>( trackTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( trackTable.getSelectionModel().getSelectedItems() );
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, DragSource.PLAYLIST_LIST );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, DragSource.PLAYLIST_LIST );
 					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
@@ -262,7 +257,7 @@ public class PlaylistInfoWindow extends Stage {
 						if ( Utils.isMusicFile( droppedPath ) ) {
 							try {
 								tracksToAdd.add( new CurrentListTrack( droppedPath ) );
-							} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
+							} catch ( IOException e ) {
 								e.printStackTrace();
 							}
 						

@@ -39,8 +39,7 @@ public class AbstractPlayer {
 				try {
 					currentPlayer = new FlacPlayer( track, trackPositionSlider, startPaused );
 				} catch ( Exception e ) {
-					LOGGER.log( Level.WARNING, "Using backup flac decoder for: " + track.getPath() );
-					e.printStackTrace();
+					LOGGER.log ( Level.INFO, "Using backup flac decoder for: " + track.getPath() );
 					currentPlayer = new JFlacPlayer ( track, trackPositionSlider, startPaused );
 				}
 				break;

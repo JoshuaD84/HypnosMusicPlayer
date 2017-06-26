@@ -27,8 +27,7 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 		try {
 			Thread.sleep( 10 );
 		} catch ( InterruptedException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log ( Level.FINER, "Sleep interrupted during walk, this may result in more CPU used than desired while updating the library, if it happens a lot." );
 		}
 		
 		if ( Utils.isMusicFile ( file ) ) {

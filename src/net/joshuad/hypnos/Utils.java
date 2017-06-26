@@ -15,11 +15,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.TagException;
-
 public class Utils {
 
 	private static transient final Logger LOGGER = Logger.getLogger( Utils.class.getName() );
@@ -167,15 +162,6 @@ public class Utils {
 			} else {
 				try {
 					retMe.add ( new CurrentListTrack ( track ) );
-				} catch ( TagException e) {
-					System.out.println ( "Unable to read tags on: " + track.getPath().toString() +", skipping." );
-				} catch (CannotReadException e) {
-					System.out.println ( track.getPath().toString() );
-					e.printStackTrace();
-				} catch (ReadOnlyFileException e) {
-					System.out.println ( track.getPath().toString() +", is read only, unable to edit, skipping." );
-				} catch (InvalidAudioFrameException e) {
-					System.out.println ( track.getPath().toString() +", has bad audio fram data, skipping." );
 				} catch ( FileNotFoundException e ) {
 					LOGGER.log( Level.INFO, "Unable to load track: " + track.getPath().toString() );
 				} catch ( IOException e ) {

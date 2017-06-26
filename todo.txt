@@ -1,21 +1,13 @@
 New Features
-	Artwork drag and drop
-
 	Styles
 		Dark
 		Light
 			File stylesheet = new File ( "style.css" );
 			scene.getStylesheets().add( "file:///" + stylesheet.getAbsolutePath().replace( "\\", "/" ) ); //TODO: DD
-
-	Lyrics
-		http://lyrics.wikia.com	- No API
-		https://www.musixmatch.com/ - Charges a fee, can we scrape?
-		https://github.com/jkiddo/gmusic.api
-		
+	
 	Hot Keys
 		
 	Error notifications	
-		Make a shim that takes all errors, puts all to error log, and can decide to show some to the user via popups. 
 		Have there be an in-program way to view error log? Or at least, view it using the system text editor. 
 
 	Some way to get the file name corresponding to a file in the current list. 
@@ -27,6 +19,7 @@ New Features
 
 
 Bug Fixes / Incremental Improvements
+	Select two albums on album list, right click -> play - Only plays one of the albums. 
 	
 	Changing tag information doesn't update all the proper places.
 		Changing disc info on album list
@@ -40,13 +33,17 @@ Bug Fixes / Incremental Improvements
 		
 	Redesign the transport	
 		Do I even need to do this anymore? I kinda like it. Maybe shuffle / repeat, but I'm pretty hapy with UI. 
+		
+	Editing multiple album artists doesn't seem to work - Dusty Fingers
+	
+	Make sure the text labels for time left and time elapsed are padded to NN:NN:NN, to avoid stuff moving. 
 
 Refactor / organize my code. 
  	Separate player / ui systems. 
- 
- 	Re-design the code for the current playing info box above the current list.
-
- 	Have a single thread handle playing all tracks. Have it be the same thread that accepts requests rather than spawning new threads off UI actions. 
+ 	Use start() exclusively, get rid of all calls in main()
+ 	Have a single thread handle playing all tracks. 
+ 		Have it be the same thread that accepts requests rather than spawning new threads off UI actions. 
+ 	Clean up start() and MusicPlayerUI
 
 Decoders
 	Mp4
@@ -55,8 +52,11 @@ Decoders
 	Ogg
 		Works, seeking is done using read() instead of skip(), so it's a little slow.
 		
-	m4b - Double speed play for some reason
-	
+	m4b - Fast play for some reason
+		https://stackoverflow.com/questions/44750751/why-are-m4bs-playing-at-faster-speeds
+		I need to set the sample rate to one of these: 96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350 
+		The files seem te report the wrong sample rate. JAAD acutally reads them. 
+		
 	Flac
 		Can we get flacplayer.java to play things that we need jflac for:
 			Adrian Orange
@@ -73,10 +73,7 @@ Decoders
 		
 		Leonard Cohen - You want it Darker
 			No volume control
-			
-		*.m4b
-			Double play speed
-			
+
 		three-silver.ogg
 			Long files take a long time to seek
 			Long load time
@@ -102,7 +99,7 @@ OS Specific
 		Installer
 	    Standalone build (32-bit)
 		Rename java process to Hypnos
-		Always use embedded calibri?
+		Always use embedded calibri font? Only on systems <= win 7?
 		
 	Linux
 		Open-with shell integration
@@ -117,7 +114,7 @@ OS Specific
 		Gnome3 
 			Right click -> Open with -- loads the files to current list, but doesn't start playing. 
 			
-		Always use Dejavu? 
+		Always use Dejavu font? 
 	
 	OSX
 		Does our package work? 
@@ -125,7 +122,7 @@ OS Specific
 		.DMG installer
 		Rename java process to Hypnos ?
 		
-		Always use LucidaGrande?
+		Always use LucidaGrande font?
 		
 	Tray icon
 		Gnome 3 doesn't support. Code works but creates a bad entry on taskbar.

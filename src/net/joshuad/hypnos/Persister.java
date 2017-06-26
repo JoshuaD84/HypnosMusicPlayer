@@ -174,7 +174,7 @@ public class Persister {
 		try (
 				ObjectInputStream currentListIn = new ObjectInputStream( new FileInputStream( currentFile ) );
 		) {
-			MusicPlayerUI.currentListData.addAll( (ArrayList<CurrentListTrack>) currentListIn.readObject() );
+			MusicPlayerUI.currentList.addAll( (ArrayList<CurrentListTrack>) currentListIn.readObject() );
 		} catch ( FileNotFoundException e ) {
 			System.out.println ( "File not found: current, unable to load current playlist, continuing." );
 		} catch ( IOException | ClassNotFoundException e ) {
@@ -233,7 +233,7 @@ public class Persister {
 		try ( 
 				ObjectOutputStream currentListOut = new ObjectOutputStream ( new FileOutputStream ( currentFile ) );
 		) {
-			currentListOut.writeObject( new ArrayList <CurrentListTrack> ( Arrays.asList( MusicPlayerUI.currentListData.toArray( new CurrentListTrack[ MusicPlayerUI.currentListData.size() ] ) ) ) );
+			currentListOut.writeObject( new ArrayList <CurrentListTrack> ( Arrays.asList( MusicPlayerUI.currentList.toArray( new CurrentListTrack[ MusicPlayerUI.currentList.size() ] ) ) ) );
 			currentListOut.flush();
 			
 		} catch ( IOException e ) {
@@ -513,7 +513,7 @@ public class Persister {
 							try {
 								int tracklistNumber = Integer.parseInt( value );
 								if ( tracklistNumber != -1 ) {
-									MusicPlayerUI.currentListData.get( tracklistNumber ).setIsCurrentTrack( true );
+									MusicPlayerUI.currentList.get( tracklistNumber ).setIsCurrentTrack( true );
 								}
 							} catch ( Exception e ) {
 								System.out.println ( "Error loading current list track number: " + e.getMessage() );

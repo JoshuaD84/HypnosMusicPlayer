@@ -19,13 +19,15 @@ public class DraggedTrackContainer implements Serializable {
 	
 	private List<Track> tracks;
 	private List<Integer> indices;
+	private List<Album> albums;
 	
 	private DragSource source;
 	
-	public DraggedTrackContainer( List<Integer> indices, List<Track> tracks, DragSource source ) {
+	public DraggedTrackContainer( List<Integer> indices, List<Track> tracks, List<Album> albums, DragSource source ) {
 		this.indices = indices;
 		this.source = source;
 		this.tracks = tracks;
+		this.albums = albums;
 	}
 	
 	public List<Integer> getIndices() {
@@ -38,5 +40,9 @@ public class DraggedTrackContainer implements Serializable {
 	
 	public List<Track> getTracks() {
 		return tracks;
+	}
+	
+	public List<Album> getAlbums() {
+		return albums;
 	}
 }

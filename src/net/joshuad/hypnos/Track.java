@@ -191,13 +191,6 @@ public class Track implements Serializable {
 		if ( album.equals( "" ) && !fnAlbum.equals( "" ) ) { album = fnAlbum; setByFileName = true; }
 		if ( date.equals( "" ) && !fnYear.equals( "" ) ) { date = fnYear; setByFileName = true; }
 		if ( title.equals( "" ) && !fnTitle.equals( "" )  ) { title = fnTitle; setByFileName = true; }
-		
-		if ( setByFileName ) {
-			if ( Library.SHOW_SCAN_NOTES ) {
-				System.out.println ( "Set by filename: " + trackFile );
-			}
-		}
-			
 	}
 	
 	private void parseArtist( Tag tag ) {
@@ -262,15 +255,11 @@ public class Track implements Serializable {
 					
 				} else if ( rawText.matches("^[0-9]+/.*") ) {
 					trackNumber = Integer.parseInt( rawText.split("/")[0] );
-					if ( Library.SHOW_SCAN_NOTES ) {
-						System.out.println ( "Bad, but fixable, track numbering: " + rawText + " - " + trackFile.toString() );
-					}
+					LOGGER.log( Level.INFO, "Bad, but fixable, track numbering: " + rawText + " - " + trackFile.toString() );
 				
 				} else if ( rawNoWhiteSpace.matches("^[0-9]+/.*") ) {
 					trackNumber = Integer.parseInt( rawNoWhiteSpace.split("/")[0] );
-					if ( Library.SHOW_SCAN_NOTES ) {
-						System.out.println ( "Bad, but fixable, track numbering: " + rawText + " - " + trackFile.toString() );
-					}
+					LOGGER.log( Level.INFO, "Bad, but fixable, track numbering: " + rawText + " - " + trackFile.toString() );
 					
 				} else {
 					throw new NumberFormatException();
@@ -278,9 +267,7 @@ public class Track implements Serializable {
 				
 			} catch ( NumberFormatException e ) {
 				if ( ! rawNoWhiteSpace.equals( "" ) ) {
-					if ( Library.SHOW_SCAN_NOTES ) {
-						System.out.println ( "Invalid track number: " + rawText  + " - " + trackFile.toString() );
-					}
+					LOGGER.log( Level.INFO, "Invalid track number: " + rawText  + " - " + trackFile.toString() );
 				}
 			}
 		}
@@ -297,9 +284,7 @@ public class Track implements Serializable {
 				discCount = Integer.valueOf( tag.getFirst ( FieldKey.DISC_TOTAL ) );
 			} catch ( NumberFormatException e ) {
 				if ( ! tag.getFirst ( FieldKey.DISC_TOTAL ).equals( "" ) ) {
-					if ( Library.SHOW_SCAN_NOTES ) {
-						System.out.println ( "Invalid disc count: " + tag.getFirst ( FieldKey.DISC_TOTAL )  + " - " + trackFile.toString() );
-					}
+					LOGGER.log( Level.INFO, "Invalid disc count: " + tag.getFirst ( FieldKey.DISC_TOTAL )  + " - " + trackFile.toString() );
 				}
 			} catch ( UnsupportedOperationException e ) {
 				//No problem, it doesn't exist for this file format
@@ -325,9 +310,7 @@ public class Track implements Serializable {
 						discCount = Integer.parseInt( rawText.split("/")[1] );
 					}
 						
-					if ( Library.SHOW_SCAN_NOTES ) {	
-						System.out.println ( "Bad, but fixable, disc numbering: " + rawText + " - " + trackFile.toString() );
-					}
+					LOGGER.log( Level.INFO, "Bad, but fixable, disc numbering: " + rawText + " - " + trackFile.toString() );
 				
 				} else if ( rawNoWhiteSpace.matches("^[0-9]+/.*") ) {
 					//if matches 23/<whatever>
@@ -337,9 +320,7 @@ public class Track implements Serializable {
 						discCount = Integer.parseInt( rawNoWhiteSpace.split("/")[1] );
 					}
 
-					if ( Library.SHOW_SCAN_NOTES ) {	
-						System.out.println ( "Bad, but fixable, disc numbering: " + rawText + " - " + trackFile.toString() );
-					}
+					LOGGER.log( Level.INFO, "Bad, but fixable, disc numbering: " + rawText + " - " + trackFile.toString() );
 					
 				} else {
 					throw new NumberFormatException();
@@ -347,9 +328,7 @@ public class Track implements Serializable {
 				
 			} catch ( NumberFormatException e ) {
 				if ( ! rawNoWhiteSpace.equals( "" ) ) {
-					if ( Library.SHOW_SCAN_NOTES ) {
-						System.out.println ( "Invalid disc number: " + rawText  + " - " + trackFile.toString() );
-					}
+					LOGGER.log( Level.INFO, "Invalid disc number: " + rawText  + " - " + trackFile.toString() );
 				}
 			} catch ( UnsupportedOperationException e ) {
 				//No problem, it doesn't exist for this file format
@@ -387,7 +366,11 @@ public class Track implements Serializable {
 		}
 	}
 	
-	public String getAlbum () {
+	public String getSimpleAlbumTitle () {
+		return album;
+	}
+	
+	public String getFullAlbumTitle () {
 		String retMe = album;
 		
 		if ( releaseType != null && !releaseType.equals("") && !releaseType.matches( "(?i:album)" ) ) {
@@ -498,7 +481,6 @@ public class Track implements Serializable {
 		return ( compareTo.getPath().toAbsolutePath().equals( getPath().toAbsolutePath() ) );
 	}
 	
-	//TODO: Move this to track.GetAlbumCover()
 	public Image getAlbumCoverImage ( ) {
 		
 		if ( this.getPath().getParent() == null ) return null;
@@ -542,7 +524,7 @@ public class Track implements Serializable {
 		} catch ( IOException | CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
 			// TODO Auto-generated catch block
 			// TODO CannotReadException for Test Cases/long.m4a
-			e.printStackTrace();
+			e.printStackTrace( System.out );
 		} catch ( NullPointerException e ) {
 			//TODO:
 		}

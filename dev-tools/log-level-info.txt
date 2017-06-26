@@ -1,2 +1,9 @@
 Info
    Can't read a tag
+   Using backup flac decoder
+
+Fine
+	Can't close a resource
+	
+Finer
+	InterruptedException while sleeping in a thread

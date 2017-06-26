@@ -24,19 +24,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
-
-import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.FieldKey;
-import org.jaudiotagger.tag.TagException;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
@@ -52,6 +45,7 @@ import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
@@ -70,6 +64,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -85,6 +80,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
@@ -100,11 +96,20 @@ import net.joshuad.hypnos.players.AbstractPlayer;
 @SuppressWarnings({ "rawtypes", "unchecked" }) // TODO: Maybe get rid of this when I understand things better
 public class MusicPlayerUI extends Application {
 	
+	private static final Logger LOGGER = Logger.getLogger( MusicPlayerUI.class.getName() );
+	
+	enum ExitCode {
+		NORMAL ( 0 );
+		
+		private int value;
+		ExitCode ( int value ) { this.value = value; }
+		public int getValue() { return value; }
+	}
+	
 	public static boolean IS_STANDALONE = false;
 	public static boolean IS_DEVELOPING = false;
 	public static Path ROOT;
 	
-	private static final Logger LOGGER = Logger.getLogger( MusicPlayerUI.class.getName() );
 
 	private static final int MAX_PREVIOUS_NEXT_STACK_SIZE = 10000;
 	private static final int MAX_HISTORY_SIZE = 100;
@@ -113,7 +118,7 @@ public class MusicPlayerUI extends Application {
 
 	public static final String PROGRAM_NAME = "Hypnos";
 
-	final static ObservableList <CurrentListTrack> currentListData = FXCollections.observableArrayList(); //TODO: rename to currentList
+	final static ObservableList <CurrentListTrack> currentList = FXCollections.observableArrayList(); 
 	
 	static TableView <Album> albumTable;
 	static TableView <Playlist> playlistTable;
@@ -150,8 +155,9 @@ public class MusicPlayerUI extends Application {
 
 	static Label timeElapsedLabel = new Label( "" );
 	static Label timeRemainingLabel = new Label( "" );
-	static Label currentPlayingListInfo = new Label( "" );
 	static Label trackInfo = new Label( "" );
+
+	static ListInfoUpdater listInfoUpdater;
 	
 	static Label emptyPlaylistLabel = new Label( 
 		"You haven't created any playlists, make a playlist on the right and click 💾 to save it for later." );
@@ -186,8 +192,6 @@ public class MusicPlayerUI extends Application {
 	static int playOnceShuffleTracksPlayedCounter = 1;
 
 	static Playlist currentPlaylist = null;
-
-	static boolean playlistChanged = false;
 	
 	static CheckBox trackListCheckBox;
 	static TextField trackFilterBox;
@@ -284,7 +288,7 @@ public class MusicPlayerUI extends Application {
 					}
 				}
 				
-				if ( currentListData.contains( candidate ) ) {
+				if ( currentList.contains( candidate ) ) {
 					previousTrack = candidate;
 				}
 			}
@@ -296,7 +300,7 @@ public class MusicPlayerUI extends Application {
 		} else if ( repeatMode == RepeatMode.PLAY_ONCE ) {
 			playOnceShuffleTracksPlayedCounter = 1;
 			Track previousTrackInList = null;
-			for ( CurrentListTrack track : currentListData ) {
+			for ( CurrentListTrack track : currentList ) {
 				if ( track.getIsCurrentTrack() ) {
 					if ( previousTrackInList != null ) {
 						playTrack( previousTrackInList, isPaused, false );
@@ -310,12 +314,12 @@ public class MusicPlayerUI extends Application {
 			}
 		} else if ( repeatMode == RepeatMode.REPEAT ) {
 			Track previousTrackInList = null;
-			for ( CurrentListTrack track : currentListData ) {
+			for ( CurrentListTrack track : currentList ) {
 				if ( track.getIsCurrentTrack() ) {
 					if ( previousTrackInList != null ) {
 						playTrack( previousTrackInList, isPaused, false );
 					} else {
-						playTrack( currentListData.get( currentListData.size() - 1 ), isPaused, false );
+						playTrack( currentList.get( currentList.size() - 1 ), isPaused, false );
 					}
 					break;
 				} else {
@@ -349,8 +353,8 @@ public class MusicPlayerUI extends Application {
 			if ( selectedTrack != null ) {
 				playTrack( selectedTrack );
 
-			} else if ( !currentListTable.getItems().isEmpty() ) {
-				selectedTrack = currentListTable.getItems().get( 0 );
+			} else if ( !currentList.isEmpty() ) {
+				selectedTrack = currentList.get( 0 );
 				playTrack( selectedTrack );
 			}
 		}
@@ -371,7 +375,7 @@ public class MusicPlayerUI extends Application {
 				playTrack( Queue.getNextTrack() );
 				
 			} else if ( shuffleMode == ShuffleMode.SEQUENTIAL ) {
-				ListIterator <CurrentListTrack> iterator = currentListData.listIterator();
+				ListIterator <CurrentListTrack> iterator = currentList.listIterator();
 				boolean didSomething = false;
 				boolean currentlyPaused = currentPlayer.isPaused();
 				while ( iterator.hasNext() ) {
@@ -383,8 +387,8 @@ public class MusicPlayerUI extends Application {
 							playOnceShuffleTracksPlayedCounter = 1;
 							stopTrack();
 							didSomething = true;
-						} else if ( repeatMode == RepeatMode.REPEAT && currentListData.size() > 0 ) {
-							playTrack( currentListData.get( 0 ), currentlyPaused );
+						} else if ( repeatMode == RepeatMode.REPEAT && currentList.size() > 0 ) {
+							playTrack( currentList.get( 0 ), currentlyPaused );
 							didSomething = true;
 						} else {
 							stopTrack();
@@ -394,16 +398,16 @@ public class MusicPlayerUI extends Application {
 					}
 				}
 				if ( !didSomething ) {
-					if ( currentListData.size() > 0 ) {
-						playTrack ( currentListData.get( 0 ), currentlyPaused );
+					if ( currentList.size() > 0 ) {
+						playTrack ( currentList.get( 0 ), currentlyPaused );
 					}
 				}
 				
 			} else if ( shuffleMode == ShuffleMode.SHUFFLE && repeatMode == RepeatMode.PLAY_ONCE ) {
 
-				if ( playOnceShuffleTracksPlayedCounter < currentListData.size() ) {
+				if ( playOnceShuffleTracksPlayedCounter < currentList.size() ) {
 					List <Track> alreadyPlayed = previousNextStack.subList( 0, playOnceShuffleTracksPlayedCounter );
-					ArrayList <Track> viableTracks = new ArrayList <Track>( currentListData );
+					ArrayList <Track> viableTracks = new ArrayList <Track>( currentList );
 					viableTracks.removeAll( alreadyPlayed );
 					Track playMe = viableTracks.get( randomGenerator.nextInt( viableTracks.size() ) );
 					playTrack( playMe );
@@ -417,7 +421,7 @@ public class MusicPlayerUI extends Application {
 				playOnceShuffleTracksPlayedCounter = 1;
 				// TODO: I think there may be issues with multithreading here.
 				// TODO: Ban the most recent X tracks from playing
-				int currentListSize = currentListData.size();
+				int currentListSize = currentList.size();
 				int collisionWindowSize = currentListSize / 3; // TODO: Fine tune this amount
 				int permittedRetries = 3; // TODO: fine tune this number
 
@@ -435,7 +439,7 @@ public class MusicPlayerUI extends Application {
 				}
 
 				do {
-					playMe = currentListData.get( randomGenerator.nextInt( currentListData.size() ) );
+					playMe = currentList.get( randomGenerator.nextInt( currentList.size() ) );
 					if ( !collisionWindow.contains( playMe ) ) {
 						foundMatch = true;
 					} else {
@@ -508,15 +512,14 @@ public class MusicPlayerUI extends Application {
 
 	public static void playAlbum ( Album album ) {
 		currentPlaylist = null;
-		currentListData.clear();
-		currentListData.addAll( Utils.convertTrackList( album.getTracks() ) );
-		Track firstTrack = currentListData.get( 0 );
+		currentList.clear();
+		currentList.addAll( Utils.convertTrackList( album.getTracks() ) );
+		Track firstTrack = currentList.get( 0 );
 		if ( firstTrack != null ) {
 			playTrack( firstTrack );
 		}
 
-		playlistChanged = false;
-		currentPlayingListInfo.setText( "Album: " + album.getAlbumArtist() + " - " + album.getYear() + " - " + album.getTitle() );
+		listInfoUpdater.albumLoaded( album );
 	}
 	
 	public static void loadTrack ( Track track ) {
@@ -549,11 +552,11 @@ public class MusicPlayerUI extends Application {
 	}
 
 	public static void loadTracks ( List <Track> tracks, boolean startPaused ) {
-		currentListTable.getItems().clear();
-		currentListTable.getItems().addAll( Utils.convertTrackList( tracks ) );
-		currentPlayingListInfo.setText( "Playlist: New" );
-		if ( !currentListTable.getItems().isEmpty() ) {
-			playTrack( currentListTable.getItems().get( 0 ), startPaused );
+		currentList.clear();
+		currentList.addAll( Utils.convertTrackList( tracks ) );
+		listInfoUpdater.tracksLoaded ( );
+		if ( !currentList.isEmpty() ) {
+			playTrack( currentList.get( 0 ), startPaused );
 		}
 		currentPlaylist = null;
 	}
@@ -561,10 +564,10 @@ public class MusicPlayerUI extends Application {
 	public static void playPlaylist ( Playlist playlist ) {
 
 		stopTrack();
-		currentListData.clear();
-		currentListData.addAll( Utils.convertTrackList( playlist.getTracks() ) );
-		if ( !currentListData.isEmpty() ) {
-			Track firstTrack = currentListData.get( 0 );
+		currentList.clear();
+		currentList.addAll( Utils.convertTrackList( playlist.getTracks() ) );
+		if ( !currentList.isEmpty() ) {
+			Track firstTrack = currentList.get( 0 );
 			if ( firstTrack != null ) {
 				playTrack( firstTrack );
 			}
@@ -572,12 +575,12 @@ public class MusicPlayerUI extends Application {
 		}
 		currentPlaylist = playlist;
 
-		currentPlayingListInfo.setText( "Playlist: " + playlist.getName() );
-		playlistChanged = false;
+		listInfoUpdater.playlistLoaded ( playlist );
 	}
 
 	public static void appendAlbum ( Album album ) {
-		currentListData.addAll( Utils.convertTrackList( album.getTracks() ) );
+		currentList.addAll( Utils.convertTrackList( album.getTracks() ) );
+		listInfoUpdater.tracksAdded();
 	}
 
 	public static void stopTrack () {
@@ -888,23 +891,25 @@ public class MusicPlayerUI extends Application {
 			
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					currentListTable.getItems().clear();
+					Track playMe = historyTable.getSelectionModel().getSelectedItem();
 					try {
-						currentListTable.getItems().add( new CurrentListTrack ( historyTable.getSelectionModel().getSelectedItem() ) );
-					} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e1 ) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						CurrentListTrack addMe = new CurrentListTrack ( playMe );
+						currentList.clear();
+						currentList.add( addMe );
+						playTrack( addMe );
+						listInfoUpdater.tracksLoaded ( );
+					} catch ( IOException e ) {
+						LOGGER.log( Level.INFO, e.getMessage() + "\nError opening file from history: " + playMe.getPath() );
+						notifyUserError( "Cannot play.\n\n" + e.getMessage() );
 					}
-					playTrack( historyTable.getSelectionModel().getSelectedItem() );
-					currentPlayingListInfo.setText( "Playlist: New Playlist *" );
 				}
-			} );
+			});
 			
 			row.setOnDragDetected( event -> {
 				if ( !row.isEmpty() ) {
 					ArrayList <Integer> indices = new ArrayList <Integer>( historyTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( historyTable.getSelectionModel().getSelectedItems() );
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, DragSource.HISTORY );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, DragSource.HISTORY );
 					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
@@ -959,7 +964,9 @@ public class MusicPlayerUI extends Application {
 		apendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				currentListTable.getItems().addAll( Utils.convertTrackList( historyTable.getSelectionModel().getSelectedItems() ) );
+				//TODO: have currentList do this conversion for us
+				currentList.addAll( Utils.convertTrackList( historyTable.getSelectionModel().getSelectedItems() ) );
+				listInfoUpdater.tracksAdded();
 			}
 		});
 		
@@ -1167,15 +1174,18 @@ public class MusicPlayerUI extends Application {
 			
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					currentListTable.getItems().clear();
+					
+					Track playMe = queueTable.getSelectionModel().getSelectedItem();
 					try {
-						currentListTable.getItems().add( new CurrentListTrack ( queueTable.getSelectionModel().getSelectedItem() ) );
-					} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e1 ) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						CurrentListTrack addMe = new CurrentListTrack ( playMe );
+						currentList.clear();
+						currentList.add( addMe );
+						playTrack( addMe );
+						listInfoUpdater.tracksLoaded( );
+					} catch ( IOException e ) {
+						LOGGER.log( Level.INFO, e.getMessage() + "\nError opening file from queue: " + playMe.getPath() );
+						notifyUserError( "Cannot play.\n\n" + e.getMessage() );
 					}
-					playTrack( queueTable.getSelectionModel().getSelectedItem() );
-					currentPlayingListInfo.setText( "Playlist: New Playlist *" );
 				}
 			} );
 			
@@ -1183,7 +1193,7 @@ public class MusicPlayerUI extends Application {
 				if ( !row.isEmpty() ) {
 					ArrayList <Integer> indices = new ArrayList <Integer>( queueTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( queueTable.getSelectionModel().getSelectedItems() );
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, DragSource.QUEUE );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, DragSource.QUEUE );
 					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
@@ -1221,11 +1231,11 @@ public class MusicPlayerUI extends Application {
 							
 						} break;
 						case CURRENT_LIST: {
-							synchronized ( currentListData ) {
+							synchronized ( currentList ) {
 								ArrayList <CurrentListTrack> tracksToCopy = new ArrayList <CurrentListTrack> (  );
 								for ( int index : draggedIndices ) {
-									if ( index >= 0 && index < currentListData.size() ) {
-										tracksToCopy.add( currentListData.get( index ) );
+									if ( index >= 0 && index < currentList.size() ) {
+										tracksToCopy.add( currentList.get( index ) );
 									}
 								}
 								Queue.addAllTracks( dropIndex, tracksToCopy );
@@ -1281,8 +1291,8 @@ public class MusicPlayerUI extends Application {
 						}
 					}
 					if ( !tracksToAdd.isEmpty() ) {
-						int dropIndex = row.isEmpty() ? dropIndex = currentListTable.getItems().size() : row.getIndex();
-						queueTable.getItems().addAll( Math.min( dropIndex, currentListTable.getItems().size() ), tracksToAdd );
+						int dropIndex = row.isEmpty() ? dropIndex = currentList.size() : row.getIndex();
+						queueTable.getItems().addAll( Math.min( dropIndex, currentList.size() ), tracksToAdd );
 					}
 
 					event.setDropCompleted( true );
@@ -1323,11 +1333,11 @@ public class MusicPlayerUI extends Application {
 						
 					} break;
 					case CURRENT_LIST: {
-						synchronized ( currentListData ) {
+						synchronized ( currentList ) {
 							ArrayList <CurrentListTrack> tracksToCopy = new ArrayList <CurrentListTrack> (  );
 							for ( int index : draggedIndices ) {
-								if ( index >= 0 && index < currentListData.size() ) {
-									tracksToCopy.add( currentListData.get( index ) );
+								if ( index >= 0 && index < currentList.size() ) {
+									tracksToCopy.add( currentList.get( index ) );
 								}
 							}
 							Queue.addAllTracks( tracksToCopy );
@@ -1423,7 +1433,8 @@ public class MusicPlayerUI extends Application {
 		apendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				currentListTable.getItems().addAll( Utils.convertTrackList( queueTable.getSelectionModel().getSelectedItems() ) );
+				currentList.addAll( Utils.convertTrackList( queueTable.getSelectionModel().getSelectedItems() ) );
+				listInfoUpdater.tracksAdded();
 			}
 		});
 		
@@ -1484,7 +1495,7 @@ public class MusicPlayerUI extends Application {
 		root.getChildren().add( queueTable );
 		queueWindow.setScene( scene );
 	}
-
+	
 	public void setupLibraryWindow () {
 		libraryWindow = new Stage();
 		libraryWindow.initModality( Modality.NONE );
@@ -1614,27 +1625,6 @@ public class MusicPlayerUI extends Application {
 
 	public void setupArtistImage () {
 		artistImage = new BorderPane();
-		artistImage.setOnDragOver( event -> {
-			//TODO: Become more discerning -- if ( db.hasFiles() ) {
-			Dragboard db = event.getDragboard();
-			event.acceptTransferModes( TransferMode.COPY );
-			event.consume();
-		});
-		
-		artistImage.setOnDragDropped( event -> {
-			Dragboard db = event.getDragboard();
-			if ( db.hasFiles() ) {
-				File file = db.getFiles().get( 0 );
-				
-				if ( Utils.isImageFile( file ) ) {
-					//TODO: Prompt for how they want us to save it. 
-				}
-			}
-			
-			for ( DataFormat format : db.getContentTypes() ) {
-				System.out.println( "-" + format.toString() );
-			}
-		});
 	}
 
 	public static void setAlbumImage ( Image image ) {
@@ -1661,7 +1651,8 @@ public class MusicPlayerUI extends Application {
 	public static void addToPlaylist ( List <Track> tracks, Playlist playlist ) {
 		playlist.getTracks().addAll( tracks );
 		if ( currentPlaylist != null && currentPlaylist.getName().equals( playlist.getName() ) ) {
-			currentListData.addAll( Utils.convertTrackList( tracks ) );
+			currentList.addAll( Utils.convertTrackList( tracks ) );
+			listInfoUpdater.playlistLoaded( playlist );
 		}
 		playlistTable.refresh(); 
 	}
@@ -1695,8 +1686,7 @@ public class MusicPlayerUI extends Application {
 			
 			if ( isCurrentList ) {
 				currentPlaylist = newPlaylist;
-				currentPlayingListInfo.setText( "Playlist: " + newPlaylist.getName() );
-				playlistChanged = false;
+				listInfoUpdater.playlistLoaded( currentPlaylist );
 			}
 		}
 	}
@@ -1717,11 +1707,7 @@ public class MusicPlayerUI extends Application {
 			playlist.setName ( enteredName );
 			Library.addPlaylist( playlist );
 			
-			if ( currentPlaylist.equals( playlist ) ) {
-				String title = "Playlist: " + playlist.getName();
-				if ( playlistChanged ) title += " *";
-				currentPlayingListInfo.setText( title );
-			}
+			listInfoUpdater.playlistLoaded( playlist );
 		}
 	}
 
@@ -1766,14 +1752,15 @@ public class MusicPlayerUI extends Application {
 		savePlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				promptAndSavePlaylist( new ArrayList <Track>( currentListData ), true );
+				promptAndSavePlaylist( new ArrayList <Track>( currentList ), true );
 			}
 		});
 		
 		clearButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				currentListData.clear();
+				currentList.clear();
+				listInfoUpdater.listCleared();
 			}
 		});
 		
@@ -1844,17 +1831,18 @@ public class MusicPlayerUI extends Application {
 			@Override
 			public void handle ( ActionEvent event ) {
 				String playlistName = ((Playlist) ((MenuItem) event.getSource()).getUserData()).getName();
-				Playlist playlist = new Playlist( playlistName, new ArrayList <Track>( currentListTable.getItems() ) );
+				Playlist playlist = new Playlist( playlistName, new ArrayList <Track>( currentList ) );
 				Library.addPlaylist( playlist );
 			}
 		};
 
-		currentPlayingListInfo.setAlignment( Pos.CENTER );
-
 		playlistControls = new HBox();
 		playlistControls.setAlignment( Pos.CENTER_RIGHT );
-
+		
+		Label currentPlayingListInfo = new Label ( "" );
+		currentPlayingListInfo.setAlignment( Pos.CENTER );
 		currentPlayingListInfo.prefWidthProperty().bind( playlistControls.widthProperty() );
+		listInfoUpdater = new ListInfoUpdater ( currentPlayingListInfo );
 
 		playlistControls.getChildren().addAll( toggleRepeatButton, toggleShuffleButton, showQueueButton, showHistoryButton,
 				currentPlayingListInfo, loadTracksButton, savePlaylistButton, clearButton );
@@ -2001,8 +1989,8 @@ public class MusicPlayerUI extends Application {
 		matchableText.add( track.getArtist().toLowerCase() );
 		matchableText.add( Normalizer.normalize( track.getTitle(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
 		matchableText.add( track.getTitle().toLowerCase() );
-		matchableText.add( Normalizer.normalize( track.getAlbum(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-		matchableText.add( track.getAlbum().toLowerCase() );
+		matchableText.add( Normalizer.normalize( track.getFullAlbumTitle(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+		matchableText.add( track.getFullAlbumTitle().toLowerCase() );
 
 		for ( String token : lowerCaseFilterTokens ) {
 			boolean tokenMatches = false;
@@ -2036,8 +2024,8 @@ public class MusicPlayerUI extends Application {
 
 				matchableText.add( Normalizer.normalize( album.getAlbumArtist(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
 				matchableText.add( album.getAlbumArtist().toLowerCase() );
-				matchableText.add( Normalizer.normalize( album.getTitle(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-				matchableText.add( album.getTitle().toLowerCase() );
+				matchableText.add( Normalizer.normalize( album.getFullTitle(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+				matchableText.add( album.getFullTitle().toLowerCase() );
 				matchableText.add( Normalizer.normalize( album.getYear(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
 				matchableText.add( album.getYear().toLowerCase() );
 
@@ -2109,7 +2097,7 @@ public class MusicPlayerUI extends Application {
 
 		artistColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "albumArtist" ) );
 		yearColumn.setCellValueFactory( new PropertyValueFactory <Album, Integer>( "year" ) );
-		albumColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "title" ) );
+		albumColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "fullTitle" ) );
 
 		artistColumn.setMaxWidth( 45000 );
 		yearColumn.setMaxWidth( 10000 );
@@ -2304,10 +2292,12 @@ public class MusicPlayerUI extends Application {
 					ArrayList <Track> tracks = new ArrayList <Track> ();
 					
 					for ( Album album : albums ) {
-						tracks.addAll( album.getTracks() );
+						if ( album != null ) {
+							tracks.addAll( album.getTracks() );
+						}
 					}
 					
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( null, tracks, DragSource.ALBUM_LIST );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( null, tracks, albums, DragSource.ALBUM_LIST );
 					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
@@ -2335,7 +2325,7 @@ public class MusicPlayerUI extends Application {
 		titleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
 		lengthColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "LengthDisplay" ) );
 		trackColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "TrackNumber" ) );
-		albumColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "Album" ) );
+		albumColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "fullAlbumTitle" ) );
 
 		artistColumn.setSortType( TableColumn.SortType.ASCENDING );
 
@@ -2426,7 +2416,8 @@ public class MusicPlayerUI extends Application {
 		apendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				currentListTable.getItems().addAll( Utils.convertTrackList( trackTable.getSelectionModel().getSelectedItems() ) );
+				currentList.addAll( Utils.convertTrackList( trackTable.getSelectionModel().getSelectedItems() ) );
+				listInfoUpdater.tracksAdded();
 			}
 		} );
 		
@@ -2497,15 +2488,18 @@ public class MusicPlayerUI extends Application {
 			
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					currentListTable.getItems().clear();
+					
+					Track playMe = trackTable.getSelectionModel().getSelectedItem();
 					try {
-						currentListTable.getItems().add( new CurrentListTrack ( trackTable.getSelectionModel().getSelectedItem() ) );
-					} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e1 ) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						CurrentListTrack addMe = new CurrentListTrack ( playMe );
+						currentList.clear();
+						currentList.add( addMe );
+						playTrack( addMe );
+						listInfoUpdater.tracksLoaded ( );
+					} catch ( IOException e ) {
+						LOGGER.log( Level.INFO, e.getMessage() + "\nError opening file from track list: " + playMe.getPath() );
+						notifyUserError( e.getMessage() + "\n\nUnable to play." );
 					}
-					playTrack( trackTable.getSelectionModel().getSelectedItem() );
-					currentPlayingListInfo.setText( "Playlist: New Playlist *" );
 				}
 			} );
 			
@@ -2537,7 +2531,7 @@ public class MusicPlayerUI extends Application {
 					
 					ArrayList <Integer> indices = new ArrayList <Integer>( trackTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( trackTable.getSelectionModel().getSelectedItems() );
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, DragSource.TRACK_LIST );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, DragSource.TRACK_LIST );
 					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
@@ -2606,7 +2600,8 @@ public class MusicPlayerUI extends Application {
 		appendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				currentListData.addAll( Utils.convertTrackList( playlistTable.getSelectionModel().getSelectedItem().getTracks() ) );
+				currentList.addAll( Utils.convertTrackList( playlistTable.getSelectionModel().getSelectedItem().getTracks() ) );
+				listInfoUpdater.tracksAdded();
 			}
 		});
 		
@@ -2693,7 +2688,7 @@ public class MusicPlayerUI extends Application {
 						tracks.addAll ( playlist.getTracks() );
 					}
 					
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( null, tracks, DragSource.PLAYLIST_LIST );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( null, tracks, null, DragSource.PLAYLIST_LIST );
 					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
@@ -2776,7 +2771,7 @@ public class MusicPlayerUI extends Application {
 		playingColumn.setCellValueFactory( new PropertyValueFactory ( "display" ) );
 		artistColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "artist" ) );
 		yearColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, Integer>( "year" ) );
-		albumColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "album" ) );
+		albumColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "fullAlbumTitle" ) );
 		titleColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "title" ) );
 		trackColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, Integer>( "trackNumber" ) );
 		lengthColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "lengthDisplay" ) );
@@ -2801,21 +2796,7 @@ public class MusicPlayerUI extends Application {
 		currentListTable.getColumns().addAll( playingColumn, trackColumn, artistColumn, yearColumn, albumColumn, titleColumn, lengthColumn );
 		albumTable.getSortOrder().add( trackColumn );
 		currentListTable.setEditable( false );
-		currentListTable.setItems( currentListData );
-
-		currentListData.addListener( new InvalidationListener() {
-			@Override
-			public void invalidated ( Observable arg0 ) {
-				if ( !playlistChanged ) {
-					if ( currentListData.isEmpty() ) {
-						currentPlayingListInfo.setText( "" );
-					} else {
-						currentPlayingListInfo.setText( "Playlist: New Playlist *" );
-						playlistChanged = true;
-					}
-				}
-			}
-		});
+		currentListTable.setItems( currentList );
 
 		FixedWidthCustomResizePolicy resizePolicy = new FixedWidthCustomResizePolicy();
 		currentListTable.setColumnResizePolicy( resizePolicy );
@@ -2853,29 +2834,17 @@ public class MusicPlayerUI extends Application {
 					case ALBUM_INFO:
 					case HISTORY: {
 						List <Track> tracksToCopy = container.getTracks();
-						currentListTable.getItems().addAll( Utils.convertTrackList( tracksToCopy ) );
+						currentList.addAll( Utils.convertTrackList( tracksToCopy ) );
+						if ( container.getAlbums() != null ) {
+							listInfoUpdater.albumsLoaded( container.getAlbums() );
+						} else {
+							listInfoUpdater.tracksLoaded();
+						}
 					
 					} break;
 					
 					case CURRENT_LIST: {
-						List <Integer> draggedIndices = container.getIndices();
-						ArrayList <CurrentListTrack> tracksToMove = new ArrayList <CurrentListTrack> ( draggedIndices.size() );
-						for ( int index : draggedIndices ) {
-							if ( index >= 0 && index < currentListTable.getItems().size() ) {
-								tracksToMove.add( currentListTable.getItems().get( index ) );
-							}
-						}
-						
-						for ( int k = draggedIndices.size() - 1; k >= 0; k-- ) {
-							int index = draggedIndices.get( k ).intValue();
-							if ( index >= 0 && index < currentListTable.getItems().size() ) {
-								currentListTable.getItems().remove ( index );
-							}
-						}
-						
-						currentListTable.getItems().addAll( tracksToMove );
-						currentListTable.getSelectionModel().clearSelection();
-						
+						//There is no meaning in dragging from an empty list to an empty list. 
 					} break;
 					
 					case QUEUE: {
@@ -2894,12 +2863,13 @@ public class MusicPlayerUI extends Application {
 											queueTable.getItems().add( index, newAddMe );
 											tracksToCopy.add( newAddMe );
 											
-										} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e1 ) {
+										} catch ( IOException e ) {
 											LOGGER.log( Level.WARNING, "Unable to convert queue track to CurrentListTrack, not adding to current list" );
 										}
 									}
 								}
-								currentListTable.getItems().addAll( tracksToCopy );
+								currentList.addAll( tracksToCopy );
+								listInfoUpdater.tracksAdded();
 							}
 						}
 						
@@ -2918,22 +2888,22 @@ public class MusicPlayerUI extends Application {
 					Path droppedPath = Paths.get( file.getAbsolutePath() );
 					if ( Utils.isMusicFile( droppedPath ) ) {
 						try {
-							currentListTable.getItems().add( new CurrentListTrack( droppedPath ) );
-						} catch ( CannotReadException | IOException | TagException 
-						| ReadOnlyFileException | InvalidAudioFrameException e ) {
+							currentList.add( new CurrentListTrack( droppedPath ) );
+							listInfoUpdater.tracksAdded();
+						} catch ( IOException e ) {
 							e.printStackTrace();
 						}
 					
 					} else if ( Files.isDirectory( droppedPath ) ) {
-						currentListTable.getItems().addAll( Utils.convertTrackList( Utils.getAllTracksInDirectory( droppedPath ) ) );
-					
+						currentList.addAll( Utils.convertTrackList( Utils.getAllTracksInDirectory( droppedPath ) ) );
+						listInfoUpdater.tracksAdded();
 					} else if ( Utils.isPlaylistFile ( droppedPath ) ) {
 						Playlist playlist = Playlist.loadPlaylist( droppedPath );
 						if ( playlist != null ) {
-							currentListTable.getItems().addAll( Utils.convertTrackList( playlist.getTracks() ) );
+							currentList.addAll( Utils.convertTrackList( playlist.getTracks() ) );
+							listInfoUpdater.tracksAdded();
 						}
 					}
-						
 				}
 
 				event.setDropCompleted( true );
@@ -2995,7 +2965,8 @@ public class MusicPlayerUI extends Application {
 		shuffleMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				Collections.shuffle( currentListTable.getItems() );
+				Collections.shuffle( currentList );
+				listInfoUpdater.listReordered();
 			}
 		});
 		
@@ -3044,7 +3015,12 @@ public class MusicPlayerUI extends Application {
 
 					int selectAfterDelete = selectedIndexes.get( 0 ) - 1;
 					for ( int k = removeMe.size() - 1; k >= 0; k-- ) {
-						currentListData.remove ( removeMe.get( k ).intValue() );
+						currentList.remove ( removeMe.get( k ).intValue() );
+						if ( currentList.size() == 0 ) {
+							listInfoUpdater.listCleared();
+						} else {
+							listInfoUpdater.tracksRemoved();
+						}
 					}
 					currentListTable.getSelectionModel().clearAndSelect( selectAfterDelete );
 				}
@@ -3059,7 +3035,7 @@ public class MusicPlayerUI extends Application {
 				
 				ArrayList <Integer> removeMe = new ArrayList<Integer> ();
 				
-				for ( int k = 0; k < currentListTable.getItems().size(); k++ ) {
+				for ( int k = 0; k < currentList.size(); k++ ) {
 					if ( !selectedIndexes.contains( k ) ) {
 						removeMe.add ( k );
 					}
@@ -3067,7 +3043,7 @@ public class MusicPlayerUI extends Application {
 				
 				if ( !removeMe.isEmpty() ) {
 					for ( int k = removeMe.size() - 1; k >= 0; k-- ) {
-						currentListData.remove ( removeMe.get( k ).intValue() );
+						currentList.remove ( removeMe.get( k ).intValue() );
 					}
 
 					currentListTable.getSelectionModel().clearSelection();
@@ -3083,6 +3059,7 @@ public class MusicPlayerUI extends Application {
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
 					playTrack( row.getItem() );
+					//TODO: Do we want the error here? 
 				}
 			} );
 
@@ -3090,7 +3067,7 @@ public class MusicPlayerUI extends Application {
 				if ( !row.isEmpty() ) {
 					ArrayList <Integer> indices = new ArrayList <Integer>( currentListTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( currentListTable.getSelectionModel().getSelectedItems() );
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, DragSource.CURRENT_LIST );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, DragSource.CURRENT_LIST );
 					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
@@ -3113,7 +3090,7 @@ public class MusicPlayerUI extends Application {
 				if ( db.hasContent( DRAGGED_TRACKS ) ) {
 
 					DraggedTrackContainer container = (DraggedTrackContainer) db.getContent( DRAGGED_TRACKS );
-					int dropIndex = row.isEmpty() ? dropIndex = currentListTable.getItems().size() : row.getIndex();
+					int dropIndex = row.isEmpty() ? dropIndex = currentList.size() : row.getIndex();
 					
 					switch ( container.getSource() ) {
 						case ALBUM_LIST:
@@ -3122,7 +3099,8 @@ public class MusicPlayerUI extends Application {
 						case ALBUM_INFO:
 						case HISTORY: {
 							List <Track> tracksToCopy = container.getTracks();
-							currentListTable.getItems().addAll( dropIndex, Utils.convertTrackList( tracksToCopy ) );
+							currentList.addAll( dropIndex, Utils.convertTrackList( tracksToCopy ) );
+							listInfoUpdater.tracksAdded();
 						
 						} break;
 						
@@ -3130,26 +3108,28 @@ public class MusicPlayerUI extends Application {
 							List <Integer> draggedIndices = container.getIndices();
 							ArrayList <CurrentListTrack> tracksToMove = new ArrayList <CurrentListTrack> ( draggedIndices.size() );
 							for ( int index : draggedIndices ) {
-								if ( index >= 0 && index < currentListTable.getItems().size() ) {
-									tracksToMove.add( currentListTable.getItems().get( index ) );
+								if ( index >= 0 && index < currentList.size() ) {
+									tracksToMove.add( currentList.get( index ) );
 								}
 							}
 							
 							for ( int k = draggedIndices.size() - 1; k >= 0; k-- ) {
 								int index = draggedIndices.get( k ).intValue();
-								if ( index >= 0 && index < currentListTable.getItems().size() ) {
-									currentListTable.getItems().remove ( index );
+								if ( index >= 0 && index < currentList.size() ) {
+									currentList.remove ( index );
 								}
 							}
 							
-							dropIndex = Math.min( currentListTable.getItems().size(), row.getIndex() );
+							dropIndex = Math.min( currentList.size(), row.getIndex() );
 							
-							currentListTable.getItems().addAll( dropIndex, tracksToMove );
+							currentList.addAll( dropIndex, tracksToMove );
 							
 							currentListTable.getSelectionModel().clearSelection();
 							for ( int k = 0; k < draggedIndices.size(); k++ ) {
 								currentListTable.getSelectionModel().select( dropIndex + k );
 							}
+
+							listInfoUpdater.listReordered( );
 						} break;
 						
 						case QUEUE: {
@@ -3168,12 +3148,14 @@ public class MusicPlayerUI extends Application {
 												queueTable.getItems().add( index, newAddMe );
 												tracksToCopy.add( newAddMe );
 												
-											} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e1 ) {
+											} catch ( IOException e1 ) {
+												//TODO: Warning or info?
 												LOGGER.log( Level.WARNING, "Unable to convert queue track to CurrentListTrack, not adding to current list" );
 											}
 										}
 									}
-									currentListTable.getItems().addAll( dropIndex, tracksToCopy );
+									currentList.addAll( dropIndex, tracksToCopy );
+									listInfoUpdater.tracksAdded();
 								}
 							}
 							
@@ -3192,7 +3174,8 @@ public class MusicPlayerUI extends Application {
 						if ( Utils.isMusicFile( droppedPath ) ) {
 							try {
 								tracksToAdd.add( new CurrentListTrack( droppedPath ) );
-							} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
+							} catch ( IOException e ) {
+								//TODO: 
 								e.printStackTrace();
 							}
 						
@@ -3208,8 +3191,9 @@ public class MusicPlayerUI extends Application {
 					}
 					
 					if ( !tracksToAdd.isEmpty() ) {
-						int dropIndex = row.isEmpty() ? dropIndex = currentListTable.getItems().size() : row.getIndex();
-						currentListTable.getItems().addAll( Math.min( dropIndex, currentListTable.getItems().size() ), tracksToAdd );
+						int dropIndex = row.isEmpty() ? dropIndex = currentList.size() : row.getIndex();
+						currentList.addAll( Math.min( dropIndex, currentList.size() ), tracksToAdd );
+						listInfoUpdater.tracksAdded();
 					}
 
 					event.setDropCompleted( true );
@@ -3360,8 +3344,8 @@ public class MusicPlayerUI extends Application {
 	}
 	
 	public static int getCurrentTrackNumber() {
-		for ( int k = 0 ; k < currentListData.size(); k++ ) {
-			if ( currentListData.get( k ).isCurrentTrack ) {
+		for ( int k = 0 ; k < currentList.size(); k++ ) {
+			if ( currentList.get( k ).isCurrentTrack ) {
 				return k;
 			}
 		}
@@ -3372,6 +3356,24 @@ public class MusicPlayerUI extends Application {
 	@Override
 	public void stop(){
 		//TODO: Use this to get rid of main
+	}
+
+	public static void notifyUserError ( String message ) { 
+		
+		Alert alert = new Alert ( AlertType.ERROR );
+		alert.setTitle( "Error" );
+		alert.setContentText( message );
+		alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+		alert.showAndWait();
+	}
+	
+	public static void exit ( ExitCode exitCode ) {
+		if ( currentPlayer != null ) {
+			currentPlayer.stop();
+		}
+		
+		Persister.saveAllData();
+		System.exit ( exitCode.getValue() );
 	}
 	
 	@Override
@@ -3533,15 +3535,8 @@ public class MusicPlayerUI extends Application {
 			UIUpdater.init();
 			
 			Thread uiThread = new Thread (() -> {
-				
 				Application.launch( args );
-				
-				if ( currentPlayer != null ) {
-					currentPlayer.stop();
-				}
-				
-				Persister.saveAllData();
-				System.exit ( 0 );
+				exit ( ExitCode.NORMAL );
 			});
 			
 			uiThread.start();
@@ -3561,10 +3556,11 @@ public class MusicPlayerUI extends Application {
 		} else {
 			SingleInstanceController.sendCommandsThroughSocket( commands );
 			System.out.println ( "Not first instance, sent commands, now exiting." ); //TODO: Better loggings
-			System.exit ( 0 );
+			System.exit ( 0 ); //TODO: Use exit ()
 		}
 	}
 }
+	
 
 class LineNumbersCellFactory<T, E> implements Callback<TableColumn<T, E>, TableCell<T, E>> {
 

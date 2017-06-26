@@ -1,6 +1,9 @@
 package net.joshuad.hypnos.players;
 
 import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.sound.sampled.*;
 
 import javafx.scene.control.Slider;
@@ -8,20 +11,25 @@ import net.joshuad.hypnos.MusicPlayerUI;
 import net.joshuad.hypnos.Track;
 
 public final class FlacPlayer extends AbstractPlayer implements Runnable {
+
+	private static final Logger LOGGER = Logger.getLogger( FlacPlayer.class.getName() );
 	
 	private FlacDecoderLogic decodedInput;
 	
-	public FlacPlayer ( Track track, Slider trackPositionSlider, boolean startPaused ) throws IOException, LineUnavailableException {
+	public FlacPlayer ( Track track, Slider trackPositionSlider, boolean startPaused ) {
 		this.track = track;
 		this.trackPosition = trackPositionSlider;
 		this.pauseRequested = startPaused;
+		
+		openStreamsAtRequestedOffset(); //We do this here to throw an exception we can catch if we can't open the streams with this player. 
+		closeAllResources();
 		
 		Thread t = new Thread ( this );
 		t.setDaemon( true );
 		t.start();
 	}
 	
-	public FlacPlayer ( Track track, Slider trackPositionSlider ) throws IOException, LineUnavailableException {
+	public FlacPlayer ( Track track, Slider trackPositionSlider ) {
 		this ( track, trackPositionSlider, false );
 	}
 	
@@ -29,8 +37,9 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 
 		boolean streamsOpen = openStreamsAtRequestedOffset();
 		if ( !streamsOpen ) {
-			//TODO: Logging
-			System.out.println ( "Unable to open audio stream, not playing track." );
+			closeAllResources();
+			MusicPlayerUI.songFinishedPlaying( false );
+			return;
 		}
 		
 		while ( true ) {	
@@ -57,8 +66,9 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 				closeAllResources();
 				streamsOpen = openStreamsAtRequestedOffset();
 				if ( !streamsOpen ) {
-					//TODO: Logging
-					System.out.println ( "Unable to open audio stream, not playing track." );
+					closeAllResources();
+					MusicPlayerUI.songFinishedPlaying( false );
+					return;
 				}
 				
 				seekRequestPercent = NO_SEEK_REQUESTED;
@@ -73,16 +83,13 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 					temp = decodedInput.readNextBlock();
 				
 					if (temp != null) samples = (long[][])temp[0];
-					
 									
-					// Wait when end of stream reached
-					if (samples == null) {
+					if (samples == null) { // End of stream
 						closeAllResources();
 						MusicPlayerUI.songFinishedPlaying( false );
 						return;
 					}
 					
-					// Convert samples to channel-interleaved bytes in little endian
 					int bytesPerSample = decodedInput.sampleDepth / 8;
 					byte[] sampleBytes = new byte[samples[0].length * samples.length * bytesPerSample];
 					for (int i = 0, k = 0; i < samples[0].length; i++) {
@@ -96,15 +103,13 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 					audioOutput.write ( sampleBytes, 0, sampleBytes.length );
 					
 				} catch (IOException e) {
-					// TODO decodedInput.readNextBlock()
-					e.printStackTrace();
+					LOGGER.log( Level.INFO, "Error reading block from flac file.", e );
 				}
 			} else {
 				try {
 					Thread.sleep ( 5 );
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LOGGER.log ( Level.FINER, "Sleep interrupted during paused" );
 				}
 			}
 			
@@ -119,7 +124,13 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 
 			decodedInput = new FlacDecoderLogic ( track.getPath().toAbsolutePath().toFile() );
 			if ( decodedInput.numSamples == 0 ) throw new FlacDecoderLogic.FormatException("Unknown audio length");
-			
+		} catch (IOException e) {
+			String message = "Unable to decode flac file:\n\n" + track.getPath().toString() + "\n\nIt may be corrupt." ;
+			LOGGER.log( Level.WARNING, message );
+			MusicPlayerUI.notifyUserError ( message );
+			return false;
+		}
+		
 			AudioFormat outputFormat = new AudioFormat ( decodedInput.sampleRate, decodedInput.sampleDepth, decodedInput.numChannels, true, false );
 			DataLine.Info datalineInfo = new DataLine.Info( SourceDataLine.class, outputFormat );
 
@@ -127,43 +138,46 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 				audioOutput = (SourceDataLine) AudioSystem.getLine( datalineInfo );
 				audioOutput.open( outputFormat );
 			} catch ( LineUnavailableException exception ) {
-				System.out.println( "The audio output line could not be opened due to resource restrictions." );
-				System.err.println( exception );
+				String message = "The audio output line could not be opened due to resource restrictions.";
+				LOGGER.log( Level.WARNING, message, exception );
+				MusicPlayerUI.notifyUserError( message );
 				return false;
 			} catch ( IllegalStateException exception ) {
-				System.out.println( "The audio output line is already open." );
-				System.err.println( exception );
+				String message = "The audio output line is already open.";
+				LOGGER.log( Level.WARNING, message, exception );
+				MusicPlayerUI.notifyUserError( message );
 				return false;
 			} catch ( SecurityException exception ) {
-				System.out.println( "The audio output line could not be opened due to security restrictions." );
-				System.err.println( exception );
+				String message = "The audio output line could not be opened due to security restrictions.";
+				LOGGER.log( Level.WARNING, message, exception );
+				MusicPlayerUI.notifyUserError( message );
 				return false;
-			}
+			} 
 			
 			
 			clipStartTimeMS = 0;
 			
 			if ( seekRequestPercent != NO_SEEK_REQUESTED ) {
 				long samplePos = Math.round ( seekRequestPercent * decodedInput.numSamples );
-	
-				long[][] samples = decodedInput.seekAndReadBlock ( samplePos );
-				clipStartTimeMS = (long)( ( track.getLengthS() * 1000 ) * seekRequestPercent );
-
-				seekRequestPercent = NO_SEEK_REQUESTED;
 				
-				if (samples == null) {
-					//TODO: This is a problem, since it doesn't break teh loop up above now. 
-					MusicPlayerUI.songFinishedPlaying( false );
-					return false;
+				try {
+					long[][] samples = decodedInput.seekAndReadBlock ( samplePos );
+					
+					if (samples == null) {
+						return false;
+					}
+					
+				} catch ( IOException e ) {
+					String message = "Unable to seek.";
+					LOGGER.log( Level.WARNING, message, e );
+					MusicPlayerUI.notifyUserError( message );
 				}
+				
+				clipStartTimeMS = (long)( ( track.getLengthS() * 1000 ) * seekRequestPercent );
+				seekRequestPercent = NO_SEEK_REQUESTED;
 			}
 
 			audioOutput.start();
-		
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
 		return true;
 	}
@@ -177,9 +191,9 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 			if ( decodedInput != null ) {
 				decodedInput.close();
 			}
+			
 		} catch ( IOException e) {
-			//TODO: 
-			e.printStackTrace();
+			LOGGER.log ( Level.INFO, "Unable to close flac file reader for: " + track.getPath() );
 		}
 	}
 }

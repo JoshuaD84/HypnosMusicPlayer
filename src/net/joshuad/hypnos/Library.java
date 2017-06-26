@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,9 +28,9 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 
 public class Library {
-	
-	public static final boolean SHOW_SCAN_NOTES = false; //TODO: use logging, put this at the appropriate level
-	
+
+	private static final Logger LOGGER = Logger.getLogger( Library.class.getName() );
+		
 	private static WatchService watcher;
     private static final HashMap<WatchKey,Path> keys = new HashMap <WatchKey,Path> ();
     
@@ -79,8 +81,9 @@ public class Library {
 				modifiedFileDelayedUpdater.setDaemon( true );
 				modifiedFileDelayedUpdater.start();
 			} catch ( IOException e ) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				String message = "Unable to initialize file watcher, changes to file system while running won't be detected";
+				LOGGER.log( Level.WARNING, message );
+				MusicPlayerUI.notifyUserError( message );
 			}
 		}
 	}
@@ -146,8 +149,7 @@ public class Library {
 						}
 						
 					} catch ( InterruptedException e ) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						LOGGER.log ( Level.FINER, "Sleep interupted during wait period." );
 					}
 					
 				
@@ -459,8 +461,8 @@ public class Library {
 			);
 		
 		} catch ( IOException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			String message = "Unable to watch directory for changes: " + start.toString();
+			LOGGER.log( Level.INFO, message );
 		}
 	}
 	
@@ -519,6 +521,7 @@ public class Library {
 }
 
 class ModifiedFileUpdaterThread extends Thread {
+	private static final Logger LOGGER = Logger.getLogger( ModifiedFileUpdaterThread.class.getName() );
 	public static final int DELAY_LENGTH_MS = 1000; 
 	public int counter = DELAY_LENGTH_MS;
 	
@@ -529,7 +532,9 @@ class ModifiedFileUpdaterThread extends Thread {
 			long startSleepTime = System.currentTimeMillis();
 			try { 
 				Thread.sleep ( 50 ); 
-			} catch ( InterruptedException e ) {} //TODO: Is this OK to do? Feels dangerous.
+			} catch ( InterruptedException e ) {
+				LOGGER.log ( Level.FINER, "Sleep interupted during wait period." );
+			}
 
 			long sleepTime = System.currentTimeMillis() - startSleepTime;
 			

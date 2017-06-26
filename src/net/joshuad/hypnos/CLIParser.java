@@ -3,6 +3,8 @@ package net.joshuad.hypnos;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -12,6 +14,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 public class CLIParser {
+
+	private static final Logger LOGGER = Logger.getLogger( CLIParser.class.getName() );
 	
 	//TODO: Combine these into an Enum with the things in SingleInstanceController and the strings in constructor below. 
 	private static final String HELP = "help";
@@ -95,8 +99,7 @@ public class CLIParser {
 			}
 		
 		} catch ( ParseException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log ( Level.WARNING, "Unable to parse command line arguments. ", e );
 		}
 		
 		return retMe;

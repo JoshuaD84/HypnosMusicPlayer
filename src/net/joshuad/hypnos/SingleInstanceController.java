@@ -10,11 +10,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.TagException;
-
 import javafx.application.Platform;
 
 public class SingleInstanceController {
@@ -89,15 +84,15 @@ public class SingleInstanceController {
 						} else {
 							try {
 								newList.add( new CurrentListTrack ( file.toPath() ) );
-							} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
+							} catch ( IOException e ) {
 								System.out.println ( "Unable to load file specified by user: " + file.toString() );
 							}
 						}
 					}
 					
 					if ( newList.size() > 0 ) {
-						MusicPlayerUI.currentListData.clear();
-						MusicPlayerUI.currentListData.addAll( newList );
+						MusicPlayerUI.currentList.clear();
+						MusicPlayerUI.currentList.addAll( newList );
 					}
 				}
 			}

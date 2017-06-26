@@ -2,6 +2,8 @@ package net.joshuad.hypnos.players;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -21,6 +23,8 @@ import net.joshuad.hypnos.MusicPlayerUI;
 import net.joshuad.hypnos.Track;
 
 public class JFlacPlayer extends AbstractPlayer implements Runnable {
+	
+	private static final Logger LOGGER = Logger.getLogger( JFlacPlayer.class.getName() );
 
 	AudioInputStream encodedInput;
 	AudioInputStream decodedInput;
@@ -192,8 +196,7 @@ public class JFlacPlayer extends AbstractPlayer implements Runnable {
 			decodedInput.close();
 			encodedInput.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log ( Level.INFO, "Unable to close flac file reader for: " + track.getPath() );
 		}
 	}
 }

@@ -4,6 +4,8 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
@@ -27,6 +29,8 @@ import net.joshuad.hypnos.MusicPlayerUI;
 import net.joshuad.hypnos.Track;
 
 public class MP3Player extends AbstractPlayer implements Runnable {
+
+	private static final Logger LOGGER = Logger.getLogger( MP3Player.class.getName() );
 	
 	private Bitstream encodedInput;
 	private Decoder decoder;
@@ -47,12 +51,12 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	
 	public void run() {
 
-		try {
-			openStreamsAtRequestedOffset();
+		boolean streamsOpen = openStreamsAtRequestedOffset();
 						
-		} catch ( IOException | JavaLayerException e ) {
-			//TODO: We should break here; if the thing's not open then it's going to fail later. 
-			e.printStackTrace();
+		if ( !streamsOpen ) {
+			closeAllResources();
+			MusicPlayerUI.songFinishedPlaying( false );
+			return;
 		}
 
 	    long bytePosition = 0;
@@ -77,13 +81,14 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 			
 			if ( seekRequestPercent != NO_SEEK_REQUESTED ) {
 				
-				try {
+				closeAllResources();
+				
+				streamsOpen = openStreamsAtRequestedOffset();
+				
+				if ( !streamsOpen ) {
 					closeAllResources();
-					openStreamsAtRequestedOffset();
-					 
-				} catch ( JavaLayerException | IOException e ) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					MusicPlayerUI.songFinishedPlaying( false );
+					return;
 				}
 				
 				seekRequestPercent = NO_SEEK_REQUESTED;
@@ -93,10 +98,11 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 			if ( !paused ) {
 				try {
 					Header header = encodedInput.readFrame();
+					
 					if ( header == null ) {
-
+						closeAllResources();
 						MusicPlayerUI.songFinishedPlaying( false );
-						break; // We reached the end of the file. 
+						return; 
 					}
 	
 					SampleBuffer output = (SampleBuffer) decoder.decodeFrame( header, encodedInput );
@@ -115,8 +121,7 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 				try {
 					Thread.sleep ( 5 );
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LOGGER.log ( Level.FINER, "Sleep interrupted during paused" );
 				}
 			}
 			updateTransport();
@@ -139,15 +144,30 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 		return b;
 	}
 	
-	public void openStreamsAtRequestedOffset () throws IOException, JavaLayerException {
-		FileInputStream fis = new FileInputStream( track.getPath().toFile() );
+	public boolean openStreamsAtRequestedOffset () {
+		FileInputStream fis;
+		try {
+			fis = new FileInputStream( track.getPath().toFile() );
+		} catch (IOException e) {
+			String message = "Unable to open mp3 file:\n\n" + track.getPath().toString() + "\n\nIt may be corrupt." ;
+			LOGGER.log( Level.WARNING, message );
+			MusicPlayerUI.notifyUserError ( message );
+			return false;
+		}
         BufferedInputStream bis = new BufferedInputStream(fis);
 		
 		if ( seekRequestPercent != NO_SEEK_REQUESTED ) {
 			int seekPositionMS = (int) ( track.getLengthS() * 1000 * seekRequestPercent );
 			long seekPositionByte = getBytePosition ( track.getPath().toFile(), seekPositionMS );
-			bis.skip( seekPositionByte ); 
-			clipStartTimeMS = seekPositionMS;
+			
+			try {
+				bis.skip( seekPositionByte ); 
+				clipStartTimeMS = seekPositionMS;
+			} catch ( IOException e ) {
+				String message = "Unable to seek.";
+				LOGGER.log( Level.WARNING, message, e );
+				MusicPlayerUI.notifyUserError( message );
+			}
 		}
 		
 		encodedInput = new Bitstream( bis );
@@ -161,20 +181,25 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 			audioOutput = (SourceDataLine) AudioSystem.getLine( datalineInfo );
 			audioOutput.open( outputFormat );
 		} catch ( LineUnavailableException exception ) {
-			System.out.println( "The audio output line could not be opened due to resource restrictions." );
-			System.err.println( exception );
-			return;
+			String message = "The audio output line could not be opened due to resource restrictions.";
+			LOGGER.log( Level.WARNING, message, exception );
+			MusicPlayerUI.notifyUserError( message );
+			return false;
 		} catch ( IllegalStateException exception ) {
-			System.out.println( "The audio output line is already open." );
-			System.err.println( exception );
-			return;
+			String message = "The audio output line is already open.";
+			LOGGER.log( Level.WARNING, message, exception );
+			MusicPlayerUI.notifyUserError( message );
+			return false;
 		} catch ( SecurityException exception ) {
-			System.out.println( "The audio output line could not be opened due to security restrictions." );
-			System.err.println( exception );
-			return;
+			String message = "The audio output line could not be opened due to security restrictions.";
+			LOGGER.log( Level.WARNING, message, exception );
+			MusicPlayerUI.notifyUserError( message );
+			return false;
 		}
 
 		audioOutput.start();
+		
+		return true;
 	}
 
 	public long getBytePosition ( File file, long targetTimeMS ) {
@@ -212,8 +237,7 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 			audioOutput.close();
 			encodedInput.close();
 		} catch ( BitstreamException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log ( Level.INFO, "Unable to close mp3 file: " + track.getPath() );
 		}
 	}
 	
