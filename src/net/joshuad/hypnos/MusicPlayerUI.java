@@ -475,6 +475,10 @@ public class MusicPlayerUI extends Application {
 		
 		if ( currentPlayer == null ) return;
 		
+		for ( CurrentListTrack listTrack : currentList ) {
+			listTrack.setIsCurrentTrack( false );
+		}
+		
 		if ( track instanceof CurrentListTrack ) {
 			((CurrentListTrack)track).setIsCurrentTrack( true );
 		}

@@ -37,8 +37,6 @@ Bug Fixes / Incremental Improvements
 	
 	Make sure the text labels for time left and time elapsed are padded to NN:NN:NN, to avoid stuff moving. 
 	
-	Guarantee that only one track at a time has the play indicator. 
-
 Refactor / organize my code. 
  	Separate player / ui systems. 
  	Use start() exclusively, get rid of all calls in main()
