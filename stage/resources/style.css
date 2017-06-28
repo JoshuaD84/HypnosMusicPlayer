@@ -1,0 +1,12 @@
+.queueActive {
+	-fx-base: #90EE90;
+}
+
+.volumeLabel {
+	-fx-font-size: 22px;
+}
+
+.trackInfo {
+	-fx-font-weight: bold;
+	-fx-font-size: 16px;
+}

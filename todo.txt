@@ -17,24 +17,27 @@ New Features
 		Show total length of currentlist somewhere.  
 		Maybe show current playing track info, like bitrate, etc. This would probably go in a status bar at the bottom. 
 
-
+	When you click on an album on the list, show it in the art pane for a little bit? 
+	
 Bug Fixes / Incremental Improvements	
 	Changing tag information doesn't update all the proper places.
 		Changing disc info on album list
 		changing album info when the album is loaded in current list. 
+	
+	Look at queue right click functionaliy
+		After playing a track, should we remove it from the queue? 
 	
 	Make sure horizontal scroll bars never appear
 		6/9 - Can't find anything on google.
 
 	Remember windowed-width even if maximized
 		https://stackoverflow.com/questions/44636866/save-and-set-the-not-maximized-window-size
-		
-	Redesign the transport	
-		Do I even need to do this anymore? I kinda like it. Maybe shuffle / repeat, but I'm pretty hapy with UI. 
-		
+				
 	Editing multiple album artists doesn't seem to work - Dusty Fingers
 	
 	Make sure the text labels for time left and time elapsed are padded to NN:NN:NN, to avoid stuff moving. 
+	
+	Guarantee that only one track at a time has the play indicator. 
 
 Refactor / organize my code. 
  	Separate player / ui systems. 
@@ -42,6 +45,7 @@ Refactor / organize my code.
  	Have a single thread handle playing all tracks. 
  		Have it be the same thread that accepts requests rather than spawning new threads off UI actions. 
  	Clean up start() and MusicPlayerUI
+ 	Maybe get rid of static classes. 
 
 Decoders
 	Mp4

@@ -90,7 +90,6 @@ public class PlaylistInfoWindow extends Stage {
 
 					if ( value == null || value.equals( Track.NO_TRACK_NUMBER ) || empty ) {
 						setText( null );
-						setStyle( "" );
 					} else {
 						setText( value.toString() );
 					}

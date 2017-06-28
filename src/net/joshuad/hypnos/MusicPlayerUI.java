@@ -185,6 +185,7 @@ public class MusicPlayerUI extends Application {
 	static Button togglePlayButton;
 	static Button toggleRepeatButton;
 	static Button toggleShuffleButton;
+	static Button showQueueButton;
 
 	static SplitPane artSplitPane;
 
@@ -509,7 +510,10 @@ public class MusicPlayerUI extends Application {
 
 		setAlbumImage( track.getAlbumCoverImage() );
 		setArtistImage( track.getAlbumArtistImagePath( ) );
+		
 	}
+	
+	
 
 	public static void playAlbum ( Album album ) {
 		currentPlaylist = null;
@@ -747,7 +751,6 @@ public class MusicPlayerUI extends Application {
 		timeRemainingLabel = new Label( "" );
 
 		timeElapsedLabel.setMinWidth( 40 );
-		timeElapsedLabel.setStyle( "" );
 		timeElapsedLabel.setAlignment( Pos.CENTER_RIGHT );
 
 		timeRemainingLabel.setMinWidth( 40 );
@@ -784,7 +787,7 @@ public class MusicPlayerUI extends Application {
 		
 
 		Label volumeLabel = new Label ( "🔊" );
-		volumeLabel.setStyle( "-fx-font-size: 22px" );
+		volumeLabel.getStyleClass().add( "volumeLabel" );
 		volumeLabel.setMinWidth( 30 );
 		
 		Slider volumeSlider = new Slider();
@@ -837,7 +840,7 @@ public class MusicPlayerUI extends Application {
 
 		HBox playingTrackInfo = new HBox();
 		trackInfo = new Label( "" );
-		trackInfo.setStyle( "-fx-font-weight: bold; -fx-font-size: 16" );
+		trackInfo.getStyleClass().add( "trackInfo" );
 			
 		playingTrackInfo.getChildren().add( trackInfo );
 		playingTrackInfo.setAlignment( Pos.CENTER );
@@ -1103,6 +1106,18 @@ public class MusicPlayerUI extends Application {
 		queueTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
 		queueTable.setPlaceholder( emptyLabel );
 		queueTable.setItems( Queue.getData() );
+		
+		Queue.getData().addListener( new ListChangeListener () {
+			@Override
+			public void onChanged ( Change arg0 ) {
+				if ( Queue.isEmpty() ) {
+					showQueueButton.getStyleClass().removeAll ( "queueActive" );
+				} else {
+					showQueueButton.getStyleClass().add ( "queueActive" );
+				}
+			} 
+		});
+		
 		queueTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 
 		queueTable.widthProperty().addListener( new ChangeListener <Number>() {
@@ -1738,7 +1753,7 @@ public class MusicPlayerUI extends Application {
 
 		toggleRepeatButton = new Button( repeatMode.getSymbol() );
 		toggleShuffleButton = new Button( shuffleMode.getSymbol() );
-		Button showQueueButton = new Button ( "Q" );
+		showQueueButton = new Button ( "Q" );
 		Button showHistoryButton = new Button ( "H" );
 		Button loadTracksButton = new Button( "⏏" );
 		Button savePlaylistButton = new Button( "💾" );
@@ -2366,7 +2381,6 @@ public class MusicPlayerUI extends Application {
 
 					if ( value == null || value.equals( Track.NO_TRACK_NUMBER ) || empty ) {
 						setText( null );
-						setStyle( "" );
 					} else {
 						setText( value.toString() );
 					}
@@ -2807,7 +2821,6 @@ public class MusicPlayerUI extends Application {
 
 					if ( value == null || value.equals( Track.NO_TRACK_NUMBER ) || empty ) {
 						setText( null );
-						setStyle( "" );
 					} else {
 						setText( value.toString() );
 					}
@@ -3405,10 +3418,13 @@ public class MusicPlayerUI extends Application {
 		mainStage = stage;
 		scene = new Scene( new Group(), 1024, 768 );
 		
+		File stylesheet = new File ( ROOT + File.separator + "resources" + File.separator + "style.css" );
+		scene.getStylesheets().add( "file:///" + stylesheet.getAbsolutePath().replace( "\\", "/" ) ); //TODO: DD
+		
 		//TODO: If we launch the jar from a different directory, it doesn't shwo the icon
 		//we need to get the directory of the jar and load the image from there, not just from the current directory
 		try {
-			mainStage.getIcons().add( new Image( new FileInputStream ( ROOT.resolve( "resources/icon.png" ).toFile() ) ) );
+			mainStage.getIcons().add( new Image( new FileInputStream ( ROOT.resolve( "resources" + File.separator + "icon.png" ).toFile() ) ) );
 		} catch ( FileNotFoundException e ) {
 			System.out.println ( "Unable to load program icon: resources/icon.png" );
 		}

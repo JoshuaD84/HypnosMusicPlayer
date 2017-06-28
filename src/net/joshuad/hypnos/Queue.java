@@ -87,6 +87,10 @@ public class Queue {
 		return ( !queue.isEmpty() );
 	}
 	
+	public synchronized static boolean isEmpty() {
+		return queue.isEmpty();
+	}
+	
 	public synchronized static Track getNextTrack ( ) {
 		if ( queue.isEmpty() ) {
 			//TODO: throw new QueueException();
