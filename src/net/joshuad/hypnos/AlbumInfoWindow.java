@@ -42,9 +42,13 @@ public class AlbumInfoWindow extends Stage {
 	Album album;
 	TableView <Track> trackTable;
 	TextField locationField;
+	PlayerController player;
+	FXUI ui;
 	
-	public AlbumInfoWindow( Stage owner ) {
+	public AlbumInfoWindow( Stage owner, FXUI ui, PlayerController player ) {
 		super();
+		this.ui = ui;
+		this.player = player;
 		this.initModality( Modality.NONE );
 		this.initOwner( owner );
 		this.setTitle( "Album Info" );
@@ -168,7 +172,7 @@ public class AlbumInfoWindow extends Stage {
 		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				MusicPlayerUI.promptAndSavePlaylist ( 
+				ui.promptAndSavePlaylist ( 
 					new ArrayList <Track> ( trackTable.getSelectionModel().getSelectedItems() ), 
 					false 
 				);
@@ -179,32 +183,32 @@ public class AlbumInfoWindow extends Stage {
 			@Override
 			public void handle ( ActionEvent event ) {
 				Playlist playlist = (Playlist) ((MenuItem) event.getSource()).getUserData();
-				MusicPlayerUI.addToPlaylist ( trackTable.getSelectionModel().getSelectedItems(), playlist );
+				ui.addToPlaylist ( trackTable.getSelectionModel().getSelectedItems(), playlist );
 			}
 		};
 
-		Library.playlistsSorted.addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
-			MusicPlayerUI.updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
+		Hypnos.library.playlistsSorted.addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
+			ui.updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		});
 
-		MusicPlayerUI.updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
+		ui.updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		
 		queueMenuItem.setOnAction( event -> {
-			Queue.addAllTracks( trackTable.getSelectionModel().getSelectedItems() );
+			Hypnos.queue.addAllTracks( trackTable.getSelectionModel().getSelectedItems() );
 		});
 		
 			
 		editTagMenuItem.setOnAction( event -> {
-			MusicPlayerUI.tagWindow.setTracks( (List<Track>)(List<?>)trackTable.getSelectionModel().getSelectedItems(), null );
-			MusicPlayerUI.tagWindow.show();
+			ui.tagWindow.setTracks( (List<Track>)(List<?>)trackTable.getSelectionModel().getSelectedItems(), null );
+			ui.tagWindow.show();
 		});
 		
 		appendMenuItem.setOnAction( event -> {
-			MusicPlayerUI.currentListTable.getItems().addAll( Utils.convertTrackList( trackTable.getSelectionModel().getSelectedItems() ) );
+			ui.appendTracks ( trackTable.getSelectionModel().getSelectedItems() );
 		});
 
 		playMenuItem.setOnAction( event -> {
-			MusicPlayerUI.playTrack( trackTable.getSelectionModel().getSelectedItem() );
+			player.playTrack( trackTable.getSelectionModel().getSelectedItem() );
 		});
 		
 		trackTable.setRowFactory( tv -> {
@@ -215,7 +219,7 @@ public class AlbumInfoWindow extends Stage {
 			row.setOnMouseClicked( event -> {
 				//TODO: is this what I want to happen? 
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					MusicPlayerUI.playTrack( row.getItem() );
+					player.playTrack( row.getItem() );
 				}
 			} );
 
@@ -227,7 +231,7 @@ public class AlbumInfoWindow extends Stage {
 					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
-					cc.put( MusicPlayerUI.DRAGGED_TRACKS, dragObject );
+					cc.put( FXUI.DRAGGED_TRACKS, dragObject );
 					db.setContent( cc );
 					event.consume();
 				}

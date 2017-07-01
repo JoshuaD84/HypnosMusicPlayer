@@ -1,7 +1,7 @@
-package net.joshuad.hypnos.players;
+package net.joshuad.hypnos.audio;
 
 import javafx.scene.control.Slider;
-import net.joshuad.hypnos.MusicPlayerUI;
+import net.joshuad.hypnos.PlayerController;
 import net.joshuad.hypnos.Track;
 
 import java.io.IOException;
@@ -16,8 +16,9 @@ public class OggPlayer extends AbstractPlayer implements Runnable {
 	
 	OggDecoderLogic decoder;
 	
-	public OggPlayer ( Track track, Slider trackPositionSlider, boolean startPaused  ) throws IOException {
+	public OggPlayer ( Track track, PlayerController player, Slider trackPositionSlider, boolean startPaused  ) throws IOException {
 		this.track = track;
+		this.player = player;
 		this.trackPosition = trackPositionSlider;
 		this.pauseRequested = startPaused;
 		
@@ -25,8 +26,8 @@ public class OggPlayer extends AbstractPlayer implements Runnable {
 		playerThread.start();
 	}
 	
-	public OggPlayer ( Track track, Slider trackPositionSlider ) throws IOException {
-		this ( track, trackPositionSlider, false );
+	public OggPlayer ( Track track, PlayerController player, Slider trackPositionSlider ) throws IOException {
+		this ( track, player, trackPositionSlider, false );
 	}
 	
 	public void run () {
@@ -45,7 +46,7 @@ public class OggPlayer extends AbstractPlayer implements Runnable {
 			
 			if ( stopRequested ) {
 				closeAllResources();
-				MusicPlayerUI.songFinishedPlaying( true );
+				player.songFinishedPlaying( true );
 				return;
 			}	
 			
@@ -90,7 +91,7 @@ public class OggPlayer extends AbstractPlayer implements Runnable {
 			}
 		}
 		
-		MusicPlayerUI.songFinishedPlaying( false );
+		player.songFinishedPlaying( false );
 		closeAllResources();
 	}
 

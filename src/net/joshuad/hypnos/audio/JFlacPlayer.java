@@ -1,4 +1,4 @@
-package net.joshuad.hypnos.players;
+package net.joshuad.hypnos.audio;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +19,7 @@ import org.jaudiotagger.audio.AudioHeader;
 import org.jaudiotagger.audio.flac.FlacAudioHeader;
 
 import javafx.scene.control.Slider;
-import net.joshuad.hypnos.MusicPlayerUI;
+import net.joshuad.hypnos.PlayerController;
 import net.joshuad.hypnos.Track;
 
 public class JFlacPlayer extends AbstractPlayer implements Runnable {
@@ -29,13 +29,14 @@ public class JFlacPlayer extends AbstractPlayer implements Runnable {
 	AudioInputStream encodedInput;
 	AudioInputStream decodedInput;
 
-	public JFlacPlayer ( Track track, Slider trackPosition ) {
-		this ( track, trackPosition, false );
+	public JFlacPlayer (Track track, PlayerController player, Slider trackPositionSlider ) {
+		this ( track, player, trackPositionSlider, false );
 	}
 	
-	public JFlacPlayer ( Track track, Slider trackPosition, boolean startPaused ) {
+	public JFlacPlayer ( Track track, PlayerController player, Slider trackPositionSlider, boolean startPaused ) {
 		this.track = track;
-		this.trackPosition = trackPosition;
+		this.player = player;
+		this.trackPosition = trackPositionSlider;
 		this.pauseRequested = startPaused;
 
 		Thread t = new Thread ( this );
@@ -59,7 +60,7 @@ public class JFlacPlayer extends AbstractPlayer implements Runnable {
 		while ( true ) {
 			if ( stopRequested ) {
 				closeAllResources();
-				MusicPlayerUI.songFinishedPlaying( true );
+				player.songFinishedPlaying( true );
 				stopRequested = false;
 				return;
 			}				
@@ -98,7 +99,7 @@ public class JFlacPlayer extends AbstractPlayer implements Runnable {
 					
 					if ( bytesRead < 0 ) {
 						closeAllResources();
-						MusicPlayerUI.songFinishedPlaying( false );
+						player.songFinishedPlaying( false );
 						return;
 						
 					} else {

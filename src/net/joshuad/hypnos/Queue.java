@@ -8,14 +8,16 @@ import javafx.collections.ObservableList;
 
 public class Queue {
 
-	final private static ObservableList <Track> queue = FXCollections.observableArrayList ( new ArrayList <Track>() );
+	final private ObservableList <Track> queue = FXCollections.observableArrayList ( new ArrayList <Track>() );
 	
-	public synchronized static void addTrack ( Track track ) {
+	public Queue() {}
+	
+	public synchronized void addTrack ( Track track ) {
 		addTrack ( queue.size(), track );
 	}
 				
 				
-	public synchronized static void addTrack ( int index, Track track ) {
+	public synchronized void addTrack ( int index, Track track ) {
 		queue.add( index, track );
 		
 		if ( track instanceof CurrentListTrack ) {
@@ -23,7 +25,7 @@ public class Queue {
 		}
 	}
 	
-	public synchronized static void addAllAlbums ( List<? extends Album> albums ) {
+	public synchronized void addAllAlbums ( List<? extends Album> albums ) {
 		for ( Album album : albums ) {
 			for ( Track track : album.getTracks() ) {
 				addTrack ( track );
@@ -31,28 +33,27 @@ public class Queue {
 		}
 	}
 
-	public synchronized static void addAllPlaylists ( List<? extends Playlist> playlists ) {
+	public synchronized void addAllPlaylists ( List<? extends Playlist> playlists ) {
 		for ( Playlist playlist : playlists ) {
 			for ( Track track : playlist.getTracks() ) {
 				addTrack ( track );
 			}
 		}
 	}
-
 	
-	public synchronized static void addAllTracks ( List<? extends Track> tracks ) {
+	public synchronized void addAllTracks ( List<? extends Track> tracks ) {
 		for ( Track track : tracks ) {
 			addTrack ( track );
 		}
 	}
 	
-	public synchronized static void addAllTracks ( int index, List<? extends Track> tracks ) {
+	public synchronized void addAllTracks ( int index, List<? extends Track> tracks ) {
 		for ( Track track : tracks ) {
 			addTrack ( track );
 		}
 	}
 	
-	public synchronized static void updateQueueIndexes( Track removedTrack ) {
+	public synchronized void updateQueueIndexes( Track removedTrack ) {
 		if ( removedTrack != null && removedTrack instanceof CurrentListTrack ) {
 			((CurrentListTrack)removedTrack).clearQueueIndex();
 		}
@@ -72,26 +73,26 @@ public class Queue {
 		}
 	}
 	
-	public synchronized static int size () {
+	public synchronized int size () {
 		return queue.size();
 	}
 	
-	public synchronized static void remove ( int index ) {
+	public synchronized void remove ( int index ) {
 		if ( queue.size() > index ) {
 			Track removedTrack = queue.remove( index );
 			updateQueueIndexes( removedTrack );
 		}
 	}
 	
-	public synchronized static boolean hasNext() {
+	public synchronized boolean hasNext() {
 		return ( !queue.isEmpty() );
 	}
 	
-	public synchronized static boolean isEmpty() {
+	public synchronized boolean isEmpty() {
 		return queue.isEmpty();
 	}
 	
-	public synchronized static Track getNextTrack ( ) {
+	public synchronized Track getNextTrack ( ) {
 		if ( queue.isEmpty() ) {
 			//TODO: throw new QueueException();
 			return null;
@@ -103,9 +104,8 @@ public class Queue {
 		return nextTrack;
 	}
 	
-	//You shouldn't use this except when setting up tables. 
-	public synchronized static ObservableList<Track> getData() {
-		return queue;
+	public synchronized ObservableList<Track> getData() {
+		return FXCollections.unmodifiableObservableList( queue );
 	}
 
 }

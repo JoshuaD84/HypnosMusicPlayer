@@ -1,4 +1,4 @@
-package net.joshuad.hypnos.players;
+package net.joshuad.hypnos.audio;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -11,7 +11,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.LineUnavailableException;
 
 import javafx.scene.control.Slider;
-import net.joshuad.hypnos.MusicPlayerUI;
+import net.joshuad.hypnos.PlayerController;
 import net.joshuad.hypnos.Track;
 import net.sourceforge.jaad.aac.Decoder;
 import net.sourceforge.jaad.aac.SampleBuffer;
@@ -28,12 +28,13 @@ public class MP4Player extends AbstractPlayer implements Runnable {
 	AudioTrack audioTrack;
 	SampleBuffer buffer;
 	
-	public MP4Player ( Track track, Slider trackPosition ) {
-		this ( track, trackPosition, false );
+	public MP4Player ( Track track, PlayerController player, Slider trackPosition ) {
+		this ( track, player, trackPosition, false );
 	}
 	
-	public MP4Player ( Track track, Slider trackPosition, boolean startPaused ) {
+	public MP4Player ( Track track, PlayerController player, Slider trackPosition, boolean startPaused ) {
 		this.track = track;
+		this.player = player;
 		this.trackPosition = trackPosition;
 		this.pauseRequested = startPaused;
 
@@ -51,7 +52,7 @@ public class MP4Player extends AbstractPlayer implements Runnable {
 		while ( true ) {
 			if ( stopRequested ) {
 				closeAllResources();
-				MusicPlayerUI.songFinishedPlaying( true );
+				player.songFinishedPlaying( true );
 				stopRequested = false;
 				return;
 			}				
@@ -89,7 +90,7 @@ public class MP4Player extends AbstractPlayer implements Runnable {
 						e.printStackTrace(); //TODO:
 					}
 				} else {
-					MusicPlayerUI.songFinishedPlaying( false );
+					player.songFinishedPlaying( false );
 					return;
 				}
 				

@@ -20,6 +20,14 @@ New Features
 	When you click on an album on the list, show it in the art pane for a little bit? 
 	
 Bug Fixes / Incremental Improvements	
+	Press next when no track is playing.
+	
+	Adding to a playlist changes its name wrongly
+	
+	If playlists folder doesn't exist, it doesn't save playlists and doens't create it. 
+	
+	Queue # isn't being removed properly from current list. 
+	
 	Changing tag information doesn't update all the proper places.
 		Changing disc info on album list
 		changing album info when the album is loaded in current list. 
@@ -38,12 +46,9 @@ Bug Fixes / Incremental Improvements
 	Make sure the text labels for time left and time elapsed are padded to NN:NN:NN, to avoid stuff moving. 
 	
 Refactor / organize my code. 
- 	Separate player / ui systems. 
- 	Use start() exclusively, get rid of all calls in main()
  	Have a single thread handle playing all tracks. 
  		Have it be the same thread that accepts requests rather than spawning new threads off UI actions. 
- 	Clean up start() and MusicPlayerUI
- 	Maybe get rid of static classes. 
+ 	Get rid of static library
 
 Decoders
 	Mp4
@@ -152,5 +157,18 @@ OS Specific
 Note
 	You can increase the slider button size by increasing the font size.
 
+
+
+	try {
+				l
+				CurrentListTrack addMe = new CurrentListTrack ( playMe );
+				currentList.clear();
+				currentList.add( addMe );
+				player.playTrack( addMe );
+				listInfoUpdater.tracksLoaded( );
+			} catch ( IOException e ) {
+				LOGGER.log( Level.INFO, e.getMessage() + "\nError opening file from queue: " + playMe.getPath() );
+				notifyUserError( "Cannot play.\n\n" + e.getMessage() );
+			}
 	
 

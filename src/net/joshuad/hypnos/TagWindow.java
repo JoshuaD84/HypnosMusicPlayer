@@ -174,7 +174,7 @@ public class TagWindow extends Stage {
 							} catch ( IOException e ) {
 								//TODO: I don't think we need to do anything here?
 							}
-							MusicPlayerUI.currentListTable.refresh();
+							Hypnos.ui.currentListTable.refresh();
 						} catch ( CannotWriteException e ) {
 							e.printStackTrace(); //TODO: 
 						}
@@ -191,7 +191,7 @@ public class TagWindow extends Stage {
 				if ( albums != null ) {
 					for ( Album album : albums ) {
 						album.refreshTagData();
-						MusicPlayerUI.albumTable.refresh();
+						Hypnos.ui.albumTable.refresh();
 					}
 				}
 			}

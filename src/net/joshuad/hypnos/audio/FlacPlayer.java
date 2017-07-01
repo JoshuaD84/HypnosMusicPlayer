@@ -1,4 +1,4 @@
-package net.joshuad.hypnos.players;
+package net.joshuad.hypnos.audio;
 
 import java.io.*;
 import java.util.logging.Level;
@@ -7,7 +7,8 @@ import java.util.logging.Logger;
 import javax.sound.sampled.*;
 
 import javafx.scene.control.Slider;
-import net.joshuad.hypnos.MusicPlayerUI;
+import net.joshuad.hypnos.FXUI;
+import net.joshuad.hypnos.PlayerController;
 import net.joshuad.hypnos.Track;
 
 public final class FlacPlayer extends AbstractPlayer implements Runnable {
@@ -16,8 +17,9 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 	
 	private FlacDecoderLogic decodedInput;
 	
-	public FlacPlayer ( Track track, Slider trackPositionSlider, boolean startPaused ) {
+	public FlacPlayer ( Track track, PlayerController player, Slider trackPositionSlider, boolean startPaused ) {
 		this.track = track;
+		this.player = player;
 		this.trackPosition = trackPositionSlider;
 		this.pauseRequested = startPaused;
 		
@@ -29,8 +31,8 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 		t.start();
 	}
 	
-	public FlacPlayer ( Track track, Slider trackPositionSlider ) {
-		this ( track, trackPositionSlider, false );
+	public FlacPlayer ( Track track, PlayerController player, Slider trackPositionSlider ) {
+		this ( track, player, trackPositionSlider, false );
 	}
 	
 	public void run() {
@@ -38,14 +40,14 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 		boolean streamsOpen = openStreamsAtRequestedOffset();
 		if ( !streamsOpen ) {
 			closeAllResources();
-			MusicPlayerUI.songFinishedPlaying( false );
+			player.songFinishedPlaying( false );
 			return;
 		}
 		
 		while ( true ) {	
 			if ( stopRequested ) {
 				closeAllResources();
-				MusicPlayerUI.songFinishedPlaying( true );
+				player.songFinishedPlaying( true );
 				return;
 			}				
 				
@@ -67,7 +69,7 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 				streamsOpen = openStreamsAtRequestedOffset();
 				if ( !streamsOpen ) {
 					closeAllResources();
-					MusicPlayerUI.songFinishedPlaying( false );
+					player.songFinishedPlaying( false );
 					return;
 				}
 				
@@ -86,7 +88,7 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 									
 					if (samples == null) { // End of stream
 						closeAllResources();
-						MusicPlayerUI.songFinishedPlaying( false );
+						player.songFinishedPlaying( false );
 						return;
 					}
 					
@@ -127,7 +129,7 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 		} catch (IOException e) {
 			String message = "Unable to decode flac file:\n\n" + track.getPath().toString() + "\n\nIt may be corrupt." ;
 			LOGGER.log( Level.WARNING, message );
-			MusicPlayerUI.notifyUserError ( message );
+			FXUI.notifyUserError ( message );
 			return false;
 		}
 		
@@ -140,17 +142,17 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 			} catch ( LineUnavailableException exception ) {
 				String message = "The audio output line could not be opened due to resource restrictions.";
 				LOGGER.log( Level.WARNING, message, exception );
-				MusicPlayerUI.notifyUserError( message );
+				FXUI.notifyUserError( message );
 				return false;
 			} catch ( IllegalStateException exception ) {
 				String message = "The audio output line is already open.";
 				LOGGER.log( Level.WARNING, message, exception );
-				MusicPlayerUI.notifyUserError( message );
+				FXUI.notifyUserError( message );
 				return false;
 			} catch ( SecurityException exception ) {
 				String message = "The audio output line could not be opened due to security restrictions.";
 				LOGGER.log( Level.WARNING, message, exception );
-				MusicPlayerUI.notifyUserError( message );
+				FXUI.notifyUserError( message );
 				return false;
 			} 
 			
@@ -170,7 +172,7 @@ public final class FlacPlayer extends AbstractPlayer implements Runnable {
 				} catch ( IOException e ) {
 					String message = "Unable to seek.";
 					LOGGER.log( Level.WARNING, message, e );
-					MusicPlayerUI.notifyUserError( message );
+					FXUI.notifyUserError( message );
 				}
 				
 				clipStartTimeMS = (long)( ( track.getLengthS() * 1000 ) * seekRequestPercent );

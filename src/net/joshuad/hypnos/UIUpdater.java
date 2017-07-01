@@ -6,16 +6,17 @@ public class UIUpdater {
 
 	private static final int MAX_CHANGES_PER_REQUEST = 250;
 
-	private static boolean runLaterPending = false;
+	private boolean runLaterPending = false;
 	
+	private FXUI ui;
 	
-	public static void init() {
+	public UIUpdater( FXUI ui ) {
+		this.ui = ui;
 		
 		Thread uiUpdaterThread = new Thread( () -> {
 			while ( true ) {
-				
 				if( !runLaterPending ) {
-					UIUpdater.updateUI();
+					updateUI();
 				}
 				
 				try {
@@ -30,10 +31,10 @@ public class UIUpdater {
 		uiUpdaterThread.start();
 	}
 	
-	private static void updateUI () { 
-		if ( !Library.albumsToAdd.isEmpty() || !Library.albumsToRemove.isEmpty() || !Library.albumsToUpdate.isEmpty() 
-		  || !Library.tracksToAdd.isEmpty() || !Library.tracksToRemove.isEmpty() || !Library.tracksToUpdate.isEmpty() 	
-		  || !Library.playlistsToAdd.isEmpty() || !Library.playlistsToRemove.isEmpty() || !Library.playlistsToUpdate.isEmpty() 
+	private void updateUI () { 
+		if ( !Hypnos.library.albumsToAdd.isEmpty() || !Hypnos.library.albumsToRemove.isEmpty() || !Hypnos.library.albumsToUpdate.isEmpty() 
+		  || !Hypnos.library.tracksToAdd.isEmpty() || !Hypnos.library.tracksToRemove.isEmpty() || !Hypnos.library.tracksToUpdate.isEmpty() 	
+		  || !Hypnos.library.playlistsToAdd.isEmpty() || !Hypnos.library.playlistsToRemove.isEmpty() || !Hypnos.library.playlistsToUpdate.isEmpty() 
 		  ){
 			
 			runLaterPending = true;
@@ -43,63 +44,63 @@ public class UIUpdater {
 				
 					int changeCount = 0;
 					
-					synchronized ( Library.albumsToRemove ) {
-						if ( !Library.albumsToRemove.isEmpty() ) {
-							while ( changeCount < MAX_CHANGES_PER_REQUEST && !Library.albumsToRemove.isEmpty() ) {
-								Library.albums.remove( Library.albumsToRemove.remove( 0 ) );
+					synchronized ( Hypnos.library.albumsToRemove ) {
+						if ( !Hypnos.library.albumsToRemove.isEmpty() ) {
+							while ( changeCount < MAX_CHANGES_PER_REQUEST && !Hypnos.library.albumsToRemove.isEmpty() ) {
+								Hypnos.library.albums.remove( Hypnos.library.albumsToRemove.remove( 0 ) );
 								changeCount++;
 							}
 							
-							MusicPlayerUI.updateAlbumListPlaceholder();
+							ui.updateAlbumListPlaceholder();
 
 							if ( changeCount >= MAX_CHANGES_PER_REQUEST ) {
-								MusicPlayerUI.albumTable.refresh(); //TODO: this may not be necessary. 
+								ui.albumTable.refresh(); //TODO: this may not be necessary. 
 								return;
 							}
 						}
 					}
 						
-					synchronized ( Library.albumsToAdd ) {
-						if ( !Library.albumsToAdd.isEmpty() ) {
-							while ( changeCount < MAX_CHANGES_PER_REQUEST && !Library.albumsToAdd.isEmpty() ) {
-								Library.albums.add( Library.albumsToAdd.remove( 0 ) );
+					synchronized ( Hypnos.library.albumsToAdd ) {
+						if ( !Hypnos.library.albumsToAdd.isEmpty() ) {
+							while ( changeCount < MAX_CHANGES_PER_REQUEST && !Hypnos.library.albumsToAdd.isEmpty() ) {
+								Hypnos.library.albums.add( Hypnos.library.albumsToAdd.remove( 0 ) );
 								changeCount++;
 							}
 							
-							MusicPlayerUI.updateAlbumListPlaceholder();
+							ui.updateAlbumListPlaceholder();
 
 							if ( changeCount >= MAX_CHANGES_PER_REQUEST ) {
-								MusicPlayerUI.albumTable.refresh(); //TODO: this may not be necessary. 
+								ui.albumTable.refresh(); //TODO: this may not be necessary. 
 								return;
 							}
 						}
 					}
 					
-					synchronized ( Library.albumsToUpdate ) {
-						if ( !Library.albumsToUpdate.isEmpty() ) {
-							while ( changeCount < MAX_CHANGES_PER_REQUEST && !Library.albumsToUpdate.isEmpty() ) {
-								Album updateSource = Library.albumsToUpdate.remove( 0 );
-								if ( Library.albums.contains( updateSource ) ) {
-									Album updateMe = Library.albums.get( Library.albums.indexOf( updateSource ) );
+					synchronized ( Hypnos.library.albumsToUpdate ) {
+						if ( !Hypnos.library.albumsToUpdate.isEmpty() ) {
+							while ( changeCount < MAX_CHANGES_PER_REQUEST && !Hypnos.library.albumsToUpdate.isEmpty() ) {
+								Album updateSource = Hypnos.library.albumsToUpdate.remove( 0 );
+								if ( Hypnos.library.albums.contains( updateSource ) ) {
+									Album updateMe = Hypnos.library.albums.get( Hypnos.library.albums.indexOf( updateSource ) );
 									updateMe.refreshTagData();
 									
 								} else {
-									Library.albums.add( updateSource );
+									Hypnos.library.albums.add( updateSource );
 								}
 								changeCount += 2; //We charge two here because this is a costly transaction
  							}
 							
 							if ( changeCount >= MAX_CHANGES_PER_REQUEST ) {
-								MusicPlayerUI.albumTable.refresh(); //TODO: this may not be necessary. 
+								ui.albumTable.refresh(); //TODO: this may not be necessary. 
 								return;
 							}
 						}
 					}
 					
-					synchronized ( Library.tracksToRemove ) {
-						if ( !Library.tracksToRemove.isEmpty() ) {
-							while ( changeCount < MAX_CHANGES_PER_REQUEST && !Library.tracksToRemove.isEmpty() ) {
-								boolean removed = Library.tracks.remove( Library.tracksToRemove.remove( 0 ) );
+					synchronized ( Hypnos.library.tracksToRemove ) {
+						if ( !Hypnos.library.tracksToRemove.isEmpty() ) {
+							while ( changeCount < MAX_CHANGES_PER_REQUEST && !Hypnos.library.tracksToRemove.isEmpty() ) {
+								boolean removed = Hypnos.library.tracks.remove( Hypnos.library.tracksToRemove.remove( 0 ) );
 								
 								if ( removed ) {
 									changeCount++;
@@ -107,51 +108,51 @@ public class UIUpdater {
 							}
 
 
-							MusicPlayerUI.updateTrackListPlaceholder();
+							ui.updateTrackListPlaceholder();
 							
 							if ( changeCount >= MAX_CHANGES_PER_REQUEST ) {
-								MusicPlayerUI.trackTable.refresh(); //TODO: this may not be necessary. 
+								ui.trackTable.refresh(); //TODO: this may not be necessary. 
 								return;
 							}
 						}
 					}
 						
-					synchronized ( Library.tracksToAdd ) {
-						if ( !Library.tracksToAdd.isEmpty() ) {
-							while ( changeCount < MAX_CHANGES_PER_REQUEST && !Library.tracksToAdd.isEmpty() ) {
-								Library.tracks.add( Library.tracksToAdd.remove( 0 ) );
+					synchronized ( Hypnos.library.tracksToAdd ) {
+						if ( !Hypnos.library.tracksToAdd.isEmpty() ) {
+							while ( changeCount < MAX_CHANGES_PER_REQUEST && !Hypnos.library.tracksToAdd.isEmpty() ) {
+								Hypnos.library.tracks.add( Hypnos.library.tracksToAdd.remove( 0 ) );
 								changeCount++;
 							}
 
 
-							MusicPlayerUI.updateTrackListPlaceholder();
+							ui.updateTrackListPlaceholder();
 							
 							if ( changeCount >= MAX_CHANGES_PER_REQUEST ) {
-								MusicPlayerUI.trackTable.refresh(); //TODO: this may not be necessary. 
+								ui.trackTable.refresh(); //TODO: this may not be necessary. 
 								return;
 							}
 						}
 					}
 	
-					Library.tracksToUpdate.clear();
+					Hypnos.library.tracksToUpdate.clear();
 					//TODO: Update tracks
 					
 					//TODO: make sure these don't violate MAX_CHANGES like above, but whatever do it later not gonna happen. 
-					synchronized ( Library.playlistsToRemove ) {
-						Library.playlists.removeAll( Library.playlistsToRemove );
-						Library.playlistsToRemove.clear();
+					synchronized ( Hypnos.library.playlistsToRemove ) {
+						Hypnos.library.playlists.removeAll( Hypnos.library.playlistsToRemove );
+						Hypnos.library.playlistsToRemove.clear();
 
-						MusicPlayerUI.updatePlaylistPlaceholder();
+						ui.updatePlaylistPlaceholder();
 					}
 				
-					synchronized ( Library.playlistsToAdd ) {
-						Library.playlists.addAll( Library.playlistsToAdd );
-						Library.playlistsToAdd.clear();
+					synchronized ( Hypnos.library.playlistsToAdd ) {
+						Hypnos.library.playlists.addAll( Hypnos.library.playlistsToAdd );
+						Hypnos.library.playlistsToAdd.clear();
 					}
 					
-					Library.playlistsToUpdate.clear();
+					Hypnos.library.playlistsToUpdate.clear();
 
-					MusicPlayerUI.updatePlaylistPlaceholder();
+					ui.updatePlaylistPlaceholder();
 					
 				} finally {
 					runLaterPending = false;

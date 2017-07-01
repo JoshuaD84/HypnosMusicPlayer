@@ -1,4 +1,4 @@
-package net.joshuad.hypnos.players;
+package net.joshuad.hypnos.audio;
 
 import java.io.IOException;
 import javax.sound.sampled.AudioFormat;
@@ -18,19 +18,20 @@ import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.TagException;
 
 import javafx.scene.control.Slider;
-import net.joshuad.hypnos.MusicPlayerUI;
+import net.joshuad.hypnos.PlayerController;
 import net.joshuad.hypnos.Track;
 
 public class WavPlayer extends AbstractPlayer implements Runnable {
 	
 	AudioInputStream decodedInput;
 	
-	public WavPlayer ( Track track, Slider trackPosition ) {
-		this ( track, trackPosition, false );
+	public WavPlayer ( Track track, PlayerController player, Slider trackPosition ) {
+		this ( track, player, trackPosition, false );
 	}
 
-	public WavPlayer ( Track track, Slider trackPosition, boolean startPaused ) {
+	public WavPlayer ( Track track, PlayerController player, Slider trackPosition, boolean startPaused ) {
 		this.track = track;
+		this.player = player;
 		this.trackPosition = trackPosition;
 		this.pauseRequested = startPaused;
 
@@ -56,7 +57,7 @@ public class WavPlayer extends AbstractPlayer implements Runnable {
 		while ( true ) {
 			if ( stopRequested ) {
 				closeAllResources();
-				MusicPlayerUI.songFinishedPlaying( true );
+				player.songFinishedPlaying( true );
 				stopRequested = false;
 				return;
 			}				
@@ -95,7 +96,7 @@ public class WavPlayer extends AbstractPlayer implements Runnable {
 					
 					if ( bytesRead < 0 ) {
 						closeAllResources();
-						MusicPlayerUI.songFinishedPlaying( false );
+						player.songFinishedPlaying( false );
 						return;
 						
 					} else {

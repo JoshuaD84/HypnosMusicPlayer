@@ -1,4 +1,4 @@
-package net.joshuad.hypnos.players;
+package net.joshuad.hypnos.audio;
 
 /* 
  * Simple GUI FLAC player

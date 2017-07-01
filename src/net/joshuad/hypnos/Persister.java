@@ -25,24 +25,24 @@ import java.util.zip.GZIPOutputStream;
 
 public class Persister {
 	
-	static File configDirectory;
-	static File sourcesFile;
-	static File playlistsDirectory;
-	static File currentFile;
-	static File queueFile;
-	static File historyFile;
-	static File dataFile;
-	static File settingsFile;
+	File configDirectory;
+	File sourcesFile;
+	File playlistsDirectory;
+	File currentFile;
+	File queueFile;
+	File historyFile;
+	File dataFile;
+	File settingsFile;
 	
-	
-	public static void init() {
+	public Persister ( ) {
+		
 		//TODO: We might want to make a few fall-throughs if these locations don't exist. 
 		//TODO: I'm sure this needs fine tuning. I don't love putting it in a static block, either 
 		String osString = System.getProperty( "os.name" ).toLowerCase();
 		String home = System.getProperty( "user.home" );
 		
-		if ( MusicPlayerUI.IS_STANDALONE ) {
-			configDirectory = MusicPlayerUI.ROOT.resolve( "config" ).toFile();
+		if ( Hypnos.IS_STANDALONE ) {
+			configDirectory = Hypnos.ROOT.resolve( "config" ).toFile();
 			
 		} else if ( osString.indexOf( "win" ) >= 0 ) {
 			if ( osString.indexOf( "xp" ) >= 0 ) {
@@ -112,7 +112,7 @@ public class Persister {
 		settingsFile = new File ( configDirectory + File.separator + "settings" );
 	}
 	
-	private static void createNecessaryFolders() {	
+	private void createNecessaryFolders() {	
 		if ( !configDirectory.exists() ) {
 			boolean created = configDirectory.mkdirs();
 			//TODO: check created
@@ -128,39 +128,39 @@ public class Persister {
 	}
 		
 	
-	public static void loadDataBeforeShowWindow() {
-		loadPreWindowSettings();
+	public void loadDataBeforeShowWindow( PlayerController player, FXUI ui ) {
+		loadPreWindowSettings( player, ui );
 	}
 	
-	public static void loadDataAfterShowWindow() {
+	public void loadDataAfterShowWindow( PlayerController player, FXUI ui ) {
 		loadAlbumsAndTracks();
 		loadSources();
-		loadCurrentList();
+		loadCurrentList( player );
 		loadQueue();
-		loadHistory();
+		loadHistory( player );
 		loadPlaylists();
-		loadPostWindowSettings();
+		loadPostWindowSettings( player, ui );
 	}
 
-	public static void saveAllData() {
+	public void saveAllData(  PlayerController player, FXUI ui ) {
 		createNecessaryFolders();
 		saveAlbumsAndTracks();
 		saveSources();
-		saveCurrentList();
+		saveCurrentList( player );
 		saveQueue();
-		saveHistory();
+		saveHistory( player );
 		savePlaylists();
-		saveSettings();
+		saveSettings( player, ui );
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static void loadSources() {
+	public void loadSources() {
 		try (
 				ObjectInputStream sourcesIn = new ObjectInputStream( new FileInputStream( sourcesFile ) );
 		) {
 			ArrayList<String> searchPaths = (ArrayList<String>) sourcesIn.readObject();
 			for ( String pathString : searchPaths ) {
-				Library.requestUpdateSource( Paths.get( pathString ) );
+				Hypnos.library.requestUpdateSource( Paths.get( pathString ) );
 			}
 		} catch ( FileNotFoundException e ) {
 			System.out.println ( "File not found: sources, unable to load library source location list, continuing." );
@@ -170,11 +170,11 @@ public class Persister {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static void loadCurrentList() {
+	public void loadCurrentList( PlayerController player ) {
 		try (
 				ObjectInputStream currentListIn = new ObjectInputStream( new FileInputStream( currentFile ) );
 		) {
-			MusicPlayerUI.currentList.addAll( (ArrayList<CurrentListTrack>) currentListIn.readObject() );
+			player.loadTracks( (ArrayList<CurrentListTrack>) currentListIn.readObject(), true );
 		} catch ( FileNotFoundException e ) {
 			System.out.println ( "File not found: current, unable to load current playlist, continuing." );
 		} catch ( IOException | ClassNotFoundException e ) {
@@ -184,12 +184,11 @@ public class Persister {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static void loadQueue() {
-		
+	public void loadQueue() {
 		try (
 				ObjectInputStream queueIn = new ObjectInputStream( new FileInputStream( queueFile ) );
 		) {
-			Queue.addAllTracks( (ArrayList<Track>) queueIn.readObject() );
+			Hypnos.queue.addAllTracks( (ArrayList<Track>) queueIn.readObject() );
 		} catch ( FileNotFoundException e ) {
 			System.out.println ( "File not found: queue, unable to load queue, continuing." );
 		} catch ( IOException | ClassNotFoundException e ) {
@@ -199,11 +198,11 @@ public class Persister {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static void loadHistory() {
+	public void loadHistory( PlayerController player ) {
 		try (
 				ObjectInputStream historyIn = new ObjectInputStream( new FileInputStream( historyFile ) );
 		) {
-			MusicPlayerUI.history.addAll( (ArrayList<Track>) historyIn.readObject() );
+			player.addToHistory( (ArrayList<Track>) historyIn.readObject() );
 		} catch ( FileNotFoundException e ) {
 			System.out.println ( "File not found: history, unable to load queue, continuing." );
 		} catch ( IOException | ClassNotFoundException e ) {
@@ -212,12 +211,12 @@ public class Persister {
 		}
 	}
 	
-	public static void saveSources() {
+	public void saveSources() {
 		try ( 
 				ObjectOutputStream sourcesOut = new ObjectOutputStream ( new FileOutputStream ( sourcesFile ) );
 		) {
-			ArrayList <String> searchPaths = new ArrayList <String> ( Library.musicSourcePaths.size() );
-			for ( Path path : Library.musicSourcePaths ) {
+			ArrayList <String> searchPaths = new ArrayList <String> ( Hypnos.library.musicSourcePaths.size() );
+			for ( Path path : Hypnos.library.musicSourcePaths ) {
 				searchPaths.add( path.toString() );
 			}
 			sourcesOut.writeObject( searchPaths );
@@ -229,11 +228,11 @@ public class Persister {
 		}
 	}
 	
-	public static void saveCurrentList() {
+	public void saveCurrentList( PlayerController player ) {
 		try ( 
 				ObjectOutputStream currentListOut = new ObjectOutputStream ( new FileOutputStream ( currentFile ) );
 		) {
-			currentListOut.writeObject( new ArrayList <CurrentListTrack> ( Arrays.asList( MusicPlayerUI.currentList.toArray( new CurrentListTrack[ MusicPlayerUI.currentList.size() ] ) ) ) );
+			currentListOut.writeObject( new ArrayList <CurrentListTrack> ( Arrays.asList( player.getCurrentList().toArray( new CurrentListTrack[ player.getCurrentList().size() ] ) ) ) );
 			currentListOut.flush();
 			
 		} catch ( IOException e ) {
@@ -242,12 +241,12 @@ public class Persister {
 		}
 	}
 	
-	public static void saveQueue() {
+	public void saveQueue() {
 		
 		try ( 
 				ObjectOutputStream queueListOut = new ObjectOutputStream ( new FileOutputStream ( queueFile ) );
 		) {
-			queueListOut.writeObject( new ArrayList <Track> ( Arrays.asList( Queue.getData().toArray( new Track[ Queue.getData().size() ] ) ) ) );
+			queueListOut.writeObject( new ArrayList <Track> ( Arrays.asList( Hypnos.queue.getData().toArray( new Track[ Hypnos.queue.getData().size() ] ) ) ) );
 			queueListOut.flush();
 			
 		} catch ( IOException e ) {
@@ -256,11 +255,11 @@ public class Persister {
 		}
 	}
 	
-	public static void saveHistory() {
+	public void saveHistory( PlayerController player ) {
 		try ( 
 				ObjectOutputStream historyListOut = new ObjectOutputStream ( new FileOutputStream ( historyFile ) );
 		) {
-			historyListOut.writeObject( new ArrayList <Track> ( Arrays.asList( MusicPlayerUI.history.toArray( new Track[ MusicPlayerUI.history.size() ] ) ) ) );
+			historyListOut.writeObject( new ArrayList <Track> ( Arrays.asList( player.getHistory().toArray( new Track[ player.getHistory().size() ] ) ) ) );
 			historyListOut.flush();
 			
 		} catch ( IOException e ) {
@@ -270,13 +269,13 @@ public class Persister {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static void loadAlbumsAndTracks() {
+	public void loadAlbumsAndTracks() {
 		try (
 				ObjectInputStream dataIn = new ObjectInputStream( new GZIPInputStream ( new FileInputStream( dataFile ) ) );
 		) {
 			//TODO: Maybe do this more carefully, give Library more control over it? 
-			Library.albums.addAll( (ArrayList<Album>) dataIn.readObject() );
-			Library.tracks.addAll( (ArrayList<Track>) dataIn.readObject() );
+			Hypnos.library.albums.addAll( (ArrayList<Album>) dataIn.readObject() );
+			Hypnos.library.tracks.addAll( (ArrayList<Track>) dataIn.readObject() );
 		} catch ( FileNotFoundException e ) {
 			System.out.println ( "File not found: info.data, unable to load albuma and song lists, continuing." );
 		} catch ( IOException | ClassNotFoundException e ) {
@@ -285,7 +284,7 @@ public class Persister {
 		}
 	}
 	
-	public static void saveAlbumsAndTracks() {
+	public void saveAlbumsAndTracks() {
 		/* Some notes for future Josh (2017/05/14):
 		 * 1. For some reason, keeping the ByteArrayOutputStream in the middle makes things take ~2/3 the amount of time.
 		 * 2. I tried removing tracks that have albums (since they're being written twice) but it didn't create any savings. I guess compression is handling that
@@ -298,8 +297,8 @@ public class Persister {
 			ByteArrayOutputStream byteWriter = new ByteArrayOutputStream();
 			ObjectOutputStream bytesOut = new ObjectOutputStream ( byteWriter );
 			
-			bytesOut.writeObject( new ArrayList <Album> ( Arrays.asList( Library.albums.toArray( new Album[ Library.albums.size() ] ) ) ) );
-			bytesOut.writeObject( new ArrayList <Track> ( Arrays.asList( Library.tracks.toArray( new Track[ Library.tracks.size() ] ) ) ) );
+			bytesOut.writeObject( new ArrayList <Album> ( Arrays.asList( Hypnos.library.albums.toArray( new Album[ Hypnos.library.albums.size() ] ) ) ) );
+			bytesOut.writeObject( new ArrayList <Track> ( Arrays.asList( Hypnos.library.tracks.toArray( new Track[ Hypnos.library.tracks.size() ] ) ) ) );
 
 			compressedOut.write( byteWriter.toByteArray() );
 			compressedOut.flush();
@@ -310,7 +309,7 @@ public class Persister {
 		}
 	}
 	
-	public static void loadPlaylists() {
+	public void loadPlaylists() {
 		
 		try ( 
 				DirectoryStream <Path> stream = Files.newDirectoryStream( playlistsDirectory.toPath() ); 
@@ -318,7 +317,7 @@ public class Persister {
 			for ( Path child : stream ) {
 				Playlist playlist = Playlist.loadPlaylist( child );
 				if ( playlist != null ) {
-					Library.addPlaylist( playlist );
+					Hypnos.library.addPlaylist( playlist );
 				}
 			}
 			
@@ -328,8 +327,8 @@ public class Persister {
 		}
 	}
 	
-	public static void savePlaylists() {
-		ArrayList <Playlist> playlists = new ArrayList <Playlist> ( Library.playlists );
+	public void savePlaylists() {
+		ArrayList <Playlist> playlists = new ArrayList <Playlist> ( Hypnos.library.playlists );
 		
 		int playlistIndex = 1;
 		for ( Playlist playlist : playlists ) {
@@ -374,36 +373,36 @@ public class Persister {
 	private static final String SETTING_TAG_TRACK_POSITION = "CurrentTrackPosition";
 	private static final String SETTING_TAG_TRACK_NUMBER = "CurrentTrackNumber";
 	
-	public static void saveSettings() {
+	public void saveSettings( PlayerController player, FXUI ui ) {
 		try ( 
 				FileWriter fileWriter = new FileWriter( settingsFile );
 		) {
 			PrintWriter settingsOut = new PrintWriter( new BufferedWriter( fileWriter ) );
 			
-			if ( MusicPlayerUI.currentPlayer != null ) {
-				settingsOut.printf( "%s: %s\n", SETTING_TAG_TRACK, MusicPlayerUI.currentPlayer.getTrack().getPath().toString() );
-				settingsOut.printf( "%s: %s\n", SETTING_TAG_TRACK_POSITION, MusicPlayerUI.currentPlayer.getPositionMS() );
-				settingsOut.printf( "%s: %d\n", SETTING_TAG_TRACK_NUMBER, MusicPlayerUI.getCurrentTrackNumber() );
+			if ( !player.isStopped() ) {
+				settingsOut.printf( "%s: %s\n", SETTING_TAG_TRACK, player.getCurrentTrack().getPath().toString() );
+				//TODO: settingsOut.printf( "%s: %s\n", SETTING_TAG_TRACK_POSITION, player.getPositionMS() );
+				settingsOut.printf( "%s: %d\n", SETTING_TAG_TRACK_NUMBER, player.getCurrentTrackNumber() );
 			} 
 			
-			settingsOut.printf( "%s: %s\n", SETTING_TAG_SHUFFLE, MusicPlayerUI.shuffleMode.toString() );
-			settingsOut.printf( "%s: %s\n", SETTING_TAG_REPEAT, MusicPlayerUI.repeatMode.toString() );
-			settingsOut.printf( "%s: %b\n", SETTING_TAG_HIDE_ALBUM_TRACKS, MusicPlayerUI.trackListCheckBox.isSelected() );
+			settingsOut.printf( "%s: %s\n", SETTING_TAG_SHUFFLE, player.getShuffleMode().toString() );
+			settingsOut.printf( "%s: %s\n", SETTING_TAG_REPEAT, player.getRepeatMode().toString() );
+			settingsOut.printf( "%s: %b\n", SETTING_TAG_HIDE_ALBUM_TRACKS, ui.trackListCheckBox.isSelected() );
 			
-			boolean isMaximized = MusicPlayerUI.isMaximized();
+			boolean isMaximized = ui.isMaximized();
 			settingsOut.printf( "%s: %b\n", SETTING_TAG_WINDOW_MAXIMIZED, isMaximized );
-			settingsOut.printf( "%s: %f\n", SETTING_TAG_WINDOW_X_POSITION, MusicPlayerUI.mainStage.getX() ); //So we are on the right monitor
+			settingsOut.printf( "%s: %f\n", SETTING_TAG_WINDOW_X_POSITION, ui.mainStage.getX() ); //So we are on the right monitor
 			
 			if ( !isMaximized ) {
-				settingsOut.printf( "%s: %f\n", SETTING_TAG_WINDOW_X_POSITION, MusicPlayerUI.mainStage.getX() );
-				settingsOut.printf( "%s: %f\n", SETTING_TAG_WINDOW_Y_POSITION, MusicPlayerUI.mainStage.getY() );
-				settingsOut.printf( "%s: %f\n", SETTING_TAG_WINDOW_WIDTH, MusicPlayerUI.mainStage.getWidth() );
-				settingsOut.printf( "%s: %f\n", SETTING_TAG_WINDOW_HEIGHT, MusicPlayerUI.mainStage.getHeight() );
+				settingsOut.printf( "%s: %f\n", SETTING_TAG_WINDOW_X_POSITION, ui.mainStage.getX() );
+				settingsOut.printf( "%s: %f\n", SETTING_TAG_WINDOW_Y_POSITION, ui.mainStage.getY() );
+				settingsOut.printf( "%s: %f\n", SETTING_TAG_WINDOW_WIDTH, ui.mainStage.getWidth() );
+				settingsOut.printf( "%s: %f\n", SETTING_TAG_WINDOW_HEIGHT, ui.mainStage.getHeight() );
 			}
 			
-			settingsOut.printf( "%s: %f\n", SETTING_TAG_PRIMARY_SPLIT_PERCENT, MusicPlayerUI.getPrimarySplitPercent() );
-			settingsOut.printf( "%s: %f\n", SETTING_TAG_CURRENT_LIST_SPLIT_PERCENT, MusicPlayerUI.getCurrentListSplitPercent() );
-			settingsOut.printf( "%s: %f\n", SETTING_TAG_ART_SPLIT_PERCENT, MusicPlayerUI.getArtSplitPercent() );
+			settingsOut.printf( "%s: %f\n", SETTING_TAG_PRIMARY_SPLIT_PERCENT, ui.getPrimarySplitPercent() );
+			settingsOut.printf( "%s: %f\n", SETTING_TAG_CURRENT_LIST_SPLIT_PERCENT, ui.getCurrentListSplitPercent() );
+			settingsOut.printf( "%s: %f\n", SETTING_TAG_ART_SPLIT_PERCENT, ui.getArtSplitPercent() );
 			
 			settingsOut.flush();
 			
@@ -413,7 +412,7 @@ public class Persister {
 		}
 	}
 	
-	public static void loadPreWindowSettings() {
+	public void loadPreWindowSettings( PlayerController player, FXUI ui ) {
 		try (
 				FileReader fileReader = new FileReader( settingsFile );
 		) {
@@ -427,47 +426,49 @@ public class Persister {
 				try {
 					switch ( tag ) {
 						case SETTING_TAG_SHUFFLE:
-							MusicPlayerUI.setShuffleMode ( MusicPlayerUI.ShuffleMode.valueOf( value ) );
+							player.setShuffleMode ( PlayerController.ShuffleMode.valueOf( value ) );
+							//TODO: Update UI
 							break;
 							
 						case SETTING_TAG_REPEAT:
-							MusicPlayerUI.setRepeatMode ( MusicPlayerUI.RepeatMode.valueOf( value ) );
+							player.setRepeatMode ( PlayerController.RepeatMode.valueOf( value ) );
+							//TODO: Update UI
 							break;
 							
 						case SETTING_TAG_HIDE_ALBUM_TRACKS:
-							MusicPlayerUI.setShowAlbumTracks ( Boolean.valueOf( value ) );
+							ui.setShowAlbumTracks ( Boolean.valueOf( value ) );
 							break;		
 							
 						case SETTING_TAG_WINDOW_X_POSITION:
-							MusicPlayerUI.mainStage.setX( Double.valueOf( value ) );
+							ui.mainStage.setX( Double.valueOf( value ) );
 							break;
 							
 						case SETTING_TAG_WINDOW_Y_POSITION:
-							MusicPlayerUI.mainStage.setY( Double.valueOf( value ) );
+							ui.mainStage.setY( Double.valueOf( value ) );
 							break;
 							
 						case SETTING_TAG_WINDOW_WIDTH:
-							MusicPlayerUI.mainStage.setWidth( Double.valueOf( value ) );
+							ui.mainStage.setWidth( Double.valueOf( value ) );
 							break;
 							
 						case SETTING_TAG_WINDOW_HEIGHT:
-							MusicPlayerUI.mainStage.setHeight( Double.valueOf( value ) );
+							ui.mainStage.setHeight( Double.valueOf( value ) );
 							break;
 							
 						case SETTING_TAG_WINDOW_MAXIMIZED:
-							MusicPlayerUI.setMaximized ( Boolean.valueOf( value ) );
+							ui.setMaximized ( Boolean.valueOf( value ) );
 							break;
 							
 						case SETTING_TAG_PRIMARY_SPLIT_PERCENT:
-							MusicPlayerUI.setPrimarySplitPercent ( Double.valueOf( value ) );
+							ui.setPrimarySplitPercent ( Double.valueOf( value ) );
 							break;
 							
 						case SETTING_TAG_CURRENT_LIST_SPLIT_PERCENT:
-							MusicPlayerUI.setCurrentListSplitPercent ( Double.valueOf( value ) );
+							ui.setCurrentListSplitPercent ( Double.valueOf( value ) );
 							break;
 							
 						case SETTING_TAG_ART_SPLIT_PERCENT:
-							MusicPlayerUI.setArtSplitPercent ( Double.valueOf( value ) );
+							ui.setArtSplitPercent ( Double.valueOf( value ) );
 							break;
 							
 					}
@@ -485,7 +486,7 @@ public class Persister {
 		}
 	}
 	
-	public static void loadPostWindowSettings() {
+	public void loadPostWindowSettings( PlayerController player, FXUI ui ) {
 		try (
 				FileReader fileReader = new FileReader( settingsFile );
 		) {
@@ -500,20 +501,18 @@ public class Persister {
 					switch ( tag ) {
 						case SETTING_TAG_TRACK:
 							Track track = new Track ( Paths.get( value ), false );
-							MusicPlayerUI.playTrack( track, true );
+							player.playTrack( track, true );
 							break;
 							
 						case SETTING_TAG_TRACK_POSITION:
-							if ( MusicPlayerUI.currentPlayer != null ) {
-								MusicPlayerUI.currentPlayer.seekMS( Long.parseLong( value ) );
-							}
+							player.seekMS( Long.parseLong( value ) );
 							break;
 							
 						case SETTING_TAG_TRACK_NUMBER:
 							try {
 								int tracklistNumber = Integer.parseInt( value );
 								if ( tracklistNumber != -1 ) {
-									MusicPlayerUI.currentList.get( tracklistNumber ).setIsCurrentTrack( true );
+									//TODO: MusicPlayerUI.currentList.get( tracklistNumber ).setIsCurrentTrack( true );
 								}
 							} catch ( Exception e ) {
 								System.out.println ( "Error loading current list track number: " + e.getMessage() );

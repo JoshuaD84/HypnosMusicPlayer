@@ -28,7 +28,7 @@ public class SingleInstanceController {
 	// Return true if the socket is available.
 	public static boolean startCLICommandListener() {
 		
-		if ( MusicPlayerUI.IS_DEVELOPING ) {
+		if ( Hypnos.IS_DEVELOPING ) {
 			port = 49486;
 		} 
 		
@@ -76,7 +76,7 @@ public class SingleInstanceController {
 		Platform.runLater( new Runnable() { public void run() {
 			for ( SocketCommand command : commands ) {
 				if ( command.getType() == SocketCommand.CommandType.LOAD_TRACKS ) {
-					ArrayList<CurrentListTrack> newList = new ArrayList<CurrentListTrack>();
+					ArrayList<Track> newList = new ArrayList<Track>();
 					
 					for ( File file : (List<File>) command.getObject() ) {
 						if ( file.isDirectory() ) {
@@ -91,8 +91,7 @@ public class SingleInstanceController {
 					}
 					
 					if ( newList.size() > 0 ) {
-						MusicPlayerUI.currentList.clear();
-						MusicPlayerUI.currentList.addAll( newList );
+						Hypnos.ui.loadTracks ( newList );
 					}
 				}
 			}
@@ -101,29 +100,31 @@ public class SingleInstanceController {
 				if ( command.getType() == SocketCommand.CommandType.CONTROL ) {
 					int action = (Integer)command.getObject();
 	
+					/* TODO 
 					switch ( action ) {
 						case NEXT: 
-							MusicPlayerUI.nextTrack();
+							Hypnos.ui.nextTrack();
 							break;
 						case PREVIOUS:
-							MusicPlayerUI.previousTrack();
+							Hypnos.ui.previousTrack();
 							break;
 						case PAUSE:
-							MusicPlayerUI.pause();
+							Hypnos.ui.pause();
 							break;
 						case PLAY:
-							MusicPlayerUI.play();
+							Hypnos.ui.play();
 							break;
 						case TOGGLE_PAUSE:
-							MusicPlayerUI.togglePause();
+							Hypnos.ui.togglePause();
 							break;
 						case STOP:
-							MusicPlayerUI.stopTrack();
+							Hypnos.ui.stopTrack();
 							break;
 						case TOGGLE_MINIMIZED:
-							MusicPlayerUI.toggleMinimized();
+							Hypnos.ui.toggleMinimized();
 							break;
 					}
+					*/
 				} 
 				
 				try {

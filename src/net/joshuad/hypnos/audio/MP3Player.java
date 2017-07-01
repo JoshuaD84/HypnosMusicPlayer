@@ -1,4 +1,4 @@
-package net.joshuad.hypnos.players;
+package net.joshuad.hypnos.audio;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -25,7 +25,8 @@ import javazoom.jl.decoder.Decoder;
 import javazoom.jl.decoder.Header;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.decoder.SampleBuffer;
-import net.joshuad.hypnos.MusicPlayerUI;
+import net.joshuad.hypnos.FXUI;
+import net.joshuad.hypnos.PlayerController;
 import net.joshuad.hypnos.Track;
 
 public class MP3Player extends AbstractPlayer implements Runnable {
@@ -35,12 +36,13 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 	private Bitstream encodedInput;
 	private Decoder decoder;
 
-	public MP3Player ( Track track, Slider trackPosition ) {
-		this ( track, trackPosition, false );
+	public MP3Player ( Track track, PlayerController player, Slider trackPosition ) {
+		this ( track, player, trackPosition, false );
 	}
 	
-	public MP3Player ( Track track, Slider trackPosition, boolean startPaused ) {
+	public MP3Player ( Track track, PlayerController player, Slider trackPosition, boolean startPaused ) {
 		this.track = track;
+		this.player = player;
 		this.trackPosition = trackPosition;
 		this.pauseRequested = startPaused;
 
@@ -55,7 +57,7 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 						
 		if ( !streamsOpen ) {
 			closeAllResources();
-			MusicPlayerUI.songFinishedPlaying( false );
+			player.songFinishedPlaying( false );
 			return;
 		}
 
@@ -64,7 +66,7 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 		while ( true ) {
 			if ( stopRequested ) {
 				closeAllResources();
-				MusicPlayerUI.songFinishedPlaying( true );
+				player.songFinishedPlaying( true );
 				stopRequested = false;
 				return;
 			}				
@@ -87,7 +89,7 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 				
 				if ( !streamsOpen ) {
 					closeAllResources();
-					MusicPlayerUI.songFinishedPlaying( false );
+					player.songFinishedPlaying( false );
 					return;
 				}
 				
@@ -101,7 +103,7 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 					
 					if ( header == null ) {
 						closeAllResources();
-						MusicPlayerUI.songFinishedPlaying( false );
+						player.songFinishedPlaying( false );
 						return; 
 					}
 	
@@ -151,7 +153,7 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 		} catch (IOException e) {
 			String message = "Unable to open mp3 file:\n\n" + track.getPath().toString() + "\n\nIt may be corrupt." ;
 			LOGGER.log( Level.WARNING, message );
-			MusicPlayerUI.notifyUserError ( message );
+			FXUI.notifyUserError ( message );
 			return false;
 		}
         BufferedInputStream bis = new BufferedInputStream(fis);
@@ -166,7 +168,7 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 			} catch ( IOException e ) {
 				String message = "Unable to seek.";
 				LOGGER.log( Level.WARNING, message, e );
-				MusicPlayerUI.notifyUserError( message );
+				FXUI.notifyUserError( message );
 			}
 		}
 		
@@ -183,17 +185,17 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 		} catch ( LineUnavailableException exception ) {
 			String message = "The audio output line could not be opened due to resource restrictions.";
 			LOGGER.log( Level.WARNING, message, exception );
-			MusicPlayerUI.notifyUserError( message );
+			FXUI.notifyUserError( message );
 			return false;
 		} catch ( IllegalStateException exception ) {
 			String message = "The audio output line is already open.";
 			LOGGER.log( Level.WARNING, message, exception );
-			MusicPlayerUI.notifyUserError( message );
+			FXUI.notifyUserError( message );
 			return false;
 		} catch ( SecurityException exception ) {
 			String message = "The audio output line could not be opened due to security restrictions.";
 			LOGGER.log( Level.WARNING, message, exception );
-			MusicPlayerUI.notifyUserError( message );
+			FXUI.notifyUserError( message );
 			return false;
 		}
 

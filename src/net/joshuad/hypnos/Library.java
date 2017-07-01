@@ -31,50 +31,49 @@ public class Library {
 
 	private static final Logger LOGGER = Logger.getLogger( Library.class.getName() );
 		
-	private static WatchService watcher;
-    private static final HashMap<WatchKey,Path> keys = new HashMap <WatchKey,Path> ();
+	private WatchService watcher;
+    private final HashMap<WatchKey,Path> keys = new HashMap <WatchKey,Path> ();
     
-    private static MusicFileVisitor fileWalker = null; //YOU MUST SET THIS TO NULL AFTER IT WALKS
+    private MusicFileVisitor fileWalker = null; //YOU MUST SET THIS TO NULL AFTER IT WALKS
     
-	private static Thread loaderThread;
-	private final static ModifiedFileUpdaterThread modifiedFileDelayedUpdater = new ModifiedFileUpdaterThread();
+	private Thread loaderThread;
+	private final ModifiedFileUpdaterThread modifiedFileDelayedUpdater = new ModifiedFileUpdaterThread();
 	
 	// These are all three representations of the same data. Add stuff to the
 	// Observable List, the other two can't accept add.
-	final static ObservableList <Album> albums = FXCollections.observableArrayList( new ArrayList <Album>() );
-	final static FilteredList <Album> albumsFiltered = new FilteredList <Album>( albums, p -> true );
-	final static SortedList <Album> albumsSorted = new SortedList <Album>( albumsFiltered );
+	final ObservableList <Album> albums = FXCollections.observableArrayList( new ArrayList <Album>() );
+	final FilteredList <Album> albumsFiltered = new FilteredList <Album>( albums, p -> true );
+	final SortedList <Album> albumsSorted = new SortedList <Album>( albumsFiltered );
 
-	final static ObservableList <Track> tracks = FXCollections.observableArrayList( new ArrayList <Track>() );
-	final static FilteredList <Track> tracksFiltered = new FilteredList <Track>( tracks, p -> true );
-	final static SortedList <Track> tracksSorted = new SortedList <Track>( tracksFiltered );
+	final ObservableList <Track> tracks = FXCollections.observableArrayList( new ArrayList <Track>() );
+	final FilteredList <Track> tracksFiltered = new FilteredList <Track>( tracks, p -> true );
+	final SortedList <Track> tracksSorted = new SortedList <Track>( tracksFiltered );
 
-	final static ObservableList <Playlist> playlists = FXCollections.observableArrayList( new ArrayList <Playlist>() );
-	final static FilteredList <Playlist> playlistsFiltered = new FilteredList <Playlist>( playlists, p -> true );
-	final static SortedList <Playlist> playlistsSorted = new SortedList <Playlist>( playlistsFiltered );
+	final ObservableList <Playlist> playlists = FXCollections.observableArrayList( new ArrayList <Playlist>() );
+	final FilteredList <Playlist> playlistsFiltered = new FilteredList <Playlist>( playlists, p -> true );
+	final SortedList <Playlist> playlistsSorted = new SortedList <Playlist>( playlistsFiltered );
 
-	final static ObservableList <Path> musicSourcePaths = FXCollections.observableArrayList();
+	final ObservableList <Path> musicSourcePaths = FXCollections.observableArrayList();
 	
-	static Vector <Album> albumsToAdd = new Vector <Album>();
-	static Vector <Album> albumsToRemove = new Vector <Album>();
-	static Vector <Album> albumsToUpdate = new Vector <Album>();
+	Vector <Album> albumsToAdd = new Vector <Album>();
+	Vector <Album> albumsToRemove = new Vector <Album>();
+	Vector <Album> albumsToUpdate = new Vector <Album>();
 
-	static Vector <Track> tracksToAdd = new Vector <Track>();
-	static Vector <Track> tracksToRemove = new Vector <Track>();
-	static Vector <Track> tracksToUpdate = new Vector <Track>();
+	Vector <Track> tracksToAdd = new Vector <Track>();
+	Vector <Track> tracksToRemove = new Vector <Track>();
+	Vector <Track> tracksToUpdate = new Vector <Track>();
 
-	static Vector <Playlist> playlistsToAdd = new Vector <Playlist>();
-	static Vector <Playlist> playlistsToRemove = new Vector <Playlist>();
-	static Vector <Playlist> playlistsToUpdate = new Vector <Playlist>();
+	Vector <Playlist> playlistsToAdd = new Vector <Playlist>();
+	Vector <Playlist> playlistsToRemove = new Vector <Playlist>();
+	Vector <Playlist> playlistsToUpdate = new Vector <Playlist>();
 
-	private static Vector <Path> sourceToAdd = new Vector <Path>();
-	private static Vector <Path> sourceToRemove = new Vector <Path>();
-	private static Vector <Path> sourceToUpdate = new Vector <Path>();
+	private Vector <Path> sourceToAdd = new Vector <Path>();
+	private Vector <Path> sourceToRemove = new Vector <Path>();
+	private Vector <Path> sourceToUpdate = new Vector <Path>();
 	
-	private static boolean purgeOrphansAndMissing = true;
+	private boolean purgeOrphansAndMissing = true;
 	
-	public static void init() {
-		
+	public Library() {
 		if ( watcher == null ) {
 			try {
 				watcher = FileSystems.getDefault().newWatchService();
@@ -83,12 +82,12 @@ public class Library {
 			} catch ( IOException e ) {
 				String message = "Unable to initialize file watcher, changes to file system while running won't be detected";
 				LOGGER.log( Level.WARNING, message );
-				MusicPlayerUI.notifyUserError( message );
+				FXUI.notifyUserError( message );
 			}
 		}
 	}
 
-	public static void startLoader() {
+	public void startLoader() {
 		
 		
 		loaderThread = new Thread ( new Runnable() {
@@ -124,16 +123,16 @@ public class Library {
 
 					if ( System.currentTimeMillis() - lastSaveTime > 10000 ) {
 						if ( albumTrackDataChangedSinceLastSave ) {
-							Persister.saveAlbumsAndTracks();
+							Hypnos.persister.saveAlbumsAndTracks();
 							albumTrackDataChangedSinceLastSave = false;
 						}
 						
-						Persister.saveSources();
-						Persister.saveCurrentList();
-						Persister.saveQueue();
-						Persister.saveHistory();
-						Persister.savePlaylists();
-						Persister.saveSettings();
+						Hypnos.persister.saveSources();
+						Hypnos.persister.saveCurrentList( Hypnos.player );
+						Hypnos.persister.saveQueue();
+						Hypnos.persister.saveHistory( Hypnos.player );
+						Hypnos.persister.savePlaylists();
+						Hypnos.persister.saveSettings( Hypnos.player, Hypnos.ui );
 						
 						lastSaveTime = System.currentTimeMillis();
 					}
@@ -161,14 +160,14 @@ public class Library {
 		loaderThread.start();
 	}
 	
-	public static void requestUpdateSources ( List<Path> paths ) {
+	public void requestUpdateSources ( List<Path> paths ) {
 		sourceToUpdate.addAll( paths );
 		for ( Path path : paths ) {
 			musicSourcePaths.add( path );
 		}
 	}
 	
-	public static void requestAddSources ( List<Path> paths ) {
+	public void requestAddSources ( List<Path> paths ) {
 		for ( Path path : paths ) {
 			if ( path != null ) {
 				path = path.toAbsolutePath();
@@ -176,7 +175,7 @@ public class Library {
 				if ( path.toFile().exists() && path.toFile().isDirectory() ) {
 
 					boolean addSelectedPathToList = true;
-					for ( Path alreadyAddedPath : Library.musicSourcePaths ) {
+					for ( Path alreadyAddedPath : musicSourcePaths ) {
 						try {
 							if ( Files.isSameFile( path, alreadyAddedPath ) ) {
 								addSelectedPathToList = false;
@@ -186,7 +185,7 @@ public class Library {
 					
 					if ( addSelectedPathToList ) {
 						sourceToAdd.add ( path );
-						Library.musicSourcePaths.add( path );
+						musicSourcePaths.add( path );
 						if ( fileWalker != null ) {
 							fileWalker.interrupt();
 						}
@@ -196,7 +195,7 @@ public class Library {
 		}
 	}	
 	
-	public static void requestRemoveSources ( List<Path> paths ) {
+	public void requestRemoveSources ( List<Path> paths ) {
 		sourceToRemove.addAll ( paths );
 		
 		if ( fileWalker != null ) {
@@ -208,36 +207,36 @@ public class Library {
 		}
 	}
 	
-	public static void requestUpdate ( Path path ) {
+	public void requestUpdate ( Path path ) {
 		sourceToUpdate.add( path );
 	}
 	
-	public static void requestUpdateSource ( Path path ) {
+	public void requestUpdateSource ( Path path ) {
 		requestUpdateSources( Arrays.asList( path ) );
 	}
 
-	public static void requestAddSource ( Path path ) {
+	public void requestAddSource ( Path path ) {
 		requestAddSources( Arrays.asList( path ) );
 	}
 	
-	public static void requestRemoveSource ( Path path ) {
+	public void requestRemoveSource ( Path path ) {
 		requestRemoveSources ( Arrays.asList( path ) );
 	}
 	
-	public static boolean containsAlbum ( Album album ) {
+	public boolean containsAlbum ( Album album ) {
 		if ( albumsToRemove.contains ( album ) ) return false;
 		else if ( albums.contains( album ) ) return true;
 		else if ( albumsToAdd.contains( album ) ) return true;
 		else return false;
 	}
 	
-	public static void addAlbums ( ArrayList<Album> albums ) {
+	public void addAlbums ( ArrayList<Album> albums ) {
 		for ( Album album : albums ) {
 			addAlbum ( album );
 		}
 	}
 	
-	static void addAlbum ( Album album ) {
+	void addAlbum ( Album album ) {
 		if ( containsAlbum( album ) ) {
 			albumsToUpdate.add ( album ); 
 		} else {
@@ -247,13 +246,13 @@ public class Library {
 		addTracks( album.getTracks() );
 	}
 	
-	static void removeAlbums ( ArrayList<Album> albums ) {
+	void removeAlbums ( ArrayList<Album> albums ) {
 		for ( Album album : albums ) {
 			removeAlbum ( album );
 		}
 	}
 	
-	static void removeAlbum ( Album album ) {
+	void removeAlbum ( Album album ) {
 		if ( !albumsToRemove.contains( album ) ) {
 			albumsToRemove.add ( album );
 			removeTracks ( album.tracks );
@@ -261,20 +260,20 @@ public class Library {
 	}
 	
 	
-	public static boolean containsTrack ( Track track ) {
+	public boolean containsTrack ( Track track ) {
 		if ( tracksToRemove.contains ( track ) ) return false;
 		else if ( tracks.contains( track ) ) return true;
 		else if ( tracksToAdd.contains( track ) ) return true;
 		else return false;
 	}
 	
-	static void addTracks ( ArrayList<Track> tracks ) {
+	void addTracks ( ArrayList<Track> tracks ) {
 		for ( Track track : tracks ) {
 			addTrack ( track );
 		}
 	}
 	
-	static void addTrack ( Track track ) {
+	void addTrack ( Track track ) {
 		if ( containsTrack( track ) ) {
 			tracksToUpdate.add ( track );
 		} else {
@@ -282,34 +281,34 @@ public class Library {
 		}
 	}
 	
-	static void removeTracks ( ArrayList<Track> tracks ) {
+	void removeTracks ( ArrayList<Track> tracks ) {
 		for ( Track track : tracks ) {
 			removeTrack ( track );
 		}
 	}
 	
-	static void removeTrack ( Track track ) {
+	void removeTrack ( Track track ) {
 		if ( !tracksToRemove.contains( track ) ) {
 			tracksToRemove.add( track );
 		}
 	}
 	
-	public static void addPlaylists ( ArrayList<Playlist> playlists ) {
+	public void addPlaylists ( ArrayList<Playlist> playlists ) {
 		for ( Playlist playlist : playlists ) {
 			addPlaylist ( playlist );
 		}
 	}
 	
-	public static void addPlaylist ( Playlist playlist ) {
+	public void addPlaylist ( Playlist playlist ) {
 		//TODO: name checking? 
 		playlistsToAdd.add( playlist );
 	}
 	
-	public static void removePlaylist ( Playlist playlist ) {
+	public void removePlaylist ( Playlist playlist ) {
 		playlistsToRemove.add( playlist );
 	}
 	
-	private static void removeOneSource() {
+	private void removeOneSource() {
 
 		while ( fileWalker != null ) {
 			try {
@@ -338,7 +337,7 @@ public class Library {
 		}
 	}
 	
-	private static void loadOneSource() {
+	private void loadOneSource() {
 		Path selectedPath = sourceToAdd.get( 0 );
 		fileWalker = new MusicFileVisitor( );
 		try {
@@ -362,7 +361,7 @@ public class Library {
 		fileWalker = null;
 	}
 	
-	private static void updateOneSource() {
+	private void updateOneSource() {
 		Path selectedPath = sourceToUpdate.get( 0 );
 		fileWalker = new MusicFileVisitor( );
 		try {
@@ -388,7 +387,7 @@ public class Library {
 		watcherRegisterAll ( selectedPath );
 	}
 	
-	private static void purgeMissingFiles() {
+	private void purgeMissingFiles() {
 		ArrayList <Album> albumsCopy = new ArrayList <Album> ( albums );
 		for ( Album album : albumsCopy ) {
 			if ( !Files.exists( album.getPath() ) || !Files.isDirectory( album.getPath() ) ) {
@@ -404,11 +403,11 @@ public class Library {
 		}
 	}
 	
-	private static void purgeOrphans () {
+	private void purgeOrphans () {
 		ArrayList <Album> albumsCopy = new ArrayList <Album> ( albums );
 		for ( Album album : albumsCopy ) {
 			boolean hasParent = false;
-			for ( Path sourcePath : Library.musicSourcePaths ) {
+			for ( Path sourcePath : musicSourcePaths ) {
 				if ( album.getPath().toAbsolutePath().startsWith( sourcePath ) ) {
 					hasParent = true;
 				}
@@ -426,7 +425,7 @@ public class Library {
 		ArrayList <Track> tracksCopy = new ArrayList <Track> ( tracks );
 		for ( Track track : tracksCopy ) {
 			boolean hasParent = false;
-			for ( Path sourcePath : Library.musicSourcePaths ) {
+			for ( Path sourcePath : musicSourcePaths ) {
 				if ( track.getPath().toAbsolutePath().startsWith( sourcePath ) ) {
 					hasParent = true;
 				}
@@ -438,7 +437,7 @@ public class Library {
 		}
 	}
 	
-	private static void watcherRegisterAll ( final Path start ) {
+	private void watcherRegisterAll ( final Path start ) {
 		try {
 			Files.walkFileTree( 
 				start, 
@@ -467,7 +466,7 @@ public class Library {
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static boolean processWatcherEvents () {
+	private boolean processWatcherEvents () {
 		WatchKey key;
 		try {
 			key = watcher.poll( 250, TimeUnit.MILLISECONDS );
@@ -521,8 +520,8 @@ public class Library {
 }
 
 class ModifiedFileUpdaterThread extends Thread {
-	private static final Logger LOGGER = Logger.getLogger( ModifiedFileUpdaterThread.class.getName() );
-	public static final int DELAY_LENGTH_MS = 1000; 
+	private final Logger LOGGER = Logger.getLogger( ModifiedFileUpdaterThread.class.getName() );
+	public final int DELAY_LENGTH_MS = 1000; 
 	public int counter = DELAY_LENGTH_MS;
 	
 	Vector <Path> updateItems = new Vector <Path> ();
@@ -543,7 +542,7 @@ class ModifiedFileUpdaterThread extends Thread {
 			} else {
 				Vector <Path> copyUpdateItems = new Vector<Path> ( updateItems );
 				for ( Path path : copyUpdateItems ) {
-					Library.requestUpdate ( path );
+					Hypnos.library.requestUpdate ( path );
 					updateItems.remove( path );
 				}
 			}

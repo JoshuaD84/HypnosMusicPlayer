@@ -1,4 +1,4 @@
-package net.joshuad.hypnos.players;
+package net.joshuad.hypnos.audio;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -8,7 +8,8 @@ import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.SourceDataLine;
 
 import javafx.scene.control.Slider;
-import net.joshuad.hypnos.MusicPlayerUI;
+import net.joshuad.hypnos.Hypnos;
+import net.joshuad.hypnos.PlayerController;
 import net.joshuad.hypnos.Track;
 
 //TODO: finish refactoring this stuff
@@ -29,32 +30,33 @@ public class AbstractPlayer {
 	long clipStartTimeMS = 0; //If we seek, we need to remember where we started so we can make the seek bar look right. 
 	
 	boolean paused = false;
+	PlayerController player;
 	
-	public static AbstractPlayer getPlayer ( Track track, Slider trackPositionSlider, boolean startPaused ) {
+	public static AbstractPlayer getPlayer ( Track track, PlayerController player, Slider trackPositionSlider, boolean startPaused ) {
 		
 		AbstractPlayer currentPlayer = null;
 		
 		switch ( track.getFormat() ) {
 			case FLAC:
 				try {
-					currentPlayer = new FlacPlayer( track, trackPositionSlider, startPaused );
+					currentPlayer = new FlacPlayer( track, player, trackPositionSlider, startPaused );
 				} catch ( Exception e ) {
 					LOGGER.log ( Level.INFO, "Using backup flac decoder for: " + track.getPath() );
-					currentPlayer = new JFlacPlayer ( track, trackPositionSlider, startPaused );
+					currentPlayer = new JFlacPlayer ( track, player, trackPositionSlider, startPaused );
 				}
 				break;
 				
 			case MP3:
-				currentPlayer = new MP3Player( track, trackPositionSlider, startPaused );
+				currentPlayer = new MP3Player( track, player, trackPositionSlider, startPaused );
 				break;
 				
 			case AAC:
-				currentPlayer = new MP4Player( track, trackPositionSlider, startPaused );
+				currentPlayer = new MP4Player( track, player, trackPositionSlider, startPaused );
 				break;
 				
 			case OGG:
 				try {
-					currentPlayer = new OggPlayer( track, trackPositionSlider, startPaused );
+					currentPlayer = new OggPlayer( track, player, trackPositionSlider, startPaused );
 				} catch ( IOException e ) {
 					//TODO: 
 					e.printStackTrace();
@@ -62,7 +64,7 @@ public class AbstractPlayer {
 				break;
 				
 			case WAV:
-				currentPlayer = new WavPlayer ( track, trackPositionSlider, startPaused );
+				currentPlayer = new WavPlayer ( track, player, trackPositionSlider, startPaused );
 				break;
 			
 			case UNKNOWN:
@@ -143,11 +145,11 @@ public class AbstractPlayer {
 			double positionPercent = (double) getPositionMS() / ( (double) track.getLengthS() * 1000 );
 			int timeElapsed = (int)(track.getLengthS() * positionPercent);
 			int timeRemaining = track.getLengthS() - timeElapsed;
-			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, positionPercent );
+			Hypnos.ui.updateTransport ( timeElapsed, -timeRemaining, positionPercent );
 		} else {
 			int timeElapsed = (int)(track.getLengthS() * seekRequestPercent);
 			int timeRemaining = track.getLengthS() - timeElapsed;
-			MusicPlayerUI.updateTransport ( timeElapsed, -timeRemaining, seekRequestPercent );
+			Hypnos.ui.updateTransport ( timeElapsed, -timeRemaining, seekRequestPercent );
 		}
 	}
 }
