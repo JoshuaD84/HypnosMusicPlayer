@@ -1,22 +1,20 @@
-package net.joshuad.hypnos;
+package net.joshuad.hypnos.fxui;
 
-import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.SwingUtilities;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
@@ -29,111 +27,70 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import net.joshuad.hypnos.DraggedTrackContainer.DragSource;
+import net.joshuad.hypnos.CurrentListTrack;
+import net.joshuad.hypnos.Hypnos;
+import net.joshuad.hypnos.Playlist;
+import net.joshuad.hypnos.Track;
+import net.joshuad.hypnos.Utils;
+import net.joshuad.hypnos.audio.PlayerController;
+import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 
-public class AlbumInfoWindow extends Stage {
+public class PlaylistInfoWindow extends Stage {
 	
-	Album album;
+	Playlist playlist;
 	TableView <Track> trackTable;
 	TextField locationField;
-	PlayerController player;
 	FXUI ui;
+	PlayerController player;
 	
-	public AlbumInfoWindow( Stage owner, FXUI ui, PlayerController player ) {
+	public PlaylistInfoWindow( FXUI ui, PlayerController player ) {
 		super();
 		this.ui = ui;
 		this.player = player;
 		this.initModality( Modality.NONE );
-		this.initOwner( owner );
+		this.initOwner( ui.getMainStage() );
 		this.setTitle( "Album Info" );
-		this.setWidth( 700 );
-		Pane root = new Pane();
+		this.setWidth( 500 );
+		Group root = new Group();
 		Scene scene = new Scene( root );
 		VBox primaryPane = new VBox();
 		
-		setupAlbumTable();
-		
-		Label label = new Label ( "Location: " );
-		label.setAlignment( Pos.CENTER_RIGHT );
-		
-		locationField = new TextField();
-		locationField.setEditable( false );
-		locationField.setMaxWidth( Double.MAX_VALUE );
-		
-		HBox.setHgrow( locationField, Priority.ALWAYS );
-		Button browseButton = new Button( "Browse" );
-		browseButton.setOnAction( new EventHandler <ActionEvent>() {
-			// TODO: This is the better way, once openjdk and openjfx supports
-			// it: getHostServices().showDocument(file.toURI().toString());
-			@Override
-			public void handle ( ActionEvent event ) {
-				SwingUtilities.invokeLater( new Runnable() {
-					public void run () {
-						try {
-							if ( album != null ) {
-								Path path = album.getPath();
-								if ( path != null ) {
-									Desktop.getDesktop().open( path.toFile() );
-								}
-							}
-						} catch ( IOException e ) {
-							//TODO: 
-							e.printStackTrace();
-						}
-					}
-				} );
-			}
-		} );
-		
-		HBox locationBox = new HBox();
-		locationBox.getChildren().addAll( label, locationField, browseButton );
-		label.prefHeightProperty().bind( locationBox.heightProperty() );
-		locationBox.prefWidthProperty().bind( primaryPane.widthProperty() );
-	
-		primaryPane.getChildren().addAll( locationBox, trackTable );
-	
+		setupPlaylistTable();
+
+		primaryPane.getChildren().addAll( trackTable );
 		root.getChildren().add( primaryPane );
 		setScene( scene );
 	}
 
-	public void setAlbum ( Album album ) { 
-		this.album = album;
-		trackTable.setItems( FXCollections.observableArrayList ( album.getTracks() ) );
-		locationField.setText( album.getPath().toString() );
+	public void setPlaylist ( Playlist playlist ) { 
+		this.playlist = playlist;
+		if ( playlist != null ) {
+			trackTable.setItems( FXCollections.observableArrayList ( playlist.getTracks() ) );
+			this.setTitle( "Playlist Info: " + playlist.getName() );
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void setupAlbumTable () {
+	private void setupPlaylistTable () {
 		
 		TableColumn<Track, Integer> trackNumberColumn = new TableColumn<Track, Integer>( "#" );
 		TableColumn<Track, String> titleColumn = new TableColumn<Track, String>( "Title" );
 		TableColumn<Track, Integer> lengthColumn = new TableColumn<Track, Integer>( "Length" );
-		TableColumn<Track, String> fileColumn = new TableColumn<Track, String>( "Filename" );
-		TableColumn<Track, String> encodingColumn = new TableColumn<Track, String>( "Encoding" );
 		
 		trackNumberColumn.setMaxWidth( 70000 );
 		titleColumn.setMaxWidth( 500000 );
 		lengthColumn.setMaxWidth( 90000 );
-		fileColumn.setMaxWidth( 500000 );
-		encodingColumn.setMaxWidth( 180000 );
 		
 		trackNumberColumn.setEditable( false );
 		titleColumn.setEditable( false );
 		lengthColumn.setEditable( false );
-		fileColumn.setEditable( false );
-		encodingColumn.setEditable( false );
 		
 		trackNumberColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "trackNumber" ) );
 		titleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
 		lengthColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "LengthDisplay" ) );
-		fileColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Filename" ) );
-		encodingColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "ShortEncodingString" ) );
 		
 		trackNumberColumn.setCellFactory( column -> {
 			return new TableCell <Track, Integer>() {
@@ -143,7 +100,6 @@ public class AlbumInfoWindow extends Stage {
 
 					if ( value == null || value.equals( Track.NO_TRACK_NUMBER ) || empty ) {
 						setText( null );
-						setStyle( "" );
 					} else {
 						setText( value.toString() );
 					}
@@ -151,7 +107,7 @@ public class AlbumInfoWindow extends Stage {
 			};
 		} );
 		trackTable = new TableView<Track> ();
-		trackTable.getColumns().addAll( trackNumberColumn, titleColumn, lengthColumn, fileColumn, encodingColumn );
+		trackTable.getColumns().addAll( trackNumberColumn, titleColumn, lengthColumn );
 		trackTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
 		trackTable.setEditable( true );
 		trackTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
@@ -187,14 +143,14 @@ public class AlbumInfoWindow extends Stage {
 			}
 		};
 
-		Hypnos.library.playlistsSorted.addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
+		Hypnos.library().getPlaylistSorted().addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
 			ui.updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		});
 
 		ui.updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		
 		queueMenuItem.setOnAction( event -> {
-			Hypnos.queue.addAllTracks( trackTable.getSelectionModel().getSelectedItems() );
+			Hypnos.queue().addAllTracks( trackTable.getSelectionModel().getSelectedItems() );
 		});
 		
 			
@@ -204,7 +160,7 @@ public class AlbumInfoWindow extends Stage {
 		});
 		
 		appendMenuItem.setOnAction( event -> {
-			ui.appendTracks ( trackTable.getSelectionModel().getSelectedItems() );
+			ui.currentListTable.getItems().addAll( Utils.convertTrackList( trackTable.getSelectionModel().getSelectedItems() ) );
 		});
 
 		playMenuItem.setOnAction( event -> {
@@ -222,12 +178,12 @@ public class AlbumInfoWindow extends Stage {
 					player.playTrack( row.getItem() );
 				}
 			} );
-
+			
 			row.setOnDragDetected( event -> {
 				if ( !row.isEmpty() ) {
 					ArrayList <Integer> indices = new ArrayList <Integer>( trackTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( trackTable.getSelectionModel().getSelectedItems() );
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, DragSource.ALBUM_INFO );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, DragSource.PLAYLIST_LIST );
 					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
@@ -236,9 +192,111 @@ public class AlbumInfoWindow extends Stage {
 					event.consume();
 				}
 			});
+			
+			row.setOnDragOver( event -> {
+				Dragboard db = event.getDragboard();
+				if ( db.hasContent( FXUI.DRAGGED_TRACKS ) || db.hasFiles() ) {
+					event.acceptTransferModes( TransferMode.COPY );
+					event.consume();
+				}
+			} );
+
+			row.setOnDragDropped( event -> {
+				Dragboard db = event.getDragboard();
+				if ( db.hasContent( FXUI.DRAGGED_TRACKS ) ) {
+
+					DraggedTrackContainer container = (DraggedTrackContainer) db.getContent( FXUI.DRAGGED_TRACKS );
+					int dropIndex = row.isEmpty() ? dropIndex = trackTable.getItems().size() : row.getIndex();
+					
+					switch ( container.getSource() ) {
+						case ALBUM_LIST:
+						case TRACK_LIST:
+						case ALBUM_INFO:
+						case HISTORY: 
+						case CURRENT_LIST:
+						case QUEUE: {
+							List <Track> tracksToCopy = container.getTracks();
+							trackTable.getItems().addAll( dropIndex, tracksToCopy );
+							
+							Playlist newList = new Playlist ( playlist.getName(), new ArrayList <Track> ( trackTable.getItems() ) );
+							Hypnos.library().removePlaylist( playlist );
+							Hypnos.library().addPlaylist( newList );
+							
+							playlist = newList;
+							
+						} break;
+						
+						case PLAYLIST_LIST: {
+							List <Integer> draggedIndices = container.getIndices();
+							ArrayList <Track> tracksToMove = new ArrayList <Track> ( draggedIndices.size() );
+							for ( int index : draggedIndices ) {
+								if ( index >= 0 && index < trackTable.getItems().size() ) {
+									tracksToMove.add( trackTable.getItems().get( index ) );
+								}
+							}
+							
+							for ( int k = draggedIndices.size() - 1; k >= 0; k-- ) {
+								int index = draggedIndices.get( k ).intValue();
+								if ( index >= 0 && index < trackTable.getItems().size() ) {
+									trackTable.getItems().remove ( index );
+								}
+							}
+							
+							dropIndex = Math.min( trackTable.getItems().size(), row.getIndex() );
+							
+							trackTable.getItems().addAll( dropIndex, tracksToMove );
+							
+							trackTable.getSelectionModel().clearSelection();
+							for ( int k = 0; k < draggedIndices.size(); k++ ) {
+								trackTable.getSelectionModel().select( dropIndex + k );
+							}
+
+							playlist.setTracks( new ArrayList <Track> ( trackTable.getItems() ) );
+						} break;
+					}
+
+					event.setDropCompleted( true );
+					event.consume();
+
+				} else if ( db.hasFiles() ) {
+					ArrayList <CurrentListTrack> tracksToAdd = new ArrayList <CurrentListTrack>();
+					
+					for ( File file : db.getFiles() ) {
+						Path droppedPath = Paths.get( file.getAbsolutePath() );
+						if ( Utils.isMusicFile( droppedPath ) ) {
+							try {
+								tracksToAdd.add( new CurrentListTrack( droppedPath ) );
+							} catch ( IOException e ) {
+								e.printStackTrace();
+							}
+						
+						} else if ( Files.isDirectory( droppedPath ) ) {
+							tracksToAdd.addAll( Utils.convertTrackList( Utils.getAllTracksInDirectory( droppedPath ) ) );
+						
+						} else if ( Utils.isPlaylistFile ( droppedPath ) ) {
+							Playlist playlist = Playlist.loadPlaylist( droppedPath );
+							if ( playlist != null ) {
+								tracksToAdd.addAll( Utils.convertTrackList( playlist.getTracks() ) );
+							}
+						}
+					}
+					
+					if ( !tracksToAdd.isEmpty() ) {
+						int dropIndex = row.isEmpty() ? dropIndex = trackTable.getItems().size() : row.getIndex();
+						trackTable.getItems().addAll( Math.min( dropIndex, trackTable.getItems().size() ), tracksToAdd );
+					}
+
+					event.setDropCompleted( true );
+					event.consume();
+				}
+			} );
+		
 
 			return row;
 		});
 	}
 }
+
+
+
 

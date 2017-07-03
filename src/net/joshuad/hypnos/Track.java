@@ -255,11 +255,11 @@ public class Track implements Serializable {
 					
 				} else if ( rawText.matches("^[0-9]+/.*") ) {
 					trackNumber = Integer.parseInt( rawText.split("/")[0] );
-					LOGGER.log( Level.INFO, "Bad, but fixable, track numbering: " + rawText + " - " + trackFile.toString() );
+					//TODO: LOGGER.log( Level.INFO, "Bad, but fixable, track numbering: " + rawText + " - " + trackFile.toString() );
 				
 				} else if ( rawNoWhiteSpace.matches("^[0-9]+/.*") ) {
 					trackNumber = Integer.parseInt( rawNoWhiteSpace.split("/")[0] );
-					LOGGER.log( Level.INFO, "Bad, but fixable, track numbering: " + rawText + " - " + trackFile.toString() );
+					//TODO: LOGGER.log( Level.INFO, "Bad, but fixable, track numbering: " + rawText + " - " + trackFile.toString() );
 					
 				} else {
 					throw new NumberFormatException();
@@ -267,7 +267,7 @@ public class Track implements Serializable {
 				
 			} catch ( NumberFormatException e ) {
 				if ( ! rawNoWhiteSpace.equals( "" ) ) {
-					LOGGER.log( Level.INFO, "Invalid track number: " + rawText  + " - " + trackFile.toString() );
+					//TODO: LOGGER.log( Level.INFO, "Invalid track number: " + rawText  + " - " + trackFile.toString() );
 				}
 			}
 		}
@@ -284,7 +284,7 @@ public class Track implements Serializable {
 				discCount = Integer.valueOf( tag.getFirst ( FieldKey.DISC_TOTAL ) );
 			} catch ( NumberFormatException e ) {
 				if ( ! tag.getFirst ( FieldKey.DISC_TOTAL ).equals( "" ) ) {
-					LOGGER.log( Level.INFO, "Invalid disc count: " + tag.getFirst ( FieldKey.DISC_TOTAL )  + " - " + trackFile.toString() );
+					//TODO: LOGGER.log( Level.INFO, "Invalid disc count: " + tag.getFirst ( FieldKey.DISC_TOTAL )  + " - " + trackFile.toString() );
 				}
 			} catch ( UnsupportedOperationException e ) {
 				//No problem, it doesn't exist for this file format
@@ -310,7 +310,7 @@ public class Track implements Serializable {
 						discCount = Integer.parseInt( rawText.split("/")[1] );
 					}
 						
-					LOGGER.log( Level.INFO, "Bad, but fixable, disc numbering: " + rawText + " - " + trackFile.toString() );
+					//TODO: LOGGER.log( Level.INFO, "Bad, but fixable, disc numbering: " + rawText + " - " + trackFile.toString() );
 				
 				} else if ( rawNoWhiteSpace.matches("^[0-9]+/.*") ) {
 					//if matches 23/<whatever>
@@ -320,7 +320,7 @@ public class Track implements Serializable {
 						discCount = Integer.parseInt( rawNoWhiteSpace.split("/")[1] );
 					}
 
-					LOGGER.log( Level.INFO, "Bad, but fixable, disc numbering: " + rawText + " - " + trackFile.toString() );
+					//TODO: LOGGER.log( Level.INFO, "Bad, but fixable, disc numbering: " + rawText + " - " + trackFile.toString() );
 					
 				} else {
 					throw new NumberFormatException();
@@ -328,7 +328,7 @@ public class Track implements Serializable {
 				
 			} catch ( NumberFormatException e ) {
 				if ( ! rawNoWhiteSpace.equals( "" ) ) {
-					LOGGER.log( Level.INFO, "Invalid disc number: " + rawText  + " - " + trackFile.toString() );
+					//TODO: LOGGER.log( Level.INFO, "Invalid disc number: " + rawText  + " - " + trackFile.toString() );
 				}
 			} catch ( UnsupportedOperationException e ) {
 				//No problem, it doesn't exist for this file format

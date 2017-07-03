@@ -61,32 +61,32 @@ public class CLIParser {
 			}
 
 			if ( line.hasOption( PLAY ) ) {
-				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SingleInstanceController.PLAY ) );
+				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SocketCommand.PLAY ) );
 			}
 			
 			if ( line.hasOption( NEXT ) ) {
-				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SingleInstanceController.NEXT ) );
+				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SocketCommand.NEXT ) );
 			}
 			
 			if ( line.hasOption( PREVIOUS ) ) {
-				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SingleInstanceController.PREVIOUS ) );
+				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SocketCommand.PREVIOUS ) );
 			}
 			
 			if ( line.hasOption( TOGGLE_PAUSE ) ) {
-				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SingleInstanceController.TOGGLE_PAUSE ) );
+				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SocketCommand.TOGGLE_PAUSE ) );
 			}
 
 			
 			if ( line.hasOption( PAUSE ) ) {
-				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SingleInstanceController.PAUSE ) );
+				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SocketCommand.PAUSE ) );
 			}
 			
 			if ( line.hasOption( STOP ) ) {
-				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SingleInstanceController.STOP ) );
+				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SocketCommand.STOP ) );
 			}
 			
 			if ( line.hasOption( TOGGLE_MINIMIZED ) ) {
-				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SingleInstanceController.TOGGLE_MINIMIZED ) );
+				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SocketCommand.TOGGLE_MINIMIZED ) );
 			}
 			
 			ArrayList<File> filesToLoad = new ArrayList<File> ();

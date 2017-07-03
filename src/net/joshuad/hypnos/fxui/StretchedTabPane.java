@@ -1,4 +1,4 @@
-package net.joshuad.hypnos;
+package net.joshuad.hypnos.fxui;
 
 
 import javafx.beans.value.ChangeListener;

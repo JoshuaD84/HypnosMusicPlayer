@@ -19,8 +19,17 @@ New Features
 
 	When you click on an album on the list, show it in the art pane for a little bit? 
 	
+	Control volume via commandline
+	
+	Tag Window, next and previous button?  
+	
 Bug Fixes / Incremental Improvements	
+	use observable values for all of the track and album stuff, so we don't have to do refreshes
+	Persisted current track doesn't have the title text or the slider thumb
+
 	Press next when no track is playing.
+	
+	Make it so filtering long lists isn't laggy. Some way of delaying processing, skipping some letters? Do we need to add the predicate everytime like we are?
 	
 	Adding to a playlist changes its name wrongly
 	
@@ -45,10 +54,13 @@ Bug Fixes / Incremental Improvements
 	
 	Make sure the text labels for time left and time elapsed are padded to NN:NN:NN, to avoid stuff moving. 
 	
+	Queue button isn't turning green
+	
 Refactor / organize my code. 
  	Have a single thread handle playing all tracks. 
  		Have it be the same thread that accepts requests rather than spawning new threads off UI actions. 
- 	Get rid of static library
+ 	There are a few windows being built in FXUI that should have their own classes
+ 	
 
 Decoders
 	Mp4
@@ -99,6 +111,9 @@ Decoders
 		BufferedInputStream
 
 OS Specific		
+	All:
+		https://stackoverflow.com/questions/7506329/embed-java-into-a-c-application
+
 	Windows
 		Open-with shell integration
 		Installer

@@ -1,4 +1,4 @@
-package net.joshuad.hypnos;
+package net.joshuad.hypnos.fxui;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -34,6 +34,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import net.joshuad.hypnos.Album;
+import net.joshuad.hypnos.MultiFileTagPair;
+import net.joshuad.hypnos.Track;
 
 
 @SuppressWarnings("rawtypes")
@@ -58,11 +61,14 @@ public class TagWindow extends Stage {
 	TableColumn tagColumn;
 	TableColumn valueColumn;
 	
+	FXUI ui;
+	
 	@SuppressWarnings({ "unchecked" })
-	public TagWindow( Stage owner ) {
+	public TagWindow( FXUI ui ) {
 		super();
+		this.ui = ui;
 		this.initModality( Modality.NONE );
-		this.initOwner( owner );
+		this.initOwner( ui.getMainStage() );
 		this.setTitle( "Tag Editor" );
 		this.setWidth( 600 );
 		//this.setHeight ( 400 );
@@ -174,7 +180,7 @@ public class TagWindow extends Stage {
 							} catch ( IOException e ) {
 								//TODO: I don't think we need to do anything here?
 							}
-							Hypnos.ui.currentListTable.refresh();
+							ui.refreshCurrentList();
 						} catch ( CannotWriteException e ) {
 							e.printStackTrace(); //TODO: 
 						}
@@ -191,7 +197,7 @@ public class TagWindow extends Stage {
 				if ( albums != null ) {
 					for ( Album album : albums ) {
 						album.refreshTagData();
-						Hypnos.ui.albumTable.refresh();
+						ui.refreshAlbumTable();
 					}
 				}
 			}

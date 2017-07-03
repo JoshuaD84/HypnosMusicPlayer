@@ -1,4 +1,4 @@
-package net.joshuad.hypnos.audio;
+package net.joshuad.hypnos.audio.decoders;
 
 import java.io.BufferedInputStream;
 import java.io.File;

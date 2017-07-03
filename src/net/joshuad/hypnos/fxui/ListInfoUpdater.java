@@ -1,10 +1,12 @@
-package net.joshuad.hypnos;
+package net.joshuad.hypnos.fxui;
 
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javafx.scene.control.Label;
+import net.joshuad.hypnos.Album;
+import net.joshuad.hypnos.Playlist;
 
 public class ListInfoUpdater {
 	

@@ -26,6 +26,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import net.joshuad.hypnos.fxui.FXUI;
 
 public class Library {
 
@@ -87,7 +88,7 @@ public class Library {
 		}
 	}
 
-	public void startLoader() {
+	public void startLoader( Persister persister ) {
 		
 		
 		loaderThread = new Thread ( new Runnable() {
@@ -123,16 +124,16 @@ public class Library {
 
 					if ( System.currentTimeMillis() - lastSaveTime > 10000 ) {
 						if ( albumTrackDataChangedSinceLastSave ) {
-							Hypnos.persister.saveAlbumsAndTracks();
+							persister.saveAlbumsAndTracks();
 							albumTrackDataChangedSinceLastSave = false;
 						}
 						
-						Hypnos.persister.saveSources();
-						Hypnos.persister.saveCurrentList( Hypnos.player );
-						Hypnos.persister.saveQueue();
-						Hypnos.persister.saveHistory( Hypnos.player );
-						Hypnos.persister.savePlaylists();
-						Hypnos.persister.saveSettings( Hypnos.player, Hypnos.ui );
+						persister.saveSources();
+						persister.saveCurrentList();
+						persister.saveQueue();
+						persister.saveHistory();
+						persister.savePlaylists();
+						persister.saveSettings();
 						
 						lastSaveTime = System.currentTimeMillis();
 					}
@@ -517,6 +518,46 @@ public class Library {
 		
 		return true;
 	}
+
+	public SortedList <Playlist> getPlaylistSorted () {
+		return playlistsSorted;
+	}
+
+	public ObservableList <Playlist> getPlaylists () {
+		return FXCollections.unmodifiableObservableList( playlists );
+	}
+
+	public ObservableList <Path> getMusicSourcePaths () {
+		return FXCollections.unmodifiableObservableList( musicSourcePaths );
+	}
+
+	public FilteredList <Playlist> getPlaylistsFiltered () {
+		return playlistsFiltered;
+	}
+
+	public FilteredList <Track> getTracksFiltered () {
+		return tracksFiltered;
+	}
+	
+	public FilteredList <Album> getAlbumsFiltered() {
+		return albumsFiltered;
+	}
+	
+	public SortedList <Album> getAlbumsSorted() {
+		return albumsSorted;
+	}
+	
+	public ObservableList <Album> getAlbums () {
+		return FXCollections.unmodifiableObservableList( albums );
+	}
+	
+	public ObservableList <Track> getTracks () {
+		return FXCollections.unmodifiableObservableList( tracks );
+	}
+
+	public SortedList <Track> getTracksSorted () {
+		return tracksSorted;
+	}
 }
 
 class ModifiedFileUpdaterThread extends Thread {
@@ -542,7 +583,7 @@ class ModifiedFileUpdaterThread extends Thread {
 			} else {
 				Vector <Path> copyUpdateItems = new Vector<Path> ( updateItems );
 				for ( Path path : copyUpdateItems ) {
-					Hypnos.library.requestUpdate ( path );
+					Hypnos.library().requestUpdate ( path );
 					updateItems.remove( path );
 				}
 			}

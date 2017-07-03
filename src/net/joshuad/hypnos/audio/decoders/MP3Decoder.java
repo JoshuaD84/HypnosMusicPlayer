@@ -1,4 +1,4 @@
-package net.joshuad.hypnos.audio;
+package net.joshuad.hypnos.audio.decoders;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -18,135 +18,30 @@ import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.AudioHeader;
 import org.jaudiotagger.audio.mp3.MP3AudioHeader;
 
-import javafx.scene.control.Slider;
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.BitstreamException;
 import javazoom.jl.decoder.Decoder;
 import javazoom.jl.decoder.Header;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.decoder.SampleBuffer;
-import net.joshuad.hypnos.FXUI;
-import net.joshuad.hypnos.PlayerController;
 import net.joshuad.hypnos.Track;
+import net.joshuad.hypnos.fxui.FXUI;
 
-public class MP3Player extends AbstractPlayer implements Runnable {
+public class MP3Decoder extends AbstractDecoder {
 
-	private static final Logger LOGGER = Logger.getLogger( MP3Player.class.getName() );
+	private static final Logger LOGGER = Logger.getLogger( MP3Decoder.class.getName() );
 	
 	private Bitstream encodedInput;
 	private Decoder decoder;
-
-	public MP3Player ( Track track, PlayerController player, Slider trackPosition ) {
-		this ( track, player, trackPosition, false );
-	}
 	
-	public MP3Player ( Track track, PlayerController player, Slider trackPosition, boolean startPaused ) {
+	Track track;
+
+	public MP3Decoder ( Track track ) {
 		this.track = track;
-		this.player = player;
-		this.trackPosition = trackPosition;
-		this.pauseRequested = startPaused;
-
-		Thread t = new Thread ( this );
-		t.setDaemon( true );
-		t.start();
+		initialize();
 	}
 	
-	public void run() {
-
-		boolean streamsOpen = openStreamsAtRequestedOffset();
-						
-		if ( !streamsOpen ) {
-			closeAllResources();
-			player.songFinishedPlaying( false );
-			return;
-		}
-
-	    long bytePosition = 0;
-	    
-		while ( true ) {
-			if ( stopRequested ) {
-				closeAllResources();
-				player.songFinishedPlaying( true );
-				stopRequested = false;
-				return;
-			}				
-				
-			if ( pauseRequested ) {
-				pauseRequested = false;
-				paused = true;
-			}
-			
-			if ( playRequested ) {
-				playRequested = false;
-				paused = false;
-			}
-			
-			if ( seekRequestPercent != NO_SEEK_REQUESTED ) {
-				
-				closeAllResources();
-				
-				streamsOpen = openStreamsAtRequestedOffset();
-				
-				if ( !streamsOpen ) {
-					closeAllResources();
-					player.songFinishedPlaying( false );
-					return;
-				}
-				
-				seekRequestPercent = NO_SEEK_REQUESTED;
-				updateTransport();
-			}
-			
-			if ( !paused ) {
-				try {
-					Header header = encodedInput.readFrame();
-					
-					if ( header == null ) {
-						closeAllResources();
-						player.songFinishedPlaying( false );
-						return; 
-					}
-	
-					SampleBuffer output = (SampleBuffer) decoder.decodeFrame( header, encodedInput );
-					
-					byte[] writeMe = convertToBytes ( output.getBuffer() );
-					
-					audioOutput.write( writeMe, 0, writeMe.length );
-					
-					
-					encodedInput.closeFrame();
-					
-				} catch ( JavaLayerException e ) {
-					e.printStackTrace();
-				}
-			} else {
-				try {
-					Thread.sleep ( 5 );
-				} catch (InterruptedException e) {
-					LOGGER.log ( Level.FINER, "Sleep interrupted during paused" );
-				}
-			}
-			updateTransport();
-		}
-	}
-	
-	private byte[] convertToBytes ( short[] samples ) {
-		
-		byte[] b = new byte[ samples.length*2];
-		int idx = 0;
-		short s;
-		int len = samples.length;
-		int offs = 0;
-		while ( len-- > 0)
-		{
-			s = samples[offs++];
-			b[idx++] = (byte)s;
-			b[idx++] = (byte)(s>>>8);
-		}
-		return b;
-	}
-	
-	public boolean openStreamsAtRequestedOffset () {
+	public boolean openStreamsAt ( double seekPercent ) {
 		FileInputStream fis;
 		try {
 			fis = new FileInputStream( track.getPath().toFile() );
@@ -158,8 +53,8 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 		}
         BufferedInputStream bis = new BufferedInputStream(fis);
 		
-		if ( seekRequestPercent != NO_SEEK_REQUESTED ) {
-			int seekPositionMS = (int) ( track.getLengthS() * 1000 * seekRequestPercent );
+		if ( seekPercent != 0 ) {
+			int seekPositionMS = (int) ( track.getLengthS() * 1000 * seekPercent );
 			long seekPositionByte = getBytePosition ( track.getPath().toFile(), seekPositionMS );
 			
 			try {
@@ -233,23 +128,59 @@ public class MP3Player extends AbstractPlayer implements Runnable {
 		}
 	}
 	
-	private void closeAllResources() {
-		try {
+	public void closeAllResources() {
+		if ( audioOutput != null ) {
 			audioOutput.flush();
 			audioOutput.close();
+		}
+		
+		try {
 			encodedInput.close();
 		} catch ( BitstreamException e) {
 			LOGGER.log ( Level.INFO, "Unable to close mp3 file: " + track.getPath() );
 		}
 	}
 	
-	protected boolean decodeFrame () throws JavaLayerException {
+	@Override
+	public boolean playSingleFrame () {
 		try {
-
+			Header header = encodedInput.readFrame();
 			
-		} catch ( RuntimeException ex ) {
-			throw new JavaLayerException( "Exception decoding audio frame", ex );
+			if ( header == null ) {
+				closeAllResources();
+				return true; 
+			}
+
+			SampleBuffer output = (SampleBuffer) decoder.decodeFrame( header, encodedInput );
+			
+			byte[] writeMe = convertToBytes ( output.getBuffer() );
+			
+			audioOutput.write( writeMe, 0, writeMe.length );
+			
+			encodedInput.closeFrame();
+			
+		} catch ( JavaLayerException e ) {
+			//TODO: 
+			e.printStackTrace();
 		}
-		return true;
+		
+		return false;
+	}
+	
+	//TODO: maybe just inline this and get rid of the function; it's only called in one place. 
+	private byte[] convertToBytes ( short[] samples ) {
+		
+		byte[] b = new byte[ samples.length*2];
+		int idx = 0;
+		short s;
+		int len = samples.length;
+		int offs = 0;
+		while ( len-- > 0)
+		{
+			s = samples[offs++];
+			b[idx++] = (byte)s;
+			b[idx++] = (byte)(s>>>8);
+		}
+		return b;
 	}
 }

@@ -1,4 +1,4 @@
-package net.joshuad.hypnos;
+package net.joshuad.hypnos.audio;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -6,45 +6,49 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
+import java.util.Vector;
+import java.util.logging.Logger;
 
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import net.joshuad.hypnos.audio.AbstractPlayer;
+import net.joshuad.hypnos.Album;
+import net.joshuad.hypnos.CurrentListTrack;
+import net.joshuad.hypnos.Hypnos;
+import net.joshuad.hypnos.Persister;
+import net.joshuad.hypnos.Playlist;
+import net.joshuad.hypnos.Track;
+import net.joshuad.hypnos.Utils;
+import net.joshuad.hypnos.Persister.Setting;
+
+/* TODO: Consider, is this class doing too much? 
+ * 1. Sends requests to AudioPlayer
+ * 2. manages History
+ * 3. manages current list
+ */
 
 public class PlayerController {
+	
+	private static final Logger LOGGER = Logger.getLogger( PlayerController.class.getName() );
 
 	public enum ShuffleMode {
 		SEQUENTIAL ( "⇉" ), SHUFFLE ( "🔀" );
-
 		String symbol;
-
-		ShuffleMode ( String symbol ) {
-			this.symbol = symbol;
-		}
-
-		public String getSymbol () {
-			return symbol;
-		}
+		ShuffleMode ( String symbol ) { this.symbol = symbol; }
+		public String getSymbol () { return symbol; }
 	}
 
 	public enum RepeatMode {
 		PLAY_ONCE ( "⇥" ), REPEAT ( "🔁" ), REPEAT_ONE_TRACK ( "🔂" );
-
 		String symbol;
-
-		RepeatMode ( String symbol ) {
-			this.symbol = symbol;
-		}
-
-		public String getSymbol () {
-			return symbol;
-		}
+		RepeatMode ( String symbol ) { this.symbol = symbol; }
+		public String getSymbol () { return symbol; }
 	}
-
+	
+	private Vector<PlayerListener> listeners = new Vector<PlayerListener>();
 
 	private ShuffleMode shuffleMode = ShuffleMode.SEQUENTIAL;
 	private RepeatMode repeatMode = RepeatMode.PLAY_ONCE;
@@ -54,30 +58,28 @@ public class PlayerController {
 
 	private final ObservableList <CurrentListTrack> currentList = FXCollections.observableArrayList(); 
 
-	private final ArrayList <Track> previousNextStack = new ArrayList <Track>(MAX_PREVIOUS_NEXT_STACK_SIZE);
+	private final ArrayList <Track> previousNextStack = new ArrayList <Track>( MAX_PREVIOUS_NEXT_STACK_SIZE );
 	private final ObservableList <Track> history = FXCollections.observableArrayList( new ArrayList <Track>(MAX_HISTORY_SIZE) );
 
-	private AbstractPlayer currentPlayer;
+	private AudioPlayer currentPlayer;
 	
 	private Random randomGenerator = new Random();
 
 	static Playlist currentPlaylist = null;
 	
 	private int playOnceShuffleTracksPlayedCounter = 1;
-
-	// This is called by the various players
-	public void songFinishedPlaying ( boolean userRequested ) {
-		Platform.runLater( new Runnable() {
-			public void run () {
-				if ( !userRequested ) {
-					if ( repeatMode == RepeatMode.REPEAT_ONE_TRACK && currentPlayer != null ) {
-						playTrack ( currentPlayer.getTrack() );
-					} else {
-						nextTrack();
-					}
-				}
-			}
-		} );
+	
+	public PlayerController () {
+		currentPlayer = new AudioPlayer ( this );
+	}
+	
+	
+	public void unpause() {
+		currentPlayer.requestUnpause();
+	}
+	
+	public void pause() {
+		currentPlayer.requestPause();
 	}
 	
 	public void previousTrack() {
@@ -91,7 +93,7 @@ public class PlayerController {
 				Track candidate = previousNextStack.remove( 0 );
 				if ( playOnceShuffleTracksPlayedCounter > 0 ) playOnceShuffleTracksPlayedCounter--;
 				
-				if ( currentPlayer != null && candidate.equals( currentPlayer.getTrack() ) ) {
+				if ( candidate.equals( currentPlayer.getTrack() ) ) {
 					if ( !previousNextStack.isEmpty() ) {
 						candidate = previousNextStack.remove( 0 );
 						if ( playOnceShuffleTracksPlayedCounter > 0 ) playOnceShuffleTracksPlayedCounter--;
@@ -146,41 +148,14 @@ public class PlayerController {
 			pause();
 
 		} else {
-			play();
+			unpause();
 		}
 	}
 	
-	
-	public void play() {
-		if ( currentPlayer != null && currentPlayer.isPaused() ) {
-			currentPlayer.play();
-			
-		} else if ( Hypnos.queue.hasNext() ) {
-			playTrack ( Hypnos.queue.getNextTrack() );
-		
-		} else {
-			Track selectedTrack = Hypnos.ui.getSelectedTrack();
-
-			if ( selectedTrack != null ) {
-				playTrack( selectedTrack );
-
-			} else if ( !currentList.isEmpty() ) {
-				selectedTrack = currentList.get( 0 );
-				playTrack( selectedTrack );
-			}
-		}
-	}
-	
-	public void pause() {
-		if ( currentPlayer != null ) {
-			currentPlayer.pause();
-		}
-	}
-		
 	public void nextTrack () {
 		//TODO: Handle what we do when isStopped()
-		if ( Hypnos.queue.hasNext() ) {
-			playTrack( Hypnos.queue.getNextTrack() );
+		if ( Hypnos.queue().hasNext() ) {
+			playTrack( Hypnos.queue().getNextTrack() );
 			
 		} else if ( shuffleMode == ShuffleMode.SEQUENTIAL ) {
 			ListIterator <CurrentListTrack> iterator = currentList.listIterator();
@@ -269,10 +244,10 @@ public class PlayerController {
 	                                                                 
 	public void playTrack ( Track track, boolean startPaused, boolean addToPreviousNextStack ) {
 		if ( currentPlayer != null ) {
-			currentPlayer.stop();
+			stopTrack();
 		}
 		
-		currentPlayer = AbstractPlayer.getPlayer( track, this, Hypnos.ui.trackPositionSlider, startPaused );
+		currentPlayer.requestPlayTrack( track, startPaused );
 		
 		if ( currentPlayer == null ) return;
 		
@@ -299,9 +274,9 @@ public class PlayerController {
 			
 			history.add( 0, track );
 		}
+		
+		notifyStarted ( track );
 	}
-	
-	
 
 	public void playAlbum ( Album album ) {
 		currentPlaylist = null;
@@ -408,8 +383,9 @@ public class PlayerController {
 		if ( currentPlayer != null ) {
 			Track track = currentPlayer.getTrack();
 			if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( false );
-			currentPlayer.stop();
-			currentPlayer = null;
+			currentPlayer.requestStop();
+
+			notifyStopped( currentPlayer.getTrack(), false ); //TODO: this shouldn't auto-be false.
 		}
 		
 		playOnceShuffleTracksPlayedCounter = 0;
@@ -417,7 +393,7 @@ public class PlayerController {
 	
 	public int getCurrentTrackNumber() {
 		for ( int k = 0 ; k < currentList.size(); k++ ) {
-			if ( currentList.get( k ).isCurrentTrack ) {
+			if ( currentList.get( k ).getIsCurrentTrack() ) {
 				return k;
 			}
 		}
@@ -463,7 +439,7 @@ public class PlayerController {
 		return history;
 	}
 
-	public void addAll ( int index, ArrayList <CurrentListTrack> tracks ) { //TODO: rename addTracks
+	public void addTracks ( int index, ArrayList <CurrentListTrack> tracks ) { //TODO: rename addTracks
 		int boundedIndex = Math.min( index, currentList.size() );
 		currentList.addAll( boundedIndex, tracks );
 	}
@@ -496,20 +472,15 @@ public class PlayerController {
 	}
 
 	public void seekRequested ( double percent ) {
-		if ( currentPlayer != null ) {
-			currentPlayer.seekPercent( percent );
-		}
+		currentPlayer.requestSeekPercent( percent );
 	}
 
 	public void setVolumePercent ( double percent ) {
-		//TODO: Does this persist to the next track? Pretty sure not. Make sure it does
-		if ( currentPlayer != null ) {
-			currentPlayer.setVolumePercent( percent );
-		}
+		currentPlayer.requestVolumePercent( percent );
 	}
 	
 	public boolean isPaused() {
-		if ( currentPlayer == null ) return false;
+		if ( currentPlayer == null ) return true;
 		else return currentPlayer.isPaused();
 	}
 
@@ -526,12 +497,126 @@ public class PlayerController {
 	}
 
 	public void seekMS ( long ms ) {	
-		if ( currentPlayer != null ) {
-			currentPlayer.seekMS( ms );
-		}
+		//TODO: 
 	}
 
 	public void addToHistory ( ArrayList <Track> tracks ) {
 		history.addAll ( tracks );
 	}
+	
+	public long getPositionMS() {
+		return currentPlayer.getPositionMS();
+	}
+	
+	public EnumMap <Persister.Setting, ? extends Object> getSettings () {
+		EnumMap <Persister.Setting, Object> retMe = new EnumMap <Persister.Setting, Object> ( Persister.Setting.class );
+		
+		if ( !currentPlayer.isStopped() ) {
+			retMe.put ( Setting.TRACK, getCurrentTrack().getPath().toString() );
+			retMe.put ( Setting.TRACK_POSITION, getPositionMS() );
+			retMe.put ( Setting.TRACK_NUMBER, getCurrentTrackNumber() );
+		}
+
+		retMe.put ( Setting.SHUFFLE, getShuffleMode().toString() );
+		retMe.put ( Setting.REPEAT, getRepeatMode() );
+		
+		return retMe;
+	}
+
+	public void addListener ( PlayerListener listener ) {
+		if ( listener != null ) {
+			listeners.add( listener );
+		} else {
+			LOGGER.info( "Null player listener was attempted to be added, ignoring." );
+		}
+	}
+	
+	public void notifyPositionChanged ( int positionMS, int lengthMS ) {
+		for ( PlayerListener listener : listeners ) {
+			listener.playerPositionChanged( positionMS, lengthMS );
+		}
+	}
+	
+	public void notifyStopped ( Track track, boolean userRequested ) {
+		for ( PlayerListener listener : listeners ) {
+			listener.playerStopped( track, userRequested );
+		}
+	}
+	public void notifyStarted ( Track track ) {
+		for ( PlayerListener listener : listeners ) {
+			listener.playerStarted( track );
+		}
+	}
+	
+	public void notifyPaused () {
+		for ( PlayerListener listener : listeners ) {
+			listener.playerPaused();
+		}
+	}
+	
+	public void notifyUnpaused () {
+		for ( PlayerListener listener : listeners ) {
+			listener.playerUnpaused( );
+		}
+	}
+	
+	public void notifyVolumeChanged ( double newVolumePercent ) {
+		for ( PlayerListener listener : listeners ) {
+			listener.playerVolumeChanged( newVolumePercent );
+		}
+	}
+	
+	public void notifyShuffleModeChanged ( ShuffleMode newMode ) {
+		for ( PlayerListener listener : listeners ) {
+			listener.playerShuffleModeChanged( newMode );
+		}
+	}
+	
+	public void notifyRepeatModeChanged ( RepeatMode newMode ) {
+		for ( PlayerListener listener : listeners ) {
+			listener.playerRepeatModeChanged( newMode );
+		}
+	}
+
+	public void playerStopped ( boolean userRequested ) {
+		if ( !userRequested ) {
+			if ( repeatMode == RepeatMode.REPEAT_ONE_TRACK && currentPlayer != null ) {
+				playTrack ( currentPlayer.getTrack() );
+			} else {
+				nextTrack();
+			}
+		}
+	}
+
+
+	public void playerPaused () {
+		// TODO Auto-generated method stub
+	}
+
+	public void playerUnpaused () {
+		// TODO Auto-generated method stub
+	}
+
+	public void playerSeekedToPercent ( double seekPercentRequested ) {
+		// TODO Auto-generated method stub
+	}
+
+	public void volumeChanged ( double volumePercentRequested ) {
+		// TODO Auto-generated method stub
+	}
+
+	public void playerStarted () {
+		// TODO Auto-generated method stub
+	}
+
+
+	public void playTrackPositionChanged ( int positionMS, int lengthMS ) {
+		notifyPositionChanged ( positionMS, lengthMS );
+	}
 }
+
+
+
+
+
+
