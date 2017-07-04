@@ -32,10 +32,10 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.Hypnos;
+import net.joshuad.hypnos.SoundSystem;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
-import net.joshuad.hypnos.audio.PlayerController;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 
 public class PlaylistInfoWindow extends Stage {
@@ -44,9 +44,9 @@ public class PlaylistInfoWindow extends Stage {
 	TableView <Track> trackTable;
 	TextField locationField;
 	FXUI ui;
-	PlayerController player;
+	SoundSystem player;
 	
-	public PlaylistInfoWindow( FXUI ui, PlayerController player ) {
+	public PlaylistInfoWindow( FXUI ui, SoundSystem player ) {
 		super();
 		this.ui = ui;
 		this.player = player;
@@ -150,7 +150,7 @@ public class PlaylistInfoWindow extends Stage {
 		ui.updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		
 		queueMenuItem.setOnAction( event -> {
-			Hypnos.queue().addAllTracks( trackTable.getSelectionModel().getSelectedItems() );
+			player.getQueue().addAllTracks( trackTable.getSelectionModel().getSelectedItems() );
 		});
 		
 			

@@ -105,7 +105,7 @@ public class Queue {
 	}
 	
 	public synchronized ObservableList<Track> getData() {
-		return FXCollections.unmodifiableObservableList( queue );
+		return queue;
 	}
 
 }

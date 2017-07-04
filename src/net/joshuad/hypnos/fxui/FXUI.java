@@ -11,7 +11,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Optional;
@@ -26,8 +25,6 @@ import org.jaudiotagger.tag.FieldKey;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
@@ -53,7 +50,6 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -69,19 +65,15 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Callback;
@@ -90,14 +82,14 @@ import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Persister;
+import net.joshuad.hypnos.SoundSystem;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.SocketCommand;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.Persister.Setting;
-import net.joshuad.hypnos.audio.PlayerController;
-import net.joshuad.hypnos.audio.PlayerController.RepeatMode;
-import net.joshuad.hypnos.audio.PlayerController.ShuffleMode;
+import net.joshuad.hypnos.SoundSystem.RepeatMode;
+import net.joshuad.hypnos.SoundSystem.ShuffleMode;
 import net.joshuad.hypnos.audio.PlayerListener;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 
@@ -114,9 +106,6 @@ public class FXUI implements PlayerListener {
 	TableView <Playlist> playlistTable;
 	TableView <Track> trackTable;
 	TableView <CurrentListTrack> currentListTable;
-	TableView <Path> musicSourceTable;
-	TableView <Track> queueTable;
-	TableView <Track> historyTable;
 
 	BorderPane albumImage;
 	BorderPane artistImage;
@@ -159,12 +148,13 @@ public class FXUI implements PlayerListener {
 
 	Scene scene;
 	Stage mainStage;
-	Stage libraryWindow;
-	Stage queueWindow;
-	Stage historyWindow;
+	
+	QueueWindow queueWindow;
 	TagWindow tagWindow;
 	PlaylistInfoWindow playlistInfoWindow;
 	AlbumInfoWindow albumInfoWindow;
+	LibraryLocationWindow libraryLocationWindow;
+	HistoryWindow historyWindow;
 
 	Button togglePlayButton;
 	Button toggleRepeatButton;
@@ -176,22 +166,22 @@ public class FXUI implements PlayerListener {
 	CheckBox trackListCheckBox;
 	TextField trackFilterBox;
 	
-	PlayerController player;
+	SoundSystem player;
 	
 	
-	public FXUI ( Stage stage, PlayerController player ) {
+	public FXUI ( Stage stage, SoundSystem player ) {
 		mainStage = stage;
 		this.player = player;
 		
 		scene = new Scene( new Group(), 1024, 768 );
 		
-		File stylesheet = new File ( Hypnos.ROOT + File.separator + "resources" + File.separator + "style.css" );
+		File stylesheet = new File ( Hypnos.getRootDirectory() + File.separator + "resources" + File.separator + "style.css" );
 		scene.getStylesheets().add( "file:///" + stylesheet.getAbsolutePath().replace( "\\", "/" ) ); //TODO: DD
 		
 		//TODO: If we launch the jar from a different directory, it doesn't shwo the icon
 		//we need to get the directory of the jar and load the image from there, not just from the current directory
 		try {
-			mainStage.getIcons().add( new Image( new FileInputStream ( Hypnos.ROOT.resolve( "resources" + File.separator + "icon.png" ).toFile() ) ) );
+			mainStage.getIcons().add( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) ) );
 		} catch ( FileNotFoundException e ) {
 			System.out.println ( "Unable to load program icon: resources/icon.png" );
 		}
@@ -200,8 +190,6 @@ public class FXUI implements PlayerListener {
 		setupTrackListCheckBox();
 		setupAlbumFilterPane();
 		setupTrackFilterPane();
-		setupQueueWindow();
-		setupHistoryWindow();
 		setupPlaylistFilterPane();
 		setupCurrentListTable();
 		setupPlaylistTable();
@@ -210,11 +198,13 @@ public class FXUI implements PlayerListener {
 		setupAlbumImage();
 		setupArtistImage();
 		setupTransport();
-		setupLibraryWindow();
 		
-		tagWindow = new TagWindow ( this );
+		libraryLocationWindow = new LibraryLocationWindow ( mainStage );
+		tagWindow = new TagWindow ( this ); 
+		queueWindow = new QueueWindow ( this, player, tagWindow );
 		albumInfoWindow = new AlbumInfoWindow ( this, player );
 		playlistInfoWindow = new PlaylistInfoWindow ( this, player );
+		historyWindow = new HistoryWindow ( this, player );
 
 		artSplitPane = new SplitPane();
 		artSplitPane.getItems().addAll( albumImage, artistImage );
@@ -279,66 +269,6 @@ public class FXUI implements PlayerListener {
 		player.addListener ( this );
 	}
 	
-	private void playPlaylists ( List<Playlist> playlists ) {
-		player.playPlaylists( playlists );
-		listInfoUpdater.playlistsLoaded ( playlists );
-	}
-	
-	private void playPlaylist ( Playlist playlist ) {
-		player.playPlaylist( playlist );
-		listInfoUpdater.playlistLoaded( playlist );
-	}
-	
-	private void playTrack ( Track track ) {
-		player.playTrack( track );
-	}
-	
-	private void playAlbum ( Album album ) {
-		player.playAlbum( album );
-		listInfoUpdater.albumLoaded( album );
-	}
-	
-	private void playAlbums ( List<Album> albums ) {
-		player.playAlbums ( albums );
-		listInfoUpdater.albumsLoaded( albums );
-	}
-	
-	public void loadTracks ( List <Track> newList ) {
-		player.loadTracks( Utils.convertTrackList( newList ) );
-		listInfoUpdater.tracksLoaded ( );
-	}
-	
-	private void loadTrack ( Track track ) {
-		loadTracks ( Arrays.asList( track ) );
-	}
-	
-	void appendTracks ( List <Track> tracks ) {
-		player.loadTracks( Utils.convertTrackList( tracks ) );
-		listInfoUpdater.tracksAdded();
-	}
-	
-	private void addTracks ( int dropIndex, ArrayList <CurrentListTrack> tracksToCopy ) {
-		player.addTracks( dropIndex, tracksToCopy );
-		listInfoUpdater.tracksAdded();
-	}
-	
-	private void appendTrack ( Path location ) {
-		player.loadTrack( location );
-		listInfoUpdater.tracksAdded();
-	}
-	
-	private void appendAlbum ( Album album ) {
-		boolean wasEmpty = player.getCurrentList().isEmpty();
-		
-		player.appendAlbum( album );
-		
-		if ( wasEmpty ) {
-			listInfoUpdater.albumLoaded( album );
-		} else {
-			listInfoUpdater.tracksAdded();
-		}
-	}
-	
 	public void clearList() {
 		player.clearList();
 		listInfoUpdater.listCleared();
@@ -350,21 +280,14 @@ public class FXUI implements PlayerListener {
 	
 	public void pause() {
 		player.pause();
-		togglePlayButton.setGraphic( playImage );
 	}
 	
 	public void unpause() {
 		player.unpause();
-		togglePlayButton.setGraphic( pauseImage );
 	}
 	
 	public void togglePause() {
 		player.togglePause();
-		if ( player.isPaused() || player.isStopped() ) {
-			togglePlayButton.setGraphic( playImage );
-		} else {
-			togglePlayButton.setGraphic( pauseImage );
-		}
 	}
 	
 	public void nextTrack() {
@@ -430,7 +353,7 @@ public class FXUI implements PlayerListener {
 		pauseImage = null;
 		
 		try {
-			playImage = new ImageView ( new Image( new FileInputStream ( Hypnos.ROOT.resolve( "resources/play.png" ).toFile() ) ) );
+			playImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/play.png" ).toFile() ) ) );
 			playImage.setFitHeight( 18 );
 			playImage.setFitWidth( 18 );
 		} catch ( FileNotFoundException e ) {
@@ -438,7 +361,7 @@ public class FXUI implements PlayerListener {
 		}
 		
 		try {
-			pauseImage = new ImageView ( new Image( new FileInputStream ( Hypnos.ROOT.resolve( "resources/pause.png" ).toFile() ) ) );
+			pauseImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/pause.png" ).toFile() ) ) );
 			pauseImage.setFitHeight( 18 );
 			pauseImage.setFitWidth( 18 );
 		} catch ( FileNotFoundException e ) {
@@ -453,7 +376,7 @@ public class FXUI implements PlayerListener {
 		
 		ImageView previousImage = null;
 		try {
-			previousImage = new ImageView ( new Image( new FileInputStream ( Hypnos.ROOT.resolve( "resources/previous.png" ).toFile() ) ) );
+			previousImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/previous.png" ).toFile() ) ) );
 			previousImage.setFitHeight( 18 );
 			previousImage.setFitWidth( 18 );
 		} catch ( FileNotFoundException e ) {
@@ -468,7 +391,7 @@ public class FXUI implements PlayerListener {
 		
 		ImageView nextImage = null;
 		try {
-			nextImage = new ImageView ( new Image( new FileInputStream ( Hypnos.ROOT.resolve( "resources/next.png" ).toFile() ) ) );
+			nextImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/next.png" ).toFile() ) ) );
 			nextImage.setFitHeight( 18 );
 			nextImage.setFitWidth( 18 );
 		} catch ( FileNotFoundException e ) {
@@ -483,7 +406,7 @@ public class FXUI implements PlayerListener {
 		
 		ImageView stopImage = null;
 		try {
-			stopImage = new ImageView ( new Image( new FileInputStream ( Hypnos.ROOT.resolve( "resources/stop.png" ).toFile() ) ) );
+			stopImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/stop.png" ).toFile() ) ) );
 			stopImage.setFitHeight( 18 );
 			stopImage.setFitWidth( 18 );
 		} catch ( FileNotFoundException e ) {
@@ -622,789 +545,6 @@ public class FXUI implements PlayerListener {
 		transport.setSpacing( 5 );
 	}
 	
-	public void setupHistoryWindow () {
-		historyWindow = new Stage();
-		historyWindow.initModality( Modality.NONE );
-		historyWindow.initOwner( mainStage );
-		historyWindow.setTitle( "History" );
-		historyWindow.setWidth( 600 );
-		historyWindow.setHeight ( 400 );
-		Pane root = new Pane();
-		Scene scene = new Scene( root );
-		VBox primaryPane = new VBox();
-
-		historyTable = new TableView();
-		Label emptyLabel = new Label( "History is empty." );
-		emptyLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
-		emptyLabel.setWrapText( true );
-		emptyLabel.setTextAlignment( TextAlignment.CENTER );
-
-		historyTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
-		historyTable.setPlaceholder( emptyLabel );
-		historyTable.setItems( player.getHistory() );
-		historyTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
-
-		historyTable.setOnKeyPressed( new EventHandler <KeyEvent>() {
-			@Override
-			public void handle ( final KeyEvent keyEvent ) {
-				if ( keyEvent.getCode().equals( KeyCode.DELETE ) ) {
-					ObservableList <Integer> indexes = historyTable.getSelectionModel().getSelectedIndices();
-					for ( int index : indexes ) { //TODO: removeAll
-						Hypnos.queue().remove( index );
-					}
-				}
-			}
-		});
-
-		TableColumn numberColumn = new TableColumn( "#" );
-		TableColumn artistColumn = new TableColumn( "Artist" );
-		TableColumn albumColumn = new TableColumn( "Album" );
-		TableColumn titleColumn = new TableColumn( "Title" );
-		
-		numberColumn.setMaxWidth( 10000 );
-		artistColumn.setMaxWidth( 30000 );
-		albumColumn.setMaxWidth ( 30000 );
-		titleColumn.setMaxWidth ( 30000 );
-		
-		ContextMenu trackContextMenu = new ContextMenu();
-		MenuItem playMenuItem = new MenuItem( "Play" );
-		MenuItem apendMenuItem = new MenuItem( "Append" );
-		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
-		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
-		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
-		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
-		MenuItem removeMenuItem = new MenuItem( "Remove from History" );
-		trackContextMenu.getItems().addAll( 
-			playMenuItem, apendMenuItem, enqueueMenuItem,
-			editTagMenuItem, browseMenuItem, addToPlaylistMenuItem, removeMenuItem 
-		);
-		
-		MenuItem newPlaylistButton = new MenuItem( "<New>" );
-
-		historyTable.setRowFactory( tv -> {
-			TableRow <Track> row = new TableRow <>();
-			row.setContextMenu( trackContextMenu );
-			
-			row.setOnMouseClicked( event -> {
-				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					Track playMe = historyTable.getSelectionModel().getSelectedItem();
-					loadTrack ( playMe );
-				}
-			});
-			
-			row.setOnDragDetected( event -> {
-				if ( !row.isEmpty() ) {
-					ArrayList <Integer> indices = new ArrayList <Integer>( historyTable.getSelectionModel().getSelectedIndices() );
-					ArrayList <Track> tracks = new ArrayList <Track>( historyTable.getSelectionModel().getSelectedItems() );
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, DragSource.HISTORY );
-					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
-					db.setDragView( row.snapshot( null, null ) );
-					ClipboardContent cc = new ClipboardContent();
-					cc.put( DRAGGED_TRACKS, dragObject );
-					db.setContent( cc );
-					event.consume();
-
-				}
-			} );
-			
-			return row;
-		});
-
-		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
-
-		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				promptAndSavePlaylist ( historyTable.getSelectionModel().getSelectedItems(), false );
-			}
-		});
-
-		EventHandler addToPlaylistHandler = new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				Playlist playlist = (Playlist) ((MenuItem) event.getSource()).getUserData();
-				addToPlaylist ( historyTable.getSelectionModel().getSelectedItems(), playlist );
-			}
-		};
-		
-		//TODO: I don't know if this is right; 
-		Hypnos.library().getPlaylistSorted().addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
-			updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
-		});
-
-		updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
-		
-		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				loadTracks( historyTable.getSelectionModel().getSelectedItems() );
-			}
-		});
-		
-		enqueueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				Hypnos.queue().addAllTracks( historyTable.getSelectionModel().getSelectedItems() );
-			}
-		});
-
-		apendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				appendTracks ( historyTable.getSelectionModel().getSelectedItems() );
-			}
-		});
-		
-		editTagMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				List<Track> tracks = historyTable.getSelectionModel().getSelectedItems();
-				
-				tagWindow.setTracks( tracks, null );
-				tagWindow.show();
-			}
-		});
-		
-
-		removeMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				synchronized ( historyTable.getItems() ) {
-					List<Integer> selectedIndices = historyTable.getSelectionModel().getSelectedIndices();
-					
-					ArrayList<Integer> removeMeIndices = new ArrayList ( selectedIndices );
-					
-					for ( int k = removeMeIndices.size() - 1; k >= 0 ; k-- ) {
-						//TODO: probably put the remove code somewhere else. 
-						historyTable.getItems().remove( removeMeIndices.get( k ).intValue() );
-					}
-				}
-			}
-		});
-
-		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			// TODO: This is the better way, once openjdk and openjfx supports
-			// it: getHostServices().showDocument(file.toURI().toString());
-			@Override
-			public void handle ( ActionEvent event ) {
-				SwingUtilities.invokeLater( new Runnable() {
-					public void run () {
-						try {
-							Track selectedTrack = historyTable.getSelectionModel().getSelectedItem();
-							if ( selectedTrack != null ) {
-								Desktop.getDesktop().open( selectedTrack.getPath().getParent().toFile() );
-							}
-						} catch ( IOException e ) {
-							e.printStackTrace();
-						}
-					}
-				} );
-			}
-		} );
-		
-		
-		numberColumn.setCellValueFactory( new Callback <CellDataFeatures <Track, Track>, ObservableValue <Track>>() {
-			@Override
-			public ObservableValue <Track> call ( CellDataFeatures <Track, Track> p ) {
-				return new ReadOnlyObjectWrapper( p.getValue() );
-			}
-		});
-
-		numberColumn.setCellFactory( new Callback <TableColumn <Track, Track>, TableCell <Track, Track>>() {
-			@Override
-			public TableCell <Track, Track> call ( TableColumn <Track, Track> param ) {
-				return new TableCell <Track, Track>() {
-					@Override
-					protected void updateItem ( Track item, boolean empty ) {
-						super.updateItem( item, empty );
-
-						if ( this.getTableRow() != null && item != null ) {
-							setText( this.getTableRow().getIndex() + 1 + "" );
-						} else {
-							setText( "" );
-						}
-					}
-				};
-			}
-		});
-		numberColumn.setSortable(false);
-		artistColumn.setSortable(false);
-		albumColumn.setSortable(false);
-		titleColumn.setSortable(false);
-		
-		artistColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Artist" ) );
-		titleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
-		albumColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "FullAlbumTitle" ) );
-		
-		historyTable.getColumns().addAll( numberColumn, artistColumn, albumColumn, titleColumn );
-
-		historyTable.prefWidthProperty().bind( root.widthProperty() );
-		historyTable.prefHeightProperty().bind( root.heightProperty() );
-		
-		primaryPane.getChildren().addAll( historyTable );
-		root.getChildren().add( primaryPane );
-		historyWindow.setScene( scene );
-	}
-	
-	public void setupQueueWindow () {
-		queueWindow = new Stage();
-		queueWindow.initModality( Modality.NONE );
-		queueWindow.initOwner( mainStage );
-		queueWindow.setTitle( "Queue" );
-		queueWindow.setWidth( 500 );
-		queueWindow.setHeight ( 400 );
-		Pane root = new Pane();
-		Scene scene = new Scene( root );
-
-		queueTable = new TableView();
-		Label emptyLabel = new Label( "Queue is empty." );
-		emptyLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
-		emptyLabel.setWrapText( true );
-		emptyLabel.setTextAlignment( TextAlignment.CENTER );
-
-		queueTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
-		queueTable.setPlaceholder( emptyLabel );
-		queueTable.setItems( Hypnos.queue().getData() );
-		
-		Hypnos.queue().getData().addListener( new ListChangeListener () {
-			@Override
-			public void onChanged ( Change arg0 ) {
-				if ( Hypnos.queue().isEmpty() ) {
-					showQueueButton.getStyleClass().removeAll ( "queueActive" );
-				} else {
-					showQueueButton.getStyleClass().add ( "queueActive" );
-				}
-			} 
-		});
-		
-		queueTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
-
-		queueTable.widthProperty().addListener( new ChangeListener <Number>() {
-			@Override
-			public void changed ( ObservableValue <? extends Number> source, Number oldWidth, Number newWidth ) {
-				Pane header = (Pane) queueTable.lookup( "TableHeaderRow" );
-				if ( header.isVisible() ) {
-					header.setMaxHeight( 0 );
-					header.setMinHeight( 0 );
-					header.setPrefHeight( 0 );
-					header.setVisible( false );
-				}
-			}
-		});
-		
-		queueTable.setOnKeyPressed( keyEvent -> {
-
-			if ( keyEvent.getCode().equals( KeyCode.DELETE ) ) {
-				ObservableList <Integer> selectedIndexes = queueTable.getSelectionModel().getSelectedIndices();
-				
-				List<Integer> removeMe = new ArrayList ( selectedIndexes );
-				
-				if ( !removeMe.isEmpty() ) {
-	
-					int selectAfterDelete = selectedIndexes.get( 0 ) - 1;
-					for ( int k = removeMe.size() - 1; k >= 0; k-- ) {
-						queueTable.getItems().remove ( removeMe.get( k ).intValue() );
-					}
-					queueTable.getSelectionModel().clearAndSelect( selectAfterDelete );
-				}
-			}
-		});
-
-		TableColumn numberColumn = new TableColumn ( "#" );
-		TableColumn artistColumn = new TableColumn( "Artist" );
-		TableColumn titleColumn = new TableColumn( "Title" );
-		
-		numberColumn.setMaxWidth( 10000 );
-		artistColumn.setMaxWidth( 45000 );
-		titleColumn.setMaxWidth ( 45000 );
-		
-		numberColumn.setCellValueFactory( new Callback <CellDataFeatures <Track, Track>, ObservableValue <Track>>() {
-			@Override
-			public ObservableValue <Track> call ( CellDataFeatures <Track, Track> p ) {
-				return new ReadOnlyObjectWrapper( p.getValue() );
-			}
-		});
-
-		numberColumn.setCellFactory( new Callback <TableColumn <Track, Track>, TableCell <Track, Track>>() {
-			@Override
-			public TableCell <Track, Track> call ( TableColumn <Track, Track> param ) {
-				return new TableCell <Track, Track>() {
-					@Override
-					protected void updateItem ( Track item, boolean empty ) {
-						super.updateItem( item, empty );
-
-						if ( this.getTableRow() != null && item != null ) {
-							setText( this.getTableRow().getIndex() + 1 + "" );
-						} else {
-							setText( "" );
-						}
-					}
-				};
-			}
-		});
-		numberColumn.setSortable(false);
-		
-		
-		artistColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Artist" ) );
-		titleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
-		
-		queueTable.getColumns().addAll( numberColumn, artistColumn, titleColumn );
-		
-		
-		ContextMenu contextMenu = new ContextMenu();
-		MenuItem playMenuItem = new MenuItem( "Play" );
-		MenuItem apendMenuItem = new MenuItem( "Append" );
-		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
-		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
-		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
-		MenuItem cropMenuItem = new MenuItem( "Crop" );
-		MenuItem removeMenuItem = new MenuItem( "Remove from Queue" );
-		contextMenu.getItems().addAll( 
-			playMenuItem, apendMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem, cropMenuItem, removeMenuItem 
-		);
-		
-		MenuItem newPlaylistButton = new MenuItem( "<New>" );
-
-		queueTable.setRowFactory( tv -> {
-			TableRow <Track> row = new TableRow <>();
-			row.setContextMenu( contextMenu );
-			
-			row.setOnMouseClicked( event -> {
-				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					loadTrack ( queueTable.getSelectionModel().getSelectedItem() );
-				}
-			} );
-			
-			row.setOnDragDetected( event -> {
-				if ( !row.isEmpty() ) {
-					ArrayList <Integer> indices = new ArrayList <Integer>( queueTable.getSelectionModel().getSelectedIndices() );
-					ArrayList <Track> tracks = new ArrayList <Track>( queueTable.getSelectionModel().getSelectedItems() );
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, DragSource.QUEUE );
-					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
-					db.setDragView( row.snapshot( null, null ) );
-					ClipboardContent cc = new ClipboardContent();
-					cc.put( DRAGGED_TRACKS, dragObject );
-					db.setContent( cc );
-					event.consume();
-				}
-			});
-			
-			row.setOnDragOver( event -> {
-
-				Dragboard db = event.getDragboard();
-				if (  db.hasContent( DRAGGED_TRACKS ) || db.hasFiles() ) {
-					event.acceptTransferModes( TransferMode.COPY );
-					event.consume();
-				}
-			} );
-
-			row.setOnDragDropped( event -> {
-				Dragboard db = event.getDragboard();
-				if ( db.hasContent( DRAGGED_TRACKS ) ) {
-					
-					DraggedTrackContainer container = (DraggedTrackContainer) db.getContent( DRAGGED_TRACKS );
-					List <Integer> draggedIndices = container.getIndices();
-					int dropIndex = row.isEmpty() ? dropIndex = queueTable.getItems().size() : row.getIndex();
-					
-					switch ( container.getSource() ) {
-						case ALBUM_LIST:
-						case PLAYLIST_LIST:
-						case HISTORY: 
-						case ALBUM_INFO:
-						case TRACK_LIST: {
-							List <Track> tracksToCopy = container.getTracks();
-							Hypnos.queue().addAllTracks( dropIndex, tracksToCopy );
-							
-						} break;
-						case CURRENT_LIST: {
-							//TODO: Should I refactor this? 
-							synchronized ( currentListTable.getItems() ) {
-								ArrayList <CurrentListTrack> tracksToCopy = new ArrayList <CurrentListTrack> (  );
-								for ( int index : draggedIndices ) {
-									if ( index >= 0 && index < currentListTable.getItems().size() ) {
-										tracksToCopy.add( currentListTable.getItems().get( index ) );
-									}
-								}
-								Hypnos.queue().addAllTracks( dropIndex, tracksToCopy );
-							}
-						} break;
-						
-												
-						case QUEUE: {
-							ArrayList <Track> tracksToMove = new ArrayList <Track> ( draggedIndices.size() );
-							for ( int index : draggedIndices ) {
-								if ( index >= 0 && index < queueTable.getItems().size() ) {
-									tracksToMove.add( queueTable.getItems().get( index ) );
-								}
-							}
-							
-							for ( int k = draggedIndices.size() - 1; k >= 0; k-- ) {
-								int index = draggedIndices.get( k ).intValue();
-								if ( index >= 0 && index < queueTable.getItems().size() ) {
-									Hypnos.queue().remove ( index );
-								}
-							}
-							
-							dropIndex = Math.min( Hypnos.queue().size(), row.getIndex() );
-							
-							Hypnos.queue().addAllTracks( dropIndex, tracksToMove );
-							
-							queueTable.getSelectionModel().clearSelection();
-							for ( int k = 0; k < draggedIndices.size(); k++ ) {
-								queueTable.getSelectionModel().select( dropIndex + k );
-							}
-							
-							Hypnos.queue().updateQueueIndexes( null );
-							
-						} break;
-					}
-
-					Hypnos.queue().updateQueueIndexes( null );
-					event.setDropCompleted( true );
-					event.consume();
-
-				} else if ( db.hasFiles() ) {
-					ArrayList <Track> tracksToAdd = new ArrayList();
-					for ( File file : db.getFiles() ) {
-						Path droppedPath = Paths.get( file.getAbsolutePath() );
-						if ( Utils.isMusicFile( droppedPath ) ) {
-							try {
-								tracksToAdd.add( new Track( droppedPath ) );
-							} catch ( IOException e ) {
-								e.printStackTrace();
-							}
-						} else if ( Files.isDirectory( droppedPath ) ) {
-							tracksToAdd.addAll( Utils.getAllTracksInDirectory( droppedPath ) );
-						}
-					}
-					if ( !tracksToAdd.isEmpty() ) {
-						int dropIndex = row.isEmpty() ? dropIndex = queueTable.getItems().size() : row.getIndex();
-						queueTable.getItems().addAll( Math.min( dropIndex, queueTable.getItems().size() ), tracksToAdd );
-					}
-
-					event.setDropCompleted( true );
-					event.consume();
-				}
-			});
-			
-			return row;
-		});
-		
-		queueTable.setOnDragOver( event -> {
-			Dragboard db = event.getDragboard();
-
-			if ( db.hasContent( DRAGGED_TRACKS ) || db.hasFiles() ) {
-
-				event.acceptTransferModes( TransferMode.COPY );
-				event.consume();
-
-			}
-		} );
-
-		queueTable.setOnDragDropped( event -> {
-			Dragboard db = event.getDragboard();
-			if ( db.hasContent( DRAGGED_TRACKS ) ) {
-				
-				DraggedTrackContainer container = (DraggedTrackContainer) db.getContent( DRAGGED_TRACKS );
-				List <Integer> draggedIndices = container.getIndices();
-				
-				switch ( container.getSource() ) {
-
-					case ALBUM_LIST:
-					case PLAYLIST_LIST:
-					case HISTORY: 
-					case ALBUM_INFO:
-					case TRACK_LIST: {
-						List <Track> tracksToCopy = container.getTracks();
-						Hypnos.queue().addAllTracks( tracksToCopy );
-						
-					} break;
-					case CURRENT_LIST: {
-						//TODO: should I refactor this
-						synchronized ( currentListTable.getItems() ) {
-							ArrayList <CurrentListTrack> tracksToCopy = new ArrayList <CurrentListTrack> (  );
-							for ( int index : draggedIndices ) {
-								if ( index >= 0 && index < currentListTable.getItems().size() ) {
-									tracksToCopy.add( currentListTable.getItems().get( index ) );
-								}
-							}
-							Hypnos.queue().addAllTracks( tracksToCopy );
-						}
-					} break;
-					
-											
-					case QUEUE: {
-						ArrayList <Track> tracksToMove = new ArrayList <Track> ( draggedIndices.size() );
-						for ( int index : draggedIndices ) {
-							if ( index >= 0 && index < queueTable.getItems().size() ) {
-								tracksToMove.add( queueTable.getItems().get( index ) );
-							}
-						}
-						
-						for ( int k = draggedIndices.size() - 1; k >= 0; k-- ) {
-							int index = draggedIndices.get( k ).intValue();
-							if ( index >= 0 && index < queueTable.getItems().size() ) {
-								Hypnos.queue().remove ( index );
-							}
-						}
-						
-						Hypnos.queue().addAllTracks( tracksToMove );
-						
-						queueTable.getSelectionModel().clearSelection();
-						for ( int k = 0; k < draggedIndices.size(); k++ ) {
-							queueTable.getSelectionModel().select( k );
-						}
-						
-						Hypnos.queue().updateQueueIndexes( null );
-						
-					} break;
-				}
-
-				Hypnos.queue().updateQueueIndexes( null );
-				event.setDropCompleted( true );
-				event.consume();
-
-			} else if ( db.hasFiles() ) {
-				ArrayList <Track> tracksToAdd = new ArrayList();
-				for ( File file : db.getFiles() ) {
-					Path droppedPath = Paths.get( file.getAbsolutePath() );
-					if ( Utils.isMusicFile( droppedPath ) ) {
-						try {
-							tracksToAdd.add( new Track( droppedPath ) );
-						} catch ( IOException e ) {
-							e.printStackTrace();
-						}
-					} else if ( Files.isDirectory( droppedPath ) ) {
-						tracksToAdd.addAll( Utils.getAllTracksInDirectory( droppedPath ) );
-					}
-				}
-				if ( !tracksToAdd.isEmpty() ) {
-					queueTable.getItems().addAll( tracksToAdd );
-				}
-
-				event.setDropCompleted( true );
-				event.consume();
-			}
-
-		} );
-
-		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
-
-		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				promptAndSavePlaylist ( queueTable.getSelectionModel().getSelectedItems(), false );
-			}
-		});
-
-		EventHandler addToPlaylistHandler = new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				Playlist playlist = (Playlist) ((MenuItem) event.getSource()).getUserData();
-				addToPlaylist ( queueTable.getSelectionModel().getSelectedItems(), playlist );
-			}
-		};
-		
-		Hypnos.library().getPlaylistSorted().addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
-			updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
-		});
-
-		updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
-		
-		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				loadTracks( queueTable.getSelectionModel().getSelectedItems() );
-			}
-		});
-
-		apendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				appendTracks ( queueTable.getSelectionModel().getSelectedItems() );
-			}
-		});
-		
-		editTagMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				List<Track> tracks = queueTable.getSelectionModel().getSelectedItems();
-				
-				tagWindow.setTracks( tracks, null );
-				tagWindow.show();
-			}
-		});
-
-		cropMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-
-				ObservableList <Integer> selectedIndexes = queueTable.getSelectionModel().getSelectedIndices();
-				
-				ArrayList <Integer> removeMe = new ArrayList<Integer> ();
-				
-				for ( int k = 0; k < queueTable.getItems().size(); k++ ) {
-					if ( !selectedIndexes.contains( k ) ) {
-						removeMe.add ( k );
-					}
-				}
-				
-				if ( !removeMe.isEmpty() ) {
-					for ( int k = removeMe.size() - 1; k >= 0; k-- ) {
-						Hypnos.queue().remove ( removeMe.get( k ).intValue() );
-					}
-
-					queueTable.getSelectionModel().clearSelection();
-				}
-			}
-		} );
-
-
-		removeMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				synchronized ( queueTable.getItems() ) {
-					List<Integer> selectedIndices = queueTable.getSelectionModel().getSelectedIndices();
-					
-					ArrayList<Integer> removeMeIndices = new ArrayList ( selectedIndices );
-					
-					for ( int k = removeMeIndices.size() - 1; k >= 0 ; k-- ) {
-						Hypnos.queue().remove( removeMeIndices.get( k ).intValue() );
-					}
-				}
-			}
-		});
-
-		queueTable.prefWidthProperty().bind( root.widthProperty() );
-		queueTable.prefHeightProperty().bind( root.heightProperty() );
-		
-		root.getChildren().add( queueTable );
-		queueWindow.setScene( scene );
-	}
-	
-	public void setupLibraryWindow () {
-		libraryWindow = new Stage();
-		libraryWindow.initModality( Modality.NONE );
-		libraryWindow.initOwner( mainStage );
-		libraryWindow.setTitle( "Music Search Locations" );
-		libraryWindow.setWidth( 350 );
-		Group root = new Group();
-		Scene scene = new Scene( root );
-		VBox primaryPane = new VBox();
-
-		musicSourceTable = new TableView();
-		Label emptyLabel = new Label( "No directories in your library. Either '+ Add' or drop directories here." );
-		emptyLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
-		emptyLabel.setWrapText( true );
-		emptyLabel.setTextAlignment( TextAlignment.CENTER );
-
-		musicSourceTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
-		musicSourceTable.setPlaceholder( emptyLabel );
-		musicSourceTable.setItems( Hypnos.library().getMusicSourcePaths() );
-		musicSourceTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
-
-		musicSourceTable.widthProperty().addListener( new ChangeListener <Number>() {
-			@Override
-			public void changed ( ObservableValue <? extends Number> source, Number oldWidth, Number newWidth ) {
-				Pane header = (Pane) musicSourceTable.lookup( "TableHeaderRow" );
-				if ( header.isVisible() ) {
-					header.setMaxHeight( 0 );
-					header.setMinHeight( 0 );
-					header.setPrefHeight( 0 );
-					header.setVisible( false );
-				}
-			}
-		} );
-
-		TableColumn <Path, String> dirListColumn = new TableColumn( "Location" );
-		dirListColumn.setCellValueFactory( new Callback <TableColumn.CellDataFeatures <Path, String>, ObservableValue <String>>() {
-
-			@Override
-			public ObservableValue <String> call ( TableColumn.CellDataFeatures <Path, String> p ) {
-				if ( p.getValue() != null ) {
-					return new SimpleStringProperty( p.getValue().toAbsolutePath().toString() );
-				} else {
-					return new SimpleStringProperty( "<no name>" );
-				}
-			}
-		} );
-		
-		musicSourceTable.setOnDragDropped( event -> {
-			Dragboard db = event.getDragboard();
-			if ( db.hasFiles() ) {
-				List <File> files = db.getFiles();
-				
-				for ( File file : files ) {
-					Hypnos.library().requestAddSource( file.toPath() );
-				}
-
-				event.setDropCompleted( true );
-				event.consume();
-			}
-		});
-			
-		musicSourceTable.getColumns().add( dirListColumn );
-		
-		musicSourceTable.setOnDragOver( event -> {
-			Dragboard db = event.getDragboard();
-			if ( db.hasFiles() ) {
-				event.acceptTransferModes( TransferMode.COPY );
-				event.consume();
-
-			}
-		});
-
-		DirectoryChooser chooser = new DirectoryChooser();
-		chooser.setTitle( "Music Folder" );
-		File defaultDirectory = new File( System.getProperty( "user.home" ) ); // TODO: start windows on desktop maybe.
-		chooser.setInitialDirectory( defaultDirectory );
-
-		Button addButton = new Button( "+ Add" );
-		Button removeButton = new Button( "- Remove" );
-
-		addButton.setPrefWidth( 100 );
-		removeButton.setPrefWidth( 100 );
-		addButton.setMinWidth( 100 );
-		removeButton.setMinWidth( 100 );
-
-		addButton.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				File selectedFile = chooser.showDialog( libraryWindow );
-				if ( selectedFile != null ) {
-					Hypnos.library().requestAddSource( selectedFile.toPath() );
-				}
-			}
-		});
-
-		removeButton.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				Hypnos.library().requestRemoveSources( musicSourceTable.getSelectionModel().getSelectedItems() );
-				musicSourceTable.getSelectionModel().clearSelection();	
-			}
-		});
-
-		musicSourceTable.setOnKeyPressed( new EventHandler <KeyEvent>() {
-			@Override
-			public void handle ( final KeyEvent keyEvent ) {
-				if ( keyEvent.getCode().equals( KeyCode.DELETE ) ) {
-					Hypnos.library().requestRemoveSources( musicSourceTable.getSelectionModel().getSelectedItems() );
-				}
-			}
-		});
-		
-		HBox controlBox = new HBox();
-		controlBox.getChildren().addAll( addButton, removeButton);
-		controlBox.setAlignment( Pos.CENTER );
-		controlBox.prefWidthProperty().bind( libraryWindow.widthProperty() );
-		controlBox.setPadding( new Insets( 5 ) );
-
-		primaryPane.getChildren().addAll( musicSourceTable, controlBox );
-		root.getChildren().add( primaryPane );
-		libraryWindow.setScene( scene );
-	}
-	
 	public void setupAlbumImage () {
 		albumImage = new BorderPane();
 	}
@@ -1530,6 +670,20 @@ public class FXUI implements PlayerListener {
 			}
 		});
 		
+		player.getQueue().getData().addListener( new ListChangeListener () {
+			@Override
+			public void onChanged ( Change arg0 ) {
+				System.out.println ( "Changed" ); //TODO: DD
+				if ( player.getQueue().isEmpty() ) {
+					System.out.println ( "-Empty" ); //TODO: DD
+					showQueueButton.getStyleClass().removeAll ( "queueActive" );
+				} else {
+					showQueueButton.getStyleClass().add ( "queueActive" );
+					System.out.println ( "-Full" ); //TODO: DD
+				}
+			} 
+		});
+		
 		showHistoryButton.setOnAction ( new EventHandler <ActionEvent>() {
 			public void handle ( ActionEvent e ) {
 				historyWindow.show();
@@ -1578,7 +732,7 @@ public class FXUI implements PlayerListener {
 					}
 				}
 				
-				loadTracks ( tracks );
+				player.loadTracks ( tracks );
 					
 			}
 		});
@@ -1662,10 +816,10 @@ public class FXUI implements PlayerListener {
 		settingsButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				if ( libraryWindow.isShowing() ) {
-					libraryWindow.hide();
+				if ( libraryLocationWindow.isShowing() ) {
+					libraryLocationWindow.hide();
 				} else {
-					libraryWindow.show();
+					libraryLocationWindow.show();
 				}
 			}
 		});
@@ -1707,10 +861,10 @@ public class FXUI implements PlayerListener {
 		settingsButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				if ( libraryWindow.isShowing() ) {
-					libraryWindow.hide();
+				if ( libraryLocationWindow.isShowing() ) {
+					libraryLocationWindow.hide();
 				} else {
-					libraryWindow.show();
+					libraryLocationWindow.show();
 				}
 			}
 		} );
@@ -1825,10 +979,10 @@ public class FXUI implements PlayerListener {
 		settingsButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				if ( libraryWindow.isShowing() ) {
-					libraryWindow.hide();
+				if ( libraryLocationWindow.isShowing() ) {
+					libraryLocationWindow.hide();
 				} else {
-					libraryWindow.show();
+					libraryLocationWindow.show();
 				}
 			}
 		} );
@@ -1958,15 +1112,15 @@ public class FXUI implements PlayerListener {
 		updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		
 		playMenuItem.setOnAction( event -> {
-			playAlbums( albumTable.getSelectionModel().getSelectedItems() );
+			player.playAlbums( albumTable.getSelectionModel().getSelectedItems() );
 		});
 
 		apendMenuItem.setOnAction( event -> {
-			appendAlbum( albumTable.getSelectionModel().getSelectedItem() );
+			player.appendAlbum( albumTable.getSelectionModel().getSelectedItem() );
 		});
 
 		enqueueMenuItem.setOnAction( event -> {
-			Hypnos.queue().addAllAlbums( albumTable.getSelectionModel().getSelectedItems() );
+			player.getQueue().addAllAlbums( albumTable.getSelectionModel().getSelectedItems() );
 		});
 		
 		editTagMenuItem.setOnAction( event -> {
@@ -2028,7 +1182,7 @@ public class FXUI implements PlayerListener {
 
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					playAlbum( row.getItem() );
+					player.playAlbum( row.getItem() );
 				}
 			} );
 			
@@ -2180,21 +1334,21 @@ public class FXUI implements PlayerListener {
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				loadTracks( trackTable.getSelectionModel().getSelectedItems() );
+				player.loadTracks( trackTable.getSelectionModel().getSelectedItems() );
 			}
 		} );
 
 		apendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				appendTracks ( trackTable.getSelectionModel().getSelectedItems() );
+				player.addTracks ( trackTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 		
 		enqueueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				Hypnos.queue().addAllTracks( trackTable.getSelectionModel().getSelectedItems() );
+				player.getQueue().addAllTracks( trackTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 		
@@ -2258,7 +1412,7 @@ public class FXUI implements PlayerListener {
 			
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					loadTrack ( trackTable.getSelectionModel().getSelectedItem() );
+					player.loadTrack ( trackTable.getSelectionModel().getSelectedItem() );
 				}
 			});
 			
@@ -2349,21 +1503,21 @@ public class FXUI implements PlayerListener {
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				playPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
+				player.playPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 
 		appendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				appendTracks ( playlistTable.getSelectionModel().getSelectedItem().getTracks() );
+				player.addTracks ( playlistTable.getSelectionModel().getSelectedItem().getTracks() );
 			}
 		});
 		
 		enqueueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				Hypnos.queue().addAllPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
+				player.getQueue().addAllPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 		
@@ -2431,7 +1585,7 @@ public class FXUI implements PlayerListener {
 
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					playPlaylist( row.getItem() );
+					player.playPlaylist( row.getItem() );
 				}
 			});
 
@@ -2589,7 +1743,7 @@ public class FXUI implements PlayerListener {
 					case ALBUM_INFO:
 					case HISTORY: {
 						List <Track> tracksToCopy = container.getTracks();
-						appendTracks ( tracksToCopy );
+						player.addTracks ( tracksToCopy );
 						if ( container.getAlbums() != null ) {
 							listInfoUpdater.albumsLoaded( container.getAlbums() );
 						} else {
@@ -2603,19 +1757,19 @@ public class FXUI implements PlayerListener {
 					} break;
 					
 					case QUEUE: {
-						synchronized ( queueTable.getItems() ) {
+						synchronized ( player.getQueue().getData() ) {
 							List <Integer> draggedIndices = container.getIndices();
 							ArrayList <Track> tracksToCopy = new ArrayList <Track> ( draggedIndices.size() );
 							for ( int index : draggedIndices ) {
-								if ( index >= 0 && index < queueTable.getItems().size() ) {
-									Track addMe = queueTable.getItems().get( index );
+								if ( index >= 0 && index < player.getQueue().getData().size() ) {
+									Track addMe = player.getQueue().getData().get( index );
 									if ( addMe instanceof CurrentListTrack ) {
 										tracksToCopy.add( (CurrentListTrack)addMe );
 									} else {
 										try {
 											CurrentListTrack newAddMe = new CurrentListTrack ( addMe );
-											queueTable.getItems().remove ( index );
-											queueTable.getItems().add( index, newAddMe );
+											player.getQueue().getData().remove ( index );
+											player.getQueue().getData().add( index, newAddMe );
 											tracksToCopy.add( newAddMe );
 											
 										} catch ( IOException e ) {
@@ -2623,7 +1777,7 @@ public class FXUI implements PlayerListener {
 										}
 									}
 								}
-								appendTracks( tracksToCopy );
+								player.addTracks( tracksToCopy );
 								listInfoUpdater.tracksAdded();
 							}
 						}
@@ -2631,7 +1785,7 @@ public class FXUI implements PlayerListener {
 					} break;
 				}
 
-				Hypnos.queue().updateQueueIndexes( null );
+				player.getQueue().updateQueueIndexes( null );
 				event.setDropCompleted( true );
 				event.consume();
 
@@ -2642,13 +1796,18 @@ public class FXUI implements PlayerListener {
 				for ( File file : db.getFiles() ) {
 					Path droppedPath = Paths.get( file.getAbsolutePath() );
 					if ( Utils.isMusicFile( droppedPath ) ) {
-						appendTrack ( droppedPath );
+						try {
+							player.addTrack ( droppedPath );
+						} catch ( IOException e ) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					} else if ( Files.isDirectory( droppedPath ) ) {
-						appendTracks ( Utils.getAllTracksInDirectory( droppedPath ) );
+						player.addTracks ( Utils.getAllTracksInDirectory( droppedPath ) );
 					} else if ( Utils.isPlaylistFile ( droppedPath ) ) {
 						Playlist playlist = Playlist.loadPlaylist( droppedPath );
 						if ( playlist != null ) {
-							appendTracks ( playlist.getTracks() );
+							player.addTracks ( playlist.getTracks() );
 						}
 					}
 				}
@@ -2705,7 +1864,7 @@ public class FXUI implements PlayerListener {
 		queueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				Hypnos.queue().addAllTracks( currentListTable.getSelectionModel().getSelectedItems() );
+				player.getQueue().addAllTracks( currentListTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 		
@@ -2729,7 +1888,7 @@ public class FXUI implements PlayerListener {
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				playTrack( currentListTable.getSelectionModel().getSelectedItem() );
+				player.playTrack( currentListTable.getSelectionModel().getSelectedItem() );
 			}
 		} );
 
@@ -2785,7 +1944,7 @@ public class FXUI implements PlayerListener {
 
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					playTrack( row.getItem() );
+					player.playTrack( row.getItem() );
 					//TODO: Do we want the error here? 
 				}
 			});
@@ -2825,7 +1984,7 @@ public class FXUI implements PlayerListener {
 						case TRACK_LIST:
 						case ALBUM_INFO:
 						case HISTORY: {
-							addTracks( dropIndex, Utils.convertTrackList( container.getTracks() ) );
+							player.addTracks( dropIndex, Utils.convertTrackList( container.getTracks() ) );
 						} break;
 						
 						case CURRENT_LIST: {
@@ -2845,7 +2004,7 @@ public class FXUI implements PlayerListener {
 								}
 							}
 							
-							addTracks ( row.getIndex(), tracksToMove );
+							player.addTracks ( row.getIndex(), tracksToMove );
 							
 							currentListTable.getSelectionModel().clearSelection();
 							for ( int k = 0; k < draggedIndices.size(); k++ ) {
@@ -2856,19 +2015,19 @@ public class FXUI implements PlayerListener {
 						} break;
 						
 						case QUEUE: {
-							synchronized ( queueTable.getItems() ) {
+							synchronized ( player.getQueue().getData() ) {
 								List <Integer> draggedIndices = container.getIndices();
 								ArrayList <CurrentListTrack> tracksToCopy = new ArrayList <CurrentListTrack> ( draggedIndices.size() );
 								for ( int index : draggedIndices ) {
-									if ( index >= 0 && index < queueTable.getItems().size() ) {
-										Track addMe = queueTable.getItems().get( index );
+									if ( index >= 0 && index < player.getQueue().getData().size() ) {
+										Track addMe = player.getQueue().getData().get( index );
 										if ( addMe instanceof CurrentListTrack ) {
 											tracksToCopy.add( (CurrentListTrack)addMe );
 										} else {
 											try {
 												CurrentListTrack newAddMe = new CurrentListTrack ( addMe );
-												queueTable.getItems().remove ( index );
-												queueTable.getItems().add( index, newAddMe );
+												player.getQueue().getData().remove ( index );
+												player.getQueue().getData().add( index, newAddMe );
 												tracksToCopy.add( newAddMe );
 												
 											} catch ( IOException e1 ) {
@@ -2877,14 +2036,14 @@ public class FXUI implements PlayerListener {
 											}
 										}
 									}
-									addTracks ( dropIndex, tracksToCopy );
+									player.addTracks ( dropIndex, tracksToCopy );
 								}
 							}
 							
 						} break;
 					}
 
-					Hypnos.queue().updateQueueIndexes( null );
+					player.getQueue().updateQueueIndexes( null );
 					event.setDropCompleted( true );
 					event.consume();
 
@@ -2913,7 +2072,7 @@ public class FXUI implements PlayerListener {
 					}
 					
 					if ( !tracksToAdd.isEmpty() ) {
-						addTracks ( row.getIndex(), tracksToAdd );
+						player.addTracks ( row.getIndex(), tracksToAdd );
 					}
 
 					event.setDropCompleted( true );
@@ -3141,12 +2300,12 @@ public class FXUI implements PlayerListener {
 							break;
 							
 						case SHUFFLE:
-							player.setShuffleMode ( PlayerController.ShuffleMode.valueOf( value ) );
+							player.setShuffleMode ( SoundSystem.ShuffleMode.valueOf( value ) );
 							//TODO: Update UI
 							break;
 							
 						case REPEAT:
-							player.setRepeatMode ( PlayerController.RepeatMode.valueOf( value ) );
+							player.setRepeatMode ( SoundSystem.RepeatMode.valueOf( value ) );
 							//TODO: Update UI
 							break;
 					//END NOT BELONG
@@ -3231,7 +2390,7 @@ public class FXUI implements PlayerListener {
 					}
 					
 					if ( newList.size() > 0 ) {
-						loadTracks ( newList );
+						player.loadTracks ( newList );
 					}
 				}
 			}
@@ -3308,11 +2467,7 @@ public class FXUI implements PlayerListener {
 	@Override
 	public void playerStarted ( Track track ) {
 		Platform.runLater( () -> {
-			if ( player.isPaused() ) {
-				togglePlayButton.setGraphic( playImage );
-			} else {
-				togglePlayButton.setGraphic( pauseImage );
-			}
+			togglePlayButton.setGraphic( pauseImage );
 			
 			currentListTable.refresh();
 	
@@ -3329,14 +2484,17 @@ public class FXUI implements PlayerListener {
 
 	@Override
 	public void playerPaused () {
-		// TODO Auto-generated method stub
-		
+		Platform.runLater( () -> {
+			togglePlayButton.setGraphic( playImage );
+		});
 	}
 
 
 	@Override
 	public void playerUnpaused () {
-		// TODO Auto-generated method stub
+		Platform.runLater( () -> {
+			togglePlayButton.setGraphic( pauseImage );
+		});
 		
 	}
 

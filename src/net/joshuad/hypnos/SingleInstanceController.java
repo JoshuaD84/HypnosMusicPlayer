@@ -19,7 +19,7 @@ public class SingleInstanceController {
 	
 	@SuppressWarnings("resource")
 	public SingleInstanceController() {
-		if ( Hypnos.IS_DEVELOPING ) {
+		if ( Hypnos.isDeveloping() ) {
 			port = 49486;
 		} 
 		

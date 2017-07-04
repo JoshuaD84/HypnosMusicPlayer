@@ -3,6 +3,7 @@ package net.joshuad.hypnos.audio;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.joshuad.hypnos.SoundSystem;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.audio.decoders.*;
 
@@ -22,10 +23,10 @@ public class AudioPlayer {
 	boolean isPaused = false;
 	
 	AbstractDecoder decoder;
-	PlayerController controller;
+	SoundSystem controller;
 	Track track;
 	
-	public AudioPlayer( PlayerController controller ) {
+	public AudioPlayer( SoundSystem controller ) {
 		this.controller = controller;
 		
 		Thread playerThread = new Thread ( () -> {
@@ -57,13 +58,17 @@ public class AudioPlayer {
 						decoder = getPlayer ( trackRequested );
 						
 						if ( decoder != null ) {
-							controller.playerStarted();
+							controller.playerStarted( trackRequested );
 						} else {
 							LOGGER.info( "Unable to initialize decoder for: " + track.getFilename() );
 						}
 		
 						track = trackRequested;
 						trackRequested = null;
+						
+						stopRequested = false;
+						isPaused = false;
+						seekPercentRequested = NO_REQUEST;
 					}
 				}
 				
@@ -83,9 +88,8 @@ public class AudioPlayer {
 					
 					if ( seekPercentRequested != NO_REQUEST ) {
 						decoder.seekTo ( seekPercentRequested );
-						controller.playerSeekedToPercent ( seekPercentRequested );
-						seekPercentRequested = NO_REQUEST;
 						updateTrackPosition();
+						seekPercentRequested = NO_REQUEST;
 					}
 					
 					if ( volumePercentRequested != NO_REQUEST ) {
@@ -234,6 +238,6 @@ public class AudioPlayer {
 			timeElapsedMS = (int)( lengthMS * seekPercentRequested );
 		}
 		
-		controller.playTrackPositionChanged ( timeElapsedMS, lengthMS );
+		controller.playerTrackPositionChanged ( timeElapsedMS, lengthMS );
 	}
 }

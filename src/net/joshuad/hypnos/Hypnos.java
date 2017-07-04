@@ -6,50 +6,119 @@ import java.net.URLDecoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import net.joshuad.hypnos.audio.PlayerController;
 import net.joshuad.hypnos.fxui.FXUI;
 
 public class Hypnos extends Application {
+
+	private static final Logger LOGGER = Logger.getLogger( Hypnos.class.getName() );
 	
 	public enum ExitCode {
 		NORMAL,
+		UNKNOWN_ERROR,
 		AUDIO_ERROR
 	}
 	
-	public static boolean IS_STANDALONE = false;
-	public static boolean IS_DEVELOPING = false;
-	public static Path ROOT;
+	public enum OS {
+		WIN_XP ( "Windows XP" ),
+		WIN_VISTA ( "Windows Vista" ),
+		WIN_7 ( "Windows 7" ),
+		WIN_8 ( "Windows 8" ),
+		WIN_10 ( "Windows 10" ),
+		WIN_UNKNOWN ( "Windows Unknown" ),
+		OSX ( "Mac OSX" ),
+		NIX ( "Linux/Unix" ), 
+		UNKNOWN ( "Unknown" );
+		
+		private String displayName;
+		OS ( String displayName ) { this.displayName = displayName; }
+		public String getDisplayName () { return displayName; }
+	}
 	
+	
+	private static OS os = OS.UNKNOWN;
+	private static boolean IS_STANDALONE = false;
+	private static boolean IS_DEVELOPING = false;
+	private static Path ROOT;
 	private static Library library;
-	private static Queue queue;
 	
-	private UIUpdater uiUpdater;
 	private static Persister persister;
-	private static PlayerController player;
+	private static SoundSystem player;
 	private FXUI ui;
+	private LibraryUpdater libraryUpdater;
 	
 	public static Library library() {
 		return library;
 	}
 	
-	public static Queue queue() {
-		return queue; 
+	public static OS getOS() {
+		return os;
 	}
 	
-	public void parseSystemProperties() {
+	public static boolean isStandalone() {
+		return IS_STANDALONE;
+	}
+	
+	public static boolean isDeveloping() {
+		return IS_DEVELOPING;
+	}
+	
+	public static Path getRootDirectory() {
+		return ROOT;
+	}
+	
+	private void parseSystemProperties() {
 				
 		IS_STANDALONE = Boolean.getBoolean( "hypnos.standalone" );
 		IS_DEVELOPING = Boolean.getBoolean( "hypnos.developing" );
 		
 		//TODO: Logging instead of print
-		if ( IS_STANDALONE ) System.out.println ( "Running as standalone" );
-		if ( IS_DEVELOPING ) System.out.println ( "Running on development port" );
+		if ( IS_STANDALONE ) LOGGER.info ( "Running as standalone" );
+		if ( IS_DEVELOPING ) LOGGER.info ( "Running on development port" );
 	}
 	
-	public void setupRootDirectory () {
+	private void determineOS() {
+		String osString = System.getProperty( "os.name" ).toLowerCase();
+		
+		if ( osString.indexOf( "win" ) >= 0 ) {
+			if ( osString.indexOf( "xp" ) >= 0 ) {
+				os = OS.WIN_XP;
+
+			} else if ( osString.indexOf( "vista" ) >= 0 ) {
+				os = OS.WIN_VISTA;
+			
+			} else if ( osString.indexOf( "7" ) >= 0 ) {
+				os = OS.WIN_7;
+				
+			} else if ( osString.indexOf( "8" ) >= 0 ) {
+				os = OS.WIN_8;
+				
+			} else if ( osString.indexOf( "10" ) >= 0 ) {
+				os = OS.WIN_10;
+
+			} else {
+				os = OS.WIN_UNKNOWN;
+			}
+			
+		} else if ( osString.indexOf( "nix" ) >= 0 || osString.indexOf( "linux" ) >= 0 ) {
+			os = OS.NIX;
+
+		} else if ( osString.indexOf( "mac" ) >= 0 ) {
+			os = OS.OSX;
+			
+		} else {
+			os = OS.UNKNOWN;
+		}
+		
+		LOGGER.info ( "Operating System: " + os.getDisplayName() );
+	}
+	
+	
+	private void setupRootDirectory () {
 		String path = FXUI.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 				
 		try {
@@ -62,11 +131,10 @@ public class Hypnos extends Application {
 		}
 	}
 	
-	public void setupJavaLibraryPath() {
-		// This is a cool little hack that makes it so 
-		// the user doensn't have to specify -Djava.libary.path="./lib" at the 
+	private void setupJavaLibraryPath() {
+		// This makes it so the user doensn't have to specify -Djava.libary.path="./lib" at the 
 		// command line, making the .jar's double-clickable
-		System.setProperty( "java.library.path", "./lib" );
+		System.setProperty( "java.library.path", getRootDirectory().resolve ("lib").toString() );
 		
 		try {
 			Field fieldSysPath = ClassLoader.class.getDeclaredField( "sys_paths" );
@@ -74,6 +142,7 @@ public class Hypnos extends Application {
 			fieldSysPath.set( null, null );
 			
 		} catch (NoSuchFieldException|SecurityException|IllegalArgumentException|IllegalAccessException e1) {
+			//TODO: Logging
 			System.out.println ( "Unable to set java.library.path. A crash is likely imminent, but I'll try to continue running.");
 		}
 	}
@@ -93,6 +162,7 @@ public class Hypnos extends Application {
 	public void start ( Stage stage ) {
 		try {
 			parseSystemProperties();
+			determineOS();
 			setupRootDirectory(); 
 			setupJavaLibraryPath();
 			
@@ -102,12 +172,9 @@ public class Hypnos extends Application {
 			
 			SingleInstanceController singleInstanceController = new SingleInstanceController();
 					
-			boolean firstInstance = singleInstanceController.isFirstInstance();
-			
-			if ( firstInstance ) {
+			if ( singleInstanceController.isFirstInstance() ) {
 				library = new Library();
-				queue = new Queue();
-				player = new PlayerController();
+				player = new SoundSystem();
 				ui = new FXUI ( stage, player );
 				
 				persister = new Persister( ui, player );
@@ -116,8 +183,9 @@ public class Hypnos extends Application {
 				ui.showMainWindow();
 				persister.loadDataAfterShowWindow();
 				
-				uiUpdater = new UIUpdater ( ui );
-				ui.takeRemoteCommand( commands );
+				libraryUpdater = new LibraryUpdater ( ui );
+				
+				ui.takeRemoteCommand( commands ); //TODO: maybe pass these to player instead? 
 				
 				library.startLoader( persister );
 				
@@ -128,8 +196,8 @@ public class Hypnos extends Application {
 			}
 			
 		} catch ( Exception e ) {
-			//TODO: 
-			e.printStackTrace();
+			LOGGER.log( Level.SEVERE, "Exception caught at top level of Hypnos. Exiting.", e );
+			exit ( ExitCode.UNKNOWN_ERROR );
 		}
 	}
 

@@ -23,7 +23,11 @@ New Features
 	
 	Tag Window, next and previous button?  
 	
-Bug Fixes / Incremental Improvements	
+	Log to file, how does that work inside java? 
+	
+Bug Fixes / Incremental Improvements
+	When we're playing for the first time on a list with shuffle, pick a random track not the first track. 
+	
 	use observable values for all of the track and album stuff, so we don't have to do refreshes
 	Persisted current track doesn't have the title text or the slider thumb
 
@@ -54,12 +58,9 @@ Bug Fixes / Incremental Improvements
 	
 	Make sure the text labels for time left and time elapsed are padded to NN:NN:NN, to avoid stuff moving. 
 	
-	Queue button isn't turning green
+	History is only saving or loading 1 track, not the full history. 
 	
 Refactor / organize my code. 
- 	Have a single thread handle playing all tracks. 
- 		Have it be the same thread that accepts requests rather than spawning new threads off UI actions. 
- 	There are a few windows being built in FXUI that should have their own classes
  	
 
 Decoders

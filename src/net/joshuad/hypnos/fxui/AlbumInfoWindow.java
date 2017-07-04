@@ -37,9 +37,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.Hypnos;
+import net.joshuad.hypnos.SoundSystem;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
-import net.joshuad.hypnos.audio.PlayerController;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 
 public class AlbumInfoWindow extends Stage {
@@ -48,9 +48,9 @@ public class AlbumInfoWindow extends Stage {
 	TableView <Track> trackTable;
 	TextField locationField;
 	FXUI ui;
-	PlayerController player;
+	SoundSystem player;
 	
-	public AlbumInfoWindow( FXUI ui, PlayerController player ) {
+	public AlbumInfoWindow( FXUI ui, SoundSystem player ) {
 		super();
 		this.ui = ui;
 		this.initModality( Modality.NONE );
@@ -198,7 +198,7 @@ public class AlbumInfoWindow extends Stage {
 		ui.updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		
 		queueMenuItem.setOnAction( event -> {
-			Hypnos.queue().addAllTracks( trackTable.getSelectionModel().getSelectedItems() );
+			player.getQueue().addAllTracks( trackTable.getSelectionModel().getSelectedItems() );
 		});
 		
 			
@@ -208,7 +208,7 @@ public class AlbumInfoWindow extends Stage {
 		});
 		
 		appendMenuItem.setOnAction( event -> {
-			ui.appendTracks ( trackTable.getSelectionModel().getSelectedItems() );
+			player.addTracks ( trackTable.getSelectionModel().getSelectedItems() );
 		});
 
 		playMenuItem.setOnAction( event -> {

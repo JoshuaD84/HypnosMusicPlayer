@@ -1,4 +1,4 @@
-package net.joshuad.hypnos.audio;
+package net.joshuad.hypnos;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -15,24 +15,19 @@ import java.util.logging.Logger;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import net.joshuad.hypnos.Album;
-import net.joshuad.hypnos.CurrentListTrack;
-import net.joshuad.hypnos.Hypnos;
-import net.joshuad.hypnos.Persister;
-import net.joshuad.hypnos.Playlist;
-import net.joshuad.hypnos.Track;
-import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.Persister.Setting;
+import net.joshuad.hypnos.audio.AudioPlayer;
+import net.joshuad.hypnos.audio.PlayerListener;
 
 /* TODO: Consider, is this class doing too much? 
  * 1. Sends requests to AudioPlayer
- * 2. manages History
+ * 2. Manages next/previous stack
  * 3. manages current list
  */
 
-public class PlayerController {
+public class SoundSystem {
 	
-	private static final Logger LOGGER = Logger.getLogger( PlayerController.class.getName() );
+	private static final Logger LOGGER = Logger.getLogger( SoundSystem.class.getName() );
 
 	public enum ShuffleMode {
 		SEQUENTIAL ( "⇉" ), SHUFFLE ( "🔀" );
@@ -54,14 +49,12 @@ public class PlayerController {
 	private RepeatMode repeatMode = RepeatMode.PLAY_ONCE;
 	
 	private static final int MAX_PREVIOUS_NEXT_STACK_SIZE = 10000;
-	private static final int MAX_HISTORY_SIZE = 100;
 
 	private final ObservableList <CurrentListTrack> currentList = FXCollections.observableArrayList(); 
 
 	private final ArrayList <Track> previousNextStack = new ArrayList <Track>( MAX_PREVIOUS_NEXT_STACK_SIZE );
-	private final ObservableList <Track> history = FXCollections.observableArrayList( new ArrayList <Track>(MAX_HISTORY_SIZE) );
 
-	private AudioPlayer currentPlayer;
+	private AudioPlayer player;
 	
 	private Random randomGenerator = new Random();
 
@@ -69,22 +62,30 @@ public class PlayerController {
 	
 	private int playOnceShuffleTracksPlayedCounter = 1;
 	
-	public PlayerController () {
-		currentPlayer = new AudioPlayer ( this );
+	private Queue queue;
+	private History history; 
+	
+	public SoundSystem () {
+		player = new AudioPlayer ( this );
+		queue = new Queue();
+		history = new History();
 	}
 	
+	public Queue getQueue() {
+		return queue;
+	}
 	
 	public void unpause() {
-		currentPlayer.requestUnpause();
+		player.requestUnpause();
 	}
 	
 	public void pause() {
-		currentPlayer.requestPause();
+		player.requestPause();
 	}
 	
 	public void previousTrack() {
 		
-		boolean isPaused = currentPlayer.isPaused();
+		boolean isPaused = player.isPaused();
 		
 		Track previousTrack = null;
 
@@ -93,7 +94,7 @@ public class PlayerController {
 				Track candidate = previousNextStack.remove( 0 );
 				if ( playOnceShuffleTracksPlayedCounter > 0 ) playOnceShuffleTracksPlayedCounter--;
 				
-				if ( candidate.equals( currentPlayer.getTrack() ) ) {
+				if ( candidate.equals( player.getTrack() ) ) {
 					if ( !previousNextStack.isEmpty() ) {
 						candidate = previousNextStack.remove( 0 );
 						if ( playOnceShuffleTracksPlayedCounter > 0 ) playOnceShuffleTracksPlayedCounter--;
@@ -144,7 +145,7 @@ public class PlayerController {
 	}
 	
 	public void togglePause() {
-		if ( currentPlayer != null && !currentPlayer.isPaused() ) {
+		if ( player != null && !player.isPaused() ) {
 			pause();
 
 		} else {
@@ -154,13 +155,13 @@ public class PlayerController {
 	
 	public void nextTrack () {
 		//TODO: Handle what we do when isStopped()
-		if ( Hypnos.queue().hasNext() ) {
-			playTrack( Hypnos.queue().getNextTrack() );
+		if ( queue.hasNext() ) {
+			playTrack( queue.getNextTrack() );
 			
 		} else if ( shuffleMode == ShuffleMode.SEQUENTIAL ) {
 			ListIterator <CurrentListTrack> iterator = currentList.listIterator();
 			boolean didSomething = false;
-			boolean currentlyPaused = currentPlayer.isPaused();
+			boolean currentlyPaused = player.isPaused();
 			while ( iterator.hasNext() ) {
 				if ( iterator.next().getIsCurrentTrack() ) {
 					if ( iterator.hasNext() ) {
@@ -243,13 +244,8 @@ public class PlayerController {
 	}
 	                                                                 
 	public void playTrack ( Track track, boolean startPaused, boolean addToPreviousNextStack ) {
-		if ( currentPlayer != null ) {
-			stopTrack();
-		}
 		
-		currentPlayer.requestPlayTrack( track, startPaused );
-		
-		if ( currentPlayer == null ) return;
+		player.requestPlayTrack( track, startPaused );
 		
 		for ( CurrentListTrack listTrack : currentList ) {
 			listTrack.setIsCurrentTrack( false );
@@ -267,15 +263,7 @@ public class PlayerController {
 			previousNextStack.add( 0, track );
 		}
 		
-		if ( history.size() == 0 || !history.get( 0 ).equals( track ) ) {
-			while ( history.size() >= MAX_HISTORY_SIZE ) {
-				history.remove( history.size() - 1 );
-			}
-			
-			history.add( 0, track );
-		}
-		
-		notifyStarted ( track );
+		history.trackPlayed( track );
 	}
 
 	public void playAlbum ( Album album ) {
@@ -340,17 +328,13 @@ public class PlayerController {
 		}
 	}
 	
-	public void loadTracks ( List <CurrentListTrack> tracks ) {
+	public void loadTracks ( List <? extends Track> tracks ) {
 		loadTracks ( tracks, false );
 	}
 
-	public void loadTracks ( List <CurrentListTrack> tracks, boolean startPaused ) {
+	public void loadTracks ( List <? extends Track> tracks, boolean startPaused ) {
 		currentList.clear();
-		currentList.addAll( tracks );
-		if ( !currentList.isEmpty() ) {
-			playTrack( currentList.get( 0 ), startPaused );
-		}
-		currentPlaylist = null;
+		addTracks ( tracks );
 	}
 
 	public void playPlaylist ( Playlist playlist ) {
@@ -380,12 +364,12 @@ public class PlayerController {
 	}
 
 	public void stopTrack () {
-		if ( currentPlayer != null ) {
-			Track track = currentPlayer.getTrack();
+		if ( player != null ) {
+			Track track = player.getTrack();
 			if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( false );
-			currentPlayer.requestStop();
+			player.requestStop();
 
-			notifyStopped( currentPlayer.getTrack(), false ); //TODO: this shouldn't auto-be false.
+			notifyStopped( player.getTrack(), false ); //TODO: this shouldn't auto-be false.
 		}
 		
 		playOnceShuffleTracksPlayedCounter = 0;
@@ -435,17 +419,35 @@ public class PlayerController {
 		return repeatMode;
 	}
 
-	public ObservableList <Track> getHistory () {
+	public History getHistory () {
 		return history;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public void addTracks ( List <? extends Track> tracks ) {
+		if ( tracks == null || tracks.size() <= 0 ) {
+			LOGGER.info( "Empty list of tracks added, ignored." );
+			return;
+		}
+		
+		if ( tracks.get( 0 ) instanceof CurrentListTrack ) {
+			currentList.addAll( (ArrayList<CurrentListTrack>) tracks );
+		} else {
+			currentList.addAll( Utils.convertTrackList( (ArrayList<Track>) tracks ) );
+		}
+	}
+	
+	public void addTrack ( Path path ) throws IOException {
+		CurrentListTrack track = new CurrentListTrack ( path );
+	}
 
-	public void addTracks ( int index, ArrayList <CurrentListTrack> tracks ) { //TODO: rename addTracks
+	public void addTracks ( int index, ArrayList <CurrentListTrack> tracks ) { 
 		int boundedIndex = Math.min( index, currentList.size() );
 		currentList.addAll( boundedIndex, tracks );
 	}
 
 	public boolean isStopped () {
-		return currentPlayer == null;
+		return player == null;
 	}
 
 	public void addAll ( ArrayList <CurrentListTrack> convertTrackList ) {
@@ -472,16 +474,16 @@ public class PlayerController {
 	}
 
 	public void seekRequested ( double percent ) {
-		currentPlayer.requestSeekPercent( percent );
+		player.requestSeekPercent( percent );
 	}
 
 	public void setVolumePercent ( double percent ) {
-		currentPlayer.requestVolumePercent( percent );
+		player.requestVolumePercent( percent );
 	}
 	
 	public boolean isPaused() {
-		if ( currentPlayer == null ) return true;
-		else return currentPlayer.isPaused();
+		if ( player == null ) return true;
+		else return player.isPaused();
 	}
 
 	public Playlist getCurrentPlaylist () {
@@ -489,8 +491,8 @@ public class PlayerController {
 	}
 
 	public Track getCurrentTrack () {
-		if ( currentPlayer != null ) {
-			return currentPlayer.getTrack();
+		if ( player != null ) {
+			return player.getTrack();
 		} else {
 			return null;
 		}
@@ -499,19 +501,15 @@ public class PlayerController {
 	public void seekMS ( long ms ) {	
 		//TODO: 
 	}
-
-	public void addToHistory ( ArrayList <Track> tracks ) {
-		history.addAll ( tracks );
-	}
 	
 	public long getPositionMS() {
-		return currentPlayer.getPositionMS();
+		return player.getPositionMS();
 	}
 	
 	public EnumMap <Persister.Setting, ? extends Object> getSettings () {
 		EnumMap <Persister.Setting, Object> retMe = new EnumMap <Persister.Setting, Object> ( Persister.Setting.class );
 		
-		if ( !currentPlayer.isStopped() ) {
+		if ( !player.isStopped() ) {
 			retMe.put ( Setting.TRACK, getCurrentTrack().getPath().toString() );
 			retMe.put ( Setting.TRACK_POSITION, getPositionMS() );
 			retMe.put ( Setting.TRACK_NUMBER, getCurrentTrackNumber() );
@@ -580,37 +578,31 @@ public class PlayerController {
 
 	public void playerStopped ( boolean userRequested ) {
 		if ( !userRequested ) {
-			if ( repeatMode == RepeatMode.REPEAT_ONE_TRACK && currentPlayer != null ) {
-				playTrack ( currentPlayer.getTrack() );
+			if ( repeatMode == RepeatMode.REPEAT_ONE_TRACK && player != null ) {
+				playTrack ( player.getTrack() );
 			} else {
 				nextTrack();
 			}
 		}
 	}
 
-
 	public void playerPaused () {
-		// TODO Auto-generated method stub
+		notifyPaused();
 	}
 
 	public void playerUnpaused () {
-		// TODO Auto-generated method stub
-	}
-
-	public void playerSeekedToPercent ( double seekPercentRequested ) {
-		// TODO Auto-generated method stub
+		notifyUnpaused();
 	}
 
 	public void volumeChanged ( double volumePercentRequested ) {
-		// TODO Auto-generated method stub
+		notifyVolumeChanged ( volumePercentRequested );
 	}
 
-	public void playerStarted () {
-		// TODO Auto-generated method stub
+	public void playerStarted ( Track track ) {
+		notifyStarted( track );
 	}
 
-
-	public void playTrackPositionChanged ( int positionMS, int lengthMS ) {
+	public void playerTrackPositionChanged ( int positionMS, int lengthMS ) {
 		notifyPositionChanged ( positionMS, lengthMS );
 	}
 }

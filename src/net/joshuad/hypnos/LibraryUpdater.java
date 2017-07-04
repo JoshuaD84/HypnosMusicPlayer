@@ -4,7 +4,7 @@ import javafx.application.Platform;
 import net.joshuad.hypnos.fxui.FXUI;
 
 //TODO: This has an unclear mission. Does a few things. 
-public class UIUpdater {
+public class LibraryUpdater {
 
 	private static final int MAX_CHANGES_PER_REQUEST = 250;
 
@@ -12,13 +12,13 @@ public class UIUpdater {
 	
 	private FXUI ui;
 	
-	public UIUpdater( FXUI ui ) {
+	public LibraryUpdater( FXUI ui ) {
 		this.ui = ui;
 		
 		Thread uiUpdaterThread = new Thread( () -> {
 			while ( true ) {
 				if( !runLaterPending ) {
-					updateUI();
+					updateLibrary();
 				}
 				
 				try {
@@ -33,7 +33,7 @@ public class UIUpdater {
 		uiUpdaterThread.start();
 	}
 	
-	private void updateUI () { 
+	private void updateLibrary () { 
 		if ( !Hypnos.library().albumsToAdd.isEmpty() || !Hypnos.library().albumsToRemove.isEmpty() || !Hypnos.library().albumsToUpdate.isEmpty() 
 		  || !Hypnos.library().tracksToAdd.isEmpty() || !Hypnos.library().tracksToRemove.isEmpty() || !Hypnos.library().tracksToUpdate.isEmpty() 	
 		  || !Hypnos.library().playlistsToAdd.isEmpty() || !Hypnos.library().playlistsToRemove.isEmpty() || !Hypnos.library().playlistsToUpdate.isEmpty() 

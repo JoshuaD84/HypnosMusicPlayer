@@ -1,8 +1,8 @@
 package net.joshuad.hypnos.audio;
 
 import net.joshuad.hypnos.Track;
-import net.joshuad.hypnos.audio.PlayerController.RepeatMode;
-import net.joshuad.hypnos.audio.PlayerController.ShuffleMode;
+import net.joshuad.hypnos.SoundSystem.RepeatMode;
+import net.joshuad.hypnos.SoundSystem.ShuffleMode;
 
 public interface PlayerListener {
 	public void playerPositionChanged ( int positionMS, int lengthMS );
