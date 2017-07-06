@@ -214,18 +214,20 @@ public class Utils {
 		else return false;
 	}
 	
-	public static ArrayList <Track> getAllTracksInDirectory ( Path startingDirectory ) {
+
+	//TODO: Have this return a list of paths rather than a list of tracks, so the track metadata isn't loaded multiple times. 
+	public static ArrayList <Path> getAllTracksInDirectory ( Path startingDirectory ) {
 		
 		TrackFinder finder = new TrackFinder ();
 		try {
 			Files.walkFileTree( startingDirectory, finder );
-	    	return finder.tracks;
+	    	return finder.trackPaths;
 	    	
 		} catch (IOException e) {
 			System.out.println ( "Read error while traversing directory, some files may not have been loaded: " + startingDirectory.toString() );
 		}
 		
-		return new ArrayList <Track> ();
+		return new ArrayList <Path> ();
 	}
 }
 
@@ -234,23 +236,18 @@ class TrackFinder extends SimpleFileVisitor <Path> {
 
 	private static transient final Logger LOGGER = Logger.getLogger( TrackFinder.class.getName() );
 	
-	ArrayList <Track> tracks = new ArrayList <Track> ();
+	ArrayList <Path> trackPaths = new ArrayList <Path> ();
 	
 	@Override
-	public FileVisitResult visitFile ( Path file, BasicFileAttributes attr ) {
+	public FileVisitResult visitFile ( Path path, BasicFileAttributes attr ) {
 
-		boolean isMusicFile = Utils.isMusicFile ( file );
+		boolean isMusicFile = Utils.isMusicFile ( path );
 		
 		if ( isMusicFile ) {
-			try {
-				Track track = new Track ( file );
-				tracks.add ( track );
-			} catch ( IOException e ) {
-				LOGGER.log( Level.INFO, "Unable to load track", e );
-			}
+			trackPaths.add ( path );
 		} 
+		
 		return FileVisitResult.CONTINUE;
-			
 	}
 	
 	@Override

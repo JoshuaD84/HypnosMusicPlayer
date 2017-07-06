@@ -6,8 +6,12 @@ import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Playlist implements Serializable {
+	private static final Logger LOGGER = Logger.getLogger( Playlist.class.getName() );
 	
 	private static final long serialVersionUID = 1L;
 
@@ -22,6 +26,32 @@ public class Playlist implements Serializable {
 	public Playlist ( String name, ArrayList <Track> tracks ) {
 		setTracks( tracks );
 		this.name = name;
+	}
+	
+	public static List<Path> getTrackPaths ( Path playlistPath ) {
+		List<Path> retMe = new ArrayList<Path> ();
+		
+		if ( playlistPath.toString().toLowerCase().endsWith( ".m3u" ) ) {
+			try (
+					FileReader fileReader = new FileReader( playlistPath.toFile() );
+			) {
+				BufferedReader m3uIn = new BufferedReader ( fileReader );
+				for ( String line; (line = m3uIn.readLine()) != null; ) {
+					if ( line.isEmpty() ) {
+						//Do nothing
+						
+					} else if ( !line.startsWith( "#" ) ) {
+						retMe.add( Paths.get ( line ) );
+					}
+				}
+			} catch ( Exception e ) {
+				LOGGER.log( Level.INFO, "Error reading playlist file: " + playlistPath, e );
+			}
+		} else {
+			LOGGER.info( "Asked to load a playlist that doesn't have a playlist extension, ignoring." );
+		}
+			
+		return retMe;
 	}
 
 	public static Playlist loadPlaylist ( Path path ) {
@@ -44,6 +74,7 @@ public class Playlist implements Serializable {
 						try {
 							playlist.addTrack ( new Track ( Paths.get ( line ) ) );
 						} catch ( Exception e ) {
+							//TODO: 
 							System.out.println ( "Error parsing line in playlist: " + path.toString() + ", continuing." );
 							System.out.println ( "\tLine: " + line );
 						}
@@ -52,10 +83,12 @@ public class Playlist implements Serializable {
 						
 				}
 			} catch ( Exception e ) {
-				System.out.println ( "Error loading: " + path.toString() );
-				e.printStackTrace();
+				LOGGER.info( "Error reading playlist file: " + path );
 				return null;
 			}
+			
+			//TODO: If name isn't set, set it to the file name, so we have something. 
+			
 			return playlist;
 		}
 		return null;

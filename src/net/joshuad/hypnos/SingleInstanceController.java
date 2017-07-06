@@ -8,8 +8,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import net.joshuad.hypnos.fxui.FXUI;
-
 public class SingleInstanceController {
 	
 	int port = 49485;
@@ -17,14 +15,13 @@ public class SingleInstanceController {
 	boolean isFirstInstance = true;
 	ServerSocket serverSocket;
 	
-	@SuppressWarnings("resource")
 	public SingleInstanceController() {
 		if ( Hypnos.isDeveloping() ) {
 			port = 49486;
 		} 
 		
 		try {
-			ServerSocket serverSocket = new ServerSocket ( port, 0, InetAddress.getByName(null) );
+			serverSocket = new ServerSocket ( port, 0, InetAddress.getByName(null) );
 			
 		} catch ( IOException e ) {
 			isFirstInstance = false;
@@ -35,7 +32,7 @@ public class SingleInstanceController {
 		return isFirstInstance;
 	}
 	
-	public boolean startCLICommandListener( FXUI ui ) {
+	public boolean startCLICommandListener( Hypnos hypnos ) {
 		
 		if ( !isFirstInstance ) {
 			//TODO: throw the error, or log it? 
@@ -52,7 +49,7 @@ public class SingleInstanceController {
 					Object dataIn = in.readObject();
 					
 					if ( dataIn instanceof ArrayList ) {
-						ui.takeRemoteCommand ( (ArrayList <SocketCommand>) dataIn );
+						hypnos.applyCommands ( (ArrayList <SocketCommand>) dataIn );
 					}
 
 				} catch ( IOException | ClassNotFoundException e ) {

@@ -3,12 +3,15 @@ package net.joshuad.hypnos.audio;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.joshuad.hypnos.SoundSystem;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.audio.decoders.*;
 
 public class AudioPlayer {
 
+	public enum PlayState {
+		STOPPED, PAUSED, PLAYING;
+	}
+	
 	private static final Logger LOGGER = Logger.getLogger( AudioPlayer.class.getName() );
 
 	public static final int NO_REQUEST = -1;
@@ -20,13 +23,13 @@ public class AudioPlayer {
 	double seekPercentRequested = NO_REQUEST;
 	double volumePercentRequested = NO_REQUEST;
 	
-	boolean isPaused = false;
+	PlayState state = PlayState.STOPPED;
 	
 	AbstractDecoder decoder;
-	SoundSystem controller;
+	AudioSystem controller;
 	Track track;
 	
-	public AudioPlayer( SoundSystem controller ) {
+	public AudioPlayer( AudioSystem controller ) {
 		this.controller = controller;
 		
 		Thread playerThread = new Thread ( () -> {
@@ -40,16 +43,18 @@ public class AudioPlayer {
 	public void runPlayerThread() {
 		while ( true ) {
 			try {
-				if ( stopRequested ) {
-					if ( decoder != null ) {
-						decoder.closeAllResources();
-						controller.playerStopped( true );
-					}
+				if ( state != PlayState.STOPPED && stopRequested ) {
+					System.out.println ( "Stopping" ); //TODO: DD
+					state = PlayState.STOPPED;
+					decoder.closeAllResources();
+					controller.playerStopped( true );
 					decoder = null;
 					stopRequested = false;
 				}	
 				
 				if ( trackRequested != null ) {
+					System.out.println ( "Starting" ); //TODO: DD
+					//TODO: Probably have to send a controller.stopped();
 					synchronized ( trackRequested ) {
 						if ( decoder != null ) {
 							decoder.closeAllResources();
@@ -59,30 +64,32 @@ public class AudioPlayer {
 						
 						if ( decoder != null ) {
 							controller.playerStarted( trackRequested );
+							track = trackRequested;
+							state = PlayState.PLAYING;
 						} else {
 							LOGGER.info( "Unable to initialize decoder for: " + track.getFilename() );
+							state = PlayState.STOPPED;
 						}
 		
-						track = trackRequested;
 						trackRequested = null;
-						
 						stopRequested = false;
-						isPaused = false;
 						seekPercentRequested = NO_REQUEST;
 					}
 				}
 				
-				if ( decoder != null ) {
+				if ( state != PlayState.STOPPED ) {
 						
 					if ( pauseRequested ) {
+						System.out.println ( "Pausing" ); //TODO: DD
 						pauseRequested = false;
-						isPaused = true;
+						state = PlayState.PAUSED;
 						controller.playerPaused();
 					}
 					
 					if ( unpauseRequested ) {
+						System.out.println ( "Unpausing" ); //TODO: DD
 						unpauseRequested = false;
-						isPaused = false;
+						state = PlayState.PLAYING;
 						controller.playerUnpaused();
 					}
 					
@@ -98,16 +105,17 @@ public class AudioPlayer {
 						volumePercentRequested = NO_REQUEST;
 					}
 					
-					if ( !isPaused ) {
+					if ( state == PlayState.PLAYING ) {
 						
 						boolean finishedPlaying = decoder.playSingleFrame();
+						updateTrackPosition();
+						
 						if ( finishedPlaying ) {
 							decoder.closeAllResources();
 							decoder = null;
-							controller.playerStopped ( false );
-						}
-						
-						updateTrackPosition();
+							state = PlayState.STOPPED;
+							controller.playerStopped( false );
+						} 				
 						
 					} else {
 						try {
@@ -132,10 +140,6 @@ public class AudioPlayer {
 		}
 	}
 	
-	public boolean isStopped() {
-		return decoder == null;
-	}
-	
 	public void requestUnpause() {
 		unpauseRequested = true;
 	}
@@ -145,10 +149,19 @@ public class AudioPlayer {
 	}
 	
 	public void requestTogglePause() {
-		if ( isPaused ) {
-			requestUnpause();
-		} else {
-			requestPause();
+		switch ( state ) {
+			case PAUSED:
+				requestUnpause();
+				break;
+				
+			case PLAYING:
+				requestPause();
+				break;
+				
+			case STOPPED: //Fallthrough. 
+			default:
+				//Do nothing. 
+				break;
 		}
 	}
 	
@@ -157,6 +170,7 @@ public class AudioPlayer {
 	}
 	
 	public void requestPlayTrack ( Track track, boolean startPaused ) {
+		System.out.println ( "requestPlayCalled, paused: " + startPaused ); //TODO: DD
 		trackRequested = track;
 		pauseRequested = startPaused;
 	}
@@ -164,19 +178,53 @@ public class AudioPlayer {
 	public void requestSeekPercent ( double seekPercent ) {
 		this.seekPercentRequested = seekPercent;
 	}
+
+	public void requestSeekMS ( long seekMS ) {
+		if ( seekMS < 0 ) {
+			LOGGER.info( "Requested a seek to a negative location. Seeking to 0 instead." );
+		}
+		
+		if ( track != null ) {
+			requestSeekPercent ( seekMS / (double)( track.getLengthS() * 1000 ) );
+		}
+	}
 	
 	public void requestVolumePercent ( double volumePercent ) {
+		if ( volumePercent < 0 ) {
+			LOGGER.info( "Volume requested to be turned down below 0. Setting to 0 instead." );
+			volumePercent = 0;
+		}
 		this.volumePercentRequested = volumePercent;
 	}
-	
-	public boolean isPaused() {
-		return isPaused;
-	}
-	
+		
 	public Track getTrack() {
-		return track;
+		if ( isStopped() ) {
+			return null;
+		} else {
+			return track;
+		}
 	}
-
+	
+	public boolean isStopped () {
+		if ( trackRequested != null ) return false;
+		else if ( state == PlayState.STOPPED ) return true;
+		else if ( stopRequested ) return true;
+		else return false;
+	}
+	
+	public boolean isPaused () {
+		if ( trackRequested != null ) return false;
+		else if ( stopRequested ) return false;
+		else if ( unpauseRequested ) return false;
+		else if ( state == PlayState.PAUSED ) return true;
+		else if ( pauseRequested ) return true;
+		else return false; 
+	}
+	
+	public boolean isPlaying() {
+		return ( !isStopped() && !isPaused() );
+	}
+	
 	public long getPositionMS () {
 		if ( decoder == null ) {
 			return 0;
@@ -184,7 +232,6 @@ public class AudioPlayer {
 			return decoder.getPositionMS();
 		}
 	}
-
 		
 	private AbstractDecoder getPlayer ( Track track ) {
 		
@@ -218,8 +265,7 @@ public class AudioPlayer {
 			
 			case UNKNOWN:
 			default:
-				//TODO: 
-				System.out.println ( "Unknown music file type" );
+				LOGGER.info( "Unrecognized file format. Unable to initialize decoder." );
 				break;
 		}
 		

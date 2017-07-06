@@ -30,14 +30,18 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import net.joshuad.hypnos.Hypnos;
+import net.joshuad.hypnos.Library;
 
 public class LibraryLocationWindow extends Stage {
 
 	TableView <Path> musicSourceTable;
 	
-	public LibraryLocationWindow ( Stage mainStage ) {
+	Library library;
+	
+	public LibraryLocationWindow ( Stage mainStage, Library library ) {
 		super();
+		this.library = library;
+		
 		initModality( Modality.NONE );
 		initOwner( mainStage );
 		setTitle( "Music Search Locations" );
@@ -54,7 +58,7 @@ public class LibraryLocationWindow extends Stage {
 
 		musicSourceTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
 		musicSourceTable.setPlaceholder( emptyLabel );
-		musicSourceTable.setItems( Hypnos.library().getMusicSourcePaths() );
+		musicSourceTable.setItems( library.getMusicSourcePaths() );
 		musicSourceTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 
 		musicSourceTable.widthProperty().addListener( new ChangeListener <Number>() {
@@ -89,7 +93,7 @@ public class LibraryLocationWindow extends Stage {
 				List <File> files = db.getFiles();
 				
 				for ( File file : files ) {
-					Hypnos.library().requestAddSource( file.toPath() );
+					library.requestAddSource( file.toPath() );
 				}
 
 				event.setDropCompleted( true );
@@ -127,7 +131,7 @@ public class LibraryLocationWindow extends Stage {
 			public void handle ( ActionEvent e ) {
 				File selectedFile = chooser.showDialog( me );
 				if ( selectedFile != null ) {
-					Hypnos.library().requestAddSource( selectedFile.toPath() );
+					library.requestAddSource( selectedFile.toPath() );
 				}
 			}
 		});
@@ -135,7 +139,7 @@ public class LibraryLocationWindow extends Stage {
 		removeButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				Hypnos.library().requestRemoveSources( musicSourceTable.getSelectionModel().getSelectedItems() );
+				library.requestRemoveSources( musicSourceTable.getSelectionModel().getSelectedItems() );
 				musicSourceTable.getSelectionModel().clearSelection();	
 			}
 		});
@@ -144,7 +148,7 @@ public class LibraryLocationWindow extends Stage {
 			@Override
 			public void handle ( final KeyEvent keyEvent ) {
 				if ( keyEvent.getCode().equals( KeyCode.DELETE ) ) {
-					Hypnos.library().requestRemoveSources( musicSourceTable.getSelectionModel().getSelectedItems() );
+					library.requestRemoveSources( musicSourceTable.getSelectionModel().getSelectedItems() );
 				}
 			}
 		});

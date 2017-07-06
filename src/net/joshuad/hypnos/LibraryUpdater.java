@@ -3,7 +3,6 @@ package net.joshuad.hypnos;
 import javafx.application.Platform;
 import net.joshuad.hypnos.fxui.FXUI;
 
-//TODO: This has an unclear mission. Does a few things. 
 public class LibraryUpdater {
 
 	private static final int MAX_CHANGES_PER_REQUEST = 250;
@@ -11,11 +10,13 @@ public class LibraryUpdater {
 	private boolean runLaterPending = false;
 	
 	private FXUI ui;
+	private Library library;
 	
-	public LibraryUpdater( FXUI ui ) {
+	public LibraryUpdater( Library library, FXUI ui ) {
 		this.ui = ui;
+		this.library = library;
 		
-		Thread uiUpdaterThread = new Thread( () -> {
+		Thread libraryUpdaterThread = new Thread( () -> {
 			while ( true ) {
 				if( !runLaterPending ) {
 					updateLibrary();
@@ -24,19 +25,19 @@ public class LibraryUpdater {
 				try {
 					Thread.sleep ( 100 );
 				} catch ( InterruptedException e ) {
-					e.printStackTrace();
+					//TODO: handle this properly. 
 				}
 			}
 		});
 		
-		uiUpdaterThread.setDaemon( true );
-		uiUpdaterThread.start();
+		libraryUpdaterThread.setDaemon( true );
+		libraryUpdaterThread.start();
 	}
 	
 	private void updateLibrary () { 
-		if ( !Hypnos.library().albumsToAdd.isEmpty() || !Hypnos.library().albumsToRemove.isEmpty() || !Hypnos.library().albumsToUpdate.isEmpty() 
-		  || !Hypnos.library().tracksToAdd.isEmpty() || !Hypnos.library().tracksToRemove.isEmpty() || !Hypnos.library().tracksToUpdate.isEmpty() 	
-		  || !Hypnos.library().playlistsToAdd.isEmpty() || !Hypnos.library().playlistsToRemove.isEmpty() || !Hypnos.library().playlistsToUpdate.isEmpty() 
+		if ( !library.albumsToAdd.isEmpty() || !library.albumsToRemove.isEmpty() || !library.albumsToUpdate.isEmpty() 
+		  || !library.tracksToAdd.isEmpty() || !library.tracksToRemove.isEmpty() || !library.tracksToUpdate.isEmpty() 	
+		  || !library.playlistsToAdd.isEmpty() || !library.playlistsToRemove.isEmpty() || !library.playlistsToUpdate.isEmpty() 
 		  ){
 			
 			runLaterPending = true;
@@ -46,10 +47,10 @@ public class LibraryUpdater {
 				
 					int changeCount = 0;
 					
-					synchronized ( Hypnos.library().albumsToRemove ) {
-						if ( !Hypnos.library().albumsToRemove.isEmpty() ) {
-							while ( changeCount < MAX_CHANGES_PER_REQUEST && !Hypnos.library().albumsToRemove.isEmpty() ) {
-								Hypnos.library().albums.remove( Hypnos.library().albumsToRemove.remove( 0 ) );
+					synchronized ( library.albumsToRemove ) {
+						if ( !library.albumsToRemove.isEmpty() ) {
+							while ( changeCount < MAX_CHANGES_PER_REQUEST && !library.albumsToRemove.isEmpty() ) {
+								library.albums.remove( library.albumsToRemove.remove( 0 ) );
 								changeCount++;
 							}
 							
@@ -62,10 +63,10 @@ public class LibraryUpdater {
 						}
 					}
 						
-					synchronized ( Hypnos.library().albumsToAdd ) {
-						if ( !Hypnos.library().albumsToAdd.isEmpty() ) {
-							while ( changeCount < MAX_CHANGES_PER_REQUEST && !Hypnos.library().albumsToAdd.isEmpty() ) {
-								Hypnos.library().albums.add( Hypnos.library().albumsToAdd.remove( 0 ) );
+					synchronized ( library.albumsToAdd ) {
+						if ( !library.albumsToAdd.isEmpty() ) {
+							while ( changeCount < MAX_CHANGES_PER_REQUEST && !library.albumsToAdd.isEmpty() ) {
+								library.albums.add( library.albumsToAdd.remove( 0 ) );
 								changeCount++;
 							}
 							
@@ -78,16 +79,16 @@ public class LibraryUpdater {
 						}
 					}
 					
-					synchronized ( Hypnos.library().albumsToUpdate ) {
-						if ( !Hypnos.library().albumsToUpdate.isEmpty() ) {
-							while ( changeCount < MAX_CHANGES_PER_REQUEST && !Hypnos.library().albumsToUpdate.isEmpty() ) {
-								Album updateSource = Hypnos.library().albumsToUpdate.remove( 0 );
-								if ( Hypnos.library().albums.contains( updateSource ) ) {
-									Album updateMe = Hypnos.library().albums.get( Hypnos.library().albums.indexOf( updateSource ) );
+					synchronized ( library.albumsToUpdate ) {
+						if ( !library.albumsToUpdate.isEmpty() ) {
+							while ( changeCount < MAX_CHANGES_PER_REQUEST && !library.albumsToUpdate.isEmpty() ) {
+								Album updateSource = library.albumsToUpdate.remove( 0 );
+								if ( library.albums.contains( updateSource ) ) {
+									Album updateMe = library.albums.get( library.albums.indexOf( updateSource ) );
 									updateMe.refreshTagData();
 									
 								} else {
-									Hypnos.library().albums.add( updateSource );
+									library.albums.add( updateSource );
 								}
 								changeCount += 2; //We charge two here because this is a costly transaction
  							}
@@ -99,10 +100,10 @@ public class LibraryUpdater {
 						}
 					}
 					
-					synchronized ( Hypnos.library().tracksToRemove ) {
-						if ( !Hypnos.library().tracksToRemove.isEmpty() ) {
-							while ( changeCount < MAX_CHANGES_PER_REQUEST && !Hypnos.library().tracksToRemove.isEmpty() ) {
-								boolean removed = Hypnos.library().tracks.remove( Hypnos.library().tracksToRemove.remove( 0 ) );
+					synchronized ( library.tracksToRemove ) {
+						if ( !library.tracksToRemove.isEmpty() ) {
+							while ( changeCount < MAX_CHANGES_PER_REQUEST && !library.tracksToRemove.isEmpty() ) {
+								boolean removed = library.tracks.remove( library.tracksToRemove.remove( 0 ) );
 								
 								if ( removed ) {
 									changeCount++;
@@ -119,10 +120,10 @@ public class LibraryUpdater {
 						}
 					}
 						
-					synchronized ( Hypnos.library().tracksToAdd ) {
-						if ( !Hypnos.library().tracksToAdd.isEmpty() ) {
-							while ( changeCount < MAX_CHANGES_PER_REQUEST && !Hypnos.library().tracksToAdd.isEmpty() ) {
-								Hypnos.library().tracks.add( Hypnos.library().tracksToAdd.remove( 0 ) );
+					synchronized ( library.tracksToAdd ) {
+						if ( !library.tracksToAdd.isEmpty() ) {
+							while ( changeCount < MAX_CHANGES_PER_REQUEST && !library.tracksToAdd.isEmpty() ) {
+								library.tracks.add( library.tracksToAdd.remove( 0 ) );
 								changeCount++;
 							}
 
@@ -136,23 +137,23 @@ public class LibraryUpdater {
 						}
 					}
 	
-					Hypnos.library().tracksToUpdate.clear();
+					library.tracksToUpdate.clear();
 					//TODO: Update tracks
 					
 					//TODO: make sure these don't violate MAX_CHANGES like above, but whatever do it later not gonna happen. 
-					synchronized ( Hypnos.library().playlistsToRemove ) {
-						Hypnos.library().playlists.removeAll( Hypnos.library().playlistsToRemove );
-						Hypnos.library().playlistsToRemove.clear();
+					synchronized ( library.playlistsToRemove ) {
+						library.playlists.removeAll( library.playlistsToRemove );
+						library.playlistsToRemove.clear();
 
 						ui.updatePlaylistPlaceholder();
 					}
 				
-					synchronized ( Hypnos.library().playlistsToAdd ) {
-						Hypnos.library().playlists.addAll( Hypnos.library().playlistsToAdd );
-						Hypnos.library().playlistsToAdd.clear();
+					synchronized ( library.playlistsToAdd ) {
+						library.playlists.addAll( library.playlistsToAdd );
+						library.playlistsToAdd.clear();
 					}
 					
-					Hypnos.library().playlistsToUpdate.clear();
+					library.playlistsToUpdate.clear();
 
 					ui.updatePlaylistPlaceholder();
 					

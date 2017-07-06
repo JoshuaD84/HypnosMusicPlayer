@@ -27,6 +27,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import javafx.collections.ObservableList;
+import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.FXUI;
 
 public class Persister {
@@ -34,33 +35,29 @@ public class Persister {
 	private static final Logger LOGGER = Logger.getLogger( Persister.class.getName() );
 
 	public enum Setting {
-		SHUFFLE, REPEAT, HIDE_ALBUM_TRACKS, WINDOW_MAXIMIZED, PRIMARY_SPLIT_PERCENT, CURRENT_LIST_SPLIT_PERCENT, ART_SPLIT_PERCENT, WINDOW_X_POSITION, WINDOW_Y_POSITION, WINDOW_WIDTH, WINDOW_HEIGHT, TRACK, TRACK_POSITION, TRACK_NUMBER;
+		SHUFFLE, REPEAT, HIDE_ALBUM_TRACKS, WINDOW_MAXIMIZED, PRIMARY_SPLIT_PERCENT, 
+		CURRENT_LIST_SPLIT_PERCENT, ART_SPLIT_PERCENT, WINDOW_X_POSITION, WINDOW_Y_POSITION, 
+		WINDOW_WIDTH, WINDOW_HEIGHT, TRACK, TRACK_POSITION, TRACK_NUMBER;
 	}
 
-	File configDirectory;
+	private File configDirectory;
+	private File sourcesFile;
+	private File playlistsDirectory;
+	private File currentFile;
+	private File queueFile;
+	private File historyFile;
+	private File dataFile;
+	private File settingsFile;
 
-	File sourcesFile;
-
-	File playlistsDirectory;
-
-	File currentFile;
-
-	File queueFile;
-
-	File historyFile;
-
-	File dataFile;
-
-	File settingsFile;
-
-	FXUI ui;
-
-	SoundSystem player;
-
-	public Persister ( FXUI ui, SoundSystem player ) {
+	private FXUI ui;
+	private AudioSystem player;
+	private Library library;
+	
+	public Persister ( FXUI ui, Library library, AudioSystem player ) {
 
 		this.ui = ui;
 		this.player = player;
+		this.library = library;
 
 		// TODO: We might want to make a few fall-throughs if these locations
 		// don't exist.
@@ -158,7 +155,7 @@ public class Persister {
 		try ( ObjectInputStream sourcesIn = new ObjectInputStream( new FileInputStream( sourcesFile ) ); ) {
 			ArrayList <String> searchPaths = (ArrayList <String>) sourcesIn.readObject();
 			for ( String pathString : searchPaths ) {
-				Hypnos.library().requestUpdateSource( Paths.get( pathString ) );
+				library.requestUpdateSource( Paths.get( pathString ) );
 			}
 		} catch ( FileNotFoundException e ) {
 			System.out.println( "File not found: sources, unable to load library source location list, continuing." );
@@ -170,7 +167,7 @@ public class Persister {
 	@SuppressWarnings("unchecked")
 	public void loadCurrentList () {
 		try ( ObjectInputStream currentListIn = new ObjectInputStream( new FileInputStream( currentFile ) ); ) {
-			player.loadTracks( (ArrayList <CurrentListTrack>) currentListIn.readObject(), true );
+			player.setTracks((ArrayList <CurrentListTrack>) currentListIn.readObject() );
 		} catch ( FileNotFoundException e ) {
 			System.out.println( "File not found: current, unable to load current playlist, continuing." );
 		} catch ( IOException | ClassNotFoundException e ) {
@@ -205,8 +202,8 @@ public class Persister {
 
 	public void saveSources () {
 		try ( ObjectOutputStream sourcesOut = new ObjectOutputStream( new FileOutputStream( sourcesFile ) ); ) {
-			ArrayList <String> searchPaths = new ArrayList <String>( Hypnos.library().musicSourcePaths.size() );
-			for ( Path path : Hypnos.library().musicSourcePaths ) {
+			ArrayList <String> searchPaths = new ArrayList <String>( library.musicSourcePaths.size() );
+			for ( Path path : library.musicSourcePaths ) {
 				searchPaths.add( path.toString() );
 			}
 			sourcesOut.writeObject( searchPaths );
@@ -260,8 +257,8 @@ public class Persister {
 		try ( ObjectInputStream dataIn = new ObjectInputStream( new GZIPInputStream( new FileInputStream( dataFile ) ) ); ) {
 			// TODO: Maybe do this more carefully, give Library more control
 			// over it?
-			Hypnos.library().albums.addAll( (ArrayList <Album>) dataIn.readObject() );
-			Hypnos.library().tracks.addAll( (ArrayList <Track>) dataIn.readObject() );
+			library.albums.addAll( (ArrayList <Album>) dataIn.readObject() );
+			library.tracks.addAll( (ArrayList <Track>) dataIn.readObject() );
 		} catch ( FileNotFoundException e ) {
 			System.out.println( "File not found: info.data, unable to load albuma and song lists, continuing." );
 		} catch ( IOException | ClassNotFoundException e ) {
@@ -284,8 +281,8 @@ public class Persister {
 			ByteArrayOutputStream byteWriter = new ByteArrayOutputStream();
 			ObjectOutputStream bytesOut = new ObjectOutputStream( byteWriter );
 
-			bytesOut.writeObject( new ArrayList <Album>( Arrays.asList( Hypnos.library().albums.toArray( new Album [ Hypnos.library().albums.size() ] ) ) ) );
-			bytesOut.writeObject( new ArrayList <Track>( Arrays.asList( Hypnos.library().tracks.toArray( new Track [ Hypnos.library().tracks.size() ] ) ) ) );
+			bytesOut.writeObject( new ArrayList <Album>( Arrays.asList( library.albums.toArray( new Album [ library.albums.size() ] ) ) ) );
+			bytesOut.writeObject( new ArrayList <Track>( Arrays.asList( library.tracks.toArray( new Track [ library.tracks.size() ] ) ) ) );
 
 			compressedOut.write( byteWriter.toByteArray() );
 			compressedOut.flush();
@@ -302,7 +299,7 @@ public class Persister {
 			for ( Path child : stream ) {
 				Playlist playlist = Playlist.loadPlaylist( child );
 				if ( playlist != null ) {
-					Hypnos.library().addPlaylist( playlist );
+					library.addPlaylist( playlist );
 				}
 			}
 
@@ -313,7 +310,7 @@ public class Persister {
 	}
 
 	public void savePlaylists () {
-		ArrayList <Playlist> playlists = new ArrayList <Playlist>( Hypnos.library().playlists );
+		ArrayList <Playlist> playlists = new ArrayList <Playlist>( library.playlists );
 
 		int playlistIndex = 1;
 		for ( Playlist playlist : playlists ) {

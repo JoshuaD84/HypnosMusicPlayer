@@ -15,7 +15,11 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 	
 	private boolean walkInterrupted = false;
 	
-	public MusicFileVisitor ( ) {}
+	Library library;
+	
+	public MusicFileVisitor ( Library library ) {
+		this.library = library;
+	}
 	
 	@Override
 	public FileVisitResult visitFile ( Path file, BasicFileAttributes attr ) {
@@ -37,8 +41,8 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 					Track track = new Track ( file, true ); //This track is discarded. 
 					Album album = new Album ( file.getParent() );
 				
-					Hypnos.library().addAlbum( album );
-					Hypnos.library().addTracks( album.getTracks() );
+					library.addAlbum( album );
+					library.addTracks( album.getTracks() );
 					
 					return FileVisitResult.SKIP_SIBLINGS;
 				} catch ( IOException e ) {
@@ -50,8 +54,8 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 				try {
 					Track track = new Track( file, false );
 	
-					if ( !Hypnos.library().containsTrack( track ) ) {
-						Hypnos.library().addTrack( track );
+					if ( !library.containsTrack( track ) ) {
+						library.addTrack( track );
 					}
 				} catch ( IOException e ) { 
 					LOGGER.log( Level.INFO, "Unable to load track", e );

@@ -37,23 +37,25 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import net.joshuad.hypnos.Hypnos;
-import net.joshuad.hypnos.SoundSystem;
+import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
+import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 
 public class HistoryWindow extends Stage {
 	
 	private FXUI ui;
-	private SoundSystem player;
+	private AudioSystem player;
+	private Library library;
 
 	private TableView <Track> historyTable;
 	
-	public HistoryWindow ( FXUI ui, SoundSystem player ) {
+	public HistoryWindow ( FXUI ui, Library library, AudioSystem player ) {
 		super();
 		this.ui = ui;
 		this.player = player;
+		this.library = library;
 		
 		initModality( Modality.NONE );
 		initOwner( ui.getMainStage() );
@@ -119,7 +121,8 @@ public class HistoryWindow extends Stage {
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
 					Track playMe = historyTable.getSelectionModel().getSelectedItem();
-					player.loadTrack ( playMe );
+					player.setTrack ( playMe );
+					player.play();
 				}
 			});
 			
@@ -159,7 +162,7 @@ public class HistoryWindow extends Stage {
 		};
 		
 		//TODO: I don't know if this is right; 
-		Hypnos.library().getPlaylistSorted().addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
+		library.getPlaylistSorted().addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
 			ui.updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		});
 
@@ -168,7 +171,8 @@ public class HistoryWindow extends Stage {
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.loadTracks( historyTable.getSelectionModel().getSelectedItems() );
+				player.setTracks( historyTable.getSelectionModel().getSelectedItems() );
+				player.play();
 			}
 		});
 		
@@ -182,7 +186,7 @@ public class HistoryWindow extends Stage {
 		apendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.addTracks ( historyTable.getSelectionModel().getSelectedItems() );
+				player.appendTracks ( historyTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 		

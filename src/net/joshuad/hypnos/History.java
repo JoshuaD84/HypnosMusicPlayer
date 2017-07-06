@@ -15,7 +15,10 @@ public class History {
 	public History() {}
 	
 	public void trackPlayed ( Track track ) {
-		if ( history.size() == 0 || !history.get( 0 ).equals( track ) ) {
+		
+		if ( track == null ) return;
+		
+		if ( history.size() == 0 || !track.equals( history.get( 0 ) ) ) {
 			while ( history.size() >= MAX_HISTORY_SIZE ) {
 				history.remove( history.size() - 1 );
 			}
@@ -31,5 +34,13 @@ public class History {
 	public void setData ( List <Track> history ) {
 		history.clear();
 		history.addAll( history );
+	}
+
+	public Track getLastTrack () {
+		if ( history.size() >= 0 ) {
+			return history.get( 0 );
+		} else {
+			return null;
+		}
 	}
 }

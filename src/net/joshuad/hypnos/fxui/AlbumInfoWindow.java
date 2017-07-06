@@ -36,10 +36,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.joshuad.hypnos.Album;
-import net.joshuad.hypnos.Hypnos;
-import net.joshuad.hypnos.SoundSystem;
+import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
+import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 
 public class AlbumInfoWindow extends Stage {
@@ -48,11 +48,15 @@ public class AlbumInfoWindow extends Stage {
 	TableView <Track> trackTable;
 	TextField locationField;
 	FXUI ui;
-	SoundSystem player;
+	AudioSystem player;
+	Library library;
 	
-	public AlbumInfoWindow( FXUI ui, SoundSystem player ) {
+	public AlbumInfoWindow( FXUI ui, Library library, AudioSystem player ) {
 		super();
 		this.ui = ui;
+		this.library = library;
+		this.player = player;
+		
 		this.initModality( Modality.NONE );
 		this.initOwner( ui.getMainStage() );
 		this.setTitle( "Album Info" );
@@ -191,7 +195,7 @@ public class AlbumInfoWindow extends Stage {
 			}
 		};
 
-		Hypnos.library().getPlaylistSorted().addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
+		library.getPlaylistSorted().addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
 			ui.updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		});
 
@@ -208,7 +212,7 @@ public class AlbumInfoWindow extends Stage {
 		});
 		
 		appendMenuItem.setOnAction( event -> {
-			player.addTracks ( trackTable.getSelectionModel().getSelectedItems() );
+			player.appendTracks ( trackTable.getSelectionModel().getSelectedItems() );
 		});
 
 		playMenuItem.setOnAction( event -> {

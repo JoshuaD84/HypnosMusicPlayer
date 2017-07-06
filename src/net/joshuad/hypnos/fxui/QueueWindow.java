@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
@@ -38,24 +39,28 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import net.joshuad.hypnos.CurrentListTrack;
-import net.joshuad.hypnos.Hypnos;
-import net.joshuad.hypnos.SoundSystem;
+import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
+import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 
 public class QueueWindow extends Stage {
 
+	private static final Logger LOGGER = Logger.getLogger( QueueWindow.class.getName() );
+	
 	TableView <Track> queueTable;
 	FXUI ui;
-	SoundSystem player;
+	AudioSystem player;
+	Library library;
 	
 	@SuppressWarnings("unchecked")
-	public QueueWindow ( FXUI ui, SoundSystem player, TagWindow tagWindow ) {
+	public QueueWindow ( FXUI ui, Library library, AudioSystem player, TagWindow tagWindow ) {
 		super();
 		this.ui = ui;
 		this.player = player;
+		this.library = library;
 		initModality( Modality.NONE );
 		initOwner( ui.getMainStage() );
 		setTitle( "Queue" );
@@ -107,17 +112,18 @@ public class QueueWindow extends Stage {
 			}
 		});
 
-		TableColumn numberColumn = new TableColumn ( "#" );
-		TableColumn artistColumn = new TableColumn ( "Artist" );
-		TableColumn titleColumn = new TableColumn ( "Title" );
+		TableColumn numberColumn = new TableColumn<Track, String> ( "#" );
+		TableColumn artistColumn = new TableColumn<Track, String> ( "Artist" );
+		TableColumn titleColumn = new TableColumn<Track, String> ( "Title" );
 		
 		numberColumn.setMaxWidth( 10000 );
 		artistColumn.setMaxWidth( 45000 );
 		titleColumn.setMaxWidth ( 45000 );
 		
-		numberColumn.setCellValueFactory( new Callback <CellDataFeatures <Track, Track>, ObservableValue <String>>() {
+		numberColumn.setCellValueFactory( new Callback <CellDataFeatures <Track, String>, ObservableValue <String>>() {
+			@SuppressWarnings("rawtypes") //TODO: Figure out how to get rid of this. 
 			@Override
-			public ObservableValue <String> call ( CellDataFeatures <Track, Track> p ) {
+			public ObservableValue <String> call ( CellDataFeatures <Track, String> p ) {
 				return new ReadOnlyObjectWrapper ( p.getValue() );
 			}
 		});
@@ -168,7 +174,8 @@ public class QueueWindow extends Stage {
 			
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					player.loadTrack ( queueTable.getSelectionModel().getSelectedItem() );
+					player.setTrack ( queueTable.getSelectionModel().getSelectedItem() );
+					player.play();
 				}
 			} );
 			
@@ -261,19 +268,35 @@ public class QueueWindow extends Stage {
 					event.consume();
 
 				} else if ( db.hasFiles() ) {
-					ArrayList <Track> tracksToAdd = new ArrayList<Track> ();
+					
+					
+					
+				ArrayList <Path> pathsToAdd = new ArrayList<Path> ();
+					
 					for ( File file : db.getFiles() ) {
 						Path droppedPath = Paths.get( file.getAbsolutePath() );
 						if ( Utils.isMusicFile( droppedPath ) ) {
-							try {
-								tracksToAdd.add( new Track( droppedPath ) );
-							} catch ( IOException e ) {
-								e.printStackTrace();
-							}
+							pathsToAdd.add( droppedPath );
+						
 						} else if ( Files.isDirectory( droppedPath ) ) {
-							tracksToAdd.addAll( Utils.getAllTracksInDirectory( droppedPath ) );
+							pathsToAdd.addAll( Utils.getAllTracksInDirectory( droppedPath ) );
+						
+						} else if ( Utils.isPlaylistFile ( droppedPath ) ) {
+							List<Path> paths = Playlist.getTrackPaths( droppedPath );
+							pathsToAdd.addAll( paths );
 						}
 					}
+					
+					ArrayList <Track> tracksToAdd = new ArrayList<Track> ( pathsToAdd.size() );
+					
+					for ( Path path : pathsToAdd ) {
+						try {
+							tracksToAdd.add( new Track ( path ) );
+						} catch ( IOException e ) {
+							LOGGER.info ( "Error loading track: " + path );
+						}
+					}
+										
 					if ( !tracksToAdd.isEmpty() ) {
 						int dropIndex = row.isEmpty() ? dropIndex = queueTable.getItems().size() : row.getIndex();
 						queueTable.getItems().addAll( Math.min( dropIndex, queueTable.getItems().size() ), tracksToAdd );
@@ -362,19 +385,32 @@ public class QueueWindow extends Stage {
 				event.consume();
 
 			} else if ( db.hasFiles() ) {
-				ArrayList <Track> tracksToAdd = new ArrayList<Track> ();
+				ArrayList <Path> pathsToAdd = new ArrayList<Path> ();
+				
 				for ( File file : db.getFiles() ) {
 					Path droppedPath = Paths.get( file.getAbsolutePath() );
 					if ( Utils.isMusicFile( droppedPath ) ) {
-						try {
-							tracksToAdd.add( new Track( droppedPath ) );
-						} catch ( IOException e ) {
-							e.printStackTrace();
-						}
+						pathsToAdd.add( droppedPath );
+					
 					} else if ( Files.isDirectory( droppedPath ) ) {
-						tracksToAdd.addAll( Utils.getAllTracksInDirectory( droppedPath ) );
+						pathsToAdd.addAll( Utils.getAllTracksInDirectory( droppedPath ) );
+					
+					} else if ( Utils.isPlaylistFile ( droppedPath ) ) {
+						List<Path> paths = Playlist.getTrackPaths( droppedPath );
+						pathsToAdd.addAll( paths );
 					}
 				}
+				
+				ArrayList <Track> tracksToAdd = new ArrayList<Track> ( pathsToAdd.size() );
+				
+				for ( Path path : pathsToAdd ) {
+					try {
+						tracksToAdd.add( new Track ( path ) );
+					} catch ( IOException e ) {
+						LOGGER.info ( "Error loading track: " + path );
+					}
+				}
+				
 				if ( !tracksToAdd.isEmpty() ) {
 					queueTable.getItems().addAll( tracksToAdd );
 				}
@@ -402,7 +438,7 @@ public class QueueWindow extends Stage {
 			}
 		};
 		
-		Hypnos.library().getPlaylistSorted().addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
+		library.getPlaylistSorted().addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
 			ui.updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		});
 
@@ -411,14 +447,16 @@ public class QueueWindow extends Stage {
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.loadTracks( queueTable.getSelectionModel().getSelectedItems() );
+				player.setTracks( queueTable.getSelectionModel().getSelectedItems() );
+				player.play();
 			}
 		});
 
 		apendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.addTracks ( queueTable.getSelectionModel().getSelectedItems() );
+				player.appendTracks ( queueTable.getSelectionModel().getSelectedItems() );
+				player.play();
 			}
 		});
 		

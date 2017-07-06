@@ -8,7 +8,7 @@ public class SocketCommand implements Serializable {
 	
 	public enum CommandType {
 		CONTROL,
-		LOAD_TRACKS
+		SET_TRACKS
 	}
 	
 	//TODO: Maybe change these to enums

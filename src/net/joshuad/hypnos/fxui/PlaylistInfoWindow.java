@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -30,25 +31,28 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import net.joshuad.hypnos.CurrentListTrack;
-import net.joshuad.hypnos.Hypnos;
-import net.joshuad.hypnos.SoundSystem;
+import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
+import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 
 public class PlaylistInfoWindow extends Stage {
+	
+	private static final Logger LOGGER = Logger.getLogger( PlaylistInfoWindow.class.getName() );
 	
 	Playlist playlist;
 	TableView <Track> trackTable;
 	TextField locationField;
 	FXUI ui;
-	SoundSystem player;
+	Library library;
+	AudioSystem player;
 	
-	public PlaylistInfoWindow( FXUI ui, SoundSystem player ) {
+	public PlaylistInfoWindow( FXUI ui, Library library, AudioSystem player ) {
 		super();
 		this.ui = ui;
+		this.library = library;
 		this.player = player;
 		this.initModality( Modality.NONE );
 		this.initOwner( ui.getMainStage() );
@@ -143,7 +147,7 @@ public class PlaylistInfoWindow extends Stage {
 			}
 		};
 
-		Hypnos.library().getPlaylistSorted().addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
+		library.getPlaylistSorted().addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
 			ui.updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		});
 
@@ -219,8 +223,8 @@ public class PlaylistInfoWindow extends Stage {
 							trackTable.getItems().addAll( dropIndex, tracksToCopy );
 							
 							Playlist newList = new Playlist ( playlist.getName(), new ArrayList <Track> ( trackTable.getItems() ) );
-							Hypnos.library().removePlaylist( playlist );
-							Hypnos.library().addPlaylist( newList );
+							library.removePlaylist( playlist );
+							library.addPlaylist( newList );
 							
 							playlist = newList;
 							
@@ -259,25 +263,29 @@ public class PlaylistInfoWindow extends Stage {
 					event.consume();
 
 				} else if ( db.hasFiles() ) {
-					ArrayList <CurrentListTrack> tracksToAdd = new ArrayList <CurrentListTrack>();
+					ArrayList <Path> pathsToAdd = new ArrayList<Path> ();
 					
 					for ( File file : db.getFiles() ) {
 						Path droppedPath = Paths.get( file.getAbsolutePath() );
 						if ( Utils.isMusicFile( droppedPath ) ) {
-							try {
-								tracksToAdd.add( new CurrentListTrack( droppedPath ) );
-							} catch ( IOException e ) {
-								e.printStackTrace();
-							}
+							pathsToAdd.add( droppedPath );
 						
 						} else if ( Files.isDirectory( droppedPath ) ) {
-							tracksToAdd.addAll( Utils.convertTrackList( Utils.getAllTracksInDirectory( droppedPath ) ) );
+							pathsToAdd.addAll( Utils.getAllTracksInDirectory( droppedPath ) );
 						
 						} else if ( Utils.isPlaylistFile ( droppedPath ) ) {
-							Playlist playlist = Playlist.loadPlaylist( droppedPath );
-							if ( playlist != null ) {
-								tracksToAdd.addAll( Utils.convertTrackList( playlist.getTracks() ) );
-							}
+							List<Path> paths = Playlist.getTrackPaths( droppedPath );
+							pathsToAdd.addAll( paths );
+						}
+					}
+					
+					ArrayList <Track> tracksToAdd = new ArrayList<Track> ( pathsToAdd.size() );
+					
+					for ( Path path : pathsToAdd ) {
+						try {
+							tracksToAdd.add( new Track ( path ) );
+						} catch ( IOException e ) {
+							LOGGER.info ( "Error loading track: " + path );
 						}
 					}
 					

@@ -49,7 +49,7 @@ public class Queue {
 	
 	public synchronized void addAllTracks ( int index, List<? extends Track> tracks ) {
 		for ( Track track : tracks ) {
-			addTrack ( track );
+			addTrack ( index, track );
 		}
 	}
 	

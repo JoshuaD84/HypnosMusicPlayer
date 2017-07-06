@@ -95,7 +95,7 @@ public class CLIParser {
 			}
 			
 			if ( filesToLoad.size() > 0 ) {
-				retMe.add( new SocketCommand ( SocketCommand.CommandType.LOAD_TRACKS, filesToLoad ) );
+				retMe.add( new SocketCommand ( SocketCommand.CommandType.SET_TRACKS, filesToLoad ) );
 			}
 		
 		} catch ( ParseException e ) {

@@ -1,16 +1,20 @@
 package net.joshuad.hypnos;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.URLDecoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.stage.Stage;
+import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.FXUI;
 
 public class Hypnos extends Application {
@@ -39,46 +43,40 @@ public class Hypnos extends Application {
 		public String getDisplayName () { return displayName; }
 	}
 	
-	
 	private static OS os = OS.UNKNOWN;
-	private static boolean IS_STANDALONE = false;
-	private static boolean IS_DEVELOPING = false;
-	private static Path ROOT;
-	private static Library library;
+	private static Path rootDirectory;
+	private static boolean isStandalone = false;
+	private static boolean isDeveloping = false;
 	
 	private static Persister persister;
-	private static SoundSystem player;
+	private static AudioSystem player;
 	private FXUI ui;
 	private LibraryUpdater libraryUpdater;
-	
-	public static Library library() {
-		return library;
-	}
+	private Library library;
 	
 	public static OS getOS() {
 		return os;
 	}
 	
 	public static boolean isStandalone() {
-		return IS_STANDALONE;
+		return isStandalone;
 	}
 	
 	public static boolean isDeveloping() {
-		return IS_DEVELOPING;
+		return isDeveloping;
 	}
 	
 	public static Path getRootDirectory() {
-		return ROOT;
+		return rootDirectory;
 	}
 	
 	private void parseSystemProperties() {
 				
-		IS_STANDALONE = Boolean.getBoolean( "hypnos.standalone" );
-		IS_DEVELOPING = Boolean.getBoolean( "hypnos.developing" );
+		isStandalone = Boolean.getBoolean( "hypnos.standalone" );
+		isDeveloping = Boolean.getBoolean( "hypnos.developing" );
 		
-		//TODO: Logging instead of print
-		if ( IS_STANDALONE ) LOGGER.info ( "Running as standalone" );
-		if ( IS_DEVELOPING ) LOGGER.info ( "Running on development port" );
+		if ( isStandalone ) LOGGER.config ( "Running as standalone" );
+		if ( isDeveloping ) LOGGER.config ( "Running on development port" );
 	}
 	
 	private void determineOS() {
@@ -114,7 +112,7 @@ public class Hypnos extends Application {
 			os = OS.UNKNOWN;
 		}
 		
-		LOGGER.info ( "Operating System: " + os.getDisplayName() );
+		LOGGER.config ( "Operating System: " + os.getDisplayName() );
 	}
 	
 	
@@ -124,10 +122,10 @@ public class Hypnos extends Application {
 		try {
 			String decodedPath = URLDecoder.decode(path, "UTF-8");
 			decodedPath = decodedPath.replaceFirst("^/(.:/)", "$1");
-			ROOT = Paths.get( decodedPath ).getParent();
+			rootDirectory = Paths.get( decodedPath ).getParent();
 			
 		} catch ( UnsupportedEncodingException e ) {
-			ROOT = Paths.get( path ).getParent();
+			rootDirectory = Paths.get( path ).getParent();
 		}
 	}
 	
@@ -142,14 +140,72 @@ public class Hypnos extends Application {
 			fieldSysPath.set( null, null );
 			
 		} catch (NoSuchFieldException|SecurityException|IllegalArgumentException|IllegalAccessException e1) {
-			//TODO: Logging
-			System.out.println ( "Unable to set java.library.path. A crash is likely imminent, but I'll try to continue running.");
+			LOGGER.warning( "Unable to set java.library.path. A crash is likely imminent, but I'll try to continue running.");
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void applyCommands ( ArrayList <SocketCommand> commands ) {
+		Platform.runLater( () -> {
+			for ( SocketCommand command : commands ) {
+				if ( command.getType() == SocketCommand.CommandType.SET_TRACKS ) {
+					ArrayList<Path> newList = new ArrayList<Path>();
+					
+					for ( File file : (List<File>) command.getObject() ) {
+						if ( file.isDirectory() ) {
+							newList.addAll( Utils.getAllTracksInDirectory( file.toPath() ) );
+						} else {
+							newList.add( file.toPath() );
+						}
+					}
+					
+					if ( newList.size() > 0 ) {
+						player.setTracksPathList( newList );
+					}
+				}
+			}
+	
+			for ( SocketCommand command : commands ) {
+				if ( command.getType() == SocketCommand.CommandType.CONTROL ) {
+					int action = (Integer)command.getObject();
+	
+					switch ( action ) {
+						case SocketCommand.NEXT: 
+							player.next();
+							break;
+						case SocketCommand.PREVIOUS:
+							player.previous();
+							break;
+						case SocketCommand.PAUSE:
+							player.pause();
+							break;
+						case SocketCommand.PLAY:
+							player.unpause();
+							break;
+						case SocketCommand.TOGGLE_PAUSE:
+							player.togglePause();
+							break;
+						case SocketCommand.STOP:
+							player.stop( true );
+							break;
+						case SocketCommand.TOGGLE_MINIMIZED:
+							ui.toggleMinimized();
+							break;
+					}
+				} 
+				
+				try {
+					Thread.sleep( 5 ); //We have to do this because too many quick calls to any SourceDataLine.open() locks up
+				} catch ( InterruptedException e ) {
+					LOGGER.fine( "Sleep interrupted, continuing." );
+				} 
+			}
+		});
 	}
 
 	public static void exit ( ExitCode exitCode ) {
 		persister.saveAllData();
-		player.stopTrack();
+		player.stop( true );
 		System.exit ( exitCode.ordinal() );
 	}
 	
@@ -166,33 +222,35 @@ public class Hypnos extends Application {
 			setupRootDirectory(); 
 			setupJavaLibraryPath();
 			
-			CLIParser parser = new CLIParser( );
 			String[] args = getParameters().getRaw().toArray(new String[0]);
+
+			CLIParser parser = new CLIParser( );
 			ArrayList <SocketCommand> commands = parser.parseCommands( args );
 			
 			SingleInstanceController singleInstanceController = new SingleInstanceController();
 					
 			if ( singleInstanceController.isFirstInstance() ) {
 				library = new Library();
-				player = new SoundSystem();
-				ui = new FXUI ( stage, player );
+				player = new AudioSystem();
+				ui = new FXUI ( stage, library, player );
 				
-				persister = new Persister( ui, player );
+				persister = new Persister( ui, library, player );
 				
 				persister.loadDataBeforeShowWindow();
 				ui.showMainWindow();
 				persister.loadDataAfterShowWindow();
 				
-				libraryUpdater = new LibraryUpdater ( ui );
+				libraryUpdater = new LibraryUpdater ( library, ui );
 				
-				ui.takeRemoteCommand( commands ); //TODO: maybe pass these to player instead? 
+				applyCommands( commands );
 				
+				singleInstanceController.startCLICommandListener ( this );
 				library.startLoader( persister );
 				
 			} else {
 				singleInstanceController.sendCommandsThroughSocket( commands );
 				System.out.println ( "Not first instance, sent commands, now exiting." ); //TODO: Logging instead of print
-				System.exit ( 0 ); //TODO: Use exit ()
+				System.exit ( 0 ); //We don't use exit here intentionally. 
 			}
 			
 		} catch ( Exception e ) {
@@ -202,6 +260,6 @@ public class Hypnos extends Application {
 	}
 
 	public static void main ( String[] args ) {
-		launch( args ); //This calls start() above. 
+		launch( args ); //This calls start()
 	}
 }

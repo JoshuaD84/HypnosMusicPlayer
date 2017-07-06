@@ -38,7 +38,7 @@ public class Library {
     private MusicFileVisitor fileWalker = null; //YOU MUST SET THIS TO NULL AFTER IT WALKS
     
 	private Thread loaderThread;
-	private final ModifiedFileUpdaterThread modifiedFileDelayedUpdater = new ModifiedFileUpdaterThread();
+	private final ModifiedFileUpdaterThread modifiedFileDelayedUpdater;
 	
 	// These are all three representations of the same data. Add stuff to the
 	// Observable List, the other two can't accept add.
@@ -75,6 +75,7 @@ public class Library {
 	private boolean purgeOrphansAndMissing = true;
 	
 	public Library() {
+		modifiedFileDelayedUpdater = new ModifiedFileUpdaterThread( this );
 		if ( watcher == null ) {
 			try {
 				watcher = FileSystems.getDefault().newWatchService();
@@ -89,8 +90,7 @@ public class Library {
 	}
 
 	public void startLoader( Persister persister ) {
-		
-		
+				
 		loaderThread = new Thread ( new Runnable() {
 
 			long lastSaveTime = System.currentTimeMillis();
@@ -151,8 +151,6 @@ public class Library {
 					} catch ( InterruptedException e ) {
 						LOGGER.log ( Level.FINER, "Sleep interupted during wait period." );
 					}
-					
-				
 				}
 			}
 		});
@@ -309,6 +307,12 @@ public class Library {
 		playlistsToRemove.add( playlist );
 	}
 	
+	public void removePlaylists ( List <Playlist> playlists ) {
+		for ( Playlist playlist : playlists ) {
+			removePlaylist ( playlist );
+		}
+	}
+	
 	private void removeOneSource() {
 
 		while ( fileWalker != null ) {
@@ -340,7 +344,7 @@ public class Library {
 	
 	private void loadOneSource() {
 		Path selectedPath = sourceToAdd.get( 0 );
-		fileWalker = new MusicFileVisitor( );
+		fileWalker = new MusicFileVisitor( this );
 		try {
 
 			Files.walkFileTree ( 
@@ -364,7 +368,7 @@ public class Library {
 	
 	private void updateOneSource() {
 		Path selectedPath = sourceToUpdate.get( 0 );
-		fileWalker = new MusicFileVisitor( );
+		fileWalker = new MusicFileVisitor( this );
 		try {
 			Files.walkFileTree ( 
 				selectedPath, 
@@ -566,6 +570,11 @@ class ModifiedFileUpdaterThread extends Thread {
 	public int counter = DELAY_LENGTH_MS;
 	
 	Vector <Path> updateItems = new Vector <Path> ();
+	Library library;
+	
+	public ModifiedFileUpdaterThread ( Library library ) {
+		this.library = library;
+	}
 	
 	public void run() {
 		while ( true ) {
@@ -583,7 +592,7 @@ class ModifiedFileUpdaterThread extends Thread {
 			} else {
 				Vector <Path> copyUpdateItems = new Vector<Path> ( updateItems );
 				for ( Path path : copyUpdateItems ) {
-					Hypnos.library().requestUpdate ( path );
+					library.requestUpdate ( path );
 					updateItems.remove( path );
 				}
 			}
