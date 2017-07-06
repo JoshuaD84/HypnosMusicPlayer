@@ -29,18 +29,27 @@ New Features
 	
 	If the current playing track is next in Queue, have the playing indicator show that, maybe
 	
-	Make a current list queue entry 33+ or something. It'll render as "..."	
-	
 	Add a "Preview" right click menu for any track (not albums or playlists)
 		Maybe provide an option in a settings window that lets you define which thing happens when you double click, preview or set
+		
+	DND the first disc of an album, then dnd the second disc, adding to the list. It makes a new playlist. 
+		
+	Option: Warn when erasing an unsaved playlist. 
+	
+	Double click a single track anywhere -> preview, don't mess with current list. 
+	
+	Double click an album or playlist -> erase the queue. 
 	
 Bug Fixes / Incremental Improvements
+
+	
 	After persist
 		track position not set and transport pending/elapsed not showing
 		tracks on current list that are in queue aren't linked. 
 		Do we want to remember which tab in the library pane is showing?
 		paused current track doesn't have the title text or the slider thumb
 		History is only saving or loading 1 track, not the full history. 
+		Save the current playlist so we can setup the SoundSystem and ListInfoTextBox
 			
 	Update my interruptedException handling: 
 		https://codereview.stackexchange.com/questions/167344/is-this-a-good-general-approach-to-handling-interruptedexceptions-during-sleep
@@ -50,16 +59,11 @@ Bug Fixes / Incremental Improvements
 
 	Make it so filtering long lists isn't laggy. Some way of delaying processing, skipping some letters? Do we need to add the predicate everytime like we are?
 	
-	Adding to a playlist changes its name wrongly
-	
 	If playlists folder doesn't exist, it doesn't save playlists and doens't create it. 
 		
 	Changing tag information doesn't update all the proper places.
 		Changing disc info on album list
 		changing album info when the album is loaded in current list. 
-	
-	Look at queue right click functionaliy
-		After playing a track, should we remove it from the queue? 
 	
 	Make sure horizontal scroll bars never appear
 		6/9 - Can't find anything on google.
@@ -69,7 +73,9 @@ Bug Fixes / Incremental Improvements
 				
 	Editing multiple album artists doesn't seem to work - Dusty Fingers
 	
-	Make sure the text labels for time left and time elapsed are padded to NN:NN:NN, to avoid stuff moving. 
+	Make sure the text labels for time left and time elapsed are padded to NN:NN:NN, to avoid stuff moving.
+
+	Doube click an album - > watch console. It pauses for a loop before unpausing. Delay in opening feels like lag. 
 	
 	
 Refactor / organize my code. 

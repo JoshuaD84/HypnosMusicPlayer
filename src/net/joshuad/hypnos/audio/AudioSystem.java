@@ -52,7 +52,8 @@ public class AudioSystem {
 	private ShuffleMode shuffleMode = ShuffleMode.SEQUENTIAL;
 	private RepeatMode repeatMode = RepeatMode.PLAY_ONCE;
 	
-	private Vector<AudioSystemListener> listeners = new Vector<AudioSystemListener> ();
+	private Vector<PlayerListener> playerListeners = new Vector<PlayerListener> ();
+	private Vector<CurrentListListener> currentListListeners = new Vector<CurrentListListener> ();
 
 	private final ObservableList <CurrentListTrack> currentList = FXCollections.observableArrayList(); 
 
@@ -64,7 +65,6 @@ public class AudioSystem {
 	private Random randomGenerator = new Random();
 
 	static Playlist currentPlaylist = null;
-	static Album currentAlbum = null;
 	
 	private int shuffleTracksPlayedCounter = 0;
 	
@@ -327,9 +327,6 @@ public class AudioSystem {
 	public Playlist getCurrentPlaylist () {
 		return currentPlaylist;
 	}
-
-	
-	
 	
 	public void shuffleList() {
 		Collections.shuffle( currentList );
@@ -383,66 +380,115 @@ public class AudioSystem {
 	
 	
 //Manage Listeners
-	
 
-	public void addListener ( AudioSystemListener listener ) {
+	public void addPlayerListener ( PlayerListener listener ) {
 		if ( listener != null ) {
-			listeners.add( listener );
+			playerListeners.add( listener );
 		} else {
 			LOGGER.info( "Null player listener was attempted to be added, ignoring." );
 		}
 	}
 	
+	public void addCurrentListListener ( CurrentListListener listener ) {		
+		if ( listener != null ) {
+			currentListListeners.add( listener );
+		} else {
+			LOGGER.info( "Null player listener was attempted to be added, ignoring." );
+		}
+		
+	}
+	
 	private void notifyListenersPositionChanged ( int positionMS, int lengthMS ) {
-		for ( AudioSystemListener listener : listeners ) {
+		for ( PlayerListener listener : playerListeners ) {
 			listener.playerPositionChanged( positionMS, lengthMS );
 		}
 	}
 	
 	private void notifyListenersStopped ( Track track, boolean userRequested ) {
-		for ( AudioSystemListener listener : listeners ) {
+		for ( PlayerListener listener : playerListeners ) {
 			listener.playerStopped( track, userRequested );
 		}
 	}
 	
 	private void notifyListenersStarted ( Track track ) {
-		for ( AudioSystemListener listener : listeners ) {
+		for ( PlayerListener listener : playerListeners ) {
 			listener.playerStarted( track );
 		}
 	}
 	
 	private void notifyListenersPaused () {
-		for ( AudioSystemListener listener : listeners ) {
+		for ( PlayerListener listener : playerListeners ) {
 			listener.playerPaused();
 		}
 	}
 	
 	private void notifyListenersUnpaused () {
-		for ( AudioSystemListener listener : listeners ) {
+		for ( PlayerListener listener : playerListeners ) {
 			listener.playerUnpaused( );
 		}
 	}
 	
 	private void notifyListenersVolumeChanged ( double newVolumePercent ) {
-		for ( AudioSystemListener listener : listeners ) {
+		for ( PlayerListener listener : playerListeners ) {
 			listener.playerVolumeChanged( newVolumePercent );
 		}
 	}
 	
 	private void notifyListenersShuffleModeChanged ( ShuffleMode newMode ) {
-		for ( AudioSystemListener listener : listeners ) {
+		for ( PlayerListener listener : playerListeners ) {
 			listener.playerShuffleModeChanged( newMode );
 		}
 	}
 	
 	private void notifyListenersRepeatModeChanged ( RepeatMode newMode ) {
-		for ( AudioSystemListener listener : listeners ) {
+		for ( PlayerListener listener : playerListeners ) {
 			listener.playerRepeatModeChanged( newMode );
 		}
 	}
-
 	
 	
+	
+	private void notifyListenersAlbumsSet ( List<Album> albums ) {
+		for ( CurrentListListener listener : currentListListeners ) {
+			listener.albumsSet( albums );
+		}
+	}
+	
+	private void notifyListenersPlaylistsSet ( List<Playlist> playlists ) {
+		for ( CurrentListListener listener : currentListListeners ) {
+			listener.playlistsSet( playlists );
+		}
+	}
+	
+	private void notifyListenersTracksSet () {
+		for ( CurrentListListener listener : currentListListeners ) {
+			listener.tracksSet();
+		}
+	}
+	
+	private void notifyListenersTracksAdded () {
+		for ( CurrentListListener listener : currentListListeners ) {
+			listener.tracksAdded();
+		}
+	}
+	
+	private void notifyListenersTracksRemoved () {
+		for ( CurrentListListener listener : currentListListeners ) {
+			listener.tracksRemoved();
+		}
+	}
+	
+	private void notifyListenersListCleared () {
+		for ( CurrentListListener listener : currentListListeners ) {
+			listener.listCleared();
+		}
+	}
+	
+	private void notifyListenersListReordered() {
+		for ( CurrentListListener listener : currentListListeners ) {
+			listener.listReordered();
+		}
+	}
 	
 	
 	
@@ -518,13 +564,27 @@ public class AudioSystem {
 // Add and remove tracks from the current list
 	
 	public void clearList() {
+		if ( currentList.size() > 0 ) {
+			notifyListenersListCleared();
+		}
 		currentList.clear();
 	}
 	
 	public void removeTracksAtIndices ( List <Integer> indicies ) {
+		int tracksRemoved = 0;
 		for ( int k = indicies.size() - 1; k >= 0; k-- ) {
 			if ( indicies.get( k ) >= 0 && indicies.get ( k ) < currentList.size() ) {
 				currentList.remove ( indicies.get( k ).intValue() );
+				tracksRemoved++;
+			}
+		}
+		
+		if ( tracksRemoved > 0 ) {
+			if ( currentList.size() == 0 ) {
+				notifyListenersListCleared();
+				currentPlaylist = null;
+			} else {
+				notifyListenersTracksRemoved();
 			}
 		}
 	}
@@ -592,6 +652,9 @@ public class AudioSystem {
 	}
 	
 	public void insertTrackPathList ( int index, List <Path> paths ) {
+		
+		boolean startedEmpty = currentList.isEmpty();
+		
 		if ( paths == null || paths.size() <= 0 ) {
 			LOGGER.fine( "Recieved a null or empty track list. No tracks loaded." );
 			return;
@@ -599,9 +662,11 @@ public class AudioSystem {
 		
 		ArrayList <CurrentListTrack> tracks = new ArrayList <CurrentListTrack> ( paths.size() );
 		
+		int tracksAdded = 0;
 		for ( Path path : paths ) {
 			try {
 				tracks.add ( new CurrentListTrack ( path ) );
+				tracksAdded++;
 			} catch ( IOException | NullPointerException e ) {
 				LOGGER.fine( "Recieved a null or empty track. Skipping." );
 			}
@@ -611,37 +676,58 @@ public class AudioSystem {
 			if ( index < 0 ) {
 				LOGGER.fine( "Asked to insert tracks at: " + index + ", inserting at 0 instead." );
 				index = 0;
-			} else if ( index >= currentList.size() ) {
+			} else if ( index > currentList.size() ) {
 				LOGGER.fine( "Asked to insert tracks past the end of current list. Inserting at end instead." );
-				index = currentList.size() - 1;
+				index = currentList.size();
 			}
 	
 			currentList.addAll( index, tracks );
 		}
 		
-		currentPlaylist = null;
-		currentAlbum = null;
+		if ( tracksAdded > 0 ) {
+			if ( startedEmpty ) {
+				notifyListenersTracksSet();
+			} else {
+				notifyListenersTracksAdded();
+			}
+		}
 	}
-	
-	
-	
-	
 	
 	public void appendAlbum ( Album album ) {
 		
-		boolean setAsAlbum = false;
-		if ( currentList.size() == 0 ) setAsAlbum = true;
+		boolean startedEmpty = false;
+		if ( currentList.size() == 0 ) startedEmpty = true;
 		
 		appendTracks ( album.getTracks() );
 		
-		if ( setAsAlbum ) currentAlbum = album;
+		if ( startedEmpty ) {
+			this.notifyListenersAlbumsSet( Arrays.asList( album ) );
+		}
 	}
 	
-	//TODO: appendAlbums
+	public void appendAlbums ( List<Album> albums ) {
+
+		boolean startedEmpty = false;
+		if ( currentList.size() == 0 ) startedEmpty = true;
+		
+		int albumsAdded = 0;
+		Album lastAlbum = null;
+		for ( Album album : albums ) {
+			if ( album != null ) {
+				appendTracks ( album.getTracks() );
+				lastAlbum = album;
+				albumsAdded++;
+			}
+		}
+		
+		if ( startedEmpty ) {
+			notifyListenersAlbumsSet ( albums );
+		}
+	}
 	
 	public void setAlbum ( Album album ) {
 		setTracks ( album.getTracks() );
-		currentAlbum = album;
+		notifyListenersAlbumsSet ( Arrays.asList( album ) );
 	}
 	
 	public void setAlbums ( List<Album> albums ) {
@@ -660,9 +746,7 @@ public class AudioSystem {
 		
 		setTracks ( addMe );
 		
-		if ( albumsAdded == 1 ) {
-			currentAlbum = albumAdded;
-		}
+		notifyListenersAlbumsSet ( albums );
 	}
 	
 	
@@ -672,15 +756,38 @@ public class AudioSystem {
 		
 		appendTracks ( playlist.getTracks() );
 		
-		if ( setAsPlaylist ) currentPlaylist = playlist;
-		
+		if ( setAsPlaylist ) {
+			currentPlaylist = playlist;
+			notifyListenersPlaylistsSet ( Arrays.asList( playlist ) );
+		}
 	}
 	
-	//TODO: appendPLaylists
+	public void appendPlaylists ( List<Playlist> playlists ) {
+
+		boolean startedEmpty = false;
+		if ( currentList.size() == 0 ) startedEmpty = true;
+		
+		int playlistsAdded = 0;
+		Playlist lastPlaylist = null;
+		for ( Playlist playlist : playlists ) {
+			if ( playlist != null ) {
+				appendTracks ( playlist.getTracks() );
+				lastPlaylist = playlist;
+				playlistsAdded++;
+			}
+		}
+		
+		if ( startedEmpty && playlistsAdded == 1 ) {
+			currentPlaylist = lastPlaylist;
+		}
+		
+		if ( startedEmpty ) {
+			notifyListenersPlaylistsSet ( playlists );
+		}
+	}
 	
 	public void setPlaylist ( Playlist playlist ) {
 		setPlaylists ( Arrays.asList( playlist ) );
-		currentPlaylist = playlist;
 	}
 	
 	public void setPlaylists ( List<Playlist> playlists ) {
@@ -703,6 +810,8 @@ public class AudioSystem {
 		if ( playlistsAdded == 1 ) {
 			currentPlaylist = playlistAdded;
 		}
+		
+		notifyListenersPlaylistsSet ( playlists );
 	}
 }
 

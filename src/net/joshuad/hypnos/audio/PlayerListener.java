@@ -4,7 +4,7 @@ import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
 
-public interface AudioSystemListener {
+public interface PlayerListener {
 	public void playerPositionChanged ( int positionMS, int lengthMS );
 	public void playerStopped ( Track track, boolean userRequested );
 	public void playerStarted ( Track track );

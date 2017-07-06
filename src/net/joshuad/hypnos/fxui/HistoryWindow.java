@@ -130,7 +130,7 @@ public class HistoryWindow extends Stage {
 				if ( !row.isEmpty() ) {
 					ArrayList <Integer> indices = new ArrayList <Integer>( historyTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( historyTable.getSelectionModel().getSelectedItems() );
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, DragSource.HISTORY );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, null, DragSource.HISTORY );
 					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();

@@ -87,14 +87,14 @@ import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.Persister.Setting;
-import net.joshuad.hypnos.audio.AudioSystemListener;
+import net.joshuad.hypnos.audio.PlayerListener;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 
 @SuppressWarnings({ "rawtypes", "unchecked" }) // TODO: Maybe get rid of this when I understand things better
-public class FXUI implements AudioSystemListener {
+public class FXUI implements PlayerListener {
 	
 	private static final Logger LOGGER = Logger.getLogger( FXUI.class.getName() );
 
@@ -268,24 +268,17 @@ public class FXUI implements AudioSystemListener {
 		((Group) scene.getRoot()).getChildren().addAll( primaryContainer );
 		mainStage.setScene( scene );
 		
-		player.addListener ( this );
+		player.addPlayerListener ( this );
 	}
 	
 	public void clearList() {
 		player.clearList();
-		listInfoUpdater.listCleared();
 	}
 
 	private void removeFromCurrentList ( List<Integer> removeMe ) {
 		
 		if ( !removeMe.isEmpty() ) {
 			player.removeTracksAtIndices ( removeMe );
-			
-			if ( currentListTable.getItems().size() == 0 ) {
-				listInfoUpdater.listCleared();
-			} else {
-				listInfoUpdater.tracksRemoved();
-			}
 		}
 	}
 	
@@ -585,7 +578,6 @@ public class FXUI implements AudioSystemListener {
 		playlist.getTracks().addAll( tracks );
 		if ( player.getCurrentPlaylist() != null && player.getCurrentPlaylist().getName().equals( playlist.getName() ) ) {
 			player.appendTracks( tracks );
-			listInfoUpdater.playlistLoaded( playlist );
 		}
 		playlistTable.refresh(); 
 	}
@@ -617,11 +609,6 @@ public class FXUI implements AudioSystemListener {
 
 			Playlist newPlaylist = new Playlist( enteredName, new ArrayList <Track> ( tracks ) );
 			library.addPlaylist ( newPlaylist );
-			
-			if ( isCurrentList ) {
-				//currentPlaylist = newPlaylist; //TODO: SOmething is probably broken because I commented this out. 
-				listInfoUpdater.playlistLoaded( player.getCurrentPlaylist() );
-			}
 		}
 	}
 	
@@ -640,8 +627,6 @@ public class FXUI implements AudioSystemListener {
 			library.removePlaylist( playlist );
 			playlist.setName ( enteredName );
 			library.addPlaylist( playlist );
-			
-			listInfoUpdater.playlistLoaded( playlist );
 		}
 	}
 
@@ -771,6 +756,7 @@ public class FXUI implements AudioSystemListener {
 		currentPlayingListInfo.setAlignment( Pos.CENTER );
 		currentPlayingListInfo.prefWidthProperty().bind( playlistControls.widthProperty() );
 		listInfoUpdater = new ListInfoUpdater ( currentPlayingListInfo );
+		player.addCurrentListListener ( listInfoUpdater );
 
 		playlistControls.getChildren().addAll( toggleRepeatButton, toggleShuffleButton, showQueueButton, showHistoryButton,
 				currentPlayingListInfo, loadTracksButton, savePlaylistButton, clearButton );
@@ -1224,7 +1210,7 @@ public class FXUI implements AudioSystemListener {
 						}
 					}
 					
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( null, tracks, albums, DragSource.ALBUM_LIST );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( null, tracks, albums, null, DragSource.ALBUM_LIST );
 					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
@@ -1445,7 +1431,7 @@ public class FXUI implements AudioSystemListener {
 				if ( !row.isEmpty() ) {
 					ArrayList <Integer> indices = new ArrayList <Integer>( trackTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( trackTable.getSelectionModel().getSelectedItems() );
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, DragSource.TRACK_LIST );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, null, DragSource.TRACK_LIST );
 					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
@@ -1600,11 +1586,13 @@ public class FXUI implements AudioSystemListener {
 					List <Playlist> selectedPlaylists = playlistTable.getSelectionModel().getSelectedItems();
 					List <Track> tracks = new ArrayList <Track> ();
 					
+					List <Playlist> serializableList = new ArrayList ( selectedPlaylists );
+					
 					for ( Playlist playlist : selectedPlaylists ) {
 						tracks.addAll ( playlist.getTracks() );
 					}
 					
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( null, tracks, null, DragSource.PLAYLIST_LIST );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( null, tracks, null, serializableList, DragSource.PLAYLIST_LIST );
 					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
@@ -1721,8 +1709,8 @@ public class FXUI implements AudioSystemListener {
 		currentListTable.setPlaceholder( new Label( "No tracks in playlist." ) );
 		currentListTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 
-		playingColumn.setMaxWidth( 28 );
-		playingColumn.setMinWidth( 28 );
+		playingColumn.setMaxWidth( 38 );
+		playingColumn.setMinWidth( 38 );
 
 		currentListTable.setOnDragOver( event -> {
 			
@@ -1743,19 +1731,21 @@ public class FXUI implements AudioSystemListener {
 				DraggedTrackContainer container = (DraggedTrackContainer) db.getContent( DRAGGED_TRACKS );
 				
 				switch ( container.getSource() ) {
-					case ALBUM_LIST:
-					case PLAYLIST_LIST:
 					case TRACK_LIST:
 					case ALBUM_INFO:
+					case PLAYLIST_INFO:
 					case HISTORY: {
-						List <Track> tracksToCopy = container.getTracks();
-						player.appendTracks ( tracksToCopy );
-						if ( container.getAlbums() != null ) {
-							listInfoUpdater.albumsLoaded( container.getAlbums() );
-						} else {
-							listInfoUpdater.tracksLoaded();
-						}
+						player.appendTracks ( container.getTracks() );
 					
+					} break;
+
+					case PLAYLIST_LIST: {
+						player.appendPlaylists ( container.getPlaylists() );
+						
+					} break;
+					
+					case ALBUM_LIST: {
+						player.appendAlbums ( container.getAlbums() );
 					} break;
 					
 					case CURRENT_LIST: {
@@ -1765,6 +1755,7 @@ public class FXUI implements AudioSystemListener {
 					case QUEUE: {
 						synchronized ( player.getQueue().getData() ) {
 							List <Integer> draggedIndices = container.getIndices();
+							
 							ArrayList <Track> tracksToCopy = new ArrayList <Track> ( draggedIndices.size() );
 							for ( int index : draggedIndices ) {
 								if ( index >= 0 && index < player.getQueue().getData().size() ) {
@@ -1783,15 +1774,14 @@ public class FXUI implements AudioSystemListener {
 										}
 									}
 								}
-								player.appendTracks( tracksToCopy );
-								listInfoUpdater.tracksAdded();
 							}
+							player.appendTracks( tracksToCopy );
 						}
 						
 					} break;
 				}
 
-				player.getQueue().updateQueueIndexes( null );
+				player.getQueue().updateQueueIndexes();
 				event.setDropCompleted( true );
 				event.consume();
 
@@ -1875,7 +1865,6 @@ public class FXUI implements AudioSystemListener {
 			@Override
 			public void handle ( ActionEvent event ) {
 				player.shuffleList();
-				listInfoUpdater.listReordered();
 			}
 		});
 		
@@ -1956,7 +1945,7 @@ public class FXUI implements AudioSystemListener {
 				if ( !row.isEmpty() ) {
 					ArrayList <Integer> indices = new ArrayList <Integer>( currentListTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( currentListTable.getSelectionModel().getSelectedItems() );
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, DragSource.CURRENT_LIST );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, null, DragSource.CURRENT_LIST );
 					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
@@ -1986,12 +1975,13 @@ public class FXUI implements AudioSystemListener {
 						case PLAYLIST_LIST:
 						case TRACK_LIST:
 						case ALBUM_INFO:
+						case PLAYLIST_INFO:
 						case HISTORY: {
 							player.insertTracks( dropIndex, Utils.convertTrackList( container.getTracks() ) );
 						} break;
 						
 						case CURRENT_LIST: {
-							//TODO: Generalize this out into a fucntion? 
+							//TODO: Generalize this out into a function? 
 							List <Integer> draggedIndices = container.getIndices();
 							ArrayList <CurrentListTrack> tracksToMove = new ArrayList <CurrentListTrack> ( draggedIndices.size() );
 							for ( int index : draggedIndices ) {
@@ -2013,13 +2003,12 @@ public class FXUI implements AudioSystemListener {
 							for ( int k = 0; k < draggedIndices.size(); k++ ) {
 								currentListTable.getSelectionModel().select( dropIndex + k );
 							}
-
-							listInfoUpdater.listReordered( );
 						} break;
 						
 						case QUEUE: {
 							synchronized ( player.getQueue().getData() ) {
 								List <Integer> draggedIndices = container.getIndices();
+								
 								ArrayList <CurrentListTrack> tracksToCopy = new ArrayList <CurrentListTrack> ( draggedIndices.size() );
 								for ( int index : draggedIndices ) {
 									if ( index >= 0 && index < player.getQueue().getData().size() ) {
@@ -2039,14 +2028,14 @@ public class FXUI implements AudioSystemListener {
 											}
 										}
 									}
-									player.insertTracks ( dropIndex, tracksToCopy );
 								}
+								player.insertTracks ( dropIndex, tracksToCopy );
 							}
 							
 						} break;
 					}
 
-					player.getQueue().updateQueueIndexes( null );
+					player.getQueue().updateQueueIndexes( );
 					event.setDropCompleted( true );
 					event.consume();
 
@@ -2357,8 +2346,7 @@ public class FXUI implements AudioSystemListener {
 						break;
 				}
 			} catch ( Exception e ) {
-				e.printStackTrace( System.out );
-				LOGGER.info( "Unable to apply setting: " + setting + " to UI." );
+				LOGGER.log( Level.INFO, "Unable to apply setting: " + setting + " to UI.", e );
 			}
 		});
 	}

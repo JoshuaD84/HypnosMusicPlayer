@@ -31,6 +31,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
@@ -187,7 +188,7 @@ public class PlaylistInfoWindow extends Stage {
 				if ( !row.isEmpty() ) {
 					ArrayList <Integer> indices = new ArrayList <Integer>( trackTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( trackTable.getSelectionModel().getSelectedItems() );
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, DragSource.PLAYLIST_LIST );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, null, DragSource.PLAYLIST_INFO );
 					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
@@ -213,7 +214,41 @@ public class PlaylistInfoWindow extends Stage {
 					int dropIndex = row.isEmpty() ? dropIndex = trackTable.getItems().size() : row.getIndex();
 					
 					switch ( container.getSource() ) {
-						case ALBUM_LIST:
+						case PLAYLIST_LIST: {
+							if ( container.getPlaylists() == null ) {
+								LOGGER.fine ( "Recieved null data from playlist list, ignoring." );
+								
+							} else {
+								List <Track> tracksToCopy = new ArrayList<Track>();
+								for ( Playlist playlist : container.getPlaylists() ) {
+									if ( playlist == null ) {
+										LOGGER.fine ( "Recieved null playlist from playlist list, ignoring." );
+									} else {
+										tracksToCopy.addAll( playlist.getTracks() );
+									}
+										
+								}
+								trackTable.getItems().addAll ( tracksToCopy );
+							}
+						} break;
+						
+						case ALBUM_LIST: {
+							if ( container.getAlbums() == null ) {
+								LOGGER.fine ( "Recieved null data from playlist list, ignoring." );
+								
+							} else {
+								List <Track> tracksToCopy = new ArrayList<Track>();
+								for ( Album album : container.getAlbums() ) {
+									if ( album == null ) {
+										LOGGER.fine ( "Recieved null playlist from playlist list, ignoring." );
+									} else {
+										tracksToCopy.addAll( album.getTracks() );
+									}
+								}
+								trackTable.getItems().addAll ( tracksToCopy );
+							}
+						} break;
+						
 						case TRACK_LIST:
 						case ALBUM_INFO:
 						case HISTORY: 
@@ -230,7 +265,7 @@ public class PlaylistInfoWindow extends Stage {
 							
 						} break;
 						
-						case PLAYLIST_LIST: {
+						case PLAYLIST_INFO: {
 							List <Integer> draggedIndices = container.getIndices();
 							ArrayList <Track> tracksToMove = new ArrayList <Track> ( draggedIndices.size() );
 							for ( int index : draggedIndices ) {

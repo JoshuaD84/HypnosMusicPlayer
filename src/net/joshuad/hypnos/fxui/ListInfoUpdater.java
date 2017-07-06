@@ -7,8 +7,9 @@ import java.util.logging.Logger;
 import javafx.scene.control.Label;
 import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.Playlist;
+import net.joshuad.hypnos.audio.CurrentListListener;
 
-public class ListInfoUpdater {
+public class ListInfoUpdater implements CurrentListListener {
 	
 	private static final Logger LOGGER = Logger.getLogger( ListInfoUpdater.class.getName() );
 	
@@ -44,8 +45,8 @@ public class ListInfoUpdater {
 		this.label = label;
 	}
 	
-	public void albumsLoaded ( List<Album> albums ) {
-		
+	@Override
+	public void albumsSet ( List<Album> albums ) {
 		if ( albums == null ) {
 			LOGGER.log( Level.FINE, "Recieved an null album list." );
 			return;
@@ -56,7 +57,7 @@ public class ListInfoUpdater {
 			return;
 			
 		} else if ( albums.size() == 1 ) {
-			albumLoaded ( albums.get( 0 ) );
+			albumSet ( albums.get( 0 ) );
 			return;
 			
 		} else {
@@ -89,10 +90,10 @@ public class ListInfoUpdater {
 			}
 			
 			if ( !initialized ) {
-				tracksLoaded();
+				tracksSet();
 				
 			} else if ( differentBaseAlbums ) {
-				tracksLoaded();
+				tracksSet();
 				
 			} else {
 				baseString = "Album: " + artist + " - " + year + " - " + simpleTitle;
@@ -102,7 +103,7 @@ public class ListInfoUpdater {
 		}
 	}
 	
-	public void albumLoaded ( Album album ) {
+	private void albumSet ( Album album ) {
 		if ( album == null ) {
 			LOGGER.log( Level.FINE, "Recieved a null album." );
 			return;
@@ -112,22 +113,25 @@ public class ListInfoUpdater {
 		label.setText( baseString );
 		mode = Mode.ALBUM;
 	}
-
-	public void tracksLoaded ( ) { 
+	
+	@Override
+	public void tracksSet () { 
 		baseString = NEW_PLAYLIST_NAME;
 		label.setText( baseString + " *");
 		mode = Mode.PLAYLIST;
 	}
 	
+	@Override
 	public void tracksAdded () {
 		if ( mode == Mode.PLAYLIST ) {
 			label.setText( baseString + " *" );
 			
 		} else {
-			tracksLoaded();
+			tracksSet();
 		}
 	}
 	
+	@Override
 	public void tracksRemoved() {
 		if ( mode == Mode.PLAYLIST ) {
 			label.setText( baseString + " *" );
@@ -139,7 +143,7 @@ public class ListInfoUpdater {
 		}
 	}
 
-	public void playlistLoaded ( Playlist playlist ) {
+	private void playlistSet( Playlist playlist ) {
 		if ( playlist == null )  {
 			LOGGER.log( Level.FINE, "Recieved a null playlist." );
 			return;
@@ -150,7 +154,8 @@ public class ListInfoUpdater {
 		mode = Mode.PLAYLIST;
 	}
 	
-	public void playlistsLoaded ( List<Playlist> playlists ) {
+	@Override
+	public void playlistsSet ( List<Playlist> playlists ) {
 		if ( playlists == null ) {
 			LOGGER.log( Level.FINE, "Recieved an null playlist list." );
 			return;
@@ -161,19 +166,21 @@ public class ListInfoUpdater {
 			return;
 			
 		} else if ( playlists.size() == 1 ) {
-			playlistLoaded ( playlists.get( 0 ) );
+			playlistSet ( playlists.get( 0 ) );
 			return;
 			
 		} else {
-			tracksLoaded();
+			tracksSet();
 		}
 	}
 	
+	@Override
 	public void listCleared () {
 		label.setText( EMPTY_LIST_NAME );
 		mode = Mode.EMPTY;
 	}	
 	
+	@Override
 	public void listReordered() {
 		label.setText( baseString + " *" );
 	}

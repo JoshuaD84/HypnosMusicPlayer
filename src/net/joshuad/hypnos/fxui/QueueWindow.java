@@ -102,12 +102,12 @@ public class QueueWindow extends Stage {
 				List<Integer> removeMe = new ArrayList<Integer> ( selectedIndexes );
 				
 				if ( !removeMe.isEmpty() ) {
-	
 					int selectAfterDelete = selectedIndexes.get( 0 ) - 1;
 					for ( int k = removeMe.size() - 1; k >= 0; k-- ) {
-						queueTable.getItems().remove ( removeMe.get( k ).intValue() );
+						player.getQueue().remove ( removeMe.get( k ) );
 					}
 					queueTable.getSelectionModel().clearAndSelect( selectAfterDelete );
+					
 				}
 			}
 		});
@@ -183,7 +183,7 @@ public class QueueWindow extends Stage {
 				if ( !row.isEmpty() ) {
 					ArrayList <Integer> indices = new ArrayList <Integer>( queueTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( queueTable.getSelectionModel().getSelectedItems() );
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, DragSource.QUEUE );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, null, DragSource.QUEUE );
 					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
@@ -208,18 +208,23 @@ public class QueueWindow extends Stage {
 					
 					DraggedTrackContainer container = (DraggedTrackContainer) db.getContent( FXUI.DRAGGED_TRACKS );
 					List <Integer> draggedIndices = container.getIndices();
-					int dropIndex = row.isEmpty() ? dropIndex = queueTable.getItems().size() : row.getIndex();
+					int dropIndex = row.isEmpty() ? dropIndex = player.getQueue().size() : row.getIndex();
 					
 					switch ( container.getSource() ) {
 						case ALBUM_LIST:
 						case PLAYLIST_LIST:
 						case HISTORY: 
 						case ALBUM_INFO:
+						case PLAYLIST_INFO:
 						case TRACK_LIST: {
 							List <Track> tracksToCopy = container.getTracks();
+							for ( Track track : tracksToCopy ) {
+								System.out.println ( track.getTitle() );
+							}
 							player.getQueue().addAllTracks( dropIndex, tracksToCopy );
 							
 						} break;
+						
 						case CURRENT_LIST: {
 							//TODO: Should I refactor this? 
 							synchronized ( player.getCurrentList() ) {
@@ -232,19 +237,18 @@ public class QueueWindow extends Stage {
 								player.getQueue().addAllTracks( dropIndex, tracksToCopy );
 							}
 						} break;
-						
-												
+
 						case QUEUE: {
 							ArrayList <Track> tracksToMove = new ArrayList <Track> ( draggedIndices.size() );
 							for ( int index : draggedIndices ) {
-								if ( index >= 0 && index < queueTable.getItems().size() ) {
-									tracksToMove.add( queueTable.getItems().get( index ) );
+								if ( index >= 0 && index < player.getQueue().size() ) {
+									tracksToMove.add( player.getQueue().get( index ) );
 								}
 							}
 							
 							for ( int k = draggedIndices.size() - 1; k >= 0; k-- ) {
 								int index = draggedIndices.get( k ).intValue();
-								if ( index >= 0 && index < queueTable.getItems().size() ) {
+								if ( index >= 0 && index < player.getQueue().size() ) {
 									player.getQueue().remove ( index );
 								}
 							}
@@ -258,12 +262,12 @@ public class QueueWindow extends Stage {
 								queueTable.getSelectionModel().select( dropIndex + k );
 							}
 							
-							player.getQueue().updateQueueIndexes( null );
+							player.getQueue().updateQueueIndexes();
 							
 						} break;
 					}
 
-					player.getQueue().updateQueueIndexes( null );
+					player.getQueue().updateQueueIndexes( );
 					event.setDropCompleted( true );
 					event.consume();
 
@@ -298,8 +302,8 @@ public class QueueWindow extends Stage {
 					}
 										
 					if ( !tracksToAdd.isEmpty() ) {
-						int dropIndex = row.isEmpty() ? dropIndex = queueTable.getItems().size() : row.getIndex();
-						queueTable.getItems().addAll( Math.min( dropIndex, queueTable.getItems().size() ), tracksToAdd );
+						int dropIndex = row.isEmpty() ? dropIndex = player.getQueue().size() : row.getIndex();
+						player.getQueue().addAllTracks( Math.min( dropIndex, player.getQueue().size() ), tracksToAdd );
 					}
 
 					event.setDropCompleted( true );
@@ -334,11 +338,12 @@ public class QueueWindow extends Stage {
 					case PLAYLIST_LIST:
 					case HISTORY: 
 					case ALBUM_INFO:
+					case PLAYLIST_INFO:
 					case TRACK_LIST: {
 						List <Track> tracksToCopy = container.getTracks();
 						player.getQueue().addAllTracks( tracksToCopy );
-						
 					} break;
+					
 					case CURRENT_LIST: {
 						//TODO: should I refactor this
 						synchronized ( player.getCurrentList() ) {
@@ -352,35 +357,13 @@ public class QueueWindow extends Stage {
 						}
 					} break;
 					
-											
 					case QUEUE: {
-						ArrayList <Track> tracksToMove = new ArrayList <Track> ( draggedIndices.size() );
-						for ( int index : draggedIndices ) {
-							if ( index >= 0 && index < queueTable.getItems().size() ) {
-								tracksToMove.add( queueTable.getItems().get( index ) );
-							}
-						}
-						
-						for ( int k = draggedIndices.size() - 1; k >= 0; k-- ) {
-							int index = draggedIndices.get( k ).intValue();
-							if ( index >= 0 && index < queueTable.getItems().size() ) {
-								player.getQueue().remove ( index );
-							}
-						}
-						
-						player.getQueue().addAllTracks( tracksToMove );
-						
-						queueTable.getSelectionModel().clearSelection();
-						for ( int k = 0; k < draggedIndices.size(); k++ ) {
-							queueTable.getSelectionModel().select( k );
-						}
-						
-						player.getQueue().updateQueueIndexes( null );
+						//Dragging from an empty queue to the queue has no meaning. 
 						
 					} break;
 				}
 
-				player.getQueue().updateQueueIndexes( null );
+				player.getQueue().updateQueueIndexes();
 				event.setDropCompleted( true );
 				event.consume();
 
@@ -412,7 +395,7 @@ public class QueueWindow extends Stage {
 				}
 				
 				if ( !tracksToAdd.isEmpty() ) {
-					queueTable.getItems().addAll( tracksToAdd );
+					player.getQueue().addAllTracks( tracksToAdd );
 				}
 
 				event.setDropCompleted( true );
@@ -485,6 +468,7 @@ public class QueueWindow extends Stage {
 				}
 				
 				if ( !removeMe.isEmpty() ) {
+
 					for ( int k = removeMe.size() - 1; k >= 0; k-- ) {
 						player.getQueue().remove ( removeMe.get( k ).intValue() );
 					}

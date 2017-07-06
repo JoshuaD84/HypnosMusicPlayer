@@ -56,7 +56,16 @@ import javafx.beans.property.StringProperty;
 			if ( queueIndex == null ) queueIndex = new ArrayList <Integer> ();//TODO: Do this better. 
 			
 			if ( isCurrentTrack ) {
-				display.set( "▶" );
+				if ( queueIndex.size() == 1 && queueIndex.get( 0 ) == 1  ) {
+					display.set( "🔁" );
+				} else if ( queueIndex.size() > 1 && queueIndex.get( 0 ) == 1  ) {
+					display.set( "🔁+" );
+				} else if ( queueIndex.size() > 0 ) {
+					display.set( "▶+" );
+				} else {
+					display.set( "▶" );
+				}
+
 			} else if ( queueIndex.size() == 1 ) {
 				display.set( queueIndex.get( 0 ).toString() );
 			} else if ( queueIndex.size() >= 1 ) {
