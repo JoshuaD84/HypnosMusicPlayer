@@ -501,6 +501,20 @@ public class AudioSystem {
 			play();
 		}
 	}
+
+	//Used after program loads to get everything linked back up properly. 
+	public void linkQueueToCurrentList () {
+		for ( CurrentListTrack track : currentList.getItems() ) {
+			for ( int index : track.getQueueIndices() ) {
+				if ( index < queue.size() ) {
+					queue.getData().set( index - 1, track );
+				} else {
+					LOGGER.fine( "Current list had a queue index beyond the length of the queue. Removing." );
+					track.getQueueIndices().remove( new Integer ( index ) );
+				}
+			}
+		}
+	}
 }
 
 

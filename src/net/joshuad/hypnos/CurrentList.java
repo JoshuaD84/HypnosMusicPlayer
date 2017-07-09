@@ -61,6 +61,20 @@ public class CurrentList {
 		return new CurrentListState ( items, currentAlbums, currentPlaylist, mode );
 	}
 	
+	public void setState( CurrentListState state ) {
+		items.clear();
+		items.addAll( state.getItems() );
+		
+		currentAlbums.clear();
+		currentAlbums.addAll( state.getAlbums() );
+		
+		currentPlaylist = state.getPlaylist();
+		
+		mode = state.getMode();
+		
+		notifyListenersStateChanged();
+	}
+	
 	public Playlist getCurrentPlaylist () {
 		return currentPlaylist;
 	}
@@ -94,6 +108,36 @@ public class CurrentList {
 				tracksRemoved();
 			}
 		}
+	}
+	
+	
+	public void moveTracks ( List<Integer> fromLocations, int toLocation ) {
+		if ( fromLocations == null ) {
+			LOGGER.fine( "Recieved a null list, ignoring request." );
+			return;
+		}
+		
+		if ( fromLocations.size() == 0 ) {
+			LOGGER.fine( "Recieved an empty list, ignoring request." );
+			return;
+		}
+				
+		ArrayList <CurrentListTrack> tracksToMove = new ArrayList <CurrentListTrack> ( fromLocations.size() );
+		
+		for ( int index : fromLocations ) {
+			if ( index >= 0 && index < items.size() ) {
+				tracksToMove.add( items.get( index ) );
+			}
+		}
+		
+		for ( int k = fromLocations.size() - 1; k >= 0; k-- ) {
+			int index = fromLocations.get( k ).intValue();
+			if ( index >= 0 && index < items.size() ) {
+				items.remove ( index );
+			}
+		}
+		
+		items.addAll( toLocation, tracksToMove );
 	}
 	
 	public void setTrack ( String location ) {
@@ -492,8 +536,10 @@ public class CurrentList {
 	}
 
 	public void listReordered () {
+		System.out.println ( "A" ); //TODO: DD
 		if ( mode == Mode.ALBUM ) {
 			mode = Mode.ALBUM_MODIFIED;
+			System.out.println ( "A" ); //TODO: BB
 			
 		} else if ( mode == Mode.PLAYLIST ) {
 			mode = Mode.PLAYLIST_MODIFIED;

@@ -21,7 +21,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
-import java.util.List;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -135,6 +134,7 @@ public class Persister {
 		loadAlbumsAndTracks();
 		loadSources();
 		loadQueue();
+		player.linkQueueToCurrentList();
 		loadHistory();
 		loadPlaylists();
 		loadPostWindowSettings();
@@ -165,10 +165,9 @@ public class Persister {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public void loadCurrentList () {
 		try ( ObjectInputStream currentListIn = new ObjectInputStream( new FileInputStream( currentFile ) ); ) {
-			player.getCurrentList().setTracks((ArrayList <CurrentListTrack>) currentListIn.readObject() );
+			player.getCurrentList().setState ( (CurrentListState)currentListIn.readObject() );
 		} catch ( FileNotFoundException e ) {
 			System.out.println( "File not found: current, unable to load current playlist, continuing." );
 		} catch ( IOException | ClassNotFoundException e ) {
@@ -218,8 +217,7 @@ public class Persister {
 
 	public void saveCurrentList () {
 		try ( ObjectOutputStream currentListOut = new ObjectOutputStream( new FileOutputStream( currentFile ) ) ) {
-			List <Track> writeMe = new ArrayList <Track>( player.getCurrentList().getItems() );
-			currentListOut.writeObject( writeMe );
+			currentListOut.writeObject( player.getCurrentList().getState() );
 			currentListOut.flush();
 
 		} catch ( IOException e ) {

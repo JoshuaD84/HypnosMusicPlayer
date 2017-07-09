@@ -2,7 +2,7 @@ New Features
 	Hot Keys
 		
 	Error notifications	
-		Have there be an in-program way to view error log? Or at least, view it using the system text editor. 
+		Have there be an in-program way to view error log? Or at least, a button to view it using the system text editor. 
 
 	Some way to get the file name corresponding to a file in the current list. 
 		Use album info window or something like it? 
@@ -14,10 +14,6 @@ New Features
 	Option: Warn when erasing an unsaved playlist. 
 			
 Bug Fixes / Incremental Improvements
-	
-	After persist  
-		tracks on current list that are in queue aren't linked. 
-		Save the current playlist so we can setup the SoundSystem and ListInfoTextBox
 
 	use observable values for all of the track and album stuff, so we don't have to do refreshes
 	
@@ -25,8 +21,9 @@ Bug Fixes / Incremental Improvements
 		6/9 - Can't find anything on google.
 	
 	Some bugs on the currentListInfoLabel. Work them out one at a time. 	
+		DND the first disc of an album, then dnd the second disc, inserting in the middle -> it should show modified, but it doesn't 
 		
-	DND the first disc of an album, then dnd the second disc, inserting in the middle -> it should show modified, but it doesn't 
+	Flipping through albums / tracks with up and down arrow doesn't update the art pane. 
 		
 		
 Refactor / organize my code. 

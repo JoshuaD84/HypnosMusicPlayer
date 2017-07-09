@@ -1,12 +1,15 @@
 package net.joshuad.hypnos;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import net.joshuad.hypnos.CurrentList.Mode;
 
-public class CurrentListState {
+public class CurrentListState implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	private Mode mode;
 	private Playlist playlist;
@@ -42,7 +45,7 @@ public class CurrentListState {
 		return Collections.unmodifiableList( albums );
 	}
 	
-	public List<CurrentListTrack> getTracks() {
+	public List<CurrentListTrack> getItems() {
 		return Collections.unmodifiableList( tracks );
 	}
 	

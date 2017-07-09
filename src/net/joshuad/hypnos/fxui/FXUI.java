@@ -2083,23 +2083,9 @@ public class FXUI implements PlayerListener {
 						} break;
 						
 						case CURRENT_LIST: {
-							//TODO: Generalize this out into a function? 
-							List <Integer> draggedIndices = container.getIndices();
-							ArrayList <CurrentListTrack> tracksToMove = new ArrayList <CurrentListTrack> ( draggedIndices.size() );
-							for ( int index : draggedIndices ) {
-								if ( index >= 0 && index < currentListTable.getItems().size() ) {
-									tracksToMove.add( currentListTable.getItems().get( index ) );
-								}
-							}
+							List<Integer> draggedIndices = container.getIndices();
 							
-							for ( int k = draggedIndices.size() - 1; k >= 0; k-- ) {
-								int index = draggedIndices.get( k ).intValue();
-								if ( index >= 0 && index < currentListTable.getItems().size() ) {
-									currentListTable.getItems().remove ( index );
-								}
-							}
-							
-							player.getCurrentList().insertTracks ( row.getIndex(), tracksToMove );
+							player.getCurrentList().moveTracks ( draggedIndices, dropIndex );
 							
 							currentListTable.getSelectionModel().clearSelection();
 							for ( int k = 0; k < draggedIndices.size(); k++ ) {
