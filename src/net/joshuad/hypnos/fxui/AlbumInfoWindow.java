@@ -212,7 +212,7 @@ public class AlbumInfoWindow extends Stage {
 		});
 		
 		appendMenuItem.setOnAction( event -> {
-			player.appendTracks ( trackTable.getSelectionModel().getSelectedItems() );
+			player.getCurrentList().appendTracks ( trackTable.getSelectionModel().getSelectedItems() );
 		});
 
 		playMenuItem.setOnAction( event -> {

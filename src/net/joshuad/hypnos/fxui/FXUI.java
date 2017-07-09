@@ -80,6 +80,7 @@ import javafx.stage.Window;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import net.joshuad.hypnos.Album;
+import net.joshuad.hypnos.CurrentListState;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Library;
@@ -88,8 +89,8 @@ import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.Persister.Setting;
-import net.joshuad.hypnos.audio.PlayerListener;
 import net.joshuad.hypnos.audio.AudioSystem;
+import net.joshuad.hypnos.audio.PlayerListener;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
@@ -133,8 +134,6 @@ public class FXUI implements PlayerListener {
 	Label timeElapsedLabel = new Label( "" );
 	Label timeRemainingLabel = new Label( "" );
 	Label trackInfo = new Label( "" );
-
-	ListInfoUpdater listInfoUpdater;
 	
 	Label emptyPlaylistLabel = new Label( 
 		"You haven't created any playlists, make a playlist on the right and click 💾 to save it for later." );
@@ -172,13 +171,18 @@ public class FXUI implements PlayerListener {
 	AudioSystem player;
 	Library library;
 	
+	private double windowedWidth = 1024;
+	private double windowedHeight = 768;
+	private double windowedX = 50;
+	private double windowedY = 50;
+	
 	
 	public FXUI ( Stage stage, Library library, AudioSystem player ) {
 		mainStage = stage;
 		this.library = library;
 		this.player = player;
 		
-		scene = new Scene( new Group(), 1024, 768 );
+		scene = new Scene( new Group(), windowedWidth, windowedHeight );
 		
 		File stylesheet = new File ( Hypnos.getRootDirectory() + File.separator + "resources" + File.separator + "style.css" );
 		scene.getStylesheets().add( "file:///" + stylesheet.getAbsolutePath().replace( "\\", "/" ) ); 
@@ -270,18 +274,29 @@ public class FXUI implements PlayerListener {
 
 		((Group) scene.getRoot()).getChildren().addAll( primaryContainer );
 		mainStage.setScene( scene );
+
+		ChangeListener windowSizeListener = new ChangeListener () {
+			@Override
+			public void changed ( ObservableValue observable, Object oldValue, Object newValue ) {
+				if ( !mainStage.isMaximized() ) {
+					windowedWidth = mainStage.getWidth();
+					windowedHeight = mainStage.getHeight();
+					windowedX = mainStage.getX();
+					windowedY = mainStage.getY();
+				}
+			}
+		};
+		
+		stage.widthProperty().addListener( windowSizeListener );
+		stage.heightProperty().addListener( windowSizeListener );
 		
 		player.addPlayerListener ( this );
 	}
 	
-	public void clearList() {
-		player.clearList();
-	}
-
 	private void removeFromCurrentList ( List<Integer> removeMe ) {
 		
 		if ( !removeMe.isEmpty() ) {
-			player.removeTracksAtIndices ( removeMe );
+			player.getCurrentList().removeTracksAtIndices ( removeMe );
 		}
 	}
 	
@@ -588,8 +603,9 @@ public class FXUI implements PlayerListener {
 	//TODO: This function probably belongs in Library
 	public void addToPlaylist ( List <Track> tracks, Playlist playlist ) {
 		playlist.getTracks().addAll( tracks );
+		//TODO: playlist.equals ( playlist ) instead of name .equals ( name ) ?
 		if ( player.getCurrentPlaylist() != null && player.getCurrentPlaylist().getName().equals( playlist.getName() ) ) {
-			player.appendTracks( tracks );
+			player.getCurrentList().appendTracks( tracks );
 		}
 		playlistTable.refresh(); 
 	}
@@ -621,6 +637,7 @@ public class FXUI implements PlayerListener {
 
 			Playlist newPlaylist = new Playlist( enteredName, new ArrayList <Track> ( tracks ) );
 			library.addPlaylist ( newPlaylist );
+			player.getCurrentList().setPlaylist( newPlaylist );
 		}
 	}
 	
@@ -694,14 +711,14 @@ public class FXUI implements PlayerListener {
 		savePlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				promptAndSavePlaylist( new ArrayList <Track>( player.getCurrentList() ), true );
+				promptAndSavePlaylist( new ArrayList <Track>( player.getCurrentList().getItems() ), true );
 			}
 		});
 		
 		clearButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				clearList();
+				player.getCurrentList().clearList();
 			}
 		});
 		
@@ -729,7 +746,7 @@ public class FXUI implements PlayerListener {
 					paths.add( file.toPath() );
 				}
 				
-				player.setTracksPathList( paths );
+				player.getCurrentList().setTracksPathList( paths );
 					
 			}
 		});
@@ -756,7 +773,7 @@ public class FXUI implements PlayerListener {
 			@Override
 			public void handle ( ActionEvent event ) {
 				String playlistName = ((Playlist) ((MenuItem) event.getSource()).getUserData()).getName();
-				Playlist playlist = new Playlist( playlistName, new ArrayList <Track>( player.getCurrentList() ) );
+				Playlist playlist = new Playlist( playlistName, new ArrayList <Track>( player.getCurrentList().getItems() ) );
 				library.addPlaylist( playlist );
 			}
 		};
@@ -768,12 +785,12 @@ public class FXUI implements PlayerListener {
 		currentListLength.setMinWidth( Region.USE_PREF_SIZE );
 		currentListLength.setPadding( new Insets ( 0, 10, 0, 0 ) );
 		
-		player.getCurrentList().addListener( new ListChangeListener () {
+		player.getCurrentList().getItems().addListener( new ListChangeListener () {
 			@Override
 			public void onChanged ( Change changes ) {
 				int lengthS = 0;
 				
-				for ( Track track : player.getCurrentList() ) {
+				for ( Track track : player.getCurrentList().getItems() ) {
 					if ( track != null ) {
 						lengthS += track.getLengthS();
 					}
@@ -785,10 +802,10 @@ public class FXUI implements PlayerListener {
 		final Label currentPlayingListInfo = new Label ( "" );
 		currentPlayingListInfo.setAlignment( Pos.CENTER );
 		currentPlayingListInfo.prefWidthProperty().bind( playlistControls.widthProperty() );
-		listInfoUpdater = new ListInfoUpdater ( currentPlayingListInfo );
-		player.addCurrentListListener ( listInfoUpdater );
 		
-
+		player.getCurrentList().addListener( ( CurrentListState currentState ) -> {  
+			currentPlayingListInfo.setText( currentState.getDisplayString() );
+		});
 		
 		final ContextMenu queueButtonMenu = new ContextMenu();
 		MenuItem clearQueue = new MenuItem ( "Clear" );
@@ -1167,12 +1184,12 @@ public class FXUI implements PlayerListener {
 		updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		
 		playMenuItem.setOnAction( event -> {
-			player.setAlbums( albumTable.getSelectionModel().getSelectedItems() );
+			player.getCurrentList().setAlbums( albumTable.getSelectionModel().getSelectedItems() );
 			player.play();
 		});
 
 		apendMenuItem.setOnAction( event -> {
-			player.appendAlbums( albumTable.getSelectionModel().getSelectedItems() );
+			player.getCurrentList().appendAlbums( albumTable.getSelectionModel().getSelectedItems() );
 		});
 
 		enqueueMenuItem.setOnAction( event -> {
@@ -1184,7 +1201,9 @@ public class FXUI implements PlayerListener {
 			ArrayList<Track> editMe = new ArrayList<Track>();
 			
 			for ( Album album : albums ) {
-				editMe.addAll( album.getTracks() );
+				if ( album != null ) {
+					editMe.addAll( album.getTracks() );
+				}
 			}
 			
 			tagWindow.setTracks( editMe, albums, FieldKey.TRACK, FieldKey.TITLE );
@@ -1242,7 +1261,7 @@ public class FXUI implements PlayerListener {
 					setArtistImage( row.getItem().getAlbumArtistImagePath( ) );
 					
 				} else if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					player.setAlbum( row.getItem() );
+					player.getCurrentList().setAlbum( row.getItem() );
 					player.play();
 				}
 			} );
@@ -1402,7 +1421,7 @@ public class FXUI implements PlayerListener {
 		apendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.appendTracks ( trackTable.getSelectionModel().getSelectedItems() );
+				player.getCurrentList().appendTracks ( trackTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 		
@@ -1568,7 +1587,7 @@ public class FXUI implements PlayerListener {
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.setPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
+				player.getCurrentList().setPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
 				player.play();
 			}
 		});
@@ -1576,7 +1595,7 @@ public class FXUI implements PlayerListener {
 		appendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.setTracks ( playlistTable.getSelectionModel().getSelectedItem().getTracks() );
+				player.getCurrentList().setTracks ( playlistTable.getSelectionModel().getSelectedItem().getTracks() );
 			}
 		});
 		
@@ -1652,7 +1671,7 @@ public class FXUI implements PlayerListener {
 
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					player.setPlaylist( row.getItem() );
+					player.getCurrentList().setPlaylist( row.getItem() );
 					player.play();
 				}
 			});
@@ -1775,7 +1794,7 @@ public class FXUI implements PlayerListener {
 		currentListTable.getColumns().addAll( playingColumn, trackColumn, artistColumn, yearColumn, albumColumn, titleColumn, lengthColumn );
 		albumTable.getSortOrder().add( trackColumn );
 		currentListTable.setEditable( false );
-		currentListTable.setItems( player.getCurrentList() );
+		currentListTable.setItems( player.getCurrentList().getItems() );
 
 		FixedWidthCustomResizePolicy resizePolicy = new FixedWidthCustomResizePolicy();
 		currentListTable.setColumnResizePolicy( resizePolicy );
@@ -1811,17 +1830,17 @@ public class FXUI implements PlayerListener {
 					case ALBUM_INFO:
 					case PLAYLIST_INFO:
 					case HISTORY: {
-						player.appendTracks ( container.getTracks() );
+						player.getCurrentList().appendTracks ( container.getTracks() );
 					
 					} break;
 
 					case PLAYLIST_LIST: {
-						player.appendPlaylists ( container.getPlaylists() );
+						player.getCurrentList().appendPlaylists ( container.getPlaylists() );
 						
 					} break;
 					
 					case ALBUM_LIST: {
-						player.appendAlbums ( container.getAlbums() );
+						player.getCurrentList().appendAlbums ( container.getAlbums() );
 					} break;
 					
 					case CURRENT_LIST: {
@@ -1851,7 +1870,7 @@ public class FXUI implements PlayerListener {
 									}
 								}
 							}
-							player.appendTracks( tracksToCopy );
+							player.getCurrentList().appendTracks( tracksToCopy );
 						}
 						
 					} break;
@@ -1868,15 +1887,15 @@ public class FXUI implements PlayerListener {
 				for ( File file : db.getFiles() ) {
 					Path droppedPath = Paths.get( file.getAbsolutePath() );
 					if ( Utils.isMusicFile( droppedPath ) ) {
-						player.appendTrack ( droppedPath );
+						player.getCurrentList().appendTrack ( droppedPath );
 						
 					} else if ( Files.isDirectory( droppedPath ) ) {
 						//TODO: Better to have this function return a list of paths
-						player.appendTracksPathList ( Utils.getAllTracksInDirectory( droppedPath ) );
+						player.getCurrentList().appendTracksPathList ( Utils.getAllTracksInDirectory( droppedPath ) );
 					} else if ( Utils.isPlaylistFile ( droppedPath ) ) {
 						Playlist playlist = Playlist.loadPlaylist( droppedPath );
 						if ( playlist != null ) {
-							player.appendPlaylist ( playlist );
+							player.getCurrentList().appendPlaylist ( playlist );
 						}
 					}
 				}
@@ -2051,13 +2070,16 @@ public class FXUI implements PlayerListener {
 					int dropIndex = row.getIndex();
 					
 					switch ( container.getSource() ) {
-						case ALBUM_LIST:
+						case ALBUM_LIST: {
+							player.getCurrentList().insertAlbums( dropIndex, container.getAlbums() );
+						} break;
+						
 						case PLAYLIST_LIST:
 						case TRACK_LIST:
 						case ALBUM_INFO:
 						case PLAYLIST_INFO:
 						case HISTORY: {
-							player.insertTracks( dropIndex, Utils.convertTrackList( container.getTracks() ) );
+							player.getCurrentList().insertTracks( dropIndex, Utils.convertTrackList( container.getTracks() ) );
 						} break;
 						
 						case CURRENT_LIST: {
@@ -2077,7 +2099,7 @@ public class FXUI implements PlayerListener {
 								}
 							}
 							
-							player.insertTracks ( row.getIndex(), tracksToMove );
+							player.getCurrentList().insertTracks ( row.getIndex(), tracksToMove );
 							
 							currentListTable.getSelectionModel().clearSelection();
 							for ( int k = 0; k < draggedIndices.size(); k++ ) {
@@ -2109,7 +2131,7 @@ public class FXUI implements PlayerListener {
 										}
 									}
 								}
-								player.insertTracks ( dropIndex, tracksToCopy );
+								player.getCurrentList().insertTracks ( dropIndex, tracksToCopy );
 							}
 							
 						} break;
@@ -2139,7 +2161,7 @@ public class FXUI implements PlayerListener {
 					
 					if ( !tracksToAdd.isEmpty() ) {
 						int dropIndex = row.isEmpty() ? dropIndex = trackTable.getItems().size() : row.getIndex();
-						player.insertTrackPathList ( dropIndex, tracksToAdd );
+						player.getCurrentList().insertTrackPathList ( dropIndex, tracksToAdd );
 					}
 
 					event.setDropCompleted( true );
@@ -2317,9 +2339,14 @@ public class FXUI implements PlayerListener {
 		
 		boolean isMaximized = isMaximized();
 		retMe.put ( Setting.WINDOW_MAXIMIZED, isMaximized );
-		retMe.put ( Setting.WINDOW_X_POSITION, mainStage.getX() ); //So we are on the right monitor
 		
-		if ( !isMaximized ) {
+		if ( isMaximized ) {
+			retMe.put ( Setting.WINDOW_X_POSITION, windowedX ); 
+			retMe.put ( Setting.WINDOW_Y_POSITION, windowedY ); 
+			retMe.put ( Setting.WINDOW_WIDTH, windowedWidth );
+			retMe.put ( Setting.WINDOW_HEIGHT, windowedHeight );
+		
+		} else {
 			retMe.put ( Setting.WINDOW_X_POSITION, mainStage.getX() );
 			retMe.put ( Setting.WINDOW_Y_POSITION, mainStage.getY() );
 			retMe.put ( Setting.WINDOW_WIDTH, mainStage.getWidth() );
@@ -2330,6 +2357,8 @@ public class FXUI implements PlayerListener {
 		retMe.put ( Setting.CURRENT_LIST_SPLIT_PERCENT, getCurrentListSplitPercent() );
 		retMe.put ( Setting.ART_SPLIT_PERCENT, getArtSplitPercent() );
 		retMe.put ( Setting.LIBRARY_TAB, libraryPane.getSelectionModel().getSelectedIndex() );
+		
+		
 
 		return retMe;
 	}
@@ -2399,7 +2428,7 @@ public class FXUI implements PlayerListener {
 						try {
 							int tracklistNumber = Integer.parseInt( value );
 							if ( tracklistNumber != -1 ) {
-								player.getCurrentList().get( tracklistNumber ).setIsCurrentTrack( true );
+								player.getCurrentList().getItems().get( tracklistNumber ).setIsCurrentTrack( true );
 							}
 						} catch ( Exception e ) {
 							LOGGER.info( "Error loading current list track number: " + e.getMessage() );

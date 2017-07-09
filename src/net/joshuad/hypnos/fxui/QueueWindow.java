@@ -229,8 +229,8 @@ public class QueueWindow extends Stage {
 							synchronized ( player.getCurrentList() ) {
 								ArrayList <CurrentListTrack> tracksToCopy = new ArrayList <CurrentListTrack> (  );
 								for ( int index : draggedIndices ) {
-									if ( index >= 0 && index < player.getCurrentList().size() ) {
-										tracksToCopy.add( player.getCurrentList().get( index ) );
+									if ( index >= 0 && index < player.getCurrentList().getItems().size() ) {
+										tracksToCopy.add( player.getCurrentList().getItems().get( index ) );
 									}
 								}
 								player.getQueue().addAllTracks( dropIndex, tracksToCopy );
@@ -348,8 +348,8 @@ public class QueueWindow extends Stage {
 						synchronized ( player.getCurrentList() ) {
 							ArrayList <CurrentListTrack> tracksToCopy = new ArrayList <CurrentListTrack> (  );
 							for ( int index : draggedIndices ) {
-								if ( index >= 0 && index < player.getCurrentList().size() ) {
-									tracksToCopy.add( player.getCurrentList().get( index ) );
+								if ( index >= 0 && index < player.getCurrentList().getItems().size() ) {
+									tracksToCopy.add( player.getCurrentList().getItems().get( index ) );
 								}
 							}
 							player.getQueue().addAllTracks( tracksToCopy );
@@ -436,7 +436,7 @@ public class QueueWindow extends Stage {
 		apendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.appendTracks ( queueTable.getSelectionModel().getSelectedItems() );
+				player.getCurrentList().appendTracks ( queueTable.getSelectionModel().getSelectedItems() );
 				player.play();
 			}
 		});

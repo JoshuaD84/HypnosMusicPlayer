@@ -124,11 +124,15 @@ public class Playlist implements Serializable {
 	}
 	
 	public void setTracks( ArrayList <Track> tracks ) {
-		this.tracks = tracks;
+		if ( tracks == null ) this.tracks = new ArrayList <Track> ();
+		else this.tracks = tracks;
 	}
 
 	public void addTrack ( Track track ) {
-		if ( tracks == null ) tracks = new ArrayList <Track> ();
-		if ( track != null ) tracks.add ( track );
+		tracks.add ( track );
+	}
+
+	public void addTracks ( ArrayList <Track> addMe ) {
+		tracks.addAll ( addMe );
 	}
 }

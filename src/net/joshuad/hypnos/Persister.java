@@ -168,7 +168,7 @@ public class Persister {
 	@SuppressWarnings("unchecked")
 	public void loadCurrentList () {
 		try ( ObjectInputStream currentListIn = new ObjectInputStream( new FileInputStream( currentFile ) ); ) {
-			player.setTracks((ArrayList <CurrentListTrack>) currentListIn.readObject() );
+			player.getCurrentList().setTracks((ArrayList <CurrentListTrack>) currentListIn.readObject() );
 		} catch ( FileNotFoundException e ) {
 			System.out.println( "File not found: current, unable to load current playlist, continuing." );
 		} catch ( IOException | ClassNotFoundException e ) {
@@ -218,7 +218,7 @@ public class Persister {
 
 	public void saveCurrentList () {
 		try ( ObjectOutputStream currentListOut = new ObjectOutputStream( new FileOutputStream( currentFile ) ) ) {
-			List <Track> writeMe = new ArrayList <Track>( player.getCurrentList() );
+			List <Track> writeMe = new ArrayList <Track>( player.getCurrentList().getItems() );
 			currentListOut.writeObject( writeMe );
 			currentListOut.flush();
 
@@ -358,7 +358,6 @@ public class Persister {
 		}
 	}
 
-	@SuppressWarnings("incomplete-switch")
 	public void loadPreWindowSettings () {
 		EnumMap <Setting, String> loadMe = new EnumMap <Setting, String>( Setting.class );
 
@@ -409,7 +408,6 @@ public class Persister {
 		ui.applySettings( loadMe );
 	}
 
-	@SuppressWarnings("incomplete-switch")
 	public void loadPostWindowSettings () {
 
 		EnumMap <Setting, String> loadMe = new EnumMap <Setting, String>( Setting.class );

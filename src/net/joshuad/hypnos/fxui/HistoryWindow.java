@@ -186,7 +186,7 @@ public class HistoryWindow extends Stage {
 		apendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.appendTracks ( historyTable.getSelectionModel().getSelectedItems() );
+				player.getCurrentList().appendTracks ( historyTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 		

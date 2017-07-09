@@ -160,7 +160,7 @@ public class Hypnos extends Application {
 					}
 					
 					if ( newList.size() > 0 ) {
-						player.setTracksPathList( newList );
+						player.getCurrentList().setTracksPathList( newList );
 					}
 				}
 			}

@@ -23,15 +23,19 @@ Bug Fixes / Incremental Improvements
 	
 	Make sure horizontal scroll bars never appear
 		6/9 - Can't find anything on google.
-					
+	
+	Some bugs on the currentListInfoLabel. Work them out one at a time. 	
+		
+	DND the first disc of an album, then dnd the second disc, inserting in the middle -> it should show modified, but it doesn't 
+		
+		
 Refactor / organize my code. 
  	Make LibraryUpdater part of Library. Is there a way to abstract out the Platform -> RunLater part? I feel like we're just stuck w/ that, which kind of ties to us JavaFX. 
+ 		Maybe ui.runMe ( Runnable ), and then the UI can decide whether to launch a new thread, have a thread idling, do it on this thread, or use something like Platform.runLater()	
  	
  	Can / should I get rid of Utils?
  	
  	Make MainWindow its own class, and have FXUI be more of a simple manager? 
-	
-	Make ListInfoUpdater's funcitonality mostly inside AudioSystem. 
 
 Decoders
 	Mp4
@@ -142,12 +146,8 @@ OS Specific
 Future Features, maybe:
 	Tag Window, next and previous button
 	
-	DND the first disc of an album, then dnd the second disc, adding to the list. It makes a new playlist.
-	
 	Dark Stylesheet 
 	
-	Remember windowed-size even if maximized
-		https://stackoverflow.com/questions/44636866/save-and-set-the-not-maximized-window-size
 	
 Note
 	You can increase the slider button size by increasing the font size.
