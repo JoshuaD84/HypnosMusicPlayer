@@ -18,18 +18,11 @@ Bug Fixes / Incremental Improvements
 	After persist  
 		tracks on current list that are in queue aren't linked. 
 		Save the current playlist so we can setup the SoundSystem and ListInfoTextBox
-			
-	Update my interruptedException handling: 
-		https://codereview.stackexchange.com/questions/167344/is-this-a-good-general-approach-to-handling-interruptedexceptions-during-sleep
-		https://stackoverflow.com/questions/26856242/interruptedexception-what-causes-it
-	
+
 	use observable values for all of the track and album stuff, so we don't have to do refreshes
 	
 	Make sure horizontal scroll bars never appear
 		6/9 - Can't find anything on google.
-
-	Remember windowed-width even if maximized
-		https://stackoverflow.com/questions/44636866/save-and-set-the-not-maximized-window-size
 					
 Refactor / organize my code. 
  	Make LibraryUpdater part of Library. Is there a way to abstract out the Platform -> RunLater part? I feel like we're just stuck w/ that, which kind of ties to us JavaFX. 
@@ -153,6 +146,8 @@ Future Features, maybe:
 	
 	Dark Stylesheet 
 	
+	Remember windowed-size even if maximized
+		https://stackoverflow.com/questions/44636866/save-and-set-the-not-maximized-window-size
 	
 Note
 	You can increase the slider button size by increasing the font size.

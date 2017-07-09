@@ -149,7 +149,7 @@ public class Library {
 						}
 						
 					} catch ( InterruptedException e ) {
-						LOGGER.log ( Level.FINER, "Sleep interupted during wait period." );
+						LOGGER.fine ( "Sleep interupted during wait period." );
 					}
 				}
 			}
@@ -315,10 +315,13 @@ public class Library {
 	
 	private void removeOneSource() {
 
+		//TODO: What is this and what is it doing? 
 		while ( fileWalker != null ) {
 			try {
 				Thread.sleep( 20 );
-			} catch ( InterruptedException e ) {}
+			} catch ( InterruptedException e ) {
+				LOGGER.fine ( "Interrupted while waiting for filewalker to terminate." );
+			}
 		}
 			
 		Path removeMeSource = sourceToRemove.remove( 0 );
@@ -581,7 +584,7 @@ class ModifiedFileUpdaterThread extends Thread {
 			try { 
 				Thread.sleep ( 50 ); 
 			} catch ( InterruptedException e ) {
-				LOGGER.log ( Level.FINER, "Sleep interupted during wait period." );
+				LOGGER.log ( Level.FINE, "Sleep interupted during wait period." );
 			}
 
 			long sleepTime = System.currentTimeMillis() - startSleepTime;

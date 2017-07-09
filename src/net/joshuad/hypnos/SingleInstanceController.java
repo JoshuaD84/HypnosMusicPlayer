@@ -56,12 +56,6 @@ public class SingleInstanceController {
 					System.err.println ( "Read error at commandline parser" );
 					e.printStackTrace();
 				}
-				
-				try {
-					Thread.sleep( 50 );
-				} catch ( InterruptedException e ) {
-					e.printStackTrace();
-				}
 			}
 		});
 		

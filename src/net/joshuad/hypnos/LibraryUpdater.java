@@ -1,9 +1,13 @@
 package net.joshuad.hypnos;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javafx.application.Platform;
 import net.joshuad.hypnos.fxui.FXUI;
 
 public class LibraryUpdater {
+	private static final Logger LOGGER = Logger.getLogger( LibraryUpdater.class.getName() );
 
 	private static final int MAX_CHANGES_PER_REQUEST = 250;
 
@@ -25,7 +29,7 @@ public class LibraryUpdater {
 				try {
 					Thread.sleep ( 100 );
 				} catch ( InterruptedException e ) {
-					//TODO: handle this properly. 
+					LOGGER.log ( Level.FINE, "Sleep interupted during wait period." );
 				}
 			}
 		});

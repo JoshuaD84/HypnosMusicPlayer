@@ -128,7 +128,7 @@ public class AudioPlayer {
 						try {
 							Thread.sleep( 10 );
 						} catch ( InterruptedException e ) {
-							LOGGER.warning ( "Couldn't sleep while paused, may be over-utilizing CPU while paused." );
+							LOGGER.fine( "Interrupted while paused." );
 						}
 					}
 					
@@ -136,7 +136,7 @@ public class AudioPlayer {
 					try {
 						Thread.sleep( 20 );
 					} catch ( InterruptedException e ) {
-						LOGGER.warning ( "Couldn't sleep while stopped, may be over-utilizing CPU while stopped." );
+						LOGGER.fine ( "Interrupted while stopped" );
 					}
 				}
 				

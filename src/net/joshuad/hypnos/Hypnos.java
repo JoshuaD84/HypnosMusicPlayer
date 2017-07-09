@@ -199,12 +199,6 @@ public class Hypnos extends Application {
 							break;
 					}
 				} 
-				
-				try {
-					Thread.sleep( 5 ); //We have to do this because too many quick calls to any SourceDataLine.open() locks up
-				} catch ( InterruptedException e ) {
-					LOGGER.fine( "Sleep interrupted, continuing." );
-				} 
 			}
 		});
 	}
