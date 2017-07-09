@@ -15,11 +15,14 @@ import java.util.logging.Logger;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.CannotWriteException;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
+import org.jaudiotagger.tag.id3.ID3v1Tag;
+import org.jaudiotagger.tag.id3.ID3v23Tag;
 import org.jaudiotagger.tag.images.Artwork;
 
 import javafx.embed.swing.SwingFXUtils;
@@ -556,10 +559,8 @@ public class Track implements Serializable {
 		
 		return null;
 	}
-	
-	
 
-	public Image getAlbumArtistImagePath ( ) {
+	public Image getAlbumArtistImage ( ) {
 
 		if ( this.getPath().getParent() == null ) return null;
 		
@@ -626,6 +627,35 @@ public class Track implements Serializable {
 
 		
 		return null;
+	}
+	
+	public void updateTagsAndSave ( List<MultiFileTagPair> tagPairs ) {
+		try {
+			AudioFile audioFile = AudioFileIO.read( getPath().toFile() );
+			Tag tag = audioFile.getTag();
+		
+			if ( tag instanceof ID3v1Tag ) {
+				tag = new ID3v23Tag ( (ID3v1Tag)tag );
+			}
+			
+			for ( MultiFileTagPair tagPair : tagPairs ) { 
+				
+				if ( !tagPair.isMultiValue() ) {
+					tag.setField( tagPair.getKey(), tagPair.getValue() );
+				}
+			}
+			
+			audioFile.setTag( tag );
+			AudioFileIO.write( audioFile );
+			
+			refreshTagData();
+	
+		} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException | CannotWriteException  e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 	}
 }
 

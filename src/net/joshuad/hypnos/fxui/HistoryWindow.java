@@ -4,6 +4,7 @@ import java.awt.Desktop;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
@@ -44,6 +45,8 @@ import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 
 public class HistoryWindow extends Stage {
+
+	private static final Logger LOGGER = Logger.getLogger( HistoryWindow.class.getName() );
 	
 	private FXUI ui;
 	private AudioSystem player;
@@ -120,9 +123,7 @@ public class HistoryWindow extends Stage {
 			
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					Track playMe = historyTable.getSelectionModel().getSelectedItem();
-					player.setTrack ( playMe );
-					player.play();
+					player.playTrack( row.getItem(), false );
 				}
 			});
 			
@@ -171,8 +172,7 @@ public class HistoryWindow extends Stage {
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.setTracks( historyTable.getSelectionModel().getSelectedItems() );
-				player.play();
+				player.playItems ( historyTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 		
@@ -280,6 +280,18 @@ public class HistoryWindow extends Stage {
 		root.getChildren().add( primaryPane );
 		setScene( scene );
 		
+	}
+
+	public void refresh () {
+		for ( Track track : historyTable.getItems() ) {
+			try {
+				track.refreshTagData();
+			} catch ( IOException e ) {
+				LOGGER.info( "Unable to update the tag info for track in history, removing it: " + track.getFilename() );
+				historyTable.getItems().remove( track );
+			}
+		}
+		historyTable.refresh();
 	}
 
 }

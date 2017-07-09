@@ -88,8 +88,6 @@ public class MP4Decoder extends AbstractDecoder {
 			
 			final AudioFormat outputFormat = new AudioFormat( sampleRate / 2, sampleSize, channelCount, true, true );
 			
-			System.out.println ( outputFormat ); //TODO: DD
-			
 			audioOutput = AudioSystem.getSourceDataLine( outputFormat );
 			audioOutput.open();
 			

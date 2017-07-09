@@ -97,7 +97,7 @@ public class ListInfoUpdater implements CurrentListListener {
 				
 			} else {
 				baseString = "Album: " + artist + " - " + year + " - " + simpleTitle;
-				label.setText( baseString );
+				setText( baseString );
 				mode = Mode.ALBUM;
 			}
 		}
@@ -110,21 +110,21 @@ public class ListInfoUpdater implements CurrentListListener {
 		}
 		
 		baseString = "Album: " + album.getAlbumArtist() + " - " + album.getYear() + " - " + album.getFullTitle();
-		label.setText( baseString );
+		setText( baseString );
 		mode = Mode.ALBUM;
 	}
 	
 	@Override
 	public void tracksSet () { 
 		baseString = NEW_PLAYLIST_NAME;
-		label.setText( baseString + " *");
+		setText( baseString + " *");
 		mode = Mode.PLAYLIST;
 	}
 	
 	@Override
 	public void tracksAdded () {
 		if ( mode == Mode.PLAYLIST ) {
-			label.setText( baseString + " *" );
+			setText( baseString + " *" );
 			
 		} else {
 			tracksSet();
@@ -134,11 +134,11 @@ public class ListInfoUpdater implements CurrentListListener {
 	@Override
 	public void tracksRemoved() {
 		if ( mode == Mode.PLAYLIST ) {
-			label.setText( baseString + " *" );
+			setText( baseString + " *" );
 			
 		} else {
 			baseString = NEW_PLAYLIST_NAME;
-			label.setText( baseString + " *");
+			setText( baseString + " *");
 			mode = Mode.PLAYLIST;
 		}
 	}
@@ -150,7 +150,7 @@ public class ListInfoUpdater implements CurrentListListener {
 		}
 		
 		baseString = "Playlist: " + playlist.getName();
-		label.setText( baseString );
+		setText( baseString );
 		mode = Mode.PLAYLIST;
 	}
 	
@@ -176,12 +176,16 @@ public class ListInfoUpdater implements CurrentListListener {
 	
 	@Override
 	public void listCleared () {
-		label.setText( EMPTY_LIST_NAME );
+		setText( EMPTY_LIST_NAME );
 		mode = Mode.EMPTY;
 	}	
 	
 	@Override
 	public void listReordered() {
-		label.setText( baseString + " *" );
+		setText( baseString + " *" );
+	}
+	
+	private void setText ( String string ) {
+		label.setText( string );
 	}
 }

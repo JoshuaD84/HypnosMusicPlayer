@@ -133,5 +133,14 @@ public class Queue {
 	public synchronized ObservableList<Track> getData() {
 		return queue;
 	}
-
+	
+	public void clear() {
+		for ( Track removedTrack : queue ) {
+			if ( removedTrack != null && removedTrack instanceof CurrentListTrack ) {
+				((CurrentListTrack)removedTrack).clearQueueIndex();
+			}
+		}
+		
+		queue.clear();
+	}
 }

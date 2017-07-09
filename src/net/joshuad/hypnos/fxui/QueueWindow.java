@@ -174,8 +174,7 @@ public class QueueWindow extends Stage {
 			
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					player.setTrack ( queueTable.getSelectionModel().getSelectedItem() );
-					player.play();
+					player.playTrack( row.getItem(), false );
 				}
 			} );
 			
@@ -430,8 +429,7 @@ public class QueueWindow extends Stage {
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.setTracks( queueTable.getSelectionModel().getSelectedItems() );
-				player.play();
+				player.playItems( new ArrayList<Track> ( queueTable.getSelectionModel().getSelectedItems() ) );
 			}
 		});
 
@@ -478,7 +476,6 @@ public class QueueWindow extends Stage {
 			}
 		} );
 
-
 		removeMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
@@ -499,5 +496,17 @@ public class QueueWindow extends Stage {
 		
 		root.getChildren().add( queueTable );
 		setScene( scene );
+	}
+	
+	public void refresh () {
+		for ( Track track : queueTable.getItems() ) {
+			try {
+				track.refreshTagData();
+			} catch ( IOException e ) {
+				LOGGER.info( "Unable to update the tag info for track in queue, removing it: " + track.getFilename() );
+				queueTable.getItems().remove( track );
+			}
+		}
+		queueTable.refresh();
 	}
 }

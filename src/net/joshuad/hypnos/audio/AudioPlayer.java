@@ -21,6 +21,7 @@ public class AudioPlayer {
 	boolean stopRequested = false;
 	Track trackRequested = null;
 	double seekPercentRequested = NO_REQUEST;
+	double seekMSRequested = NO_REQUEST;
 	double volumePercentRequested = NO_REQUEST;
 	
 	PlayState state = PlayState.STOPPED;
@@ -28,6 +29,8 @@ public class AudioPlayer {
 	AbstractDecoder decoder;
 	AudioSystem controller;
 	Track track;
+	
+	private double volumePercent = 1;
 	
 	public AudioPlayer( AudioSystem controller ) {
 		this.controller = controller;
@@ -44,7 +47,6 @@ public class AudioPlayer {
 		while ( true ) {
 			try {
 				if ( state != PlayState.STOPPED && stopRequested ) {
-					System.out.println ( "Stopping" ); //TODO: DD
 					state = PlayState.STOPPED;
 					decoder.closeAllResources();
 					controller.playerStopped( true );
@@ -53,7 +55,6 @@ public class AudioPlayer {
 				}	
 				
 				if ( trackRequested != null ) {
-					System.out.println ( "Starting" ); //TODO: DD
 					//TODO: Probably have to send a controller.stopped();
 					synchronized ( trackRequested ) {
 						if ( decoder != null ) {
@@ -63,8 +64,10 @@ public class AudioPlayer {
 						decoder = getPlayer ( trackRequested );
 						
 						if ( decoder != null ) {
-							controller.playerStarted( trackRequested );
 							track = trackRequested;
+							decoder.setVolumePercent( volumePercent );
+							controller.playerStarted( trackRequested );
+							updateTrackPosition();
 							state = PlayState.PLAYING;
 						} else {
 							LOGGER.info( "Unable to initialize decoder for: " + track.getFilename() );
@@ -73,21 +76,18 @@ public class AudioPlayer {
 		
 						trackRequested = null;
 						stopRequested = false;
-						seekPercentRequested = NO_REQUEST;
 					}
 				}
 				
 				if ( state != PlayState.STOPPED ) {
 						
 					if ( pauseRequested ) {
-						System.out.println ( "Pausing" ); //TODO: DD
 						pauseRequested = false;
 						state = PlayState.PAUSED;
 						controller.playerPaused();
 					}
 					
 					if ( unpauseRequested ) {
-						System.out.println ( "Unpausing" ); //TODO: DD
 						unpauseRequested = false;
 						state = PlayState.PLAYING;
 						controller.playerUnpaused();
@@ -99,9 +99,16 @@ public class AudioPlayer {
 						seekPercentRequested = NO_REQUEST;
 					}
 					
+					if ( seekMSRequested != NO_REQUEST ) {
+						decoder.seekTo ( seekMSRequested / (double)( track.getLengthS() * 1000 )  );
+						updateTrackPosition();
+						seekMSRequested = NO_REQUEST;
+					}
+					
 					if ( volumePercentRequested != NO_REQUEST ) {
 						decoder.setVolumePercent( volumePercentRequested );
 						controller.volumeChanged ( volumePercentRequested );
+						volumePercent = decoder.getVolumePercent();
 						volumePercentRequested = NO_REQUEST;
 					}
 					
@@ -170,7 +177,6 @@ public class AudioPlayer {
 	}
 	
 	public void requestPlayTrack ( Track track, boolean startPaused ) {
-		System.out.println ( "requestPlayCalled, paused: " + startPaused ); //TODO: DD
 		trackRequested = track;
 		pauseRequested = startPaused;
 	}
@@ -182,11 +188,10 @@ public class AudioPlayer {
 	public void requestSeekMS ( long seekMS ) {
 		if ( seekMS < 0 ) {
 			LOGGER.info( "Requested a seek to a negative location. Seeking to 0 instead." );
+			seekMS = 0;
 		}
-		
-		if ( track != null ) {
-			requestSeekPercent ( seekMS / (double)( track.getLengthS() * 1000 ) );
-		}
+
+		this.seekMSRequested = seekMS;
 	}
 	
 	public void requestVolumePercent ( double volumePercent ) {
@@ -195,6 +200,7 @@ public class AudioPlayer {
 			volumePercent = 0;
 		}
 		this.volumePercentRequested = volumePercent;
+		this.volumePercent = volumePercent;
 	}
 		
 	public Track getTrack() {
@@ -285,5 +291,13 @@ public class AudioPlayer {
 		}
 		
 		controller.playerTrackPositionChanged ( timeElapsedMS, lengthMS );
+	}
+
+	public double getVolumePercent () {
+		if ( decoder != null ) {
+			return decoder.getVolumePercent();
+		} else {
+			return volumePercent;
+		}
 	}
 }

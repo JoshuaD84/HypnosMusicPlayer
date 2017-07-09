@@ -8,7 +8,7 @@ import javafx.collections.ObservableList;
 
 public class History {
 
-	private static final int MAX_HISTORY_SIZE = 100;
+	private static final int MAX_HISTORY_SIZE = 1000;
 
 	private final ObservableList <Track> history = FXCollections.observableArrayList( new ArrayList <Track>(MAX_HISTORY_SIZE) );
 	
@@ -31,9 +31,9 @@ public class History {
 		return history;
 	}
 
-	public void setData ( List <Track> history ) {
+	public void setData ( List <Track> data ) {
 		history.clear();
-		history.addAll( history );
+		history.addAll( data );
 	}
 
 	public Track getLastTrack () {

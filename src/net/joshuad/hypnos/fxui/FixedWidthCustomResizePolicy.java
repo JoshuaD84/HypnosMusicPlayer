@@ -9,7 +9,7 @@ import javafx.util.Callback;
 
 //TODO: this doesn't work perfectly for last columns. 
 
-@SuppressWarnings ( "rawtypes" ) //TODO: I'm not sure why this one is firing or how to fix it yet.
+@SuppressWarnings ( "rawtypes" ) //Would be nice to get rid of this. Whatever
 public class FixedWidthCustomResizePolicy implements Callback <TableView.ResizeFeatures, Boolean> {
 	static final double DEFAULT_MIN_WIDTH = 10.0F, DEFAULT_MAX_WIDTH = 5000.0F;
 	

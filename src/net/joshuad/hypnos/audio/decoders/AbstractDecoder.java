@@ -46,7 +46,11 @@ public abstract class AbstractDecoder {
 			double max = volume.getMaximum();
 			double value = (max - min) * percent + min;
 			
-			volume.setValue( (float)value );
+			try {
+				volume.setValue( (float)value );
+			} catch ( IllegalArgumentException e ) {
+				LOGGER.info( "Unable to change volume to " + percent + "%, ignoring request." );
+			}
 			
 		} else if ( audioOutput.isControlSupported( FloatControl.Type.MASTER_GAIN ) ) {
 			FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.MASTER_GAIN );
@@ -55,7 +59,11 @@ public abstract class AbstractDecoder {
 			double max = volume.getMaximum();
 			double value = (max - min) * percent + min;
 			
-			volume.setValue( (float)value );
+			try {
+				volume.setValue( (float)value );
+			} catch ( IllegalArgumentException e ) {
+				LOGGER.info( "Unable to change volume to " + ( percent * 100 ) + "%, ignoring request." );
+			}
 			
 		} else {
 			System.out.println( "Volume control not supported." );
@@ -69,6 +77,28 @@ public abstract class AbstractDecoder {
 	
 	public Track getTrack () {
 		return track;
+	}
+	
+	public double getVolumePercent () {
+		if ( audioOutput.isControlSupported( FloatControl.Type.VOLUME ) ) {
+			FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.VOLUME );
+			double min = volume.getMinimum();
+			double max = volume.getMaximum();
+			double value = volume.getValue();
+			
+			return ( value - min ) / ( max - min );
+			
+		} else if ( audioOutput.isControlSupported( FloatControl.Type.MASTER_GAIN ) ) {
+			FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.MASTER_GAIN );
+			double min = volume.getMinimum();
+			double max = volume.getMaximum();
+			double value = volume.getValue();
+			
+			return ( value - min ) / ( max - min );
+			
+		} else {
+			return 0;
+		}
 	}
 
 	public void seekTo ( double seekPercent ) {

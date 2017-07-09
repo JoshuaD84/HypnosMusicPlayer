@@ -3,11 +3,10 @@ package net.joshuad.hypnos.fxui;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
-import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.CannotWriteException;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.FieldKey;
@@ -15,7 +14,6 @@ import org.jaudiotagger.tag.KeyNotFoundException;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
 
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -41,6 +39,7 @@ import net.joshuad.hypnos.Track;
 
 @SuppressWarnings("rawtypes")
 public class TagWindow extends Stage {
+	private static transient final Logger LOGGER = Logger.getLogger( TagWindow.class.getName() );
 	
 	List<Track> tracks;
 	List<Album> albums;
@@ -71,7 +70,6 @@ public class TagWindow extends Stage {
 		this.initOwner( ui.getMainStage() );
 		this.setTitle( "Tag Editor" );
 		this.setWidth( 600 );
-		//this.setHeight ( 400 );
 		Group root = new Group();
 		Scene scene = new Scene( root );
 		VBox primaryPane = new VBox();
@@ -151,57 +149,31 @@ public class TagWindow extends Stage {
 	}
 
 	private void saveCurrentTags() {
-		
-		for ( Track track : tracks ) {
-			try {
-				AudioFile audioFile = AudioFileIO.read( track.getPath().toFile() );
-				Tag tag = audioFile.getTag();
-				
-				//TODO: read value thing instead of cell value
-				for ( int k = 0; k < tagPairs.size(); k++ ) {
-					FieldKey key = FieldKey.valueOf( (String)tagColumn.getCellData( k ) );
-					String newValue = (String)valueColumn.getCellData( k );
-
-					if ( hiddenTagsList.contains( key ) ) continue;
-					
-					if ( !tagPairs.get( k ).isMultiValue() ) {
-						tag.setField( key, newValue );
-					}
-				}
-				
-				//TODO: Maybe reduce to one runLater
-				Platform.runLater( new Runnable() {
-					public void run() {
-						try {
-							audioFile.setTag( tag );
-							AudioFileIO.write( audioFile );
-							try {
-								track.refreshTagData();
-							} catch ( IOException e ) {
-								//TODO: I don't think we need to do anything here?
-							}
-							ui.refreshCurrentList();
-						} catch ( CannotWriteException e ) {
-							e.printStackTrace(); //TODO: 
-						}
-					}
-				});
-				
-			} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
-				e.printStackTrace();
-			}
-		}
-		
-		Platform.runLater( new Runnable() {
-			public void run() {
-				if ( albums != null ) {
-					for ( Album album : albums ) {
-						album.refreshTagData();
-						ui.refreshAlbumTable();
-					}
+		Thread saverThread = new Thread( () -> {
+			long startTime = System.currentTimeMillis(); //TODO: DD
+			if ( tracks != null ) {
+				for ( Track track : tracks ) {
+					track.updateTagsAndSave( tagPairs );
 				}
 			}
+			
+			if ( albums != null ) {
+				for ( Album album : albums ) {
+					album.refreshTagData();
+				}
+			}
+			
+			//TODO: it would be nice to get rid of these functions by using observable items. 
+			ui.refreshAlbumTable();
+			ui.refreshTrackTable();
+			ui.refreshCurrentList();
+			ui.refreshQueueList();
+			ui.refreshHistory();
+			
+			System.out.print( "Elapsed: " + ( System.currentTimeMillis() - startTime ) ); //TODO: DD
 		});
+		saverThread.setDaemon( true );
+		saverThread.start();
 	}
 	
 	public void setTracks ( List <Track> tracks, List <Album> albumsToRefresh, FieldKey ... hiddenTags ) { 

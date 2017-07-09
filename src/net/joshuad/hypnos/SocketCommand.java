@@ -19,6 +19,8 @@ public class SocketCommand implements Serializable {
 	public static final int TOGGLE_PAUSE = 4;
 	public static final int STOP = 5;
 	public static final int TOGGLE_MINIMIZED = 6;
+	public static final int VOLUME_DOWN = 7;
+	public static final int VOLUME_UP = 8;
 	
 	
 	private CommandType type;

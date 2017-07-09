@@ -169,7 +169,7 @@ public class PlaylistInfoWindow extends Stage {
 		});
 
 		playMenuItem.setOnAction( event -> {
-			player.playTrack( trackTable.getSelectionModel().getSelectedItem() );
+			player.playItems( trackTable.getSelectionModel().getSelectedItems() );
 		});
 		
 		trackTable.setRowFactory( tv -> {
@@ -178,7 +178,6 @@ public class PlaylistInfoWindow extends Stage {
 			row.setContextMenu( contextMenu );
 
 			row.setOnMouseClicked( event -> {
-				//TODO: is this what I want to happen? 
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
 					player.playTrack( row.getItem() );
 				}

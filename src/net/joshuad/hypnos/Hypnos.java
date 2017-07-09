@@ -191,6 +191,12 @@ public class Hypnos extends Application {
 						case SocketCommand.TOGGLE_MINIMIZED:
 							ui.toggleMinimized();
 							break;
+						case SocketCommand.VOLUME_DOWN:
+							player.decrementVolume();
+							break;
+						case SocketCommand.VOLUME_UP:
+							player.incrementVolume();
+							break;
 					}
 				} 
 				

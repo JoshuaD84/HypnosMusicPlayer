@@ -26,7 +26,6 @@ import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import javafx.collections.ObservableList;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.FXUI;
 
@@ -37,7 +36,7 @@ public class Persister {
 	public enum Setting {
 		SHUFFLE, REPEAT, HIDE_ALBUM_TRACKS, WINDOW_MAXIMIZED, PRIMARY_SPLIT_PERCENT, 
 		CURRENT_LIST_SPLIT_PERCENT, ART_SPLIT_PERCENT, WINDOW_X_POSITION, WINDOW_Y_POSITION, 
-		WINDOW_WIDTH, WINDOW_HEIGHT, TRACK, TRACK_POSITION, TRACK_NUMBER;
+		WINDOW_WIDTH, WINDOW_HEIGHT, TRACK, TRACK_POSITION, TRACK_NUMBER, VOLUME, LIBRARY_TAB;
 	}
 
 	private File configDirectory;
@@ -108,6 +107,8 @@ public class Persister {
 		historyFile = new File( configDirectory + File.separator + "history" );
 		dataFile = new File( configDirectory + File.separator + "data" );
 		settingsFile = new File( configDirectory + File.separator + "settings" );
+		
+		createNecessaryFolders();
 	}
 
 	private void createNecessaryFolders () {
@@ -126,13 +127,13 @@ public class Persister {
 	}
 
 	public void loadDataBeforeShowWindow () {
+		loadCurrentList();
 		loadPreWindowSettings();
 	}
 
 	public void loadDataAfterShowWindow () {
 		loadAlbumsAndTracks();
 		loadSources();
-		loadCurrentList();
 		loadQueue();
 		loadHistory();
 		loadPlaylists();
@@ -216,9 +217,8 @@ public class Persister {
 	}
 
 	public void saveCurrentList () {
-		try ( ObjectOutputStream currentListOut = new ObjectOutputStream( new FileOutputStream( currentFile ) ); ) {
-			ObservableList <CurrentListTrack> saveMe = player.getCurrentList();
-			List <Track> writeMe = new ArrayList <Track>( Arrays.asList( saveMe.toArray( new Track [ saveMe.size() ] ) ) );
+		try ( ObjectOutputStream currentListOut = new ObjectOutputStream( new FileOutputStream( currentFile ) ) ) {
+			List <Track> writeMe = new ArrayList <Track>( player.getCurrentList() );
 			currentListOut.writeObject( writeMe );
 			currentListOut.flush();
 
@@ -230,8 +230,8 @@ public class Persister {
 
 	public void saveQueue () {
 
-		try ( ObjectOutputStream queueListOut = new ObjectOutputStream( new FileOutputStream( queueFile ) ); ) {
-			queueListOut.writeObject( new ArrayList <Track>( Arrays.asList( player.getQueue().getData().toArray( new Track [ player.getQueue().getData().size() ] ) ) ) );
+		try ( ObjectOutputStream queueListOut = new ObjectOutputStream( new FileOutputStream( queueFile ) ) ) {
+			queueListOut.writeObject( new ArrayList <Track>( player.getQueue().getData() ) );
 			queueListOut.flush();
 
 		} catch ( IOException e ) {
@@ -241,9 +241,9 @@ public class Persister {
 	}
 
 	public void saveHistory () {
-		try ( ObjectOutputStream historyListOut = new ObjectOutputStream( new FileOutputStream( historyFile ) ); ) {
-			ObservableList <Track> historyData = player.getHistory().getItems();
-			historyListOut.writeObject( new ArrayList <Track>( Arrays.asList( historyData.toArray( new Track [ historyData.size() ] ) ) ) );
+		try ( ObjectOutputStream historyListOut = new ObjectOutputStream( new FileOutputStream( historyFile ) ) ) {
+			
+			historyListOut.writeObject( new ArrayList <Track>( player.getHistory().getItems() ) );
 			historyListOut.flush();
 
 		} catch ( IOException e ) {
@@ -254,13 +254,13 @@ public class Persister {
 
 	@SuppressWarnings("unchecked")
 	public void loadAlbumsAndTracks () {
-		try ( ObjectInputStream dataIn = new ObjectInputStream( new GZIPInputStream( new FileInputStream( dataFile ) ) ); ) {
+		try ( ObjectInputStream dataIn = new ObjectInputStream( new GZIPInputStream( new FileInputStream( dataFile ) ) ) ) {
 			// TODO: Maybe do this more carefully, give Library more control
 			// over it?
 			library.albums.addAll( (ArrayList <Album>) dataIn.readObject() );
 			library.tracks.addAll( (ArrayList <Track>) dataIn.readObject() );
 		} catch ( FileNotFoundException e ) {
-			System.out.println( "File not found: info.data, unable to load albuma and song lists, continuing." );
+			System.out.println( "File not found: data, unable to load albuma and song lists, continuing." );
 		} catch ( IOException | ClassNotFoundException e ) {
 			// TODO:
 			e.printStackTrace();
@@ -389,6 +389,11 @@ public class Persister {
 					case PRIMARY_SPLIT_PERCENT:
 					case CURRENT_LIST_SPLIT_PERCENT:
 					case ART_SPLIT_PERCENT:
+					case VOLUME: 
+					case LIBRARY_TAB:
+					case TRACK:
+					case TRACK_POSITION:
+					case TRACK_NUMBER:
 						loadMe.put( setting, value );
 						break;
 				}
@@ -422,7 +427,8 @@ public class Persister {
 				}
 
 				String value = line.split( ":\\s+" )[1];
-
+				
+				/*
 				switch ( setting ) {
 					case TRACK:
 					case TRACK_POSITION:
@@ -430,6 +436,7 @@ public class Persister {
 						loadMe.put( setting, value );
 						break;
 				}
+				*/
 			}
 
 		} catch ( FileNotFoundException e ) {

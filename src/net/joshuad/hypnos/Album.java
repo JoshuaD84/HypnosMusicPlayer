@@ -8,6 +8,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+import javafx.scene.image.Image;
+
 public class Album implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
@@ -84,6 +86,24 @@ public class Album implements Serializable {
 		Album compareTo = (Album)e;
 		
 		return compareTo.getPath().toAbsolutePath().equals( this.getPath().toAbsolutePath() );
+	}
+
+	public Image getAlbumCoverImage () {
+		for ( Track track : tracks ) {
+			if ( track.getAlbumCoverImage() != null ) {
+				return track.getAlbumCoverImage();
+			}
+		}
+		return null;
+	}
+
+	public Image getAlbumArtistImagePath () {
+		for ( Track track : tracks ) {
+			if ( track.getAlbumCoverImage() != null ) {
+				return track.getAlbumArtistImage();
+			}
+		}
+		return null;
 	}
 }
 

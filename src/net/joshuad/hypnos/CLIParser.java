@@ -26,6 +26,8 @@ public class CLIParser {
 	private static final String TOGGLE_PAUSE = "play-pause";
 	private static final String STOP = "stop";
 	private static final String TOGGLE_MINIMIZED = "toggle-window";
+	private static final String VOLUME_DOWN = "volume-down";
+	private static final String VOLUME_UP = "volume-up";
 	
 	CommandLineParser parser;
 	Options options;
@@ -42,6 +44,8 @@ public class CLIParser {
 		options.addOption( null, TOGGLE_PAUSE, false, "Toggle play/pause mode" );
 		options.addOption( null, STOP, false, "Stop playback" );
 		options.addOption( null, TOGGLE_MINIMIZED, false, "Toggle the minimized state" );
+		options.addOption( null, VOLUME_UP, false, "Turn up the volume" );
+		options.addOption( null, VOLUME_DOWN, false, "Turn down the volume" );
 		
 		parser = new DefaultParser();
 		
@@ -87,6 +91,14 @@ public class CLIParser {
 			
 			if ( line.hasOption( TOGGLE_MINIMIZED ) ) {
 				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SocketCommand.TOGGLE_MINIMIZED ) );
+			}
+			
+			if ( line.hasOption( VOLUME_DOWN ) ) {
+				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SocketCommand.VOLUME_DOWN ) );
+			}
+			
+			if ( line.hasOption( VOLUME_UP ) ) {
+				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SocketCommand.VOLUME_UP ) );
 			}
 			
 			ArrayList<File> filesToLoad = new ArrayList<File> ();

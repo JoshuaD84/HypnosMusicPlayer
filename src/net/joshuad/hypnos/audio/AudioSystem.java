@@ -57,7 +57,6 @@ public class AudioSystem {
 
 	private final ObservableList <CurrentListTrack> currentList = FXCollections.observableArrayList(); 
 
-
 	private AudioPlayer player;
 
 	private final ArrayList <Track> previousNextStack = new ArrayList <Track>( MAX_PREVIOUS_NEXT_STACK_SIZE );
@@ -319,6 +318,10 @@ public class AudioSystem {
 	public Queue getQueue() {
 		return queue;
 	}
+	
+	public Track getCurrentTrack() {
+		return player.getTrack();
+	}
 
 	public ObservableList <CurrentListTrack> getCurrentList () {
 		return currentList;
@@ -343,8 +346,18 @@ public class AudioSystem {
 	public void setVolumePercent ( double percent ) {
 		player.requestVolumePercent( percent );
 	}
+
+	public void decrementVolume () {
+		double target = player.getVolumePercent() - .05;
+		if ( target < 0 ) target = 0;
+		player.requestVolumePercent( target );
+	}
 	
-	
+	public void incrementVolume () {
+		double target = player.getVolumePercent() + .05;
+		if ( target > 1 ) target = 1;
+		player.requestVolumePercent( target );
+	}
 	
 	public boolean isPlaying () {
 		return player.isPlaying();
@@ -371,6 +384,7 @@ public class AudioSystem {
 
 		retMe.put ( Setting.SHUFFLE, getShuffleMode().toString() );
 		retMe.put ( Setting.REPEAT, getRepeatMode() );
+		retMe.put ( Setting.VOLUME, player.getVolumePercent() );
 		
 		return retMe;
 	}
@@ -570,6 +584,10 @@ public class AudioSystem {
 		currentList.clear();
 	}
 	
+	public void clearQueue() {
+		queue.clear();
+	}
+	
 	public void removeTracksAtIndices ( List <Integer> indicies ) {
 		int tracksRemoved = 0;
 		for ( int k = indicies.size() - 1; k >= 0; k-- ) {
@@ -603,6 +621,7 @@ public class AudioSystem {
 	
 	public void setTracks ( List <? extends Track> tracks ) {
 		clearList();
+		clearQueue();
 		appendTracks ( tracks );
 	}
 		
@@ -812,6 +831,15 @@ public class AudioSystem {
 		}
 		
 		notifyListenersPlaylistsSet ( playlists );
+	}
+
+	public void playItems ( List <Track> items ) {
+		if ( items.size() == 1 ) {
+			playTrack ( items.get( 0 ) );
+		} else if ( items.size() > 1 ) {
+			setTracks( items );
+			play();
+		}
 	}
 }
 

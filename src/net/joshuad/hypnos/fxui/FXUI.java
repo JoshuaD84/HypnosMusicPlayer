@@ -40,6 +40,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -112,6 +113,7 @@ public class FXUI implements PlayerListener {
 	
 	SplitPane primarySplitPane;
 	SplitPane currentListSplitPane;
+	StretchedTabPane libraryPane;
 	
 	ImageView playImage;
 	ImageView pauseImage;
@@ -120,8 +122,9 @@ public class FXUI implements PlayerListener {
 	HBox trackFilterPane;
 	HBox playlistFilterPane;
 	HBox playlistControls;
-
+	
 	Slider trackPositionSlider;
+	Slider volumeSlider;
 
 	boolean sliderMouseHeld;
 
@@ -178,7 +181,7 @@ public class FXUI implements PlayerListener {
 		scene = new Scene( new Group(), 1024, 768 );
 		
 		File stylesheet = new File ( Hypnos.getRootDirectory() + File.separator + "resources" + File.separator + "style.css" );
-		scene.getStylesheets().add( "file:///" + stylesheet.getAbsolutePath().replace( "\\", "/" ) ); //TODO: DD
+		scene.getStylesheets().add( "file:///" + stylesheet.getAbsolutePath().replace( "\\", "/" ) ); 
 		
 		//TODO: If we launch the jar from a different directory, it doesn't shwo the icon
 		//we need to get the directory of the jar and load the image from there, not just from the current directory
@@ -235,7 +238,7 @@ public class FXUI implements PlayerListener {
 		playlistPane.setTop( playlistFilterPane );
 		playlistPane.setCenter( playlistTable );
 
-		StretchedTabPane libraryTabPane = new StretchedTabPane(); // TODO: I can probably name this better.
+		libraryPane = new StretchedTabPane();
 
 		Tab albumListTab = new Tab( "Albums" );
 		albumListTab.setContent( albumListPane );
@@ -249,11 +252,11 @@ public class FXUI implements PlayerListener {
 		songListTab.setContent( trackListPane );
 		songListTab.setClosable( false );
 
-		libraryTabPane.getTabs().addAll( albumListTab, songListTab, playlistTab );
-		libraryTabPane.setSide( Side.BOTTOM );
+		libraryPane.getTabs().addAll( albumListTab, songListTab, playlistTab );
+		libraryPane.setSide( Side.BOTTOM );
 
 		primarySplitPane = new SplitPane();
-		primarySplitPane.getItems().addAll( currentListSplitPane, libraryTabPane  );
+		primarySplitPane.getItems().addAll( libraryPane, currentListSplitPane );
 
 		final BorderPane primaryContainer = new BorderPane();
 
@@ -334,7 +337,7 @@ public class FXUI implements PlayerListener {
 			items.add( newItem );
 		}
 	}
-
+	
 	public void setupTransport () {
 	
 		playImage = null;
@@ -450,10 +453,12 @@ public class FXUI implements PlayerListener {
 		timeElapsedLabel = new Label( "" );
 		timeRemainingLabel = new Label( "" );
 
-		timeElapsedLabel.setMinWidth( 40 );
+		timeElapsedLabel.setMinWidth( 65 );
+		timeElapsedLabel.setContentDisplay( ContentDisplay.RIGHT );
+		timeElapsedLabel.setTextAlignment( TextAlignment.RIGHT );
 		timeElapsedLabel.setAlignment( Pos.CENTER_RIGHT );
 
-		timeRemainingLabel.setMinWidth( 40 );
+		timeRemainingLabel.setMinWidth( 65 );
 
 		trackPositionSlider = new Slider();
 		trackPositionSlider.setMin( 0 );
@@ -485,10 +490,9 @@ public class FXUI implements PlayerListener {
 		volumeLabel.getStyleClass().add( "volumeLabel" );
 		volumeLabel.setMinWidth( 30 );
 		
-		Slider volumeSlider = new Slider();
+		volumeSlider = new Slider();
 		volumeSlider.setMin( 0 );
 		volumeSlider.setMax( 100 );
-		volumeSlider.setValue( 100 );
 		volumeSlider.setPrefWidth( 100 );
 		
 		volumeSlider.setOnMouseDragged( ( MouseEvent e ) -> {
@@ -537,6 +541,14 @@ public class FXUI implements PlayerListener {
 			
 		playingTrackInfo.getChildren().add( trackInfo );
 		playingTrackInfo.setAlignment( Pos.CENTER );
+		
+		trackInfo.setOnMouseClicked( ( event ) -> {
+			Track current = player.getCurrentTrack();
+			if ( player.getCurrentTrack() != null ) {
+				setAlbumImage( current.getAlbumCoverImage() );
+				setArtistImage( current.getAlbumArtistImage() );
+			}
+		});
 
 		transport = new VBox();
 		transport.getChildren().add( playingTrackInfo );
@@ -752,14 +764,65 @@ public class FXUI implements PlayerListener {
 		playlistControls = new HBox();
 		playlistControls.setAlignment( Pos.CENTER_RIGHT );
 		
-		Label currentPlayingListInfo = new Label ( "" );
+		final Label currentListLength = new Label ( "" );
+		currentListLength.setMinWidth( Region.USE_PREF_SIZE );
+		currentListLength.setPadding( new Insets ( 0, 10, 0, 0 ) );
+		
+		player.getCurrentList().addListener( new ListChangeListener () {
+			@Override
+			public void onChanged ( Change changes ) {
+				int lengthS = 0;
+				
+				for ( Track track : player.getCurrentList() ) {
+					if ( track != null ) {
+						lengthS += track.getLengthS();
+					}
+				}
+				currentListLength.setText( Utils.getLengthDisplay( lengthS ) );
+			}
+		});
+		
+		final Label currentPlayingListInfo = new Label ( "" );
 		currentPlayingListInfo.setAlignment( Pos.CENTER );
 		currentPlayingListInfo.prefWidthProperty().bind( playlistControls.widthProperty() );
 		listInfoUpdater = new ListInfoUpdater ( currentPlayingListInfo );
 		player.addCurrentListListener ( listInfoUpdater );
+		
+
+		
+		final ContextMenu queueButtonMenu = new ContextMenu();
+		MenuItem clearQueue = new MenuItem ( "Clear" );
+		clearQueue.setOnAction(  ( ActionEvent e ) -> { player.getQueue().clear(); });
+		
+		queueButtonMenu.getItems().addAll( clearQueue );
+		showQueueButton.setContextMenu( queueButtonMenu );
+		
+		final ContextMenu shuffleButtonMenu = new ContextMenu();
+		toggleShuffleButton.setContextMenu( shuffleButtonMenu );
+		
+		MenuItem sequential = new MenuItem ( "Sequential" );
+		MenuItem shuffle = new MenuItem ( "Shuffle" );
+		MenuItem shuffleList = new MenuItem ( "Shuffle Current List" );
+		shuffleButtonMenu.getItems().addAll( sequential, shuffle, shuffleList );
+		
+		sequential.setOnAction( ( actionEvent ) -> { player.setShuffleMode( ShuffleMode.SEQUENTIAL ); });
+		shuffle.setOnAction( ( actionEvent ) -> { player.setShuffleMode( ShuffleMode.SHUFFLE ); });
+		shuffleList.setOnAction( ( actionEvent ) -> { player.shuffleList(); });
+		
+		final ContextMenu repeatButtonMenu = new ContextMenu();
+		toggleRepeatButton.setContextMenu( repeatButtonMenu );
+		MenuItem noRepeat = new MenuItem ( "No Repeat" );
+		MenuItem repeatAll = new MenuItem ( "Repeat All" );
+		MenuItem repeatOne = new MenuItem ( "Repeat One Track" );
+		repeatButtonMenu.getItems().addAll( noRepeat, repeatAll, repeatOne );
+		
+		noRepeat.setOnAction( ( actionEvent ) -> { player.setRepeatMode( RepeatMode.PLAY_ONCE ); });
+		repeatAll.setOnAction( ( actionEvent ) -> { player.setRepeatMode( RepeatMode.REPEAT ); });
+		repeatOne.setOnAction( ( actionEvent ) -> { player.setRepeatMode( RepeatMode.REPEAT_ONE_TRACK ); });
+		
 
 		playlistControls.getChildren().addAll( toggleRepeatButton, toggleShuffleButton, showQueueButton, showHistoryButton,
-				currentPlayingListInfo, loadTracksButton, savePlaylistButton, clearButton );
+				currentPlayingListInfo, currentListLength, loadTracksButton, savePlaylistButton, clearButton );
 	}
 
 	public void setupPlaylistFilterPane () {
@@ -768,32 +831,34 @@ public class FXUI implements PlayerListener {
 		filterBox.setPrefWidth( 500000 );
 		
 		filterBox.textProperty().addListener( ( observable, oldValue, newValue ) -> {
-			library.getPlaylistsFiltered().setPredicate( playlist -> {
-				if ( newValue == null || newValue.isEmpty() ) {
-					return true;
-				}
-
-				String[] lowerCaseFilterTokens = newValue.toLowerCase().split( "\\s+" );
-
-				ArrayList <String> matchableText = new ArrayList <String>();
-
-				matchableText.add( Normalizer.normalize( playlist.getName(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-				matchableText.add( playlist.getName().toLowerCase() );
-
-				for ( String token : lowerCaseFilterTokens ) {
-					boolean tokenMatches = false;
-					for ( String test : matchableText ) {
-						if ( test.contains( token ) ) {
-							tokenMatches = true;
+			Platform.runLater( () -> { //TODO: Does this work? 
+				library.getPlaylistsFiltered().setPredicate( playlist -> {
+					if ( newValue == null || newValue.isEmpty() ) {
+						return true;
+					}
+	
+					String[] lowerCaseFilterTokens = newValue.toLowerCase().split( "\\s+" );
+	
+					ArrayList <String> matchableText = new ArrayList <String>();
+	
+					matchableText.add( Normalizer.normalize( playlist.getName(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+					matchableText.add( playlist.getName().toLowerCase() );
+	
+					for ( String token : lowerCaseFilterTokens ) {
+						boolean tokenMatches = false;
+						for ( String test : matchableText ) {
+							if ( test.contains( token ) ) {
+								tokenMatches = true;
+							}
+						}
+	
+						if ( !tokenMatches ) {
+							return false;
 						}
 					}
-
-					if ( !tokenMatches ) {
-						return false;
-					}
-				}
-
-				return true;
+	
+					return true;
+				});
 			});
 		});
 		
@@ -836,8 +901,10 @@ public class FXUI implements PlayerListener {
 
 			@Override
 			public void changed ( ObservableValue <? extends String> observable, String oldValue, String newValue ) {
-				library.getTracksFiltered().setPredicate( track -> {
-					return acceptChange ( track, oldValue, newValue );
+				Platform.runLater( () -> {
+					library.getTracksFiltered().setPredicate( track -> {
+						return acceptTrackFilterChange ( track, oldValue, newValue ); 
+					});
 				});
 			}
 		});
@@ -875,7 +942,7 @@ public class FXUI implements PlayerListener {
 		trackFilterPane.getChildren().addAll( settingsButton, trackFilterBox, clearButton, checkBoxMargins );
 	}
 	
-	public boolean acceptChange ( Track track, Object oldValue, Object newValueIn ) {
+	public boolean acceptTrackFilterChange ( Track track, Object oldValue, Object newValueIn ) {
 				
 		String newValue = trackFilterBox.getText();
 		if ( newValueIn instanceof String ) {
@@ -927,38 +994,40 @@ public class FXUI implements PlayerListener {
 		TextField filterBox = new TextField();
 		filterBox.setPrefWidth( 500000 );
 		filterBox.textProperty().addListener( ( observable, oldValue, newValue ) -> {
-			library.getAlbumsFiltered().setPredicate( album -> {
-				if ( newValue == null || newValue.isEmpty() ) {
-					return true;
-				}
-
-				String[] lowerCaseFilterTokens = newValue.toLowerCase().split( "\\s+" );
-
-				ArrayList <String> matchableText = new ArrayList <String>();
-
-				matchableText.add( Normalizer.normalize( album.getAlbumArtist(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-				matchableText.add( album.getAlbumArtist().toLowerCase() );
-				matchableText.add( Normalizer.normalize( album.getFullTitle(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-				matchableText.add( album.getFullTitle().toLowerCase() );
-				matchableText.add( Normalizer.normalize( album.getYear(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-				matchableText.add( album.getYear().toLowerCase() );
-
-				for ( String token : lowerCaseFilterTokens ) {
-					boolean tokenMatches = false;
-					for ( String test : matchableText ) {
-						if ( test.contains( token ) ) {
-							tokenMatches = true;
+			Platform.runLater( () -> {
+				library.getAlbumsFiltered().setPredicate( album -> {
+					if ( newValue == null || newValue.isEmpty() ) {
+						return true;
+					}
+	
+					String[] lowerCaseFilterTokens = newValue.toLowerCase().split( "\\s+" );
+	
+					ArrayList <String> matchableText = new ArrayList <String>();
+	
+					matchableText.add( Normalizer.normalize( album.getAlbumArtist(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+					matchableText.add( album.getAlbumArtist().toLowerCase() );
+					matchableText.add( Normalizer.normalize( album.getFullTitle(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+					matchableText.add( album.getFullTitle().toLowerCase() );
+					matchableText.add( Normalizer.normalize( album.getYear(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+					matchableText.add( album.getYear().toLowerCase() );
+	
+					for ( String token : lowerCaseFilterTokens ) {
+						boolean tokenMatches = false;
+						for ( String test : matchableText ) {
+							if ( test.contains( token ) ) {
+								tokenMatches = true;
+							}
+						}
+	
+						if ( !tokenMatches ) {
+							return false;
 						}
 					}
-
-					if ( !tokenMatches ) {
-						return false;
-					}
-				}
-
-				return true;
-			} );
-		} );
+	
+					return true;
+				});
+			});
+		});
 
 		Button settingsButton = new Button( "+" );
 		settingsButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
@@ -996,7 +1065,7 @@ public class FXUI implements PlayerListener {
 			@Override
 			public void changed ( ObservableValue <? extends Boolean> observable, Boolean oldValue, Boolean newValue ) {
 				library.getTracksFiltered().setPredicate( track -> {
-					return acceptChange ( track, oldValue, newValue );
+					return acceptTrackFilterChange ( track, oldValue, newValue );
 				});
 			}
 		});
@@ -1099,10 +1168,11 @@ public class FXUI implements PlayerListener {
 		
 		playMenuItem.setOnAction( event -> {
 			player.setAlbums( albumTable.getSelectionModel().getSelectedItems() );
+			player.play();
 		});
 
 		apendMenuItem.setOnAction( event -> {
-			player.appendAlbum( albumTable.getSelectionModel().getSelectedItem() );
+			player.appendAlbums( albumTable.getSelectionModel().getSelectedItems() );
 		});
 
 		enqueueMenuItem.setOnAction( event -> {
@@ -1167,7 +1237,11 @@ public class FXUI implements PlayerListener {
 			row.setContextMenu( contextMenu );
 
 			row.setOnMouseClicked( event -> {
-				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
+				if ( event.getClickCount() == 1 && !row.isEmpty() ) {
+					setAlbumImage( row.getItem().getAlbumCoverImage() );
+					setArtistImage( row.getItem().getAlbumArtistImagePath( ) );
+					
+				} else if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
 					player.setAlbum( row.getItem() );
 					player.play();
 				}
@@ -1321,10 +1395,9 @@ public class FXUI implements PlayerListener {
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.setTracks( trackTable.getSelectionModel().getSelectedItems() );
-				player.play();
+				player.playItems( trackTable.getSelectionModel().getSelectedItems() );
 			}
-		} );
+		});
 
 		apendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -1399,9 +1472,12 @@ public class FXUI implements PlayerListener {
 			row.setContextMenu( trackContextMenu );
 			
 			row.setOnMouseClicked( event -> {
-				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					player.setTrack ( trackTable.getSelectionModel().getSelectedItem() );
-					player.play();
+				if ( event.getClickCount() == 1 && !row.isEmpty() ) {
+					setAlbumImage( row.getItem().getAlbumCoverImage() );
+					setArtistImage( row.getItem().getAlbumArtistImage( ) );
+					
+				} else if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
+					player.playTrack( row.getItem(), false );
 				}
 			});
 			
@@ -1493,6 +1569,7 @@ public class FXUI implements PlayerListener {
 			@Override
 			public void handle ( ActionEvent event ) {
 				player.setPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
+				player.play();
 			}
 		});
 
@@ -1500,7 +1577,6 @@ public class FXUI implements PlayerListener {
 			@Override
 			public void handle ( ActionEvent event ) {
 				player.setTracks ( playlistTable.getSelectionModel().getSelectedItem().getTracks() );
-				player.play();
 			}
 		});
 		
@@ -1935,7 +2011,11 @@ public class FXUI implements PlayerListener {
 			row.setContextMenu( contextMenu );
 
 			row.setOnMouseClicked( event -> {
-				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
+				if ( event.getClickCount() == 1 && !row.isEmpty() ) {
+					setAlbumImage( row.getItem().getAlbumCoverImage() );
+					setArtistImage( row.getItem().getAlbumArtistImage( ) );
+					
+				} else if ( event.getClickCount() == 2 && !row.isEmpty() ) {
 					player.playTrack( row.getItem() );
 					//TODO: Do we want the error here? 
 				}
@@ -2249,12 +2329,28 @@ public class FXUI implements PlayerListener {
 		retMe.put ( Setting.PRIMARY_SPLIT_PERCENT, getPrimarySplitPercent() );
 		retMe.put ( Setting.CURRENT_LIST_SPLIT_PERCENT, getCurrentListSplitPercent() );
 		retMe.put ( Setting.ART_SPLIT_PERCENT, getArtSplitPercent() );
+		retMe.put ( Setting.LIBRARY_TAB, libraryPane.getSelectionModel().getSelectedIndex() );
 
 		return retMe;
 	}
 
-
+	public void refreshQueueList() {
+		queueWindow.refresh();
+	}
+	
+	public void refreshHistory() {
+		historyWindow.refresh();
+	}
+	
 	public void refreshCurrentList () {
+		for ( Track track : currentListTable.getItems() ) {
+			try {
+				track.refreshTagData();
+			} catch ( IOException e ) {
+				LOGGER.info( "Unable to update the tag info for track on current list, removing it from the list: " + track.getFilename() );
+				currentListTable.getItems().remove( track );
+			}
+		}
 		currentListTable.refresh();
 	}
 	
@@ -2288,13 +2384,29 @@ public class FXUI implements PlayerListener {
 						
 					case SHUFFLE:
 						player.setShuffleMode ( AudioSystem.ShuffleMode.valueOf( value ) );
-						//TODO: Update UI
 						break;
 						
 					case REPEAT:
 						player.setRepeatMode ( AudioSystem.RepeatMode.valueOf( value ) );
-						//TODO: Update UI
 						break;
+						
+					case VOLUME:
+						player.setVolumePercent( Double.valueOf ( value ) );
+						playerVolumeChanged ( Double.valueOf ( value ) ); //This is kind of a hack. 
+						break;
+						
+					case TRACK_NUMBER:
+						try {
+							int tracklistNumber = Integer.parseInt( value );
+							if ( tracklistNumber != -1 ) {
+								player.getCurrentList().get( tracklistNumber ).setIsCurrentTrack( true );
+							}
+						} catch ( Exception e ) {
+							LOGGER.info( "Error loading current list track number: " + e.getMessage() );
+						}
+						
+						break;
+						
 					//END NOT BELONG
 							
 					case HIDE_ALBUM_TRACKS:
@@ -2333,18 +2445,11 @@ public class FXUI implements PlayerListener {
 						setArtSplitPercent ( Double.valueOf( value ) );
 						break;
 						
-					case TRACK_NUMBER:
-						try {
-							int tracklistNumber = Integer.parseInt( value );
-							if ( tracklistNumber != -1 ) {
-								//TODO: MusicPlayerUI.currentList.get( tracklistNumber ).setIsCurrentTrack( true );
-							}
-						} catch ( Exception e ) {
-							System.out.println ( "Error loading current list track number: " + e.getMessage() );
-						}
-						
+					case LIBRARY_TAB:
+						libraryPane.getSelectionModel().select( Integer.valueOf ( value ) );
 						break;
 				}
+				
 			} catch ( Exception e ) {
 				LOGGER.log( Level.INFO, "Unable to apply setting: " + setting + " to UI.", e );
 			}
@@ -2389,7 +2494,7 @@ public class FXUI implements PlayerListener {
 			trackInfo.setText( track.getArtist() + " - " + track.getTitle() );
 	
 			setAlbumImage( track.getAlbumCoverImage() );
-			setArtistImage( track.getAlbumArtistImagePath( ) );
+			setArtistImage( track.getAlbumArtistImage( ) );
 		});
 	}
 
@@ -2413,7 +2518,10 @@ public class FXUI implements PlayerListener {
 
 	@Override
 	public void playerVolumeChanged ( double newVolumePercent ) {
-		// TODO Auto-generated method stub
+		double min = volumeSlider.getMin();
+		double max = volumeSlider.getMax();
+		
+		volumeSlider.setValue( newVolumePercent * ( max - min ) );
 		
 	}
 
