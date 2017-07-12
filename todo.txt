@@ -12,27 +12,22 @@ New Features
 	Log to file, how does that work inside java? 
 			
 	Option: Warn when erasing an unsaved playlist. 
+	
+	Indicate missing files on current list
+		https://stackoverflow.com/questions/45047844/bind-tableview-row-background-color-to-boolean-property
 			
 Bug Fixes / Incremental Improvements
-
-	use observable values for all of the track and album stuff, so we don't have to do refreshes
 	
 	Make sure horizontal scroll bars never appear
 		6/9 - Can't find anything on google.
-	
-	Some bugs on the currentListInfoLabel. Work them out one at a time. 	
-		DND the first disc of an album, then dnd the second disc, inserting in the middle -> it should show modified, but it doesn't 
-		
-	Flipping through albums / tracks with up and down arrow doesn't update the art pane. 
-		
-		
+			
 Refactor / organize my code. 
  	Make LibraryUpdater part of Library. Is there a way to abstract out the Platform -> RunLater part? I feel like we're just stuck w/ that, which kind of ties to us JavaFX. 
  		Maybe ui.runMe ( Runnable ), and then the UI can decide whether to launch a new thread, have a thread idling, do it on this thread, or use something like Platform.runLater()	
- 	
- 	Can / should I get rid of Utils?
- 	
+
  	Make MainWindow its own class, and have FXUI be more of a simple manager? 
+ 	
+	use observable values for all of the track and album stuff, so we don't have to do refreshes
 
 Decoders
 	Mp4
@@ -123,7 +118,7 @@ OS Specific
 		https://stackoverflow.com/questions/29995727/java-systemtray-icon-does-not-always-work
 		
 	Embed and use a font with all needed UTF glyphs
-		≡✘⏏💾⇉🔀⇥🔁🔂🔊🔇🔈🔉🔊
+		≡✘⏏💾⇉🔀⇥🔁🔂🔇🔈🔉🔊
 		
 		DejaVu Sans - The thing I'm using on nix
 		Calibri - Windows

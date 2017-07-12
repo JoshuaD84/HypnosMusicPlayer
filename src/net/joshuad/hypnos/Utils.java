@@ -214,8 +214,6 @@ public class Utils {
 		else return false;
 	}
 	
-
-	//TODO: Have this return a list of paths rather than a list of tracks, so the track metadata isn't loaded multiple times. 
 	public static ArrayList <Path> getAllTracksInDirectory ( Path startingDirectory ) {
 		
 		TrackFinder finder = new TrackFinder ();
@@ -230,7 +228,6 @@ public class Utils {
 		return new ArrayList <Path> ();
 	}
 }
-
 
 class TrackFinder extends SimpleFileVisitor <Path> {
 

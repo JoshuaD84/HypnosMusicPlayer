@@ -5,6 +5,8 @@ import java.io.ObjectInputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -17,6 +19,8 @@ import javafx.beans.property.StringProperty;
 		private ArrayList <Integer> queueIndex = new ArrayList <Integer> ();
 		
 		private transient StringProperty display = new SimpleStringProperty ( "" );
+		
+		private transient BooleanProperty fileIsMissing = new SimpleBooleanProperty ( false );
 		
 		public CurrentListTrack ( Path source ) throws IOException {
 			super ( source );
@@ -91,9 +95,22 @@ import javafx.beans.property.StringProperty;
 			return display;
 		}
 		
+		public BooleanProperty fileIsMissingProperty() {
+			return fileIsMissing;
+		}
+		
+		public boolean isMissingFile () {
+			return fileIsMissing.getValue();
+		}
+		
+		public void setIsMissingFile ( boolean missing ) {
+			fileIsMissing.set( missing );
+		}
+		
 		private void readObject ( ObjectInputStream in ) throws IOException, ClassNotFoundException {
 			in.defaultReadObject();
 			display = new SimpleStringProperty ( "" );
+			fileIsMissing = new SimpleBooleanProperty ( false );
 			updateDisplayString();
 		}
 	}

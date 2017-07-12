@@ -385,12 +385,12 @@ public class Persister {
 					case WINDOW_MAXIMIZED:
 					case PRIMARY_SPLIT_PERCENT:
 					case CURRENT_LIST_SPLIT_PERCENT:
-					case ART_SPLIT_PERCENT:
 					case VOLUME: 
 					case LIBRARY_TAB:
 					case TRACK:
 					case TRACK_POSITION:
 					case TRACK_NUMBER:
+					case ART_SPLIT_PERCENT:
 						loadMe.put( setting, value );
 						break;
 				}
@@ -407,7 +407,8 @@ public class Persister {
 	}
 
 	public void loadPostWindowSettings () {
-
+						
+		/*
 		EnumMap <Setting, String> loadMe = new EnumMap <Setting, String>( Setting.class );
 		try ( FileReader fileReader = new FileReader( settingsFile ); ) {
 
@@ -424,15 +425,11 @@ public class Persister {
 
 				String value = line.split( ":\\s+" )[1];
 				
-				/*
 				switch ( setting ) {
-					case TRACK:
-					case TRACK_POSITION:
-					case TRACK_NUMBER:
 						loadMe.put( setting, value );
 						break;
 				}
-				*/
+				
 			}
 
 		} catch ( FileNotFoundException e ) {
@@ -443,5 +440,6 @@ public class Persister {
 		}
 
 		ui.applySettings( loadMe );
+		*/
 	}
 }

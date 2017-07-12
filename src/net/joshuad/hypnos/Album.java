@@ -97,7 +97,7 @@ public class Album implements Serializable {
 		return null;
 	}
 
-	public Image getAlbumArtistImagePath () {
+	public Image getAlbumArtistImage () {
 		for ( Track track : tracks ) {
 			if ( track.getAlbumCoverImage() != null ) {
 				return track.getAlbumArtistImage();

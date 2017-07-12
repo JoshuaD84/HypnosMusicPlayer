@@ -20,9 +20,9 @@ public class CurrentList {
 	
 	enum Mode {
 		ALBUM,
-		ALBUM_MODIFIED,
+		ALBUM_REORDERED,
 		PLAYLIST,
-		PLAYLIST_MODIFIED,
+		PLAYLIST_UNSAVED,
 		EMPTY;
 	}
 		
@@ -39,6 +39,36 @@ public class CurrentList {
 	
 	public CurrentList ( Queue queue ) {
 		this.queue = queue;
+		
+		startListWatcher();
+	}
+	
+	private void startListWatcher() {
+		Thread watcher = new Thread( () -> {
+			while ( true ) {
+				synchronized ( items ) {
+					for ( CurrentListTrack track : items ) {
+						boolean isMissing = !Utils.isMusicFile( track.getPath() );
+						if ( !isMissing && track.isMissingFile() ) {
+							track.setIsMissingFile ( false );
+							
+						} else if ( isMissing && !track.isMissingFile() ) {
+							track.setIsMissingFile ( true );
+						}
+							
+					}
+				}
+				
+				try {
+					Thread.sleep ( 250 );
+				} catch ( InterruptedException e ) {
+					LOGGER.fine ( "Interrupted while sleeping in current list watcher." );
+				}
+			}
+		});
+		
+		watcher.setDaemon( true );
+		watcher.start();
 	}
 	
 	public void addListener ( CurrentListListener listener ) {
@@ -136,8 +166,12 @@ public class CurrentList {
 				items.remove ( index );
 			}
 		}
+
+		if ( tracksToMove.size() > 0 ) {
+			items.addAll( toLocation, tracksToMove );
+			listReordered();
+		}
 		
-		items.addAll( toLocation, tracksToMove );
 	}
 	
 	public void setTrack ( String location ) {
@@ -255,6 +289,9 @@ public class CurrentList {
 	} 
 	
 	public void insertAlbums ( int index, List<Album> albums ) {
+		if ( index > items.size() ) index = items.size();
+		
+		boolean insertedAtEnd = ( index == items.size() );
 
 		boolean startedEmpty = false;
 		Mode startMode = mode;
@@ -273,10 +310,14 @@ public class CurrentList {
 		if ( startedEmpty ) {
 			albumsSet ( albums );
 			
-		} else if ( startMode == Mode.ALBUM || startMode == Mode.ALBUM_MODIFIED ) {
+		} else if ( startMode == Mode.ALBUM || startMode == Mode.ALBUM_REORDERED ) {
 			List<Album> fullAlbumList = new ArrayList<Album> ( currentAlbums );
 			fullAlbumList.addAll ( albums );
 			albumsSet ( fullAlbumList );
+			
+			if ( index != 0 && !insertedAtEnd ) {
+				listReordered();
+			}
 		}
 	}
 	
@@ -437,7 +478,7 @@ public class CurrentList {
 				return;
 				
 			} else if ( differentBaseAlbums ) {
-				mode = Mode.PLAYLIST_MODIFIED;
+				mode = Mode.PLAYLIST_UNSAVED;
 				currentAlbums.clear();
 				currentPlaylist = null;
 				notifyListenersStateChanged();
@@ -491,7 +532,7 @@ public class CurrentList {
 	}
 	
 	public void tracksSet () {
-		mode = Mode.PLAYLIST_MODIFIED;
+		mode = Mode.PLAYLIST_UNSAVED;
 		currentAlbums.clear();
 		currentPlaylist = null;
 		notifyListenersStateChanged();
@@ -504,12 +545,11 @@ public class CurrentList {
 				mode = Mode.PLAYLIST;			
 				
 			} else {
-				mode = Mode.PLAYLIST_MODIFIED;
+				mode = Mode.PLAYLIST_UNSAVED;
 			}
 			
-		} else if ( mode == Mode.ALBUM ) {
-			mode = Mode.PLAYLIST_MODIFIED;
-
+		} else if ( mode == Mode.ALBUM || mode == Mode.ALBUM_REORDERED ) {
+			mode = Mode.PLAYLIST_UNSAVED;
 		}
 		
 		notifyListenersStateChanged();
@@ -517,10 +557,10 @@ public class CurrentList {
 	
 	public void tracksRemoved () {
 		if ( mode == Mode.PLAYLIST ) {
-			mode = Mode.PLAYLIST_MODIFIED;
+			mode = Mode.PLAYLIST_UNSAVED;
 			
 		} else if ( mode == Mode.ALBUM ) {
-			mode = Mode.PLAYLIST_MODIFIED;
+			mode = Mode.PLAYLIST_UNSAVED;
 
 		}
 		
@@ -536,13 +576,16 @@ public class CurrentList {
 	}
 
 	public void listReordered () {
-		System.out.println ( "A" ); //TODO: DD
 		if ( mode == Mode.ALBUM ) {
-			mode = Mode.ALBUM_MODIFIED;
-			System.out.println ( "A" ); //TODO: BB
+			mode = Mode.ALBUM_REORDERED;
 			
 		} else if ( mode == Mode.PLAYLIST ) {
-			mode = Mode.PLAYLIST_MODIFIED;
+			if ( currentPlaylist != null && items.equals( currentPlaylist.getTracks() ) ) {
+				mode = Mode.PLAYLIST;			
+				
+			} else {
+				mode = Mode.PLAYLIST_UNSAVED;
+			}
 		}
 
 		notifyListenersStateChanged();

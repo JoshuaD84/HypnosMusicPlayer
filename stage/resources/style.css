@@ -10,3 +10,7 @@
 	-fx-font-weight: bold;
 	-fx-font-size: 16px;
 }
+
+.file-missing {
+	-fx-control-inner-background: palevioletred;
+}

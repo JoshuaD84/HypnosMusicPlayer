@@ -53,7 +53,7 @@ public class CurrentListState implements Serializable {
 
 		String retMe = "";
 		
-		if ( mode == Mode.ALBUM || mode == Mode.ALBUM_MODIFIED ) {
+		if ( mode == Mode.ALBUM || mode == Mode.ALBUM_REORDERED ) {
 		
 			if ( albums.size() == 0 ) {
 				
@@ -67,11 +67,11 @@ public class CurrentListState implements Serializable {
 				
 			}
 			
-			if ( mode == Mode.ALBUM_MODIFIED ) {
-				retMe += " *";
+			if ( mode == Mode.ALBUM_REORDERED ) {
+				retMe += " 🔀";
 			}
 
-		} else if ( mode == Mode.PLAYLIST || mode == Mode.PLAYLIST_MODIFIED ) {
+		} else if ( mode == Mode.PLAYLIST || mode == Mode.PLAYLIST_UNSAVED ) {
 			
 			if ( playlist != null ) {
 				retMe = "Playlist: " + playlist.getName();
@@ -80,7 +80,7 @@ public class CurrentListState implements Serializable {
 			}
 			
 				
-			if ( mode == Mode.PLAYLIST_MODIFIED ) {
+			if ( mode == Mode.PLAYLIST_UNSAVED ) {
 				retMe += " *";
 			}
 		} 

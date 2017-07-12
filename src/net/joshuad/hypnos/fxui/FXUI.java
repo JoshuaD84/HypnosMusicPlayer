@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -1116,6 +1114,7 @@ public class FXUI implements PlayerListener {
 		albumTable.getSortOrder().add( albumColumn );
 		FixedWidthCustomResizePolicy resizePolicy = new FixedWidthCustomResizePolicy();
 		resizePolicy.registerColumns( yearColumn );
+		
 		albumTable.setColumnResizePolicy( resizePolicy );
 		
 		emptyAlbumListLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
@@ -1249,6 +1248,13 @@ public class FXUI implements PlayerListener {
 				event.consume();
 			}
 		});
+		
+		albumTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
+		    if (newSelection != null) {
+				setAlbumImage( newSelection.getAlbumCoverImage() );
+				setArtistImage( newSelection.getAlbumArtistImage( ) );
+		    }
+		});
 
 		albumTable.setRowFactory( tv -> {
 			TableRow <Album> row = new TableRow <>();
@@ -1256,11 +1262,7 @@ public class FXUI implements PlayerListener {
 			row.setContextMenu( contextMenu );
 
 			row.setOnMouseClicked( event -> {
-				if ( event.getClickCount() == 1 && !row.isEmpty() ) {
-					setAlbumImage( row.getItem().getAlbumCoverImage() );
-					setArtistImage( row.getItem().getAlbumArtistImagePath( ) );
-					
-				} else if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
+				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
 					player.getCurrentList().setAlbum( row.getItem() );
 					player.play();
 				}
@@ -1462,6 +1464,13 @@ public class FXUI implements PlayerListener {
 			}
 		} );
 		
+		trackTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
+		    if (newSelection != null) {
+				setAlbumImage( newSelection.getAlbumCoverImage() );
+				setArtistImage( newSelection.getAlbumArtistImage( ) );
+		    }
+		});
+		
 		trackTable.setOnDragOver( event -> {
 			Dragboard db = event.getDragboard();
 			if ( db.hasFiles() ) {
@@ -1491,11 +1500,7 @@ public class FXUI implements PlayerListener {
 			row.setContextMenu( trackContextMenu );
 			
 			row.setOnMouseClicked( event -> {
-				if ( event.getClickCount() == 1 && !row.isEmpty() ) {
-					setAlbumImage( row.getItem().getAlbumCoverImage() );
-					setArtistImage( row.getItem().getAlbumArtistImage( ) );
-					
-				} else if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
+				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
 					player.playTrack( row.getItem(), false );
 				}
 			});
@@ -1776,7 +1781,7 @@ public class FXUI implements PlayerListener {
 		lengthColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "lengthDisplay" ) );
 		
 		trackColumn.setCellFactory( column -> {
-			return new TableCell <Track, Integer>() {
+			return new TableCell <CurrentListTrack, Integer>() {
 				@Override
 				protected void updateItem ( Integer value, boolean empty ) {
 					super.updateItem( value, empty );
@@ -1788,7 +1793,8 @@ public class FXUI implements PlayerListener {
 					}
 				}
 			};
-		} );
+		});
+		
 
 		currentListTable = new TableView();
 		currentListTable.getColumns().addAll( playingColumn, trackColumn, artistColumn, yearColumn, albumColumn, titleColumn, lengthColumn );
@@ -2023,20 +2029,22 @@ public class FXUI implements PlayerListener {
 				currentListTable.getSelectionModel().clearSelection();
 			}
 		});
-
+		
+		currentListTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
+		    if (newSelection != null) {
+				setAlbumImage( newSelection.getAlbumCoverImage() );
+				setArtistImage( newSelection.getAlbumArtistImage( ) );
+		    }
+		});
+		
 		currentListTable.setRowFactory( tv -> {
 			TableRow <CurrentListTrack> row = new TableRow <>();
 
 			row.setContextMenu( contextMenu );
-
+			
 			row.setOnMouseClicked( event -> {
-				if ( event.getClickCount() == 1 && !row.isEmpty() ) {
-					setAlbumImage( row.getItem().getAlbumCoverImage() );
-					setArtistImage( row.getItem().getAlbumArtistImage( ) );
-					
-				} else if ( event.getClickCount() == 2 && !row.isEmpty() ) {
+				if ( event.getClickCount() == 2 && !row.isEmpty() ) {
 					player.playTrack( row.getItem() );
-					//TODO: Do we want the error here? 
 				}
 			});
 
@@ -2060,7 +2068,7 @@ public class FXUI implements PlayerListener {
 					event.acceptTransferModes( TransferMode.COPY );
 					event.consume();
 				}
-			} );
+			});
 
 			row.setOnDragDropped( event -> {
 				Dragboard db = event.getDragboard();
@@ -2280,40 +2288,25 @@ public class FXUI implements PlayerListener {
 		primarySplitPane.setDividerPositions( .35d );
 		currentListSplitPane.setDividerPositions( .65d );
 		artSplitPane.setDividerPosition( 0, .51d ); // For some reason .5 doesn't work...
-	
-		// TODO: This is such a crappy hack
-		final ChangeListener <Number> listener = new ChangeListener <Number>() {
-			final Timer timer = new Timer();
-	
-			TimerTask task = null;
-	
-			final long delayTime = 500;
-	
-			@Override
-			public void changed ( ObservableValue <? extends Number> observable, Number oldValue,
-					final Number newValue ) {
-				if ( task != null ) {
-					task.cancel();
-				}
-	
-				task = new TimerTask() {
-					@Override
-					public void run () {
-						SplitPane.setResizableWithParent( artSplitPane, false );
-					}
-				};
-				timer.schedule( task, delayTime );
-			}
-		};
-	
-		mainStage.widthProperty().addListener( listener );
-		mainStage.heightProperty().addListener( listener );
 		
 		hackTooltipStartTiming();
 	
 		updateAlbumListPlaceholder();
 		updateTrackListPlaceholder();
 		updatePlaylistPlaceholder();
+		
+		//If we do the .setResizableWithParent right away the art pane doesn't display right, so we wait a little and everything's fine. 
+		Thread wait = new Thread ( () -> {
+			try {
+				Thread.sleep ( 1500 );
+			} catch ( InterruptedException e ) {
+				//TODO: just log do nothing else. 
+			}
+			SplitPane.setResizableWithParent( artSplitPane, false );
+		});
+		
+		wait.setDaemon( true );
+		wait.start();
 	}
 
 
@@ -2556,9 +2549,6 @@ public class FXUI implements PlayerListener {
 }
 
 class LineNumbersCellFactory<T, E> implements Callback<TableColumn<T, E>, TableCell<T, E>> {
-
-    public LineNumbersCellFactory() {
-    }
 
     @Override
     public TableCell<T, E> call(TableColumn<T, E> param) {
