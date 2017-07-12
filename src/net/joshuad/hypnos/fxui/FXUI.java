@@ -480,6 +480,7 @@ public class FXUI implements PlayerListener {
 		trackPositionSlider.setMaxWidth( 600 );
 		trackPositionSlider.setMinWidth( 200 );
 		trackPositionSlider.setPrefWidth( 400 );
+		trackPositionSlider.setStyle( "-fx-font-size: 18px" );
 
 		trackPositionSlider.valueChangingProperty().addListener( new ChangeListener <Boolean>() {
 			public void changed ( ObservableValue <? extends Boolean> obs, Boolean wasChanging, Boolean isNowChanging ) {
@@ -491,7 +492,7 @@ public class FXUI implements PlayerListener {
 
 		trackPositionSlider.setOnMousePressed( ( MouseEvent e ) -> {
 			sliderMouseHeld = true;
-		} );
+		});
 
 		trackPositionSlider.setOnMouseReleased( ( MouseEvent e ) -> {
 			sliderMouseHeld = false;
