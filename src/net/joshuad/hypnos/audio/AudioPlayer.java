@@ -61,7 +61,11 @@ public class AudioPlayer {
 							decoder.closeAllResources();
 						}
 						
-						decoder = getPlayer ( trackRequested );
+						try {
+							decoder = getPlayer ( trackRequested );
+						} catch ( IllegalStateException e ) {
+							LOGGER.info( "Unable to play file: " + track.getFilename() );
+						}
 						
 						if ( decoder != null ) {
 							track = trackRequested;

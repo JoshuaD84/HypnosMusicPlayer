@@ -51,6 +51,11 @@ public class LibraryUpdater {
 				
 					int changeCount = 0;
 					
+					synchronized ( Track.tagErrorsToAdd ) { //TODO: decide where to put this. 
+						library.tagErrors.addAll ( Track.tagErrorsToAdd );
+						Track.tagErrorsToAdd.clear();
+					}
+					
 					synchronized ( library.albumsToRemove ) {
 						if ( !library.albumsToRemove.isEmpty() ) {
 							while ( changeCount < MAX_CHANGES_PER_REQUEST && !library.albumsToRemove.isEmpty() ) {
@@ -89,7 +94,6 @@ public class LibraryUpdater {
 								Album updateSource = library.albumsToUpdate.remove( 0 );
 								if ( library.albums.contains( updateSource ) ) {
 									Album updateMe = library.albums.get( library.albums.indexOf( updateSource ) );
-									updateMe.refreshTagData();
 									
 								} else {
 									library.albums.add( updateSource );
@@ -141,8 +145,7 @@ public class LibraryUpdater {
 						}
 					}
 	
-					library.tracksToUpdate.clear();
-					//TODO: Update tracks
+					library.tracksToUpdate.clear();	//TODO: Update tracks
 					
 					//TODO: make sure these don't violate MAX_CHANGES like above, but whatever do it later not gonna happen. 
 					synchronized ( library.playlistsToRemove ) {
@@ -157,7 +160,8 @@ public class LibraryUpdater {
 						library.playlistsToAdd.clear();
 					}
 					
-					library.playlistsToUpdate.clear();
+					
+					library.playlistsToUpdate.clear(); //TODO: update playlsits. 
 
 					ui.updatePlaylistPlaceholder();
 					

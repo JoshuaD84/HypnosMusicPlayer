@@ -85,7 +85,7 @@ public class HistoryWindow extends Stage {
 			public void handle ( final KeyEvent keyEvent ) {
 				if ( keyEvent.getCode().equals( KeyCode.DELETE ) ) {
 					ObservableList <Integer> indexes = historyTable.getSelectionModel().getSelectedIndices();
-					for ( int index : indexes ) { //TODO: removeAll
+					for ( int index : indexes ) { 
 						player.getQueue().remove( index );
 					}
 				}
@@ -283,14 +283,17 @@ public class HistoryWindow extends Stage {
 	}
 
 	public void refresh () {
+		List <Track> removeMe = new ArrayList <Track> ();
 		for ( Track track : historyTable.getItems() ) {
 			try {
 				track.refreshTagData();
 			} catch ( IOException e ) {
 				LOGGER.info( "Unable to update the tag info for track in history, removing it: " + track.getFilename() );
-				historyTable.getItems().remove( track );
+				removeMe.add( track );
 			}
 		}
+
+		historyTable.getItems().removeAll( removeMe );
 		historyTable.refresh();
 	}
 

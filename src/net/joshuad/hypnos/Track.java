@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,6 +35,8 @@ public class Track implements Serializable {
 	public static final int NO_TRACK_NUMBER = -885533;
 	
 	private static transient final Logger LOGGER = Logger.getLogger( Track.class.getName() );
+	
+	public static Vector <TagError> tagErrorsToAdd = new Vector <TagError> ();
 
 	public enum Format {
 		FLAC ( "flac" ),
@@ -156,6 +159,7 @@ public class Track implements Serializable {
 		try {
 			fnArtist = trackFile.toPath().getParent().getParent().getFileName().toString();
 		} catch ( Exception e ) { 
+			//TODO: 
 			System.out.println ( "Unable to parse artist name from directory structure: " + trackFile.toString() );
 		}
 		
@@ -179,11 +183,11 @@ public class Track implements Serializable {
 			}
 			
 			fnTitle = trackFile.toPath().getFileName().toString();
-			
-			fnTitle = fnTitle.replaceAll( " - ", "" ).replaceAll( fnArtist, "" )
-										.replaceAll( fnAlbum, "" ).replaceAll( fnYear, "" );
-			
+
+			fnTitle = fnTitle.replaceAll( " - ", "" ).replaceAll( fnArtist, "" ).replaceAll( fnAlbum, "" ).replaceAll( fnYear, "" );
+
 		} catch ( Exception e ) { 
+			//TODO: 
 			System.out.println( "Unable to parse album info from directory structure: " + trackFile.toString() );
 		}
 
@@ -206,6 +210,10 @@ public class Track implements Serializable {
 		if ( albumArtist.equals( "" ) ) {
 			albumArtist = artist;
 		}
+		
+		if ( artist.equals( "" ) ) {
+			tagErrorsToAdd.add( new TagError ( getPath(), "No artist name", TagError.Severity.MAJOR ) );
+		}
 	}
 	
 	private void parseTitle ( Tag tag ) {
@@ -214,6 +222,7 @@ public class Track implements Serializable {
 			
 			try { 
 				if ( title.equals( "" ) ) {
+					tagErrorsToAdd.add( new TagError ( getPath(), "No track title", TagError.Severity.MAJOR ) );
 					title = tag.getFirst( FieldKey.TITLE_SORT );
 				}
 			} catch ( UnsupportedOperationException e ) {
@@ -226,7 +235,11 @@ public class Track implements Serializable {
 		if ( tag != null ) {
 			album = tag.getFirst ( FieldKey.ALBUM );
 			try { 
-				if ( album.equals( "" ) ) album = tag.getFirst( FieldKey.ALBUM_SORT );
+				if ( album.equals( "" ) ) {
+					tagErrorsToAdd.add( new TagError ( getPath(), "No album name", TagError.Severity.MAJOR ) );
+					
+					album = tag.getFirst( FieldKey.ALBUM_SORT );
+				}
 			} catch ( UnsupportedOperationException e ) {}
 		}
 	}
@@ -240,6 +253,10 @@ public class Track implements Serializable {
 			try { 
 				date = tag.getFirst( FieldKey.YEAR );
 			} catch ( UnsupportedOperationException e ) {}
+		}
+		
+		if ( date.equals( "" ) ) {
+			tagErrorsToAdd.add( new TagError ( getPath(), "No date.", TagError.Severity.MAJOR ) );
 		}
 	}
 	
@@ -255,14 +272,15 @@ public class Track implements Serializable {
 					
 				} else if ( rawNoWhiteSpace.matches( "^[0-9]+$" ) ) { 
 					trackNumber = Integer.parseInt( rawNoWhiteSpace );
+					tagErrorsToAdd.add( new TagError ( getPath(), "Track # has excess whitespace.", TagError.Severity.MINOR ) );
 					
 				} else if ( rawText.matches("^[0-9]+/.*") ) {
 					trackNumber = Integer.parseInt( rawText.split("/")[0] );
-					//TODO: LOGGER.log( Level.INFO, "Bad, but fixable, track numbering: " + rawText + " - " + trackFile.toString() );
+					tagErrorsToAdd.add( new TagError ( getPath(), "Track # in N/N format.", TagError.Severity.MINOR ) );
 				
 				} else if ( rawNoWhiteSpace.matches("^[0-9]+/.*") ) {
 					trackNumber = Integer.parseInt( rawNoWhiteSpace.split("/")[0] );
-					//TODO: LOGGER.log( Level.INFO, "Bad, but fixable, track numbering: " + rawText + " - " + trackFile.toString() );
+					tagErrorsToAdd.add( new TagError ( getPath(), "Track # in N/N format.", TagError.Severity.MINOR ) );
 					
 				} else {
 					throw new NumberFormatException();
@@ -270,7 +288,7 @@ public class Track implements Serializable {
 				
 			} catch ( NumberFormatException e ) {
 				if ( ! rawNoWhiteSpace.equals( "" ) ) {
-					//TODO: LOGGER.log( Level.INFO, "Invalid track number: " + rawText  + " - " + trackFile.toString() );
+					tagErrorsToAdd.add( new TagError ( getPath(), "Invalid track # format: " + rawNoWhiteSpace, TagError.Severity.MAJOR ) );
 				}
 			}
 		}
@@ -303,17 +321,17 @@ public class Track implements Serializable {
 					discNumber = Integer.parseInt( rawText );
 					
 				} else if ( rawNoWhiteSpace.matches( "^[0-9]+$" ) ) { 
-						discNumber = Integer.parseInt( rawNoWhiteSpace );
+					discNumber = Integer.parseInt( rawNoWhiteSpace );
+					tagErrorsToAdd.add( new TagError ( getPath(), "Disc # has excess whitespace.", TagError.Severity.MINOR ) );
 					
-				} else if ( rawText.matches("^[0-9]+/.*") ) {
-					//if matches 23/<whatever>
+				} else if ( rawText.matches("^[0-9]+/.*") ) {//if matches 23/<whatever>
 					discNumber = Integer.parseInt( rawText.split("/")[0] );
 					
 					if ( discCount == null || discCount.equals( "" ) ) {
 						discCount = Integer.parseInt( rawText.split("/")[1] );
 					}
-						
-					//TODO: LOGGER.log( Level.INFO, "Bad, but fixable, disc numbering: " + rawText + " - " + trackFile.toString() );
+
+					tagErrorsToAdd.add( new TagError ( getPath(), "Disc # in N/N format.", TagError.Severity.MINOR ) );
 				
 				} else if ( rawNoWhiteSpace.matches("^[0-9]+/.*") ) {
 					//if matches 23/<whatever>
@@ -323,7 +341,7 @@ public class Track implements Serializable {
 						discCount = Integer.parseInt( rawNoWhiteSpace.split("/")[1] );
 					}
 
-					//TODO: LOGGER.log( Level.INFO, "Bad, but fixable, disc numbering: " + rawText + " - " + trackFile.toString() );
+					tagErrorsToAdd.add( new TagError ( getPath(), "Disc # in N/N format.", TagError.Severity.MINOR ) );
 					
 				} else {
 					throw new NumberFormatException();
@@ -331,7 +349,7 @@ public class Track implements Serializable {
 				
 			} catch ( NumberFormatException e ) {
 				if ( ! rawNoWhiteSpace.equals( "" ) ) {
-					//TODO: LOGGER.log( Level.INFO, "Invalid disc number: " + rawText  + " - " + trackFile.toString() );
+					tagErrorsToAdd.add( new TagError ( getPath(), "Invalid disc number: " + rawText, TagError.Severity.MINOR ) );
 				}
 			} catch ( UnsupportedOperationException e ) {
 				//No problem, it doesn't exist for this file format

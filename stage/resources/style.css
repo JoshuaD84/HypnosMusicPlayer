@@ -12,5 +12,19 @@
 }
 
 .file-missing {
-	-fx-control-inner-background: palevioletred;
+	-fx-text-fill: firebrick;
+	-fx-text-background-color: firebrick;
 }
+
+.settingsButton {
+   -fx-background-color: transparent;
+   -fx-font-size: 32px;
+}
+
+.settingsButton:hover{
+   -fx-text-fill: cornflowerblue;
+}
+
+.settingsButton:pressed{
+   -fx-text-fill: grey;
+ }

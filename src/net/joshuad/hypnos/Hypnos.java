@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,7 +20,9 @@ import net.joshuad.hypnos.fxui.FXUI;
 
 public class Hypnos extends Application {
 
-	private static final Logger LOGGER = Logger.getLogger( Hypnos.class.getName() );
+	private static final Logger LOGGER = Logger.getLogger( Hypnos.class.getName() ); 
+
+	private static FileHandler fileHandler;
 	
 	public enum ExitCode {
 		NORMAL,
@@ -70,6 +73,10 @@ public class Hypnos extends Application {
 		return rootDirectory;
 	}
 	
+	public static FileHandler getFileHandler() {
+		return fileHandler;
+	}
+
 	private void parseSystemProperties() {
 				
 		isStandalone = Boolean.getBoolean( "hypnos.standalone" );
@@ -246,10 +253,16 @@ public class Hypnos extends Application {
 				
 				singleInstanceController.startCLICommandListener ( this );
 				library.startLoader( persister );
+				LOGGER.info( "Hypnos finished loading." );
 				
 			} else {
 				singleInstanceController.sendCommandsThroughSocket( commands );
-				System.out.println ( "Not first instance, sent commands, now exiting." ); //TODO: Logging instead of print
+				if ( commands.size() > 0 ) {
+					System.out.println ( "Commands sent to currently running Hypnos." );
+				} else {
+					System.out.println ( "Hypnos is already running." );
+				}
+				
 				System.exit ( 0 ); //We don't use exit here intentionally. 
 			}
 			

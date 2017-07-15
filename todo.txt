@@ -1,27 +1,50 @@
-New Features	
-	Hot Keys
-		
-	Error notifications	
-		Have there be an in-program way to view error log? Or at least, a button to view it using the system text editor. 
+New Features
+	Settings Window	
+		Hot Keys			
+		Option: Warn when erasing an unsaved playlist. 
+		Option: Remember shuffle / repeat state for playlists
 
 	Some way to get the file name corresponding to a file in the current list. 
 		Use album info window or something like it? 
-	
-	Maybe show current playing track info, like bitrate, etc.
-	
-	Log to file, how does that work inside java? 
-			
-	Option: Warn when erasing an unsaved playlist. 
-	
-	Indicate missing files on current list
-		https://stackoverflow.com/questions/45047844/bind-tableview-row-background-color-to-boolean-property
 		
-	Have <ESC> clear the three filters when they have focus.  
-			
+	Log to file, how does that work inside java? 
+		
+	try to play a missing file. It keeps throwing exception. Only throw it once.
+	
+	have escape on lists clear selection.
+	
+	If you select multiple songs and right click shuffle, only shuffle those songs. 
+	
+	Some loading progress indicator while the list is loading new data, maybe? 
+	
+	album info window table doesn't resize with window
+	
 Bug Fixes / Incremental Improvements
 	
 	Make sure horizontal scroll bars never appear
 		6/9 - Can't find anything on google.
+		
+	Be a little more selective about what images we accept for album/artist. Random files on desktop get annoying images. 
+	
+	Persister.loadCurrentList()
+		This is from trying to run a new version of hypnos after having data from a previous version. 
+		Jul 15, 2017 5:42:38 PM net.joshuad.hypnos.Hypnos start
+		SEVERE: Exception caught at top level of Hypnos. Exiting.
+		java.lang.ClassCastException: java.util.ArrayList cannot be cast to net.joshuad.hypnos.CurrentListState
+			at net.joshuad.hypnos.Persister.loadCurrentList(Unknown Source)
+			at net.joshuad.hypnos.Persister.loadDataBeforeShowWindow(Unknown Source)
+			at net.joshuad.hypnos.Hypnos.start(Unknown Source)
+			at com.sun.javafx.application.LauncherImpl.lambda$launchApplication1$8(LauncherImpl.java:863)
+			at com.sun.javafx.application.PlatformImpl.lambda$runAndWait$7(PlatformImpl.java:326)
+			at com.sun.javafx.application.PlatformImpl.lambda$null$5(PlatformImpl.java:295)
+			at java.security.AccessController.doPrivileged(Native Method)
+			at com.sun.javafx.application.PlatformImpl.lambda$runLater$6(PlatformImpl.java:294)
+			at com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:95)
+			at com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
+			at com.sun.glass.ui.gtk.GtkApplication.lambda$null$5(GtkApplication.java:139)
+			at java.lang.Thread.run(Thread.java:748)
+				
+		
 			
 Refactor / organize my code. 
  	Make LibraryUpdater part of Library. Is there a way to abstract out the Platform -> RunLater part? I feel like we're just stuck w/ that, which kind of ties to us JavaFX. 
@@ -82,6 +105,7 @@ Decoders
 OS Specific		
 	All:
 		https://stackoverflow.com/questions/7506329/embed-java-into-a-c-application
+		Global Hotkeys: https://github.com/kwhat/jnativehook
 
 	Windows
 		Open-with shell integration
@@ -120,7 +144,7 @@ OS Specific
 		https://stackoverflow.com/questions/29995727/java-systemtray-icon-does-not-always-work
 		
 	Embed and use a font with all needed UTF glyphs
-		≡✘⏏💾⇉🔀⇥🔁🔂🔇🔈🔉🔊
+		≡✘⏏💾⇉🔀⇥🔁🔂🔇🔈🔉🔊⚙
 		
 		DejaVu Sans - The thing I'm using on nix
 		Calibri - Windows

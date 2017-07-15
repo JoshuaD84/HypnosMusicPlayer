@@ -64,6 +64,7 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -155,6 +156,7 @@ public class FXUI implements PlayerListener {
 	AlbumInfoWindow albumInfoWindow;
 	LibraryLocationWindow libraryLocationWindow;
 	HistoryWindow historyWindow;
+	SettingsWindow settingsWindow;
 
 	Button togglePlayButton;
 	Button toggleRepeatButton;
@@ -212,6 +214,7 @@ public class FXUI implements PlayerListener {
 		albumInfoWindow = new AlbumInfoWindow ( this, library, player );
 		playlistInfoWindow = new PlaylistInfoWindow ( this, library, player );
 		historyWindow = new HistoryWindow ( this, library, player );
+		settingsWindow = new SettingsWindow ( this, library );
 
 		artSplitPane = new SplitPane();
 		artSplitPane.getItems().addAll( albumImage, artistImage );
@@ -541,20 +544,29 @@ public class FXUI implements PlayerListener {
 		trackControls.setPadding( new Insets( 5 ) );
 		trackControls.setSpacing( 5 );
 		
-		VBox whatever = new VBox(); //TODO: Rename me
-		whatever.getChildren().addAll ( volumePane, trackControls );
-
 		HBox controls = new HBox();
-		controls.getChildren().addAll( whatever, positionSliderPane, volumePane );
+		controls.getChildren().addAll( trackControls, positionSliderPane, volumePane );
 		controls.setSpacing( 10 );
 		controls.setAlignment( Pos.CENTER );
 
-		HBox playingTrackInfo = new HBox();
+		Button settingsButton = new Button ( "⚙" );
+		settingsButton.setPadding( new Insets ( 0, 5, 0, 5 ) );
+		settingsButton.getStyleClass().add( "settingsButton" );
+		
+		settingsButton.setOnAction ( ( ActionEvent event ) -> {
+			settingsWindow.show();
+		});
+		
+		Label settingsWidthPadding = new Label ( "" );
+		settingsWidthPadding.setMinWidth( 36 ); // I couldn't figure out how to make it the exact same width as settings button
+		
+		BorderPane playingTrackInfo = new BorderPane();
 		trackInfo = new Label( "" );
+		trackInfo.setPadding( new Insets ( 10, 0, 0, 0 ) );
 		trackInfo.getStyleClass().add( "trackInfo" );
-			
-		playingTrackInfo.getChildren().add( trackInfo );
-		playingTrackInfo.setAlignment( Pos.CENTER );
+		playingTrackInfo.setCenter( trackInfo );
+		playingTrackInfo.setRight( settingsButton );
+		playingTrackInfo.setLeft( settingsWidthPadding );
 		
 		trackInfo.setOnMouseClicked( ( event ) -> {
 			Track current = player.getCurrentTrack();
@@ -564,10 +576,11 @@ public class FXUI implements PlayerListener {
 			}
 		});
 
+
 		transport = new VBox();
 		transport.getChildren().add( playingTrackInfo );
 		transport.getChildren().add( controls );
-		transport.setPadding( new Insets( 10, 0, 10, 0 ) );
+		transport.setPadding( new Insets( 0, 0, 10, 0 ) );
 		transport.setSpacing( 5 );
 	}
 	
@@ -582,6 +595,8 @@ public class FXUI implements PlayerListener {
 	public void setAlbumImage ( Image image ) {
 		try {
 			ResizableImageView view = new ResizableImageView( image );
+			view.setSmooth(true);
+			view.setCache(true);
 			view.setPreserveRatio( true );
 			albumImage.setCenter( view );
 		} catch ( Exception e ) {
@@ -592,6 +607,8 @@ public class FXUI implements PlayerListener {
 	public void setArtistImage ( Image image ) {
 		try {
 			ResizableImageView view = new ResizableImageView( image );
+			view.setSmooth(true);
+			view.setCache(true);
 			view.setPreserveRatio( true );
 			artistImage.setCenter( view );
 		} catch ( Exception e ) {
@@ -847,7 +864,7 @@ public class FXUI implements PlayerListener {
 		filterBox.setPrefWidth( 500000 );
 		
 		filterBox.textProperty().addListener( ( observable, oldValue, newValue ) -> {
-			Platform.runLater( () -> { //TODO: Does this work? 
+			Platform.runLater( () -> {
 				library.getPlaylistsFiltered().setPredicate( playlist -> {
 					if ( newValue == null || newValue.isEmpty() ) {
 						return true;
@@ -876,6 +893,12 @@ public class FXUI implements PlayerListener {
 					return true;
 				});
 			});
+		});
+		
+		filterBox.setOnKeyPressed( ( KeyEvent event ) -> {
+			if ( event.getCode() == KeyCode.ESCAPE ) {
+				filterBox.clear();
+			}
 		});
 		
 		Button settingsButton = new Button( "+" );
@@ -922,6 +945,12 @@ public class FXUI implements PlayerListener {
 						return acceptTrackFilterChange ( track, oldValue, newValue ); 
 					});
 				});
+			}
+		});
+		
+		trackFilterBox.setOnKeyPressed( ( KeyEvent event ) -> {
+			if ( event.getCode() == KeyCode.ESCAPE ) {
+				trackFilterBox.clear();
 			}
 		});
 		
@@ -1043,6 +1072,12 @@ public class FXUI implements PlayerListener {
 					return true;
 				});
 			});
+		});
+		
+		filterBox.setOnKeyPressed( ( KeyEvent event ) -> {
+			if ( event.getCode() == KeyCode.ESCAPE ) {
+				filterBox.clear();
+			}
 		});
 
 		Button settingsButton = new Button( "+" );
@@ -1926,12 +1961,6 @@ public class FXUI implements PlayerListener {
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
 		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
-		
-		//TODO: These don't work right
-		queueMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.Q, KeyCombination.SHIFT_ANY ) );
-		playMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.ENTER ) );
-		cropMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.DELETE, KeyCombination.SHIFT_DOWN ) );
-		removeMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.DELETE, KeyCombination.SHIFT_ANY ) );
 		contextMenu.getItems().addAll( playMenuItem, queueMenuItem, shuffleMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem, cropMenuItem, removeMenuItem );
 		
 		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
@@ -2013,6 +2042,8 @@ public class FXUI implements PlayerListener {
 			}
 		});
 		
+		removeMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.DELETE, KeyCombination.SHIFT_ANY ) );
+		
 		cropMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
@@ -2046,6 +2077,28 @@ public class FXUI implements PlayerListener {
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && !row.isEmpty() ) {
 					player.playTrack( row.getItem() );
+				}
+			});
+			
+			row.itemProperty().addListener( (obs, oldValue, newValue ) -> {
+				if ( newValue != null ) {
+			        if ( newValue.isMissingFile() ) {
+			            row.getStyleClass().add( "file-missing" );
+			        } else {
+			            row.getStyleClass().remove( "file-missing" );
+			        }
+				}
+		    });
+			
+			row.itemProperty().addListener( ( obs, oldValue, newTrackValue ) -> {
+				if ( newTrackValue != null ) {
+					newTrackValue.fileIsMissingProperty().addListener( ( o, old, newValue ) -> {
+						if ( newValue ) {
+							row.getStyleClass().add( "file-missing" );
+						} else {
+							row.getStyleClass().remove( "file-missing" );
+						}
+					});
 				}
 			});
 
@@ -2120,8 +2173,7 @@ public class FXUI implements PlayerListener {
 												tracksToCopy.add( newAddMe );
 												
 											} catch ( IOException e1 ) {
-												//TODO: Warning or info?
-												LOGGER.log( Level.WARNING, "Unable to convert queue track to CurrentListTrack, not adding to current list" );
+												LOGGER.log( Level.INFO, "Unable to convert queue track to CurrentListTrack, not adding to current list" );
 											}
 										}
 									}
@@ -2301,7 +2353,7 @@ public class FXUI implements PlayerListener {
 			try {
 				Thread.sleep ( 1500 );
 			} catch ( InterruptedException e ) {
-				//TODO: just log do nothing else. 
+				LOGGER.fine ( "Interrupted while waiting to set art split pane percent." );
 			}
 			SplitPane.setResizableWithParent( artSplitPane, false );
 		});

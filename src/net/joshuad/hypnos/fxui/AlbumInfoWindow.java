@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
@@ -43,6 +44,8 @@ import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 
 public class AlbumInfoWindow extends Stage {
+
+	private static final Logger LOGGER = Logger.getLogger( AlbumInfoWindow.class.getName() );
 	
 	Album album;
 	TableView <Track> trackTable;
@@ -91,8 +94,7 @@ public class AlbumInfoWindow extends Stage {
 								}
 							}
 						} catch ( IOException e ) {
-							//TODO: 
-							e.printStackTrace();
+							LOGGER.info( "Unable to open directory in desktop environment." );
 						}
 					}
 				} );

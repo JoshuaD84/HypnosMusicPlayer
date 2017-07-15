@@ -80,7 +80,7 @@ public class FlacDecoder extends AbstractDecoder {
 			decodedInput = new FlacDecoderLogic ( track.getPath().toAbsolutePath().toFile() );
 			if ( decodedInput.numSamples == 0 ) throw new FlacDecoderLogic.FormatException("Unknown audio length");
 		} catch (IOException e) {
-			String message = "Unable to decode flac file:\n\n" + track.getPath().toString() + "\n\nIt may be corrupt." ;
+			String message = "Unable to decode flac file:" + track.getPath().toString();
 			LOGGER.log( Level.WARNING, message );
 			FXUI.notifyUserError ( message );
 			return false;

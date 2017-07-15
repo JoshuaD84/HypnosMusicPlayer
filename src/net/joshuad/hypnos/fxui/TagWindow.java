@@ -157,12 +157,6 @@ public class TagWindow extends Stage {
 				}
 			}
 			
-			if ( albums != null ) {
-				for ( Album album : albums ) {
-					album.refreshTagData();
-				}
-			}
-			
 			//TODO: it would be nice to get rid of these functions by using observable items. 
 			ui.refreshAlbumTable();
 			ui.refreshTrackTable();

@@ -3,6 +3,7 @@ package net.joshuad.hypnos.audio.decoders;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import javax.sound.sampled.SourceDataLine;
@@ -40,7 +41,7 @@ public class OggDecoderLogic {
 	
 	private int totalBytesInStream = 0;
 	
-	public OggDecoderLogic ( File file ) throws IOException {
+	public OggDecoderLogic ( File file ) throws FileNotFoundException, SecurityException {
 		this.file = file;
 		encodedInput = new BufferedInputStream ( new FileInputStream ( file ) );
 
@@ -256,7 +257,7 @@ public class OggDecoderLogic {
 		}
 	}
 
-	//TODO: Lol i have no idea how many frames this decodes. Whatever. If you figure it out rename it. 
+	//Lol i have no idea how many frames this decodes. Whatever. If you figure it out rename it. 
 	boolean processSomeFrames( SourceDataLine audioOutput ) {
 		boolean needMoreData = true;
 		switch ( joggSyncState.pageout( joggPage ) ) {

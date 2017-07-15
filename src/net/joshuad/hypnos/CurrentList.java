@@ -55,7 +55,6 @@ public class CurrentList {
 						} else if ( isMissing && !track.isMissingFile() ) {
 							track.setIsMissingFile ( true );
 						}
-							
 					}
 				}
 				

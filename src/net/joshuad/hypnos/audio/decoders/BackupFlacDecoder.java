@@ -1,6 +1,7 @@
 package net.joshuad.hypnos.audio.decoders;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -71,11 +72,17 @@ public class BackupFlacDecoder extends AbstractDecoder {
 	public boolean openStreamsAt ( double seekPercent ) {
 		try {
 			encodedInput = AudioSystem.getAudioInputStream( track.getPath().toFile() );
-		} catch ( UnsupportedAudioFileException | IOException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch ( FileNotFoundException e ) {
+			LOGGER.warning( "File not found: " + track.getPath().toString() );
+			return false;
+		} catch ( IOException e ) {
+			LOGGER.warning( "Unable to open: " + track.getPath().toString() );
+			return false;
+		} catch ( UnsupportedAudioFileException e ) {
+			LOGGER.warning( "Unsupported file type: " + track.getPath().toString() );
 			return false;
 		}
+			
 		
 		AudioFormat baseFormat = encodedInput.getFormat();
 		AudioFormat decoderFormat;

@@ -53,6 +53,11 @@ public class Library {
 	final ObservableList <Playlist> playlists = FXCollections.observableArrayList( new ArrayList <Playlist>() );
 	final FilteredList <Playlist> playlistsFiltered = new FilteredList <Playlist>( playlists, p -> true );
 	final SortedList <Playlist> playlistsSorted = new SortedList <Playlist>( playlistsFiltered );
+	
+	final ObservableList <TagError> tagErrors = FXCollections.observableArrayList( new ArrayList <TagError>() );
+	final FilteredList <TagError> tagErrorsFiltered = new FilteredList <TagError>( tagErrors, p -> true );
+	final SortedList <TagError> tagErrorsSorted = new SortedList <TagError>( tagErrorsFiltered );
+	
 
 	final ObservableList <Path> musicSourcePaths = FXCollections.observableArrayList();
 	
@@ -313,6 +318,7 @@ public class Library {
 		}
 	}
 	
+	
 	private void removeOneSource() {
 
 		//TODO: What is this and what is it doing? 
@@ -563,6 +569,10 @@ public class Library {
 
 	public SortedList <Track> getTracksSorted () {
 		return tracksSorted;
+	}
+	
+	public SortedList <TagError> getTagErrorsSorted () {
+		return tagErrorsSorted;
 	}
 }
 

@@ -14,7 +14,7 @@ import javafx.beans.property.StringProperty;
 		
 		private static final long serialVersionUID = 1L;
 		
-		private boolean isCurrentTrack = false; //TODO: Make this private
+		private boolean isCurrentTrack = false; 
 		
 		private ArrayList <Integer> queueIndex = new ArrayList <Integer> ();
 		
@@ -47,22 +47,16 @@ import javafx.beans.property.StringProperty;
 		}
 		
 		public void clearQueueIndex () {
-			if ( queueIndex == null ) queueIndex = new ArrayList <Integer> ();//TODO: Do this better. 
 			queueIndex.clear();
 			updateDisplayString();
 		}
 
 		public void addQueueIndex ( Integer index ) {
-			if ( queueIndex == null ) queueIndex = new ArrayList <Integer> ();//TODO: Do this better. 
 			queueIndex.add ( index );
 			updateDisplayString();
 		}
 		
 		public void updateDisplayString() {
-			//TODO: Do this better. 
-			if ( display == null ) display = new SimpleStringProperty ( "" );
-			if ( queueIndex == null ) queueIndex = new ArrayList <Integer> ();//TODO: Do this better. 
-			
 			if ( isCurrentTrack ) {
 				if ( queueIndex.size() == 1 && queueIndex.get( 0 ) == 1  ) {
 					display.set( "🔁" );
@@ -111,6 +105,7 @@ import javafx.beans.property.StringProperty;
 			in.defaultReadObject();
 			display = new SimpleStringProperty ( "" );
 			fileIsMissing = new SimpleBooleanProperty ( false );
+			queueIndex = new ArrayList <Integer> ();
 			updateDisplayString();
 		}
 	}

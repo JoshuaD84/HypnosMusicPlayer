@@ -14,9 +14,6 @@ public class Album implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private String albumArtist;
-	private String year;
-	private String fullTitle;
 	private File directory;
 	ArrayList <Track> tracks;
 	
@@ -39,27 +36,14 @@ public class Album implements Serializable {
 		} catch ( IOException e) {
 			e.printStackTrace(); 
 		} 
-		
-		refreshTagData();
-	}
-	
-	public void refreshTagData () {
-		//TODO: maybe just load these every time the methods are called, and get rid of albumArtist, year, displayTitle,
-		synchronized ( tracks ) {
-			if ( tracks.size() > 0 ) {
-				this.albumArtist = tracks.get( 0 ).getAlbumArtist();
-				this.year = tracks.get( 0 ).getYear();
-				this.fullTitle = tracks.get( 0 ).getFullAlbumTitle();
-			}
-		}
 	}
 	
 	public String getAlbumArtist () {
-		return albumArtist;
+		return tracks.get( 0 ).getAlbumArtist();
 	}
 	
 	public String getYear () {
-		return year;
+		return tracks.get( 0 ).getYear();
 	}
 	
 	public String getSimpleTitle() {
@@ -67,7 +51,7 @@ public class Album implements Serializable {
 	}
 	
 	public String getFullTitle () {
-		return fullTitle;
+		return tracks.get( 0 ).getFullAlbumTitle();
 	}		
 	
 	public Path getPath () {
