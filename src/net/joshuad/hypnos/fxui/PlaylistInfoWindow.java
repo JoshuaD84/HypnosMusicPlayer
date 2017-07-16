@@ -28,6 +28,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -59,12 +60,16 @@ public class PlaylistInfoWindow extends Stage {
 		this.initOwner( ui.getMainStage() );
 		this.setTitle( "Album Info" );
 		this.setWidth( 500 );
-		Group root = new Group();
+		this.setHeight( 400 );
+		Pane root = new Pane();
 		Scene scene = new Scene( root );
 		VBox primaryPane = new VBox();
 		
-		setupPlaylistTable();
-
+		setupPlaylistTable( primaryPane );
+		
+		primaryPane.prefWidthProperty().bind( root.widthProperty() );
+		primaryPane.prefHeightProperty().bind( root.heightProperty() );
+		
 		primaryPane.getChildren().addAll( trackTable );
 		root.getChildren().add( primaryPane );
 		setScene( scene );
@@ -79,7 +84,7 @@ public class PlaylistInfoWindow extends Stage {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void setupPlaylistTable () {
+	private void setupPlaylistTable ( VBox primaryPane ) {
 		
 		TableColumn<Track, Integer> trackNumberColumn = new TableColumn<Track, Integer>( "#" );
 		TableColumn<Track, String> titleColumn = new TableColumn<Track, String>( "Title" );
@@ -116,8 +121,8 @@ public class PlaylistInfoWindow extends Stage {
 		trackTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
 		trackTable.setEditable( true );
 		trackTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
-		
-		trackTable.prefWidthProperty().bind( this.widthProperty() );
+		trackTable.prefWidthProperty().bind( primaryPane.widthProperty() );
+		trackTable.prefHeightProperty().bind( primaryPane.heightProperty() );
 		
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
