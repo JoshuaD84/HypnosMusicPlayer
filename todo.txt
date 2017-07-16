@@ -13,8 +13,6 @@ New Features
 	
 	have escape on lists clear selection.
 	
-	If you select multiple songs and right click shuffle, only shuffle those songs. 
-	
 	Some loading progress indicator while the list is loading new data, maybe? 
 	
 Bug Fixes / Incremental Improvements

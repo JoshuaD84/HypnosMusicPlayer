@@ -835,7 +835,7 @@ public class FXUI implements PlayerListener {
 		
 		MenuItem sequential = new MenuItem ( "Sequential" );
 		MenuItem shuffle = new MenuItem ( "Shuffle" );
-		MenuItem shuffleList = new MenuItem ( "Shuffle Current List" );
+		MenuItem shuffleList = new MenuItem ( "Randomize List Order" );
 		shuffleButtonMenu.getItems().addAll( sequential, shuffle, shuffleList );
 		
 		sequential.setOnAction( ( actionEvent ) -> { player.setShuffleMode( ShuffleMode.SEQUENTIAL ); });
@@ -1951,7 +1951,7 @@ public class FXUI implements PlayerListener {
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem queueMenuItem = new MenuItem( "Enqueue" );
-		MenuItem shuffleMenuItem = new MenuItem( "Shuffle Current List" );
+		MenuItem shuffleMenuItem = new MenuItem( "Shuffle Items" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem cropMenuItem = new MenuItem( "Crop" );
 		MenuItem removeMenuItem = new MenuItem( "Remove" );
@@ -1995,7 +1995,14 @@ public class FXUI implements PlayerListener {
 		shuffleMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.shuffleList();
+				List<Integer> selectedIndices = currentListTable.getSelectionModel().getSelectedIndices();
+				
+				if ( selectedIndices.size() < 2 ) {
+					player.shuffleList();
+					
+				} else {
+					player.getCurrentList().shuffleItems( selectedIndices );
+				}
 			}
 		});
 		

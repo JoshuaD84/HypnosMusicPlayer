@@ -112,6 +112,21 @@ public class CurrentList {
 		Collections.shuffle( items );
 		listReordered();
 	}
+	
+	public void shuffleItems ( List<Integer> input ) {
+		List<CurrentListTrack> shuffleMe = new ArrayList<CurrentListTrack> ();
+		List<Integer> itemIndices = new ArrayList<Integer> ( input );
+		
+		for ( int index : itemIndices ) {
+			shuffleMe.add( items.get( index ) );
+		}
+		
+		Collections.shuffle( shuffleMe );
+		
+		for ( int index : itemIndices ) {
+			items.set( index, shuffleMe.remove( 0 ) );
+		}
+	}
 		
 	public void clearList() {
 		if ( items.size() > 0 ) {
