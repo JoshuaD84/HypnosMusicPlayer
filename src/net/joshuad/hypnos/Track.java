@@ -504,20 +504,21 @@ public class Track implements Serializable {
 	
 	public Image getAlbumCoverImage ( ) {
 		
-		if ( this.getPath().getParent() == null ) return null;
-		
-		ArrayList <Path> preferredFiles = new ArrayList <Path> ();
-		
-		preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "front.jpg" ) );
-		preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "front.png" ) );
-		preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "cover.jpg" ) );
-		preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "cover.png" ) );
-		preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "album.jpg" ) );
-		preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "album.png" ) );
-		
-		for ( Path test : preferredFiles ) {
-			if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
-				return new Image( test.toUri().toString() );
+		if ( this.getPath().getParent() != null ) {
+			
+			ArrayList <Path> preferredFiles = new ArrayList <Path> ();
+			
+			preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "front.jpg" ) );
+			preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "front.png" ) );
+			preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "cover.jpg" ) );
+			preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "cover.png" ) );
+			preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "album.jpg" ) );
+			preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "album.png" ) );
+			
+			for ( Path test : preferredFiles ) {
+				if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
+					return new Image( test.toUri().toString() );
+				}
 			}
 		}
 		
@@ -554,48 +555,53 @@ public class Track implements Serializable {
 		if ( mediaImage != null ) return mediaImage;
 		if ( otherImage != null ) return otherImage;
 
-		ArrayList<Path> otherFiles = new ArrayList<Path>();
-		try {
-			DirectoryStream <Path> albumDirectoryStream = Files.newDirectoryStream ( this.getPath().getParent(), imageFileFilter );
-			for ( Path imagePath : albumDirectoryStream ) { 
-				if ( !imagePath.toString().toLowerCase().matches( ".*artist\\.\\w{3,6}$" ) ) {
-					otherFiles.add( imagePath ); 
+		if ( this.getPath().getParent() != null ) {
+			ArrayList<Path> otherFiles = new ArrayList<Path>();
+			try {
+				DirectoryStream <Path> albumDirectoryStream = Files.newDirectoryStream ( this.getPath().getParent(), imageFileFilter );
+				for ( Path imagePath : albumDirectoryStream ) { 
+					if ( !imagePath.toString().toLowerCase().matches( ".*artist\\.\\w{3,6}$" ) ) {
+						otherFiles.add( imagePath ); 
+					}
+				}
+			
+			} catch ( IOException e ) {
+				//TODO: I think we can ignore this one. 
+			}
+			
+			for ( Path test : otherFiles ) {
+				if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
+					return new Image( test.toUri().toString() );
 				}
 			}
-		
-		} catch ( IOException e ) {
-			//TODO: I think we can ignore this one. 
 		}
 		
-		for ( Path test : otherFiles ) {
-			if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
-				return new Image( test.toUri().toString() );
-			}
-		}
-		
-		if ( backImage != null ) return backImage; //TODO: Do we really want this, I don't know man. 
+		if ( backImage != null ) return backImage;
 		
 		return null;
 	}
 
 	public Image getAlbumArtistImage ( ) {
 
-		if ( this.getPath().getParent() == null ) return null;
+		if ( this.getPath().getParent() != null ) {
 		
-		Path targetPath = this.getPath().toAbsolutePath();
-
-		
-		ArrayList <Path> possibleFiles = new ArrayList <Path> ();
-		possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.jpg" ) );
-		possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.png" ) );
-		possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.gif" ) );
-		possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.jpg" ) );
-		possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.png" ) );
-		possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.gif" ) );
-		
-		for ( Path test : possibleFiles ) {
-			if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
-				return new Image( test.toUri().toString() );
+			Path targetPath = this.getPath().toAbsolutePath();
+			
+			ArrayList <Path> possibleFiles = new ArrayList <Path> ();
+			possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.jpg" ) );
+			possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.png" ) );
+			possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.gif" ) );
+			
+			if ( this.getPath().getParent().getParent() != null ) {
+				possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.jpg" ) );
+				possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.png" ) );
+				possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.gif" ) );
+			}
+			
+			for ( Path test : possibleFiles ) {
+				if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
+					return new Image( test.toUri().toString() );
+				}
 			}
 		}
 		
@@ -632,18 +638,7 @@ public class Track implements Serializable {
 		if ( artistImage != null ) return artistImage;
 		if ( writerImage != null ) return writerImage;
 		if ( logoImage != null ) return logoImage;
-		
-
-		ArrayList <Path> otherFiles = new ArrayList <Path> ();
-		try {
-			DirectoryStream <Path> artistDirectoryStream = Files.newDirectoryStream ( targetPath.getParent().getParent(), imageFileFilter );
-			for ( Path imagePath : artistDirectoryStream ) { otherFiles.add( imagePath ); }
-		
-		} catch ( IOException e ) {
-			//TODO: I think we can ignore this one. 
-		}
-
-		
+	
 		return null;
 	}
 	

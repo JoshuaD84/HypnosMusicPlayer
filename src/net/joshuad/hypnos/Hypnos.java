@@ -225,7 +225,6 @@ public class Hypnos extends Application {
 					break;
 			}
 		});
-		
 	}
 	
 	@SuppressWarnings("unchecked")

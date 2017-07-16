@@ -64,7 +64,7 @@ public class SettingsWindow extends Stage {
 		initOwner( ui.getMainStage() );		
 		setWidth ( 500 );
 		setHeight ( 600 );
-		setTitle( "Settings" );
+		setTitle( "Config and Info" );
 		Pane root = new Pane();
 		Scene scene = new Scene( root );
 		
@@ -103,7 +103,7 @@ public class SettingsWindow extends Stage {
 		int row = 0;
 	
 		Label headerLabel = new Label ( "Global Hotkeys" );
-		headerLabel.setPadding( new Insets ( 10, 0, 10, 0 ) );
+		headerLabel.setPadding( new Insets ( 0, 0, 10, 0 ) );
 		headerLabel.setWrapText( true );
 		headerLabel.setTextAlignment( TextAlignment.CENTER );
 		headerLabel.setStyle( "-fx-alignment: center; -fx-font-size: 20px; -fx-font-weight: bold" );
@@ -116,6 +116,7 @@ public class SettingsWindow extends Stage {
 		descriptionLabel.setWrapText( true );
 		descriptionLabel.setTextAlignment( TextAlignment.CENTER );
 		content.add( descriptionLabel, 0, row, 2, 1 );
+		GridPane.setHalignment( descriptionLabel, HPos.CENTER );
 		row++;
 		
 		for ( Hotkey key : Hotkey.values() ) {
@@ -138,6 +139,7 @@ public class SettingsWindow extends Stage {
 				boolean registered = false;
 				if ( e.getCode().isModifierKey() ) {
 					field.setText( shortcut );
+					
 				} else if ( e.getCode().equals( KeyCode.ESCAPE ) ) {
 					field.setText( "" );
 					hotkeys.clearHotkey ( key );
@@ -173,6 +175,13 @@ public class SettingsWindow extends Stage {
 			row++;
 		}
 		
+		Label clearLabel = new Label ( "(Use <ESC> to erase a hotkey)" );
+		clearLabel.setPadding( new Insets ( 20, 0, 0, 0 ) );
+		clearLabel.setWrapText( true );
+		clearLabel.setTextAlignment( TextAlignment.CENTER );
+		content.add( clearLabel, 0, row, 2, 1 );
+		GridPane.setHalignment( clearLabel, HPos.CENTER );
+		row++;
 		
 		return hotkeysTab;
 	}
@@ -191,7 +200,15 @@ public class SettingsWindow extends Stage {
 		settingsTab.setClosable( false );
 		VBox settingsPane = new VBox();
 		settingsTab.setContent ( settingsPane );
-		settingsPane.setAlignment( Pos.TOP_CENTER );
+		settingsPane.setAlignment( Pos.TOP_CENTER );		
+		settingsPane.setPadding( new Insets ( 10 ) );
+		
+		Label headerLabel = new Label ( "Settings" );
+		headerLabel.setPadding( new Insets ( 0, 0, 10, 0 ) );
+		headerLabel.setWrapText( true );
+		headerLabel.setTextAlignment( TextAlignment.CENTER );
+		headerLabel.setStyle( "-fx-font-size: 20px; -fx-font-weight: bold" );
+		settingsPane.getChildren().add( headerLabel );
 
 		Insets labelInsets = new Insets ( 10, 10, 10, 10 );
 		Insets checkBoxInsets = new Insets ( 10, 10, 10, 10 );
@@ -216,6 +233,15 @@ public class SettingsWindow extends Stage {
 		logTab.setClosable( false );
 		VBox logPane = new VBox();
 		logTab.setContent( logPane );
+		logPane.setAlignment( Pos.CENTER );
+		logPane.setPadding( new Insets ( 10 ) );
+		
+		Label headerLabel = new Label ( "Error Log" );
+		headerLabel.setPadding( new Insets ( 0, 0, 10, 0 ) );
+		headerLabel.setWrapText( true );
+		headerLabel.setTextAlignment( TextAlignment.CENTER );
+		headerLabel.setStyle( "-fx-font-size: 20px; -fx-font-weight: bold" );
+		logPane.getChildren().add( headerLabel );
 		
 		TextArea logView = new TextArea();
 		logView.setEditable( false );
@@ -268,7 +294,14 @@ public class SettingsWindow extends Stage {
 		VBox pane = new VBox();
 		tab.setContent ( pane );
 		pane.setAlignment( Pos.TOP_CENTER );
-		pane.setStyle ( "-fx-background-color: orange" );
+		pane.setPadding( new Insets ( 10 ) );
+		
+		Label headerLabel = new Label ( "Tag Errors" );
+		headerLabel.setPadding( new Insets ( 0, 0, 10, 0 ) );
+		headerLabel.setWrapText( true );
+		headerLabel.setTextAlignment( TextAlignment.CENTER );
+		headerLabel.setStyle( "-fx-font-size: 20px; -fx-font-weight: bold" );
+		pane.getChildren().add( headerLabel );
 
 		
 		

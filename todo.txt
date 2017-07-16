@@ -8,16 +8,23 @@ New Features
 		
 	Log to file, how does that work inside java? 
 		
-	try to play a missing file. It keeps throwing exception. Only throw it once.
-	
 	have escape on lists clear selection.
 	
 	Some loading progress indicator while the list is loading new data, maybe? 
 	
 	Click on volume icon toggles mute. 
+		-Have player have a mute option, where it remembers teh curent volume and toggles to 0. 
 		
+	Log -> Submit error report button	
+	
 Bug Fixes / Incremental Improvements
 
+
+	Hotkeys aren't consumed, so they are passed to the current window. >:-O
+		Apparently not possible to do in X11. c
+
+	try to play a missing file. It keeps throwing exception. Only throw it once.
+	
 	Spamming next/previous/stop/play/whatever via hotkey freezes things. 
 	
 	When the volume changes via other methods, update the UI indicator and icon
@@ -25,7 +32,9 @@ Bug Fixes / Incremental Improvements
 	Make sure horizontal scroll bars never appear
 		6/9 - Can't find anything on google.
 		
-	Be a little more selective about what images we accept for album/artist. Random files on desktop get annoying images. 
+	Be a little more selective about what images we accept for album/artist. Random music files on desktop get annoying images. 
+		probably use our current method if hasAlbum(), but be more strict if not. Or maybe no file-based images if !hasAlbum
+		Problem: CurrentListTracks not having hasAlbum set properly. 
 	
 	Persister.loadCurrentList()
 		This is from trying to run a new version of hypnos after having data from a previous version. 
@@ -46,6 +55,8 @@ Bug Fixes / Incremental Improvements
 			at java.lang.Thread.run(Thread.java:748)
 				
 	Make the tag error window more user-friendly. 
+	
+	hide/show via hotkeys seems to toggle every 3 presses instead of every 2 presses. 
 			
 Refactor / organize my code. 
  	Make LibraryUpdater part of Library. Is there a way to abstract out the Platform -> RunLater part? I feel like we're just stuck w/ that, which kind of ties to us JavaFX. 
