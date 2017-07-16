@@ -93,6 +93,7 @@ import net.joshuad.hypnos.audio.PlayerListener;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
+import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
 
 @SuppressWarnings({ "rawtypes", "unchecked" }) // TODO: Maybe get rid of this when I understand things better
 public class FXUI implements PlayerListener {
@@ -177,7 +178,7 @@ public class FXUI implements PlayerListener {
 	private double windowedY = 50;
 	
 	
-	public FXUI ( Stage stage, Library library, AudioSystem player ) {
+	public FXUI ( Stage stage, Library library, AudioSystem player, GlobalHotkeys hotkeys ) {
 		mainStage = stage;
 		this.library = library;
 		this.player = player;
@@ -214,7 +215,7 @@ public class FXUI implements PlayerListener {
 		albumInfoWindow = new AlbumInfoWindow ( this, library, player );
 		playlistInfoWindow = new PlaylistInfoWindow ( this, library, player );
 		historyWindow = new HistoryWindow ( this, library, player );
-		settingsWindow = new SettingsWindow ( this, library );
+		settingsWindow = new SettingsWindow ( this, library, hotkeys );
 
 		artSplitPane = new SplitPane();
 		artSplitPane.getItems().addAll( albumImage, artistImage );
@@ -1946,7 +1947,7 @@ public class FXUI implements PlayerListener {
 				event.consume();
 			}
 
-		} );
+		});
 
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
@@ -2605,6 +2606,14 @@ public class FXUI implements PlayerListener {
 	public void playerRepeatModeChanged ( RepeatMode newMode ) {
 		toggleRepeatButton.setText( newMode.getSymbol() );
 		
+	}
+
+	public boolean hotkeysEnabled () {
+		return settingsWindow.hotkeysEnabled();
+	}
+
+	public void refreshHotkeyList () {
+		settingsWindow.refreshHotkeyFields();
 	}
 }
 

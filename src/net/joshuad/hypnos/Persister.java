@@ -27,6 +27,9 @@ import java.util.zip.GZIPOutputStream;
 
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.FXUI;
+import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
+import net.joshuad.hypnos.hotkeys.KeyState;
+import net.joshuad.hypnos.hotkeys.GlobalHotkeys.Hotkey;
 
 public class Persister {
 
@@ -46,16 +49,19 @@ public class Persister {
 	private File historyFile;
 	private File dataFile;
 	private File settingsFile;
+	private File hotkeysFile;
 
 	private FXUI ui;
 	private AudioSystem player;
 	private Library library;
+	private GlobalHotkeys hotkeys;
 	
-	public Persister ( FXUI ui, Library library, AudioSystem player ) {
+	public Persister ( FXUI ui, Library library, AudioSystem player, GlobalHotkeys hotkeys ) {
 
 		this.ui = ui;
 		this.player = player;
 		this.library = library;
+		this.hotkeys = hotkeys;
 
 		// TODO: We might want to make a few fall-throughs if these locations
 		// don't exist.
@@ -106,6 +112,7 @@ public class Persister {
 		historyFile = new File( configDirectory + File.separator + "history" );
 		dataFile = new File( configDirectory + File.separator + "data" );
 		settingsFile = new File( configDirectory + File.separator + "settings" );
+		hotkeysFile = new File( configDirectory + File.separator + "hotkeys" );
 		
 		createNecessaryFolders();
 	}
@@ -137,6 +144,8 @@ public class Persister {
 		player.linkQueueToCurrentList();
 		loadHistory();
 		loadPlaylists();
+		loadHotkeys();
+		ui.refreshHotkeyList();
 		loadPostWindowSettings();
 	}
 
@@ -149,6 +158,7 @@ public class Persister {
 		saveHistory();
 		savePlaylists();
 		saveSettings();
+		saveHotkeys();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -192,6 +202,18 @@ public class Persister {
 	public void loadHistory () {
 		try ( ObjectInputStream historyIn = new ObjectInputStream( new FileInputStream( historyFile ) ); ) {
 			player.getHistory().setData( (ArrayList <Track>) historyIn.readObject() );
+		} catch ( FileNotFoundException e ) {
+			System.out.println( "File not found: history, unable to load queue, continuing." );
+		} catch ( IOException | ClassNotFoundException e ) {
+			// TODO:
+			e.printStackTrace();
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void loadHotkeys () {
+		try ( ObjectInputStream hotkeysIn = new ObjectInputStream( new FileInputStream( hotkeysFile ) ); ) {
+			hotkeys.setMap( (EnumMap <Hotkey, KeyState>) hotkeysIn.readObject() );
 		} catch ( FileNotFoundException e ) {
 			System.out.println( "File not found: history, unable to load queue, continuing." );
 		} catch ( IOException | ClassNotFoundException e ) {
@@ -243,6 +265,18 @@ public class Persister {
 			
 			historyListOut.writeObject( new ArrayList <Track>( player.getHistory().getItems() ) );
 			historyListOut.flush();
+
+		} catch ( IOException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void saveHotkeys () {
+
+		try ( ObjectOutputStream hotkeysOut = new ObjectOutputStream( new FileOutputStream( hotkeysFile ) ) ) {
+			hotkeysOut.writeObject( hotkeys.getMap() );
+			hotkeysOut.flush();
 
 		} catch ( IOException e ) {
 			// TODO Auto-generated catch block

@@ -1,6 +1,5 @@
 New Features
-	Settings Window	
-		Hot Keys			
+	Settings Window		
 		Option: Warn when erasing an unsaved playlist. 
 		Option: Remember shuffle / repeat state for playlists
 
@@ -15,7 +14,13 @@ New Features
 	
 	Some loading progress indicator while the list is loading new data, maybe? 
 	
+	Click on volume icon toggles mute. 
+		
 Bug Fixes / Incremental Improvements
+
+	Spamming next/previous/stop/play/whatever via hotkey freezes things. 
+	
+	When the volume changes via other methods, update the UI indicator and icon
 	
 	Make sure horizontal scroll bars never appear
 		6/9 - Can't find anything on google.
@@ -101,7 +106,6 @@ Decoders
 OS Specific		
 	All:
 		https://stackoverflow.com/questions/7506329/embed-java-into-a-c-application
-		Global Hotkeys: https://github.com/kwhat/jnativehook
 
 	Windows
 		Open-with shell integration
@@ -109,6 +113,7 @@ OS Specific
 	    Standalone build (32-bit)
 		Rename java process to Hypnos
 		Always use embedded calibri font? Only on systems <= win 7?
+		Test global hotkeys
 		
 	Linux
 		Open-with shell integration
@@ -132,6 +137,7 @@ OS Specific
 		Rename java process to Hypnos ?
 		
 		Always use LucidaGrande font?
+		Test global hotkeys
 		
 	Tray icon
 		Gnome 3 doesn't support. Code works but creates a bad entry on taskbar.

@@ -10,13 +10,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
+
+import org.jnativehook.GlobalScreen;
+import org.jnativehook.NativeHookException;
 
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.FXUI;
+import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
+import net.joshuad.hypnos.hotkeys.GlobalHotkeys.Hotkey;
 
 public class Hypnos extends Application {
 
@@ -53,9 +59,10 @@ public class Hypnos extends Application {
 	
 	private static Persister persister;
 	private static AudioSystem player;
-	private FXUI ui;
+	private static FXUI ui;
 	private LibraryUpdater libraryUpdater;
 	private Library library;
+	private GlobalHotkeys hotkeys;
 	
 	public static OS getOS() {
 		return os;
@@ -151,6 +158,76 @@ public class Hypnos extends Application {
 		}
 	}
 	
+	private void startGlobalHotkeyListener() {
+
+		try {
+			LogManager.getLogManager().reset();
+			Logger logger = Logger.getLogger( GlobalScreen.class.getPackage().getName() );
+			logger.setLevel( Level.OFF );
+
+			GlobalScreen.registerNativeHook();
+			
+		} catch ( NativeHookException ex ) {
+			LOGGER.warning( "There was a problem registering the global hotkey listeners. Global Hotkeys are disabled." );
+			//TODO: set a boolean and put an indicator in the UI somewhere? 
+		}
+		hotkeys = new GlobalHotkeys();
+		GlobalScreen.addNativeKeyListener( hotkeys );
+	}
+	
+	public static boolean hotkeysEnabled () {
+		return ui.hotkeysEnabled();
+	}
+
+	public static void doHotkeyAction ( Hotkey hotkey ) {
+		Platform.runLater( () -> {
+			switch ( hotkey ) {
+				case NEXT:
+					player.next();
+					break;
+				case PLAY:
+					player.play();
+					break;
+				case PREVIOUS:
+					player.previous();
+					break;
+				case SHOW_HIDE_UI:
+					ui.toggleMinimized();
+					break;
+				case SKIP_BACK:
+					//TODO: 
+					break;
+				case SKIP_FORWARD:
+					//TODO: 
+					break;
+				case STOP:
+					player.stop( true );
+					break;
+				case TOGGLE_MUTE:
+					//TODO: 
+					break;
+				case TOGGLE_PAUSE:
+					player.togglePause();
+					break;
+				case TOGGLE_REPEAT:
+					player.toggleRepeatMode();
+					break;
+				case TOGGLE_SHUFFLE:
+					player.toggleShuffleMode();
+					break;
+				case VOLUME_DOWN:
+					player.decrementVolume();
+					break;
+				case VOLUME_UP:
+					player.incrementVolume();
+					break;
+				default:
+					break;
+			}
+		});
+		
+	}
+	
 	@SuppressWarnings("unchecked")
 	public void applyCommands ( ArrayList <SocketCommand> commands ) {
 		Platform.runLater( () -> {
@@ -239,9 +316,11 @@ public class Hypnos extends Application {
 			if ( singleInstanceController.isFirstInstance() ) {
 				library = new Library();
 				player = new AudioSystem();
-				ui = new FXUI ( stage, library, player );
+				startGlobalHotkeyListener();
 				
-				persister = new Persister( ui, library, player );
+				ui = new FXUI ( stage, library, player, hotkeys );
+				
+				persister = new Persister( ui, library, player, hotkeys );
 				
 				persister.loadDataBeforeShowWindow();
 				ui.showMainWindow();
@@ -250,6 +329,7 @@ public class Hypnos extends Application {
 				libraryUpdater = new LibraryUpdater ( library, ui );
 				
 				applyCommands( commands );
+				
 				
 				singleInstanceController.startCLICommandListener ( this );
 				library.startLoader( persister );
