@@ -68,7 +68,7 @@ public class AlbumInfoWindow extends Stage {
 		Scene scene = new Scene( root );
 		VBox primaryPane = new VBox();
 		
-		setupAlbumTable();
+		setupAlbumTable( primaryPane );
 		
 		Label label = new Label ( "Location: " );
 		label.setAlignment( Pos.CENTER_RIGHT );
@@ -108,6 +108,14 @@ public class AlbumInfoWindow extends Stage {
 	
 		primaryPane.getChildren().addAll( locationBox, trackTable );
 	
+		
+		primaryPane.prefWidthProperty().bind( root.widthProperty() );
+		primaryPane.prefHeightProperty().bind( root.heightProperty() );
+		
+
+		setWidth ( 700 );
+		setHeight ( 500 );
+		
 		root.getChildren().add( primaryPane );
 		setScene( scene );
 	}
@@ -119,7 +127,7 @@ public class AlbumInfoWindow extends Stage {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void setupAlbumTable () {
+	private void setupAlbumTable ( VBox primaryPane ) {
 		
 		TableColumn<Track, Integer> trackNumberColumn = new TableColumn<Track, Integer>( "#" );
 		TableColumn<Track, String> titleColumn = new TableColumn<Track, String>( "Title" );
@@ -166,7 +174,8 @@ public class AlbumInfoWindow extends Stage {
 		trackTable.setEditable( true );
 		trackTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 		
-		trackTable.prefWidthProperty().bind( this.widthProperty() );
+		trackTable.prefWidthProperty().bind( primaryPane.widthProperty() );
+		trackTable.prefHeightProperty().bind( primaryPane.heightProperty() );
 		
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );

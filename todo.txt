@@ -17,8 +17,6 @@ New Features
 	
 	Some loading progress indicator while the list is loading new data, maybe? 
 	
-	album info window table doesn't resize with window
-	
 Bug Fixes / Incremental Improvements
 	
 	Make sure horizontal scroll bars never appear
@@ -44,7 +42,7 @@ Bug Fixes / Incremental Improvements
 			at com.sun.glass.ui.gtk.GtkApplication.lambda$null$5(GtkApplication.java:139)
 			at java.lang.Thread.run(Thread.java:748)
 				
-		
+	Make the tag error window more user-friendly. 
 			
 Refactor / organize my code. 
  	Make LibraryUpdater part of Library. Is there a way to abstract out the Platform -> RunLater part? I feel like we're just stuck w/ that, which kind of ties to us JavaFX. 
