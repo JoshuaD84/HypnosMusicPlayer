@@ -814,13 +814,14 @@ public class FXUI implements PlayerListener {
 			}
 		});
 		
-		/*
+		
 		exportPlaylistButton.setOnAction( ( ActionEvent e ) -> {
 			FileChooser fileChooser = new FileChooser();
 			FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter( "M3U Playlists", Arrays.asList( "*.m3u" ) );
 			fileChooser.getExtensionFilters().add( fileExtensions );
-			fileChooser.setInitialDirectory( new File ( "/home/joshua/" ) );
+			fileChooser.setInitialFileName( "new-playlist.m3u" );
 			File targetFile = fileChooser.showSaveDialog( mainStage );
+			
 			
 			
 			if ( targetFile == null ) {
@@ -833,14 +834,15 @@ public class FXUI implements PlayerListener {
 				case ALBUM:
 				case ALBUM_REORDERED: {
 					Playlist saveMe = new Playlist( targetFile.getName(), Utils.convertCurrentTrackList( state.getItems() ) );
-					saveMe.saveAs( targetFile );
+					saveMe.saveAs( targetFile, false );
 				} break;
 				
 				case PLAYLIST:
 				case PLAYLIST_UNSAVED: {
 					Playlist saveMe = state.getPlaylist();
+					if ( saveMe == null ) saveMe = new Playlist( targetFile.getName() );
 					saveMe.setTracks( Utils.convertCurrentTrackList( state.getItems() ) );
-					saveMe.saveAs( targetFile );
+					saveMe.saveAs( targetFile, false );
 				} break;
 				
 				case EMPTY:
@@ -848,7 +850,6 @@ public class FXUI implements PlayerListener {
 				
 			}
 		});
-		*/
 		
 		loadTracksButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override

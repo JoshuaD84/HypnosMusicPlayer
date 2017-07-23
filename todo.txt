@@ -12,9 +12,7 @@ New Features
 		-Have player have a mute option, where it remembers teh curent volume and toggles to 0. 
 		
 	Log -> Submit error report button	
-	
-	export playlists to m3u save dialog
-	
+		
 	
 Bug Fixes / Incremental Improvements
 	Save hotkeys and settings configuratin whenever you close config and info window. 

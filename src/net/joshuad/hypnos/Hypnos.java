@@ -160,19 +160,21 @@ public class Hypnos extends Application {
 	
 	private void startGlobalHotkeyListener() {
 
-		try {
-			LogManager.getLogManager().reset();
-			Logger logger = Logger.getLogger( GlobalScreen.class.getPackage().getName() );
-			logger.setLevel( Level.OFF );
-
-			GlobalScreen.registerNativeHook();
-			
-		} catch ( NativeHookException ex ) {
-			LOGGER.warning( "There was a problem registering the global hotkey listeners. Global Hotkeys are disabled." );
-			//TODO: set a boolean and put an indicator in the UI somewhere? 
-		}
+//		try {
+//			LogManager.getLogManager().reset();
+//			Logger logger = Logger.getLogger( GlobalScreen.class.getPackage().getName() );
+//			logger.setLevel( Level.OFF );
+//
+//			GlobalScreen.registerNativeHook();
+//			
+//		} catch ( NativeHookException ex ) {
+//			LOGGER.warning( "There was a problem registering the global hotkey listeners. Global Hotkeys are disabled." );
+//			//TODO: set a boolean and put an indicator in the UI somewhere? 
+//		}
+		
 		hotkeys = new GlobalHotkeys();
-		GlobalScreen.addNativeKeyListener( hotkeys );
+		
+//		GlobalScreen.addNativeKeyListener( hotkeys );
 	}
 	
 	public static boolean hotkeysEnabled () {

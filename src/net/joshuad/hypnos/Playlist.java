@@ -141,7 +141,7 @@ public class Playlist implements Serializable {
 		tracks.addAll ( addMe );
 	}
 	
-	public void saveAs ( File file ) {
+	public void saveAs ( File file, boolean includeName ) {
 		if ( file == null ) {
 			LOGGER.info( "Recieved null file location, ignoring save request." );
 			return;
@@ -150,8 +150,11 @@ public class Playlist implements Serializable {
 		try ( FileWriter fileWriter = new FileWriter( file ) ) {
 			PrintWriter playlistOut = new PrintWriter( new BufferedWriter( fileWriter ) );
 			playlistOut.println( "#EXTM3U" );
-			playlistOut.printf( "#Name: %s\n", getName() );
-			playlistOut.println();
+			
+			if ( includeName ) {
+				playlistOut.printf( "#Name: %s\n", getName() );
+				playlistOut.println();
+			}
 
 			for ( Track track : getTracks() ) {
 				playlistOut.printf( "#EXTINF:%d,%s - %s\n", track.getLengthS(), track.getArtist(), track.getTitle() );
