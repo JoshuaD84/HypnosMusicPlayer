@@ -32,6 +32,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.TextAlignment;
@@ -168,6 +169,12 @@ public class QueueWindow extends Stage {
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
+		queueTable.setOnKeyPressed( ( KeyEvent e ) -> {
+			if ( e.getCode() == KeyCode.ESCAPE ) {
+				queueTable.getSelectionModel().clearSelection();
+			}
+		});
+		
 		queueTable.setRowFactory( tv -> {
 			TableRow <Track> row = new TableRow <>();
 			row.setContextMenu( contextMenu );

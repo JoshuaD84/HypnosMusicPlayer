@@ -117,6 +117,12 @@ public class HistoryWindow extends Stage {
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
+		historyTable.setOnKeyPressed( ( KeyEvent e ) -> {
+			if ( e.getCode() == KeyCode.ESCAPE ) {
+				historyTable.getSelectionModel().clearSelection();
+			}
+		});
+		
 		historyTable.setRowFactory( tv -> {
 			TableRow <Track> row = new TableRow <>();
 			row.setContextMenu( trackContextMenu );

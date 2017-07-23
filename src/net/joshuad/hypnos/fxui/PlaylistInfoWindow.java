@@ -27,6 +27,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -180,6 +182,12 @@ public class PlaylistInfoWindow extends Stage {
 				if ( ui.okToReplaceCurrentList() ) {
 					player.playItems( selectedItems );
 				}
+			}
+		});
+
+		trackTable.setOnKeyPressed( ( KeyEvent e ) -> {
+			if ( e.getCode() == KeyCode.ESCAPE ) {
+				trackTable.getSelectionModel().clearSelection();
 			}
 		});
 		

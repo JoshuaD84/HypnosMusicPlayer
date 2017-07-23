@@ -29,6 +29,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -233,6 +235,12 @@ public class AlbumInfoWindow extends Stage {
 				if ( ui.okToReplaceCurrentList() ) {
 					player.playItems( selectedItems );
 				}
+			}
+		});
+		
+		trackTable.setOnKeyPressed( ( KeyEvent e ) -> {
+			if ( e.getCode() == KeyCode.ESCAPE ) {
+				trackTable.getSelectionModel().clearSelection();
 			}
 		});
 		

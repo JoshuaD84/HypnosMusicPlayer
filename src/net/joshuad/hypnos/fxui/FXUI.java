@@ -1285,6 +1285,15 @@ public class FXUI implements PlayerListener {
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		MenuItem infoMenuItem = new MenuItem( "Info" );
 		
+		albumTable.setOnKeyPressed( ( KeyEvent e ) -> {
+			if ( e.getCode() == KeyCode.ESCAPE ) {
+				albumTable.getSelectionModel().clearSelection();
+				
+			} else if ( e.getCode() == KeyCode.Q ) {
+				enqueueMenuItem.fire();
+			}
+		});
+		
 		contextMenu.getItems().addAll( 
 			playMenuItem, apendMenuItem, enqueueMenuItem, editTagMenuItem, 
 			browseMenuItem, addToPlaylistMenuItem, infoMenuItem
@@ -1626,7 +1635,13 @@ public class FXUI implements PlayerListener {
 					}
 				} );
 			}
-		} );
+		});
+		
+		trackTable.setOnKeyPressed( ( KeyEvent e ) -> {
+			if ( e.getCode() == KeyCode.ESCAPE ) {
+				trackTable.getSelectionModel().clearSelection();
+			}
+		});
 		
 		trackTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
 		    if (newSelection != null) {
@@ -1801,6 +1816,13 @@ public class FXUI implements PlayerListener {
 			}
 		});
 
+		
+		playlistTable.setOnKeyPressed( ( KeyEvent e ) -> {
+			if ( e.getCode() == KeyCode.ESCAPE ) {
+				playlistTable.getSelectionModel().clearSelection();
+			}
+		});
+		
 		playlistTable.setOnDragOver( event -> {
 			Dragboard db = event.getDragboard();
 			if ( db.hasFiles() ) {
@@ -1964,7 +1986,6 @@ public class FXUI implements PlayerListener {
 			};
 		});
 		
-
 		currentListTable = new TableView();
 		currentListTable.getColumns().addAll( playingColumn, trackColumn, artistColumn, yearColumn, albumColumn, titleColumn, lengthColumn );
 		albumTable.getSortOrder().add( trackColumn );
@@ -2091,10 +2112,20 @@ public class FXUI implements PlayerListener {
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 
-
-		removeMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.DELETE ) );
-		queueMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.Q ) );
-		cropMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.DELETE, KeyCombination.SHIFT_DOWN ) );
+		currentListTable.setOnKeyPressed( ( KeyEvent e ) -> {
+			if ( e.getCode() == KeyCode.ESCAPE ) {
+				currentListTable.getSelectionModel().clearSelection();
+				
+			} else if ( e.getCode() == KeyCode.DELETE && !e.isShiftDown() ) {
+				removeMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.DELETE && e.isShiftDown() ) {
+				cropMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.Q ) {
+				queueMenuItem.fire();
+			}
+		});
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
@@ -2214,6 +2245,7 @@ public class FXUI implements PlayerListener {
 		
 		currentListTable.setRowFactory( tv -> {
 			TableRow <CurrentListTrack> row = new TableRow <>();
+			
 
 			row.setContextMenu( contextMenu );
 			

@@ -4,7 +4,7 @@ New Features
 		
 	Log to file, how does that work inside java? 
 		
-	have escape on lists clear selection.
+	have hotkeys work on tables, but only when they ahve focus. 
 	
 	Some loading progress indicator while the list is loading new data, maybe? 
 	
@@ -12,6 +12,9 @@ New Features
 		-Have player have a mute option, where it remembers teh curent volume and toggles to 0. 
 		
 	Log -> Submit error report button	
+	
+	Decide if we like the onKeyPress paradigm better for in-program hotkeys
+		and if we do, implement it on every table. 
 		
 	
 Bug Fixes / Incremental Improvements
