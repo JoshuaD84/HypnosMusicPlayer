@@ -68,8 +68,6 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
@@ -350,7 +348,28 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public void toggleMinimized() {
-		mainStage.setIconified( !mainStage.isIconified() );
+
+		System.out.println ( "Before call" );
+		System.out.println ( "\tisIconified(): " + mainStage.isIconified() );
+		System.out.println ( "\tisMaximized(): " + mainStage.isIconified() );
+		System.out.println ();
+		
+		if ( mainStage.isIconified() ) {
+			System.out.println ( "Setting iconified to false" );
+			System.out.println ();
+			mainStage.setIconified( false );
+		} else {
+			System.out.println ( "Setting iconified to true" );
+			System.out.println ();
+			mainStage.setIconified( true );
+		}
+		
+
+		System.out.println ( "After call" );
+		System.out.println ( "\tisIconified(): " + mainStage.isIconified() );
+		System.out.println ( "\tisMaximized(): " + mainStage.isIconified() );
+		System.out.println ();
+		System.out.println ();
 	}
 
 	public void updatePlaylistMenuItems ( ObservableList <MenuItem> items, EventHandler <ActionEvent> eventHandler ) {
@@ -1844,7 +1863,7 @@ public class FXUI implements PlayerListener {
 				}
 				
 				if ( !playlistsToAdd.isEmpty() ) {
-					library.getPlaylists().addAll( playlistsToAdd );
+					library.addPlaylists( playlistsToAdd );
 				}
 
 				event.setDropCompleted( true );
@@ -1931,7 +1950,7 @@ public class FXUI implements PlayerListener {
 					
 					if ( !playlistsToAdd.isEmpty() ) {
 						int dropIndex = row.isEmpty() ? dropIndex = library.getPlaylists().size() : row.getIndex();
-						library.getPlaylists().addAll( Math.min( dropIndex, library.getPlaylists().size() ), playlistsToAdd );
+						library.addPlaylists( playlistsToAdd );
 					}
 
 					event.setDropCompleted( true );

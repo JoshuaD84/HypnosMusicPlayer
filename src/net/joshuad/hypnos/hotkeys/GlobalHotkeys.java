@@ -93,9 +93,9 @@ public class GlobalHotkeys implements NativeKeyListener {
 					
 					try {
 						//This is an attempt to consume the hotkey. Doesn't work in X11
-						Field f = NativeInputEvent.class.getDeclaredField("reserved");
+						/*Field f = NativeInputEvent.class.getDeclaredField("reserved");
 						f.setAccessible(true);
-						f.setShort(e, (short) 0x01);
+						f.setShort(e, (short) 0x01);*/
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}

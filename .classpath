@@ -13,6 +13,6 @@
 	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/stage/lib/jl1.0.1.jar"/>
 	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/stage/lib/jogg-0.0.7.jar"/>
 	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/stage/lib/jorbis-0.0.15.jar"/>
-	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/stage/lib/jnativehook-2.1.0.jar"/>
+	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/stage/lib/jnativehook-2.0.2.jar"/>
 	<classpathentry kind="output" path="stage/bin"/>
 </classpath>

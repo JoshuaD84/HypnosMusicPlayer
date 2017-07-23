@@ -12,8 +12,17 @@ New Features
 			
 	Log -> Submit error report button	
 	
+	Drag and drop artwork into artpanes. 
+	
+	F2 to rename stuff. Maybe show tag window. 
+	
 	
 Bug Fixes / Incremental Improvements
+
+	Save after modifing stuff more frequently. Playlist delete. 
+
+	Renaming a playlist doesn't refresh the playlist table. 
+	
 	Save hotkeys and settings configuratin whenever you close config and info window. 
 
 	Hotkeys aren't consumed, so they are passed to the current window. >:-O
@@ -51,7 +60,13 @@ Bug Fixes / Incremental Improvements
 				
 	Make the tag error window more user-friendly. 
 	
-	hide/show via hotkeys seems to toggle every 3 presses instead of every 2 presses. 
+	hide/show via hotkeys while maximized toggles every 3 presses instead of every 2 presses. 
+	https://stackoverflow.com/questions/45269173/stage-seticonified-and-stage-isiconified-not-acting-properly
+	
+	While loading the library, the table view scrolls a little bit. 
+	
+	The width on the volume button needs to be set to a minimum to avoid shifting. 
+	
 	
 Refactor / organize my code. 
  	Make LibraryUpdater part of Library. Is there a way to abstract out the Platform -> RunLater part? I feel like we're just stuck w/ that, which kind of ties to us JavaFX. 
