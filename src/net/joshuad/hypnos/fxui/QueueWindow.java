@@ -408,7 +408,7 @@ public class QueueWindow extends Stage {
 		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				ui.promptAndSavePlaylist ( queueTable.getSelectionModel().getSelectedItems(), false );
+				ui.promptAndSavePlaylist ( queueTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 
@@ -429,7 +429,16 @@ public class QueueWindow extends Stage {
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.playItems( new ArrayList<Track> ( queueTable.getSelectionModel().getSelectedItems() ) );
+				List <Track> selectedItems =  new ArrayList<Track> ( queueTable.getSelectionModel().getSelectedItems() );
+				
+				if ( selectedItems.size() == 1 ) {
+					player.playItems( selectedItems );
+					
+				} else if ( selectedItems.size() > 1 ) {
+					if ( ui.okToReplaceCurrentList() ) {
+						player.playItems( selectedItems );
+					}
+				}
 			}
 		});
 

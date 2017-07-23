@@ -1,8 +1,4 @@
 New Features
-	Settings Window		
-		Option: Warn when erasing an unsaved playlist. 
-		Option: Remember shuffle / repeat state for playlists
-
 	Some way to get the file name corresponding to a file in the current list. 
 		Use album info window or something like it? 
 		
@@ -17,11 +13,14 @@ New Features
 		
 	Log -> Submit error report button	
 	
+	export playlists to m3u save dialog
+	
 Bug Fixes / Incremental Improvements
-
+	Save hotkeys and settings configuratin whenever you close config and info window. 
 
 	Hotkeys aren't consumed, so they are passed to the current window. >:-O
-		Apparently not possible to do in X11. c
+		Check windows and OSX
+		for Linux, just add a label to the dialog and tell them to consume the hotkey using some other program
 
 	try to play a missing file. It keeps throwing exception. Only throw it once.
 	
@@ -32,6 +31,8 @@ Bug Fixes / Incremental Improvements
 	Make sure horizontal scroll bars never appear
 		6/9 - Can't find anything on google.
 		
+	shuffle - forward / back / forward / back / forward / back - doesn't work right. 
+	
 	Be a little more selective about what images we accept for album/artist. Random music files on desktop get annoying images. 
 		probably use our current method if hasAlbum(), but be more strict if not. Or maybe no file-based images if !hasAlbum
 		Problem: CurrentListTracks not having hasAlbum set properly. 
@@ -57,7 +58,9 @@ Bug Fixes / Incremental Improvements
 	Make the tag error window more user-friendly. 
 	
 	hide/show via hotkeys seems to toggle every 3 presses instead of every 2 presses. 
-			
+	
+	Changing the playlist order doesn
+	
 Refactor / organize my code. 
  	Make LibraryUpdater part of Library. Is there a way to abstract out the Platform -> RunLater part? I feel like we're just stuck w/ that, which kind of ties to us JavaFX. 
  		Maybe ui.runMe ( Runnable ), and then the UI can decide whether to launch a new thread, have a thread idling, do it on this thread, or use something like Platform.runLater()	
@@ -65,6 +68,12 @@ Refactor / organize my code.
  	Make MainWindow its own class, and have FXUI be more of a simple manager? 
  	
 	use observable values for all of the track and album stuff, so we don't have to do refreshes
+	
+	a better structure for persister
+	
+	a better structure for tag error log
+	
+	a better structure for hotkey commands (maybe combine with commandline commands?)
 
 Decoders
 	Mp4

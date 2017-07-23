@@ -150,7 +150,7 @@ public class HistoryWindow extends Stage {
 		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				ui.promptAndSavePlaylist ( historyTable.getSelectionModel().getSelectedItems(), false );
+				ui.promptAndSavePlaylist ( historyTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 
@@ -172,7 +172,16 @@ public class HistoryWindow extends Stage {
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.playItems ( historyTable.getSelectionModel().getSelectedItems() );
+				List <Track> selectedItems =  new ArrayList<Track> ( historyTable.getSelectionModel().getSelectedItems() );
+				
+				if ( selectedItems.size() == 1 ) {
+					player.playItems( selectedItems );
+					
+				} else if ( selectedItems.size() > 1 ) {
+					if ( ui.okToReplaceCurrentList() ) {
+						player.playItems( selectedItems );
+					}
+				}
 			}
 		});
 		

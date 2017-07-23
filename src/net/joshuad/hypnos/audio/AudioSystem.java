@@ -56,7 +56,7 @@ public class AudioSystem {
 		queue = new Queue();
 		history = new History();
 		previousStack = new PreviousStack();
-		currentList = new CurrentList( queue );
+		currentList = new CurrentList( this, queue );
 	}
 	
 	public void unpause() {
@@ -284,8 +284,6 @@ public class AudioSystem {
 		notifyListenersRepeatModeChanged ( repeatMode );
 	}
 	
-	
-
 	public History getHistory () {
 		return history;
 	}
@@ -463,7 +461,7 @@ public class AudioSystem {
 	
 	
 
-	
+	//TODO: why are these here instead of in CurrentList?
 	
 	public void playTrack ( Track track ) {
 		playTrack ( track, false );
@@ -494,6 +492,7 @@ public class AudioSystem {
 	
 
 	public void playItems ( List <Track> items ) {
+		//TODO: maybe break this into two separate functions and have the UI determine whether to set tracks or just play
 		if ( items.size() == 1 ) {
 			playTrack ( items.get( 0 ) );
 		} else if ( items.size() > 1 ) {

@@ -191,10 +191,7 @@ public class AlbumInfoWindow extends Stage {
 		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				ui.promptAndSavePlaylist ( 
-					new ArrayList <Track> ( trackTable.getSelectionModel().getSelectedItems() ), 
-					false 
-				);
+				ui.promptAndSavePlaylist ( new ArrayList <Track> ( trackTable.getSelectionModel().getSelectedItems() ) );
 			}
 		});
 
@@ -227,7 +224,16 @@ public class AlbumInfoWindow extends Stage {
 		});
 
 		playMenuItem.setOnAction( event -> {
-			player.playItems( trackTable.getSelectionModel().getSelectedItems() );
+			List <Track> selectedItems =  new ArrayList<Track> ( trackTable.getSelectionModel().getSelectedItems() );
+			
+			if ( selectedItems.size() == 1 ) {
+				player.playItems( selectedItems );
+				
+			} else if ( selectedItems.size() > 1 ) {
+				if ( ui.okToReplaceCurrentList() ) {
+					player.playItems( selectedItems );
+				}
+			}
 		});
 		
 		trackTable.setRowFactory( tv -> {

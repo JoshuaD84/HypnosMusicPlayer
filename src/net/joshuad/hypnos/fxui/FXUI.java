@@ -23,6 +23,8 @@ import org.jaudiotagger.tag.FieldKey;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
@@ -34,12 +36,15 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -79,6 +84,7 @@ import javafx.stage.Window;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import net.joshuad.hypnos.Album;
+import net.joshuad.hypnos.CurrentList;
 import net.joshuad.hypnos.CurrentListState;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.Hypnos;
@@ -176,6 +182,8 @@ public class FXUI implements PlayerListener {
 	private double windowedHeight = 768;
 	private double windowedX = 50;
 	private double windowedY = 50;
+	
+	private SimpleBooleanProperty promptBeforeOverwrite = new SimpleBooleanProperty ( true );
 	
 	
 	public FXUI ( Stage stage, Library library, AudioSystem player, GlobalHotkeys hotkeys ) {
@@ -627,9 +635,72 @@ public class FXUI implements PlayerListener {
 		playlistTable.refresh(); 
 	}
 	
-	public void promptAndSavePlaylist ( List <Track> tracks, boolean isCurrentList ) { 
+
+	public void setPromptBeforeOverwrite ( boolean prompt ) {
+		promptBeforeOverwrite.set( prompt );
+	}
+	
+	public BooleanProperty promptBeforeOverwriteProperty ( ) {
+		return promptBeforeOverwrite;
+	}
+		
+	public boolean okToReplaceCurrentList () {
+		if ( player.getCurrentList().getState().getMode() != CurrentList.Mode.PLAYLIST_UNSAVED ) {
+			return true;
+		}
+		
+		if ( !promptBeforeOverwrite.getValue() ) {
+			return true;
+		}
+			
+		Alert alert = new Alert( AlertType.CONFIRMATION );
+		alert.getDialogPane().applyCss();
+		double x = mainStage.getX() + mainStage.getWidth() / 2 - 220; //It'd be nice to use alert.getWidth() / 2, but it's NAN now. 
+		double y = mainStage.getY() + mainStage.getHeight() / 2 - 50;
+		
+		alert.setX( x );
+		alert.setY( y );
+		
+		alert.setDialogPane( new DialogPane() {
+			@Override
+			protected Node createDetailsButton () {
+				CheckBox optOut = new CheckBox();
+				optOut.setText( "Do not ask again" );
+				optOut.setOnAction( e -> {
+					promptBeforeOverwrite.set( !optOut.isSelected() );
+				});
+				return optOut;
+			}
+		});
+		
+		alert.getDialogPane().getButtonTypes().addAll( ButtonType.YES, ButtonType.NO, ButtonType.CANCEL );
+		alert.getDialogPane().setContentText( "You have an unsaved playlist, do you wish to save it?" );
+		alert.getDialogPane().setExpandableContent( new Group() );
+		alert.getDialogPane().setExpanded( false );
+		alert.getDialogPane().setGraphic( alert.getDialogPane().getGraphic() );
+		alert.setTitle( "Save Unsaved Playlist" );
+		alert.setHeaderText( null );
+		
+		Optional <ButtonType> result = alert.showAndWait();
+		
+		if ( result.isPresent() ) {
+				
+			if ( result.get() == ButtonType.NO ) {
+				return true;
+				
+			} else if (result.get() == ButtonType.YES ) {
+				promptAndSavePlaylist ( Utils.convertCurrentTrackList( player.getCurrentList().getItems() ) ); 
+				return true;
+			
+			} else {
+				return false;
+			}
+		}
+		return false;
+	}
+	
+	public void promptAndSavePlaylist ( List <Track> tracks ) { 
 	//TODO: This should probably be refactored into promptForPlaylistName and <something>.savePlaylist( name, items )
-	//TODO: I can probably figure out if it's current on my own
 		String defaultName = "";
 		if ( player.getCurrentPlaylist() != null ) {
 			defaultName = player.getCurrentPlaylist().getName();
@@ -728,7 +799,7 @@ public class FXUI implements PlayerListener {
 		savePlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				promptAndSavePlaylist( new ArrayList <Track>( player.getCurrentList().getItems() ), true );
+				promptAndSavePlaylist( new ArrayList <Track>( player.getCurrentList().getItems() ) );
 			}
 		});
 		
@@ -1192,7 +1263,7 @@ public class FXUI implements PlayerListener {
 				for ( Album album : selectedAlbums ) {
 					tracks.addAll( album.getTracks() );
 				}
-				promptAndSavePlaylist ( tracks, false );
+				promptAndSavePlaylist ( tracks );
 			}
 		});
 
@@ -1220,8 +1291,10 @@ public class FXUI implements PlayerListener {
 		updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		
 		playMenuItem.setOnAction( event -> {
-			player.getCurrentList().setAlbums( albumTable.getSelectionModel().getSelectedItems() );
-			player.play();
+			if ( okToReplaceCurrentList() ) {
+				player.getCurrentList().setAlbums( albumTable.getSelectionModel().getSelectedItems() );
+				player.play();
+			}
 		});
 
 		apendMenuItem.setOnAction( event -> {
@@ -1300,8 +1373,12 @@ public class FXUI implements PlayerListener {
 
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					player.getCurrentList().setAlbum( row.getItem() );
-					player.play();
+					boolean doOverwrite = okToReplaceCurrentList();
+					
+					if ( doOverwrite ) {
+						player.getCurrentList().setAlbum( row.getItem() );
+						player.play();
+					}
 				}
 			} );
 			
@@ -1432,7 +1509,7 @@ public class FXUI implements PlayerListener {
 		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				promptAndSavePlaylist ( trackTable.getSelectionModel().getSelectedItems(), false );
+				promptAndSavePlaylist ( trackTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 
@@ -1453,7 +1530,16 @@ public class FXUI implements PlayerListener {
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.playItems( trackTable.getSelectionModel().getSelectedItems() );
+				List <Track> selectedItems = new ArrayList <Track> ( trackTable.getSelectionModel().getSelectedItems() );
+				
+				if ( selectedItems.size() == 1 ) {
+					player.playItems( selectedItems );
+					
+				} else if ( selectedItems.size() > 1 ) {
+					if ( okToReplaceCurrentList() ) {
+						player.playItems( selectedItems );
+					}
+				}
 			}
 		});
 
@@ -1629,8 +1715,10 @@ public class FXUI implements PlayerListener {
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.getCurrentList().setPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
-				player.play();
+				if ( okToReplaceCurrentList() ) {
+					player.getCurrentList().setPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
+					player.play();
+				}
 			}
 		});
 
@@ -1712,9 +1800,12 @@ public class FXUI implements PlayerListener {
 			row.setContextMenu ( contextMenu );
 
 			row.setOnMouseClicked( event -> {
-				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					player.getCurrentList().setPlaylist( row.getItem() );
-					player.play();
+				if ( event.getClickCount() == 2 && !row.isEmpty() ) {
+					boolean doOverwrite = okToReplaceCurrentList();
+					if ( doOverwrite ) {
+						player.getCurrentList().setPlaylist( row.getItem() );
+						player.play();
+					}
 				}
 			});
 
@@ -1959,6 +2050,11 @@ public class FXUI implements PlayerListener {
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 
+
+		removeMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.DELETE ) );
+		queueMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.Q ) );
+		cropMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.DELETE, KeyCombination.SHIFT_DOWN ) );
+		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
 		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
@@ -1967,7 +2063,7 @@ public class FXUI implements PlayerListener {
 		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				promptAndSavePlaylist ( new ArrayList <Track> ( currentListTable.getSelectionModel().getSelectedItems() ), false );
+				promptAndSavePlaylist ( new ArrayList <Track> ( currentListTable.getSelectionModel().getSelectedItems() ) );
 			}
 		});
 
@@ -2049,9 +2145,7 @@ public class FXUI implements PlayerListener {
 				currentListTable.getSelectionModel().clearAndSelect( selectAfterDelete );
 			}
 		});
-		
-		removeMenuItem.setAccelerator( new KeyCodeCombination ( KeyCode.DELETE, KeyCombination.SHIFT_ANY ) );
-		
+				
 		cropMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
@@ -2397,9 +2491,8 @@ public class FXUI implements PlayerListener {
 		retMe.put ( Setting.CURRENT_LIST_SPLIT_PERCENT, getCurrentListSplitPercent() );
 		retMe.put ( Setting.ART_SPLIT_PERCENT, getArtSplitPercent() );
 		retMe.put ( Setting.LIBRARY_TAB, libraryPane.getSelectionModel().getSelectedIndex() );
+		retMe.put ( Setting.PROMPT_BEFORE_OVERWRITE, promptBeforeOverwrite.getValue() );
 		
-		
-
 		return retMe;
 	}
 
@@ -2516,6 +2609,10 @@ public class FXUI implements PlayerListener {
 						
 					case LIBRARY_TAB:
 						libraryPane.getSelectionModel().select( Integer.valueOf ( value ) );
+						break;
+						
+					case PROMPT_BEFORE_OVERWRITE:
+						promptBeforeOverwrite.setValue( Boolean.valueOf( value ) );
 						break;
 				}
 				

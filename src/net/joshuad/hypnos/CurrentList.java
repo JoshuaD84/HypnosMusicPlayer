@@ -13,12 +13,14 @@ import java.util.logging.Logger;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import net.joshuad.hypnos.audio.AudioSystem;
+import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
 
 public class CurrentList {
 
 	private static final Logger LOGGER = Logger.getLogger( CurrentList.class.getName() );
 	
-	enum Mode {
+	public enum Mode {
 		ALBUM,
 		ALBUM_REORDERED,
 		PLAYLIST,
@@ -35,10 +37,15 @@ public class CurrentList {
 	private final List <CurrentListListener> listeners = new ArrayList<CurrentListListener> ();
 	
 	Queue queue;
+	private AudioSystem player;
+
+	private ShuffleMode albumShuffleMode = ShuffleMode.SEQUENTIAL;
+	private ShuffleMode trackShuffleMode = null;
+	private ShuffleMode playlistShuffleMode = ShuffleMode.SHUFFLE;
 	
-	
-	public CurrentList ( Queue queue ) {
+	public CurrentList ( AudioSystem player, Queue queue ) {
 		this.queue = queue;
+		this.player = player;
 		
 		startListWatcher();
 	}
@@ -455,6 +462,7 @@ public class CurrentList {
 		
 		} else if ( albums.size() == 1 ) {
 			mode = Mode.ALBUM;
+			if ( albumShuffleMode != null ) player.setShuffleMode( albumShuffleMode );
 			currentAlbums.clear();
 			currentAlbums.addAll( albums );
 			notifyListenersStateChanged();
@@ -493,6 +501,7 @@ public class CurrentList {
 				
 			} else if ( differentBaseAlbums ) {
 				mode = Mode.PLAYLIST_UNSAVED;
+				if ( albumShuffleMode != null ) player.setShuffleMode( albumShuffleMode );
 				currentAlbums.clear();
 				currentPlaylist = null;
 				notifyListenersStateChanged();
@@ -500,13 +509,13 @@ public class CurrentList {
 				
 			} else {
 				mode = Mode.ALBUM;
+				if ( albumShuffleMode != null ) player.setShuffleMode( albumShuffleMode );
 				currentAlbums.clear();
 				currentAlbums.addAll( albums );
 				notifyListenersStateChanged();
 				return;
 			}
 		}
-		
 	}
 	
 	public void playlistsSet ( List <Playlist> playlists ) {
@@ -531,6 +540,7 @@ public class CurrentList {
 		
 		} else if ( playlists.size() == 1 ) {
 			mode = Mode.PLAYLIST;
+			if ( playlistShuffleMode != null ) player.setShuffleMode( playlistShuffleMode );
 			currentAlbums.clear();
 			currentPlaylist = playlists.get( 0 );
 			notifyListenersStateChanged();
@@ -538,6 +548,7 @@ public class CurrentList {
 
 		} else {
 			mode = Mode.PLAYLIST;
+			if ( playlistShuffleMode != null ) player.setShuffleMode( playlistShuffleMode );
 			currentAlbums.clear();
 			currentPlaylist = null;
 			notifyListenersStateChanged();
@@ -547,6 +558,7 @@ public class CurrentList {
 	
 	public void tracksSet () {
 		mode = Mode.PLAYLIST_UNSAVED;
+		if ( trackShuffleMode != null ) player.setShuffleMode( trackShuffleMode );
 		currentAlbums.clear();
 		currentPlaylist = null;
 		notifyListenersStateChanged();

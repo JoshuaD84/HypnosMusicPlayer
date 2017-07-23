@@ -9,12 +9,15 @@ import java.io.IOException;
 import java.util.EnumMap;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
@@ -219,11 +222,45 @@ public class SettingsWindow extends Stage {
 		CheckBox warnCheckBox = new CheckBox ();
 		warnCheckBox.setPadding( checkBoxInsets );
 		
+		warnCheckBox.selectedProperty().bindBidirectional( ui.promptBeforeOverwriteProperty() );
+		
+		warnCheckBox.selectedProperty().addListener( (obs, wasSelected, isNowSelected) -> {
+	    	ui.setPromptBeforeOverwrite( isNowSelected );
+		});
+				
 		HBox warnBox = new HBox();
 		warnBox.setAlignment( Pos.CENTER );
 		warnBox.getChildren().addAll( warnLabel, warnCheckBox );
 		
-		settingsPane.getChildren().addAll( warnBox );
+		GridPane shuffleGrid = new GridPane();
+		
+		final ObservableList<String> shuffleOptions = FXCollections.observableArrayList( "No Change", "Sequential", "Shuffle" );
+		int row = 0;
+		Label albumsLabel = new Label ( "Default shuffle setting for albums:" );
+		albumsLabel.setPadding( new Insets ( 0, 10, 0, 0 ) );
+		shuffleGrid.add ( albumsLabel, 0, row );
+		ChoiceBox <String> albumChoices = new ChoiceBox <String>( shuffleOptions );
+		shuffleGrid.add ( albumChoices, 1, row );
+		albumChoices.getSelectionModel().select( 1 );
+		row++;
+		
+		Label trackLabel = new Label ( "Default shuffle setting for tracks:" );
+		trackLabel.setPadding( new Insets ( 0, 10, 0, 0 ) );
+		shuffleGrid.add ( trackLabel, 0, row );
+		ChoiceBox <String> trackChoices = new ChoiceBox <String>( shuffleOptions );
+		shuffleGrid.add ( trackChoices, 1, row );
+		trackChoices.getSelectionModel().select( 0 );
+		row++;
+		
+		Label playlistLabel = new Label ( "Default shuffle setting for playlists:" );
+		playlistLabel.setPadding( new Insets ( 0, 10, 0, 0 ) );
+		shuffleGrid.add ( playlistLabel, 0, row );
+		ChoiceBox <String> playlistChoices = new ChoiceBox <String>( shuffleOptions );
+		shuffleGrid.add ( playlistChoices, 1, row );
+		playlistChoices.getSelectionModel().select( 2 );
+		row++;
+
+		settingsPane.getChildren().addAll( warnBox, shuffleGrid );
 		
 		return settingsTab;
 	}

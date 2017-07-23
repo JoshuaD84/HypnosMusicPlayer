@@ -29,7 +29,7 @@ public class AudioPlayer {
 	AbstractDecoder decoder;
 	AudioSystem controller;
 	Track track;
-	
+
 	private double volumePercent = 1;
 	
 	public AudioPlayer( AudioSystem controller ) {

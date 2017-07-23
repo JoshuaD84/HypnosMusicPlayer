@@ -37,7 +37,7 @@
 				<attribute name="Class-Path" value="lib/commons-cli-1.4.jar lib/jaad-0.8.4-nospi.jar
 													lib/jaudiotagger-2.2.6-SNAPSHOT.jar lib/jflac-1.2.jar
 													lib/jl1.0.1.jar lib/jogg-0.0.7.jar lib/jorbis-0.0.15.jar
-													lib/vorbisspi1.0.3.jar" />
+													lib/vorbisspi1.0.3.jar lib/jnativehook-2.1.0.jar" />
 			</manifest>
 		</jar>
 	</target>
