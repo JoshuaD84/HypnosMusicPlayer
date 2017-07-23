@@ -4,7 +4,7 @@
 
 Released under the GNU General Public License (v3). [Git Hub Project Page](https://github.com/JoshuaD84/HypnosMusicPlayer)
 
-[![](hypnos-2017-06-04.png)](hypnos-2017-06-04.png)
+[![](hypnos-2017-06-04.png)](http://hypnosplayer.org/hypnos-2017-06-04.png)
 
 ## Status
 
