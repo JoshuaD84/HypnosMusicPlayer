@@ -21,10 +21,22 @@
    -fx-font-size: 32px;
 }
 
-.settingsButton:hover{
+.settingsButton:hover {
    -fx-text-fill: cornflowerblue;
 }
 
-.settingsButton:pressed{
+.settingsButton:pressed {
    -fx-text-fill: grey;
- }
+}
+
+.volumeButton {
+   -fx-background-color: transparent;
+}
+
+.volumeButton:hover{
+   -fx-text-fill: cornflowerblue;
+}
+
+.volumeButton:pressed{
+   -fx-text-fill: grey;
+}

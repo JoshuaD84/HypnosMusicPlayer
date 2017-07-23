@@ -51,6 +51,8 @@ public class AudioSystem {
 	private final PreviousStack previousStack;
 	private final CurrentList currentList;
 	
+	private Double unmutedVolume = null;
+	
 	public AudioSystem () {
 		player = new AudioPlayer ( this );
 		queue = new Queue();
@@ -512,6 +514,20 @@ public class AudioSystem {
 					track.getQueueIndices().remove( new Integer ( index ) );
 				}
 			}
+		}
+	}
+
+	public void toggleMute () {
+		if ( player.getVolumePercent() == 0 ) {
+			if ( unmutedVolume != null ) {
+				player.requestVolumePercent( unmutedVolume );
+				unmutedVolume = null;
+			} else { 
+				player.requestVolumePercent( 100 );
+			}
+		} else {
+			unmutedVolume = player.getVolumePercent();
+			player.requestVolumePercent( 0 );
 		}
 	}
 }

@@ -133,6 +133,7 @@ public class FXUI implements PlayerListener {
 	
 	Slider trackPositionSlider;
 	Slider volumeSlider;
+	Button volumeMuteButton;
 
 	boolean sliderMouseHeld;
 
@@ -512,10 +513,15 @@ public class FXUI implements PlayerListener {
 			player.seekPercent( trackPositionSlider.getValue() / trackPositionSlider.getMax() );
 		});
 		
-
-		Label volumeLabel = new Label ( "🔊" );
-		volumeLabel.getStyleClass().add( "volumeLabel" );
-		volumeLabel.setMinWidth( 30 );
+		volumeMuteButton = new Button ( "🔊" );
+		volumeMuteButton.getStyleClass().add( "volumeLabel" );
+		volumeMuteButton.setMinWidth( 30 );
+		volumeMuteButton.setPadding( new Insets ( 0, 5, 0, 5 ) );
+		volumeMuteButton.getStyleClass().add( "volumeButton" );
+		
+		volumeMuteButton.setOnAction( ( ActionEvent e ) -> {
+			player.toggleMute();
+		});
 		
 		volumeSlider = new Slider();
 		volumeSlider.setMin( 0 );
@@ -527,20 +533,10 @@ public class FXUI implements PlayerListener {
 			double max = volumeSlider.getMax();
 			double percent = (volumeSlider.getValue() - min) / (max - min);
 			player.setVolumePercent( percent ); //Note: this works because min is 0 
-			
-			if ( percent == 0 ) {
-				volumeLabel.setText ( "🔇" );
-			} else if ( percent > 0 && percent <= .33f ) {
-				volumeLabel.setText ( "🔈" );
-			} else if ( percent > .33f && percent <= .66f ) {
-				volumeLabel.setText ( "🔉" );
-			} else if ( percent > .66f ) {
-				volumeLabel.setText ( "🔊" );
-			}
 		});
 		
 		HBox volumePane = new HBox();
-		volumePane.getChildren().addAll( volumeLabel, volumeSlider );
+		volumePane.getChildren().addAll( volumeMuteButton, volumeSlider );
 		volumePane.setAlignment( Pos.CENTER );
 		volumePane.setSpacing( 5 );
 		
@@ -2757,11 +2753,22 @@ public class FXUI implements PlayerListener {
 
 	@Override
 	public void playerVolumeChanged ( double newVolumePercent ) {
-		double min = volumeSlider.getMin();
-		double max = volumeSlider.getMax();
-		
-		volumeSlider.setValue( newVolumePercent * ( max - min ) );
-		
+		Platform.runLater( () -> {
+			double min = volumeSlider.getMin();
+			double max = volumeSlider.getMax();
+			
+			volumeSlider.setValue( newVolumePercent * ( max - min ) );
+			
+			if ( newVolumePercent == 0 ) {
+				volumeMuteButton.setText ( "🔇" );
+			} else if ( newVolumePercent > 0 && newVolumePercent <= .33f ) {
+				volumeMuteButton.setText ( "🔈" );
+			} else if ( newVolumePercent > .33f && newVolumePercent <= .66f ) {
+				volumeMuteButton.setText ( "🔉" );
+			} else if ( newVolumePercent > .66f ) {
+				volumeMuteButton.setText ( "🔊" );
+			}
+		});
 	}
 
 
