@@ -347,6 +347,7 @@ public class Persister {
 
 		int playlistIndex = 1;
 		for ( Playlist playlist : playlists ) {
+			//TODO: Use Playlist.saveAs()
 			try ( FileWriter fileWriter = new FileWriter( Paths.get( playlistsDirectory.toString(), playlistIndex + ".m3u" ).toFile() ); ) {
 				PrintWriter playlistOut = new PrintWriter( new BufferedWriter( fileWriter ) );
 				playlistOut.println( "#EXTM3U" );

@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Optional;
@@ -755,6 +756,7 @@ public class FXUI implements PlayerListener {
 		Button showHistoryButton = new Button ( "H" );
 		Button loadTracksButton = new Button( "⏏" );
 		Button savePlaylistButton = new Button( "💾" );
+		Button exportPlaylistButton = new Button ( "➚" );
 		Button clearButton = new Button ( "✘" );
 
 		toggleRepeatButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
@@ -763,6 +765,7 @@ public class FXUI implements PlayerListener {
 		showHistoryButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );;
 		loadTracksButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
 		savePlaylistButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
+		exportPlaylistButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
 		clearButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
 		
 		toggleRepeatButton.setTooltip( new Tooltip( "Toggle Repeat Type" ) );
@@ -771,6 +774,7 @@ public class FXUI implements PlayerListener {
 		showHistoryButton.setTooltip( new Tooltip( "Show Play History" ) );
 		loadTracksButton.setTooltip( new Tooltip( "Load tracks from the filesystem" ) );
 		savePlaylistButton.setTooltip( new Tooltip( "Save this playlist" ) );
+		exportPlaylistButton.setTooltip( new Tooltip( "Export current list as m3u" ) );
 		clearButton.setTooltip( new Tooltip( "Clear the current list" ) );
 		
 		showQueueButton.setOnAction ( new EventHandler <ActionEvent>() {
@@ -809,6 +813,42 @@ public class FXUI implements PlayerListener {
 				player.getCurrentList().clearList();
 			}
 		});
+		
+		/*
+		exportPlaylistButton.setOnAction( ( ActionEvent e ) -> {
+			FileChooser fileChooser = new FileChooser();
+			FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter( "M3U Playlists", Arrays.asList( "*.m3u" ) );
+			fileChooser.getExtensionFilters().add( fileExtensions );
+			fileChooser.setInitialDirectory( new File ( "/home/joshua/" ) );
+			File targetFile = fileChooser.showSaveDialog( mainStage );
+			
+			
+			if ( targetFile == null ) {
+				return;
+			}
+			
+			CurrentListState state = player.getCurrentList().getState();
+			
+			switch ( state.getMode() ) {
+				case ALBUM:
+				case ALBUM_REORDERED: {
+					Playlist saveMe = new Playlist( targetFile.getName(), Utils.convertCurrentTrackList( state.getItems() ) );
+					saveMe.saveAs( targetFile );
+				} break;
+				
+				case PLAYLIST:
+				case PLAYLIST_UNSAVED: {
+					Playlist saveMe = state.getPlaylist();
+					saveMe.setTracks( Utils.convertCurrentTrackList( state.getItems() ) );
+					saveMe.saveAs( targetFile );
+				} break;
+				
+				case EMPTY:
+					break;
+				
+			}
+		});
+		*/
 		
 		loadTracksButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -927,7 +967,7 @@ public class FXUI implements PlayerListener {
 		
 
 		playlistControls.getChildren().addAll( toggleRepeatButton, toggleShuffleButton, showQueueButton, showHistoryButton,
-				currentPlayingListInfo, currentListLength, loadTracksButton, savePlaylistButton, clearButton );
+			currentPlayingListInfo, currentListLength, loadTracksButton, exportPlaylistButton, savePlaylistButton, clearButton );
 	}
 
 	public void setupPlaylistFilterPane () {

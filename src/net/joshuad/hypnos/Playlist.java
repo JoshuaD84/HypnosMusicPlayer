@@ -1,7 +1,12 @@
 package net.joshuad.hypnos;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -123,9 +128,9 @@ public class Playlist implements Serializable {
 		return tracks;
 	}
 	
-	public void setTracks( ArrayList <Track> tracks ) {
+	public void setTracks( List <Track> tracks ) {
 		if ( tracks == null ) this.tracks = new ArrayList <Track> ();
-		else this.tracks = tracks;
+		else this.tracks = new ArrayList <Track> ( tracks );
 	}
 
 	public void addTrack ( Track track ) {
@@ -134,5 +139,30 @@ public class Playlist implements Serializable {
 
 	public void addTracks ( ArrayList <Track> addMe ) {
 		tracks.addAll ( addMe );
+	}
+	
+	public void saveAs ( File file ) {
+		if ( file == null ) {
+			LOGGER.info( "Recieved null file location, ignoring save request." );
+			return;
+		}
+		
+		try ( FileWriter fileWriter = new FileWriter( file ) ) {
+			PrintWriter playlistOut = new PrintWriter( new BufferedWriter( fileWriter ) );
+			playlistOut.println( "#EXTM3U" );
+			playlistOut.printf( "#Name: %s\n", getName() );
+			playlistOut.println();
+
+			for ( Track track : getTracks() ) {
+				playlistOut.printf( "#EXTINF:%d,%s - %s\n", track.getLengthS(), track.getArtist(), track.getTitle() );
+				playlistOut.println( track.getPath().toString() );
+				playlistOut.println();
+			}
+
+			playlistOut.flush();
+		} catch ( IOException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

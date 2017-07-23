@@ -15,6 +15,7 @@ New Features
 	
 	export playlists to m3u save dialog
 	
+	
 Bug Fixes / Incremental Improvements
 	Save hotkeys and settings configuratin whenever you close config and info window. 
 
