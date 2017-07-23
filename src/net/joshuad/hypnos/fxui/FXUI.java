@@ -2771,7 +2771,6 @@ public class FXUI implements PlayerListener {
 		});
 	}
 
-
 	@Override
 	public void playerShuffleModeChanged ( ShuffleMode newMode ) {
 		toggleShuffleButton.setText( newMode.getSymbol() );

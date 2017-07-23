@@ -113,7 +113,7 @@ public class AudioSystem {
 		shuffleTracksPlayedCounter -= previousStackSizeDifference;
 		
 		if ( previousTrack != null ) {
-			playTrack ( previousTrack, startPaused, false );
+			playTrack ( previousTrack, startPaused, true );
 			
 		} else if ( repeatMode == RepeatMode.PLAY_ONCE || repeatMode == RepeatMode.REPEAT_ONE_TRACK ) {
 			shuffleTracksPlayedCounter = 1;
@@ -156,6 +156,9 @@ public class AudioSystem {
 
 		if ( queue.hasNext() ) {
 			playTrack( queue.getNextTrack(), startPaused );
+			
+		} else if ( currentList.getItems().size() == 0 ) {
+			return;
 			
 		} else if ( shuffleMode == ShuffleMode.SEQUENTIAL ) {
 			ListIterator <CurrentListTrack> iterator = currentList.getItems().listIterator();
