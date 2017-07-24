@@ -24,11 +24,15 @@ import javafx.beans.property.StringProperty;
 		
 		public CurrentListTrack ( Path source ) throws IOException {
 			super ( source );
+			if ( Utils.isAlbumDirectory( source.getParent() ) ) {
+				this.albumDirectory = source.getParent().toFile();
+			}
+			
 			updateDisplayString();
 		}
 	
 		public CurrentListTrack ( Track source ) throws IOException {
-			super ( source.getPath() );
+			super ( source.getPath(), source.getAlbumPath() );
 			updateDisplayString();
 		}
 		

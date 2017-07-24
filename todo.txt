@@ -7,17 +7,20 @@ New Features
 	have hotkeys work on tables, but only when they ahve focus. 
 		Decide if we like the onKeyPress paradigm better for in-program hotkeys
 		and if we do, implement it on every table. 
+		F2 to rename stuff. Maybe show tag window. 
 	
 	Some loading progress indicator while the list is loading new data, maybe? 
 			
 	Log -> Submit error report button	
 	
-	Drag and drop artwork into artpanes. 
-	
-	F2 to rename stuff. Maybe show tag window. 
-	
+	Add artist to playlist info 
 	
 Bug Fixes / Incremental Improvements
+
+	Drag and drop artwork into artpanes. 
+
+	hard-to-sort/ConnorObsert - HEre's to speical treatment
+		Drag ot current list, click on tracks. Very slow. 
 
 	Save after modifing stuff more frequently. Playlist delete. 
 
@@ -35,10 +38,6 @@ Bug Fixes / Incremental Improvements
 		
 	Make sure horizontal scroll bars never appear
 		6/9 - Can't find anything on google.
-			
-	Be a little more selective about what images we accept for album/artist. Random music files on desktop get annoying images. 
-		probably use our current method if hasAlbum(), but be more strict if not. Or maybe no file-based images if !hasAlbum
-		Problem: CurrentListTracks not having hasAlbum set properly. 
 	
 	Persister.loadCurrentList()
 		This is from trying to run a new version of hypnos after having data from a previous version. 

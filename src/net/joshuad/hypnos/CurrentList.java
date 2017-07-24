@@ -276,7 +276,8 @@ public class CurrentList {
 				tracks.add ( new CurrentListTrack ( path ) );
 				tracksAdded++;
 			} catch ( IOException | NullPointerException e ) {
-				LOGGER.fine( "Recieved a null or empty track. Skipping." );
+				LOGGER.info( " -- Couldn't load track: " + path.toString() + ". Skipping." );
+				e.printStackTrace(); //TODO: DDs
 			}
 		}
 		

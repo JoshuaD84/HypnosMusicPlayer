@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 /* Note: this class is not designed for repeat uses. */
 
-public class MusicFileVisitor extends SimpleFileVisitor <Path> {
+public class NewMusicFileVisitor extends SimpleFileVisitor <Path> {
 
 	private static transient final Logger LOGGER = Logger.getLogger( MusicFileVisitor.class.getName() );
 	
@@ -17,7 +17,7 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 	
 	Library library;
 	
-	public MusicFileVisitor ( Library library ) {
+	public NewMusicFileVisitor ( Library library ) {
 		this.library = library;
 	}
 	
@@ -66,6 +66,14 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 		} else {
 			return FileVisitResult.CONTINUE;
 		}
+	}
+	
+	@Override
+	public FileVisitResult preVisitDirectory ( Path dir, BasicFileAttributes attrs ) {
+		
+
+		return FileVisitResult.CONTINUE;
+		
 	}
 	
 	@Override

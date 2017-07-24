@@ -1,11 +1,14 @@
 package net.joshuad.hypnos.fxui;
 
 import java.awt.Desktop;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -43,6 +46,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DialogPane;
@@ -106,6 +110,18 @@ public class FXUI implements PlayerListener {
 	private static final Logger LOGGER = Logger.getLogger( FXUI.class.getName() );
 
 	public static final DataFormat DRAGGED_TRACKS = new DataFormat( "application/hypnos-java-track" );
+	
+	enum ImageSaveLocation {
+		GENERAL_FILE ( "File: All albums by this artist" ),
+		ALBUM_FILE ( "File: This album only" ),
+		ALBUM_ID3 ( "Tag: All tracks in this album" ),
+		TRACK_ID3 ( "Tag: This track only" );
+		
+		private String description;
+		
+		ImageSaveLocation ( String description ) { this.description = description; }
+		public String toString () { return description; }
+	}
 
 	public final String PROGRAM_NAME = "Hypnos";
 
@@ -182,6 +198,8 @@ public class FXUI implements PlayerListener {
 	private double windowedHeight = 768;
 	private double windowedX = 50;
 	private double windowedY = 50;
+	
+	private Track currentImagesTrack = null;
 	
 	private SimpleBooleanProperty promptBeforeOverwrite = new SimpleBooleanProperty ( true );
 	
@@ -595,9 +613,8 @@ public class FXUI implements PlayerListener {
 		
 		trackInfo.setOnMouseClicked( ( event ) -> {
 			Track current = player.getCurrentTrack();
-			if ( player.getCurrentTrack() != null ) {
-				setAlbumImage( current.getAlbumCoverImage() );
-				setArtistImage( current.getAlbumArtistImage() );
+			if ( current != null ) {
+				setImages( current );
 			}
 		});
 
@@ -611,10 +628,261 @@ public class FXUI implements PlayerListener {
 	
 	public void setupAlbumImage () {
 		albumImage = new BorderPane();
+		
+		albumImage.setOnDragOver( event -> {
+			Dragboard db = event.getDragboard();
+			event.acceptTransferModes( TransferMode.COPY );
+			event.consume();
+		});
+		
+		albumImage.setOnDragDropped( event -> {
+			Dragboard db = event.getDragboard();
+			if ( db.hasFiles() ) {
+				List <File> files = db.getFiles();
+				event.setDropCompleted( true );
+				event.consume();
+				
+				for ( File file : files ) {
+					if ( Utils.isImageFile( file ) ) {
+						try {
+							byte[] buffer = Files.readAllBytes( file.toPath() );
+							promptAndSaveAlbumImage ( buffer );
+							break;
+						} catch ( IOException e ) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+		
+			} else {
+				for ( DataFormat contentType : db.getContentTypes() ) {
+					if ( contentType == DataFormat.lookupMimeType("application/octet-stream" ) ) {
+						ByteBuffer buffer = (ByteBuffer)db.getContent( contentType );
+						promptAndSaveAlbumImage ( buffer.array() );
+					}
+				}
+				
+				event.setDropCompleted( true );
+				event.consume();
+				
+			}
+		});
 	}
+	
+
 
 	public void setupArtistImage () {
 		artistImage = new BorderPane();
+		
+		artistImage.setOnDragOver( event -> {
+			Dragboard db = event.getDragboard();
+			event.acceptTransferModes( TransferMode.COPY );
+			event.consume();
+		});
+		
+		artistImage.setOnDragDropped( event -> {
+			Dragboard db = event.getDragboard();
+			if ( db.hasFiles() ) {
+				List <File> files = db.getFiles();
+				event.setDropCompleted( true );
+				event.consume();
+				
+				for ( File file : files ) {
+					if ( Utils.isImageFile( file ) ) {
+						try {
+							byte[] buffer = Files.readAllBytes( file.toPath() );
+							promptAndSaveArtistImage ( buffer );
+							break;
+						} catch ( IOException e ) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+		
+			} else {
+				for ( DataFormat contentType : db.getContentTypes() ) {
+					if ( contentType == DataFormat.lookupMimeType("application/octet-stream" ) ) {
+						ByteBuffer buffer = (ByteBuffer)db.getContent( contentType );
+						promptAndSaveArtistImage ( buffer.array() );
+					}
+				}
+				
+				event.setDropCompleted( true );
+				event.consume();
+				
+			}
+		});
+	}
+	
+	private void promptAndSaveAlbumImage ( byte[] buffer ) {
+		Track targetTrack = currentImagesTrack;
+		
+		boolean saved = false;
+		if ( targetTrack != null ) {
+			
+			Path albumPath = targetTrack.getAlbumPath();
+		
+			List <ImageSaveLocation> choices = new ArrayList<>();
+			
+			if (albumPath != null ) {
+				choices.add ( ImageSaveLocation.ALBUM_FILE );
+				choices.add ( ImageSaveLocation.ALBUM_ID3 );
+			} 
+			
+			choices.add( ImageSaveLocation.TRACK_ID3 );
+										
+			ChoiceDialog <ImageSaveLocation> choiceDialog = new ChoiceDialog<> ( 
+				null, choices
+			);
+			
+			choiceDialog.setTitle( "Set Album Image" );
+			choiceDialog.setHeaderText( "Choose Location" );
+			double x = mainStage.getX() + mainStage.getWidth() / 2 - 200; //It'd be nice to use alert.getWidth() / 2, but it's NAN now. 
+			double y = mainStage.getY() + mainStage.getHeight() / 2 - 100;
+			choiceDialog.setX ( x );
+			choiceDialog.setY ( y );
+			
+			Optional<ImageSaveLocation> choice = choiceDialog.showAndWait();
+			
+			if ( choice.isPresent() ) {
+				switch ( choice.get() ) {
+					
+					case ALBUM_FILE:
+						Utils.saveImageToDisk( albumPath.resolve( "front.png" ), buffer );
+						setImages ( currentImagesTrack );
+						break;
+						
+					case GENERAL_FILE:
+						//Impossible, this only is for artists. 
+						break;
+
+					case ALBUM_ID3:
+						setAlbumImage ( new Image ( new ByteArrayInputStream ( buffer ) ) );
+						
+						Thread workerThread = new Thread ( () -> {
+							try ( DirectoryStream <Path> stream = Files.newDirectoryStream( albumPath ) ) {
+								for ( Path child : stream ) {
+									if ( Utils.isMusicFile( child ) ) {
+										Utils.saveAlbumImageToID3 ( child.toFile(), buffer );
+									}
+								}
+							} catch ( IOException e ) {
+								//TODO: 
+							}
+
+							Platform.runLater( () -> setImages ( currentImagesTrack ) );
+						});
+						
+						workerThread.setDaemon( false );
+						workerThread.start();
+						
+						break;
+						
+					case TRACK_ID3:
+						Utils.saveAlbumImageToID3 ( targetTrack.getPath().toFile(), buffer );
+						setImages ( currentImagesTrack );
+						break;
+						
+				}
+			}
+		}
+	}
+	
+	private void promptAndSaveArtistImage ( byte[] buffer ) {
+		Track targetTrack = currentImagesTrack;
+		
+		boolean saved = false;
+		if ( targetTrack != null ) {
+			
+			Path albumPath = targetTrack.getAlbumPath();
+			Path artistPath = null;
+			
+			if ( albumPath != null && Utils.isArtistDirectory( albumPath.getParent() ) ) {
+				artistPath = albumPath.getParent();
+			}
+			
+			List <ImageSaveLocation> choices = new ArrayList<>();
+			
+			if ( artistPath != null ) {
+				choices.add ( ImageSaveLocation.GENERAL_FILE );
+			}
+			
+			if (albumPath != null ) {
+				choices.add ( ImageSaveLocation.ALBUM_FILE );
+				choices.add ( ImageSaveLocation.ALBUM_ID3 );
+			} 
+			
+			choices.add( ImageSaveLocation.TRACK_ID3 );
+										
+			ChoiceDialog <ImageSaveLocation> choiceDialog = new ChoiceDialog<> ( 
+				null, choices
+			);
+			
+			choiceDialog.setTitle( "Set Artist Image" );
+			choiceDialog.setHeaderText( "Choose Location" );
+			double x = mainStage.getX() + mainStage.getWidth() / 2 - 200; //It'd be nice to use alert.getWidth() / 2, but it's NAN now. 
+			double y = mainStage.getY() + mainStage.getHeight() / 2 - 100;
+			choiceDialog.setX ( x );
+			choiceDialog.setY ( y );
+			
+			Optional<ImageSaveLocation> choice = choiceDialog.showAndWait();
+			
+			if ( choice.isPresent() ) {
+				switch ( choice.get() ) {
+					
+					case ALBUM_FILE:
+						Utils.saveImageToDisk( albumPath.resolve( "artist.png" ), buffer );
+						setImages ( currentImagesTrack );
+						break;
+						
+					case GENERAL_FILE:
+						Utils.saveImageToDisk( artistPath.resolve( "artist.png" ), buffer );
+						setImages ( currentImagesTrack );
+						break;
+
+					case ALBUM_ID3:
+						setArtistImage ( new Image ( new ByteArrayInputStream ( buffer ) ) );
+						
+						Thread workerThread = new Thread ( () -> {
+							try ( DirectoryStream <Path> stream = Files.newDirectoryStream( albumPath ) ) {
+								for ( Path child : stream ) {
+									if ( Utils.isMusicFile( child ) ) {
+										Utils.saveArtistImageToID3 ( child.toFile(), buffer );
+									}
+								}
+							} catch ( IOException e ) {
+								//TODO: 
+							}
+
+							Platform.runLater( () -> setImages ( currentImagesTrack ) );
+						});
+						
+						workerThread.setDaemon( false );
+						workerThread.start();
+						
+						break;
+						
+					case TRACK_ID3:
+						Utils.saveArtistImageToID3 ( targetTrack.getPath().toFile(), buffer );
+						setImages ( currentImagesTrack );
+						break;
+						
+				}
+			}
+		}
+	}
+	
+	public void setImages ( Track track ) {
+		currentImagesTrack = track;
+		if ( track != null ) {
+			setAlbumImage( track.getAlbumCoverImage() );
+			setArtistImage( track.getAlbumArtistImage( ) );
+		} else {
+			setAlbumImage ( null );
+			setArtistImage ( null );
+		}
 	}
 
 	public void setAlbumImage ( Image image ) {
@@ -1127,7 +1395,7 @@ public class FXUI implements PlayerListener {
 			boxSelected = (Boolean)newValueIn;
 		}
 			
-		if ( track.hasAlbum() && boxSelected ) {
+		if ( track.hasAlbumDirectory() && boxSelected ) {
 			return false;
 		} 
 	
@@ -1426,8 +1694,7 @@ public class FXUI implements PlayerListener {
 		
 		albumTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
 		    if (newSelection != null) {
-				setAlbumImage( newSelection.getAlbumCoverImage() );
-				setArtistImage( newSelection.getAlbumArtistImage( ) );
+		    	setImages ( newSelection.getTracks().get( 0 ) );
 		    }
 		});
 
@@ -1660,8 +1927,7 @@ public class FXUI implements PlayerListener {
 		
 		trackTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
 		    if (newSelection != null) {
-				setAlbumImage( newSelection.getAlbumCoverImage() );
-				setArtistImage( newSelection.getAlbumArtistImage( ) );
+		    	setImages ( newSelection );
 		    }
 		});
 		
@@ -2253,8 +2519,7 @@ public class FXUI implements PlayerListener {
 		
 		currentListTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
 		    if (newSelection != null) {
-				setAlbumImage( newSelection.getAlbumCoverImage() );
-				setArtistImage( newSelection.getAlbumArtistImage( ) );
+		    	setImages ( newSelection );
 		    }
 		});
 		
@@ -2624,7 +2889,7 @@ public class FXUI implements PlayerListener {
 				switch ( setting ) {
 					//TODO: These don't belong here. 
 					case TRACK:
-						Track track = new Track ( Paths.get( value ), false );
+						Track track = new Track ( Paths.get( value ) );
 						player.playTrack( track, true );
 						break;
 						
@@ -2746,9 +3011,7 @@ public class FXUI implements PlayerListener {
 			thumb.setVisible( true );
 			
 			trackInfo.setText( track.getArtist() + " - " + track.getTitle() );
-	
-			setAlbumImage( track.getAlbumCoverImage() );
-			setArtistImage( track.getAlbumArtistImage( ) );
+			setImages( track );
 		});
 	}
 

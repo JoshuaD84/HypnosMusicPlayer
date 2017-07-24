@@ -1,6 +1,9 @@
 package net.joshuad.hypnos;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.URLDecoder;
@@ -56,6 +59,7 @@ public class Hypnos extends Application {
 	private static Path rootDirectory;
 	private static boolean isStandalone = false;
 	private static boolean isDeveloping = false;
+	private static boolean disableHotkeys = false;
 	
 	private static Persister persister;
 	private static AudioSystem player;
@@ -88,9 +92,11 @@ public class Hypnos extends Application {
 				
 		isStandalone = Boolean.getBoolean( "hypnos.standalone" );
 		isDeveloping = Boolean.getBoolean( "hypnos.developing" );
+		disableHotkeys = Boolean.getBoolean( "hypnos.disableglobalhotkeys" );
 		
 		if ( isStandalone ) LOGGER.config ( "Running as standalone" );
 		if ( isDeveloping ) LOGGER.config ( "Running on development port" );
+		if ( isDeveloping ) LOGGER.config ( "Global hotkeys disabled" );
 	}
 	
 	private void determineOS() {
@@ -159,22 +165,35 @@ public class Hypnos extends Application {
 	}
 	
 	private void startGlobalHotkeyListener() {
-
-		try {
-			LogManager.getLogManager().reset();
-			Logger logger = Logger.getLogger( GlobalScreen.class.getPackage().getName() );
-			logger.setLevel( Level.OFF );
-
-			GlobalScreen.registerNativeHook();
+		
+		if ( !disableHotkeys ) {
+			PrintStream out = System.out;
 			
-		} catch ( NativeHookException ex ) {
-			LOGGER.warning( "There was a problem registering the global hotkey listeners. Global Hotkeys are disabled." );
-			//TODO: set a boolean and put an indicator in the UI somewhere? 
+			try {
+				//This suppresses the lgpl banner from the hotkey library. 
+				System.setOut( new PrintStream ( new OutputStream() {
+				    @Override public void write(int b) throws IOException {}
+				}));
+			
+				LogManager.getLogManager().reset();
+				Logger logger = Logger.getLogger( GlobalScreen.class.getPackage().getName() );
+				logger.setLevel( Level.OFF );
+	
+				GlobalScreen.registerNativeHook();
+				
+			} catch ( NativeHookException ex ) {
+				LOGGER.warning( "There was a problem registering the global hotkey listeners. Global Hotkeys are disabled." );
+				//TODO: set a boolean and put an indicator in the UI somewhere? 
+			} finally {
+				System.setOut( out );
+			}
 		}
 		
 		hotkeys = new GlobalHotkeys();
 		
-		GlobalScreen.addNativeKeyListener( hotkeys );
+		if ( !disableHotkeys ) {
+			GlobalScreen.addNativeKeyListener( hotkeys );
+		}
 	}
 	
 	public static boolean hotkeysEnabled () {

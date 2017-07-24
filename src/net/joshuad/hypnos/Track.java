@@ -1,8 +1,11 @@
 package net.joshuad.hypnos;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,6 +15,8 @@ import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -60,6 +65,8 @@ public class Track implements Serializable {
 	private File trackFile;
 	private boolean hasAlbum = false;
 	
+	File albumDirectory = null;
+	
 	private String artist = "";
 	private String albumArtist = "";
 	private String title = "";
@@ -79,7 +86,7 @@ public class Track implements Serializable {
 	private String encodingType;
 	private String format;
 	
-	public static final DirectoryStream.Filter<Path> imageFileFilter = new DirectoryStream.Filter<Path>() {
+	private static final DirectoryStream.Filter<Path> imageFileFilter = new DirectoryStream.Filter<Path>() {
 		@Override
 		public boolean accept ( Path entry ) throws IOException {
 			return Utils.isImageFile ( entry );			
@@ -87,19 +94,26 @@ public class Track implements Serializable {
 	};
 	
 	public Track ( Path trackPath ) throws IOException {
-		this ( trackPath, false );
-	}
-	
-	//TODO: Deal w/ these exceptions right, don't throw them. Catch them and fill in data as best you can. 
-	public Track ( Path trackPath, boolean hasAlbum ) throws IOException {
-
-		Logger.getLogger( "org.jaudiotagger" ).setLevel( Level.OFF );
 		this.trackFile = trackPath.toFile();
-		this.hasAlbum = hasAlbum;
-		
+		Logger.getLogger( "org.jaudiotagger" ).setLevel( Level.OFF );
 		refreshTagData();
 	}
 	
+	public Track ( Path trackPath, Path albumPath ) throws IOException {
+		this ( trackPath );
+		if ( albumPath != null ) {
+			this.albumDirectory = albumPath.toFile();
+		}
+	}
+	
+	public Path getAlbumPath() {
+		if ( albumDirectory == null ) {
+			return null;
+		} else {
+			return albumDirectory.toPath();
+		}
+	}
+		
 	//TODO: Why does it catch all other exceptions but throw IO? 
 	public void refreshTagData() throws IOException {
 		Tag tag = null;
@@ -490,10 +504,10 @@ public class Track implements Serializable {
 		}
 	}
 	
-	public boolean hasAlbum() {
-		return hasAlbum;
+	public boolean hasAlbumDirectory() {
+		return albumDirectory != null;
 	}
-	
+		
 	public boolean equals( Object o ) {
 		if ( !( o instanceof Track ) ) return false;
 		
@@ -504,20 +518,23 @@ public class Track implements Serializable {
 	
 	public Image getAlbumCoverImage ( ) {
 		
-		if ( this.getPath().getParent() != null ) {
-			
-			ArrayList <Path> preferredFiles = new ArrayList <Path> ();
-			
-			preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "front.jpg" ) );
-			preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "front.png" ) );
-			preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "cover.jpg" ) );
-			preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "cover.png" ) );
-			preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "album.jpg" ) );
-			preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "album.png" ) );
-			
-			for ( Path test : preferredFiles ) {
-				if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
-					return new Image( test.toUri().toString() );
+		if ( hasAlbumDirectory() ) {
+		
+			if ( this.getPath().getParent() != null ) {
+				
+				ArrayList <Path> preferredFiles = new ArrayList <Path> ();
+
+				preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "front.png" ) );
+				preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "front.jpg" ) );
+				preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "cover.png" ) );
+				preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "cover.jpg" ) );
+				preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "album.png" ) );
+				preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "album.jpg" ) );
+				
+				for ( Path test : preferredFiles ) {
+					if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
+						return new Image( test.toUri().toString() );
+					}
 				}
 			}
 		}
@@ -555,23 +572,26 @@ public class Track implements Serializable {
 		if ( mediaImage != null ) return mediaImage;
 		if ( otherImage != null ) return otherImage;
 
-		if ( this.getPath().getParent() != null ) {
-			ArrayList<Path> otherFiles = new ArrayList<Path>();
-			try {
-				DirectoryStream <Path> albumDirectoryStream = Files.newDirectoryStream ( this.getPath().getParent(), imageFileFilter );
-				for ( Path imagePath : albumDirectoryStream ) { 
-					if ( !imagePath.toString().toLowerCase().matches( ".*artist\\.\\w{3,6}$" ) ) {
-						otherFiles.add( imagePath ); 
+		if ( hasAlbumDirectory() ) {
+				
+			if ( this.getPath().getParent() != null ) {
+				ArrayList<Path> otherFiles = new ArrayList<Path>();
+				try {
+					DirectoryStream <Path> albumDirectoryStream = Files.newDirectoryStream ( this.getPath().getParent(), imageFileFilter );
+					for ( Path imagePath : albumDirectoryStream ) { 
+						if ( !imagePath.toString().toLowerCase().matches( ".*artist\\.\\w{3,6}$" ) ) {
+							otherFiles.add( imagePath ); 
+						}
 					}
+				
+				} catch ( IOException e ) {
+					//TODO: I think we can ignore this one. 
 				}
-			
-			} catch ( IOException e ) {
-				//TODO: I think we can ignore this one. 
-			}
-			
-			for ( Path test : otherFiles ) {
-				if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
-					return new Image( test.toUri().toString() );
+				
+				for ( Path test : otherFiles ) {
+					if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
+						return new Image( test.toUri().toString() );
+					}
 				}
 			}
 		}
@@ -581,26 +601,30 @@ public class Track implements Serializable {
 		return null;
 	}
 
-	public Image getAlbumArtistImage ( ) {
 
-		if ( this.getPath().getParent() != null ) {
+	public Image getAlbumArtistImage ( ) {
 		
-			Path targetPath = this.getPath().toAbsolutePath();
+		if ( hasAlbumDirectory() ) {
+	
+			if ( this.getPath().getParent() != null ) {
 			
-			ArrayList <Path> possibleFiles = new ArrayList <Path> ();
-			possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.jpg" ) );
-			possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.png" ) );
-			possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.gif" ) );
-			
-			if ( this.getPath().getParent().getParent() != null ) {
-				possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.jpg" ) );
-				possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.png" ) );
-				possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.gif" ) );
-			}
-			
-			for ( Path test : possibleFiles ) {
-				if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
-					return new Image( test.toUri().toString() );
+				Path targetPath = this.getPath().toAbsolutePath();
+				
+				ArrayList <Path> possibleFiles = new ArrayList <Path> ();
+				possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.png" ) );
+				possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.jpg" ) );
+				possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.gif" ) );
+				
+				if ( this.getPath().getParent().getParent() != null ) {
+					possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.png" ) );
+					possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.jpg" ) );
+					possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.gif" ) );
+				}
+				
+				for ( Path test : possibleFiles ) {
+					if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
+						return new Image( test.toUri().toString() );
+					}
 				}
 			}
 		}
@@ -615,10 +639,11 @@ public class Track implements Serializable {
 			List<Artwork> artworkList = getAudioFile().getTag().getArtworkList(); //TODO: This line can throw a NPE
 			if ( artworkList != null ) {
 				for ( Artwork artwork : artworkList ) {
-					if ( artwork.getPictureType() == 7 ) {	
-						leadArtistImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
-					} else if ( artwork.getPictureType() == 8 ) {
+					
+					if ( artwork.getPictureType() == 8 ) {
 						artistImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
+					} else if ( artwork.getPictureType() == 7 ) {	
+						leadArtistImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
 					} else if ( artwork.getPictureType() == 12 ) {
 						writerImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
 					} else if ( artwork.getPictureType() == 13 ) {
@@ -633,9 +658,9 @@ public class Track implements Serializable {
 		} catch ( NullPointerException e ) {
 			//TODO:
 		}
-		
-		if ( leadArtistImage != null ) return leadArtistImage;
+
 		if ( artistImage != null ) return artistImage;
+		if ( leadArtistImage != null ) return leadArtistImage;
 		if ( writerImage != null ) return writerImage;
 		if ( logoImage != null ) return logoImage;
 	

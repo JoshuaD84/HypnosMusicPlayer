@@ -1,7 +1,11 @@
 package net.joshuad.hypnos;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -14,6 +18,23 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
+
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.CannotWriteException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.TagException;
+import org.jaudiotagger.tag.id3.ID3v1Tag;
+import org.jaudiotagger.tag.id3.ID3v23Tag;
+import org.jaudiotagger.tag.images.Artwork;
+import org.jaudiotagger.tag.images.StandardArtwork;
+
+import me.xdrop.fuzzywuzzy.FuzzySearch;
 
 public class Utils {
 
@@ -183,32 +204,100 @@ public class Utils {
 		return retMe;
 	}
 	
-	public static boolean isAlbumDirectory ( Path path ) {
-		//TODO: This doesn't work perfectly. See "misc" folder
+	public static boolean isArtistDirectory ( Path path ) {
 		if ( !Files.isDirectory( path ) ) return false;
 		
-		boolean hasChildAlbumDirectory = false;
-		boolean hasChildTrack = false;
+		String directoryName = prepareArtistForCompare ( path.getFileName().toString() );
 		
-		try ( 
-			DirectoryStream <Path> stream = Files.newDirectoryStream( path ); 
-		) {
+		int entries = 0;
+		
+		try ( DirectoryStream <Path> stream = Files.newDirectoryStream( path ) ) {
 			for ( Path child : stream ) {
-				if ( Files.isDirectory( child ) ) {
-					if ( isAlbumDirectory ( child ) ) {
-						hasChildAlbumDirectory = true;
-					}
-				}
-				
-				if ( Utils.isMusicFile( child ) ) {
-					hasChildTrack = true;
+				if ( isAlbumDirectory ( child ) ) {
+					entries++;
+					Album album = new Album ( child );
+					int matchPercent = FuzzySearch.weightedRatio( directoryName, prepareArtistForCompare ( album.getAlbumArtist() ) );
+					if ( matchPercent < 90 ) return false;
+					
+					
+				} else if ( isMusicFile( child ) ) {
+					entries++;
+					Track track = new Track ( child );
+					int matchPercent = FuzzySearch.weightedRatio( directoryName, prepareArtistForCompare ( track.getAlbumArtist() ) );
+					if ( matchPercent < 90 ) return false;
 				}
 			}
 		} catch ( IOException e ) {
 			return false;
 		}
 		
-		if ( hasChildAlbumDirectory ) return false;
+		if ( entries > 0 ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	private static String prepareArtistForCompare ( String string ) {
+		return string
+			.toLowerCase()
+			.replaceAll( " & ", " and " )
+			.replaceAll( "&", " and " )
+			.replaceAll( " \\+ ", " and ")
+			.replaceAll( "\\+", " and " )
+			.replaceAll( "  ", " " )
+			.replaceAll( " the ", "" )
+			.replaceAll( "^the ", "" )
+			.replaceAll( ", the$", "" )
+			.replaceAll( "-", " " )
+			.replaceAll( "\\.", "" )
+			.replaceAll( "_", " ")
+		;
+	}
+	
+	private static String prepareAlbumForCompare ( String string ) {
+		return string.toLowerCase();
+	}
+	
+	public static boolean isAlbumDirectory ( Path path ) {
+		if ( !Files.isDirectory( path ) ) return false;
+		
+		boolean hasChildTrack = false;
+		
+		String albumName = null;
+		String artistName = null;
+		
+		try ( 
+			DirectoryStream <Path> stream = Files.newDirectoryStream( path ); 
+		) {
+			for ( Path child : stream ) {
+				if ( isAlbumDirectory ( child ) ) {
+					return false;
+				}
+				
+				if ( Utils.isMusicFile( child ) ) {
+					Track track = new Track ( child );
+					if ( albumName == null ) {
+						albumName = prepareAlbumForCompare ( track.getSimpleAlbumTitle() );
+						artistName = prepareArtistForCompare ( track.getAlbumArtist() );
+						
+					} else {
+						int albumMatchPercent = FuzzySearch.weightedRatio( albumName, prepareAlbumForCompare ( track.getSimpleAlbumTitle() ) );
+						if ( albumMatchPercent < 90 ) {
+							return false;
+						}
+						
+						int artistMatchPercent = FuzzySearch.weightedRatio( artistName, prepareArtistForCompare ( track.getAlbumArtist() ) );
+						if ( artistMatchPercent < 90 ) {
+							return false;
+						}
+					}
+					hasChildTrack = true;
+				}
+			}
+		} catch ( IOException e ) {
+			return false;
+		}
 		
 		if ( hasChildTrack ) return true;
 		else return false;
@@ -226,6 +315,60 @@ public class Utils {
 		}
 		
 		return new ArrayList <Path> ();
+	}
+	
+	public static boolean saveImageToDisk ( Path location, byte[] buffer ) {
+		
+		if ( location == null ) {
+			return false;
+		}
+		
+		InputStream in = new ByteArrayInputStream ( buffer );
+		
+		try {
+			BufferedImage bImage = ImageIO.read( in );
+			ImageIO.write ( bImage, "png", location.toFile() );
+			return true;
+			
+		} catch ( IOException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public static void saveArtistImageToID3 ( File file, byte[] buffer ) {
+		saveImageToID3 ( file, buffer, 8 );
+	}
+	
+
+	public static void saveAlbumImageToID3 ( File file, byte[] buffer ) {
+		saveImageToID3 ( file, buffer, 3 );
+	}
+	
+	private static void saveImageToID3 ( File file, byte[] buffer, int type ) {
+		try {
+			
+			AudioFile audioFile = AudioFileIO.read( file );
+			Tag tag = audioFile.getTag();
+			
+			if ( tag instanceof ID3v1Tag ) {
+				tag = new ID3v23Tag ( (ID3v1Tag)tag );
+			}
+			
+			Artwork artwork = new StandardArtwork();
+			artwork.setBinaryData( buffer );
+			artwork.setPictureType( type ); //See ID3 specifications for why 8 
+			
+			tag.addField( artwork );
+			
+			audioFile.setTag( tag );
+			AudioFileIO.write( audioFile );
+			
+		} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException | CannotWriteException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
 
