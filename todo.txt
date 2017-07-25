@@ -7,24 +7,12 @@ New Features
 	have hotkeys work on tables, but only when they ahve focus. 
 		Decide if we like the onKeyPress paradigm better for in-program hotkeys
 		and if we do, implement it on every table. 
-		F2 to rename stuff. Maybe show tag window. 
-	
-	Some loading progress indicator while the list is loading new data, maybe? 
-			
-	Log -> Submit error report button	
-	
-	Add artist to playlist info 
 	
 Bug Fixes / Incremental Improvements
 
-	Drag and drop artwork into artpanes. 
-
-	hard-to-sort/ConnorObsert - HEre's to speical treatment
-		Drag ot current list, click on tracks. Very slow. 
-
 	Save after modifing stuff more frequently. Playlist delete. 
 
-	Renaming a playlist doesn't refresh the playlist table. 
+	Adding tracks to a playlist doesn't refresh the playlist info screen
 	
 	Save hotkeys and settings configuratin whenever you close config and info window. 
 
@@ -33,9 +21,7 @@ Bug Fixes / Incremental Improvements
 		for Linux, just add a label to the dialog and tell them to consume the hotkey using some other program
 
 	try to play a missing file. It keeps throwing exception. Only throw it once.
-	
-	Spamming next/previous/stop/play/whatever via hotkey freezes things. 
-		
+			
 	Make sure horizontal scroll bars never appear
 		6/9 - Can't find anything on google.
 	
@@ -63,8 +49,6 @@ Bug Fixes / Incremental Improvements
 	https://stackoverflow.com/questions/45269173/stage-seticonified-and-stage-isiconified-not-acting-properly
 	
 	While loading the library, the table view scrolls a little bit. 
-	
-	The width on the volume button needs to be set to a minimum to avoid shifting. 
 	
 	
 Refactor / organize my code. 

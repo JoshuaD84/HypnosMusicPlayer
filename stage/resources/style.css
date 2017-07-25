@@ -31,12 +31,13 @@
 
 .volumeButton {
    -fx-background-color: transparent;
+   -fx-pref-width: 50px;
 }
 
-.volumeButton:hover{
+.volumeButton:hover {
    -fx-text-fill: cornflowerblue;
 }
 
-.volumeButton:pressed{
+.volumeButton:pressed {
    -fx-text-fill: grey;
 }

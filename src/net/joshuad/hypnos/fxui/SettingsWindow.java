@@ -52,7 +52,7 @@ public class SettingsWindow extends Stage {
 	private GlobalHotkeys hotkeys;
 	
 	private TabPane tabPane;
-	private Tab hotkeysTab;
+	private Tab globalHotkeysTab;
 	
 	private EnumMap <Hotkey, TextField> hotkeyFields = new EnumMap <Hotkey, TextField> ( Hotkey.class );
 	
@@ -75,12 +75,12 @@ public class SettingsWindow extends Stage {
 		
 		
 		Tab settingsTab = setupSettingsTab( root );
-		hotkeysTab = setupHotkeysTab ( root );
+		globalHotkeysTab = setupGlobalHotkeysTab ( root );
 		Tab logTab = setupLogTab( root );
 		Tab tagTab = setupTagTab ( root );
 		Tab aboutTab = setupAboutTab( root ); 
 		
-		tabPane.getTabs().addAll( settingsTab, hotkeysTab, logTab, tagTab, aboutTab );
+		tabPane.getTabs().addAll( settingsTab, globalHotkeysTab, logTab, tagTab, aboutTab );
 		
 		tabPane.prefWidthProperty().bind( root.widthProperty() );
 		tabPane.prefHeightProperty().bind( root.heightProperty() );
@@ -93,13 +93,13 @@ public class SettingsWindow extends Stage {
 		refreshHotkeyFields();
 	}	
 	
-	private Tab setupHotkeysTab ( Pane root ) {
+	private Tab setupGlobalHotkeysTab ( Pane root ) {
 		GridPane content = new GridPane();
 		content.setAlignment( Pos.TOP_CENTER );
 		content.setPadding( new Insets ( 10 ) );
 		content.setVgap( 2 );
 		
-		Tab hotkeysTab = new Tab ( "Hotkeys" );
+		Tab hotkeysTab = new Tab ( "Global Hotkeys" );
 		hotkeysTab.setClosable( false );
 		hotkeysTab.setContent( content );
 		
@@ -266,7 +266,7 @@ public class SettingsWindow extends Stage {
 	}
 	
 	private Tab setupLogTab( Pane root ) {
-		Tab logTab = new Tab ( "Logs" );
+		Tab logTab = new Tab ( "Log" );
 		logTab.setClosable( false );
 		VBox logPane = new VBox();
 		logTab.setContent( logPane );
@@ -468,10 +468,10 @@ public class SettingsWindow extends Stage {
 
 	public boolean hotkeysEnabled () {
 		if ( tabPane == null ) return true;
-		if ( hotkeysTab == null ) return true;
+		if ( globalHotkeysTab == null ) return true;
 		if ( !this.isShowing() ) return true;
 		
-		if ( tabPane.getSelectionModel().getSelectedItem().equals( this.hotkeysTab ) )  {
+		if ( tabPane.getSelectionModel().getSelectedItem().equals( this.globalHotkeysTab ) )  {
 			return false;
 		}
 		

@@ -545,33 +545,28 @@ public class Track implements Serializable {
 		Image mediaImage = null;
 		
 		try {
-			List<Artwork> artworkList = getAudioFile().getTag().getArtworkList();//TODO: This line can throw a NPE
+			List<Artwork> artworkList = getAudioFile().getTag().getArtworkList();
 			if ( artworkList != null ) {
 				for ( Artwork artwork : artworkList ) {
 					if ( artwork.getPictureType() == 3 ) {	
 						coverImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
+						if ( coverImage != null ) return coverImage;
 					} else if ( artwork.getPictureType() == 0 ) {
 						otherImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
-					} else if ( artwork.getPictureType() == 4 ) {
-						backImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
+						if ( otherImage != null ) return otherImage;
 					} else if ( artwork.getPictureType() == 6 ) {
 						mediaImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
+						if ( mediaImage != null ) return mediaImage;
 					}
 				}
 			}			
 			
-		} catch ( IOException | CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
+		} catch ( NullPointerException | IOException | CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
 			// TODO Auto-generated catch block
 			// TODO CannotReadException for Test Cases/long.m4a
 			e.printStackTrace( System.out );
-		} catch ( NullPointerException e ) {
-			//TODO:
-		}
+		} 
 		
-		if ( coverImage != null ) return coverImage;
-		if ( mediaImage != null ) return mediaImage;
-		if ( otherImage != null ) return otherImage;
-
 		if ( hasAlbumDirectory() ) {
 				
 			if ( this.getPath().getParent() != null ) {
@@ -595,9 +590,6 @@ public class Track implements Serializable {
 				}
 			}
 		}
-		
-		if ( backImage != null ) return backImage;
-		
 		return null;
 	}
 

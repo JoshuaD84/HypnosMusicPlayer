@@ -61,7 +61,7 @@ public class PlaylistInfoWindow extends Stage {
 		this.initModality( Modality.NONE );
 		this.initOwner( ui.getMainStage() );
 		this.setTitle( "Album Info" );
-		this.setWidth( 500 );
+		this.setWidth( 600 );
 		this.setHeight( 400 );
 		Pane root = new Pane();
 		Scene scene = new Scene( root );
@@ -88,38 +88,24 @@ public class PlaylistInfoWindow extends Stage {
 	@SuppressWarnings("unchecked")
 	private void setupPlaylistTable ( VBox primaryPane ) {
 		
-		TableColumn<Track, Integer> trackNumberColumn = new TableColumn<Track, Integer>( "#" );
+		TableColumn<Track, String> artistColumn = new TableColumn<Track, String>( "Artist" );
 		TableColumn<Track, String> titleColumn = new TableColumn<Track, String>( "Title" );
 		TableColumn<Track, Integer> lengthColumn = new TableColumn<Track, Integer>( "Length" );
 		
-		trackNumberColumn.setMaxWidth( 70000 );
+		artistColumn.setMaxWidth( 400000 );
 		titleColumn.setMaxWidth( 500000 );
 		lengthColumn.setMaxWidth( 90000 );
 		
-		trackNumberColumn.setEditable( false );
+		artistColumn.setEditable( false );
 		titleColumn.setEditable( false );
 		lengthColumn.setEditable( false );
 		
-		trackNumberColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "trackNumber" ) );
+		artistColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Artist" ) );
 		titleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
 		lengthColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "LengthDisplay" ) );
 		
-		trackNumberColumn.setCellFactory( column -> {
-			return new TableCell <Track, Integer>() {
-				@Override
-				protected void updateItem ( Integer value, boolean empty ) {
-					super.updateItem( value, empty );
-
-					if ( value == null || value.equals( Track.NO_TRACK_NUMBER ) || empty ) {
-						setText( null );
-					} else {
-						setText( value.toString() );
-					}
-				}
-			};
-		} );
 		trackTable = new TableView<Track> ();
-		trackTable.getColumns().addAll( trackNumberColumn, titleColumn, lengthColumn );
+		trackTable.getColumns().addAll( artistColumn, titleColumn, lengthColumn );
 		trackTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
 		trackTable.setEditable( true );
 		trackTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );

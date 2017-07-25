@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedByInterruptException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -321,6 +322,7 @@ public class FXUI implements PlayerListener {
 		player.addPlayerListener ( this );
 	}
 	
+	//TODO: Does this function need to exist? 
 	private void removeFromCurrentList ( List<Integer> removeMe ) {
 		
 		if ( !removeMe.isEmpty() ) {
@@ -874,11 +876,34 @@ public class FXUI implements PlayerListener {
 		}
 	}
 	
+	private Thread imageLoader = null;
 	public void setImages ( Track track ) {
 		currentImagesTrack = track;
 		if ( track != null ) {
-			setAlbumImage( track.getAlbumCoverImage() );
-			setArtistImage( track.getAlbumArtistImage( ) );
+			if ( imageLoader != null ) {
+				imageLoader.interrupt();
+			}
+			
+			FXUI ui = this;
+			
+			imageLoader = new Thread ( ) {
+				public void run() {
+					Image albumImage = track.getAlbumCoverImage();
+					Image artistImage = track.getAlbumArtistImage();
+				
+					if ( !this.isInterrupted() ) { 
+						
+						Platform.runLater( () -> {
+							setAlbumImage( albumImage );
+							setArtistImage( artistImage );
+						});
+					}
+				}
+			};
+			
+			imageLoader.setDaemon( true );
+			imageLoader.start();
+			
 		} else {
 			setAlbumImage ( null );
 			setArtistImage ( null );
@@ -1028,6 +1053,7 @@ public class FXUI implements PlayerListener {
 			library.removePlaylist( playlist );
 			playlist.setName ( enteredName );
 			library.addPlaylist( playlist );
+			playlistTable.refresh();
 		}
 	}
 
@@ -2097,11 +2123,15 @@ public class FXUI implements PlayerListener {
 			}
 		});
 
-		
 		playlistTable.setOnKeyPressed( ( KeyEvent e ) -> {
 			if ( e.getCode() == KeyCode.ESCAPE ) {
 				playlistTable.getSelectionModel().clearSelection();
+				
+			} else if ( e.getCode() == KeyCode.F2 ) {
+				Playlist renameMe = playlistTable.getSelectionModel().getSelectedItem();
+				this.promptAndRenamePlaylist( renameMe );
 			}
+				
 		});
 		
 		playlistTable.setOnDragOver( event -> {
@@ -2493,9 +2523,10 @@ public class FXUI implements PlayerListener {
 			@Override
 			public void handle ( ActionEvent event ) {
 				ObservableList <Integer> selectedIndexes = currentListTable.getSelectionModel().getSelectedIndices();
+				List <Integer> removeMe = new ArrayList<> ( selectedIndexes );
 				int selectAfterDelete = selectedIndexes.get( 0 ) - 1;
-				removeFromCurrentList ( new ArrayList<Integer> ( selectedIndexes ) );
-				currentListTable.getSelectionModel().clearAndSelect( selectAfterDelete );
+				currentListTable.getSelectionModel().clearSelection();
+				removeFromCurrentList ( removeMe );
 			}
 		});
 				
