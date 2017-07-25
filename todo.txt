@@ -4,12 +4,33 @@ New Features
 		
 	Log to file, how does that work inside java? 
 		
-	have hotkeys work on tables, but only when they ahve focus. 
-		Decide if we like the onKeyPress paradigm better for in-program hotkeys
-		and if we do, implement it on every table. 
+	In-program Hotkeys
+		Playlist Table
+			Decide on a hotkey for info. 
+			
+		Album Table
+		Track Table
+		Queue Table
+		History Table
+		Album Info Table
+		Playlist Info table
 	
+	Tab in settings window for in-program hotkeys. 
+			
+	Add export button to playlist table menu
+	
+	Drag and drop from misc places to system
+		playlist table -> m3u
+		track table, history, queue, info windows, current table -> single tracks
+		album table -> folder
+	
+	Add tag image info to tag window
+
+
 Bug Fixes / Incremental Improvements
 
+	Volume change / mute when there is no track loaded.
+	
 	Save after modifing stuff more frequently. Playlist delete. 
 
 	Adding tracks to a playlist doesn't refresh the playlist info screen
@@ -179,21 +200,3 @@ Future Features, maybe:
 	Dark Stylesheet 
 	
 	
-Note
-	You can increase the slider button size by increasing the font size.
-
-
-
-	try {
-				l
-				CurrentListTrack addMe = new CurrentListTrack ( playMe );
-				currentList.clear();
-				currentList.add( addMe );
-				player.playTrack( addMe );
-				listInfoUpdater.tracksLoaded( );
-			} catch ( IOException e ) {
-				LOGGER.log( Level.INFO, e.getMessage() + "\nError opening file from queue: " + playMe.getPath() );
-				notifyUserError( "Cannot play.\n\n" + e.getMessage() );
-			}
-	
-

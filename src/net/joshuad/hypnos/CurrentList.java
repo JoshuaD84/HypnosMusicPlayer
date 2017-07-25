@@ -333,9 +333,15 @@ public class CurrentList {
 			albumsSet ( albums );
 			
 		} else if ( startMode == Mode.ALBUM || startMode == Mode.ALBUM_REORDERED ) {
+			boolean startedReordered = ( startMode == Mode.ALBUM_REORDERED );
+			
 			List<Album> fullAlbumList = new ArrayList<Album> ( currentAlbums );
 			fullAlbumList.addAll ( albums );
 			albumsSet ( fullAlbumList );
+			
+			if ( startedReordered && mode == Mode.ALBUM ) {
+				mode = Mode.ALBUM_REORDERED;
+			}
 			
 			if ( index != 0 && !insertedAtEnd ) {
 				listReordered();

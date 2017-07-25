@@ -2075,49 +2075,56 @@ public class FXUI implements PlayerListener {
 		MenuItem removeMenuItem = new MenuItem( "Remove" );
 		contextMenu.getItems().addAll( playMenuItem, appendMenuItem, enqueueMenuItem, renameMenuItem, infoMenuItem, removeMenuItem );
 
-		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				if ( okToReplaceCurrentList() ) {
-					player.getCurrentList().setPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
-					player.play();
+		playMenuItem.setOnAction( ( ActionEvent event ) -> {
+			if ( okToReplaceCurrentList() ) {
+				player.getCurrentList().setPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
+				player.play();
+			}
+		});
+
+		appendMenuItem.setOnAction( ( ActionEvent event ) -> {
+			player.getCurrentList().appendPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
+		});
+		
+		enqueueMenuItem.setOnAction( ( ActionEvent event ) -> {
+			player.getQueue().addAllPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
+		});
+		
+		renameMenuItem.setOnAction( ( ActionEvent event ) -> {
+			promptAndRenamePlaylist ( playlistTable.getSelectionModel().getSelectedItem() );
+		});
+		
+		infoMenuItem.setOnAction( ( ActionEvent event ) -> {
+			//TODO: Multiple selections, deal with or is this ok? 
+			playlistInfoWindow.setPlaylist ( playlistTable.getSelectionModel().getSelectedItem() );
+			playlistInfoWindow.show();
+		});
+
+		removeMenuItem.setOnAction( ( ActionEvent event ) -> {
+			
+			List <Playlist> deleteMe = playlistTable.getSelectionModel().getSelectedItems();
+			if ( deleteMe.size() == 0 ) return;
+			
+			Alert alert = new Alert( AlertType.CONFIRMATION );
+			
+			alert.setTitle( "Confirm" );
+			alert.setHeaderText( "Delete Playlist Requested" );
+			String text = "Are you sure you want to delete theses playlists?\n";
+			int count = 0;
+			for ( Playlist playlist : deleteMe ) { 
+				text += "\n  " + playlist.getName(); 
+				count++;
+				if ( count > 6 ) { 
+					text += "\n  <... and more>";
+					break;
 				}
-			}
-		});
+			};
+			
+			alert.setContentText( text );
 
-		appendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				player.getCurrentList().setTracks ( playlistTable.getSelectionModel().getSelectedItem().getTracks() );
-			}
-		});
-		
-		enqueueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				player.getQueue().addAllPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
-			}
-		});
-		
-		renameMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				promptAndRenamePlaylist ( playlistTable.getSelectionModel().getSelectedItem() );
-			}
-		});
-		
-		infoMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				//TODO: Multiple selections, deal with or is this ok? 
-				playlistInfoWindow.setPlaylist ( playlistTable.getSelectionModel().getSelectedItem() );
-				playlistInfoWindow.show();
-			}
-		});
-
-		removeMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
+			Optional <ButtonType> result = alert.showAndWait();
+			
+			if ( result.get() == ButtonType.OK ) {
 				library.removePlaylists( playlistTable.getSelectionModel().getSelectedItems() );
 				playlistTable.getSelectionModel().clearSelection();
 			}
@@ -2128,10 +2135,20 @@ public class FXUI implements PlayerListener {
 				playlistTable.getSelectionModel().clearSelection();
 				
 			} else if ( e.getCode() == KeyCode.F2 ) {
-				Playlist renameMe = playlistTable.getSelectionModel().getSelectedItem();
-				this.promptAndRenamePlaylist( renameMe );
-			}
+				renameMenuItem.fire();
 				
+			} else if ( e.getCode() == KeyCode.Q ) {
+				enqueueMenuItem.fire();
+
+			}  else if ( e.getCode() == KeyCode.ENTER && !e.isShiftDown() ) {
+				playMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown() ) {
+				appendMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.DELETE ) {
+				removeMenuItem.fire();
+			}
 		});
 		
 		playlistTable.setOnDragOver( event -> {
