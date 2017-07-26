@@ -44,6 +44,7 @@ public class AudioPlayer {
 	}
 	
 	public void runPlayerThread() {
+		
 		while ( true ) {
 			try {
 				if ( state != PlayState.STOPPED && stopRequested ) {
@@ -104,7 +105,7 @@ public class AudioPlayer {
 					}
 					
 					if ( seekMSRequested != NO_REQUEST ) {
-						decoder.seekTo ( seekMSRequested / (double)( track.getLengthS() * 1000 )  );
+						decoder.seekTo ( seekMSRequested / (double)( track.getLengthS() * 1000 ) );
 						updateTrackPosition();
 						seekMSRequested = NO_REQUEST;
 					}
@@ -187,6 +188,15 @@ public class AudioPlayer {
 	
 	public void requestSeekPercent ( double seekPercent ) {
 		this.seekPercentRequested = seekPercent;
+	}
+
+	public void requestIncrementMS ( int diffMS ) {
+		if ( seekMSRequested == NO_REQUEST ) {
+			seekMSRequested = this.getPositionMS() + diffMS;
+		} else {
+			seekMSRequested += diffMS;
+		}
+		
 	}
 
 	public void requestSeekMS ( long seekMS ) {

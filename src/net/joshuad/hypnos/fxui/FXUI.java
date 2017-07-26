@@ -8,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
-import java.nio.channels.ClosedByInterruptException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -186,6 +185,8 @@ public class FXUI implements PlayerListener {
 	Button toggleRepeatButton;
 	Button toggleShuffleButton;
 	Button showQueueButton;
+	Button savePlaylistButton;
+	Button exportPlaylistButton;
 
 	SplitPane artSplitPane;
 	
@@ -203,7 +204,6 @@ public class FXUI implements PlayerListener {
 	private Track currentImagesTrack = null;
 	
 	private SimpleBooleanProperty promptBeforeOverwrite = new SimpleBooleanProperty ( true );
-	
 	
 	public FXUI ( Stage stage, Library library, AudioSystem player, GlobalHotkeys hotkeys ) {
 		mainStage = stage;
@@ -316,8 +316,40 @@ public class FXUI implements PlayerListener {
 			}
 		};
 		
-		stage.widthProperty().addListener( windowSizeListener );
-		stage.heightProperty().addListener( windowSizeListener );
+		primaryContainer.setOnKeyPressed( ( KeyEvent e ) -> { 
+
+			System.out.println ( "herea" ); //TODO: 
+			if ( e.getCode() == KeyCode.S && e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				savePlaylistButton.fire();
+				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.E && e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				exportPlaylistButton.fire();
+				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.UP && !e.isControlDown() && e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				player.incrementVolume();
+				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.DOWN && !e.isControlDown() && e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				player.decrementVolume();
+				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.RIGHT && !e.isControlDown() && e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				player.skipMS( 10000 );
+				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.LEFT && !e.isControlDown() && e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				player.skipMS( -10000 );
+				e.consume();
+				
+			} 
+			
+		});
+		
+		
+		mainStage.widthProperty().addListener( windowSizeListener );
+		mainStage.heightProperty().addListener( windowSizeListener );
 		
 		player.addPlayerListener ( this );
 	}
@@ -1064,8 +1096,8 @@ public class FXUI implements PlayerListener {
 		showQueueButton = new Button ( "Q" );
 		Button showHistoryButton = new Button ( "H" );
 		Button loadTracksButton = new Button( "⏏" );
-		Button savePlaylistButton = new Button( "💾" );
-		Button exportPlaylistButton = new Button ( "➚" );
+		savePlaylistButton = new Button( "💾" );
+		exportPlaylistButton = new Button ( "➚" );
 		Button clearButton = new Button ( "✘" );
 
 		toggleRepeatButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
@@ -1128,10 +1160,9 @@ public class FXUI implements PlayerListener {
 			FileChooser fileChooser = new FileChooser();
 			FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter( "M3U Playlists", Arrays.asList( "*.m3u" ) );
 			fileChooser.getExtensionFilters().add( fileExtensions );
+			fileChooser.setTitle( "Export Playlist" );
 			fileChooser.setInitialFileName( "new-playlist.m3u" );
 			File targetFile = fileChooser.showSaveDialog( mainStage );
-			
-			
 			
 			if ( targetFile == null ) {
 				return;
@@ -1587,7 +1618,7 @@ public class FXUI implements PlayerListener {
 
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
-		MenuItem apendMenuItem = new MenuItem( "Append" );
+		MenuItem appendMenuItem = new MenuItem( "Append" );
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
@@ -1595,16 +1626,35 @@ public class FXUI implements PlayerListener {
 		MenuItem infoMenuItem = new MenuItem( "Info" );
 		
 		albumTable.setOnKeyPressed( ( KeyEvent e ) -> {
-			if ( e.getCode() == KeyCode.ESCAPE ) {
+			if ( e.getCode() == KeyCode.ESCAPE 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				albumTable.getSelectionModel().clearSelection();
 				
-			} else if ( e.getCode() == KeyCode.Q ) {
+			} else if ( e.getCode() == KeyCode.Q 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				enqueueMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.F2 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				editTagMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.F3
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				infoMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.ENTER
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				playMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown() 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+				appendMenuItem.fire();
+				
 			}
 		});
 		
 		contextMenu.getItems().addAll( 
-			playMenuItem, apendMenuItem, enqueueMenuItem, editTagMenuItem, 
+			playMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, 
 			browseMenuItem, addToPlaylistMenuItem, infoMenuItem
 		);
 		
@@ -1656,7 +1706,7 @@ public class FXUI implements PlayerListener {
 			}
 		});
 
-		apendMenuItem.setOnAction( event -> {
+		appendMenuItem.setOnAction( event -> {
 			player.getCurrentList().appendAlbums( albumTable.getSelectionModel().getSelectedItems() );
 		});
 
@@ -1853,12 +1903,12 @@ public class FXUI implements PlayerListener {
 
 		ContextMenu trackContextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
-		MenuItem apendMenuItem = new MenuItem( "Append" );
+		MenuItem appendMenuItem = new MenuItem( "Append" );
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
-		trackContextMenu.getItems().addAll( playMenuItem, apendMenuItem, enqueueMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem );
+		trackContextMenu.getItems().addAll( playMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem );
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
@@ -1901,7 +1951,7 @@ public class FXUI implements PlayerListener {
 			}
 		});
 
-		apendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+		appendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
 				player.getCurrentList().appendTracks ( trackTable.getSelectionModel().getSelectedItems() );
@@ -1946,8 +1996,26 @@ public class FXUI implements PlayerListener {
 		});
 		
 		trackTable.setOnKeyPressed( ( KeyEvent e ) -> {
-			if ( e.getCode() == KeyCode.ESCAPE ) {
-				trackTable.getSelectionModel().clearSelection();
+			if ( e.getCode() == KeyCode.ESCAPE 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				albumTable.getSelectionModel().clearSelection();
+				
+			} else if ( e.getCode() == KeyCode.Q 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				enqueueMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.F2 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				editTagMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.ENTER
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				playMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown() 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+				appendMenuItem.fire();
+				
 			}
 		});
 		
@@ -2134,21 +2202,22 @@ public class FXUI implements PlayerListener {
 			if ( e.getCode() == KeyCode.ESCAPE ) {
 				playlistTable.getSelectionModel().clearSelection();
 				
-			} else if ( e.getCode() == KeyCode.F2 ) {
+			} else if ( e.getCode() == KeyCode.F2         && !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
 				renameMenuItem.fire();
 				
-			} else if ( e.getCode() == KeyCode.Q ) {
+			} else if ( e.getCode() == KeyCode.F3         && !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
+				infoMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.Q          && !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
 				enqueueMenuItem.fire();
 
-			}  else if ( e.getCode() == KeyCode.ENTER && !e.isShiftDown() ) {
+			}  else if ( e.getCode() == KeyCode.ENTER     && !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
 				playMenuItem.fire();
 				
-			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown() ) {
+			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown()       && !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
 				appendMenuItem.fire();
 				
-			} else if ( e.getCode() == KeyCode.DELETE ) {
-				removeMenuItem.fire();
-			}
+			} 
 		});
 		
 		playlistTable.setOnDragOver( event -> {
@@ -2441,17 +2510,35 @@ public class FXUI implements PlayerListener {
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 
 		currentListTable.setOnKeyPressed( ( KeyEvent e ) -> {
-			if ( e.getCode() == KeyCode.ESCAPE ) {
+			
+			if ( e.getCode() == KeyCode.ESCAPE
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				currentListTable.getSelectionModel().clearSelection();
+				e.consume();
 				
-			} else if ( e.getCode() == KeyCode.DELETE && !e.isShiftDown() ) {
+			} else if ( e.getCode() == KeyCode.DELETE      
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				removeMenuItem.fire();
+				e.consume();
 				
-			} else if ( e.getCode() == KeyCode.DELETE && e.isShiftDown() ) {
+			} else if ( e.getCode() == KeyCode.DELETE && e.isShiftDown()
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
 				cropMenuItem.fire();
+				e.consume();
 				
-			} else if ( e.getCode() == KeyCode.Q ) {
+			} else if ( e.getCode() == KeyCode.Q
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				queueMenuItem.fire();
+				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.F2
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				editTagMenuItem.fire();
+				e.consume();
+			} else if ( e.getCode() == KeyCode.R && e.isShiftDown()
+			&& !e.isControlDown() && !e.isAltDown() && !e.isMetaDown() ) {
+				shuffleMenuItem.fire();
+				e.consume();
 			}
 		});
 		

@@ -157,21 +157,43 @@ public class QueueWindow extends Stage {
 		
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
-		MenuItem apendMenuItem = new MenuItem( "Append" );
+		MenuItem appendMenuItem = new MenuItem( "Append" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		MenuItem cropMenuItem = new MenuItem( "Crop" );
 		MenuItem removeMenuItem = new MenuItem( "Remove from Queue" );
 		contextMenu.getItems().addAll( 
-			playMenuItem, apendMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem, cropMenuItem, removeMenuItem 
+			playMenuItem, appendMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem, cropMenuItem, removeMenuItem 
 		);
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
 		queueTable.setOnKeyPressed( ( KeyEvent e ) -> {
-			if ( e.getCode() == KeyCode.ESCAPE ) {
+			if ( e.getCode() == KeyCode.ESCAPE 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				queueTable.getSelectionModel().clearSelection();
+
+			} else if ( e.getCode() == KeyCode.F2 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				editTagMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.ENTER
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				playMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown() 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+				appendMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.DELETE
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				removeMenuItem.fire();
+						
+			} else if ( e.getCode() == KeyCode.DELETE && e.isShiftDown() 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+				cropMenuItem.fire();
+				
 			}
 		});
 		
@@ -449,7 +471,7 @@ public class QueueWindow extends Stage {
 			}
 		});
 
-		apendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+		appendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
 				player.getCurrentList().appendTracks ( queueTable.getSelectionModel().getSelectedItems() );

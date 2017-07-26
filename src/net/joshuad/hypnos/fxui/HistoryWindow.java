@@ -104,23 +104,45 @@ public class HistoryWindow extends Stage {
 		
 		ContextMenu trackContextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
-		MenuItem apendMenuItem = new MenuItem( "Append" );
+		MenuItem appendMenuItem = new MenuItem( "Append" );
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		MenuItem removeMenuItem = new MenuItem( "Remove from History" );
 		trackContextMenu.getItems().addAll( 
-			playMenuItem, apendMenuItem, enqueueMenuItem,
+			playMenuItem, appendMenuItem, enqueueMenuItem,
 			editTagMenuItem, browseMenuItem, addToPlaylistMenuItem, removeMenuItem 
 		);
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
 		historyTable.setOnKeyPressed( ( KeyEvent e ) -> {
-			if ( e.getCode() == KeyCode.ESCAPE ) {
+			if ( e.getCode() == KeyCode.ESCAPE 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				historyTable.getSelectionModel().clearSelection();
-			}
+			
+			} else if ( e.getCode() == KeyCode.Q 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				enqueueMenuItem.fire();
+						
+			} else if ( e.getCode() == KeyCode.F2 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				editTagMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.ENTER
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				playMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown() 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+				appendMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.DELETE
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				removeMenuItem.fire();
+						
+			} 
 		});
 		
 		historyTable.setRowFactory( tv -> {
@@ -198,7 +220,7 @@ public class HistoryWindow extends Stage {
 			}
 		});
 
-		apendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+		appendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
 				player.getCurrentList().appendTracks ( historyTable.getSelectionModel().getSelectedItems() );

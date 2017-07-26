@@ -317,6 +317,10 @@ public class AudioSystem {
 		player.requestSeekPercent( percent );
 	}
 	
+	public void skipMS ( int diffMS ) {
+		player.requestIncrementMS ( diffMS );
+	}
+
 	public void seekMS ( long ms ) {
 		player.requestSeekMS( ms );
 	}
@@ -533,6 +537,8 @@ public class AudioSystem {
 			player.requestVolumePercent( 0 );
 		}
 	}
+
+	
 }
 
 

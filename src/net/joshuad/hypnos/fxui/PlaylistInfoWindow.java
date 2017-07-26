@@ -115,10 +115,10 @@ public class PlaylistInfoWindow extends Stage {
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem appendMenuItem = new MenuItem( "Append" );
-		MenuItem queueMenuItem = new MenuItem( "Enqueue" );
+		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
-		contextMenu.getItems().addAll ( playMenuItem, appendMenuItem, queueMenuItem, editTagMenuItem, addToPlaylistMenuItem );
+		contextMenu.getItems().addAll ( playMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, addToPlaylistMenuItem );
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
@@ -144,7 +144,32 @@ public class PlaylistInfoWindow extends Stage {
 
 		ui.updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		
-		queueMenuItem.setOnAction( event -> {
+
+		trackTable.setOnKeyPressed( ( KeyEvent e ) -> {
+			if ( e.getCode() == KeyCode.ESCAPE 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				trackTable.getSelectionModel().clearSelection();
+			
+			} else if ( e.getCode() == KeyCode.Q 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				enqueueMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.F2 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				editTagMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.ENTER
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				playMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown() 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+				appendMenuItem.fire();
+				
+			} 
+		});
+		
+		enqueueMenuItem.setOnAction( event -> {
 			player.getQueue().addAllTracks( trackTable.getSelectionModel().getSelectedItems() );
 		});
 		
@@ -168,12 +193,6 @@ public class PlaylistInfoWindow extends Stage {
 				if ( ui.okToReplaceCurrentList() ) {
 					player.playItems( selectedItems );
 				}
-			}
-		});
-
-		trackTable.setOnKeyPressed( ( KeyEvent e ) -> {
-			if ( e.getCode() == KeyCode.ESCAPE ) {
-				trackTable.getSelectionModel().clearSelection();
 			}
 		});
 		

@@ -5,24 +5,46 @@ New Features
 	Log to file, how does that work inside java? 
 		
 	In-program Hotkeys
-		Playlist Table
-			Decide on a hotkey for info. 
+		Playlist Table - Done 
+			Add export button to playlist table menu, add hotkey
 			
 		Album Table
+			Browse Folder
+			Playlist Add
+			
 		Track Table
+			Browse Folder
+			Playlist Add
+			
 		Queue Table
-		History Table
+			Browse Folder
+			Shift + Enter isn't working right
+			Playlist Add
+			
+		History Table	
+			Browse Folder
+			Playlist Add
+		
 		Album Info Table
+			Browse Folder
+			
 		Playlist Info table
+			Add a remove context menu, add to hotkeys. 
+		
+		Current List Table
+			Playlist Add
+					
+		Maybe something like ctrl + shift + 1 to add to the first playlist? 
+	
 	
 	Tab in settings window for in-program hotkeys. 
-			
-	Add export button to playlist table menu
-	
+		
 	Drag and drop from misc places to system
 		playlist table -> m3u
 		track table, history, queue, info windows, current table -> single tracks
 		album table -> folder
+		
+	Context menu on artwork. 
 	
 	Add tag image info to tag window
 
