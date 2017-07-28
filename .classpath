@@ -6,14 +6,14 @@
 			<accessrule kind="accessible" pattern="javafx/**"/>
 		</accessrules>
 	</classpathentry>
-	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/stage/lib/commons-cli-1.4.jar"/>
-	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/stage/lib/jaad-0.8.4-nospi.jar"/>
-	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/stage/lib/jaudiotagger-2.2.6-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/stage/lib/jflac-1.2.jar"/>
-	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/stage/lib/jl1.0.1.jar"/>
-	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/stage/lib/jogg-0.0.7.jar"/>
-	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/stage/lib/jorbis-0.0.15.jar"/>
-	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/stage/lib/jnativehook-2.0.2.jar"/>
-	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/stage/lib/fuzzywuzzy-1.1.8.jar"/>
+	<classpathentry kind="lib" path="stage/lib/commons-cli-1.4.jar"/>
+	<classpathentry kind="lib" path="stage/lib/fuzzywuzzy-1.1.8.jar"/>
+	<classpathentry kind="lib" path="stage/lib/jaad-0.8.4-nospi.jar"/>
+	<classpathentry kind="lib" path="stage/lib/jaudiotagger-2.2.6-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="stage/lib/jflac-1.2.jar"/>
+	<classpathentry kind="lib" path="stage/lib/jl1.0.1.jar"/>
+	<classpathentry kind="lib" path="stage/lib/jnativehook-2.0.2.jar"/>
+	<classpathentry kind="lib" path="stage/lib/jogg-0.0.7.jar"/>
+	<classpathentry kind="lib" path="stage/lib/jorbis-0.0.15.jar"/>
 	<classpathentry kind="output" path="stage/bin"/>
 </classpath>

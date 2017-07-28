@@ -1,5 +1,6 @@
 package net.joshuad.hypnos.fxui;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,6 +9,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
+import javax.swing.SwingUtilities;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
@@ -95,24 +98,6 @@ public class QueueWindow extends Stage {
 			}
 		});
 		
-		queueTable.setOnKeyPressed( keyEvent -> {
-
-			if ( keyEvent.getCode().equals( KeyCode.DELETE ) ) {
-				ObservableList <Integer> selectedIndexes = queueTable.getSelectionModel().getSelectedIndices();
-				
-				List<Integer> removeMe = new ArrayList<Integer> ( selectedIndexes );
-				
-				if ( !removeMe.isEmpty() ) {
-					int selectAfterDelete = selectedIndexes.get( 0 ) - 1;
-					for ( int k = removeMe.size() - 1; k >= 0; k-- ) {
-						player.getQueue().remove ( removeMe.get( k ) );
-					}
-					queueTable.getSelectionModel().clearAndSelect( selectAfterDelete );
-					
-				}
-			}
-		});
-
 		TableColumn numberColumn = new TableColumn<Track, String> ( "#" );
 		TableColumn artistColumn = new TableColumn<Track, String> ( "Artist" );
 		TableColumn titleColumn = new TableColumn<Track, String> ( "Title" );
@@ -148,7 +133,6 @@ public class QueueWindow extends Stage {
 		});
 		numberColumn.setSortable(false);
 		
-		
 		artistColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Artist" ) );
 		titleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
 		
@@ -159,12 +143,14 @@ public class QueueWindow extends Stage {
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem appendMenuItem = new MenuItem( "Append" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
+		MenuItem infoMenuItem = new MenuItem( "Info" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		MenuItem cropMenuItem = new MenuItem( "Crop" );
 		MenuItem removeMenuItem = new MenuItem( "Remove from Queue" );
 		contextMenu.getItems().addAll( 
-			playMenuItem, appendMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem, cropMenuItem, removeMenuItem 
+			playMenuItem, appendMenuItem, editTagMenuItem, infoMenuItem, 
+			browseMenuItem, addToPlaylistMenuItem, cropMenuItem, removeMenuItem 
 		);
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
@@ -177,6 +163,16 @@ public class QueueWindow extends Stage {
 			} else if ( e.getCode() == KeyCode.F2 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				editTagMenuItem.fire();
+			
+			} else if ( e.getCode() == KeyCode.F3
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				infoMenuItem.fire();
+				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.F4
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				browseMenuItem.fire();
+				e.consume();
 				
 			} else if ( e.getCode() == KeyCode.ENTER
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
@@ -475,7 +471,6 @@ public class QueueWindow extends Stage {
 			@Override
 			public void handle ( ActionEvent event ) {
 				player.getCurrentList().appendTracks ( queueTable.getSelectionModel().getSelectedItems() );
-				player.play();
 			}
 		});
 		
@@ -488,6 +483,31 @@ public class QueueWindow extends Stage {
 				tagWindow.show();
 			}
 		});
+		
+		infoMenuItem.setOnAction( event -> {
+			ui.trackInfoWindow.setTrack( queueTable.getSelectionModel().getSelectedItem() );
+			ui.trackInfoWindow.show();
+		});
+		
+		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			// TODO: This is the better way, once openjdk and openjfx supports
+			// it: getHostServices().showDocument(file.toURI().toString());
+			@Override
+			public void handle ( ActionEvent event ) {
+				SwingUtilities.invokeLater( new Runnable() {
+					public void run () {
+						try {
+							Track selectedTrack = queueTable.getSelectionModel().getSelectedItem();
+							if ( selectedTrack != null ) {
+								Desktop.getDesktop().open( selectedTrack.getPath().getParent().toFile() );
+							}
+						} catch ( IOException e ) {
+							e.printStackTrace();
+						}
+					}
+				} );
+			}
+		} );
 
 		cropMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override

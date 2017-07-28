@@ -13,13 +13,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -117,8 +115,12 @@ public class PlaylistInfoWindow extends Stage {
 		MenuItem appendMenuItem = new MenuItem( "Append" );
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
+		MenuItem infoMenuItem = new MenuItem( "Info" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
-		contextMenu.getItems().addAll ( playMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, addToPlaylistMenuItem );
+		MenuItem removeMenuItem = new MenuItem ( "Remove" );
+		contextMenu.getItems().addAll ( 
+			playMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, addToPlaylistMenuItem, removeMenuItem 
+		);
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
@@ -158,6 +160,10 @@ public class PlaylistInfoWindow extends Stage {
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				editTagMenuItem.fire();
 				
+			} else if ( e.getCode() == KeyCode.F3 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				infoMenuItem.fire();
+				
 			} else if ( e.getCode() == KeyCode.ENTER
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				playMenuItem.fire();
@@ -166,14 +172,21 @@ public class PlaylistInfoWindow extends Stage {
 			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
 				appendMenuItem.fire();
 				
-			} 
+			} else if ( e.getCode() == KeyCode.DELETE
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				removeMenuItem.fire();
+			}
 		});
 		
 		enqueueMenuItem.setOnAction( event -> {
 			player.getQueue().addAllTracks( trackTable.getSelectionModel().getSelectedItems() );
 		});
 		
-			
+		infoMenuItem.setOnAction( event -> {
+			ui.trackInfoWindow.setTrack( trackTable.getSelectionModel().getSelectedItem() );
+			ui.trackInfoWindow.show();
+		});
+		
 		editTagMenuItem.setOnAction( event -> {
 			ui.tagWindow.setTracks( (List<Track>)(List<?>)trackTable.getSelectionModel().getSelectedItems(), null );
 			ui.tagWindow.show();
@@ -183,6 +196,11 @@ public class PlaylistInfoWindow extends Stage {
 			ui.currentListTable.getItems().addAll( Utils.convertTrackList( trackTable.getSelectionModel().getSelectedItems() ) );
 		});
 
+		removeMenuItem.setOnAction( event -> {
+			//TODO: this doesn't work
+			playlist.getTracks().removeAll( new ArrayList<> ( trackTable.getSelectionModel().getSelectedItems() ) );
+		});
+		
 		playMenuItem.setOnAction( event -> {
 			List <Track> selectedItems =  new ArrayList<Track> ( trackTable.getSelectionModel().getSelectedItems() );
 			

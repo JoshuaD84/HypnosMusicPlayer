@@ -182,10 +182,13 @@ public class AlbumInfoWindow extends Stage {
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem appendMenuItem = new MenuItem( "Append" );
-		MenuItem queueMenuItem = new MenuItem( "Enqueue" );
+		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
+		MenuItem infoMenuItem = new MenuItem( "Info" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
-		contextMenu.getItems().addAll ( playMenuItem, appendMenuItem, queueMenuItem, editTagMenuItem, addToPlaylistMenuItem );
+		contextMenu.getItems().addAll ( 
+			playMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, addToPlaylistMenuItem 
+		);
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
@@ -211,10 +214,9 @@ public class AlbumInfoWindow extends Stage {
 
 		ui.updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		
-		queueMenuItem.setOnAction( event -> {
+		enqueueMenuItem.setOnAction( event -> {
 			player.getQueue().addAllTracks( trackTable.getSelectionModel().getSelectedItems() );
 		});
-		
 			
 		editTagMenuItem.setOnAction( event -> {
 			ui.tagWindow.setTracks( (List<Track>)(List<?>)trackTable.getSelectionModel().getSelectedItems(), null );
@@ -223,6 +225,11 @@ public class AlbumInfoWindow extends Stage {
 		
 		appendMenuItem.setOnAction( event -> {
 			player.getCurrentList().appendTracks ( trackTable.getSelectionModel().getSelectedItems() );
+		});
+		
+		infoMenuItem.setOnAction( event -> {
+			ui.trackInfoWindow.setTrack( trackTable.getSelectionModel().getSelectedItem() );
+			ui.trackInfoWindow.show();
 		});
 
 		playMenuItem.setOnAction( event -> {
@@ -239,9 +246,33 @@ public class AlbumInfoWindow extends Stage {
 		});
 		
 		trackTable.setOnKeyPressed( ( KeyEvent e ) -> {
-			if ( e.getCode() == KeyCode.ESCAPE ) {
+			if ( e.getCode() == KeyCode.ESCAPE 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				trackTable.getSelectionModel().clearSelection();
+				
+			} else if ( e.getCode() == KeyCode.Q 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				enqueueMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.F2 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				editTagMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.F3
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				infoMenuItem.fire();
+				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.ENTER
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				playMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown() 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+				appendMenuItem.fire();
+				
 			}
+				
 		});
 		
 		trackTable.setRowFactory( tv -> {

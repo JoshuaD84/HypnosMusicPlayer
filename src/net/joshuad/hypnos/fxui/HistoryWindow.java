@@ -107,12 +107,13 @@ public class HistoryWindow extends Stage {
 		MenuItem appendMenuItem = new MenuItem( "Append" );
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
+		MenuItem infoMenuItem = new MenuItem( "Info" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		MenuItem removeMenuItem = new MenuItem( "Remove from History" );
 		trackContextMenu.getItems().addAll( 
 			playMenuItem, appendMenuItem, enqueueMenuItem,
-			editTagMenuItem, browseMenuItem, addToPlaylistMenuItem, removeMenuItem 
+			editTagMenuItem, infoMenuItem, browseMenuItem, addToPlaylistMenuItem, removeMenuItem 
 		);
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
@@ -129,6 +130,16 @@ public class HistoryWindow extends Stage {
 			} else if ( e.getCode() == KeyCode.F2 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				editTagMenuItem.fire();
+			
+			} else if ( e.getCode() == KeyCode.F3
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				infoMenuItem.fire();
+				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.F4
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				browseMenuItem.fire();
+				e.consume();
 				
 			} else if ( e.getCode() == KeyCode.ENTER
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
@@ -218,6 +229,11 @@ public class HistoryWindow extends Stage {
 			public void handle ( ActionEvent event ) {
 				player.getQueue().addAllTracks( historyTable.getSelectionModel().getSelectedItems() );
 			}
+		});
+		
+		infoMenuItem.setOnAction( event -> {
+			ui.trackInfoWindow.setTrack( historyTable.getSelectionModel().getSelectedItem() );
+			ui.trackInfoWindow.show();
 		});
 
 		appendMenuItem.setOnAction( new EventHandler <ActionEvent>() {

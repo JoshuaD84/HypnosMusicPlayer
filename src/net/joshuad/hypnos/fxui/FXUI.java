@@ -155,7 +155,7 @@ public class FXUI implements PlayerListener {
 
 	Label timeElapsedLabel = new Label( "" );
 	Label timeRemainingLabel = new Label( "" );
-	Label trackInfo = new Label( "" );
+	Button trackName = new Button( "" );
 	
 	Label emptyPlaylistLabel = new Label( 
 		"You haven't created any playlists, make a playlist on the right and click 💾 to save it for later." );
@@ -180,6 +180,7 @@ public class FXUI implements PlayerListener {
 	LibraryLocationWindow libraryLocationWindow;
 	HistoryWindow historyWindow;
 	SettingsWindow settingsWindow;
+	TrackInfoWindow trackInfoWindow;
 
 	Button togglePlayButton;
 	Button toggleRepeatButton;
@@ -222,7 +223,8 @@ public class FXUI implements PlayerListener {
 		} catch ( FileNotFoundException e ) {
 			System.out.println ( "Unable to load program icon: resources/icon.png" );
 		}
-
+		
+		
 		setupAlbumTable();
 		setupTrackListCheckBox();
 		setupAlbumFilterPane();
@@ -243,6 +245,7 @@ public class FXUI implements PlayerListener {
 		playlistInfoWindow = new PlaylistInfoWindow ( this, library, player );
 		historyWindow = new HistoryWindow ( this, library, player );
 		settingsWindow = new SettingsWindow ( this, library, hotkeys );
+		trackInfoWindow = new TrackInfoWindow ( this );
 
 		artSplitPane = new SplitPane();
 		artSplitPane.getItems().addAll( albumImage, artistImage );
@@ -318,7 +321,6 @@ public class FXUI implements PlayerListener {
 		
 		primaryContainer.setOnKeyPressed( ( KeyEvent e ) -> { 
 
-			System.out.println ( "herea" ); //TODO: 
 			if ( e.getCode() == KeyCode.S && e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				savePlaylistButton.fire();
 				e.consume();
@@ -344,14 +346,54 @@ public class FXUI implements PlayerListener {
 				e.consume();
 				
 			} 
-			
 		});
-		
 		
 		mainStage.widthProperty().addListener( windowSizeListener );
 		mainStage.heightProperty().addListener( windowSizeListener );
 		
 		player.addPlayerListener ( this );
+	}
+	
+	private void setupFont() {
+		Path font, fontBold, stylesheet; 
+//		switch ( Hypnos.getOS() ) {
+//			
+//			case OSX:
+//				font = Paths.get( "stage/resources/lucidagrande/lucidagrande.ttf" );
+//				fontBold = Paths.get ( "stage/resources/lucidagrande/lucidagrande-bold.ttf" );
+//				stylesheet = Paths.get ( "stage/resources/style-font-osx.css" );
+//				break;
+//				
+//			case WIN_10:
+//			case WIN_7:
+//			case WIN_8:
+//			case WIN_UNKNOWN:
+//			case WIN_VISTA:
+//			case WIN_XP:
+//				font = Paths.get( "stage/resources/calibri/calibri.ttf" );
+//				fontBold = Paths.get ( "stage/resources/calibri/calibri-bold.ttf" );
+//				stylesheet = Paths.get ( "stage/resources/style-font-win.css" );
+//				break;
+//
+//			case UNKNOWN:
+//			case NIX:
+//			default:
+				font = Paths.get( "stage/resources/calibri/calibri.ttf" );
+				fontBold = Paths.get ( "stage/resources/calibri/calibri-bold.ttf" );
+				stylesheet = Paths.get ( "stage/resources/style-font-win.css" );
+//				break;
+//		}
+		
+	//	try {
+			//Font.loadFont( new FileInputStream ( font.toFile() ), 12 );
+			//Font.loadFont( new FileInputStream ( fontBold.toFile() ), 12 );
+			scene.getStylesheets().add( "file:///" + stylesheet.toFile().getAbsolutePath().replace( "\\", "/" ) );
+			System.out.println ( "Loaded" );
+		//} //catch ( FileNotFoundException e ) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+		//}
+		
 	}
 	
 	//TODO: Does this function need to exist? 
@@ -390,7 +432,7 @@ public class FXUI implements PlayerListener {
 					trackPositionSlider.setValue( 0 );
 					timeElapsedLabel.setText( "" );
 					timeRemainingLabel.setText( "" );
-					trackInfo.setText( "" );
+					trackName.setText( "" );
 			
 					StackPane thumb = (StackPane) trackPositionSlider.lookup( ".thumb" );
 					thumb.setVisible( false );
@@ -638,20 +680,21 @@ public class FXUI implements PlayerListener {
 		settingsWidthPadding.setMinWidth( 36 ); // I couldn't figure out how to make it the exact same width as settings button
 		
 		BorderPane playingTrackInfo = new BorderPane();
-		trackInfo = new Label( "" );
-		trackInfo.setPadding( new Insets ( 10, 0, 0, 0 ) );
-		trackInfo.getStyleClass().add( "trackInfo" );
-		playingTrackInfo.setCenter( trackInfo );
+		trackName = new Button( "" );
+		trackName.setPadding( new Insets ( 10, 0, 0, 0 ) );
+		trackName.getStyleClass().add( "trackName" );
+		playingTrackInfo.setCenter( trackName );
 		playingTrackInfo.setRight( settingsButton );
 		playingTrackInfo.setLeft( settingsWidthPadding );
 		
-		trackInfo.setOnMouseClicked( ( event ) -> {
+		trackName.setOnMouseClicked( ( event ) -> {
 			Track current = player.getCurrentTrack();
 			if ( current != null ) {
 				setImages( current );
+				trackInfoWindow.setTrack( current );
+				trackInfoWindow.show();
 			}
 		});
-
 
 		transport = new VBox();
 		transport.getChildren().add( playingTrackInfo );
@@ -1097,7 +1140,7 @@ public class FXUI implements PlayerListener {
 		Button showHistoryButton = new Button ( "H" );
 		Button loadTracksButton = new Button( "⏏" );
 		savePlaylistButton = new Button( "💾" );
-		exportPlaylistButton = new Button ( "➚" );
+		exportPlaylistButton = new Button ( "↗" );
 		Button clearButton = new Button ( "✘" );
 
 		toggleRepeatButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
@@ -1642,6 +1685,11 @@ public class FXUI implements PlayerListener {
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				infoMenuItem.fire();
 				
+			} else if ( e.getCode() == KeyCode.F4
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				browseMenuItem.fire();
+				e.consume();
+				
 			} else if ( e.getCode() == KeyCode.ENTER
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				playMenuItem.fire();
@@ -1906,9 +1954,10 @@ public class FXUI implements PlayerListener {
 		MenuItem appendMenuItem = new MenuItem( "Append" );
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
+		MenuItem infoMenuItem = new MenuItem( "Info" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
-		trackContextMenu.getItems().addAll( playMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem );
+		trackContextMenu.getItems().addAll( playMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, browseMenuItem, addToPlaylistMenuItem );
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
@@ -1974,6 +2023,15 @@ public class FXUI implements PlayerListener {
 				tagWindow.show();
 			}
 		});
+		
+		
+		infoMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				trackInfoWindow.setTrack( trackTable.getSelectionModel().getSelectedItem() );
+				trackInfoWindow.show();
+			}
+		});
 
 		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			// TODO: This is the better way, once openjdk and openjfx supports
@@ -2007,6 +2065,16 @@ public class FXUI implements PlayerListener {
 			} else if ( e.getCode() == KeyCode.F2 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				editTagMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.F3
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				infoMenuItem.fire();
+				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.F4
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				browseMenuItem.fire();
+				e.consume();
 				
 			} else if ( e.getCode() == KeyCode.ENTER
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
@@ -2202,19 +2270,24 @@ public class FXUI implements PlayerListener {
 			if ( e.getCode() == KeyCode.ESCAPE ) {
 				playlistTable.getSelectionModel().clearSelection();
 				
-			} else if ( e.getCode() == KeyCode.F2         && !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
+			} else if ( e.getCode() == KeyCode.F2         
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
 				renameMenuItem.fire();
 				
-			} else if ( e.getCode() == KeyCode.F3         && !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
+			} else if ( e.getCode() == KeyCode.F3         
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
 				infoMenuItem.fire();
 				
-			} else if ( e.getCode() == KeyCode.Q          && !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
+			} else if ( e.getCode() == KeyCode.Q
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
 				enqueueMenuItem.fire();
 
-			}  else if ( e.getCode() == KeyCode.ENTER     && !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
+			}  else if ( e.getCode() == KeyCode.ENTER
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
 				playMenuItem.fire();
 				
-			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown()       && !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown()
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
 				appendMenuItem.fire();
 				
 			} 
@@ -2504,6 +2577,7 @@ public class FXUI implements PlayerListener {
 		MenuItem queueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem shuffleMenuItem = new MenuItem( "Shuffle Items" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
+		MenuItem infoMenuItem = new MenuItem( "Info" );
 		MenuItem cropMenuItem = new MenuItem( "Crop" );
 		MenuItem removeMenuItem = new MenuItem( "Remove" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
@@ -2535,6 +2609,18 @@ public class FXUI implements PlayerListener {
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				editTagMenuItem.fire();
 				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.F3
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				infoMenuItem.fire();
+				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.F4
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				browseMenuItem.fire();
+				e.consume();
+				
+					
 			} else if ( e.getCode() == KeyCode.R && e.isShiftDown()
 			&& !e.isControlDown() && !e.isAltDown() && !e.isMetaDown() ) {
 				shuffleMenuItem.fire();
@@ -2545,7 +2631,10 @@ public class FXUI implements PlayerListener {
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
 		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
-		contextMenu.getItems().addAll( playMenuItem, queueMenuItem, shuffleMenuItem, editTagMenuItem, browseMenuItem, addToPlaylistMenuItem, cropMenuItem, removeMenuItem );
+		contextMenu.getItems().addAll( 
+			playMenuItem, queueMenuItem, shuffleMenuItem, editTagMenuItem, infoMenuItem, 
+			browseMenuItem, addToPlaylistMenuItem, cropMenuItem, removeMenuItem 
+		);
 		
 		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -2596,6 +2685,14 @@ public class FXUI implements PlayerListener {
 				
 				tagWindow.setTracks( (List<Track>)(List<?>)currentListTable.getSelectionModel().getSelectedItems(), null );
 				tagWindow.show();
+			}
+		});
+		
+		infoMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				trackInfoWindow.setTrack( currentListTable.getSelectionModel().getSelectedItem() );
+				trackInfoWindow.show();
 			}
 		});
 
@@ -3145,7 +3242,7 @@ public class FXUI implements PlayerListener {
 			StackPane thumb = (StackPane) trackPositionSlider.lookup( ".thumb" );
 			thumb.setVisible( true );
 			
-			trackInfo.setText( track.getArtist() + " - " + track.getTitle() );
+			trackName.setText( track.getArtist() + " - " + track.getTitle() );
 			setImages( track );
 		});
 	}

@@ -29,7 +29,7 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 		}
 
 		try {
-			Thread.sleep( 10 );
+			Thread.sleep( 2 );
 		} catch ( InterruptedException e ) {
 			LOGGER.fine ( "Sleep interrupted during walk break." );
 		}
