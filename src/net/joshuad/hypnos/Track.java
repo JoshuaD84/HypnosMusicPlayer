@@ -1,11 +1,9 @@
 package net.joshuad.hypnos;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
-import java.nio.ByteBuffer;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,20 +14,21 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
-
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.CannotWriteException;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.audio.generic.GenericTag;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
+import org.jaudiotagger.tag.TagField;
 import org.jaudiotagger.tag.id3.ID3v1Tag;
 import org.jaudiotagger.tag.id3.ID3v23Tag;
 import org.jaudiotagger.tag.images.Artwork;
+import org.jaudiotagger.tag.images.StandardArtwork;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
@@ -60,6 +59,23 @@ public class Track implements Serializable {
 			return extension;
 		}
 	}
+	
+	public enum ArtistTagImagePriority { 
+		GENERAL ( 0 ), 
+		ALBUM ( 1 ), 
+		TRACK ( 2 );
+		
+		
+		private int value;
+		
+		ArtistTagImagePriority ( int value ) {
+			this.value = value;
+		}
+		
+		public int getValue() {
+			return value;
+		}
+	};
 
 	private int length = 0;
 	private File trackFile;
@@ -515,11 +531,156 @@ public class Track implements Serializable {
 		
 		return ( compareTo.getPath().toAbsolutePath().equals( getPath().toAbsolutePath() ) );
 	}
+
+	public static void saveArtistImageToTag ( File file, Path imagePath, ArtistTagImagePriority priority, boolean overwriteAll ) {
+		try {
+			byte[] imageBuffer = Files.readAllBytes( imagePath );
+			saveImageToID3 ( file, imageBuffer, 8, priority, overwriteAll );
+		} catch ( IOException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
-	public Image getAlbumCoverImage ( ) {
+	public static void saveArtistImageToTag ( File file, byte[] buffer, ArtistTagImagePriority priority, boolean overwriteAll ) {
+		saveImageToID3 ( file, buffer, 8, priority, overwriteAll );
+	}
+	
+
+	public static void saveAlbumImageToTag ( File file, byte[] buffer ) {
+		saveImageToID3 ( file, buffer, 3, null, true );
+	}
+			
+	
+	private static void saveImageToID3 ( File file, byte[] buffer, int type, ArtistTagImagePriority priority, boolean overwriteAll ) {
+
+		try {
+			
+			AudioFile audioFile = AudioFileIO.read( file );
+			Tag tag = audioFile.getTag();
+
+			if ( tag instanceof ID3v1Tag ) {
+				tag = new ID3v23Tag ( (ID3v1Tag)tag );
+			}
+			
+			if ( priority != null && !overwriteAll ) {
+				Integer currentPriority = null;
+				
+				try {
+					currentPriority = ArtistTagImagePriority.valueOf( tag.getFirst( FieldKey.CUSTOM4 ) ).getValue();
+				} catch ( Exception e ) {
+					currentPriority = null;
+				}
+				
+				if ( currentPriority != null && currentPriority > priority.getValue() ) {
+					LOGGER.info( file.getName() + ": Not overwriting tag. Selected priority (" 
+						+ priority.getValue() + ") " + "is less than current priority (" + currentPriority + ")." );
+
+					return;
+				}
+			}
+			
+			tag.deleteArtworkField();
+
+			List <Artwork> artworkList = tag.getArtworkList();
+			
+			for ( Artwork artwork : artworkList ) {
+				if ( artwork.getPictureType() != type ) {
+					tag.addField( artwork );
+				}
+			}
+
+			Artwork artwork = new StandardArtwork();
+			artwork.setBinaryData( buffer );
+			artwork.setPictureType( type ); //See ID3 specifications for why 8 
+			
+			tag.addField( artwork );
+			
+			if ( priority != null ) {
+				tag.deleteField( FieldKey.CUSTOM4 );
+				tag.addField( FieldKey.CUSTOM4, priority.toString() );
+			}
+			
+			audioFile.setTag( tag );
+			AudioFileIO.write( audioFile );
+			
+		} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException | CannotWriteException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void setAndSaveAlbumImage ( Path imagePath ) {
+		try {
+			byte[] imageBuffer = Files.readAllBytes( imagePath );
+			setAndSaveAlbumImage ( imageBuffer );
+		} catch ( IOException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void setAndSaveAlbumImage ( byte[] buffer ) {
+		
+		if ( buffer.length < 8 ) return; //png signature is length 8, so might as well use that as an absolute minimum
+
+		saveAlbumImageToTag ( getPath().toFile(), buffer );
 		
 		if ( hasAlbumDirectory() ) {
-		
+			
+			String extension = null;
+			
+			if ( buffer[0] == (byte)0xFF && buffer[1] == (byte)0xD8 ) {
+				extension = ".jpg";
+				
+			} else if ( buffer[0] == (byte)0x89 && buffer[1] == (byte)0x50 && buffer[2] == (byte)0x4e && buffer[3] == (byte)0x47 
+			&& buffer[4] == (byte)0x0d && buffer[5] == (byte)0x0A && buffer[6] == (byte)0x1A && buffer[7] == (byte)0x0A ) {
+			
+				extension = ".png";
+
+			}		
+			
+			if ( extension == null ) {
+				LOGGER.info( "Invalid image file type, not saving." );
+			}
+			
+			Path copyTo = getAlbumPath().resolve( "front" + extension );
+
+			try {
+				Files.deleteIfExists( getAlbumPath().resolve( "front.png" ) );
+			} catch ( IOException e1 ) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			try ( FileOutputStream fos = new FileOutputStream ( copyTo.toFile() ) ) {
+				
+				fos.write( buffer );
+				fos.close();
+
+			} catch ( IOException e ) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			Thread updaterThread = new Thread ( () -> {
+				
+				List <Path> tracks = Utils.getAllTracksInDirectory ( this.getAlbumPath() );
+				for ( Path track : tracks ) {
+					if ( !track.toAbsolutePath().equals( getPath().toAbsolutePath() ) ) {
+						saveAlbumImageToTag ( track.toFile(), buffer );
+					}
+				}
+			});
+
+			updaterThread.setDaemon( true );
+			updaterThread.start();
+		}
+	}
+	
+	private Path getPreferredAlbumCoverPath () {
+		if ( hasAlbumDirectory() ) {
+			
 			if ( this.getPath().getParent() != null ) {
 				
 				ArrayList <Path> preferredFiles = new ArrayList <Path> ();
@@ -533,42 +694,17 @@ public class Track implements Serializable {
 				
 				for ( Path test : preferredFiles ) {
 					if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
-						return new Image( test.toUri().toString() );
+						return test;
 					}
 				}
 			}
 		}
-		
-		Image coverImage = null;
-		Image backImage = null;
-		Image otherImage = null;
-		Image mediaImage = null;
-		
-		try {
-			List<Artwork> artworkList = getAudioFile().getTag().getArtworkList();
-			if ( artworkList != null ) {
-				for ( Artwork artwork : artworkList ) {
-					if ( artwork.getPictureType() == 3 ) {	
-						coverImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
-						if ( coverImage != null ) return coverImage;
-					} else if ( artwork.getPictureType() == 0 ) {
-						otherImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
-						if ( otherImage != null ) return otherImage;
-					} else if ( artwork.getPictureType() == 6 ) {
-						mediaImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
-						if ( mediaImage != null ) return mediaImage;
-					}
-				}
-			}			
-			
-		} catch ( NullPointerException | IOException | CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
-			// TODO Auto-generated catch block
-			// TODO CannotReadException for Test Cases/long.m4a
-			e.printStackTrace( System.out );
-		} 
-		
+		return null;
+	}
+	
+	private Path getSecondaryAlbumCoverPath () {
 		if ( hasAlbumDirectory() ) {
-				
+			
 			if ( this.getPath().getParent() != null ) {
 				ArrayList<Path> otherFiles = new ArrayList<Path>();
 				try {
@@ -585,7 +721,7 @@ public class Track implements Serializable {
 				
 				for ( Path test : otherFiles ) {
 					if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
-						return new Image( test.toUri().toString() );
+						return test;
 					}
 				}
 			}
@@ -593,53 +729,84 @@ public class Track implements Serializable {
 		return null;
 	}
 
-
-	public Image getAlbumArtistImage ( ) {
+	public Image getAlbumCoverImage ( ) {
 		
-		if ( hasAlbumDirectory() ) {
-	
-			if ( this.getPath().getParent() != null ) {
-			
-				Path targetPath = this.getPath().toAbsolutePath();
-				
-				ArrayList <Path> possibleFiles = new ArrayList <Path> ();
-				possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.png" ) );
-				possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.jpg" ) );
-				possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.gif" ) );
-				
-				if ( this.getPath().getParent().getParent() != null ) {
-					possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.png" ) );
-					possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.jpg" ) );
-					possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.gif" ) );
+		//Get the tag cover image
+		//then look to folder for key files
+		//then look at tag for any other suitable images
+		//then take any image file from the album folder. 
+		
+		try {
+			List<Artwork> artworkList = getAudioFile().getTag().getArtworkList();
+			if ( artworkList != null ) {
+				for ( Artwork artwork : artworkList ) {
+					if ( artwork.getPictureType() == 3 ) {	
+						Image coverImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
+						if ( coverImage != null ) return coverImage;
+					} 
 				}
-				
-				for ( Path test : possibleFiles ) {
-					if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
-						return new Image( test.toUri().toString() );
-					}
-				}
-			}
+			}			
+		} catch ( NullPointerException | IOException | CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
+			// TODO Auto-generated catch block
+			// TODO CannotReadException for Test Cases/long.m4a
+			e.printStackTrace( System.out );
+		} 
+		
+		Path bestPath = getPreferredAlbumCoverPath ();
+		
+		if ( bestPath != null ) {
+			return new Image( bestPath.toUri().toString() );
 		}
 		
-		//TODO: it would be nice to test this code (the stuff that loads these four images). 
-		Image leadArtistImage = null;
-		Image artistImage = null;
-		Image writerImage = null;
-		Image logoImage = null;
+		try {
+			List<Artwork> artworkList = getAudioFile().getTag().getArtworkList();
+			if ( artworkList != null ) {
+				for ( Artwork artwork : artworkList ) {
+					if ( artwork.getPictureType() == 0 ) {
+						Image otherImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
+						if ( otherImage != null ) return otherImage;
+					} else if ( artwork.getPictureType() == 6 ) {
+						Image mediaImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
+						if ( mediaImage != null ) return mediaImage;
+					}
+				}
+			}			
+			
+		} catch ( NullPointerException | IOException | CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
+			// TODO Auto-generated catch block
+			// TODO CannotReadException for Test Cases/long.m4a
+			e.printStackTrace( System.out );
+		} 
+
+		Path otherPaths = getSecondaryAlbumCoverPath ();
 		
+		if ( otherPaths != null ) {
+			return new Image( otherPaths.toUri().toString() );
+		}
+		
+		return null;
+	}
+
+	private ArtistTagImagePriority tagImagePriority() {
+		try {
+			TagField tagImagePriority = getAudioFile().getTag().getFirstField( FieldKey.CUSTOM4 );
+			
+			return ArtistTagImagePriority.valueOf( tagImagePriority.toString() );
+			
+		} catch ( Exception e ) {
+			return null;
+		}
+	}
+	
+	private Image getTagArtistImage () {
 		try {
 			List<Artwork> artworkList = getAudioFile().getTag().getArtworkList(); //TODO: This line can throw a NPE
 			if ( artworkList != null ) {
 				for ( Artwork artwork : artworkList ) {
 					
 					if ( artwork.getPictureType() == 8 ) {
-						artistImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
-					} else if ( artwork.getPictureType() == 7 ) {	
-						leadArtistImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
-					} else if ( artwork.getPictureType() == 12 ) {
-						writerImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
-					} else if ( artwork.getPictureType() == 13 ) {
-						logoImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
+						Image artistImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
+						if ( artistImage != null ) return artistImage;
 					}
 				}
 			}			
@@ -650,11 +817,73 @@ public class Track implements Serializable {
 		} catch ( NullPointerException e ) {
 			//TODO:
 		}
-
-		if ( artistImage != null ) return artistImage;
-		if ( leadArtistImage != null ) return leadArtistImage;
-		if ( writerImage != null ) return writerImage;
-		if ( logoImage != null ) return logoImage;
+		
+		return null;
+	}
+	
+	public Image getAlbumArtistImage ( ) {
+				
+		if ( tagImagePriority() == ArtistTagImagePriority.TRACK ) {
+			Image tagArtistImage = getTagArtistImage();
+			if ( tagArtistImage != null ) return tagArtistImage;
+		}
+		
+		if ( hasAlbumDirectory() ) {
+	
+			if ( this.getPath().getParent() != null ) {
+			
+				Path targetPath = this.getPath().toAbsolutePath();
+				
+				ArrayList <Path> possibleFiles = new ArrayList <Path> ();
+				possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.png" ) );
+				possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.jpg" ) );
+				//possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.gif" ) );
+				
+				if ( this.getPath().getParent().getParent() != null ) {
+					possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.png" ) );
+					possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.jpg" ) );
+					//possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.gif" ) );
+				}
+				
+				for ( Path test : possibleFiles ) {
+					if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
+						return new Image( test.toUri().toString() );
+					}
+				}
+			}
+		}
+		
+		if ( tagImagePriority() == ArtistTagImagePriority.ALBUM ) {
+			Image tagArtistImage = getTagArtistImage();
+			if ( tagArtistImage != null ) return tagArtistImage;
+		}
+		
+		try {
+			List<Artwork> artworkList = getAudioFile().getTag().getArtworkList(); //This line can throw a NPE
+			if ( artworkList != null ) {
+				for ( Artwork artwork : artworkList ) {
+					
+					if ( artwork.getPictureType() == 7 ) {
+						Image leadArtistImage = SwingFXUtils.toFXImage( (BufferedImage) artwork.getImage(), null );
+						if ( leadArtistImage != null ) return leadArtistImage;
+						
+					} else if ( artwork.getPictureType() == 12 ) {
+						Image writerImage = SwingFXUtils.toFXImage( (BufferedImage) artwork.getImage(), null );
+						if ( writerImage != null ) return writerImage;
+						
+					} else if ( artwork.getPictureType() == 13 ) {
+						Image logoImage = SwingFXUtils.toFXImage( (BufferedImage) artwork.getImage(), null );
+						if ( logoImage != null ) return logoImage;
+					}
+				}
+			}			
+			
+		} catch ( IOException | CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch ( NullPointerException e ) {
+			//TODO:
+		}
 	
 		return null;
 	}
@@ -684,8 +913,6 @@ public class Track implements Serializable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
 	}
 }
 

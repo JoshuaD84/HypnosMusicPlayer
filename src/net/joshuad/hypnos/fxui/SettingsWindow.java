@@ -229,10 +229,11 @@ public class SettingsWindow extends Stage {
 		});
 				
 		HBox warnBox = new HBox();
-		warnBox.setAlignment( Pos.CENTER );
-		warnBox.getChildren().addAll( warnLabel, warnCheckBox );
-		
+		warnBox.setAlignment( Pos.CENTER_LEFT );
+		warnBox.getChildren().addAll( warnCheckBox, warnLabel );
+						
 		GridPane shuffleGrid = new GridPane();
+		shuffleGrid.setPadding( new Insets ( 15, 0, 0, 0 ) );
 		
 		final ObservableList<String> shuffleOptions = FXCollections.observableArrayList( "No Change", "Sequential", "Shuffle" );
 		int row = 0;

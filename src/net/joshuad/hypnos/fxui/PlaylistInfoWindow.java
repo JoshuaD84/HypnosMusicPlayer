@@ -197,8 +197,20 @@ public class PlaylistInfoWindow extends Stage {
 		});
 
 		removeMenuItem.setOnAction( event -> {
-			//TODO: this doesn't work
-			playlist.getTracks().removeAll( new ArrayList<> ( trackTable.getSelectionModel().getSelectedItems() ) );
+			List <Track> newTracks = new ArrayList<> ();
+			
+			for ( int k = 0; k < playlist.getTracks().size(); k++ ) {
+				if ( !trackTable.getSelectionModel().getSelectedIndices().contains( k ) ) {
+					newTracks.add( playlist.getTracks().get( k ) );
+				}
+			}
+			
+			Playlist newPlaylist = new Playlist ( playlist.getName(), newTracks );
+			
+			library.removePlaylist( playlist );
+			library.addPlaylist( newPlaylist );
+			this.setPlaylist( newPlaylist );
+			
 		});
 		
 		playMenuItem.setOnAction( event -> {

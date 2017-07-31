@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -21,18 +20,6 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.CannotWriteException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.Tag;
-import org.jaudiotagger.tag.TagException;
-import org.jaudiotagger.tag.id3.ID3v1Tag;
-import org.jaudiotagger.tag.id3.ID3v23Tag;
-import org.jaudiotagger.tag.images.Artwork;
-import org.jaudiotagger.tag.images.StandardArtwork;
 
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 
@@ -135,6 +122,7 @@ public class Utils {
 		return false;
 	}
 	
+	
 	public static boolean isPlaylistFile ( Path testFile ) {
 		String fileName = testFile.getFileName().toString();
 		
@@ -158,6 +146,19 @@ public class Utils {
 		}
 		
 		return false;
+	}
+	
+	public static String getFileExtension ( Path path ) {
+		return getFileExtension ( path.toFile() );
+	}
+	
+	public static String getFileExtension( File file ) {
+	    String name = file.getName();
+	    try {
+	        return name.substring(name.lastIndexOf(".") + 1);
+	    } catch (Exception e) {
+	        return "";
+	    }
 	}
 	
 	public static String getLengthDisplay ( int lengthSeconds ) {
@@ -334,40 +335,6 @@ public class Utils {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
-		}
-	}
-
-	public static void saveArtistImageToID3 ( File file, byte[] buffer ) {
-		saveImageToID3 ( file, buffer, 8 );
-	}
-	
-
-	public static void saveAlbumImageToID3 ( File file, byte[] buffer ) {
-		saveImageToID3 ( file, buffer, 3 );
-	}
-	
-	private static void saveImageToID3 ( File file, byte[] buffer, int type ) {
-		try {
-			
-			AudioFile audioFile = AudioFileIO.read( file );
-			Tag tag = audioFile.getTag();
-			
-			if ( tag instanceof ID3v1Tag ) {
-				tag = new ID3v23Tag ( (ID3v1Tag)tag );
-			}
-			
-			Artwork artwork = new StandardArtwork();
-			artwork.setBinaryData( buffer );
-			artwork.setPictureType( type ); //See ID3 specifications for why 8 
-			
-			tag.addField( artwork );
-			
-			audioFile.setTag( tag );
-			AudioFileIO.write( audioFile );
-			
-		} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException | CannotWriteException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 }

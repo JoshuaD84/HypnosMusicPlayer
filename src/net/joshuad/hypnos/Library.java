@@ -318,7 +318,6 @@ public class Library {
 		}
 	}
 	
-	
 	private void removeOneSource() {
 
 		//TODO: What is this and what is it doing? 

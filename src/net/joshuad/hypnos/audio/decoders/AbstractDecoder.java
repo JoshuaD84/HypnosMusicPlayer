@@ -105,6 +105,14 @@ public abstract class AbstractDecoder {
 		closeAllResources();
 		openStreamsAt ( seekPercent );
 	}
+	
+	public void pause() {
+		audioOutput.stop();
+	}
+	
+	public void unpause() {
+		audioOutput.start();
+	}
 }
 
 

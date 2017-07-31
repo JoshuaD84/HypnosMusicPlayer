@@ -20,7 +20,7 @@ public class Playlist implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
-	private ArrayList <Track> tracks;
+	private List <Track> tracks;
 	
 	private String name;
 	
@@ -28,7 +28,7 @@ public class Playlist implements Serializable {
 		this ( name, new ArrayList <Track> () );
 	}
 	
-	public Playlist ( String name, ArrayList <Track> tracks ) {
+	public Playlist ( String name, List <Track> tracks ) {
 		setTracks( tracks );
 		this.name = name;
 	}
@@ -124,7 +124,7 @@ public class Playlist implements Serializable {
 		return tracks.size();
 	}
 	
-	public ArrayList <Track> getTracks () {
+	public List <Track> getTracks () {
 		return tracks;
 	}
 	

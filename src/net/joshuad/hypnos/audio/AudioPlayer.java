@@ -90,12 +90,14 @@ public class AudioPlayer {
 						pauseRequested = false;
 						state = PlayState.PAUSED;
 						controller.playerPaused();
+						decoder.pause();
 					}
 					
 					if ( unpauseRequested ) {
 						unpauseRequested = false;
 						state = PlayState.PLAYING;
 						controller.playerUnpaused();
+						decoder.unpause();
 					}
 					
 					if ( seekPercentRequested != NO_REQUEST ) {
