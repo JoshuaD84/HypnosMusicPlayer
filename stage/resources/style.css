@@ -50,3 +50,7 @@
 .volumeButton:pressed {
    -fx-text-fill: grey;
 }
+
+.tooltip {
+	-fx-font-size: 12px;
+}

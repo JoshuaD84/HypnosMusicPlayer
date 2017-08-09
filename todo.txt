@@ -1,22 +1,14 @@
 New Features
 	Log to file, how does that work inside java? 
-			
-	Tab in settings window for in-program hotkeys. 
-		
-	Drag and drop from misc places to system
-		playlist table -> m3u
-		track table, history, queue, info windows, current table -> single tracks
-		album table -> folder
-				
-	Setting album image for flac file currently playing causes exception in decoder. 
-
 	
+	Important glyphs make pngs
+
 Bug Fixes / Incremental Improvements
+
+	Setting album image for flac file currently playing causes exception in decoder. 
 
 	No Track playing and you hit escape on the current list -> remove images?
 
-	Font size on transport tooltips 
-	
 	Playlist Info Window doesn't stay up to date as the list is changed
 		CurrentList == Playlist doesn't edit when playlist info window is edited
 			Probably just mark it as changed, don't change the list. 
@@ -193,11 +185,13 @@ Future Features, maybe:
 	
 	Dark Stylesheet 
 	
+			
+	Drag and drop from misc places to system
+		playlist table -> m3u
+		track table, history, queue, info windows, current table -> single tracks
+		album table -> folder
 	
-
-	
-	
-	
+	Tab in settings window for in-program hotkeys. 
 	
 	
 Label localLabel = new Label ( "Hypnos Hotkeys" );

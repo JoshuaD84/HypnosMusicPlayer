@@ -131,7 +131,7 @@ public class FXUI implements PlayerListener {
 	SplitPane currentListSplitPane;
 	StretchedTabPane libraryPane;
 	
-	ImageView playImage;
+	ImageView saveImage;
 	ImageView pauseImage;
 
 	HBox albumFilterPane;
@@ -356,9 +356,10 @@ public class FXUI implements PlayerListener {
 		switch ( Hypnos.getOS() ) {
 			
 			case OSX:
-				font = Paths.get( "stage/resources/lucidagrande/lucidagrande.ttf" );
-				fontBold = Paths.get ( "stage/resources/lucidagrande/lucidagrande-bold.ttf" );
-				stylesheet = Paths.get ( "stage/resources/style-font-osx.css" );
+				font = Hypnos.getRootDirectory().resolve( "resources/lucidagrande/lucidagrande.ttf" );
+				fontBold = Hypnos.getRootDirectory().resolve( "resources/lucidagrande/lucidagrande-bold.ttf" );
+				stylesheet = Hypnos.getRootDirectory().resolve( "resources/style-font-osx.css" );
+				stylesheet = Hypnos.getRootDirectory().resolve( "resources/style-font-osx.css" );
 				
 			case WIN_10:
 			case WIN_7:
@@ -367,22 +368,21 @@ public class FXUI implements PlayerListener {
 			case WIN_VISTA:
 			case WIN_XP:
 			case UNKNOWN:
-				font = Paths.get( "stage/resources/calibri/calibri.ttf" );
-				fontBold = Paths.get ( "stage/resources/calibri/calibri-bold.ttf" );
-				stylesheet = Paths.get ( "stage/resources/style-font-win.css" );
+				font = Hypnos.getRootDirectory().resolve( "resources/calibri/calibri.ttf" );
+				fontBold = Hypnos.getRootDirectory().resolve( "resources/calibri/calibri-bold.ttf" );
+				stylesheet = Hypnos.getRootDirectory().resolve( "resources/style-font-win.css" );
 				break;
 				
-			
 			case NIX:
 			default:
-				font = Paths.get( "stage/resources/dejavu/dejavusans.ttf" );
-				fontBold = Paths.get ( "stage/resources/dejavu/dejavusans-bold.ttf" );
-				stylesheet = Paths.get ( "stage/resources/style-font-nix.css" );
+				font = Hypnos.getRootDirectory().resolve( "resources/dejavu/dejavusans.ttf" );
+				fontBold = Hypnos.getRootDirectory().resolve( "resources/dejavu/dejavusans-bold.ttf" );
+				stylesheet = Hypnos.getRootDirectory().resolve( "resources/style-font-nix.css" );
 				break;
 		}
 		
 		try {
-			Font fonat = Font.loadFont( new FileInputStream ( font.toFile() ), 12 );
+			Font fonat = Font.loadFont( new FileInputStream ( font.toFile() ), 12 ); //TODO: Rename. 
 			System.out.println ( "loaded: " + fonat.getFamily() ); //TODO: DD
 			Font.loadFont( new FileInputStream ( fontBold.toFile() ), 12 );
 			scene.getStylesheets().add( "file:///" + stylesheet.toFile().getAbsolutePath().replace( "\\", "/" ) );
@@ -425,7 +425,7 @@ public class FXUI implements PlayerListener {
 					timeRemainingLabel.setText( Utils.getLengthDisplay( -timeRemainingS ) );
 				} else if ( player.isStopped() ) {
 					currentListTable.refresh();
-					togglePlayButton.setGraphic( playImage );
+					togglePlayButton.setGraphic( saveImage );
 					trackPositionSlider.setValue( 0 );
 					timeElapsedLabel.setText( "" );
 					timeRemainingLabel.setText( "" );
@@ -477,13 +477,13 @@ public class FXUI implements PlayerListener {
 	
 	public void setupTransport () {
 	
-		playImage = null;
+		saveImage = null;
 		pauseImage = null;
 		
 		try {
-			playImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/play.png" ).toFile() ) ) );
-			playImage.setFitHeight( 18 );
-			playImage.setFitWidth( 18 );
+			saveImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/play.png" ).toFile() ) ) );
+			saveImage.setFitHeight( 18 );
+			saveImage.setFitWidth( 18 );
 		} catch ( FileNotFoundException e ) {
 			System.out.println ( "Unable to load play icon: resources/play.png" );
 		}
@@ -497,7 +497,7 @@ public class FXUI implements PlayerListener {
 		}
 		
 		togglePlayButton = new Button ( "" );
-		togglePlayButton.setGraphic( playImage );
+		togglePlayButton.setGraphic( saveImage );
 		togglePlayButton.setPrefSize( 42, 35 );
 		togglePlayButton.setMinSize( 42, 35 );
 		togglePlayButton.setMaxSize( 42, 35 );
@@ -1264,10 +1264,32 @@ public class FXUI implements PlayerListener {
 		showQueueButton = new Button ( "Q" );
 		Button showHistoryButton = new Button ( "H" );
 		Button loadTracksButton = new Button( "⏏" );
-		savePlaylistButton = new Button( "💾" );
+		savePlaylistButton = new Button( "" );
 		exportPlaylistButton = new Button ( "↗" );
 		Button clearButton = new Button ( "✘" );
-
+		
+		try {
+			ImageView saveImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/save2.png" ).toFile() ) ) );
+			saveImage.setFitHeight( 11 );
+			saveImage.setFitWidth( 11 );
+			savePlaylistButton.setGraphic( saveImage );
+		} catch ( FileNotFoundException e ) {
+			savePlaylistButton.setText( "💾" );
+			System.out.println ( "Unable to load icon: resources/save.png, trying to use font glyph." );
+		}
+		
+		/*
+		
+		try {
+			ImageView clearImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/clear.png" ).toFile() ) ) );
+			clearButton.setGraphic( clearImage );
+		} catch ( FileNotFoundException e ) {
+			savePlaylistButton.setText( "✘" );
+			System.out.println ( "Unable to load icon: resources/clear.png, trying to use font glyph." );
+		}
+		*/
+		
+		
 		toggleRepeatButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
 		toggleShuffleButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
 		showQueueButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
@@ -3384,7 +3406,7 @@ public class FXUI implements PlayerListener {
 	@Override
 	public void playerPaused () {
 		Platform.runLater( () -> {
-			togglePlayButton.setGraphic( playImage );
+			togglePlayButton.setGraphic( saveImage );
 		});
 	}
 
