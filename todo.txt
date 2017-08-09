@@ -7,13 +7,9 @@ Bug Fixes / Incremental Improvements
 
 	Setting album image for flac file currently playing causes exception in decoder. 
 
-	No Track playing and you hit escape on the current list -> remove images?
-
 	Playlist Info Window doesn't stay up to date as the list is changed
 		CurrentList == Playlist doesn't edit when playlist info window is edited
 			Probably just mark it as changed, don't change the list. 
-		
-	Add tag image info to tag window
 
 	Volume mchange / mute when there is no track loaded.
 	
@@ -192,6 +188,8 @@ Future Features, maybe:
 		album table -> folder
 	
 	Tab in settings window for in-program hotkeys. 
+			
+	Add tag image info to tag window
 	
 	
 Label localLabel = new Label ( "Hypnos Hotkeys" );

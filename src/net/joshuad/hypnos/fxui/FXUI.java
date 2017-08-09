@@ -1964,9 +1964,11 @@ public class FXUI implements PlayerListener {
 		});
 		
 		albumTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
-		    if (newSelection != null) {
+		    if ( newSelection != null ) {
 		    	setImages ( newSelection.getTracks().get( 0 ) );
 		    	albumInfoWindow.setAlbum( newSelection );
+		    } else {
+		    	setImages ( null );
 		    }
 		});
 
@@ -2239,6 +2241,8 @@ public class FXUI implements PlayerListener {
 		    if (newSelection != null) {
 		    	setImages ( newSelection );
 		    	trackInfoWindow.setTrack( newSelection );
+		    } else {
+		     	setImages ( null );
 		    }
 		});
 		
@@ -2905,9 +2909,7 @@ public class FXUI implements PlayerListener {
 		});
 		
 		currentListTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
-		    if (newSelection != null) {
-		    	setImages ( newSelection );
-		    }
+		    setImages ( newSelection );
 		});
 		
 		currentListTable.setRowFactory( tv -> {
