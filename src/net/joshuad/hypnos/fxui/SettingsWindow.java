@@ -52,7 +52,7 @@ public class SettingsWindow extends Stage {
 	private GlobalHotkeys hotkeys;
 	
 	private TabPane tabPane;
-	private Tab globalHotkeysTab;
+	private Tab hotkeysTab;
 	
 	private EnumMap <Hotkey, TextField> hotkeyFields = new EnumMap <Hotkey, TextField> ( Hotkey.class );
 	
@@ -75,12 +75,12 @@ public class SettingsWindow extends Stage {
 		
 		
 		Tab settingsTab = setupSettingsTab( root );
-		globalHotkeysTab = setupGlobalHotkeysTab ( root );
+		hotkeysTab = setupHotkeysTab ( root );
 		Tab logTab = setupLogTab( root );
 		Tab tagTab = setupTagTab ( root );
 		Tab aboutTab = setupAboutTab( root ); 
 		
-		tabPane.getTabs().addAll( settingsTab, globalHotkeysTab, logTab, tagTab, aboutTab );
+		tabPane.getTabs().addAll( settingsTab, hotkeysTab, logTab, tagTab, aboutTab );
 		
 		tabPane.prefWidthProperty().bind( root.widthProperty() );
 		tabPane.prefHeightProperty().bind( root.heightProperty() );
@@ -93,15 +93,16 @@ public class SettingsWindow extends Stage {
 		refreshHotkeyFields();
 	}	
 	
-	private Tab setupGlobalHotkeysTab ( Pane root ) {
-		GridPane content = new GridPane();
-		content.setAlignment( Pos.TOP_CENTER );
-		content.setPadding( new Insets ( 10 ) );
-		content.setVgap( 2 );
+	private Tab setupHotkeysTab ( Pane root ) {
 		
+		GridPane globalContent = new GridPane();
+		globalContent.setAlignment( Pos.TOP_CENTER );
+		globalContent.setPadding( new Insets ( 10 ) );
+		globalContent.setVgap( 2 );
+				
 		Tab hotkeysTab = new Tab ( "Global Hotkeys" );
 		hotkeysTab.setClosable( false );
-		hotkeysTab.setContent( content );
+		hotkeysTab.setContent( globalContent );
 		
 		int row = 0;
 	
@@ -110,7 +111,7 @@ public class SettingsWindow extends Stage {
 		headerLabel.setWrapText( true );
 		headerLabel.setTextAlignment( TextAlignment.CENTER );
 		headerLabel.setStyle( "-fx-alignment: center; -fx-font-size: 20px; -fx-font-weight: bold" );
-		content.add( headerLabel, 0, row, 2, 1 );
+		globalContent.add( headerLabel, 0, row, 2, 1 );
 		GridPane.setHalignment( headerLabel, HPos.CENTER );
 		row++;
 		
@@ -118,7 +119,7 @@ public class SettingsWindow extends Stage {
 		descriptionLabel.setPadding( new Insets ( 0, 0, 20, 0 ) );
 		descriptionLabel.setWrapText( true );
 		descriptionLabel.setTextAlignment( TextAlignment.CENTER );
-		content.add( descriptionLabel, 0, row, 2, 1 );
+		globalContent.add( descriptionLabel, 0, row, 2, 1 );
 		GridPane.setHalignment( descriptionLabel, HPos.CENTER );
 		row++;
 		
@@ -170,20 +171,20 @@ public class SettingsWindow extends Stage {
 				refreshHotkeyFields();
 			});
 			
-			content.add( label, 0, row );
-			content.add( field, 1, row );
+			globalContent.add( label, 0, row );
+			globalContent.add( field, 1, row );
 			
 			hotkeyFields.put( key, field );
 			
 			row++;
 		}
 		
-		Label clearLabel = new Label ( "(Use <ESC> to erase a hotkey)" );
-		clearLabel.setPadding( new Insets ( 20, 0, 0, 0 ) );
-		clearLabel.setWrapText( true );
-		clearLabel.setTextAlignment( TextAlignment.CENTER );
-		content.add( clearLabel, 0, row, 2, 1 );
-		GridPane.setHalignment( clearLabel, HPos.CENTER );
+		Label clearHotkeyLabel = new Label ( "(Use <ESC> to erase a global hotkey)" );
+		clearHotkeyLabel.setPadding( new Insets ( 20, 0, 0, 0 ) );
+		clearHotkeyLabel.setWrapText( true );
+		clearHotkeyLabel.setTextAlignment( TextAlignment.CENTER );
+		globalContent.add( clearHotkeyLabel, 0, row, 2, 1 );
+		GridPane.setHalignment( clearHotkeyLabel, HPos.CENTER );
 		row++;
 		
 		return hotkeysTab;
@@ -469,10 +470,10 @@ public class SettingsWindow extends Stage {
 
 	public boolean hotkeysEnabled () {
 		if ( tabPane == null ) return true;
-		if ( globalHotkeysTab == null ) return true;
+		if ( hotkeysTab == null ) return true;
 		if ( !this.isShowing() ) return true;
 		
-		if ( tabPane.getSelectionModel().getSelectedItem().equals( this.globalHotkeysTab ) )  {
+		if ( tabPane.getSelectionModel().getSelectedItem().equals( this.hotkeysTab ) )  {
 			return false;
 		}
 		

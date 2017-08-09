@@ -1,7 +1,8 @@
 package net.joshuad.hypnos.fxui;
 
 import java.awt.Desktop;
-import java.io.ByteArrayInputStream;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,7 +13,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,12 +22,10 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
 
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.tag.FieldKey;
-import org.jaudiotagger.tag.Tag;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -38,8 +36,8 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -52,7 +50,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DialogPane;
@@ -87,6 +84,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -185,6 +183,9 @@ public class FXUI implements PlayerListener {
 	Button savePlaylistButton;
 	Button exportPlaylistButton;
 
+	ResizableImageView albumImage;
+	ResizableImageView artistImage;
+	
 	SplitPane artSplitPane;
 	
 	CheckBox trackListCheckBox;
@@ -220,7 +221,7 @@ public class FXUI implements PlayerListener {
 			System.out.println ( "Unable to load program icon: resources/icon.png" );
 		}
 		
-		
+		setupFont();
 		setupAlbumTable();
 		setupTrackListCheckBox();
 		setupAlbumFilterPane();
@@ -352,43 +353,43 @@ public class FXUI implements PlayerListener {
 	
 	private void setupFont() {
 		Path font, fontBold, stylesheet; 
-//		switch ( Hypnos.getOS() ) {
-//			
-//			case OSX:
-//				font = Paths.get( "stage/resources/lucidagrande/lucidagrande.ttf" );
-//				fontBold = Paths.get ( "stage/resources/lucidagrande/lucidagrande-bold.ttf" );
-//				stylesheet = Paths.get ( "stage/resources/style-font-osx.css" );
-//				break;
-//				
-//			case WIN_10:
-//			case WIN_7:
-//			case WIN_8:
-//			case WIN_UNKNOWN:
-//			case WIN_VISTA:
-//			case WIN_XP:
-//				font = Paths.get( "stage/resources/calibri/calibri.ttf" );
-//				fontBold = Paths.get ( "stage/resources/calibri/calibri-bold.ttf" );
-//				stylesheet = Paths.get ( "stage/resources/style-font-win.css" );
-//				break;
-//
-//			case UNKNOWN:
-//			case NIX:
-//			default:
+		switch ( Hypnos.getOS() ) {
+			
+			case OSX:
+				font = Paths.get( "stage/resources/lucidagrande/lucidagrande.ttf" );
+				fontBold = Paths.get ( "stage/resources/lucidagrande/lucidagrande-bold.ttf" );
+				stylesheet = Paths.get ( "stage/resources/style-font-osx.css" );
+				
+			case WIN_10:
+			case WIN_7:
+			case WIN_8:
+			case WIN_UNKNOWN:
+			case WIN_VISTA:
+			case WIN_XP:
+			case UNKNOWN:
 				font = Paths.get( "stage/resources/calibri/calibri.ttf" );
 				fontBold = Paths.get ( "stage/resources/calibri/calibri-bold.ttf" );
 				stylesheet = Paths.get ( "stage/resources/style-font-win.css" );
-//				break;
-//		}
+				break;
+				
+			
+			case NIX:
+			default:
+				font = Paths.get( "stage/resources/dejavu/dejavusans.ttf" );
+				fontBold = Paths.get ( "stage/resources/dejavu/dejavusans-bold.ttf" );
+				stylesheet = Paths.get ( "stage/resources/style-font-nix.css" );
+				break;
+		}
 		
-	//	try {
-			//Font.loadFont( new FileInputStream ( font.toFile() ), 12 );
-			//Font.loadFont( new FileInputStream ( fontBold.toFile() ), 12 );
+		try {
+			Font fonat = Font.loadFont( new FileInputStream ( font.toFile() ), 12 );
+			System.out.println ( "loaded: " + fonat.getFamily() ); //TODO: DD
+			Font.loadFont( new FileInputStream ( fontBold.toFile() ), 12 );
 			scene.getStylesheets().add( "file:///" + stylesheet.toFile().getAbsolutePath().replace( "\\", "/" ) );
-			System.out.println ( "Loaded" );
-		//} //catch ( FileNotFoundException e ) {
-			// TODO Auto-generated catch block
-		//	e.printStackTrace();
-		//}
+		} catch ( FileNotFoundException e ) {
+			 //TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 	
@@ -500,6 +501,7 @@ public class FXUI implements PlayerListener {
 		togglePlayButton.setPrefSize( 42, 35 );
 		togglePlayButton.setMinSize( 42, 35 );
 		togglePlayButton.setMaxSize( 42, 35 );
+		togglePlayButton.setTooltip( new Tooltip( "Toggle Play/Pause" ) );
 		
 		ImageView previousImage = null;
 		try {
@@ -515,6 +517,7 @@ public class FXUI implements PlayerListener {
 		previousButton.setPrefSize( 42, 35 );
 		previousButton.setMinSize( 42, 35 );
 		previousButton.setMaxSize( 42, 35 );
+		previousButton.setTooltip( new Tooltip( "Previous Track" ) );
 		
 		ImageView nextImage = null;
 		try {
@@ -530,6 +533,7 @@ public class FXUI implements PlayerListener {
 		nextButton.setPrefSize( 42, 35 );
 		nextButton.setMinSize( 42, 35 );
 		nextButton.setMaxSize( 42, 35 );
+		nextButton.setTooltip( new Tooltip( "Next Track" ) );
 		
 		ImageView stopImage = null;
 		try {
@@ -544,7 +548,8 @@ public class FXUI implements PlayerListener {
 		stopButton.setGraphic( stopImage );
 		stopButton.setPrefSize( 42, 35 );
 		stopButton.setMinSize( 42, 35 );
-		nextButton.setMaxSize( 42, 35 );
+		stopButton.setMaxSize( 42, 35 );
+		stopButton.setTooltip( new Tooltip( "Stop" ) );
 		
 		previousButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -593,8 +598,10 @@ public class FXUI implements PlayerListener {
 		timeElapsedLabel.setContentDisplay( ContentDisplay.RIGHT );
 		timeElapsedLabel.setTextAlignment( TextAlignment.RIGHT );
 		timeElapsedLabel.setAlignment( Pos.CENTER_RIGHT );
+		timeElapsedLabel.setTooltip( new Tooltip ( "Time Elapsed" ) );
 
 		timeRemainingLabel.setMinWidth( 65 );
+		timeRemainingLabel.setTooltip( new Tooltip ( "Time Remaining" ) );
 
 		trackPositionSlider = new Slider();
 		trackPositionSlider.setMin( 0 );
@@ -604,6 +611,7 @@ public class FXUI implements PlayerListener {
 		trackPositionSlider.setMinWidth( 200 );
 		trackPositionSlider.setPrefWidth( 400 );
 		trackPositionSlider.setStyle( "-fx-font-size: 18px" );
+		trackPositionSlider.setTooltip( new Tooltip ( "Change Track Position" ) );
 
 		trackPositionSlider.valueChangingProperty().addListener( new ChangeListener <Boolean>() {
 			public void changed ( ObservableValue <? extends Boolean> obs, Boolean wasChanging, Boolean isNowChanging ) {
@@ -627,6 +635,7 @@ public class FXUI implements PlayerListener {
 		volumeMuteButton.setMinWidth( 30 );
 		volumeMuteButton.setPadding( new Insets ( 0, 5, 0, 5 ) );
 		volumeMuteButton.getStyleClass().add( "volumeButton" );
+		volumeMuteButton.setTooltip( new Tooltip ( "Toggle Mute" ) );
 		
 		volumeMuteButton.setOnAction( ( ActionEvent e ) -> {
 			player.toggleMute();
@@ -636,6 +645,7 @@ public class FXUI implements PlayerListener {
 		volumeSlider.setMin( 0 );
 		volumeSlider.setMax( 100 );
 		volumeSlider.setPrefWidth( 100 );
+		volumeSlider.setTooltip( new Tooltip ( "Control Volume" ) );
 		
 		volumeSlider.setOnMouseDragged( ( MouseEvent e ) -> {
 			double min = volumeSlider.getMin();
@@ -667,6 +677,7 @@ public class FXUI implements PlayerListener {
 		Button settingsButton = new Button ( "⚙" );
 		settingsButton.setPadding( new Insets ( 0, 5, 0, 5 ) );
 		settingsButton.getStyleClass().add( "settingsButton" );
+		settingsButton.setTooltip( new Tooltip( "Configuration and Information" ) );
 		
 		settingsButton.setOnAction ( ( ActionEvent event ) -> {
 			settingsWindow.show();
@@ -727,14 +738,40 @@ public class FXUI implements PlayerListener {
 
 			setImages ( currentImagesTrack );
 		});
-		
-		exportImage.setOnAction( ( ActionEvent e ) -> {
-			Track track = currentImagesTrack;
-			if ( track == null ) return;
 			
-			//TODO: 
-			
-		});
+			exportImage.setOnAction( ( ActionEvent event ) -> {
+				Track track = currentImagesTrack;
+				if ( track == null ) return;
+				
+				FileChooser fileChooser = new FileChooser();
+				FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter( 
+					"Image Files", Arrays.asList( "*.png" ) );
+				
+				fileChooser.getExtensionFilters().add( fileExtensions );
+				fileChooser.setTitle( "Export Album Image" );
+				File targetFile = fileChooser.showSaveDialog( mainStage );
+				
+				if ( targetFile == null ) return; 
+	
+				if ( !targetFile.toString().toLowerCase().endsWith(".png") ) {
+					targetFile = targetFile.toPath().resolveSibling ( targetFile.getName() + ".png" ).toFile();
+					System.out.println ( targetFile.toString() );
+				}
+				
+				try {
+					BufferedImage bImage = SwingFXUtils.fromFXImage( albumImage.getImage(), null );
+					ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+					ImageIO.write( bImage, "png", byteStream );
+					byte[] imageBytes  = byteStream.toByteArray();
+					byteStream.close();
+					
+					Utils.saveImageToDisk( targetFile.toPath(), imageBytes );
+				} catch ( IOException ex ) {
+					//TODO: Show UI error. 
+					
+				}
+				
+			});
 				
 		albumImagePane = new BorderPane();
 		albumImagePane.setOnContextMenuRequested( ( ContextMenuEvent e ) -> {
@@ -825,6 +862,39 @@ public class FXUI implements PlayerListener {
 			exportImage.setDisable( disableAllMenus );
 			
 			menu.show( artistImagePane, e.getScreenX(), e.getScreenY() );
+		});
+
+		exportImage.setOnAction( ( ActionEvent event ) -> {
+			Track track = currentImagesTrack;
+			if ( track == null ) return;
+			
+			FileChooser fileChooser = new FileChooser();
+			FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter( 
+				"Image Files", Arrays.asList( "*.png" ) );
+			
+			fileChooser.getExtensionFilters().add( fileExtensions );
+			fileChooser.setTitle( "Export Artist Image" );
+			File targetFile = fileChooser.showSaveDialog( mainStage );
+			
+			if ( targetFile == null ) return; 
+
+			if ( !targetFile.toString().toLowerCase().endsWith(".png") ) {
+				targetFile = targetFile.toPath().resolveSibling ( targetFile.getName() + ".png" ).toFile();
+				System.out.println ( targetFile.toString() );
+			}
+			
+			try {
+				BufferedImage bImage = SwingFXUtils.fromFXImage( artistImage.getImage(), null );
+				ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+				ImageIO.write( bImage, "png", byteStream );
+				byte[] imageBytes  = byteStream.toByteArray();
+				byteStream.close();
+				
+				Utils.saveImageToDisk( targetFile.toPath(), imageBytes );
+			} catch ( IOException ex ) {
+				//TODO: Show UI error. 
+				
+			}
 		});
 		
 		FileChooser fileChooser = new FileChooser();
@@ -1043,11 +1113,11 @@ public class FXUI implements PlayerListener {
 
 	public void setAlbumImage ( Image image ) {
 		try {
-			ResizableImageView view = new ResizableImageView( image );
-			view.setSmooth(true);
-			view.setCache(true);
-			view.setPreserveRatio( true );
-			albumImagePane.setCenter( view );
+			albumImage = new ResizableImageView( image );
+			albumImage.setSmooth(true);
+			albumImage.setCache(true);
+			albumImage.setPreserveRatio( true );
+			albumImagePane.setCenter( albumImage );
 		} catch ( Exception e ) {
 			albumImagePane.setCenter( null );
 		}
@@ -1055,11 +1125,11 @@ public class FXUI implements PlayerListener {
 
 	public void setArtistImage ( Image image ) {
 		try {
-			ResizableImageView view = new ResizableImageView( image );
-			view.setSmooth(true);
-			view.setCache(true);
-			view.setPreserveRatio( true );
-			artistImagePane.setCenter( view );
+			artistImage = new ResizableImageView( image );
+			artistImage.setSmooth(true);
+			artistImage.setCache(true);
+			artistImage.setPreserveRatio( true );
+			artistImagePane.setCenter( artistImage );
 		} catch ( Exception e ) {
 			artistImagePane.setCenter( null );
 		}
@@ -1874,6 +1944,7 @@ public class FXUI implements PlayerListener {
 		albumTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
 		    if (newSelection != null) {
 		    	setImages ( newSelection.getTracks().get( 0 ) );
+		    	albumInfoWindow.setAlbum( newSelection );
 		    }
 		});
 
@@ -2145,6 +2216,7 @@ public class FXUI implements PlayerListener {
 		trackTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
 		    if (newSelection != null) {
 		    	setImages ( newSelection );
+		    	trackInfoWindow.setTrack( newSelection );
 		    }
 		});
 		
@@ -2319,6 +2391,12 @@ public class FXUI implements PlayerListener {
 				library.removePlaylists( playlistTable.getSelectionModel().getSelectedItems() );
 				playlistTable.getSelectionModel().clearSelection();
 			}
+		});
+		
+		playlistTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
+		    if (newSelection != null) {
+		    	playlistInfoWindow.setPlaylist( newSelection );
+		    }
 		});
 
 		playlistTable.setOnKeyPressed( ( KeyEvent e ) -> {
@@ -2676,7 +2754,7 @@ public class FXUI implements PlayerListener {
 				e.consume();
 				
 					
-			} else if ( e.getCode() == KeyCode.R && e.isShiftDown()
+			} else if ( e.getCode() == KeyCode.R && e.isShiftDown() //TODO: Put this on the hotkey list? 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isMetaDown() ) {
 				shuffleMenuItem.fire();
 				e.consume();
