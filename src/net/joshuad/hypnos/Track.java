@@ -736,6 +736,11 @@ public class Track implements Serializable {
 		//then look at tag for any other suitable images
 		//then take any image file from the album folder. 
 		
+		if ( !Files.exists( getPath() ) ) {
+			LOGGER.info( "Track file does not exist."  );
+			return null;
+		}
+		
 		try {
 			List<Artwork> artworkList = getAudioFile().getTag().getArtworkList();
 			if ( artworkList != null ) {
@@ -747,9 +752,7 @@ public class Track implements Serializable {
 				}
 			}			
 		} catch ( NullPointerException | IOException | CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
-			// TODO Auto-generated catch block
-			// TODO CannotReadException for Test Cases/long.m4a
-			e.printStackTrace( System.out );
+			
 		} 
 		
 		Path bestPath = getPreferredAlbumCoverPath ();

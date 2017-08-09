@@ -22,8 +22,6 @@ Bug Fixes / Incremental Improvements
 	Hotkeys aren't consumed, so they are passed to the current window. >:-O
 		Check windows and OSX
 		for Linux, just add a label to the dialog and tell them to consume the hotkey using some other program
-
-	try to play a missing file. It keeps throwing exception. Only throw it once.
 			
 	Make sure horizontal scroll bars never appear
 		6/9 - Can't find anything on google.
@@ -45,8 +43,6 @@ Bug Fixes / Incremental Improvements
 			at com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
 			at com.sun.glass.ui.gtk.GtkApplication.lambda$null$5(GtkApplication.java:139)
 			at java.lang.Thread.run(Thread.java:748)
-				
-	Make the tag error window more user-friendly. 
 	
 	hide/show via hotkeys while maximized toggles every 3 presses instead of every 2 presses. 
 	https://stackoverflow.com/questions/45269173/stage-seticonified-and-stage-isiconified-not-acting-properly
@@ -190,6 +186,8 @@ Future Features, maybe:
 	Tab in settings window for in-program hotkeys. 
 			
 	Add tag image info to tag window
+	
+	Make the tag error window more user-friendly. 
 	
 	
 Label localLabel = new Label ( "Hypnos Hotkeys" );

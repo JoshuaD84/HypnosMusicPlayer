@@ -1080,7 +1080,7 @@ public class FXUI implements PlayerListener {
 	private Thread imageLoader = null;
 	public void setImages ( Track track ) {
 		currentImagesTrack = track;
-		if ( track != null ) {
+		if ( track != null && Files.exists( track.getPath() ) ) {
 			if ( imageLoader != null ) {
 				imageLoader.interrupt();
 			}

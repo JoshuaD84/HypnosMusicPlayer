@@ -1,5 +1,6 @@
 package net.joshuad.hypnos.audio;
 
+import java.nio.file.Files;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -66,6 +67,7 @@ public class AudioPlayer {
 							decoder = getPlayer ( trackRequested );
 						} catch ( IllegalStateException e ) {
 							LOGGER.info( "Unable to play file: " + track.getFilename() );
+							trackRequested = null;
 						}
 						
 						if ( decoder != null ) {
@@ -257,8 +259,18 @@ public class AudioPlayer {
 		
 	private AbstractDecoder getPlayer ( Track track ) {
 		
-		AbstractDecoder decoder = null;
+		if ( track == null ) {
+			LOGGER.info ( "Asked to play null track, ignoring." );
+			return null;
+		}
 		
+		if ( !Files.exists( track.getPath() ) ) {
+			LOGGER.info ( "Track file does not exist: " + track.getPath().toString() );
+			return null;
+		}
+		
+		AbstractDecoder decoder = null;
+				
 		switch ( track.getFormat() ) {
 			case FLAC:
 				try {
