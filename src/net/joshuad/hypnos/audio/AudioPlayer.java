@@ -219,6 +219,10 @@ public class AudioPlayer {
 		}
 		this.volumePercentRequested = volumePercent;
 		this.volumePercent = volumePercent;
+		
+		if ( this.decoder == null ) {
+			controller.volumeChanged ( volumePercent );
+		}
 	}
 		
 	public Track getTrack() {
@@ -303,6 +307,7 @@ public class AudioPlayer {
 				break;
 		}
 		
+		decoder.setVolumePercent( volumePercent );
 		return decoder;
 	}
 	

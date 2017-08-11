@@ -11,7 +11,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -31,8 +30,6 @@ public class Hypnos extends Application {
 
 	private static final Logger LOGGER = Logger.getLogger( Hypnos.class.getName() ); 
 
-	private static FileHandler fileHandler;
-	
 	public enum ExitCode {
 		NORMAL,
 		UNKNOWN_ERROR,
@@ -84,8 +81,8 @@ public class Hypnos extends Application {
 		return rootDirectory;
 	}
 	
-	public static FileHandler getFileHandler() {
-		return fileHandler;
+	public static Persister getPersister() {
+		return persister;
 	}
 
 	private void parseSystemProperties() {
@@ -349,7 +346,6 @@ public class Hypnos extends Application {
 				libraryUpdater = new LibraryUpdater ( library, ui );
 				
 				applyCommands( commands );
-				
 				
 				singleInstanceController.startCLICommandListener ( this );
 				library.startLoader( persister );

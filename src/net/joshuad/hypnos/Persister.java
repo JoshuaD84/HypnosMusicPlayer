@@ -343,6 +343,17 @@ public class Persister {
 	}
 
 	public void savePlaylists () {
+		
+		try ( DirectoryStream <Path> stream = Files.newDirectoryStream( playlistsDirectory.toPath() ) ) {
+			for ( Path child : stream ) {
+				if ( Utils.isPlaylistFile( child ) ) {
+					Files.delete( child );
+				}
+			}
+		} catch ( IOException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
 		ArrayList <Playlist> playlists = new ArrayList <Playlist>( library.playlists );
 
 		int playlistIndex = 1;

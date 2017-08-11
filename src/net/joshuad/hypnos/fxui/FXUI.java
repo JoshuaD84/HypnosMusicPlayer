@@ -38,6 +38,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -646,13 +647,21 @@ public class FXUI implements PlayerListener {
 		volumeSlider.setMax( 100 );
 		volumeSlider.setPrefWidth( 100 );
 		volumeSlider.setTooltip( new Tooltip ( "Control Volume" ) );
+
 		
-		volumeSlider.setOnMouseDragged( ( MouseEvent e ) -> {
-			double min = volumeSlider.getMin();
-			double max = volumeSlider.getMax();
-			double percent = (volumeSlider.getValue() - min) / (max - min);
-			player.setVolumePercent( percent ); //Note: this works because min is 0 
-		});
+		EventHandler<MouseEvent> volumeSliderHandler = new EventHandler<MouseEvent> () {
+			@Override
+			public void handle ( MouseEvent event ) {
+				double min = volumeSlider.getMin();
+				double max = volumeSlider.getMax();
+				double percent = (volumeSlider.getValue() - min) / (max - min);
+				player.setVolumePercent( percent ); //Note: this works because min is 0 
+				
+			}
+		};
+		
+		volumeSlider.setOnMouseDragged ( volumeSliderHandler );
+		volumeSlider.setOnMouseClicked ( volumeSliderHandler );
 		
 		HBox volumePane = new HBox();
 		volumePane.getChildren().addAll( volumeMuteButton, volumeSlider );
@@ -2448,6 +2457,10 @@ public class FXUI implements PlayerListener {
 			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown()
 			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
 				appendMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.DELETE
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
+				removeMenuItem.fire();
 				
 			} 
 		});

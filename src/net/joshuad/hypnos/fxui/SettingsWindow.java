@@ -12,6 +12,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -39,6 +40,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
@@ -91,6 +93,11 @@ public class SettingsWindow extends Stage {
 		root.getChildren().add( primaryPane );
 		setScene( scene );
 		refreshHotkeyFields();
+		
+		setOnCloseRequest ( ( WindowEvent event ) -> {
+			Hypnos.getPersister().saveHotkeys();
+			Hypnos.getPersister().saveSettings();
+		});
 	}	
 	
 	private Tab setupHotkeysTab ( Pane root ) {
@@ -235,31 +242,54 @@ public class SettingsWindow extends Stage {
 						
 		GridPane shuffleGrid = new GridPane();
 		shuffleGrid.setPadding( new Insets ( 15, 0, 0, 0 ) );
+		shuffleGrid.setHgap( 15 );
+		shuffleGrid.setVgap( 5 );
+		
+		int row = 0;
+		
+		Label shuffleLabel = new Label ( "Shuffle" );
+		GridPane.setHalignment( shuffleLabel, HPos.CENTER );
+		shuffleGrid.add( shuffleLabel, 1, row );
+		
+		Label repeatLabel = new Label ( "Repeat" );
+		GridPane.setHalignment( repeatLabel, HPos.CENTER );
+		shuffleGrid.add( repeatLabel, 2, row );
+		row++;
 		
 		final ObservableList<String> shuffleOptions = FXCollections.observableArrayList( "No Change", "Sequential", "Shuffle" );
-		int row = 0;
-		Label albumsLabel = new Label ( "Default shuffle setting for albums:" );
-		albumsLabel.setPadding( new Insets ( 0, 10, 0, 0 ) );
+		final ObservableList<String> repeatOptions = FXCollections.observableArrayList( "No Change", "Play Once", "Repeat" );
+		
+		Label albumsLabel = new Label ( "Default setting for albums:" );
+		GridPane.setHalignment( albumsLabel, HPos.RIGHT );
 		shuffleGrid.add ( albumsLabel, 0, row );
 		ChoiceBox <String> albumChoices = new ChoiceBox <String>( shuffleOptions );
 		shuffleGrid.add ( albumChoices, 1, row );
 		albumChoices.getSelectionModel().select( 1 );
+		ChoiceBox <String> albumRepeatChoices = new ChoiceBox <String>( repeatOptions );
+		shuffleGrid.add ( albumRepeatChoices, 2, row );
+		albumRepeatChoices.getSelectionModel().select( 1 );
 		row++;
 		
-		Label trackLabel = new Label ( "Default shuffle setting for tracks:" );
-		trackLabel.setPadding( new Insets ( 0, 10, 0, 0 ) );
+		Label trackLabel = new Label ( "Default setting for tracks:" );
+		GridPane.setHalignment( trackLabel, HPos.RIGHT );
 		shuffleGrid.add ( trackLabel, 0, row );
 		ChoiceBox <String> trackChoices = new ChoiceBox <String>( shuffleOptions );
 		shuffleGrid.add ( trackChoices, 1, row );
 		trackChoices.getSelectionModel().select( 0 );
+		ChoiceBox <String> trackRepeatChoices = new ChoiceBox <String>( repeatOptions );
+		shuffleGrid.add ( trackRepeatChoices, 2, row );
+		trackRepeatChoices.getSelectionModel().select( 0 );
 		row++;
 		
-		Label playlistLabel = new Label ( "Default shuffle setting for playlists:" );
-		playlistLabel.setPadding( new Insets ( 0, 10, 0, 0 ) );
+		Label playlistLabel = new Label ( "Default setting for playlists:" );
+		GridPane.setHalignment( playlistLabel, HPos.RIGHT );
 		shuffleGrid.add ( playlistLabel, 0, row );
 		ChoiceBox <String> playlistChoices = new ChoiceBox <String>( shuffleOptions );
 		shuffleGrid.add ( playlistChoices, 1, row );
 		playlistChoices.getSelectionModel().select( 2 );
+		ChoiceBox <String> playlistRepeatChoices = new ChoiceBox <String>( repeatOptions );
+		shuffleGrid.add ( playlistRepeatChoices, 2, row );
+		playlistRepeatChoices.getSelectionModel().select( 2 );
 		row++;
 
 		settingsPane.getChildren().addAll( warnBox, shuffleGrid );
