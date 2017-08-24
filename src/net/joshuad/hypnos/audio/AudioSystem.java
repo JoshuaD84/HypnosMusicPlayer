@@ -35,7 +35,7 @@ public class AudioSystem {
 		RepeatMode ( String symbol ) { this.symbol = symbol; }
 		public String getSymbol () { return symbol; }
 	}
-
+	
 	private ShuffleMode shuffleMode = ShuffleMode.SEQUENTIAL;
 	private RepeatMode repeatMode = RepeatMode.PLAY_ONCE;
 	
@@ -368,10 +368,16 @@ public class AudioSystem {
 		retMe.put ( Setting.REPEAT, getRepeatMode() );
 		retMe.put ( Setting.VOLUME, player.getVolumePercent() );
 		
+		retMe.put ( Setting.DEFAULT_SHUFFLE_TRACKS, currentList.getDefaultTrackShuffleMode() );
+		retMe.put ( Setting.DEFAULT_SHUFFLE_ALBUMS, currentList.getDefaultAlbumShuffleMode() );
+		retMe.put ( Setting.DEFAULT_SHUFFLE_PLAYLISTS, currentList.getDefaultPlaylistShuffleMode() );
+
+		retMe.put ( Setting.DEFAULT_REPEAT_TRACKS, currentList.getDefaultTrackRepeatMode() );
+		retMe.put ( Setting.DEFAULT_REPEAT_ALBUMS, currentList.getDefaultAlbumRepeatMode() );
+		retMe.put ( Setting.DEFAULT_REPEAT_PLAYLISTS, currentList.getDefaultPlaylistRepeatMode() );
+		
 		return retMe;
 	}
-	
-	
 	
 	
 	

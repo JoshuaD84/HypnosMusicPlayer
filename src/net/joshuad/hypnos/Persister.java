@@ -39,7 +39,10 @@ public class Persister {
 		SHUFFLE, REPEAT, HIDE_ALBUM_TRACKS, WINDOW_MAXIMIZED, PRIMARY_SPLIT_PERCENT, 
 		CURRENT_LIST_SPLIT_PERCENT, ART_SPLIT_PERCENT, WINDOW_X_POSITION, WINDOW_Y_POSITION, 
 		WINDOW_WIDTH, WINDOW_HEIGHT, TRACK, TRACK_POSITION, TRACK_NUMBER, VOLUME, LIBRARY_TAB,
-		PROMPT_BEFORE_OVERWRITE;
+		PROMPT_BEFORE_OVERWRITE, 
+		DEFAULT_SHUFFLE_TRACKS, DEFAULT_SHUFFLE_ALBUMS, DEFAULT_SHUFFLE_PLAYLISTS,
+		DEFAULT_REPEAT_TRACKS, DEFAULT_REPEAT_ALBUMS, DEFAULT_REPEAT_PLAYLISTS
+		;
 	}
 
 	private File configDirectory;
@@ -354,7 +357,7 @@ public class Persister {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}		
-		ArrayList <Playlist> playlists = new ArrayList <Playlist>( library.playlists );
+		ArrayList <Playlist> playlists = new ArrayList <> ( library.playlists );
 
 		int playlistIndex = 1;
 		for ( Playlist playlist : playlists ) {
@@ -388,11 +391,13 @@ public class Persister {
 			PrintWriter settingsOut = new PrintWriter( new BufferedWriter( fileWriter ) );
 
 			fromPlayer.forEach( ( key, value ) -> {
-				settingsOut.printf( "%s: %s\n", key, value.toString() );
+				String valueOut = value == null ? "null" : value.toString();
+				settingsOut.printf( "%s: %s\n", key, valueOut );
 			} );
 
 			fromUI.forEach( ( key, value ) -> {
-				settingsOut.printf( "%s: %s\n", key, value.toString() );
+				String valueOut = value == null ? "null" : value.toString();
+				settingsOut.printf( "%s: %s\n", key, valueOut );
 			} );
 
 			settingsOut.flush();
@@ -439,8 +444,13 @@ public class Persister {
 					case TRACK_NUMBER:
 					case ART_SPLIT_PERCENT:
 					case PROMPT_BEFORE_OVERWRITE:
+					case DEFAULT_REPEAT_ALBUMS:
+					case DEFAULT_REPEAT_PLAYLISTS:
+					case DEFAULT_REPEAT_TRACKS:
+					case DEFAULT_SHUFFLE_ALBUMS:
+					case DEFAULT_SHUFFLE_PLAYLISTS:
+					case DEFAULT_SHUFFLE_TRACKS:
 						loadMe.put( setting, value );
-						break;
 				}
 			}
 

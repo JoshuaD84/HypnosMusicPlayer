@@ -9,10 +9,11 @@ import java.io.IOException;
 import java.util.EnumMap;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -41,29 +42,41 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import net.joshuad.hypnos.CurrentList.DefaultRepeatMode;
+import net.joshuad.hypnos.CurrentList.DefaultShuffleMode;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys.Hotkey;
 import net.joshuad.hypnos.TagError;
+import net.joshuad.hypnos.audio.AudioSystem;
 
 public class SettingsWindow extends Stage {
 	
 	private FXUI ui;
 	private Library library;
 	private GlobalHotkeys hotkeys;
+	private AudioSystem player;
 	
 	private TabPane tabPane;
 	private Tab hotkeysTab;
 	
 	private EnumMap <Hotkey, TextField> hotkeyFields = new EnumMap <Hotkey, TextField> ( Hotkey.class );
 	
-	SettingsWindow( FXUI ui, Library library, GlobalHotkeys hotkeys ) {
+	private ChoiceBox <String> albumShuffleChoices;
+	private ChoiceBox <String> albumRepeatChoices;
+	private ChoiceBox <String> trackShuffleChoices;
+	private ChoiceBox <String> trackRepeatChoices;
+	private ChoiceBox <String> playlistShuffleChoices;
+	private ChoiceBox <String> playlistRepeatChoices;
+	
+	SettingsWindow( FXUI ui, Library library, GlobalHotkeys hotkeys, AudioSystem player ) {
 		super();
 		
 		this.ui = ui;
 		this.library = library;
 		this.hotkeys = hotkeys;
+		this.player = player;
 
 		initModality( Modality.NONE );
 		initOwner( ui.getMainStage() );		
@@ -197,6 +210,88 @@ public class SettingsWindow extends Stage {
 		return hotkeysTab;
 	}
 	
+	public void updateSettings() {
+		
+		switch ( player.getCurrentList().getDefaultTrackRepeatMode() ) {
+			case NO_CHANGE:
+				trackRepeatChoices.getSelectionModel().select( 0 );
+				break;
+			case PLAY_ONCE:
+				trackRepeatChoices.getSelectionModel().select( 1 );
+				break;
+			case REPEAT:
+				trackRepeatChoices.getSelectionModel().select( 2 );
+				break;
+			
+		}
+		
+		switch ( player.getCurrentList().getDefaultAlbumRepeatMode() ) {
+			case NO_CHANGE:
+				albumRepeatChoices.getSelectionModel().select( 0 );
+				break;
+			case PLAY_ONCE:
+				albumRepeatChoices.getSelectionModel().select( 1 );
+				break;
+			case REPEAT:
+				albumRepeatChoices.getSelectionModel().select( 2 );
+				break;
+			
+		}
+		
+		switch ( player.getCurrentList().getDefaultPlaylistRepeatMode() ) {
+			case NO_CHANGE:
+				playlistRepeatChoices.getSelectionModel().select( 0 );
+				break;
+			case PLAY_ONCE:
+				playlistRepeatChoices.getSelectionModel().select( 1 );
+				break;
+			case REPEAT:
+				playlistRepeatChoices.getSelectionModel().select( 2 );
+				break;
+			
+		}
+		
+		switch ( player.getCurrentList().getDefaultTrackShuffleMode() ) {
+			case NO_CHANGE:
+				trackShuffleChoices.getSelectionModel().select( 0 );
+				break;
+			case SEQUENTIAL:
+				trackShuffleChoices.getSelectionModel().select( 1 );
+				break;
+			case SHUFFLE:
+				trackShuffleChoices.getSelectionModel().select( 2 );
+				break;
+			
+		}
+		
+		switch ( player.getCurrentList().getDefaultAlbumShuffleMode() ) {
+			case NO_CHANGE:
+				albumShuffleChoices.getSelectionModel().select( 0 );
+				break;
+			case SEQUENTIAL:
+				albumShuffleChoices.getSelectionModel().select( 1 );
+				break;
+			case SHUFFLE:
+				albumShuffleChoices.getSelectionModel().select( 2 );
+				break;
+			
+		}
+	
+		switch ( player.getCurrentList().getDefaultPlaylistShuffleMode() ) {
+			case NO_CHANGE:
+				playlistShuffleChoices.getSelectionModel().select( 0 );
+				break;
+			case SEQUENTIAL:
+				playlistShuffleChoices.getSelectionModel().select( 1 );
+				break;
+			case SHUFFLE:
+				playlistShuffleChoices.getSelectionModel().select( 2 );
+				break;
+			
+		}
+		
+	}
+	
 	public void refreshHotkeyFields() {
 		for ( Hotkey key : Hotkey.values() ) {
 			TextField field = hotkeyFields.get( key );
@@ -207,6 +302,7 @@ public class SettingsWindow extends Stage {
 	}
 	
 	private Tab setupSettingsTab ( Pane root ) {
+		
 		Tab settingsTab = new Tab ( "Settings" );
 		settingsTab.setClosable( false );
 		VBox settingsPane = new VBox();
@@ -262,34 +358,148 @@ public class SettingsWindow extends Stage {
 		Label albumsLabel = new Label ( "Default setting for albums:" );
 		GridPane.setHalignment( albumsLabel, HPos.RIGHT );
 		shuffleGrid.add ( albumsLabel, 0, row );
-		ChoiceBox <String> albumChoices = new ChoiceBox <String>( shuffleOptions );
-		shuffleGrid.add ( albumChoices, 1, row );
-		albumChoices.getSelectionModel().select( 1 );
-		ChoiceBox <String> albumRepeatChoices = new ChoiceBox <String>( repeatOptions );
+		
+		albumShuffleChoices = new ChoiceBox <String>( shuffleOptions );
+		shuffleGrid.add ( albumShuffleChoices, 1, row );
+		albumShuffleChoices.getSelectionModel().select( 1 );
+		albumShuffleChoices.getSelectionModel().selectedIndexProperty().addListener( new ChangeListener<Number>() {
+			@Override
+			public void changed ( ObservableValue <? extends Number> observableValue, Number oldValue, Number newValue ) {
+				switch ( newValue.intValue() ) {
+					case 0: 
+						player.getCurrentList().setDefaultAlbumShuffleMode ( DefaultShuffleMode.NO_CHANGE );
+						break;
+						
+					case 1:
+						player.getCurrentList().setDefaultAlbumShuffleMode ( DefaultShuffleMode.SEQUENTIAL );
+						break;
+					
+					case 2:
+						player.getCurrentList().setDefaultAlbumShuffleMode ( DefaultShuffleMode.SHUFFLE );
+						break;
+				}
+			}
+		});
+		
+		albumRepeatChoices = new ChoiceBox <String>( repeatOptions );
 		shuffleGrid.add ( albumRepeatChoices, 2, row );
 		albumRepeatChoices.getSelectionModel().select( 1 );
+		albumRepeatChoices.getSelectionModel().selectedIndexProperty().addListener( new ChangeListener<Number>() {
+			@Override
+			public void changed ( ObservableValue <? extends Number> observableValue, Number oldValue, Number newValue ) {
+				switch ( newValue.intValue() ) {
+					case 0: 
+						player.getCurrentList().setDefaultAlbumRepeatMode( DefaultRepeatMode.NO_CHANGE );
+						break;
+						
+					case 1:
+						player.getCurrentList().setDefaultAlbumRepeatMode ( DefaultRepeatMode.PLAY_ONCE );
+						break;
+					
+					case 2:
+						player.getCurrentList().setDefaultAlbumRepeatMode ( DefaultRepeatMode.REPEAT );
+						break;
+				}
+			}
+		});
 		row++;
 		
 		Label trackLabel = new Label ( "Default setting for tracks:" );
 		GridPane.setHalignment( trackLabel, HPos.RIGHT );
 		shuffleGrid.add ( trackLabel, 0, row );
-		ChoiceBox <String> trackChoices = new ChoiceBox <String>( shuffleOptions );
-		shuffleGrid.add ( trackChoices, 1, row );
-		trackChoices.getSelectionModel().select( 0 );
-		ChoiceBox <String> trackRepeatChoices = new ChoiceBox <String>( repeatOptions );
+		
+		trackShuffleChoices = new ChoiceBox <String>( shuffleOptions );
+		shuffleGrid.add ( trackShuffleChoices, 1, row );
+		trackShuffleChoices.getSelectionModel().select( 0 );
+		trackShuffleChoices.getSelectionModel().selectedIndexProperty().addListener( new ChangeListener<Number>() {
+			@Override
+			public void changed ( ObservableValue <? extends Number> observableValue, Number oldValue, Number newValue ) {
+				switch ( newValue.intValue() ) {
+					case 0: 
+						player.getCurrentList().setDefaultTrackShuffleMode( DefaultShuffleMode.NO_CHANGE );
+						break;
+						
+					case 1:
+						player.getCurrentList().setDefaultTrackShuffleMode ( DefaultShuffleMode.SEQUENTIAL );
+						break;
+					
+					case 2:
+						player.getCurrentList().setDefaultTrackShuffleMode ( DefaultShuffleMode.SHUFFLE );
+						break;
+				}
+			}
+		});
+		
+		trackRepeatChoices = new ChoiceBox <String>( repeatOptions );
 		shuffleGrid.add ( trackRepeatChoices, 2, row );
 		trackRepeatChoices.getSelectionModel().select( 0 );
+		trackRepeatChoices.getSelectionModel().selectedIndexProperty().addListener( new ChangeListener<Number>() {
+			@Override
+			public void changed ( ObservableValue <? extends Number> observableValue, Number oldValue, Number newValue ) {
+				switch ( newValue.intValue() ) {
+					case 0: 
+						player.getCurrentList().setDefaultTrackRepeatMode( DefaultRepeatMode.NO_CHANGE );
+						break;
+						
+					case 1:
+						player.getCurrentList().setDefaultTrackRepeatMode ( DefaultRepeatMode.PLAY_ONCE );
+						break;
+					
+					case 2:
+						player.getCurrentList().setDefaultTrackRepeatMode ( DefaultRepeatMode.REPEAT );
+						break;
+				}
+			}
+		});
 		row++;
 		
 		Label playlistLabel = new Label ( "Default setting for playlists:" );
 		GridPane.setHalignment( playlistLabel, HPos.RIGHT );
 		shuffleGrid.add ( playlistLabel, 0, row );
-		ChoiceBox <String> playlistChoices = new ChoiceBox <String>( shuffleOptions );
-		shuffleGrid.add ( playlistChoices, 1, row );
-		playlistChoices.getSelectionModel().select( 2 );
-		ChoiceBox <String> playlistRepeatChoices = new ChoiceBox <String>( repeatOptions );
+		
+		playlistShuffleChoices = new ChoiceBox <String>( shuffleOptions );
+		shuffleGrid.add ( playlistShuffleChoices, 1, row );
+		playlistShuffleChoices.getSelectionModel().select( 2 );
+		playlistShuffleChoices.getSelectionModel().selectedIndexProperty().addListener( new ChangeListener<Number>() {
+			@Override
+			public void changed ( ObservableValue <? extends Number> observableValue, Number oldValue, Number newValue ) {
+				switch ( newValue.intValue() ) {
+					case 0: 
+						player.getCurrentList().setDefaultPlaylistShuffleMode( DefaultShuffleMode.NO_CHANGE );
+						break;
+						
+					case 1:
+						player.getCurrentList().setDefaultPlaylistShuffleMode ( DefaultShuffleMode.SEQUENTIAL );
+						break;
+					
+					case 2:
+						player.getCurrentList().setDefaultPlaylistShuffleMode ( DefaultShuffleMode.SHUFFLE );
+						break;
+				}
+			}
+		});
+		
+		playlistRepeatChoices = new ChoiceBox <String>( repeatOptions );
 		shuffleGrid.add ( playlistRepeatChoices, 2, row );
 		playlistRepeatChoices.getSelectionModel().select( 2 );
+		playlistRepeatChoices.getSelectionModel().selectedIndexProperty().addListener( new ChangeListener<Number>() {
+			@Override
+			public void changed ( ObservableValue <? extends Number> observableValue, Number oldValue, Number newValue ) {
+				switch ( newValue.intValue() ) {
+					case 0: 
+						player.getCurrentList().setDefaultPlaylistRepeatMode( DefaultRepeatMode.NO_CHANGE );
+						break;
+						
+					case 1:
+						player.getCurrentList().setDefaultPlaylistRepeatMode ( DefaultRepeatMode.PLAY_ONCE );
+						break;
+					
+					case 2:
+						player.getCurrentList().setDefaultPlaylistRepeatMode ( DefaultRepeatMode.REPEAT );
+						break;
+				}
+			}
+		});
 		row++;
 
 		settingsPane.getChildren().addAll( warnBox, shuffleGrid );

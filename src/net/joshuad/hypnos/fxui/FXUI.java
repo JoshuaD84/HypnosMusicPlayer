@@ -38,7 +38,6 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -242,7 +241,7 @@ public class FXUI implements PlayerListener {
 		albumInfoWindow = new AlbumInfoWindow ( this, library, player );
 		playlistInfoWindow = new PlaylistInfoWindow ( this, library, player );
 		historyWindow = new HistoryWindow ( this, library, player );
-		settingsWindow = new SettingsWindow ( this, library, hotkeys );
+		settingsWindow = new SettingsWindow ( this, library, hotkeys, player );
 		trackInfoWindow = new TrackInfoWindow ( this );
 
 		artSplitPane = new SplitPane();
@@ -3324,6 +3323,32 @@ public class FXUI implements PlayerListener {
 						
 						break;
 						
+					case DEFAULT_REPEAT_ALBUMS:
+						player.getCurrentList().setDefaultAlbumRepeatMode( CurrentList.DefaultRepeatMode.valueOf( value ) );
+						break;
+						
+					case DEFAULT_REPEAT_PLAYLISTS:
+						player.getCurrentList().setDefaultPlaylistRepeatMode( CurrentList.DefaultRepeatMode.valueOf( value ) );
+						
+						break;
+						
+					case DEFAULT_REPEAT_TRACKS:
+						player.getCurrentList().setDefaultTrackRepeatMode( CurrentList.DefaultRepeatMode.valueOf( value ) );
+						break;
+						
+					case DEFAULT_SHUFFLE_ALBUMS:
+						player.getCurrentList().setDefaultAlbumShuffleMode( CurrentList.DefaultShuffleMode.valueOf( value ) );
+						break;
+						
+					case DEFAULT_SHUFFLE_PLAYLISTS:
+						player.getCurrentList().setDefaultPlaylistShuffleMode( CurrentList.DefaultShuffleMode.valueOf( value ) );
+						break;
+						
+					case DEFAULT_SHUFFLE_TRACKS:
+						player.getCurrentList().setDefaultTrackShuffleMode( CurrentList.DefaultShuffleMode.valueOf( value )  );
+						break;
+						
+						
 					//END NOT BELONG
 							
 					case HIDE_ALBUM_TRACKS:
@@ -3375,6 +3400,9 @@ public class FXUI implements PlayerListener {
 				LOGGER.log( Level.INFO, "Unable to apply setting: " + setting + " to UI.", e );
 			}
 		});
+		
+
+		settingsWindow.updateSettings();
 	}
 
 

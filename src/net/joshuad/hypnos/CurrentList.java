@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import net.joshuad.hypnos.audio.AudioSystem;
+import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
 
 public class CurrentList {
@@ -27,6 +28,14 @@ public class CurrentList {
 		PLAYLIST_UNSAVED,
 		EMPTY;
 	}
+	
+	public enum DefaultShuffleMode {
+		SEQUENTIAL, SHUFFLE, NO_CHANGE
+	}
+	
+	public enum DefaultRepeatMode {
+		PLAY_ONCE, REPEAT, NO_CHANGE
+	}
 		
 	Mode mode = Mode.EMPTY;
 	final List <Album> currentAlbums = new ArrayList <Album> ();
@@ -36,12 +45,16 @@ public class CurrentList {
 	
 	private final List <CurrentListListener> listeners = new ArrayList<CurrentListListener> ();
 	
-	Queue queue;
 	private AudioSystem player;
+	private Queue queue;
 
-	private ShuffleMode albumShuffleMode = ShuffleMode.SEQUENTIAL;
-	private ShuffleMode trackShuffleMode = null;
-	private ShuffleMode playlistShuffleMode = ShuffleMode.SHUFFLE;
+	private DefaultShuffleMode albumShuffleMode = DefaultShuffleMode.SEQUENTIAL;
+	private DefaultShuffleMode trackShuffleMode = DefaultShuffleMode.NO_CHANGE;
+	private DefaultShuffleMode playlistShuffleMode = DefaultShuffleMode.SHUFFLE;
+
+	private DefaultRepeatMode albumRepeatMode = DefaultRepeatMode.PLAY_ONCE;
+	private DefaultRepeatMode trackRepeatMode = DefaultRepeatMode.NO_CHANGE;
+	private DefaultRepeatMode playlistRepeatMode = DefaultRepeatMode.REPEAT;
 	
 	public CurrentList ( AudioSystem player, Queue queue ) {
 		this.queue = queue;
@@ -96,6 +109,56 @@ public class CurrentList {
 	public CurrentListState getState () {
 		return new CurrentListState ( items, currentAlbums, currentPlaylist, mode );
 	}
+	
+	public void setDefaultAlbumShuffleMode ( DefaultShuffleMode mode ) {
+		this.albumShuffleMode = mode;
+	}
+	
+	public void setDefaultTrackShuffleMode ( DefaultShuffleMode mode ) {
+		this.trackShuffleMode = mode;
+	}
+	
+	public void setDefaultPlaylistShuffleMode ( DefaultShuffleMode mode ) {
+		this.playlistShuffleMode = mode;
+	}
+	
+	public void setDefaultAlbumRepeatMode ( DefaultRepeatMode mode ) {
+		this.albumRepeatMode = mode;
+	}
+	
+	public void setDefaultTrackRepeatMode ( DefaultRepeatMode mode ) {
+		this.trackRepeatMode = mode;
+	}
+	
+	public void setDefaultPlaylistRepeatMode ( DefaultRepeatMode mode ) {
+		this.playlistRepeatMode = mode;
+	}
+	
+	public DefaultShuffleMode getDefaultTrackShuffleMode () {
+		return trackShuffleMode;
+	}
+	
+	public DefaultShuffleMode getDefaultAlbumShuffleMode () {
+		return albumShuffleMode;
+	}
+	
+	public DefaultShuffleMode getDefaultPlaylistShuffleMode () {
+		return playlistShuffleMode;
+	}
+	
+	public DefaultRepeatMode getDefaultTrackRepeatMode () {
+		return trackRepeatMode;
+	}
+	
+	public DefaultRepeatMode getDefaultAlbumRepeatMode () {
+		return albumRepeatMode;
+	}
+	
+	public DefaultRepeatMode getDefaultPlaylistRepeatMode () {
+		return playlistRepeatMode;
+	}
+	
+	
 	
 	public void setState( CurrentListState state ) {
 		items.clear();
@@ -469,7 +532,7 @@ public class CurrentList {
 		
 		} else if ( albums.size() == 1 ) {
 			mode = Mode.ALBUM;
-			if ( albumShuffleMode != null ) player.setShuffleMode( albumShuffleMode );
+			updateShuffleAndRepeatMode();
 			currentAlbums.clear();
 			currentAlbums.addAll( albums );
 			notifyListenersStateChanged();
@@ -508,7 +571,7 @@ public class CurrentList {
 				
 			} else if ( differentBaseAlbums ) {
 				mode = Mode.PLAYLIST_UNSAVED;
-				if ( albumShuffleMode != null ) player.setShuffleMode( albumShuffleMode );
+				updateShuffleAndRepeatMode();
 				currentAlbums.clear();
 				currentPlaylist = null;
 				notifyListenersStateChanged();
@@ -516,12 +579,64 @@ public class CurrentList {
 				
 			} else {
 				mode = Mode.ALBUM;
-				if ( albumShuffleMode != null ) player.setShuffleMode( albumShuffleMode );
+				updateShuffleAndRepeatMode();
 				currentAlbums.clear();
 				currentAlbums.addAll( albums );
 				notifyListenersStateChanged();
 				return;
 			}
+		}
+	}
+	
+	private void updateShuffleAndRepeatMode() {
+		
+		DefaultShuffleMode shuffleTarget;
+		DefaultRepeatMode repeatTarget;
+		
+		switch ( mode ) {
+			case ALBUM:
+			case ALBUM_REORDERED:
+				shuffleTarget = albumShuffleMode;
+				repeatTarget = albumRepeatMode;
+				break;
+				
+			case PLAYLIST:
+				shuffleTarget = playlistShuffleMode;
+				repeatTarget = playlistRepeatMode;
+				break;
+				
+			case PLAYLIST_UNSAVED:
+			case EMPTY:
+			default:
+				shuffleTarget = trackShuffleMode;
+				repeatTarget = trackRepeatMode;
+				break;
+			
+		}
+		
+		switch ( shuffleTarget ) {
+			case NO_CHANGE:
+				//Do nothing
+				break;
+			case SEQUENTIAL:
+				player.setShuffleMode( ShuffleMode.SEQUENTIAL );
+				break;
+			case SHUFFLE:
+				player.setShuffleMode( ShuffleMode.SHUFFLE );
+				break;
+			
+		}
+		
+		switch ( repeatTarget ) {
+			case NO_CHANGE:
+				//Do nothing
+				break;
+			case PLAY_ONCE:
+				player.setRepeatMode( RepeatMode.PLAY_ONCE );
+				break;
+			case REPEAT:
+				player.setRepeatMode( RepeatMode.REPEAT );
+				break;
 		}
 	}
 	
@@ -547,7 +662,7 @@ public class CurrentList {
 		
 		} else if ( playlists.size() == 1 ) {
 			mode = Mode.PLAYLIST;
-			if ( playlistShuffleMode != null ) player.setShuffleMode( playlistShuffleMode );
+			updateShuffleAndRepeatMode();
 			currentAlbums.clear();
 			currentPlaylist = playlists.get( 0 );
 			notifyListenersStateChanged();
@@ -555,7 +670,7 @@ public class CurrentList {
 
 		} else {
 			mode = Mode.PLAYLIST;
-			if ( playlistShuffleMode != null ) player.setShuffleMode( playlistShuffleMode );
+			updateShuffleAndRepeatMode();
 			currentAlbums.clear();
 			currentPlaylist = null;
 			notifyListenersStateChanged();
@@ -565,7 +680,7 @@ public class CurrentList {
 	
 	public void tracksSet () {
 		mode = Mode.PLAYLIST_UNSAVED;
-		if ( trackShuffleMode != null ) player.setShuffleMode( trackShuffleMode );
+		updateShuffleAndRepeatMode();
 		currentAlbums.clear();
 		currentPlaylist = null;
 		notifyListenersStateChanged();
