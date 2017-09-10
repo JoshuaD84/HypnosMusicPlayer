@@ -1,17 +1,9 @@
 New Features
 	Log to file, how does that work inside java? 
-	
-	Important glyphs make pngs
-
-	ui.warnUser
-	
-	ui.promptUser
-	
-	make back button restart current track if less than 3s in. 
-		
+			
 Bug Fixes / Incremental Improvements
 
-	Playlist delete prompt window needs to center on main window. 
+	previous / next while paused causes lock. 
 
 	Sometimes the playlists and data is erased after closing and reopening. 
 
@@ -126,6 +118,9 @@ OS Specific
 		Always use embedded calibri font? Only on systems <= win 7?
 		Test global hotkeys
 		
+	Windows <= 7
+		Font rendering on utf glyphs
+		
 	Linux
 		Open-with shell integration
 		Debian Installer
@@ -199,6 +194,7 @@ Future Features, maybe:
 		Adding tracks to a playlist doesn't refresh the playlist info screen
 		CurrentList == Playlist doesn't edit when playlist info window is edited
 		Create a PLAYLIST_REORDERED option
+		
 		
 		
 		

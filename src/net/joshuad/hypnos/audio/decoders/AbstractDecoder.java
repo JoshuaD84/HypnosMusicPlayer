@@ -31,11 +31,10 @@ public abstract class AbstractDecoder {
 		}
 	}
 	
-	public void setVolumePercent ( double percent ) {
+	public void setVolumePercent ( double percent ) throws IllegalArgumentException {
 		
 		if ( audioOutput == null ) {
-			//TODO: 
-			System.out.println ( "Cannot set volume, audioOutput is null" );
+			LOGGER.info( "Cannot set volume, audioOutput is null" );
 			return;
 		}
 		
@@ -45,12 +44,9 @@ public abstract class AbstractDecoder {
 			double min = volume.getMinimum();
 			double max = volume.getMaximum();
 			double value = (max - min) * percent + min;
-			
-			try {
-				volume.setValue( (float)value );
-			} catch ( IllegalArgumentException e ) {
-				LOGGER.info( "Unable to change volume to " + percent + "%, ignoring request." );
-			}
+		
+			volume.setValue( (float)value );
+				
 			
 		} else if ( audioOutput.isControlSupported( FloatControl.Type.MASTER_GAIN ) ) {
 			FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.MASTER_GAIN );
@@ -58,18 +54,44 @@ public abstract class AbstractDecoder {
 			double min = volume.getMinimum();
 			double max = volume.getMaximum();
 			double value = (max - min) * percent + min;
-			
-			try {
-				volume.setValue( (float)value );
-			} catch ( IllegalArgumentException e ) {
-				LOGGER.info( "Unable to change volume to " + ( percent * 100 ) + "%, ignoring request." );
-			}
+		
+			volume.setValue( (float)value );
 			
 		} else {
-			System.out.println( "Volume control not supported." );
-			//TODO: better UI stuff
+			throw new IllegalArgumentException( "Volume Control not supported by system for this audio format." );
 		}
 	}
+	
+	public boolean volumeChangeSupported() {
+		
+		if ( audioOutput == null ) {
+			return false;
+		}
+		
+		boolean volumeSupported = true, masterGainSupported = true;
+		try {
+			FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.VOLUME );
+		} catch ( Exception e ) {
+			volumeSupported = false;
+		}
+		
+		try {
+			FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.VOLUME );
+			volume = (FloatControl)audioOutput.getControl( FloatControl.Type.MASTER_GAIN );
+		} catch ( Exception e ) {
+			masterGainSupported = false;
+		}
+		
+		if ( !volumeSupported && !masterGainSupported ) {
+			return false;
+		}
+	
+		return true;
+	}
+		
+		
+		
+		
 	
 	public long getPositionMS() {
 		return (long)( audioOutput.getMicrosecondPosition() / 1e3 ) + clipStartTimeMS;

@@ -1,7 +1,6 @@
 package net.joshuad.hypnos.audio.decoders;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,7 +10,6 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
-import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Track;
 
 public class OggDecoder extends AbstractDecoder {

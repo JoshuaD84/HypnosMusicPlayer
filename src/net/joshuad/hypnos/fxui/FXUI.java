@@ -85,6 +85,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -182,6 +183,9 @@ public class FXUI implements PlayerListener {
 	Button showQueueButton;
 	Button savePlaylistButton;
 	Button exportPlaylistButton;
+	Button showHistoryButton;
+	Button loadTracksButton;
+	Button clearCurrentListButton;
 
 	ResizableImageView albumImage;
 	ResizableImageView artistImage;
@@ -1270,20 +1274,19 @@ public class FXUI implements PlayerListener {
 		toggleRepeatButton = new Button( player.getRepeatMode().getSymbol() );
 		toggleShuffleButton = new Button( player.getShuffleMode().getSymbol() );
 		showQueueButton = new Button ( "Q" );
-		Button showHistoryButton = new Button ( "H" );
-		Button loadTracksButton = new Button( "⏏" );
+		showHistoryButton = new Button ( "H" );
+		loadTracksButton = new Button( "⏏" );
 		savePlaylistButton = new Button( "" );
 		exportPlaylistButton = new Button ( "↗" );
-		Button clearButton = new Button ( "✘" );
+		clearCurrentListButton = new Button ( "✘" );
 		
+	
 		try {
-			ImageView saveImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/save2.png" ).toFile() ) ) );
-			saveImage.setFitHeight( 11 );
-			saveImage.setFitWidth( 11 );
+			ImageView saveImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/icon-test/save.png" ).toFile() ) ) );
 			savePlaylistButton.setGraphic( saveImage );
 		} catch ( FileNotFoundException e ) {
 			savePlaylistButton.setText( "💾" );
-			System.out.println ( "Unable to load icon: resources/save.png, trying to use font glyph." );
+			System.out.println ( "Unable to load save icon, trying to use font glyph." );
 		}
 		
 		/*
@@ -1305,7 +1308,7 @@ public class FXUI implements PlayerListener {
 		loadTracksButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
 		savePlaylistButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
 		exportPlaylistButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
-		clearButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
+		clearCurrentListButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
 		
 		toggleRepeatButton.setTooltip( new Tooltip( "Toggle Repeat Type" ) );
 		toggleShuffleButton.setTooltip( new Tooltip( "Toggle Shuffle" ) );
@@ -1314,7 +1317,7 @@ public class FXUI implements PlayerListener {
 		loadTracksButton.setTooltip( new Tooltip( "Load tracks from the filesystem" ) );
 		savePlaylistButton.setTooltip( new Tooltip( "Save this playlist" ) );
 		exportPlaylistButton.setTooltip( new Tooltip( "Export current list as m3u" ) );
-		clearButton.setTooltip( new Tooltip( "Clear the current list" ) );
+		clearCurrentListButton.setTooltip( new Tooltip( "Clear the current list" ) );
 		
 		showQueueButton.setOnAction ( new EventHandler <ActionEvent>() {
 			public void handle ( ActionEvent e ) {
@@ -1346,7 +1349,7 @@ public class FXUI implements PlayerListener {
 			}
 		});
 		
-		clearButton.setOnAction( new EventHandler <ActionEvent>() {
+		clearCurrentListButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
 				player.getCurrentList().clearList();
@@ -1506,7 +1509,7 @@ public class FXUI implements PlayerListener {
 		
 
 		playlistControls.getChildren().addAll( toggleRepeatButton, toggleShuffleButton, showQueueButton, showHistoryButton,
-			currentPlayingListInfo, currentListLength, loadTracksButton, exportPlaylistButton, savePlaylistButton, clearButton );
+			currentPlayingListInfo, currentListLength, loadTracksButton, exportPlaylistButton, savePlaylistButton, clearCurrentListButton );
 	}
 
 	public void setupPlaylistFilterPane () {
@@ -3431,7 +3434,8 @@ public class FXUI implements PlayerListener {
 	public void playerStopped ( Track track, boolean userRequested ) {
 		Platform.runLater( () -> {
 			updateTransport( 0, 0, 0 ); //values don't matter. 
-			
+			volumeSlider.setDisable( false );
+			volumeMuteButton.setDisable( false );
 		});
 	}
 
@@ -3448,9 +3452,11 @@ public class FXUI implements PlayerListener {
 			
 			trackName.setText( track.getArtist() + " - " + track.getTitle() );
 			setImages( track );
+			
+			volumeSlider.setDisable( !player.volumeChangeSupported() );
+			volumeMuteButton.setDisable( !player.volumeChangeSupported() );
 		});
 	}
-
 
 	@Override
 	public void playerPaused () {
@@ -3509,6 +3515,37 @@ public class FXUI implements PlayerListener {
 	public void refreshHotkeyList () {
 		settingsWindow.refreshHotkeyFields();
 	}
+	
+	public void warnUserVolumeNotSet() {
+		Platform.runLater( () -> {
+			Alert alert = new Alert( AlertType.ERROR );
+			alert.getDialogPane().applyCss();
+			double x = mainStage.getX() + mainStage.getWidth() / 2 - 220; //It'd be nice to use alert.getWidth() / 2, but it's NAN now. 
+			double y = mainStage.getY() + mainStage.getHeight() / 2 - 50;
+			
+			alert.setX( x );
+			alert.setY( y );
+			
+			alert.setTitle( "Warning" );
+			alert.setHeaderText( "Unable to set volume." );
+				
+			Text text = new Text(
+				"System does not support software volume control for this audio format.\n\n" +
+				"Please set your physical speakers and system sound " +
+				"to a reasonable level to avoid damaging your ear drums and audio system.\n\n" +
+				"When you have done so, set Hypnos's volume to 100 and start play again.");
+			
+			text.setWrappingWidth(500);
+			text.applyCss();
+			HBox holder = new HBox();
+			holder.getChildren().add( text );
+			holder.setPadding( new Insets ( 10, 10, 10, 10 ) );
+			alert.getDialogPane().setContent( holder );
+			
+			alert.showAndWait();
+		});
+	}
+		
 }
 
 class LineNumbersCellFactory<T, E> implements Callback<TableColumn<T, E>, TableCell<T, E>> {

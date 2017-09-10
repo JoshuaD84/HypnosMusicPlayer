@@ -98,6 +98,14 @@ public class AudioSystem {
 	
 	public void previous( boolean startPaused ) {
 		
+		if ( player.isPlaying() || player.isPaused() ) {
+			
+			if ( player.getPositionMS() >= 5000 ) {
+				playTrack ( player.getTrack(), player.isPaused(), false );
+				return;
+			}
+		}		
+		
 		Track previousTrack = null;
 
 		int previousStackSize = previousStack.size();
@@ -353,6 +361,9 @@ public class AudioSystem {
 		return player.isStopped();
 	}
 	
+	public boolean volumeChangeSupported() {
+		return player.volumeChangeSupported();
+	}
 	
 	
 	public EnumMap <Persister.Setting, ? extends Object> getSettings () {
@@ -443,7 +454,7 @@ public class AudioSystem {
 	
 //TODO: Make these a listener interface, and add this object as a listener to player? 	
 	
-	void playerStopped ( boolean userRequested ) {
+	void playerStopped ( boolean userRequested ) { //TODO: 'user requested' is a bad title. Probably make this an enum and give it different options
 		
 		if ( !userRequested ) {
 			if ( repeatMode == RepeatMode.REPEAT_ONE_TRACK ) {
@@ -452,6 +463,8 @@ public class AudioSystem {
 				next ( false );
 			}
 		}
+		
+		notifyListenersStopped ( history.getLastTrack(), userRequested );
 	}
 
 	void playerPaused () {

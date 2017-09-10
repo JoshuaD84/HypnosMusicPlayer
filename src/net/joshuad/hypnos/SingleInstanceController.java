@@ -49,7 +49,7 @@ public class SingleInstanceController {
 					Object dataIn = in.readObject();
 					
 					if ( dataIn instanceof ArrayList ) {
-						hypnos.applyCommands ( (ArrayList <SocketCommand>) dataIn );
+						hypnos.applyCLICommands ( (ArrayList <SocketCommand>) dataIn );
 					}
 
 				} catch ( IOException | ClassNotFoundException e ) {

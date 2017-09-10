@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.audio.decoders.*;
 
@@ -20,6 +21,7 @@ public class AudioPlayer {
 	boolean unpauseRequested = false;
 	boolean pauseRequested = false;
 	boolean stopRequested = false;
+	boolean volumeErrorRequested = false;
 	Track trackRequested = null;
 	double seekPercentRequested = NO_REQUEST;
 	double seekMSRequested = NO_REQUEST;
@@ -64,7 +66,8 @@ public class AudioPlayer {
 						}
 						
 						try {
-							decoder = getPlayer ( trackRequested );
+							decoder = getDecoder ( trackRequested );
+							
 						} catch ( IllegalStateException e ) {
 							LOGGER.info( "Unable to play file: " + track.getFilename() );
 							trackRequested = null;
@@ -72,18 +75,29 @@ public class AudioPlayer {
 						
 						if ( decoder != null ) {
 							track = trackRequested;
-							decoder.setVolumePercent( volumePercent );
+							System.out.println ( "Initial volume percent: " + volumePercent ); //TODO: DD
+							setDecoderVolume( volumePercent );
 							controller.playerStarted( trackRequested );
 							updateTrackPosition();
 							state = PlayState.PLAYING;
+							
 						} else {
-							LOGGER.info( "Unable to initialize decoder for: " + track.getFilename() );
+							LOGGER.info( "Unable to initialize decoder for: " + trackRequested.getFilename() );
 							state = PlayState.STOPPED;
 						}
 		
 						trackRequested = null;
 						stopRequested = false;
 					}
+				}
+				
+				if ( volumeErrorRequested ) {
+					state = PlayState.STOPPED;
+					decoder.closeAllResources();
+					controller.playerStopped( true );
+					decoder = null;					
+					volumeErrorRequested = false;
+					Hypnos.warnUserVolumeNotSet();
 				}
 				
 				if ( state != PlayState.STOPPED ) {
@@ -115,7 +129,8 @@ public class AudioPlayer {
 					}
 					
 					if ( volumePercentRequested != NO_REQUEST ) {
-						decoder.setVolumePercent( volumePercentRequested );
+						System.out.println ( "Initial volume: " + volumePercentRequested );
+						setDecoderVolume ( volumePercentRequested );
 						controller.volumeChanged ( volumePercentRequested );
 						volumePercent = decoder.getVolumePercent();
 						volumePercentRequested = NO_REQUEST;
@@ -261,7 +276,7 @@ public class AudioPlayer {
 		}
 	}
 		
-	private AbstractDecoder getPlayer ( Track track ) {
+	private AbstractDecoder getDecoder ( Track track ) {
 		
 		if ( track == null ) {
 			LOGGER.info ( "Asked to play null track, ignoring." );
@@ -307,10 +322,31 @@ public class AudioPlayer {
 				break;
 		}
 		
-		decoder.setVolumePercent( volumePercent );
+		
 		return decoder;
 	}
 	
+	private void setDecoderVolume ( double volumePercent ) { 
+		
+		try {
+			decoder.setVolumePercent( volumePercent );
+			
+		} catch ( IllegalArgumentException e ) {
+			
+			if ( volumePercent < 1 ) {
+				volumeErrorRequested = true;
+			}
+		}
+	}
+	
+	public boolean volumeChangeSupported() {
+		if ( decoder != null ) {
+			return decoder.volumeChangeSupported();
+			
+		} else {
+			return true;
+		}
+	}
 	
 	void updateTrackPosition() {
 		int timeElapsedMS;

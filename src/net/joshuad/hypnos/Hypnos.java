@@ -245,8 +245,12 @@ public class Hypnos extends Application {
 		});
 	}
 	
+	public static void warnUserVolumeNotSet() {
+		ui.warnUserVolumeNotSet();
+	}
+	
 	@SuppressWarnings("unchecked")
-	public void applyCommands ( ArrayList <SocketCommand> commands ) {
+	public void applyCLICommands ( ArrayList <SocketCommand> commands ) {
 		Platform.runLater( () -> {
 			for ( SocketCommand command : commands ) {
 				if ( command.getType() == SocketCommand.CommandType.SET_TRACKS ) {
@@ -323,8 +327,7 @@ public class Hypnos extends Application {
 			setupRootDirectory(); 
 			setupJavaLibraryPath();
 			
-			String[] args = getParameters().getRaw().toArray(new String[0]);
-
+			String[] args = getParameters().getRaw().toArray ( new String[0] );
 			CLIParser parser = new CLIParser( );
 			ArrayList <SocketCommand> commands = parser.parseCommands( args );
 			
@@ -345,7 +348,7 @@ public class Hypnos extends Application {
 				
 				libraryUpdater = new LibraryUpdater ( library, ui );
 				
-				applyCommands( commands );
+				applyCLICommands( commands );
 				
 				singleInstanceController.startCLICommandListener ( this );
 				library.startLoader( persister );
@@ -359,7 +362,7 @@ public class Hypnos extends Application {
 					System.out.println ( "Hypnos is already running." );
 				}
 				
-				System.exit ( 0 ); //We don't use exit here intentionally. 
+				System.exit ( 0 ); //We don't use Hypnos.exit here intentionally. 
 			}
 			
 		} catch ( Exception e ) {
