@@ -6,11 +6,14 @@ New Features
 	ui.warnUser
 	
 	ui.promptUser
-		
-	System tray
 	
-
+	make back button restart current track if less than 3s in. 
+		
 Bug Fixes / Incremental Improvements
+
+	Playlist delete prompt window needs to center on main window. 
+
+	Sometimes the playlists and data is erased after closing and reopening. 
 
 	Setting album image for flac file currently playing causes exception in decoder. 
 
@@ -172,6 +175,9 @@ OS Specific
 
 
 Future Features, maybe:
+
+	System tray
+
 	Tag Window, next and previous button
 	
 	Dark Stylesheet 

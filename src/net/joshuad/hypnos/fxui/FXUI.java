@@ -2403,6 +2403,12 @@ public class FXUI implements PlayerListener {
 			if ( deleteMe.size() == 0 ) return;
 			
 			Alert alert = new Alert( AlertType.CONFIRMATION );
+			alert.getDialogPane().applyCss();
+			double x = mainStage.getX() + mainStage.getWidth() / 2 - 220; //It'd be nice to use alert.getWidth() / 2, but it's NAN now. 
+			double y = mainStage.getY() + mainStage.getHeight() / 2 - 50;
+			
+			alert.setX( x );
+			alert.setY( y );
 			
 			alert.setTitle( "Confirm" );
 			alert.setHeaderText( "Delete Playlist Requested" );
