@@ -75,7 +75,6 @@ public class AudioPlayer {
 						
 						if ( decoder != null ) {
 							track = trackRequested;
-							System.out.println ( "Initial volume percent: " + volumePercent ); //TODO: DD
 							setDecoderVolume( volumePercent );
 							controller.playerStarted( trackRequested );
 							updateTrackPosition();
@@ -129,7 +128,6 @@ public class AudioPlayer {
 					}
 					
 					if ( volumePercentRequested != NO_REQUEST ) {
-						System.out.println ( "Initial volume: " + volumePercentRequested );
 						setDecoderVolume ( volumePercentRequested );
 						controller.volumeChanged ( volumePercentRequested );
 						volumePercent = decoder.getVolumePercent();

@@ -222,7 +222,7 @@ public class FXUI implements PlayerListener {
 		try {
 			mainStage.getIcons().add( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) ) );
 		} catch ( FileNotFoundException e ) {
-			System.out.println ( "Unable to load program icon: resources/icon.png" );
+			LOGGER.warning( "Unable to load program icon: resources/icon.png" );
 		}
 		
 		setupFont();
@@ -387,7 +387,6 @@ public class FXUI implements PlayerListener {
 		
 		try {
 			Font fonat = Font.loadFont( new FileInputStream ( font.toFile() ), 12 ); //TODO: Rename. 
-			System.out.println ( "loaded: " + fonat.getFamily() ); //TODO: DD
 			Font.loadFont( new FileInputStream ( fontBold.toFile() ), 12 );
 			scene.getStylesheets().add( "file:///" + stylesheet.toFile().getAbsolutePath().replace( "\\", "/" ) );
 		} catch ( FileNotFoundException e ) {
@@ -443,6 +442,7 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public void toggleMinimized() {
+		//TODO: Fix this, and/or remove all the toggles
 
 		System.out.println ( "Before call" );
 		System.out.println ( "\tisIconified(): " + mainStage.isIconified() );
@@ -489,7 +489,7 @@ public class FXUI implements PlayerListener {
 			saveImage.setFitHeight( 18 );
 			saveImage.setFitWidth( 18 );
 		} catch ( FileNotFoundException e ) {
-			System.out.println ( "Unable to load play icon: resources/play.png" );
+			LOGGER.warning( "Unable to load play icon: resources/play.png" );
 		}
 		
 		try {
@@ -497,7 +497,7 @@ public class FXUI implements PlayerListener {
 			pauseImage.setFitHeight( 18 );
 			pauseImage.setFitWidth( 18 );
 		} catch ( FileNotFoundException e ) {
-			System.out.println ( "Unable to load pause icon: resources/pause.png" );
+			LOGGER.warning( "Unable to load pause icon: resources/pause.png" );
 		}
 		
 		togglePlayButton = new Button ( "" );
@@ -513,7 +513,7 @@ public class FXUI implements PlayerListener {
 			previousImage.setFitHeight( 18 );
 			previousImage.setFitWidth( 18 );
 		} catch ( FileNotFoundException e ) {
-			System.out.println ( "Unable to load previous icon: resources/previous.png" );
+			LOGGER.warning( "Unable to load previous icon: resources/previous.png" );
 		}
 		
 		Button previousButton = new Button ( "" );
@@ -545,7 +545,7 @@ public class FXUI implements PlayerListener {
 			stopImage.setFitHeight( 18 );
 			stopImage.setFitWidth( 18 );
 		} catch ( FileNotFoundException e ) {
-			System.out.println ( "Unable to load previous icon: resources/stop.png" );
+			LOGGER.warning( "Unable to load previous icon: resources/stop.png" );
 		}
 		
 		Button stopButton = new Button ( "" );
@@ -767,7 +767,6 @@ public class FXUI implements PlayerListener {
 	
 				if ( !targetFile.toString().toLowerCase().endsWith(".png") ) {
 					targetFile = targetFile.toPath().resolveSibling ( targetFile.getName() + ".png" ).toFile();
-					System.out.println ( targetFile.toString() );
 				}
 				
 				try {
@@ -892,7 +891,6 @@ public class FXUI implements PlayerListener {
 
 			if ( !targetFile.toString().toLowerCase().endsWith(".png") ) {
 				targetFile = targetFile.toPath().resolveSibling ( targetFile.getName() + ".png" ).toFile();
-				System.out.println ( targetFile.toString() );
 			}
 			
 			try {
@@ -1276,30 +1274,9 @@ public class FXUI implements PlayerListener {
 		showQueueButton = new Button ( "Q" );
 		showHistoryButton = new Button ( "H" );
 		loadTracksButton = new Button( "⏏" );
-		savePlaylistButton = new Button( "" );
+		savePlaylistButton = new Button( "💾" );
 		exportPlaylistButton = new Button ( "↗" );
 		clearCurrentListButton = new Button ( "✘" );
-		
-	
-		try {
-			ImageView saveImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/icon-test/save.png" ).toFile() ) ) );
-			savePlaylistButton.setGraphic( saveImage );
-		} catch ( FileNotFoundException e ) {
-			savePlaylistButton.setText( "💾" );
-			System.out.println ( "Unable to load save icon, trying to use font glyph." );
-		}
-		
-		/*
-		
-		try {
-			ImageView clearImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/clear.png" ).toFile() ) ) );
-			clearButton.setGraphic( clearImage );
-		} catch ( FileNotFoundException e ) {
-			savePlaylistButton.setText( "✘" );
-			System.out.println ( "Unable to load icon: resources/clear.png, trying to use font glyph." );
-		}
-		*/
-		
 		
 		toggleRepeatButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
 		toggleShuffleButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
