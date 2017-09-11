@@ -3,9 +3,7 @@ New Features
 			
 Bug Fixes / Incremental Improvements
 
-	previous / next while paused causes lock. 
-
-	Sometimes the playlists and data is erased after closing and reopening. 
+	If program is terminated abruptly, like by restarting computer, the playlists and data is erased. 
 
 	Setting album image for flac file currently playing causes exception in decoder. 
 
