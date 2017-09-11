@@ -174,8 +174,12 @@ public class AudioSystem {
 			playTrack( queue.getNextTrack(), startPaused );
 			
 		} else if ( currentList.getItems().size() == 0 ) {
+			stop ( StopReason.EMPTY_LIST );
 			return;
 			
+		} else if ( repeatMode == RepeatMode.REPEAT_ONE_TRACK ) {
+			playTrack ( history.getLastTrack() );
+
 		} else if ( shuffleMode == ShuffleMode.SEQUENTIAL ) {
 			ListIterator <CurrentListTrack> currentListIterator = currentList.getItems().listIterator();
 			boolean didSomething = false;
@@ -183,6 +187,7 @@ public class AudioSystem {
 			while ( currentListIterator.hasNext() ) {
 				if ( currentListIterator.next().getIsCurrentTrack() ) {
 					if ( currentListIterator.hasNext() ) {
+						System.out.println ( "Here." ); //TODO: DD
 						playTrack( currentListIterator.next(), startPaused );
 						didSomething = true;
 						
@@ -256,6 +261,7 @@ public class AudioSystem {
 			} 
 		}
 	}
+	
 	
 	public int getCurrentTrackIndex() {
 		for ( int k = 0 ; k < currentList.getItems().size(); k++ ) {
@@ -468,10 +474,7 @@ public class AudioSystem {
 	
 	void playerStopped ( StopReason reason ) { //TODO: 'user requested' is a bad title. Probably make this an enum and give it different options
 		
-		//TODO: Shouldn't all of this code be in next()? 
-		if ( reason == StopReason.TRACK_FINISHED && repeatMode == RepeatMode.REPEAT_ONE_TRACK ) {
-			playTrack ( history.getLastTrack() );
-		} else {
+		if ( reason == StopReason.TRACK_FINISHED ) {
 			next ( false );
 		}
 		

@@ -25,11 +25,9 @@ public class FlacDecoder extends AbstractDecoder {
 	}
 
 	@Override
-	public void closeAllResources()  {
-		audioOutput.drain();
+	public void closeAllResources() {
 		audioOutput.stop();
 		audioOutput.close();
-		
 		try {
 			if ( decodedInput != null ) {
 				decodedInput.close();

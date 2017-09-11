@@ -35,7 +35,6 @@ public class BackupFlacDecoder extends AbstractDecoder {
 	
 	@Override
 	public void closeAllResources () {
-		audioOutput.drain();
 		audioOutput.stop();
 		audioOutput.close();
 		try {

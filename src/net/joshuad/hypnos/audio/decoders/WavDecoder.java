@@ -36,7 +36,6 @@ public class WavDecoder extends AbstractDecoder {
 	@Override
 	public void closeAllResources() {
 		if ( audioOutput != null ) {
-			audioOutput.drain();
 			audioOutput.stop();
 			audioOutput.close();
 		}

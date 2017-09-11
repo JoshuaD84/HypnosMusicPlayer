@@ -58,10 +58,11 @@ public class AudioPlayer {
 					decoder = null;
 					stopRequested = false;
 				}	
-				
+
 				if ( trackRequested != null ) {
-					//TODO: Probably have to send a controller.stopped();
+					
 					synchronized ( trackRequested ) {
+						
 						if ( decoder != null ) {
 							decoder.closeAllResources();
 						}
@@ -73,7 +74,7 @@ public class AudioPlayer {
 							LOGGER.info( "Unable to play file: " + track.getFilename() );
 							trackRequested = null;
 						}
-						
+
 						if ( decoder != null ) {
 							track = trackRequested;
 							setDecoderVolume( volumePercent );
@@ -85,12 +86,12 @@ public class AudioPlayer {
 							LOGGER.info( "Unable to initialize decoder for: " + trackRequested.getFilename() );
 							state = PlayState.STOPPED;
 						}
-		
+
 						trackRequested = null;
 						stopRequested = false;
 					}
 				}
-				
+
 				if ( volumeErrorRequested ) {
 					state = PlayState.STOPPED;
 					decoder.closeAllResources();
@@ -100,6 +101,7 @@ public class AudioPlayer {
 					Hypnos.warnUserVolumeNotSet();
 				}
 				
+
 				if ( state != PlayState.STOPPED ) {
 						
 					if ( pauseRequested ) {
