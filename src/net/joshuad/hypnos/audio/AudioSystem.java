@@ -21,6 +21,14 @@ import net.joshuad.hypnos.Persister.Setting;
 public class AudioSystem {
 	
 	private static final Logger LOGGER = Logger.getLogger( AudioSystem.class.getName() );
+	
+	public enum StopReason {
+		TRACK_FINISHED,
+		USER_REQUESTED,
+		END_OF_CURRENT_LIST,
+		EMPTY_LIST,
+		ERROR
+	}
 
 	public enum ShuffleMode {
 		SEQUENTIAL ( "⇉" ), SHUFFLE ( "🔀" );
@@ -74,18 +82,18 @@ public class AudioSystem {
 	}
 	
 	public void play() {
-		stop( true );
+		stop( StopReason.USER_REQUESTED );
 		next();
 		unpause();
 	}
 	
-	public void stop ( boolean userRequested ) {
+	public void stop ( StopReason reason ) {
 		if ( player != null ) {
 			Track track = player.getTrack();
 			if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( false );
 			player.requestStop();
 
-			notifyListenersStopped( player.getTrack(), userRequested ); 
+			notifyListenersStopped( player.getTrack(), reason ); 
 		}
 		
 		shuffleTracksPlayedCounter = 0;
@@ -169,25 +177,29 @@ public class AudioSystem {
 			return;
 			
 		} else if ( shuffleMode == ShuffleMode.SEQUENTIAL ) {
-			ListIterator <CurrentListTrack> iterator = currentList.getItems().listIterator();
+			ListIterator <CurrentListTrack> currentListIterator = currentList.getItems().listIterator();
 			boolean didSomething = false;
 			
-			while ( iterator.hasNext() ) {
-				if ( iterator.next().getIsCurrentTrack() ) {
-					if ( iterator.hasNext() ) {
-						playTrack( iterator.next(), startPaused );
+			while ( currentListIterator.hasNext() ) {
+				if ( currentListIterator.next().getIsCurrentTrack() ) {
+					if ( currentListIterator.hasNext() ) {
+						playTrack( currentListIterator.next(), startPaused );
 						didSomething = true;
+						
 					} else if ( repeatMode == RepeatMode.PLAY_ONCE ) {
 						shuffleTracksPlayedCounter = 1;
-						stop( false );
+						stop( StopReason.END_OF_CURRENT_LIST );
 						didSomething = true;
+					
+					} else if ( currentList.getItems().size() <= 0 ) {
+						stop( StopReason.EMPTY_LIST );
+						didSomething = true;
+
 					} else if ( repeatMode == RepeatMode.REPEAT && currentList.getItems().size() > 0 ) {
 						playTrack( currentList.getItems().get( 0 ), startPaused );
 						didSomething = true;
-					} else {
-						stop( false );
-						didSomething = true;
-					} 
+					}
+					
 					break;
 				}
 			}
@@ -239,7 +251,7 @@ public class AudioSystem {
 					playTrack( playMe, startPaused );
 					++shuffleTracksPlayedCounter;
 				} else {
-					stop( false );
+					stop( StopReason.END_OF_CURRENT_LIST );
 				}
 			} 
 		}
@@ -408,9 +420,9 @@ public class AudioSystem {
 		}
 	}
 	
-	private void notifyListenersStopped ( Track track, boolean userRequested ) {
+	private void notifyListenersStopped ( Track track, StopReason reason ) {
 		for ( PlayerListener listener : playerListeners ) {
-			listener.playerStopped( track, userRequested );
+			listener.playerStopped( track, reason );
 		}
 	}
 	
@@ -454,17 +466,16 @@ public class AudioSystem {
 	
 //TODO: Make these a listener interface, and add this object as a listener to player? 	
 	
-	void playerStopped ( boolean userRequested ) { //TODO: 'user requested' is a bad title. Probably make this an enum and give it different options
+	void playerStopped ( StopReason reason ) { //TODO: 'user requested' is a bad title. Probably make this an enum and give it different options
 		
-		if ( !userRequested ) {
-			if ( repeatMode == RepeatMode.REPEAT_ONE_TRACK ) {
-				playTrack ( history.getLastTrack() );
-			} else {
-				next ( false );
-			}
+		//TODO: Shouldn't all of this code be in next()? 
+		if ( reason == StopReason.TRACK_FINISHED && repeatMode == RepeatMode.REPEAT_ONE_TRACK ) {
+			playTrack ( history.getLastTrack() );
+		} else {
+			next ( false );
 		}
 		
-		notifyListenersStopped ( history.getLastTrack(), userRequested );
+		notifyListenersStopped ( history.getLastTrack(), reason );
 	}
 
 	void playerPaused () {

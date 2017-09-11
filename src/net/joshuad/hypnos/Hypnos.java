@@ -22,6 +22,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import net.joshuad.hypnos.audio.AudioSystem;
+import net.joshuad.hypnos.audio.AudioSystem.StopReason;
 import net.joshuad.hypnos.fxui.FXUI;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys.Hotkey;
@@ -219,7 +220,7 @@ public class Hypnos extends Application {
 					//TODO: 
 					break;
 				case STOP:
-					player.stop( true );
+					player.stop( StopReason.USER_REQUESTED );
 					break;
 				case TOGGLE_MUTE:
 					//TODO: 
@@ -291,7 +292,7 @@ public class Hypnos extends Application {
 							player.togglePause();
 							break;
 						case SocketCommand.STOP:
-							player.stop( true );
+							player.stop( StopReason.USER_REQUESTED );
 							break;
 						case SocketCommand.TOGGLE_MINIMIZED:
 							ui.toggleMinimized();
@@ -310,7 +311,7 @@ public class Hypnos extends Application {
 
 	public static void exit ( ExitCode exitCode ) {
 		persister.saveAllData();
-		player.stop( true );
+		player.stop ( StopReason.USER_REQUESTED );
 		System.exit ( exitCode.ordinal() );
 	}
 	

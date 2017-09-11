@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Track;
+import net.joshuad.hypnos.audio.AudioSystem.StopReason;
 import net.joshuad.hypnos.audio.decoders.*;
 
 public class AudioPlayer {
@@ -53,7 +54,7 @@ public class AudioPlayer {
 				if ( state != PlayState.STOPPED && stopRequested ) {
 					state = PlayState.STOPPED;
 					decoder.closeAllResources();
-					controller.playerStopped( true );
+					controller.playerStopped( StopReason.USER_REQUESTED );
 					decoder = null;
 					stopRequested = false;
 				}	
@@ -93,7 +94,7 @@ public class AudioPlayer {
 				if ( volumeErrorRequested ) {
 					state = PlayState.STOPPED;
 					decoder.closeAllResources();
-					controller.playerStopped( true );
+					controller.playerStopped( StopReason.ERROR );
 					decoder = null;					
 					volumeErrorRequested = false;
 					Hypnos.warnUserVolumeNotSet();
@@ -143,7 +144,7 @@ public class AudioPlayer {
 							decoder.closeAllResources();
 							decoder = null;
 							state = PlayState.STOPPED;
-							controller.playerStopped( false );
+							controller.playerStopped( StopReason.TRACK_FINISHED );
 						} 				
 						
 					} else {

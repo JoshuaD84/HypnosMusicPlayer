@@ -108,6 +108,7 @@ import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.PlayerListener;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
+import net.joshuad.hypnos.audio.AudioSystem.StopReason;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
 
@@ -572,7 +573,7 @@ public class FXUI implements PlayerListener {
 		stopButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				player.stop( true );
+				player.stop( StopReason.USER_REQUESTED );
 			}
 		} );
 
@@ -3408,7 +3409,7 @@ public class FXUI implements PlayerListener {
 
 
 	@Override
-	public void playerStopped ( Track track, boolean userRequested ) {
+	public void playerStopped ( Track track, StopReason reason ) {
 		Platform.runLater( () -> {
 			updateTransport( 0, 0, 0 ); //values don't matter. 
 			volumeSlider.setDisable( false );

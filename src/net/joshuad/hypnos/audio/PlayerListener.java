@@ -3,10 +3,11 @@ package net.joshuad.hypnos.audio;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
+import net.joshuad.hypnos.audio.AudioSystem.StopReason;
 
 public interface PlayerListener {
 	public void playerPositionChanged ( int positionMS, int lengthMS );
-	public void playerStopped ( Track track, boolean userRequested );
+	public void playerStopped ( Track track, StopReason reason );
 	public void playerStarted ( Track track );
 	public void playerPaused ();
 	public void playerUnpaused (); 
