@@ -250,6 +250,10 @@ public class Hypnos extends Application {
 		ui.warnUserVolumeNotSet();
 	}
 	
+	public static void warnUserPlaylistsNotSaved ( ArrayList <Playlist> errors ) {
+		ui.warnUserPlaylistsNotSaved ( errors );
+	}
+	
 	@SuppressWarnings("unchecked")
 	public void applyCLICommands ( ArrayList <SocketCommand> commands ) {
 		Platform.runLater( () -> {
@@ -341,7 +345,7 @@ public class Hypnos extends Application {
 				
 				ui = new FXUI ( stage, library, player, hotkeys );
 				
-				persister = new Persister( ui, library, player, hotkeys );
+				persister = new Persister ( ui, library, player, hotkeys );
 				
 				persister.loadDataBeforeShowWindow();
 				ui.showMainWindow();
@@ -354,7 +358,7 @@ public class Hypnos extends Application {
 				singleInstanceController.startCLICommandListener ( this );
 				library.startLoader( persister );
 				LOGGER.info( "Hypnos finished loading." );
-				
+								
 			} else {
 				singleInstanceController.sendCommandsThroughSocket( commands );
 				if ( commands.size() > 0 ) {

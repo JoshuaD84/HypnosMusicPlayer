@@ -41,7 +41,7 @@ package net.joshuad.hypnos.test;
 	
 			System.out.println ( "Before call" );
 			System.out.println ( "\tisIconified(): " + stage.isIconified() );
-			System.out.println ( "\tisMaximized(): " + stage.isIconified() );
+			System.out.println ( "\tisMaximized(): " + stage.isMaximized() );
 			System.out.println ();
 			
 			if ( stage.isIconified() ) {
@@ -57,7 +57,7 @@ package net.joshuad.hypnos.test;
 	
 			System.out.println ( "After call" );
 			System.out.println ( "\tisIconified(): " + stage.isIconified() );
-			System.out.println ( "\tisMaximized(): " + stage.isIconified() );
+			System.out.println ( "\tisMaximized(): " + stage.isMaximized() );
 			System.out.println ();
 			System.out.println ();
 		}

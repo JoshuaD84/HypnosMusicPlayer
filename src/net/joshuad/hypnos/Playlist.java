@@ -141,10 +141,9 @@ public class Playlist implements Serializable {
 		tracks.addAll ( addMe );
 	}
 	
-	public void saveAs ( File file, boolean includeName ) {
+	public void saveAs ( File file, boolean includeName ) throws IOException {
 		if ( file == null ) {
-			LOGGER.info( "Recieved null file location, ignoring save request." );
-			return;
+			throw new IOException ( "Null file specified." );
 		}
 		
 		try ( FileWriter fileWriter = new FileWriter( file ) ) {
@@ -163,9 +162,6 @@ public class Playlist implements Serializable {
 			}
 
 			playlistOut.flush();
-		} catch ( IOException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
 	}
 }

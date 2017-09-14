@@ -447,7 +447,7 @@ public class FXUI implements PlayerListener {
 
 		System.out.println ( "Before call" );
 		System.out.println ( "\tisIconified(): " + mainStage.isIconified() );
-		System.out.println ( "\tisMaximized(): " + mainStage.isIconified() );
+		System.out.println ( "\tisMaximized(): " + mainStage.isMaximized() );
 		System.out.println ();
 		
 		if ( mainStage.isIconified() ) {
@@ -463,7 +463,7 @@ public class FXUI implements PlayerListener {
 
 		System.out.println ( "After call" );
 		System.out.println ( "\tisIconified(): " + mainStage.isIconified() );
-		System.out.println ( "\tisMaximized(): " + mainStage.isIconified() );
+		System.out.println ( "\tisMaximized(): " + mainStage.isMaximized() );
 		System.out.println ();
 		System.out.println ();
 	}
@@ -1353,7 +1353,11 @@ public class FXUI implements PlayerListener {
 				case ALBUM:
 				case ALBUM_REORDERED: {
 					Playlist saveMe = new Playlist( targetFile.getName(), Utils.convertCurrentTrackList( state.getItems() ) );
-					saveMe.saveAs( targetFile, false );
+					try {
+						saveMe.saveAs( targetFile, false );
+					} catch ( IOException e1 ) {
+						//TODO: 
+					}
 				} break;
 				
 				case PLAYLIST:
@@ -1361,7 +1365,11 @@ public class FXUI implements PlayerListener {
 					Playlist saveMe = state.getPlaylist();
 					if ( saveMe == null ) saveMe = new Playlist( targetFile.getName() );
 					saveMe.setTracks( Utils.convertCurrentTrackList( state.getItems() ) );
-					saveMe.saveAs( targetFile, false );
+					try {
+						saveMe.saveAs( targetFile, false );
+					} catch ( IOException e1 ) {
+						//TODO: 
+					}
 				} break;
 				
 				case EMPTY:
@@ -3523,7 +3531,43 @@ public class FXUI implements PlayerListener {
 			alert.showAndWait();
 		});
 	}
-		
+
+	public void warnUserPlaylistsNotSaved ( List <Playlist> errors ) {
+		Platform.runLater( () -> {
+			Alert alert = new Alert( AlertType.ERROR );
+			alert.getDialogPane().applyCss();
+			double x = mainStage.getX() + mainStage.getWidth() / 2 - 220; //It'd be nice to use alert.getWidth() / 2, but it's NAN now. 
+			double y = mainStage.getY() + mainStage.getHeight() / 2 - 50;
+			
+			alert.setX( x );
+			alert.setY( y );
+			
+			alert.setTitle( "Warning" );
+			alert.setHeaderText( "Unable to save playlists." );
+				
+			String message = "Unable to save the following playlists to the default playlist directory. " +
+					"You may want to manually export them before exiting, so your data is not lost.\n";
+					
+			for ( Playlist playlist : errors ) {
+				
+				if ( playlist != null ) {
+					message += "\n" + playlist.getName();
+				}
+			}
+				
+			Text text = new Text( message );
+			
+			text.setWrappingWidth(500);
+			text.applyCss();
+			HBox holder = new HBox();
+			holder.getChildren().add( text );
+			holder.setPadding( new Insets ( 10, 10, 10, 10 ) );
+			alert.getDialogPane().setContent( holder );
+			
+			alert.showAndWait();
+			
+		});
+	}
 }
 
 class LineNumbersCellFactory<T, E> implements Callback<TableColumn<T, E>, TableCell<T, E>> {

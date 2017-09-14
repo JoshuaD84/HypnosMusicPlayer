@@ -323,7 +323,6 @@ public class AudioPlayer {
 				break;
 		}
 		
-		
 		return decoder;
 	}
 	

@@ -32,7 +32,7 @@ public class Utils {
 	private static String[] playlistExtStrings = new String[] { "m3u" };
 		
 	public static final ArrayList <String> musicExtensions = new ArrayList <String> ( Arrays.asList ( musicExtStrings ) );  
-
+	
 	public static final DirectoryStream.Filter<Path> musicFileFilter = new DirectoryStream.Filter<Path>() {
 		@Override
 		public boolean accept ( Path entry ) throws IOException {

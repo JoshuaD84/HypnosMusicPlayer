@@ -18,6 +18,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -160,7 +161,7 @@ public class Persister {
 		saveCurrentList();
 		saveQueue();
 		saveHistory();
-		savePlaylists();
+		saveLibraryPlaylists();
 		saveSettings();
 		saveHotkeys();
 	}
@@ -227,24 +228,33 @@ public class Persister {
 	}
 
 	public void saveSources () {
-		try ( ObjectOutputStream sourcesOut = new ObjectOutputStream( new FileOutputStream( sourcesFile ) ); ) {
+		File tempSourcesFile = new File ( sourcesFile.toString() + ".temp" );
+		try ( ObjectOutputStream sourcesOut = new ObjectOutputStream( new FileOutputStream( tempSourcesFile ) ); ) {
 			ArrayList <String> searchPaths = new ArrayList <String>( library.musicSourcePaths.size() );
 			for ( Path path : library.musicSourcePaths ) {
 				searchPaths.add( path.toString() );
 			}
 			sourcesOut.writeObject( searchPaths );
 			sourcesOut.flush();
+			sourcesOut.close();
 
+			Files.move( tempSourcesFile.toPath(), sourcesFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
+			
 		} catch ( IOException e ) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 	}
 
 	public void saveCurrentList () {
-		try ( ObjectOutputStream currentListOut = new ObjectOutputStream( new FileOutputStream( currentFile ) ) ) {
+		File tempCurrentFile = new File ( currentFile.toString() + ".temp" );
+		try ( ObjectOutputStream currentListOut = new ObjectOutputStream( new FileOutputStream( tempCurrentFile ) ) ) {
 			currentListOut.writeObject( player.getCurrentList().getState() );
 			currentListOut.flush();
+			currentListOut.close();
+
+			Files.move( tempCurrentFile.toPath(), currentFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
 
 		} catch ( IOException e ) {
 			// TODO Auto-generated catch block
@@ -254,9 +264,13 @@ public class Persister {
 
 	public void saveQueue () {
 
-		try ( ObjectOutputStream queueListOut = new ObjectOutputStream( new FileOutputStream( queueFile ) ) ) {
+		File tempQueueFile = new File ( queueFile.toString() + ".temp" );
+		try ( ObjectOutputStream queueListOut = new ObjectOutputStream( new FileOutputStream( tempQueueFile ) ) ) {
 			queueListOut.writeObject( new ArrayList <Track>( player.getQueue().getData() ) );
 			queueListOut.flush();
+			queueListOut.close();
+			
+			Files.move( tempQueueFile.toPath(), queueFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
 
 		} catch ( IOException e ) {
 			// TODO Auto-generated catch block
@@ -265,10 +279,16 @@ public class Persister {
 	}
 
 	public void saveHistory () {
-		try ( ObjectOutputStream historyListOut = new ObjectOutputStream( new FileOutputStream( historyFile ) ) ) {
+
+		File tempHistoryFile = new File ( historyFile.toString() + ".temp" );
+		
+		try ( ObjectOutputStream historyListOut = new ObjectOutputStream( new FileOutputStream( tempHistoryFile ) ) ) {
 			
 			historyListOut.writeObject( new ArrayList <Track>( player.getHistory().getItems() ) );
 			historyListOut.flush();
+			historyListOut.close();
+			
+			Files.move( tempHistoryFile.toPath(), historyFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
 
 		} catch ( IOException e ) {
 			// TODO Auto-generated catch block
@@ -277,10 +297,15 @@ public class Persister {
 	}
 	
 	public void saveHotkeys () {
+		
+		File tempHotkeysFile = new File ( hotkeysFile.toString() + ".temp" );
 
 		try ( ObjectOutputStream hotkeysOut = new ObjectOutputStream( new FileOutputStream( hotkeysFile ) ) ) {
 			hotkeysOut.writeObject( hotkeys.getMap() );
 			hotkeysOut.flush();
+			hotkeysOut.close();
+			
+			Files.move( tempHotkeysFile.toPath(), hotkeysFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
 
 		} catch ( IOException e ) {
 			// TODO Auto-generated catch block
@@ -309,10 +334,13 @@ public class Persister {
 		 * the ByteArrayOutputStream in the middle makes things take ~2/3 the
 		 * amount of time. 2. I tried removing tracks that have albums (since
 		 * they're being written twice) but it didn't create any savings. I
-		 * guess compression is handling that 3. I didn't trip regular zip. GZIP
+		 * guess compression is handling that 3. I didn't try regular zip. GZIP
 		 * was easier.
 		 */
-		try ( GZIPOutputStream compressedOut = new GZIPOutputStream( new BufferedOutputStream( new FileOutputStream( dataFile ) ) ); ) {
+
+		File tempDataFile = new File ( dataFile.toString() + ".temp" );
+		
+		try ( GZIPOutputStream compressedOut = new GZIPOutputStream( new BufferedOutputStream( new FileOutputStream( tempDataFile ) ) ); ) {
 
 			ByteArrayOutputStream byteWriter = new ByteArrayOutputStream();
 			ObjectOutputStream bytesOut = new ObjectOutputStream( byteWriter );
@@ -322,6 +350,9 @@ public class Persister {
 
 			compressedOut.write( byteWriter.toByteArray() );
 			compressedOut.flush();
+			compressedOut.close();
+			
+			Files.move( tempDataFile.toPath(), dataFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
 
 		} catch ( IOException e ) {
 			// TODO Auto-generated catch block
@@ -345,49 +376,93 @@ public class Persister {
 		}
 	}
 
-	public void savePlaylists () {
+	public void saveLibraryPlaylists () {
 		
-		try ( DirectoryStream <Path> stream = Files.newDirectoryStream( playlistsDirectory.toPath() ) ) {
-			for ( Path child : stream ) {
-				if ( Utils.isPlaylistFile( child ) ) {
-					Files.delete( child );
-				}
-			}
-		} catch ( IOException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		
-		ArrayList <Playlist> playlists = new ArrayList <> ( library.playlists );
+		ArrayList <Playlist> playlists = new ArrayList <> ( library.getPlaylists() );
+		
+		ArrayList <Playlist> errors = new ArrayList <> ();
 
-		int playlistIndex = 1;
 		for ( Playlist playlist : playlists ) {
-			//TODO: Use Playlist.saveAs()
-			try ( FileWriter fileWriter = new FileWriter( Paths.get( playlistsDirectory.toString(), playlistIndex + ".m3u" ).toFile() ); ) {
-				PrintWriter playlistOut = new PrintWriter( new BufferedWriter( fileWriter ) );
-				playlistOut.println( "#EXTM3U" );
-				playlistOut.printf( "#Name: %s\n", playlist.getName() );
-				playlistOut.println();
-
-				for ( Track track : playlist.getTracks() ) {
-					playlistOut.printf( "#EXTINF:%d,%s - %s\n", track.getLengthS(), track.getArtist(), track.getTitle() );
-					playlistOut.println( track.getPath().toString() );
-					playlistOut.println();
-				}
-
-				playlistOut.flush();
-			} catch ( IOException e ) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if ( playlist == null ) {
+				LOGGER.info( "Found a null playlist in library.playlists, ignoring." );
+				continue;
 			}
-			playlistIndex++;
+			
+			try {
+				saveLibaryPlaylist ( playlist );
+			} catch ( IOException e ) {
+				LOGGER.warning ( "Unable to save library playlist " + playlist.getName() + ": " + e.getMessage() );
+				errors.add( playlist );
+			}
+		}
+		
+		if ( errors.size() > 0 ) {
+			Hypnos.warnUserPlaylistsNotSaved ( errors ); // I am getting 
+		}
+	}
+	
+	//Assumptions: playlist != null, playlist.name is not null or empty, and no playlists in library have the same name. 
+	private void saveLibaryPlaylist ( Playlist playlist ) throws IOException {
+		
+		Path targetFile = playlistsDirectory.toPath().resolve ( playlist.getName().hashCode() + ".m3u" );
+		Path backupFile = playlistsDirectory.toPath().resolve ( playlist.getName().hashCode() + ".m3u.backup" );
+		Path tempFile = playlistsDirectory.toPath().resolve ( playlist.getName().hashCode() + ".m3u.temp" );
+		
+		boolean savedToTemp = false;
+		
+		try {
+			playlist.saveAs( tempFile.toFile(), true );
+		} catch ( IOException e ) {
+			savedToTemp = false;
+			LOGGER.info( "Unable to write to a temp file, so I will try writing directly to the playlist file." +
+				"Your data will be saved in a backup file first. If this process is interrupted, you may need to manually " +
+				"recover the data from the backup file.\n" + e.getMessage() );
+			
+			if ( Files.exists( targetFile ) ) {
+				try {
+					Files.move( targetFile, backupFile, StandardCopyOption.REPLACE_EXISTING );
+				} catch ( IOException e2 ) {
+					LOGGER.info( "Unable to move existing playlist file to backup location (" + backupFile.toString() +
+						") will continue trying to save current playlist, overwriting the existing file." + 
+						"\n" + e2.getMessage() );
+				}
+			}
+		}
+		
+		try {
+			
+			boolean movedFromTemp = false;
+			
+			if ( savedToTemp ) {
+				try {
+					Files.move( tempFile, targetFile, StandardCopyOption.REPLACE_EXISTING );
+					movedFromTemp = true;
+				} catch ( IOException e ) {
+					movedFromTemp = false;
+				}
+			}
+			
+			if ( !movedFromTemp ) {
+				playlist.saveAs( targetFile.toFile(), true );
+			}
+			
+		} catch ( IOException e ) {
+			LOGGER.info( "Unable to save playlist to file: " + targetFile.toString() + "." );
+			throw e;
+			
+		} finally {
+			Files.deleteIfExists( tempFile );
+			
 		}
 	}
 
 	public void saveSettings () {
 		EnumMap <Setting, ? extends Object> fromPlayer = player.getSettings();
 		EnumMap <Setting, ? extends Object> fromUI = ui.getSettings();
+		
+		File tempSettingsFile = new File ( settingsFile.toString() + ".temp" );
 
-		try ( FileWriter fileWriter = new FileWriter( settingsFile ); ) {
+		try ( FileWriter fileWriter = new FileWriter( tempSettingsFile ); ) {
 			PrintWriter settingsOut = new PrintWriter( new BufferedWriter( fileWriter ) );
 
 			fromPlayer.forEach( ( key, value ) -> {
@@ -401,6 +476,9 @@ public class Persister {
 			} );
 
 			settingsOut.flush();
+			settingsOut.close();
+			
+			Files.move( tempSettingsFile.toPath(), settingsFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
 
 		} catch ( IOException e ) {
 			// TODO Auto-generated catch block

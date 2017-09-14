@@ -1,9 +1,13 @@
 New Features
 	Log to file, how does that work inside java? 
+	
+	Add export option to playlist right click menu
 			
 Bug Fixes / Incremental Improvements
 
-	If program is terminated abruptly, like by restarting computer, the playlists and data is erased. 
+	Audit playlists names
+		Prevent duplicates
+		Prevent no names. 
 
 	Setting album image for flac file currently playing causes exception in decoder. 
 

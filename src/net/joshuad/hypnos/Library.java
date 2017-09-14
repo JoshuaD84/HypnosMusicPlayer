@@ -137,7 +137,7 @@ public class Library {
 						persister.saveCurrentList();
 						persister.saveQueue();
 						persister.saveHistory();
-						persister.savePlaylists();
+						persister.saveLibraryPlaylists();
 						persister.saveSettings();
 						
 						lastSaveTime = System.currentTimeMillis();
