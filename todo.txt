@@ -1,7 +1,5 @@
 New Features
 	Log to file, how does that work inside java? 
-	
-	Add export option to playlist right click menu
 			
 Bug Fixes / Incremental Improvements
 

@@ -1336,45 +1336,40 @@ public class FXUI implements PlayerListener {
 		
 		
 		exportPlaylistButton.setOnAction( ( ActionEvent e ) -> {
-			FileChooser fileChooser = new FileChooser();
-			FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter( "M3U Playlists", Arrays.asList( "*.m3u" ) );
-			fileChooser.getExtensionFilters().add( fileExtensions );
-			fileChooser.setTitle( "Export Playlist" );
-			fileChooser.setInitialFileName( "new-playlist.m3u" );
-			File targetFile = fileChooser.showSaveDialog( mainStage );
-			
+			File targetFile = promptUserForPlaylistFile();
 			if ( targetFile == null ) {
 				return;
 			}
 			
 			CurrentListState state = player.getCurrentList().getState();
 			
+			Playlist saveMe = null; 
+		
 			switch ( state.getMode() ) {
 				case ALBUM:
 				case ALBUM_REORDERED: {
-					Playlist saveMe = new Playlist( targetFile.getName(), Utils.convertCurrentTrackList( state.getItems() ) );
-					try {
-						saveMe.saveAs( targetFile, false );
-					} catch ( IOException e1 ) {
-						//TODO: 
-					}
+					saveMe = new Playlist( targetFile.getName(), Utils.convertCurrentTrackList( state.getItems() ) );
+			
 				} break;
 				
 				case PLAYLIST:
 				case PLAYLIST_UNSAVED: {
-					Playlist saveMe = state.getPlaylist();
+					saveMe = state.getPlaylist();
 					if ( saveMe == null ) saveMe = new Playlist( targetFile.getName() );
 					saveMe.setTracks( Utils.convertCurrentTrackList( state.getItems() ) );
-					try {
-						saveMe.saveAs( targetFile, false );
-					} catch ( IOException e1 ) {
-						//TODO: 
-					}
+		
 				} break;
 				
 				case EMPTY:
 					break;
 				
+			}
+			
+			try {
+				saveMe.saveAs( targetFile, false );
+				
+			} catch ( IOException e1 ) {
+				alertUser ( AlertType.ERROR, "Warning", "Unable to save playlist.", "Unable to save the playlist to the specified location", 400 );
 			}
 		});
 		
@@ -2358,8 +2353,9 @@ public class FXUI implements PlayerListener {
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem renameMenuItem = new MenuItem( "Rename" );
 		MenuItem infoMenuItem = new MenuItem( "Info" );
+		MenuItem exportMenuItem = new MenuItem( "Export" );
 		MenuItem removeMenuItem = new MenuItem( "Remove" );
-		contextMenu.getItems().addAll( playMenuItem, appendMenuItem, enqueueMenuItem, renameMenuItem, infoMenuItem, removeMenuItem );
+		contextMenu.getItems().addAll( playMenuItem, appendMenuItem, enqueueMenuItem, renameMenuItem, infoMenuItem, exportMenuItem, removeMenuItem );
 
 		playMenuItem.setOnAction( ( ActionEvent event ) -> {
 			if ( okToReplaceCurrentList() ) {
@@ -2384,6 +2380,28 @@ public class FXUI implements PlayerListener {
 			//TODO: Multiple selections, deal with or is this ok? 
 			playlistInfoWindow.setPlaylist ( playlistTable.getSelectionModel().getSelectedItem() );
 			playlistInfoWindow.show();
+		});
+		
+		exportMenuItem.setOnAction( ( ActionEvent event ) -> {
+			File targetFile = promptUserForPlaylistFile();
+			
+			if ( targetFile == null ) {
+				return;
+			}
+			
+			Playlist saveMe = playlistTable.getSelectionModel().getSelectedItem(); 
+			
+			if ( saveMe == null ) {
+				return;
+			}
+			
+			try {
+				saveMe.saveAs( targetFile, false );
+				
+			} catch ( IOException e1 ) {
+				alertUser ( AlertType.ERROR, "Warning", "Unable to save playlist.", "Unable to save the playlist to the specified location", 400 );
+			}
+			
 		});
 
 		removeMenuItem.setOnAction( ( ActionEvent event ) -> {
@@ -3567,6 +3585,41 @@ public class FXUI implements PlayerListener {
 			alert.showAndWait();
 			
 		});
+	}
+	
+	public File promptUserForPlaylistFile() {
+		FileChooser fileChooser = new FileChooser();
+		FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter( "M3U Playlists", Arrays.asList( "*.m3u" ) );
+		fileChooser.getExtensionFilters().add( fileExtensions );
+		fileChooser.setTitle( "Export Playlist" );
+		fileChooser.setInitialFileName( "new-playlist.m3u" );
+		File targetFile = fileChooser.showSaveDialog( mainStage );
+		return targetFile;
+	}
+	
+	
+	public void alertUser ( AlertType type, String title, String header, String content, double textWidth ) {
+		Alert alert = new Alert( type );
+		alert.getDialogPane().applyCss();
+		double x = mainStage.getX() + mainStage.getWidth() / 2 - 220; //It'd be nice to use alert.getWidth() / 2, but it's NAN now. 
+		double y = mainStage.getY() + mainStage.getHeight() / 2 - 50;
+		
+		alert.setX( x );
+		alert.setY( y );
+		
+		alert.setTitle( title );
+		alert.setHeaderText( header );
+						
+		Text text = new Text( content );
+		
+		text.setWrappingWidth( textWidth );
+		text.applyCss();
+		HBox holder = new HBox();
+		holder.getChildren().add( text );
+		holder.setPadding( new Insets ( 10, 10, 10, 10 ) );
+		alert.getDialogPane().setContent( holder );
+		
+		alert.showAndWait(); 
 	}
 }
 
