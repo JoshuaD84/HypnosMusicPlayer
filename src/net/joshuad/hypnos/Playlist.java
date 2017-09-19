@@ -31,7 +31,7 @@ public class Playlist implements Serializable {
 	public Playlist ( String name, List <Track> tracks ) {
 		
 		if ( name == null || name.length() == 0 ) {
-			name = Hypnos.getLibrary().getNewPlaylistName();
+			name = Hypnos.getLibrary().getUniquePlaylistName();
 		}
 		
 		setTracks( tracks );
@@ -146,7 +146,7 @@ public class Playlist implements Serializable {
 		tracks.addAll ( addMe );
 	}
 	
-	public void saveAs ( File file, boolean includeName ) throws IOException {
+	public void saveAs ( File file ) throws IOException {
 		if ( file == null ) {
 			throw new IOException ( "Null file specified." );
 		}
@@ -155,10 +155,7 @@ public class Playlist implements Serializable {
 			PrintWriter playlistOut = new PrintWriter( new BufferedWriter( fileWriter ) );
 			playlistOut.println( "#EXTM3U" );
 			
-			if ( includeName ) {
-				playlistOut.printf( "#Name: %s\n", getName() );
-				playlistOut.println();
-			}
+			playlistOut.printf( "#Name: %s\n\n", getName() );
 
 			for ( Track track : getTracks() ) {
 				playlistOut.printf( "#EXTINF:%d,%s - %s\n", track.getLengthS(), track.getArtist(), track.getTitle() );

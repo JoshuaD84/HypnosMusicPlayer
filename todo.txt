@@ -19,9 +19,6 @@ Bug Fixes / Incremental Improvements
 
 	Library load and unload time
 	
-	Audit playlists names
-		Prevent duplicates
-
 	Setting album image for flac file currently playing causes exception in decoder. 
 
 	Save after modifing stuff more frequently. 

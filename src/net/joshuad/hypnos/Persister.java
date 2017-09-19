@@ -397,21 +397,29 @@ public class Persister {
 		}
 		
 		if ( errors.size() > 0 ) {
-			Hypnos.warnUserPlaylistsNotSaved ( errors ); // I am getting 
+			Hypnos.warnUserPlaylistsNotSaved ( errors ); 
 		}
 	}
 	
 	//Assumptions: playlist != null, playlist.name is not null or empty, and no playlists in library have the same name. 
 	private void saveLibaryPlaylist ( Playlist playlist ) throws IOException {
 		
-		Path targetFile = playlistsDirectory.toPath().resolve ( playlist.getName().hashCode() + ".m3u" );
-		Path backupFile = playlistsDirectory.toPath().resolve ( playlist.getName().hashCode() + ".m3u.backup" );
-		Path tempFile = playlistsDirectory.toPath().resolve ( playlist.getName().hashCode() + ".m3u.temp" );
+		String fileSafeName = playlist.getName().replaceAll("\\W+", "");
+		
+		if ( fileSafeName.length() > 12 ) {
+			fileSafeName = fileSafeName.substring( 0, 12 );
+		}
+		
+		String baseFileName =  fileSafeName + playlist.getName().hashCode();
+		Path targetFile = playlistsDirectory.toPath().resolve (  baseFileName + ".m3u" );
+		Path backupFile = playlistsDirectory.toPath().resolve ( baseFileName + ".m3u.backup" );
+		Path tempFile = playlistsDirectory.toPath().resolve ( baseFileName + ".m3u.temp" );
 		
 		boolean savedToTemp = false;
 		
 		try {
-			playlist.saveAs( tempFile.toFile(), true );
+			playlist.saveAs( tempFile.toFile() );
+			savedToTemp = true;
 		} catch ( IOException e ) {
 			savedToTemp = false;
 			LOGGER.info( "Unable to write to a temp file, so I will try writing directly to the playlist file." +
@@ -443,7 +451,7 @@ public class Persister {
 			}
 			
 			if ( !movedFromTemp ) {
-				playlist.saveAs( targetFile.toFile(), true );
+				playlist.saveAs( targetFile.toFile() );
 			}
 			
 		} catch ( IOException e ) {

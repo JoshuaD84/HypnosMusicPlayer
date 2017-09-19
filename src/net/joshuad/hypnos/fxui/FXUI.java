@@ -1366,7 +1366,7 @@ public class FXUI implements PlayerListener {
 			}
 			
 			try {
-				saveMe.saveAs( targetFile, false );
+				saveMe.saveAs( targetFile );
 				
 			} catch ( IOException e1 ) {
 				alertUser ( AlertType.ERROR, "Warning", "Unable to save playlist.", "Unable to save the playlist to the specified location", 400 );
@@ -2396,7 +2396,7 @@ public class FXUI implements PlayerListener {
 			}
 			
 			try {
-				saveMe.saveAs( targetFile, false );
+				saveMe.saveAs( targetFile );
 				
 			} catch ( IOException e1 ) {
 				alertUser ( AlertType.ERROR, "Warning", "Unable to save playlist.", "Unable to save the playlist to the specified location", 400 );

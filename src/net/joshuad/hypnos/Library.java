@@ -530,7 +530,7 @@ public class Library {
 		return true;
 	}
 	
-	public String getNewPlaylistName() {
+	public String getUniquePlaylistName() {
 		return getUniquePlaylistName ( "New Playlist" );
 	}
 	
