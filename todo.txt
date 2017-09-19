@@ -5,6 +5,7 @@ New Features
 		Like add to playlist. Other things?
 			
 Bug Fixes / Incremental Improvements
+	Data lost when computer turned off (logging out doesn't trigger, only a power down)
 
 	Play two of those leonard cohen no volume tracks in a row. It gets upset wrongly.
 		After playing one of those leonard cohen songs and getting the error, try playing a regular track
@@ -18,7 +19,6 @@ Bug Fixes / Incremental Improvements
 	
 	Audit playlists names
 		Prevent duplicates
-		Prevent no names. 
 
 	Setting album image for flac file currently playing causes exception in decoder. 
 

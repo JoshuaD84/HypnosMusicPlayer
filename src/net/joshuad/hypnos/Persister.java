@@ -300,7 +300,7 @@ public class Persister {
 		
 		File tempHotkeysFile = new File ( hotkeysFile.toString() + ".temp" );
 
-		try ( ObjectOutputStream hotkeysOut = new ObjectOutputStream( new FileOutputStream( hotkeysFile ) ) ) {
+		try ( ObjectOutputStream hotkeysOut = new ObjectOutputStream( new FileOutputStream( tempHotkeysFile ) ) ) {
 			hotkeysOut.writeObject( hotkeys.getMap() );
 			hotkeysOut.flush();
 			hotkeysOut.close();
