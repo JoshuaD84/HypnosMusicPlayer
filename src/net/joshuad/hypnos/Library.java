@@ -531,8 +531,11 @@ public class Library {
 	}
 	
 	public String getNewPlaylistName() {
-		
-		String name = "New Playlist";
+		return getUniquePlaylistName ( "New Playlist" );
+	}
+	
+	public String getUniquePlaylistName( String base ) {
+		String name = base;
 		
 		int number = 0;
 		
@@ -545,15 +548,9 @@ public class Library {
 				}
 			}
 			
-			for ( Playlist playlist : playlistsToAdd ) {
-				if ( playlist.getName().toLowerCase().equals( name.toLowerCase() ) ) {
-					foundMatch = true;
-				}
-			}
-			
 			if ( foundMatch ) {
 				number++;
-				name = "New Playlist " + number;
+				name = base + " " + number;
 			} else {
 				break;
 			}

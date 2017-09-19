@@ -156,7 +156,12 @@ public class LibraryUpdater {
 					}
 				
 					synchronized ( library.playlistsToAdd ) {
-						library.playlists.addAll( library.playlistsToAdd );
+						
+						for ( Playlist candidate : library.playlistsToAdd ) {
+							candidate.setName( library.getUniquePlaylistName( candidate.getName() ) );
+							library.playlists.add( candidate );
+						}
+						
 						library.playlistsToAdd.clear();
 					}
 					
