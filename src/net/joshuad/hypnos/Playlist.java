@@ -29,6 +29,11 @@ public class Playlist implements Serializable {
 	}
 	
 	public Playlist ( String name, List <Track> tracks ) {
+		
+		if ( name == null || name.length() == 0 ) {
+			name = Hypnos.getLibrary().getNewPlaylistName();
+		}
+		
 		setTracks( tracks );
 		this.name = name;
 	}

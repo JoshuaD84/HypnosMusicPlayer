@@ -63,7 +63,7 @@ public class Hypnos extends Application {
 	private static AudioSystem player;
 	private static FXUI ui;
 	private LibraryUpdater libraryUpdater;
-	private Library library;
+	private static Library library;
 	private GlobalHotkeys hotkeys;
 	
 	public static OS getOS() {
@@ -84,6 +84,10 @@ public class Hypnos extends Application {
 	
 	public static Persister getPersister() {
 		return persister;
+	}
+	
+	public static Library getLibrary() {
+		return library;
 	}
 
 	private void parseSystemProperties() {

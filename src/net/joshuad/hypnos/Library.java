@@ -529,6 +529,38 @@ public class Library {
 		
 		return true;
 	}
+	
+	public String getNewPlaylistName() {
+		
+		String name = "New Playlist";
+		
+		int number = 0;
+		
+		while ( true ) {
+			
+			boolean foundMatch = false;
+			for ( Playlist playlist : playlists ) {
+				if ( playlist.getName().toLowerCase().equals( name.toLowerCase() ) ) {
+					foundMatch = true;
+				}
+			}
+			
+			for ( Playlist playlist : playlistsToAdd ) {
+				if ( playlist.getName().toLowerCase().equals( name.toLowerCase() ) ) {
+					foundMatch = true;
+				}
+			}
+			
+			if ( foundMatch ) {
+				number++;
+				name = "New Playlist " + number;
+			} else {
+				break;
+			}
+		}
+		
+		return name;
+	}
 
 	public SortedList <Playlist> getPlaylistSorted () {
 		return playlistsSorted;

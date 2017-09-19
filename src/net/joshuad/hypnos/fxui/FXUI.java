@@ -1489,7 +1489,7 @@ public class FXUI implements PlayerListener {
 		repeatOne.setOnAction( ( actionEvent ) -> { player.setRepeatMode( RepeatMode.REPEAT_ONE_TRACK ); });
 		
 
-		playlistControls.getChildren().addAll( toggleRepeatButton, toggleShuffleButton, showQueueButton, showHistoryButton,
+		playlistControls.getChildren().addAll( toggleShuffleButton, toggleRepeatButton, showQueueButton, showHistoryButton,
 			currentPlayingListInfo, currentListLength, loadTracksButton, exportPlaylistButton, savePlaylistButton, clearCurrentListButton );
 	}
 

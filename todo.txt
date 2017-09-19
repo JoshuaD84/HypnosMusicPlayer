@@ -1,8 +1,21 @@
 New Features
 	Log to file, how does that work inside java? 
+	
+	Right click on current track at top of window, do stuff
+		Like add to playlist. Other things?
 			
 Bug Fixes / Incremental Improvements
 
+	Play two of those leonard cohen no volume tracks in a row. It gets upset wrongly.
+		After playing one of those leonard cohen songs and getting the error, try playing a regular track
+			Volume shows at 100%, but is actually at 0%. 
+			
+		This only seems to happen from the current list. Was able to play them from history
+		
+	UI freezes while loading a lot of tracks into current list. 
+
+	Library load and unload time
+	
 	Audit playlists names
 		Prevent duplicates
 		Prevent no names. 
@@ -42,7 +55,8 @@ JavaFX stuff
 	
 	Make sure horizontal scroll bars never appear
 		6/9 - Can't find anything on google.
-	
+		
+	Art panes won't stay the size I set them to. 
 	
 Refactor / organize my code. 
  	Make LibraryUpdater part of Library. Is there a way to abstract out the Platform -> RunLater part? I feel like we're just stuck w/ that, which kind of ties to us JavaFX. 
@@ -195,8 +209,12 @@ Future Features, maybe:
 		CurrentList == Playlist doesn't edit when playlist info window is edited
 		Create a PLAYLIST_REORDERED option
 		
+	Warn before discarding unsaved playlist -- button order (Yes, no, cancel instead of No, Yes, Cancel)	
 		
-		
+	Font for volume warning window
+	
+	
+	
 		
 Label localLabel = new Label ( "Hypnos Hotkeys" );
 		localLabel.setPadding( new Insets ( 0, 0, 10, 0 ) );

@@ -571,7 +571,6 @@ public class Persister {
 		} catch ( FileNotFoundException e ) {
 			System.out.println( "File not found: settings, unable to load user settings, using defaults. Continuing." );
 		} catch ( IOException e ) {
-			// TODO:
 			e.printStackTrace();
 		}
 
