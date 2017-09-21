@@ -249,6 +249,12 @@ public class AudioPlayer {
 		}
 	}
 	
+	public PlayState getState() {
+		if ( isStopped() ) return PlayState.STOPPED;
+		else if ( isPaused() ) return PlayState.PAUSED;
+		else return PlayState.PLAYING;
+	}
+	
 	public boolean isStopped () {
 		if ( trackRequested != null ) return false;
 		else if ( state == PlayState.STOPPED ) return true;

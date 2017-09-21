@@ -69,32 +69,40 @@ public class AudioSystem {
 		currentList = new CurrentList( this, queue );
 	}
 	
-	public void unpause() {
+	public void unpause () {
 		player.requestUnpause();
 	}
 	
-	public void pause() {
+	public void pause () {
 		player.requestPause();
 	}
 	
-	public void togglePause() {
+	public void togglePause () {
 		player.requestTogglePause();
 	}
 	
-	public void play() {
-		stop( StopReason.USER_REQUESTED );
-		next();
-		unpause();
+	public void play () {
+		switch ( player.getState() ) {
+			case PAUSED:
+				player.requestUnpause();
+				break;
+			case PLAYING:
+				player.requestPlayTrack( player.getTrack(), false );
+				break;
+			case STOPPED:
+				next( false );
+				break;
+		}
 	}
 	
 	public void stop ( StopReason reason ) {
-		if ( player != null ) {
+		//if ( player != null ) { Can't we assume player isn't null?  2017/09/20 I removed this. JDH
 			Track track = player.getTrack();
 			if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( false );
 			player.requestStop();
 
 			notifyListenersStopped( player.getTrack(), reason ); 
-		}
+		//}
 		
 		shuffleTracksPlayedCounter = 0;
 	}
@@ -104,7 +112,7 @@ public class AudioSystem {
 		previous ( startPaused );
 	}
 	
-	public void previous( boolean startPaused ) {
+	public void previous ( boolean startPaused ) {
 		
 		if ( player.isPlaying() || player.isPaused() ) {
 			

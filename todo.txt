@@ -13,8 +13,6 @@ Bug Fixes / Incremental Improvements
 			
 		This only seems to happen from the current list. Was able to play them from history
 	
-	Play button functionality
-		
 	UI freezes while loading a lot of tracks into current list. 
 
 	Library load and unload time
