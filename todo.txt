@@ -12,8 +12,6 @@ Bug Fixes / Incremental Improvements
 			Volume shows at 100%, but is actually at 0%. 
 			
 		This only seems to happen from the current list. Was able to play them from history
-	
-	UI freezes while loading a lot of tracks into current list. 
 
 	Library load and unload time
 	

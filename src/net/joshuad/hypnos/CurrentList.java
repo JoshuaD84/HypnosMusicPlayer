@@ -6,11 +6,13 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import net.joshuad.hypnos.audio.AudioSystem;
@@ -66,16 +68,20 @@ public class CurrentList {
 	private void startListWatcher() {
 		Thread watcher = new Thread( () -> {
 			while ( true ) {
-				synchronized ( items ) {
-					for ( CurrentListTrack track : items ) {
-						boolean isMissing = !Utils.isMusicFile( track.getPath() );
-						if ( !isMissing && track.isMissingFile() ) {
-							track.setIsMissingFile ( false );
-							
-						} else if ( isMissing && !track.isMissingFile() ) {
-							track.setIsMissingFile ( true );
+				try {
+					synchronized ( items ) {
+						for ( CurrentListTrack track : items ) {
+							boolean isMissing = !Utils.isMusicFile( track.getPath() );
+							if ( !isMissing && track.isMissingFile() ) {
+								track.setIsMissingFile ( false );
+								
+							} else if ( isMissing && !track.isMissingFile() ) {
+								track.setIsMissingFile ( true );
+							}
 						}
 					}
+				} catch ( ConcurrentModificationException e ) {
+					//This is kind of a hack, but whatever. If someone else is editing, stop and try again later.
 				}
 				
 				try {
@@ -324,45 +330,56 @@ public class CurrentList {
 	
 	public void insertTrackPathList ( int index, List <Path> paths ) {
 		
-		boolean startedEmpty = items.isEmpty();
-		
-		if ( paths == null || paths.size() <= 0 ) {
-			LOGGER.fine( "Recieved a null or empty track list. No tracks loaded." );
-			return;
-		}
-		
-		ArrayList <CurrentListTrack> tracks = new ArrayList <CurrentListTrack> ( paths.size() );
-		
-		int tracksAdded = 0;
-		for ( Path path : paths ) {
-			try {
-				tracks.add ( new CurrentListTrack ( path ) );
-				tracksAdded++;
-			} catch ( IOException | NullPointerException e ) {
-				LOGGER.info( " -- Couldn't load track: " + path.toString() + ". Skipping." );
-				e.printStackTrace(); //TODO: DDs
+		Thread loaderThread = new Thread () {
+			
+			public void run() {
+				boolean startedEmpty = items.isEmpty();
+				
+				if ( paths == null || paths.size() <= 0 ) {
+					LOGGER.fine( "Recieved a null or empty track list. No tracks loaded." );
+					return;
+				}
+				
+				int targetIndex = index;
+				synchronized ( items ) {
+					if ( index < 0 ) {
+						LOGGER.fine( "Asked to insert tracks at: " + index + ", inserting at 0 instead." );
+						targetIndex = 0;
+					} else if ( index > items.size() ) {
+						LOGGER.fine( "Asked to insert tracks past the end of current list. Inserting at end instead." );
+						targetIndex = items.size();
+					}
+				}
+				
+				int tracksAdded = 0;
+				for ( Path path : paths ) {
+					try {
+						addItem ( targetIndex, new CurrentListTrack ( path ) );
+						targetIndex++;
+						tracksAdded++;
+					} catch ( IOException | NullPointerException e ) {
+						LOGGER.info( " -- Couldn't load track: " + path.toString() + ". Skipping." );
+					}
+				}
+				
+				if ( tracksAdded > 0 ) {
+					if ( startedEmpty ) {
+						tracksSet();
+					} else {
+						tracksAdded();
+					}
+				}
 			}
-		}
+		};
 		
-		synchronized ( items ) {
-			if ( index < 0 ) {
-				LOGGER.fine( "Asked to insert tracks at: " + index + ", inserting at 0 instead." );
-				index = 0;
-			} else if ( index > items.size() ) {
-				LOGGER.fine( "Asked to insert tracks past the end of current list. Inserting at end instead." );
-				index = items.size();
-			}
+		loaderThread.setDaemon( true );
+		loaderThread.start();
+	}
 	
-			items.addAll( index, tracks );
-		}
-		
-		if ( tracksAdded > 0 ) {
-			if ( startedEmpty ) {
-				tracksSet();
-			} else {
-				tracksAdded();
-			}
-		}
+	private void addItem ( int index, CurrentListTrack track ) {
+		Platform.runLater( () -> {
+			items.add( index, track );
+		});
 	}
 	
 	public void appendAlbum ( Album album ) {

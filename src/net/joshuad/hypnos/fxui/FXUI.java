@@ -1455,7 +1455,9 @@ public class FXUI implements PlayerListener {
 		currentPlayingListInfo.prefWidthProperty().bind( playlistControls.widthProperty() );
 		
 		player.getCurrentList().addListener( ( CurrentListState currentState ) -> {  
-			currentPlayingListInfo.setText( currentState.getDisplayString() );
+			Platform.runLater( () -> {
+				currentPlayingListInfo.setText( currentState.getDisplayString() );
+			});
 		});
 		
 		final ContextMenu queueButtonMenu = new ContextMenu();
