@@ -1,20 +1,29 @@
 package net.joshuad.hypnos;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.URLDecoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.FileHandler;
+import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.output.TeeOutputStream;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 
@@ -55,6 +64,8 @@ public class Hypnos extends Application {
 	
 	private static OS os = OS.UNKNOWN;
 	private static Path rootDirectory;
+	private static Path configDirectory;
+	private static Path logFile;
 	private static boolean isStandalone = false;
 	private static boolean isDeveloping = false;
 	private static boolean disableHotkeys = false;
@@ -65,6 +76,12 @@ public class Hypnos extends Application {
 	private LibraryUpdater libraryUpdater;
 	private static Library library;
 	private GlobalHotkeys hotkeys;
+	
+	private static PrintStream originalOut;
+	private static PrintStream originalErr;
+	
+	private static ByteArrayOutputStream logBuffer; //Used to store log info until log file is initialized
+	
 	
 	public static OS getOS() {
 		return os;
@@ -82,6 +99,14 @@ public class Hypnos extends Application {
 		return rootDirectory;
 	}
 	
+	public static Path getConfigDirectory() {
+		return configDirectory;
+	}
+	
+	public static Path getLogFile() {
+		return logFile;
+	}
+	
 	public static Persister getPersister() {
 		return persister;
 	}
@@ -90,15 +115,29 @@ public class Hypnos extends Application {
 		return library;
 	}
 
+	
+	private static void startLogToBuffer() {
+		originalOut = System.out;
+		originalErr = System.err;
+		
+		logBuffer = new ByteArrayOutputStream();
+		
+		TeeOutputStream bufferOutTee = new TeeOutputStream ( originalOut, new PrintStream ( logBuffer ) );
+		TeeOutputStream bufferErrTee = new TeeOutputStream ( originalErr, new PrintStream ( logBuffer ) );
+		
+		System.setOut( new PrintStream ( bufferOutTee ) );
+		System.setErr( new PrintStream ( bufferErrTee ) );
+	}
+	
 	private void parseSystemProperties() {
 				
 		isStandalone = Boolean.getBoolean( "hypnos.standalone" );
 		isDeveloping = Boolean.getBoolean( "hypnos.developing" );
 		disableHotkeys = Boolean.getBoolean( "hypnos.disableglobalhotkeys" );
 		
-		if ( isStandalone ) LOGGER.config ( "Running as standalone" );
-		if ( isDeveloping ) LOGGER.config ( "Running on development port" );
-		if ( isDeveloping ) LOGGER.config ( "Global hotkeys disabled" );
+		if ( isStandalone ) LOGGER.info ( "Running as standalone" );
+		if ( isDeveloping ) LOGGER.info ( "Running on development port" );
+		if ( isDeveloping ) LOGGER.info ( "Global hotkeys disabled" );
 	}
 	
 	private void determineOS() {
@@ -148,6 +187,97 @@ public class Hypnos extends Application {
 			
 		} catch ( UnsupportedEncodingException e ) {
 			rootDirectory = Paths.get( path ).getParent();
+		}
+	}
+	
+	private void setupConfigDirectory () {
+		// TODO: We might want to make a few fall-throughs if these locations
+		// don't exist.
+		// TODO: Test this on each OS. 
+		String home = System.getProperty( "user.home" );
+
+		if ( Hypnos.isStandalone() ) {
+			configDirectory = getRootDirectory().resolve( "config" );
+
+		} else {
+			final String x = File.separator;
+			switch ( getOS() ) {
+				case NIX:
+					configDirectory = Paths.get( home + x + ".hypnos" );
+					break;
+				case OSX:
+					configDirectory = Paths.get( home + x + "Preferences" + x + "Hypnos" );
+					break;
+				case WIN_10:
+					configDirectory = Paths.get( home + x + "AppData" + x + "Local" + x + "Hypnos" );
+					break;
+				case WIN_7:
+					configDirectory = Paths.get( home + x + "AppData" + x + "Local" + x + "Hypnos" );
+					break;
+				case WIN_8:
+					configDirectory = Paths.get( home + x + "AppData" + x + "Local" + x + "Hypnos" );
+					break;
+				case WIN_UNKNOWN:
+					configDirectory = Paths.get( home + x + "AppData" + x + "Local" + x + "Hypnos" );
+					break;
+				case WIN_VISTA:
+					configDirectory = Paths.get( home + x + "AppData" + x + "Local" + x + "Hypnos" );
+					break;
+				case WIN_XP:
+					configDirectory = Paths.get( home + x + "Local Settings" + x + "Application Data" + x + "Hypnos" );
+					break;
+				case UNKNOWN: //Fall through
+				default:
+					configDirectory = Paths.get( home + x + ".hypnos" );
+					break;
+			}
+		}
+		
+		File configDirectory = Hypnos.getConfigDirectory().toFile();
+		
+		if ( !configDirectory.exists() ) {
+			boolean created = configDirectory.mkdirs();
+			// TODO: check created
+		}
+
+		if ( !configDirectory.isDirectory() ) {
+			// TODO:
+		}
+	}
+	
+	private void setupLogFile() {
+		logFile = configDirectory.resolve( "hypnos.log" );
+		try {
+			
+			logFile.toFile().createNewFile();
+			PrintWriter logOut = new PrintWriter ( new FileOutputStream ( logFile.toFile(), false ) );
+			logOut.print( logBuffer.toString() );
+			logOut.close();
+			
+			System.setOut( originalOut );
+			System.setErr( originalErr );
+			
+			FileHandler fileHandler = new FileHandler( logFile.toString(), true );     
+			fileHandler.setFormatter( new Formatter() {
+				SimpleDateFormat dateFormat = new SimpleDateFormat ( "MMM d, yyyy HH:mm:ss aaa" );
+				public String format ( LogRecord record ) {
+					
+					String retMe = dateFormat.format( new Date ( record.getMillis() ) )
+						  + " " + record.getLoggerName()
+						  + " " + record.getSourceMethodName()
+						  + "\n"
+						  + record.getLevel() + ": " + record.getMessage()
+						  + "\n";
+					
+					return retMe;
+					
+				}
+			} );
+			
+	        Logger.getLogger("").addHandler( fileHandler );
+		} catch ( IOException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
@@ -331,9 +461,13 @@ public class Hypnos extends Application {
 	@Override
 	public void start ( Stage stage ) {
 		try {
+			startLogToBuffer();
 			parseSystemProperties();
 			determineOS();
 			setupRootDirectory(); 
+			setupConfigDirectory();
+			setupLogFile();
+			
 			setupJavaLibraryPath();
 			
 			String[] args = getParameters().getRaw().toArray ( new String[0] );
@@ -361,6 +495,7 @@ public class Hypnos extends Application {
 				
 				singleInstanceController.startCLICommandListener ( this );
 				library.startLoader( persister );
+				
 				LOGGER.info( "Hypnos finished loading." );
 				
 								

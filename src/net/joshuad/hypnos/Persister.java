@@ -46,7 +46,6 @@ public class Persister {
 		;
 	}
 
-	private File configDirectory;
 	private File sourcesFile;
 	private File playlistsDirectory;
 	private File currentFile;
@@ -68,47 +67,7 @@ public class Persister {
 		this.library = library;
 		this.hotkeys = hotkeys;
 
-		// TODO: We might want to make a few fall-throughs if these locations
-		// don't exist.
-		// TODO: Test this on each OS. 
-		String home = System.getProperty( "user.home" );
-
-		if ( Hypnos.isStandalone() ) {
-			configDirectory = Hypnos.getRootDirectory().resolve( "config" ).toFile();
-
-		} else {
-			final String x = File.separator;
-			switch ( Hypnos.getOS() ) {
-				case NIX:
-					configDirectory = new File( home + x + ".hypnos" );
-					break;
-				case OSX:
-					configDirectory = new File( home + x + "Preferences" + x + "Hypnos" );
-					break;
-				case WIN_10:
-					configDirectory = new File( home + x + "AppData" + x + "Local" + x + "Hypnos" );
-					break;
-				case WIN_7:
-					configDirectory = new File( home + x + "AppData" + x + "Local" + x + "Hypnos" );
-					break;
-				case WIN_8:
-					configDirectory = new File( home + x + "AppData" + x + "Local" + x + "Hypnos" );
-					break;
-				case WIN_UNKNOWN:
-					configDirectory = new File( home + x + "AppData" + x + "Local" + x + "Hypnos" );
-					break;
-				case WIN_VISTA:
-					configDirectory = new File( home + x + "AppData" + x + "Local" + x + "Hypnos" );
-					break;
-				case WIN_XP:
-					configDirectory = new File( home + x + "Local Settings" + x + "Application Data" + x + "Hypnos" );
-					break;
-				case UNKNOWN: //Fall through
-				default:
-					configDirectory = new File( home + x + ".hypnos" );
-					break;
-			}
-		}
+		File configDirectory = Hypnos.getConfigDirectory().toFile();
 
 		sourcesFile = new File( configDirectory + File.separator + "sources" );
 		playlistsDirectory = new File( configDirectory + File.separator + "playlists" );
@@ -123,14 +82,6 @@ public class Persister {
 	}
 
 	private void createNecessaryFolders () {
-		if ( !configDirectory.exists() ) {
-			boolean created = configDirectory.mkdirs();
-			// TODO: check created
-		}
-
-		if ( !configDirectory.isDirectory() ) {
-			// TODO:
-		}
 
 		if ( !playlistsDirectory.exists() ) {
 			boolean playlistDir = playlistsDirectory.mkdirs();

@@ -529,7 +529,7 @@ public class SettingsWindow extends Stage {
 		
 		Thread logReader = new Thread( () -> {
 			try ( 
-				BufferedReader reader = new BufferedReader( new FileReader( Hypnos.getRootDirectory().resolve( "hypnos.log" ).toFile() ) ); 
+				BufferedReader reader = new BufferedReader( new FileReader( Hypnos.getLogFile().toFile() ) ); 
 			){
 				while ( true ) {
 					String line = reader.readLine();
