@@ -119,7 +119,7 @@ public abstract class AbstractDecoder {
 			return ( value - min ) / ( max - min );
 			
 		} else {
-			return 0;
+			return 1;
 		}
 	}
 
