@@ -9,7 +9,7 @@ import net.joshuad.hypnos.fxui.FXUI;
 public class LibraryUpdater {
 	private static final Logger LOGGER = Logger.getLogger( LibraryUpdater.class.getName() );
 
-	private static final int MAX_CHANGES_PER_REQUEST = 300;
+	private static final int MAX_CHANGES_PER_REQUEST = 2000;
 
 	private boolean runLaterPending = false;
 	
@@ -50,6 +50,29 @@ public class LibraryUpdater {
 				try {
 				
 					int changeCount = 0;
+					
+					//TODO: make sure these don't violate MAX_CHANGES like above, but whatever do it later not gonna happen. 
+					synchronized ( library.playlistsToRemove ) {
+						library.playlists.removeAll( library.playlistsToRemove );
+						library.playlistsToRemove.clear();
+
+						ui.updatePlaylistPlaceholder();
+					}
+				
+					synchronized ( library.playlistsToAdd ) {
+						
+						for ( Playlist candidate : library.playlistsToAdd ) {
+							candidate.setName( library.getUniquePlaylistName( candidate.getName() ) );
+							library.playlists.add( candidate );
+						}
+						
+						library.playlistsToAdd.clear();
+					}
+					
+					
+					library.playlistsToUpdate.clear(); //TODO: update playlists. 
+
+					ui.updatePlaylistPlaceholder();
 					
 					synchronized ( Track.tagErrorsToAdd ) { //TODO: decide where to put this. 
 						library.tagErrors.addAll ( Track.tagErrorsToAdd );
@@ -147,28 +170,7 @@ public class LibraryUpdater {
 	
 					library.tracksToUpdate.clear();	//TODO: Update tracks
 					
-					//TODO: make sure these don't violate MAX_CHANGES like above, but whatever do it later not gonna happen. 
-					synchronized ( library.playlistsToRemove ) {
-						library.playlists.removeAll( library.playlistsToRemove );
-						library.playlistsToRemove.clear();
-
-						ui.updatePlaylistPlaceholder();
-					}
 				
-					synchronized ( library.playlistsToAdd ) {
-						
-						for ( Playlist candidate : library.playlistsToAdd ) {
-							candidate.setName( library.getUniquePlaylistName( candidate.getName() ) );
-							library.playlists.add( candidate );
-						}
-						
-						library.playlistsToAdd.clear();
-					}
-					
-					
-					library.playlistsToUpdate.clear(); //TODO: update playlsits. 
-
-					ui.updatePlaylistPlaceholder();
 					
 				} finally {
 					runLaterPending = false;

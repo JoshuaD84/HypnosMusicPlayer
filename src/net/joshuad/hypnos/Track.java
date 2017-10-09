@@ -20,7 +20,6 @@ import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.CannotWriteException;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.audio.generic.GenericTag;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
@@ -776,9 +775,7 @@ public class Track implements Serializable {
 			}			
 			
 		} catch ( NullPointerException | IOException | CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
-			// TODO Auto-generated catch block
-			// TODO CannotReadException for Test Cases/long.m4a
-			e.printStackTrace( System.out );
+			//I don't think we need to do anything here; if we can't load an image from tags, that's OK. 
 		} 
 
 		Path otherPaths = getSecondaryAlbumCoverPath ();

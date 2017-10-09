@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -335,17 +336,56 @@ public class Library {
 		sourceToAdd.remove( removeMeSource );
 		musicSourcePaths.remove( removeMeSource );
 		
-		ArrayList <Album> albumsCopy = new ArrayList <Album> ( albums );
-		for ( Album album : albumsCopy ) {
-			if ( album.getPath().toAbsolutePath().startsWith( removeMeSource ) ) {
-				removeAlbum ( album );
-			}
-		}
+		if ( musicSourcePaths.size() == 0 ) {
+
+			Platform.runLater( () -> {
+				synchronized ( albumsToAdd ) {
+					albumsToAdd.clear();
+				}
+				
+				synchronized ( albumsToRemove ) {
+					albumsToRemove.clear();
+				}
+				
+				synchronized ( albumsToUpdate ) {
+					albumsToRemove.clear();
+				}
+				
+				synchronized ( albums ) {
+					albums.clear();
+				}
+				
+				synchronized ( tracksToAdd ) {
+					tracksToAdd.clear();
+				}
+				
+				synchronized ( tracksToRemove ) {
+					tracksToRemove.clear();
+				}
+				
+				synchronized ( tracksToUpdate ) {
+					tracksToUpdate.clear();
+				}
+				
+				synchronized ( tracks ) {
+					tracks.clear();
+				}
+			});
+			
+		} else {
 		
-		ArrayList <Track> tracksCopy = new ArrayList <Track> ( tracks );
-		for ( Track track : tracksCopy ) {
-			if ( track.getPath().toAbsolutePath().startsWith( removeMeSource ) ) {
-				removeTrack( track );
+			ArrayList <Album> albumsCopy = new ArrayList <Album> ( albums );
+			for ( Album album : albumsCopy ) {
+				if ( album.getPath().toAbsolutePath().startsWith( removeMeSource ) ) {
+					removeAlbum ( album );
+				}
+			}
+			
+			ArrayList <Track> tracksCopy = new ArrayList <Track> ( tracks );
+			for ( Track track : tracksCopy ) {
+				if ( track.getPath().toAbsolutePath().startsWith( removeMeSource ) ) {
+					removeTrack( track );
+				}
 			}
 		}
 	}
