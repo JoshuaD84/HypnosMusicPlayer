@@ -9,7 +9,7 @@ import net.joshuad.hypnos.fxui.FXUI;
 public class LibraryUpdater {
 	private static final Logger LOGGER = Logger.getLogger( LibraryUpdater.class.getName() );
 
-	private static final int MAX_CHANGES_PER_REQUEST = 250;
+	private static final int MAX_CHANGES_PER_REQUEST = 300;
 
 	private boolean runLaterPending = false;
 	
@@ -27,7 +27,7 @@ public class LibraryUpdater {
 				}
 				
 				try {
-					Thread.sleep ( 100 );
+					Thread.sleep ( 15 );
 				} catch ( InterruptedException e ) {
 					LOGGER.log ( Level.FINE, "Sleep interupted during wait period." );
 				}

@@ -3,6 +3,8 @@ New Features
 	
 	Right click on current track at top of window, do stuff
 		Like add to playlist. Other things?
+		
+	Mouse over on current track at top of window
 			
 Bug Fixes / Incremental Improvements
 	Data lost when computer turned off (logging out doesn't trigger, only a power down)
@@ -51,7 +53,6 @@ JavaFX stuff
 	Make sure horizontal scroll bars never appear
 		6/9 - Can't find anything on google.
 		
-	Art panes won't stay the size I set them to. 
 	
 Refactor / organize my code. 
  	Make LibraryUpdater part of Library. Is there a way to abstract out the Platform -> RunLater part? I feel like we're just stuck w/ that, which kind of ties to us JavaFX. 

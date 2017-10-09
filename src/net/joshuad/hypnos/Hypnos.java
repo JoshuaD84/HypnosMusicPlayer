@@ -362,6 +362,7 @@ public class Hypnos extends Application {
 				singleInstanceController.startCLICommandListener ( this );
 				library.startLoader( persister );
 				LOGGER.info( "Hypnos finished loading." );
+				
 								
 			} else {
 				singleInstanceController.sendCommandsThroughSocket( commands );

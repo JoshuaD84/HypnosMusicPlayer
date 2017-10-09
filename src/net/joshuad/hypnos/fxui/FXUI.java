@@ -320,7 +320,7 @@ public class FXUI implements PlayerListener {
 				}
 			}
 		};
-		
+				
 		primaryContainer.setOnKeyPressed( ( KeyEvent e ) -> { 
 
 			if ( e.getCode() == KeyCode.S && e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
@@ -355,6 +355,8 @@ public class FXUI implements PlayerListener {
 		
 		player.addPlayerListener ( this );
 	}
+	
+
 	
 	private void setupFont() {
 		Path font, fontBold, stylesheet; 
@@ -752,40 +754,41 @@ public class FXUI implements PlayerListener {
 			setImages ( currentImagesTrack );
 		});
 			
-			exportImage.setOnAction( ( ActionEvent event ) -> {
-				Track track = currentImagesTrack;
-				if ( track == null ) return;
+		exportImage.setOnAction( ( ActionEvent event ) -> {
+			Track track = currentImagesTrack;
+			if ( track == null ) return;
+			
+			FileChooser fileChooser = new FileChooser();
+			FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter( 
+				"Image Files", Arrays.asList( "*.png" ) );
+			
+			fileChooser.getExtensionFilters().add( fileExtensions );
+			fileChooser.setTitle( "Export Album Image" );
+			File targetFile = fileChooser.showSaveDialog( mainStage );
+			
+			if ( targetFile == null ) return; 
+
+			if ( !targetFile.toString().toLowerCase().endsWith(".png") ) {
+				targetFile = targetFile.toPath().resolveSibling ( targetFile.getName() + ".png" ).toFile();
+			}
+			
+			try {
+				BufferedImage bImage = SwingFXUtils.fromFXImage( albumImage.getImage(), null );
+				ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+				ImageIO.write( bImage, "png", byteStream );
+				byte[] imageBytes  = byteStream.toByteArray();
+				byteStream.close();
 				
-				FileChooser fileChooser = new FileChooser();
-				FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter( 
-					"Image Files", Arrays.asList( "*.png" ) );
+				Utils.saveImageToDisk( targetFile.toPath(), imageBytes );
+			} catch ( IOException ex ) {
+				//TODO: Show UI error. 
 				
-				fileChooser.getExtensionFilters().add( fileExtensions );
-				fileChooser.setTitle( "Export Album Image" );
-				File targetFile = fileChooser.showSaveDialog( mainStage );
-				
-				if ( targetFile == null ) return; 
-	
-				if ( !targetFile.toString().toLowerCase().endsWith(".png") ) {
-					targetFile = targetFile.toPath().resolveSibling ( targetFile.getName() + ".png" ).toFile();
-				}
-				
-				try {
-					BufferedImage bImage = SwingFXUtils.fromFXImage( albumImage.getImage(), null );
-					ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-					ImageIO.write( bImage, "png", byteStream );
-					byte[] imageBytes  = byteStream.toByteArray();
-					byteStream.close();
-					
-					Utils.saveImageToDisk( targetFile.toPath(), imageBytes );
-				} catch ( IOException ex ) {
-					//TODO: Show UI error. 
-					
-				}
-				
-			});
+			}
+			
+		});
 				
 		albumImagePane = new BorderPane();
+		
 		albumImagePane.setOnContextMenuRequested( ( ContextMenuEvent e ) -> {
 			boolean disableMenus = currentImagesTrack == null;
 			setImage.setDisable( disableMenus );
@@ -1891,7 +1894,8 @@ public class FXUI implements PlayerListener {
 		playMenuItem.setOnAction( event -> {
 			if ( okToReplaceCurrentList() ) {
 				player.getCurrentList().setAlbums( albumTable.getSelectionModel().getSelectedItems() );
-				player.play();
+				player.next( false );
+				//TODO: This doesn't work
 			}
 		});
 
@@ -3203,34 +3207,23 @@ public class FXUI implements PlayerListener {
 	}
 
 	public void showMainWindow() {
+
 		mainStage.show();
 	
 		// This stuff has to be done after setScene
 		StackPane thumb = (StackPane) trackPositionSlider.lookup( ".thumb" );
 		thumb.setVisible( false );
-	
+		
+		//These are the default positions.
 		primarySplitPane.setDividerPositions( .35d );
 		currentListSplitPane.setDividerPositions( .65d );
 		artSplitPane.setDividerPosition( 0, .51d ); // For some reason .5 doesn't work...
-		
+			
 		hackTooltipStartTiming();
 	
 		updateAlbumListPlaceholder();
 		updateTrackListPlaceholder();
 		updatePlaylistPlaceholder();
-		
-		//If we do the .setResizableWithParent right away the art pane doesn't display right, so we wait a little and everything's fine. 
-		Thread wait = new Thread ( () -> {
-			try {
-				Thread.sleep ( 1500 );
-			} catch ( InterruptedException e ) {
-				LOGGER.fine ( "Interrupted while waiting to set art split pane percent." );
-			}
-			SplitPane.setResizableWithParent( artSplitPane, false );
-		});
-		
-		wait.setDaemon( true );
-		wait.start();
 	}
 
 

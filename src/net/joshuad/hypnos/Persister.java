@@ -151,7 +151,6 @@ public class Persister {
 		loadPlaylists();
 		loadHotkeys();
 		ui.refreshHotkeyList();
-		loadPostWindowSettings();
 	}
 
 	public void saveAllData () {
@@ -548,41 +547,5 @@ public class Persister {
 		}
 
 		ui.applySettings( loadMe );
-	}
-
-	public void loadPostWindowSettings () {
-						
-		/*
-		EnumMap <Setting, String> loadMe = new EnumMap <Setting, String>( Setting.class );
-		try ( FileReader fileReader = new FileReader( settingsFile ); ) {
-
-			BufferedReader settingsIn = new BufferedReader( fileReader );
-
-			for ( String line; (line = settingsIn.readLine()) != null; ) {
-				Setting setting;
-				try {
-					setting = Setting.valueOf( line.split( ":\\s+" )[0] );
-				} catch ( IllegalArgumentException e ) {
-					LOGGER.info( "Found invalid setting: " + line.split( ":\\s+" )[0] + ", continuing." );
-					continue;
-				}
-
-				String value = line.split( ":\\s+" )[1];
-				
-				switch ( setting ) {
-						loadMe.put( setting, value );
-						break;
-				}
-				
-			}
-
-		} catch ( FileNotFoundException e ) {
-			System.out.println( "File not found: settings, unable to load user settings, using defaults. Continuing." );
-		} catch ( IOException e ) {
-			e.printStackTrace();
-		}
-
-		ui.applySettings( loadMe );
-		*/
 	}
 }
