@@ -5,8 +5,12 @@ New Features
 		Like add to playlist. Other things?
 		
 	Mouse over on current track at top of window
+	
+	Mouse over albums/tracks/playlists for count
 			
 Bug Fixes / Incremental Improvements
+	Apply base theme to all windows, not just main window
+	
 	Data lost when computer turned off (logging out doesn't trigger, only a power down)
 	
 	have filter boxes share text, so they feel like one box. 
@@ -18,6 +22,9 @@ Bug Fixes / Incremental Improvements
 	Setting album image for flac file currently playing causes exception in decoder. 
 
 	Save after modifing stuff more frequently. 
+	
+	Settings Window
+		Look at how I center Global hotkeys tab; center "settings" tab the same way
 		
 	Hotkeys aren't consumed, so they are passed to the current window. 
 		Check windows and OSX
@@ -40,7 +47,8 @@ Bug Fixes / Incremental Improvements
 			at com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
 			at com.sun.glass.ui.gtk.GtkApplication.lambda$null$5(GtkApplication.java:139)
 			at java.lang.Thread.run(Thread.java:748)
-	
+
+	Change css selector for .scroll-bar:horizontal to an applied class, so only chosen h-scrollbars are hidden
 	
 JavaFX stuff
 	hide/show via hotkeys while maximized toggles every 3 presses instead of every 2 presses. 
@@ -48,9 +56,7 @@ JavaFX stuff
 	
 	While loading the library, the table view scrolls a little bit. 
 	
-	Make sure horizontal scroll bars never appear
-		6/9 - Can't find anything on google.
-		
+	Tiny drop shadow on transport buttons when in dark theme. It's the line HBox, VBox, #transport { ... -fx-background-color: #222222 ... }
 	
 Refactor / organize my code. 
  	Make LibraryUpdater part of Library. Is there a way to abstract out the Platform -> RunLater part? I feel like we're just stuck w/ that, which kind of ties to us JavaFX. 
@@ -123,14 +129,11 @@ OS Specific
 		Installer
 	    Standalone build (32-bit)
 		Rename java process to Hypnos
-		Always use embedded calibri font? Only on systems <= win 7?
-		Test global hotkeys
 		
 	Windows <= 7
 		Font rendering on utf glyphs
 		
 	Linux
-		Open-with shell integration
 		Debian Installer
 	    redhat installer
 	    pacman installer

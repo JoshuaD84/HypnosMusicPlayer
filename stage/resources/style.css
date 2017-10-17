@@ -54,3 +54,8 @@
 .tooltip {
 	-fx-font-size: 12px;
 }
+
+.scroll-bar:horizontal { /*This selects all tables right now, probably not ideal.*/
+	-fx-font-size: .01px;
+}
+	

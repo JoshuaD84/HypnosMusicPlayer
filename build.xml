@@ -1,6 +1,6 @@
 <project name="Hypnos Music Player" default="compile" basedir=".">
 	
-	<property name="version" value="alpha1" />
+	<property name="version" value="beta1" />
 	
 	<property name="src" location="src"/>
 	<property name="build" location="bin"/>
@@ -34,11 +34,12 @@
 		<jar destfile="${jarFile}" basedir="${build}">
 			<manifest>
 				<attribute name="Main-Class" value="net.joshuad.hypnos.Hypnos" />
-				<attribute name="Class-Path" value="lib/commons-cli-1.4.jar lib/jaad-0.8.4-nospi.jar
+				<attribute name="Class-Path" value="lib/commons-cli-1.4.jar lib/commons-io-2.5.jar 
+													lib/fuzzywuzzy-1.1.8.jar lib/jaad-0.8.4-nospi.jar
 													lib/jaudiotagger-2.2.6-SNAPSHOT.jar lib/jflac-1.2.jar
-													lib/jl1.0.1.jar lib/jogg-0.0.7.jar lib/jorbis-0.0.15.jar
-													lib/vorbisspi1.0.3.jar lib/jnativehook-2.0.2.jar
-													lib/fuzzywuzzy-1.1.8.jar" />
+													lib/jl1.0.1.jar lib/jnativehook-2.0.2.jar 
+													lib/jogg-0.0.7.jar lib/jorbis-0.0.15.jar
+													" />
 			</manifest>
 		</jar>
 	</target>

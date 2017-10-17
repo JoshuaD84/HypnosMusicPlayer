@@ -11,7 +11,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -37,6 +36,8 @@ public class LibraryLocationWindow extends Stage {
 	TableView <Path> musicSourceTable;
 	
 	Library library;
+
+	Scene scene;
 	
 	public LibraryLocationWindow ( Stage mainStage, Library library ) {
 		super();
@@ -46,8 +47,9 @@ public class LibraryLocationWindow extends Stage {
 		initOwner( mainStage );
 		setTitle( "Music Search Locations" );
 		setWidth( 350 );
-		Group root = new Group();
-		Scene scene = new Scene( root );
+		setHeight( 500 );
+		Pane root = new Pane();
+		scene = new Scene( root );
 		VBox primaryPane = new VBox();
 
 		musicSourceTable = new TableView<Path> ();
@@ -158,10 +160,13 @@ public class LibraryLocationWindow extends Stage {
 		controlBox.setAlignment( Pos.CENTER );
 		controlBox.prefWidthProperty().bind( widthProperty() );
 		controlBox.setPadding( new Insets( 5 ) );
+		
+		primaryPane.prefWidthProperty().bind( root.widthProperty() );
+		primaryPane.prefHeightProperty().bind( root.heightProperty() );
+		musicSourceTable.prefHeightProperty().bind( root.heightProperty().subtract( controlBox.heightProperty() ) );
 
 		primaryPane.getChildren().addAll( musicSourceTable, controlBox );
 		root.getChildren().add( primaryPane );
 		setScene( scene );
 	}
-
 }

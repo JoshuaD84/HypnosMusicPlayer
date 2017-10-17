@@ -69,6 +69,7 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
@@ -133,8 +134,11 @@ public class FXUI implements PlayerListener {
 	SplitPane currentListSplitPane;
 	StretchedTabPane libraryPane;
 	
-	ImageView saveImage;
+	ImageView playImage;
 	ImageView pauseImage;
+	ImageView stopImage;
+	ImageView nextImage;
+	ImageView previousImage;
 
 	HBox albumFilterPane;
 	HBox trackFilterPane;
@@ -206,6 +210,19 @@ public class FXUI implements PlayerListener {
 	
 	private Track currentImagesTrack = null;
 	
+	private File darkStylesheet;
+	private File baseStylesheet;
+	
+	private boolean isDarkTheme = false;
+	
+	private ColorAdjust darkThemeTransportButtons = new ColorAdjust(); 
+	
+	{
+		darkThemeTransportButtons.setSaturation( -1 );
+		darkThemeTransportButtons.setHue( 1 );
+		darkThemeTransportButtons.setBrightness( .55 );
+	}
+	
 	private SimpleBooleanProperty promptBeforeOverwrite = new SimpleBooleanProperty ( true );
 	
 	public FXUI ( Stage stage, Library library, AudioSystem player, GlobalHotkeys hotkeys ) {
@@ -215,8 +232,8 @@ public class FXUI implements PlayerListener {
 		
 		scene = new Scene( new Group(), windowedWidth, windowedHeight );
 		
-		File stylesheet = new File ( Hypnos.getRootDirectory() + File.separator + "resources" + File.separator + "style.css" );
-		scene.getStylesheets().add( "file:///" + stylesheet.getAbsolutePath().replace( "\\", "/" ) ); 
+		baseStylesheet = new File ( Hypnos.getRootDirectory() + File.separator + "resources" + File.separator + "style.css" );
+		darkStylesheet = new File ( Hypnos.getRootDirectory() + File.separator + "resources" + File.separator + "style-dark.css" );
 		
 		//TODO: If we launch the jar from a different directory, it doesn't shwo the icon
 		//we need to get the directory of the jar and load the image from there, not just from the current directory
@@ -249,6 +266,8 @@ public class FXUI implements PlayerListener {
 		settingsWindow = new SettingsWindow ( this, library, hotkeys, player );
 		trackInfoWindow = new TrackInfoWindow ( this );
 
+		applyBaseTheme();
+		
 		artSplitPane = new SplitPane();
 		artSplitPane.getItems().addAll( albumImagePane, artistImagePane );
 
@@ -399,6 +418,71 @@ public class FXUI implements PlayerListener {
 		
 	}
 	
+	public void applyBaseTheme() {
+		String baseSheet = "file:///" + baseStylesheet.getAbsolutePath().replace( "\\", "/" );
+		scene.getStylesheets().add( baseSheet ); 
+		libraryLocationWindow.getScene().getStylesheets().add( baseSheet );
+		settingsWindow.getScene().getStylesheets().add( baseSheet );
+		queueWindow.getScene().getStylesheets().add( baseSheet );
+		tagWindow.getScene().getStylesheets().add( baseSheet );
+		playlistInfoWindow.getScene().getStylesheets().add( baseSheet );
+		albumInfoWindow.getScene().getStylesheets().add( baseSheet );
+		libraryLocationWindow.getScene().getStylesheets().add( baseSheet );
+		historyWindow.getScene().getStylesheets().add( baseSheet );
+		settingsWindow.getScene().getStylesheets().add( baseSheet );
+		trackInfoWindow.getScene().getStylesheets().add( baseSheet );
+	}
+	
+	public void applyDarkTheme() {
+		if ( !isDarkTheme ) {
+			isDarkTheme = true;
+			String darkSheet = "file:///" + darkStylesheet.getAbsolutePath().replace( "\\", "/" );
+			scene.getStylesheets().add( darkSheet ); 
+			libraryLocationWindow.getScene().getStylesheets().add( darkSheet );
+			settingsWindow.getScene().getStylesheets().add( darkSheet );
+			queueWindow.getScene().getStylesheets().add( darkSheet );
+			tagWindow.getScene().getStylesheets().add( darkSheet );
+			playlistInfoWindow.getScene().getStylesheets().add( darkSheet );
+			albumInfoWindow.getScene().getStylesheets().add( darkSheet );
+			libraryLocationWindow.getScene().getStylesheets().add( darkSheet );
+			historyWindow.getScene().getStylesheets().add( darkSheet );
+			settingsWindow.getScene().getStylesheets().add( darkSheet );
+			trackInfoWindow.getScene().getStylesheets().add( darkSheet );
+			
+			if ( stopImage != null ) stopImage.setEffect( darkThemeTransportButtons );
+			if ( nextImage != null ) nextImage.setEffect( darkThemeTransportButtons );
+			if ( previousImage != null ) previousImage.setEffect( darkThemeTransportButtons );
+			if ( pauseImage != null ) pauseImage.setEffect( darkThemeTransportButtons );
+			if ( playImage != null ) playImage.setEffect( darkThemeTransportButtons );
+		}
+	}
+	
+	public void removeDarkTheme() {	
+		isDarkTheme = false;
+		String darkSheet = "file:///" + darkStylesheet.getAbsolutePath().replace( "\\", "/" );
+		scene.getStylesheets().remove( darkSheet ); 
+		libraryLocationWindow.getScene().getStylesheets().remove( darkSheet );
+		settingsWindow.getScene().getStylesheets().remove( darkSheet );
+		queueWindow.getScene().getStylesheets().remove( darkSheet );
+		tagWindow.getScene().getStylesheets().remove( darkSheet );
+		playlistInfoWindow.getScene().getStylesheets().remove( darkSheet );
+		albumInfoWindow.getScene().getStylesheets().remove( darkSheet );
+		libraryLocationWindow.getScene().getStylesheets().remove( darkSheet );
+		historyWindow.getScene().getStylesheets().remove( darkSheet );
+		settingsWindow.getScene().getStylesheets().remove( darkSheet );
+		trackInfoWindow.getScene().getStylesheets().remove( darkSheet );
+		
+		if ( stopImage != null ) stopImage.setEffect( null );
+		if ( nextImage != null ) nextImage.setEffect( null );
+		if ( previousImage != null ) previousImage.setEffect( null );
+		if ( pauseImage != null ) pauseImage.setEffect( null );
+		if ( playImage != null ) playImage.setEffect( null );
+	}
+	
+	public boolean isDarkTheme() {
+		return isDarkTheme;
+	}
+		
 	//TODO: Does this function need to exist? 
 	private void removeFromCurrentList ( List<Integer> removeMe ) {
 		
@@ -431,7 +515,7 @@ public class FXUI implements PlayerListener {
 					timeRemainingLabel.setText( Utils.getLengthDisplay( -timeRemainingS ) );
 				} else if ( player.isStopped() ) {
 					currentListTable.refresh();
-					togglePlayButton.setGraphic( saveImage );
+					togglePlayButton.setGraphic( playImage );
 					trackPositionSlider.setValue( 0 );
 					timeElapsedLabel.setText( "" );
 					timeRemainingLabel.setText( "" );
@@ -483,14 +567,14 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public void setupTransport () {
-	
-		saveImage = null;
+
+		playImage = null;
 		pauseImage = null;
 		
 		try {
-			saveImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/play.png" ).toFile() ) ) );
-			saveImage.setFitHeight( 18 );
-			saveImage.setFitWidth( 18 );
+			playImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/play.png" ).toFile() ) ) );
+			playImage.setFitHeight( 18 );
+			playImage.setFitWidth( 18 );
 		} catch ( FileNotFoundException e ) {
 			LOGGER.warning( "Unable to load play icon: resources/play.png" );
 		}
@@ -504,13 +588,13 @@ public class FXUI implements PlayerListener {
 		}
 		
 		togglePlayButton = new Button ( "" );
-		togglePlayButton.setGraphic( saveImage );
+		togglePlayButton.setGraphic( playImage );
 		togglePlayButton.setPrefSize( 42, 35 );
 		togglePlayButton.setMinSize( 42, 35 );
 		togglePlayButton.setMaxSize( 42, 35 );
 		togglePlayButton.setTooltip( new Tooltip( "Toggle Play/Pause" ) );
 		
-		ImageView previousImage = null;
+		previousImage = null;
 		try {
 			previousImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/previous.png" ).toFile() ) ) );
 			previousImage.setFitHeight( 18 );
@@ -526,7 +610,7 @@ public class FXUI implements PlayerListener {
 		previousButton.setMaxSize( 42, 35 );
 		previousButton.setTooltip( new Tooltip( "Previous Track" ) );
 		
-		ImageView nextImage = null;
+		nextImage = null;
 		try {
 			nextImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/next.png" ).toFile() ) ) );
 			nextImage.setFitHeight( 18 );
@@ -542,7 +626,7 @@ public class FXUI implements PlayerListener {
 		nextButton.setMaxSize( 42, 35 );
 		nextButton.setTooltip( new Tooltip( "Next Track" ) );
 		
-		ImageView stopImage = null;
+		stopImage = null;
 		try {
 			stopImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/stop.png" ).toFile() ) ) );
 			stopImage.setFitHeight( 18 );
@@ -557,7 +641,7 @@ public class FXUI implements PlayerListener {
 		stopButton.setMinSize( 42, 35 );
 		stopButton.setMaxSize( 42, 35 );
 		stopButton.setTooltip( new Tooltip( "Stop" ) );
-		
+
 		previousButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
@@ -723,6 +807,8 @@ public class FXUI implements PlayerListener {
 		transport.getChildren().add( controls );
 		transport.setPadding( new Insets( 0, 0, 10, 0 ) );
 		transport.setSpacing( 5 );
+		transport.setId( "transport" );
+		
 	}
 	
 	public void setupAlbumImage () {
@@ -788,6 +874,8 @@ public class FXUI implements PlayerListener {
 		});
 				
 		albumImagePane = new BorderPane();
+
+		albumImagePane.getStyleClass().add( "artpane" );
 		
 		albumImagePane.setOnContextMenuRequested( ( ContextMenuEvent e ) -> {
 			boolean disableMenus = currentImagesTrack == null;
@@ -854,6 +942,8 @@ public class FXUI implements PlayerListener {
 		menu.getItems().addAll( setArtistImage, setAlbumArtistImage, setTrackArtistImage, exportImage );
 		
 		artistImagePane = new BorderPane();	
+		
+		artistImagePane.getStyleClass().add( "artpane" );
 		
 		artistImagePane.setOnContextMenuRequested( ( ContextMenuEvent e ) -> {
 			boolean disableAllMenus = false;
@@ -1434,6 +1524,7 @@ public class FXUI implements PlayerListener {
 
 		playlistControls = new HBox();
 		playlistControls.setAlignment( Pos.CENTER_RIGHT );
+		playlistControls.setId( "playlist-controls" );
 		
 		final Label currentListLength = new Label ( "" );
 		currentListLength.setMinWidth( Region.USE_PREF_SIZE );
@@ -3236,6 +3327,8 @@ public class FXUI implements PlayerListener {
 		boolean isMaximized = isMaximized();
 		retMe.put ( Setting.WINDOW_MAXIMIZED, isMaximized );
 		
+		String theme = isDarkTheme ? "Dark" : "Light";
+		
 		if ( isMaximized ) {
 			retMe.put ( Setting.WINDOW_X_POSITION, windowedX ); 
 			retMe.put ( Setting.WINDOW_Y_POSITION, windowedY ); 
@@ -3254,6 +3347,7 @@ public class FXUI implements PlayerListener {
 		retMe.put ( Setting.ART_SPLIT_PERCENT, getArtSplitPercent() );
 		retMe.put ( Setting.LIBRARY_TAB, libraryPane.getSelectionModel().getSelectedIndex() );
 		retMe.put ( Setting.PROMPT_BEFORE_OVERWRITE, promptBeforeOverwrite.getValue() );
+		retMe.put ( Setting.THEME, theme );
 		
 		return retMe;
 	}
@@ -3402,8 +3496,15 @@ public class FXUI implements PlayerListener {
 					case PROMPT_BEFORE_OVERWRITE:
 						promptBeforeOverwrite.setValue( Boolean.valueOf( value ) );
 						break;
+					
+					case THEME:
+						if ( value.equalsIgnoreCase( "dark" ) ) {
+							applyDarkTheme();
+						} else {
+							removeDarkTheme();
+						}
+						break;
 				}
-				
 			} catch ( Exception e ) {
 				LOGGER.log( Level.INFO, "Unable to apply setting: " + setting + " to UI.", e );
 			}
@@ -3460,7 +3561,7 @@ public class FXUI implements PlayerListener {
 	@Override
 	public void playerPaused () {
 		Platform.runLater( () -> {
-			togglePlayButton.setGraphic( saveImage );
+			togglePlayButton.setGraphic( playImage );
 		});
 	}
 

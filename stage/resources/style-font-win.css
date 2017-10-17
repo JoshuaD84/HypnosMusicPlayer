@@ -1,7 +1,7 @@
 .root {
-	-fx-font: 16px Calibri;
+	-fx-font: 14px Calibri;
 }
 
 .tooltip {
-	-fx-font-size: 16px;
+	-fx-font-size: 14px;
 }

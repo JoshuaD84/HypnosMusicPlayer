@@ -29,6 +29,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -70,6 +74,10 @@ public class SettingsWindow extends Stage {
 	private ChoiceBox <String> playlistShuffleChoices;
 	private ChoiceBox <String> playlistRepeatChoices;
 	
+	
+	private ToggleButton lightTheme, darkTheme;
+	private ToggleGroup themeToggleGroup;
+	
 	SettingsWindow( FXUI ui, Library library, GlobalHotkeys hotkeys, AudioSystem player ) {
 		super();
 		
@@ -89,7 +97,7 @@ public class SettingsWindow extends Stage {
 		tabPane = new TabPane();
 		
 		
-		Tab settingsTab = setupSettingsTab( root );
+		Tab settingsTab = setupSettingsTab( root, ui );
 		hotkeysTab = setupHotkeysTab ( root );
 		Tab logTab = setupLogTab( root );
 		Tab tagTab = setupTagTab ( root );
@@ -290,6 +298,11 @@ public class SettingsWindow extends Stage {
 			
 		}
 		
+		if ( ui.isDarkTheme() ) {
+			themeToggleGroup.selectToggle( darkTheme );
+		} else {
+			themeToggleGroup.selectToggle( lightTheme );
+		}
 	}
 	
 	public void refreshHotkeyFields() {
@@ -301,11 +314,11 @@ public class SettingsWindow extends Stage {
 		}
 	}
 	
-	private Tab setupSettingsTab ( Pane root ) {
+	private Tab setupSettingsTab ( Pane root, FXUI ui ) {
 		
 		Tab settingsTab = new Tab ( "Settings" );
 		settingsTab.setClosable( false );
-		VBox settingsPane = new VBox();
+		VBox settingsPane = new VBox( 40 );
 		settingsTab.setContent ( settingsPane );
 		settingsPane.setAlignment( Pos.TOP_CENTER );		
 		settingsPane.setPadding( new Insets ( 10 ) );
@@ -319,6 +332,40 @@ public class SettingsWindow extends Stage {
 
 		Insets labelInsets = new Insets ( 10, 10, 10, 10 );
 		Insets checkBoxInsets = new Insets ( 10, 10, 10, 10 );
+		
+		
+		Label themeLabel = new Label ( "Theme: " );
+		themeLabel.setPadding( labelInsets );
+		
+		
+		lightTheme = new ToggleButton ( "Light" );
+		darkTheme = new ToggleButton ( "Dark" );
+		
+		themeToggleGroup = new ToggleGroup();
+		lightTheme.setToggleGroup( themeToggleGroup );
+		darkTheme.setToggleGroup( themeToggleGroup );
+		
+		lightTheme.setPrefWidth( 150 );
+		darkTheme.setPrefWidth( 150 );
+		
+		lightTheme.setSelected( true );
+		
+		themeToggleGroup.selectedToggleProperty().addListener( new ChangeListener <Toggle>() {
+			public void changed ( ObservableValue <? extends Toggle> oldValue, Toggle toggle, Toggle newValue ) {
+				if ( newValue == null ) {
+					//Do nothing
+				} else if ( newValue == lightTheme ) {
+					ui.removeDarkTheme();
+					
+				} else if ( newValue == darkTheme ) {
+					ui.applyDarkTheme();
+				}
+			}
+		});
+		
+		HBox themeBox = new HBox();
+		themeBox.getChildren().addAll( themeLabel, lightTheme, darkTheme );
+		
 		
 		Label warnLabel = new Label ( "Warn before erasing unsaved playlists" );
 		warnLabel.setPadding( labelInsets );
@@ -337,7 +384,7 @@ public class SettingsWindow extends Stage {
 		warnBox.getChildren().addAll( warnCheckBox, warnLabel );
 						
 		GridPane shuffleGrid = new GridPane();
-		shuffleGrid.setPadding( new Insets ( 15, 0, 0, 0 ) );
+		shuffleGrid.setPadding( new Insets ( 0, 0, 0, 0 ) );
 		shuffleGrid.setHgap( 15 );
 		shuffleGrid.setVgap( 5 );
 		
@@ -501,8 +548,8 @@ public class SettingsWindow extends Stage {
 			}
 		});
 		row++;
-
-		settingsPane.getChildren().addAll( warnBox, shuffleGrid );
+		
+		settingsPane.getChildren().addAll( shuffleGrid, themeBox, warnBox );
 		
 		return settingsTab;
 	}
@@ -623,9 +670,10 @@ public class SettingsWindow extends Stage {
 		
 		aboutPane.setAlignment( Pos.CENTER );
 		Label name = new Label ( "Hypnos Music Player" );
-		name.setStyle( "-fx-font-size: 36px" );
+		name.setStyle( "-fx-font-size: 36px; -fx-text-fill: #020202" );
 		
 		Hyperlink website = new Hyperlink ( "http://www.hypnosplayer.org" );
+		website.setTooltip( new Tooltip ( "http://www.hypnosplayer.org" ) );
 		website.setOnAction( ( ActionEvent e ) -> {
 			try {
 				new ProcessBuilder("x-www-browser", "http://hypnosplayer.org" ).start();
@@ -634,10 +682,10 @@ public class SettingsWindow extends Stage {
 				e1.printStackTrace();
 			}
 		});
-		website.setStyle( "-fx-font-size: 20px" );
+		website.setStyle( "-fx-font-size: 20px; -fx-text-fill: #0A95C8" );
 
 		Label versionNumber = new Label ( Hypnos.getVersionString() );
-		versionNumber.setStyle( "-fx-font-size: 16px" );
+		versionNumber.setStyle( "-fx-font-size: 16px; -fx-text-fill: #020202" );
 		versionNumber.setPadding( new Insets ( 0, 0, 20, 0 ) );
 		
 		Image image = null;
@@ -656,9 +704,14 @@ public class SettingsWindow extends Stage {
 		HBox authorBox = new HBox();
 		authorBox.setAlignment( Pos.CENTER );
 		authorBox.setPadding ( new Insets ( 20, 0, 0, 0 ) );
-		authorBox.setStyle( "-fx-font-size: 16px" );
+		authorBox.setStyle( "-fx-font-size: 16px; -fx-background-color: transparent;" );
 		Label authorLabel = new Label ( "Author:" );
+		authorLabel.setStyle( "-fx-text-fill: #020202" );
 		Hyperlink authorLink = new Hyperlink ( "Joshua Hartwell" );
+
+		authorLink.setTooltip( new Tooltip ( "http://joshuad.net" ) );
+		
+		authorLink.setStyle( "-fx-text-fill: #0A95C8" );
 		authorLink.setOnAction( ( ActionEvent e ) -> {
 			try {
 				new ProcessBuilder("x-www-browser", "http://joshuad.net" ).start();
@@ -672,9 +725,16 @@ public class SettingsWindow extends Stage {
 		
 		
 		HBox sourceBox = new HBox();
+		sourceBox.setStyle( "-fx-background-color: transparent" );
 		sourceBox.setAlignment( Pos.CENTER );
+		sourceBox.setStyle( "-fx-background-color: transparent" );
 		Label sourceLabel = new Label ( "Source Code:" );
+		sourceLabel.setStyle( "-fx-text-fill: #020202" );
 		Hyperlink sourceLink = new Hyperlink ( "GitHub" );
+
+		sourceLink.setTooltip( new Tooltip ( "https://github.com/JoshuaD84/HypnosMusicPlayer" ) );
+		
+		sourceLink.setStyle( "-fx-text-fill: #0A95C8" );
 		sourceLink.setOnAction( ( ActionEvent e ) -> {
 			try {
 				new ProcessBuilder("x-www-browser", "https://github.com/JoshuaD84/HypnosMusicPlayer" ).start();
@@ -688,9 +748,13 @@ public class SettingsWindow extends Stage {
 		sourceBox.getChildren().addAll( sourceLabel, sourceLink );
 		
 		HBox licenseBox = new HBox();
+		licenseBox.setStyle( "-fx-background-color: transparent" );
 		licenseBox.setAlignment( Pos.CENTER );
 		Label licenseLabel = new Label ( "License:" );
+		licenseLabel.setStyle( "-fx-text-fill: #020202" );
 		Hyperlink licenseLink = new Hyperlink ( "GNU GPLv3" );
+		licenseLink.setStyle( "-fx-text-fill: #0A95C8" );
+		licenseLink.setTooltip ( new Tooltip ( "https://www.gnu.org/licenses/gpl-3.0-standalone.html" ) );
 		licenseLink.setOnAction( ( ActionEvent e ) -> {
 			try {
 				new ProcessBuilder("x-www-browser", "https://www.gnu.org/licenses/gpl-3.0-standalone.html" ).start();
