@@ -32,6 +32,11 @@ HBox, VBox, #transport {
 	-fx-background-color: #303030;
 }
 
+.table-view {
+	-fx-border-color: transparent;
+	-fx-table-cell-border-color: transparent;
+}
+
 .table-view:focused {
     -fx-focus-color: transparent;
     -fx-faint-focus-color: transparent;
@@ -64,12 +69,18 @@ HBox, VBox, #transport {
     -fx-background-color: -fx-mark-highlight-color, rgb(255, 255, 255);
 }
 
-.table-view {
-	-fx-border-color: transparent;
-	-fx-table-cell-border-color: transparent;
-}
 
 .queueActive {
 	-fx-base: #0c6f0c;
+}
+
+.split-pane:horizontal .split-pane-divider {
+	 -fx-background-color: linear-gradient(to right, #323232, #202020 );
+	 -fx-padding: 2.5px, 0, 2.5px, 0;
+}
+
+.split-pane:vertical .split-pane-divider {
+	 -fx-background-color: linear-gradient(to bottom, #323232, #202020);
+	 -fx-padding: 2.5px, 0, 2.5px, 0;
 }
 
