@@ -636,7 +636,7 @@ public class SettingsWindow extends Stage {
 		});
 		website.setStyle( "-fx-font-size: 20px" );
 
-		Label versionNumber = new Label ( " Alpha 2Pre Nightly 2017-07-15" );
+		Label versionNumber = new Label ( Hypnos.getVersionString() );
 		versionNumber.setStyle( "-fx-font-size: 16px" );
 		versionNumber.setPadding( new Insets ( 0, 0, 20, 0 ) );
 		

@@ -8,6 +8,10 @@ New Features
 			
 Bug Fixes / Incremental Improvements
 	Data lost when computer turned off (logging out doesn't trigger, only a power down)
+	
+	have filter boxes share text, so they feel like one box. 
+	
+	Drag and drop artist image from goolg eimage search can crash UI thread 
 
 	Library load and unload time
 	
