@@ -31,6 +31,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -215,6 +216,9 @@ public class FXUI implements PlayerListener {
 	
 	private boolean isDarkTheme = false;
 	
+	private double artistPaneHeightWhileMaximized = 0;
+	private boolean ignoreNextArtPaneChange = false;
+	
 	private ColorAdjust darkThemeTransportButtons = new ColorAdjust(); 
 	
 	{
@@ -279,6 +283,28 @@ public class FXUI implements PlayerListener {
 		currentListSplitPane = new SplitPane();
 		currentListSplitPane.setOrientation( Orientation.VERTICAL );
 		currentListSplitPane.getItems().addAll( currentPlayingPane, artSplitPane );
+		
+		currentListSplitPane.getDividers().get( 0 ).positionProperty().addListener ( 
+			( ObservableValue <? extends Number> item, Number oldValue, Number newValue ) -> {
+				if ( !ignoreNextArtPaneChange ) {
+					if ( isMaximized() ) {
+						artistPaneHeightWhileMaximized = newValue.doubleValue();
+					}
+				} else {
+					ignoreNextArtPaneChange = false;
+				}
+			}
+		);
+		
+		stage.maximizedProperty().addListener(new ChangeListener<Boolean>() {
+		    @Override
+		    public void changed( ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue ) {
+				ignoreNextArtPaneChange = true;
+				if ( artistPaneHeightWhileMaximized != 0 && newValue == true ) {
+					currentListSplitPane.getDividers().get( 0 ).setPosition( artistPaneHeightWhileMaximized );
+				}
+		    }
+		});
 
 		BorderPane albumListPane = new BorderPane();
 		albumFilterPane.prefWidthProperty().bind( albumListPane.widthProperty() );
