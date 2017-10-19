@@ -140,6 +140,12 @@ public class CurrentList {
 		return items;
 	}
 	
+	
+	public void setMode ( Mode mode ) {
+		this.mode = mode;
+		notifyListenersStateChanged();
+	}
+		
 	public CurrentListState getState () {
 		return new CurrentListState ( items, currentAlbums, currentPlaylist, mode );
 	}

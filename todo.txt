@@ -10,11 +10,7 @@ New Features
 			
 Bug Fixes / Incremental Improvements
 	UI thread crashes a lot, and I can't resize window
-	
-	Saving Playlists is buggy
-		The playlist gets reloaded and then doesn't have the right name 
-		Same with albums getitng loaded
-		
+
 	Data lost when computer turned off (logging out doesn't trigger, only a power down)
 	
 	have filter boxes share text, so they feel like one box. 

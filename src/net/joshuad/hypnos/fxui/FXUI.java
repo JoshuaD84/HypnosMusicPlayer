@@ -1365,7 +1365,7 @@ public class FXUI implements PlayerListener {
 
 			Playlist newPlaylist = new Playlist( enteredName, new ArrayList <Track> ( tracks ) );
 			library.addPlaylist ( newPlaylist );
-			player.getCurrentList().setPlaylist( newPlaylist );
+			player.getCurrentList().setMode ( CurrentList.Mode.PLAYLIST );
 		}
 	}
 	
