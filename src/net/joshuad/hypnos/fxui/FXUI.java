@@ -886,7 +886,7 @@ public class FXUI implements PlayerListener {
 			
 			if ( targetFile == null ) return; 
 			
-			track.setAndSaveAlbumImage ( targetFile.toPath() );
+			track.setAndSaveAlbumImage ( targetFile.toPath(), player );
 
 			setImages ( currentImagesTrack );
 		});
@@ -960,7 +960,7 @@ public class FXUI implements PlayerListener {
 				
 				for ( File file : files ) {
 					if ( Utils.isImageFile( file ) ) {
-						track.setAndSaveAlbumImage ( file.toPath() );
+						track.setAndSaveAlbumImage ( file.toPath(), player );
 						break;
 					}
 				}
@@ -971,7 +971,7 @@ public class FXUI implements PlayerListener {
 				for ( DataFormat contentType : db.getContentTypes() ) {
 					if ( contentType == DataFormat.lookupMimeType("application/octet-stream" ) ) {
 						ByteBuffer buffer = (ByteBuffer)db.getContent( contentType );
-						track.setAndSaveAlbumImage( buffer.array() );
+						track.setAndSaveAlbumImage( buffer.array(), player );
 					}
 				}
 				
@@ -1066,7 +1066,7 @@ public class FXUI implements PlayerListener {
 			File imageFile = fileChooser.showOpenDialog( mainStage );
 			if ( imageFile == null ) return; 
 			
-			Track.saveArtistImageToTag ( track.getPath().toFile(), imageFile.toPath(), ArtistTagImagePriority.TRACK, false );
+			Track.saveArtistImageToTag ( track.getPath().toFile(), imageFile.toPath(), ArtistTagImagePriority.TRACK, false, player );
 			setImages ( currentImagesTrack );
 		});
 		
@@ -1092,7 +1092,7 @@ public class FXUI implements PlayerListener {
 					try ( DirectoryStream <Path> stream = Files.newDirectoryStream( albumPath ) ) {
 						for ( Path child : stream ) {
 							if ( Utils.isMusicFile( child ) ) {
-								Track.saveArtistImageToTag ( child.toFile(), buffer, ArtistTagImagePriority.ALBUM, false );
+								Track.saveArtistImageToTag ( child.toFile(), buffer, ArtistTagImagePriority.ALBUM, false, player );
 							}
 						}
 					} catch ( IOException e3 ) {
@@ -1208,7 +1208,7 @@ public class FXUI implements PlayerListener {
 						try ( DirectoryStream <Path> stream = Files.newDirectoryStream( albumPath ) ) {
 							for ( Path child : stream ) {
 								if ( Utils.isMusicFile( child ) ) {
-									Track.saveArtistImageToTag ( child.toFile(), buffer, ArtistTagImagePriority.ALBUM, overwriteAll );
+									Track.saveArtistImageToTag ( child.toFile(), buffer, ArtistTagImagePriority.ALBUM, overwriteAll, player );
 								}
 							}
 						} catch ( IOException e ) {
@@ -1224,7 +1224,7 @@ public class FXUI implements PlayerListener {
 					break;
 					
 				case TRACK:
-					Track.saveArtistImageToTag ( targetTrack.getPath().toFile(), buffer, ArtistTagImagePriority.TRACK, overwriteAll );
+					Track.saveArtistImageToTag ( targetTrack.getPath().toFile(), buffer, ArtistTagImagePriority.TRACK, overwriteAll, player );
 					setImages ( currentImagesTrack );
 					break;
 					

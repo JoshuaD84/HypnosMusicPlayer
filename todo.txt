@@ -10,15 +10,13 @@ New Features
 			
 Bug Fixes / Incremental Improvements
 	UI thread crashes a lot. When it does, I can't resize window
-		Drag and drop artist image from goolg eimage search can crash UI thread 
+		I may have fixed this, need to do testing
 		
 	Data lost when computer turned off (logging out doesn't trigger, only a power down)
 		I don't think this is happening any more. 
 	
 	have filter boxes share text, so they feel like one box. 
-	
-	Setting album image for flac file currently playing causes exception in decoder. 
-	
+		
 	Settings Window
 		Look at how I center Global hotkeys tab; center "settings" tab the same way
 		
@@ -49,7 +47,7 @@ Post Beta fixes / updates / improvements
 	Change css selector for .scroll-bar:horizontal to an applied class, so only chosen h-scrollbars are hidden
 
 	Library load and unload time
-	
+
 	
 JavaFX stuff
 	hide/show via hotkeys while maximized toggles every 3 presses instead of every 2 presses. 

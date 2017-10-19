@@ -27,6 +27,7 @@ public class AudioSystem {
 		USER_REQUESTED,
 		END_OF_CURRENT_LIST,
 		EMPTY_LIST,
+		WRITING_TO_TAG,
 		ERROR
 	}
 
@@ -357,6 +358,10 @@ public class AudioSystem {
 
 	public void seekMS ( long ms ) {
 		player.requestSeekMS( ms );
+	}
+	
+	public long getPositionMS() {
+		return player.getPositionMS();
 	}
 
 	public void setVolumePercent ( double percent ) {

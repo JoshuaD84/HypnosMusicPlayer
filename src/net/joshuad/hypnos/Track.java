@@ -31,6 +31,8 @@ import org.jaudiotagger.tag.images.StandardArtwork;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
+import net.joshuad.hypnos.audio.AudioSystem;
+import net.joshuad.hypnos.audio.AudioSystem.StopReason;
 
 public class Track implements Serializable {
 	
@@ -155,6 +157,8 @@ public class Track implements Serializable {
 			
 		} catch ( CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e1 ) {
 			LOGGER.log( Level.INFO, e1.getClass().toString() + " while read tags on file: " + trackFile.toString() + ", using file name." );
+		} catch ( Exception e ) {
+			//This can happen sometimes TODO:
 		}
 		
 		parseFileName();
@@ -531,27 +535,27 @@ public class Track implements Serializable {
 		return ( compareTo.getPath().toAbsolutePath().equals( getPath().toAbsolutePath() ) );
 	}
 
-	public static void saveArtistImageToTag ( File file, Path imagePath, ArtistTagImagePriority priority, boolean overwriteAll ) {
+	public static void saveArtistImageToTag ( File file, Path imagePath, ArtistTagImagePriority priority, boolean overwriteAll, AudioSystem player ) {
 		try {
 			byte[] imageBuffer = Files.readAllBytes( imagePath );
-			saveImageToID3 ( file, imageBuffer, 8, priority, overwriteAll );
+			saveImageToID3 ( file, imageBuffer, 8, priority, overwriteAll, player );
 		} catch ( IOException e ) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	public static void saveArtistImageToTag ( File file, byte[] buffer, ArtistTagImagePriority priority, boolean overwriteAll ) {
-		saveImageToID3 ( file, buffer, 8, priority, overwriteAll );
+	public static void saveArtistImageToTag ( File file, byte[] buffer, ArtistTagImagePriority priority, boolean overwriteAll, AudioSystem player ) {
+		saveImageToID3 ( file, buffer, 8, priority, overwriteAll, player );
 	}
 	
 
-	public static void saveAlbumImageToTag ( File file, byte[] buffer ) {
-		saveImageToID3 ( file, buffer, 3, null, true );
+	public static void saveAlbumImageToTag ( File file, byte[] buffer, AudioSystem player ) {
+		saveImageToID3 ( file, buffer, 3, null, true, player );
 	}
 			
 	
-	private static void saveImageToID3 ( File file, byte[] buffer, int type, ArtistTagImagePriority priority, boolean overwriteAll ) {
+	private static void saveImageToID3 ( File file, byte[] buffer, int type, ArtistTagImagePriority priority, boolean overwriteAll, AudioSystem player ) {
 
 		try {
 			
@@ -578,10 +582,10 @@ public class Track implements Serializable {
 					return;
 				}
 			}
-			
-			tag.deleteArtworkField();
 
 			List <Artwork> artworkList = tag.getArtworkList();
+
+			tag.deleteArtworkField();
 			
 			for ( Artwork artwork : artworkList ) {
 				if ( artwork.getPictureType() != type ) {
@@ -600,8 +604,26 @@ public class Track implements Serializable {
 				tag.addField( FieldKey.CUSTOM4, priority.toString() );
 			}
 			
+			boolean pausedPlayer = false;
+			long currentPositionMS = 0;
+			Track currentTrack = null;
+			
+			if ( player.getCurrentTrack().getPath().equals( file.toPath() ) && player.isPlaying() ) {
+
+				currentPositionMS = player.getPositionMS();
+				currentTrack = player.getCurrentTrack();
+				player.stop( StopReason.WRITING_TO_TAG );
+				pausedPlayer = true;
+			}
+				
 			audioFile.setTag( tag );
 			AudioFileIO.write( audioFile );
+			
+			if ( pausedPlayer ) {
+				player.playTrack( currentTrack, true );
+				player.seekMS( currentPositionMS );
+				player.unpause();
+			}
 			
 		} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException | CannotWriteException e ) {
 			// TODO Auto-generated catch block
@@ -609,21 +631,21 @@ public class Track implements Serializable {
 		}
 	}
 	
-	public void setAndSaveAlbumImage ( Path imagePath ) {
+	public void setAndSaveAlbumImage ( Path imagePath, AudioSystem player ) {
 		try {
 			byte[] imageBuffer = Files.readAllBytes( imagePath );
-			setAndSaveAlbumImage ( imageBuffer );
+			setAndSaveAlbumImage ( imageBuffer, player );
 		} catch ( IOException e ) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	public void setAndSaveAlbumImage ( byte[] buffer ) {
+	public void setAndSaveAlbumImage ( byte[] buffer, AudioSystem player ) {
 		
 		if ( buffer.length < 8 ) return; //png signature is length 8, so might as well use that as an absolute minimum
 
-		saveAlbumImageToTag ( getPath().toFile(), buffer );
+		saveAlbumImageToTag ( getPath().toFile(), buffer, player );
 		
 		if ( hasAlbumDirectory() ) {
 			
@@ -667,7 +689,7 @@ public class Track implements Serializable {
 				List <Path> tracks = Utils.getAllTracksInDirectory ( this.getAlbumPath() );
 				for ( Path track : tracks ) {
 					if ( !track.toAbsolutePath().equals( getPath().toAbsolutePath() ) ) {
-						saveAlbumImageToTag ( track.toFile(), buffer );
+						saveAlbumImageToTag ( track.toFile(), buffer, player );
 					}
 				}
 			});
@@ -751,8 +773,10 @@ public class Track implements Serializable {
 				}
 			}			
 		} catch ( NullPointerException | IOException | CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
-			
-		} 
+			//TODO: ?
+		} catch ( Exception e ) {
+			//TODO: This can happen
+		}
 		
 		Path bestPath = getPreferredAlbumCoverPath ();
 		
@@ -776,7 +800,9 @@ public class Track implements Serializable {
 			
 		} catch ( NullPointerException | IOException | CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
 			//I don't think we need to do anything here; if we can't load an image from tags, that's OK. 
-		} 
+		} catch ( Exception e ) {
+			//TODO: This can happen
+		}
 
 		Path otherPaths = getSecondaryAlbumCoverPath ();
 		
@@ -816,6 +842,8 @@ public class Track implements Serializable {
 			e.printStackTrace();
 		} catch ( NullPointerException e ) {
 			//TODO:
+		} catch ( Exception e ) {
+			//TODO: this can happen sometimes
 		}
 		
 		return null;
@@ -883,6 +911,8 @@ public class Track implements Serializable {
 			e.printStackTrace();
 		} catch ( NullPointerException e ) {
 			//TODO:
+		} catch ( Exception e ) {
+			//TODO: This can happen
 		}
 	
 		return null;
