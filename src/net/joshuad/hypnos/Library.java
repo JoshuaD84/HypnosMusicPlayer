@@ -604,11 +604,11 @@ public class Library {
 	}
 
 	public ObservableList <Playlist> getPlaylists () {
-		return FXCollections.unmodifiableObservableList( playlists );
+		return playlists;
 	}
 
 	public ObservableList <Path> getMusicSourcePaths () {
-		return FXCollections.unmodifiableObservableList( musicSourcePaths );
+		return musicSourcePaths;
 	}
 
 	public FilteredList <Playlist> getPlaylistsFiltered () {
@@ -628,11 +628,11 @@ public class Library {
 	}
 	
 	public ObservableList <Album> getAlbums () {
-		return FXCollections.unmodifiableObservableList( albums );
+		return albums;
 	}
 	
 	public ObservableList <Track> getTracks () {
-		return FXCollections.unmodifiableObservableList( tracks );
+		return tracks;
 	}
 
 	public SortedList <Track> getTracksSorted () {

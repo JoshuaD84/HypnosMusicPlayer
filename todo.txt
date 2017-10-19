@@ -7,17 +7,18 @@ New Features
 	Mouse over on current track at top of window
 	
 	Mouse over albums/tracks/playlists for count
+	
+	Show play / pause icon on taskbar
 			
 Bug Fixes / Incremental Improvements
-	UI thread crashes a lot, and I can't resize window
-
+	UI thread crashes a lot. When it does, I can't resize window
+		Drag and drop artist image from goolg eimage search can crash UI thread 
+		
 	Data lost when computer turned off (logging out doesn't trigger, only a power down)
+		I don't think this is happening any more. 
 	
 	have filter boxes share text, so they feel like one box. 
 	
-	Drag and drop artist image from goolg eimage search can crash UI thread 
-
-	Library load and unload time
 	
 	Setting album image for flac file currently playing causes exception in decoder. 
 
@@ -48,7 +49,12 @@ Bug Fixes / Incremental Improvements
 			at com.sun.glass.ui.gtk.GtkApplication.lambda$null$5(GtkApplication.java:139)
 			at java.lang.Thread.run(Thread.java:748)
 
+	
+Post Beta fixes / updates / improvements 
 	Change css selector for .scroll-bar:horizontal to an applied class, so only chosen h-scrollbars are hidden
+
+	Library load and unload time
+	
 	
 JavaFX stuff
 	hide/show via hotkeys while maximized toggles every 3 presses instead of every 2 presses. 

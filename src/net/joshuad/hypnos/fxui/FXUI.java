@@ -30,6 +30,8 @@ import org.jaudiotagger.tag.FieldKey;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -327,16 +329,40 @@ public class FXUI implements PlayerListener {
 		Tab albumListTab = new Tab( "Albums" );
 		albumListTab.setContent( albumListPane );
 		albumListTab.setClosable( false );
+		Tooltip albumTabTooltip = new Tooltip ( "Album Count: " + library.getAlbums().size() );
+		albumListTab.setTooltip( albumTabTooltip );
+		
+		library.getAlbums().addListener( new ListChangeListener<Album> () {
+			public void onChanged ( Change <? extends Album> changed ) {
+				albumTabTooltip.setText( "Album Count: " + library.getAlbums().size() );
+			}
+		});
 
 		Tab playlistTab = new Tab( "Playlists" );
 		playlistTab.setContent( playlistPane );
 		playlistTab.setClosable( false );
+		Tooltip playlistTabTooltip = new Tooltip ( "Playlist Count: " + library.getPlaylists().size() );
+		playlistTab.setTooltip( playlistTabTooltip );
+		
+		library.getPlaylists().addListener( new ListChangeListener<Playlist> () {
+			public void onChanged ( Change <? extends Playlist> changed ) {
+				playlistTabTooltip.setText( "Playlist Count: " + library.getPlaylists().size() );
+			}
+		});
 
-		Tab songListTab = new Tab( "Tracks" );
-		songListTab.setContent( trackListPane );
-		songListTab.setClosable( false );
+		Tab trackListTab = new Tab( "Tracks" );
+		trackListTab.setContent( trackListPane );
+		trackListTab.setClosable( false );
+		Tooltip trackTabTooltip = new Tooltip ( "Track Count: " + library.getTracks().size() );
+		trackListTab.setTooltip( trackTabTooltip );
+		
+		library.getTracks().addListener( new ListChangeListener<Track> () {
+			public void onChanged ( Change <? extends Track> changed ) {
+				trackTabTooltip.setText( "Track Count: " + library.getTracks().size() );
+			}
+		});
 
-		libraryPane.getTabs().addAll( albumListTab, songListTab, playlistTab );
+		libraryPane.getTabs().addAll( albumListTab, trackListTab, playlistTab );
 		libraryPane.setSide( Side.BOTTOM );
 
 		primarySplitPane = new SplitPane();
