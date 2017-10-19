@@ -60,7 +60,7 @@
       	</java>
     </target>
 	
-	<target name="dist-nix" description="Make a .tar.gz without a JRE for linux distribution">
+	<target name="dist-nix" depends="jar" description="Make a .tar.gz without a JRE for linux distribution">
 		<sequential>
 			<delete dir="${temp}" />
 			<mkdir dir="${temp}/Hypnos" />

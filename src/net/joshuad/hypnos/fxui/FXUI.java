@@ -200,8 +200,8 @@ public class FXUI implements PlayerListener {
 	CheckBox trackListCheckBox;
 	TextField trackFilterBox;
 	
-	AudioSystem player;
-	Library library;
+	final AudioSystem player;
+	final Library library;
 	
 	private double windowedWidth = 1024;
 	private double windowedHeight = 768;
@@ -232,6 +232,8 @@ public class FXUI implements PlayerListener {
 		mainStage = stage;
 		this.library = library;
 		this.player = player;
+		
+		player.getCurrentList().addNoLoadThread( Thread.currentThread() );
 		
 		scene = new Scene( new Group(), windowedWidth, windowedHeight );
 		
@@ -1565,7 +1567,12 @@ public class FXUI implements PlayerListener {
 						lengthS += track.getLengthS();
 					}
 				}
-				currentListLength.setText( Utils.getLengthDisplay( lengthS ) );
+				
+				final int lengthArgument = lengthS;
+				
+				Platform.runLater( () -> {
+					currentListLength.setText( Utils.getLengthDisplay( lengthArgument ) );
+				});
 			}
 		});
 		
@@ -2130,7 +2137,6 @@ public class FXUI implements PlayerListener {
 					
 					ArrayList <Integer> indices = new ArrayList <Integer>( albumTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Album> albums = new ArrayList <Album>( albumTable.getSelectionModel().getSelectedItems() );
-					
 					ArrayList <Track> tracks = new ArrayList <Track> ();
 					
 					for ( Album album : albums ) {
@@ -2146,14 +2152,11 @@ public class FXUI implements PlayerListener {
 					cc.put( DRAGGED_TRACKS, dragObject );
 					db.setContent( cc );
 					event.consume();
-					
-				
-
 				}
-			} );
+			});
 
 			return row;
-		} );
+		});
 	}
 
 	public void setupTrackTable () {
@@ -3622,14 +3625,17 @@ public class FXUI implements PlayerListener {
 
 	@Override
 	public void playerShuffleModeChanged ( ShuffleMode newMode ) {
-		toggleShuffleButton.setText( newMode.getSymbol() );
+		Platform.runLater( () -> {
+			toggleShuffleButton.setText( newMode.getSymbol() );
+		});
 		
 	}
 
-
 	@Override
 	public void playerRepeatModeChanged ( RepeatMode newMode ) {
-		toggleRepeatButton.setText( newMode.getSymbol() );
+		Platform.runLater( () -> {
+			toggleRepeatButton.setText( newMode.getSymbol() );
+		});
 		
 	}
 
