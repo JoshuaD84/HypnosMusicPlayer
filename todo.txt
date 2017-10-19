@@ -1,8 +1,6 @@
 New Features
 	Log to file, how does that work inside java? 
-	
-	Left click on current track at top of window - Jump to current track in current list
-		
+			
 	Mouse over on current track at top of window
 		
 	Show play / pause icon on taskbar

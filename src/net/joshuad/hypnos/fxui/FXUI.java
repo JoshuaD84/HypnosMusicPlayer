@@ -850,6 +850,16 @@ public class FXUI implements PlayerListener {
 			if ( event.getButton() == MouseButton.PRIMARY ) {
 				Track current = player.getCurrentTrack();
 				if ( current != null ) {
+					synchronized ( currentListTable.getItems() ) {
+						int itemIndex = currentListTable.getItems().indexOf( current );
+						
+						if ( itemIndex != -1 && itemIndex < currentListTable.getItems().size() ) {
+							currentListTable.requestFocus();
+							currentListTable.getSelectionModel().clearAndSelect( itemIndex );
+							currentListTable.getFocusModel().focus( itemIndex );
+							currentListTable.scrollTo( itemIndex );
+						}
+					}
 					setImages( current );
 				}
 			}
