@@ -78,6 +78,7 @@ import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -155,7 +156,7 @@ public class FXUI implements PlayerListener {
 
 	Label timeElapsedLabel = new Label( "" );
 	Label timeRemainingLabel = new Label( "" );
-	Button trackName = new Button( "" );
+	Button currentTrackButton;
 	
 	Label emptyPlaylistLabel = new Label( 
 		"You haven't created any playlists, make a playlist on the right and click 💾 to save it for later." );
@@ -570,7 +571,7 @@ public class FXUI implements PlayerListener {
 					trackPositionSlider.setValue( 0 );
 					timeElapsedLabel.setText( "" );
 					timeRemainingLabel.setText( "" );
-					trackName.setText( "" );
+					currentTrackButton.setText( "" );
 			
 					StackPane thumb = (StackPane) trackPositionSlider.lookup( ".thumb" );
 					thumb.setVisible( false );
@@ -837,22 +838,146 @@ public class FXUI implements PlayerListener {
 		settingsWidthPadding.setMinWidth( 36 ); // I couldn't figure out how to make it the exact same width as settings button
 		
 		BorderPane playingTrackInfo = new BorderPane();
-		trackName = new Button( "" );
-		trackName.setPadding( new Insets ( 10, 0, 0, 0 ) );
-		trackName.getStyleClass().add( "trackName" );
-		playingTrackInfo.setCenter( trackName );
+		currentTrackButton = new Button( "" );
+		currentTrackButton.setPadding( new Insets ( 10, 0, 0, 0 ) );
+		currentTrackButton.getStyleClass().add( "trackName" );
+		playingTrackInfo.setCenter( currentTrackButton );
 		playingTrackInfo.setRight( settingsButton );
 		playingTrackInfo.setLeft( settingsWidthPadding );
 		
-		trackName.setOnMouseClicked( ( event ) -> {
-			Track current = player.getCurrentTrack();
-			if ( current != null ) {
-				setImages( current );
-				trackInfoWindow.setTrack( current );
-				trackInfoWindow.show();
+		currentTrackButton.setOnMouseClicked( ( MouseEvent event ) -> {
+			
+			if ( event.getButton() == MouseButton.PRIMARY ) {
+				Track current = player.getCurrentTrack();
+				if ( current != null ) {
+					setImages( current );
+				}
+			}
+		});
+		
+		ContextMenu trackContextMenu = new ContextMenu();
+		MenuItem playMenuItem = new MenuItem( "Play" );
+		MenuItem appendMenuItem = new MenuItem( "Append" );
+		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
+		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
+		MenuItem infoMenuItem = new MenuItem( "Info" );
+		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
+		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
+		trackContextMenu.getItems().addAll( playMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, browseMenuItem, addToPlaylistMenuItem );
+		
+		MenuItem newPlaylistButton = new MenuItem( "<New>" );
+
+		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
+
+		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent e ) {
+				Track current = player.getCurrentTrack();
+				if ( current != null ) {
+					promptAndSavePlaylist ( Arrays.asList( current ) );
+				}
 			}
 		});
 
+		EventHandler addToPlaylistHandler = new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+
+				Playlist playlist = (Playlist) ((MenuItem) event.getSource()).getUserData();
+				
+				Track currentTrack = player.getCurrentTrack();
+				if ( currentTrack != null && playlist != null ) {
+					addToPlaylist ( Arrays.asList( currentTrack ), playlist );
+				}
+			}
+		};
+		
+		library.getPlaylistSorted().addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
+			updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
+		} );
+
+		updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
+		
+		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				Track currentTrack = player.getCurrentTrack();
+				if ( currentTrack != null ) {
+					player.playTrack( currentTrack );
+				}
+			}
+		});
+
+		appendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				Track currentTrack = player.getCurrentTrack();
+				if ( currentTrack != null ) {
+					player.getCurrentList().appendTrack ( currentTrack );
+				}
+			}
+		});
+		
+		enqueueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				Track currentTrack = player.getCurrentTrack();
+				if ( currentTrack != null ) {
+					player.getQueue().addTrack( currentTrack );
+				}
+			}
+		});
+		
+		editTagMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+
+				Track currentTrack = player.getCurrentTrack();
+				if ( currentTrack != null ) {
+					tagWindow.setTracks( Arrays.asList( currentTrack ), null );
+					tagWindow.show();
+				}
+			}
+		});
+		
+		
+		infoMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				Track currentTrack = player.getCurrentTrack();
+				if ( currentTrack != null ) {
+					trackInfoWindow.setTrack( currentTrack );
+					trackInfoWindow.show();
+				}
+			}
+		});
+
+		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			// TODO: This is the better way, once openjdk and openjfx supports
+			// it: getHostServices().showDocument(file.toURI().toString());
+			@Override
+			public void handle ( ActionEvent event ) {
+				SwingUtilities.invokeLater( new Runnable() {
+					public void run () {
+						try {
+							Track selectedTrack = player.getCurrentTrack();
+							if ( selectedTrack != null ) {
+								Desktop.getDesktop().open( selectedTrack.getPath().getParent().toFile() );
+							}
+						} catch ( IOException e ) {
+							e.printStackTrace();
+						}
+					}
+				} );
+			}
+		});
+		
+		
+		ContextMenu currentTrackButtonMenu = new ContextMenu();
+		currentTrackButtonMenu.getItems().addAll( playMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, browseMenuItem, addToPlaylistMenuItem );
+		
+		currentTrackButton.setContextMenu( currentTrackButtonMenu );
+		
 		transport = new VBox();
 		transport.getChildren().add( playingTrackInfo );
 		transport.getChildren().add( controls );
@@ -1389,7 +1514,12 @@ public class FXUI implements PlayerListener {
 
 			Playlist newPlaylist = new Playlist( enteredName, new ArrayList <Track> ( tracks ) );
 			library.addPlaylist ( newPlaylist );
-			player.getCurrentList().setMode ( CurrentList.Mode.PLAYLIST );
+			
+			CurrentListState state = player.getCurrentList().getState();
+			
+			CurrentListState newState = new CurrentListState ( state.getItems(), state.getAlbums(), newPlaylist, CurrentList.Mode.PLAYLIST );
+			
+			player.getCurrentList().setState( newState );
 		}
 	}
 	
@@ -3602,7 +3732,7 @@ public class FXUI implements PlayerListener {
 			StackPane thumb = (StackPane) trackPositionSlider.lookup( ".thumb" );
 			thumb.setVisible( true );
 			
-			trackName.setText( track.getArtist() + " - " + track.getTitle() );
+			currentTrackButton.setText( track.getArtist() + " - " + track.getTitle() );
 			setImages( track );
 			
 			volumeSlider.setDisable( !player.volumeChangeSupported() );

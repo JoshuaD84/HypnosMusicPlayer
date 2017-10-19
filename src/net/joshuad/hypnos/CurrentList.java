@@ -361,7 +361,7 @@ public class CurrentList {
 	}
 
 	public void appendTrack ( Track track ) {
-		appendTracksPathList ( Arrays.asList( track.getPath() ) );
+		insertTrackPathList ( items.size(), Arrays.asList( track.getPath() ) );
 	}
 	
 	public void appendTracks ( List <? extends Track> tracks ) {

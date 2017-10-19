@@ -89,9 +89,6 @@ public abstract class AbstractDecoder {
 		return true;
 	}
 		
-		
-		
-		
 	
 	public long getPositionMS() {
 		return (long)( audioOutput.getMicrosecondPosition() / 1e3 ) + clipStartTimeMS;
@@ -102,23 +99,28 @@ public abstract class AbstractDecoder {
 	}
 	
 	public double getVolumePercent () {
-		if ( audioOutput.isControlSupported( FloatControl.Type.VOLUME ) ) {
-			FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.VOLUME );
-			double min = volume.getMinimum();
-			double max = volume.getMaximum();
-			double value = volume.getValue();
-			
-			return ( value - min ) / ( max - min );
-			
-		} else if ( audioOutput.isControlSupported( FloatControl.Type.MASTER_GAIN ) ) {
-			FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.MASTER_GAIN );
-			double min = volume.getMinimum();
-			double max = volume.getMaximum();
-			double value = volume.getValue();
-			
-			return ( value - min ) / ( max - min );
-			
-		} else {
+		try { 
+			if ( audioOutput.isControlSupported( FloatControl.Type.VOLUME ) ) {
+				FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.VOLUME );
+				double min = volume.getMinimum();
+				double max = volume.getMaximum();
+				double value = volume.getValue();
+				
+				return ( value - min ) / ( max - min );
+				
+			} else if ( audioOutput.isControlSupported( FloatControl.Type.MASTER_GAIN ) ) {
+				FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.MASTER_GAIN );
+				double min = volume.getMinimum();
+				double max = volume.getMaximum();
+				double value = volume.getValue();
+				
+				return ( value - min ) / ( max - min );
+				
+			} else {
+				return 1;
+			}
+		} catch ( Exception e ) {
+			//TODO: Log? I don't know
 			return 1;
 		}
 	}
