@@ -5,9 +5,7 @@ New Features
 		Like add to playlist. Other things?
 		
 	Mouse over on current track at top of window
-	
-	Mouse over albums/tracks/playlists for count
-	
+		
 	Show play / pause icon on taskbar
 			
 Bug Fixes / Incremental Improvements
@@ -19,10 +17,7 @@ Bug Fixes / Incremental Improvements
 	
 	have filter boxes share text, so they feel like one box. 
 	
-	
 	Setting album image for flac file currently playing causes exception in decoder. 
-
-	Save after modifing stuff more frequently. 
 	
 	Settings Window
 		Look at how I center Global hotkeys tab; center "settings" tab the same way

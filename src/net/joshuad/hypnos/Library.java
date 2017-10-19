@@ -32,6 +32,8 @@ import net.joshuad.hypnos.fxui.FXUI;
 public class Library {
 
 	private static final Logger LOGGER = Logger.getLogger( Library.class.getName() );
+	
+	public static final int SAVE_ALL_INTERVAL = 10000;
 		
 	private WatchService watcher;
     private final HashMap<WatchKey,Path> keys = new HashMap <WatchKey,Path> ();
@@ -128,7 +130,7 @@ public class Library {
 						processWatcherEvents();
 					}
 
-					if ( System.currentTimeMillis() - lastSaveTime > 10000 ) {
+					if ( System.currentTimeMillis() - lastSaveTime > SAVE_ALL_INTERVAL ) {
 						if ( albumTrackDataChangedSinceLastSave ) {
 							persister.saveAlbumsAndTracks();
 							albumTrackDataChangedSinceLastSave = false;
@@ -140,10 +142,11 @@ public class Library {
 						persister.saveHistory();
 						persister.saveLibraryPlaylists();
 						persister.saveSettings();
+						persister.saveHotkeys();
 						
 						lastSaveTime = System.currentTimeMillis();
 					}
-										
+					
 					try {
 						Thread.sleep( 50 );
 						purgeCounter++;

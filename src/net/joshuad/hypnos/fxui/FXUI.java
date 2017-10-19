@@ -30,8 +30,6 @@ import org.jaudiotagger.tag.FieldKey;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -350,11 +348,11 @@ public class FXUI implements PlayerListener {
 			}
 		});
 
-		Tab trackListTab = new Tab( "Tracks" );
-		trackListTab.setContent( trackListPane );
-		trackListTab.setClosable( false );
+		Tab songListTab = new Tab( "Tracks" );
+		songListTab.setContent( trackListPane );
+		songListTab.setClosable( false );
 		Tooltip trackTabTooltip = new Tooltip ( "Track Count: " + library.getTracks().size() );
-		trackListTab.setTooltip( trackTabTooltip );
+		songListTab.setTooltip( trackTabTooltip );
 		
 		library.getTracks().addListener( new ListChangeListener<Track> () {
 			public void onChanged ( Change <? extends Track> changed ) {
@@ -362,7 +360,7 @@ public class FXUI implements PlayerListener {
 			}
 		});
 
-		libraryPane.getTabs().addAll( albumListTab, trackListTab, playlistTab );
+		libraryPane.getTabs().addAll( albumListTab, songListTab, playlistTab );
 		libraryPane.setSide( Side.BOTTOM );
 
 		primarySplitPane = new SplitPane();
