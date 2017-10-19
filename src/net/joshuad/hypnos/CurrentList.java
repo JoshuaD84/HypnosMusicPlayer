@@ -447,6 +447,8 @@ public class CurrentList {
 	}
 	
 	private void addItem ( int index, CurrentListTrack track ) {
+		if ( track == null ) return;
+		
 		Platform.runLater( () -> {
 			items.add( index, track );
 		});
