@@ -1,11 +1,9 @@
-New Features
-	Log to file, how does that work inside java? 
-			
-	Mouse over on current track at top of window
-		
-	Show play / pause icon on taskbar
+New Features		
+	
 			
 Bug Fixes / Incremental Improvements
+	Logging
+		Is it working once I export the jar and run it in an normal environment? It doesn't appear to be. 
 	
 	Right Click a track > Add to Playlist , while that playlist is current and saved. 
 		It shows as being edited (*) but it shouldn't. 
@@ -49,6 +47,7 @@ Post Beta fixes / updates / improvements
 	UI thread crashes a lot. When it does, I can't resize window
 		I fixed some places where this can happen. Are there others? Need to watch for them. 
 
+	Show play / pause icon on taskbar
 	
 JavaFX stuff
 	hide/show via hotkeys while maximized toggles every 3 presses instead of every 2 presses. 

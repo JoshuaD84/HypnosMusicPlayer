@@ -69,7 +69,6 @@ HBox, VBox, #transport {
     -fx-background-color: -fx-mark-highlight-color, rgb(255, 255, 255);
 }
 
-
 .queueActive {
 	-fx-base: #0c6f0c;
 }

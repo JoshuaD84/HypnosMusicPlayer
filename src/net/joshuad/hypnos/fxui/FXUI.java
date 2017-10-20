@@ -157,6 +157,7 @@ public class FXUI implements PlayerListener {
 	Label timeElapsedLabel = new Label( "" );
 	Label timeRemainingLabel = new Label( "" );
 	Button currentTrackButton;
+	Tooltip currentTrackTooltip;
 	
 	Label emptyPlaylistLabel = new Label( 
 		"You haven't created any playlists, make a playlist on the right and click 💾 to save it for later." );
@@ -572,6 +573,7 @@ public class FXUI implements PlayerListener {
 					timeElapsedLabel.setText( "" );
 					timeRemainingLabel.setText( "" );
 					currentTrackButton.setText( "" );
+					currentTrackTooltip.setText( "No current track." );
 			
 					StackPane thumb = (StackPane) trackPositionSlider.lookup( ".thumb" );
 					thumb.setVisible( false );
@@ -581,7 +583,7 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public void toggleMinimized() {
-		//TODO: Fix this, and/or remove all the toggles
+		//TODO: Fix this, and/or remove all the prints
 
 		System.out.println ( "Before call" );
 		System.out.println ( "\tisIconified(): " + mainStage.isIconified() );
@@ -597,7 +599,6 @@ public class FXUI implements PlayerListener {
 			System.out.println ();
 			mainStage.setIconified( true );
 		}
-		
 
 		System.out.println ( "After call" );
 		System.out.println ( "\tisIconified(): " + mainStage.isIconified() );
@@ -864,6 +865,9 @@ public class FXUI implements PlayerListener {
 				}
 			}
 		});
+		
+		currentTrackTooltip = new Tooltip ( "" );
+		currentTrackButton.setTooltip( currentTrackTooltip );
 		
 		ContextMenu trackContextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
@@ -3743,6 +3747,12 @@ public class FXUI implements PlayerListener {
 			thumb.setVisible( true );
 			
 			currentTrackButton.setText( track.getArtist() + " - " + track.getTitle() );
+			currentTrackTooltip.setText( 
+				"Album: " + track.getSimpleAlbumTitle() + "\n" +
+				"Year: " + track.getYear() + "\n" +
+				"Encoding: " + track.getShortEncodingString()
+			);
+			
 			setImages( track );
 			
 			volumeSlider.setDisable( !player.volumeChangeSupported() );
