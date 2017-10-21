@@ -3536,6 +3536,7 @@ public class FXUI implements PlayerListener {
 			retMe.put ( Setting.WINDOW_Y_POSITION, mainStage.getY() );
 			retMe.put ( Setting.WINDOW_WIDTH, mainStage.getWidth() );
 			retMe.put ( Setting.WINDOW_HEIGHT, mainStage.getHeight() );
+			retMe.put ( Setting.MAXIMIZED_ARTIST_PANE_HEIGHT, artistPaneHeightWhileMaximized );
 		}
 		
 		retMe.put ( Setting.PRIMARY_SPLIT_PERCENT, getPrimarySplitPercent() );
@@ -3688,6 +3689,9 @@ public class FXUI implements PlayerListener {
 					case LIBRARY_TAB:
 						libraryPane.getSelectionModel().select( Integer.valueOf ( value ) );
 						break;
+					
+					case MAXIMIZED_ARTIST_PANE_HEIGHT:
+						artistPaneHeightWhileMaximized = Double.valueOf( value );
 						
 					case PROMPT_BEFORE_OVERWRITE:
 						promptBeforeOverwrite.setValue( Boolean.valueOf( value ) );

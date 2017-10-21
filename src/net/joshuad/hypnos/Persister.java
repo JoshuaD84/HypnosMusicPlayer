@@ -42,7 +42,8 @@ public class Persister {
 		WINDOW_WIDTH, WINDOW_HEIGHT, TRACK, TRACK_POSITION, TRACK_NUMBER, VOLUME, LIBRARY_TAB,
 		PROMPT_BEFORE_OVERWRITE, THEME,
 		DEFAULT_SHUFFLE_TRACKS, DEFAULT_SHUFFLE_ALBUMS, DEFAULT_SHUFFLE_PLAYLISTS,
-		DEFAULT_REPEAT_TRACKS, DEFAULT_REPEAT_ALBUMS, DEFAULT_REPEAT_PLAYLISTS
+		DEFAULT_REPEAT_TRACKS, DEFAULT_REPEAT_ALBUMS, DEFAULT_REPEAT_PLAYLISTS,
+		MAXIMIZED_ARTIST_PANE_HEIGHT
 		;
 	}
 
@@ -177,6 +178,26 @@ public class Persister {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	public void loadAlbumsAndTracks () {
+		try ( ObjectInputStream dataIn = new ObjectInputStream( new GZIPInputStream( new FileInputStream( dataFile ) ) ) ) {
+			library.albums.addAll( (ArrayList <Album>) dataIn.readObject() );
+			library.tracks.addAll( (ArrayList <Track>) dataIn.readObject() );
+			
+		} catch ( FileNotFoundException e ) {
+			System.out.println( "File not found: data, unable to load albums and song lists, continuing." );
+		} catch ( IOException e ) {
+			// TODO:
+			e.printStackTrace();
+		} catch ( ClassNotFoundException | ClassCastException e ) {
+			//TODO: 
+			
+		} catch ( Exception e ) {
+			//TODO: 
+			
+		}
+	}
+
 	public void saveSources () {
 		File tempSourcesFile = new File ( sourcesFile.toString() + ".temp" );
 		try ( ObjectOutputStream sourcesOut = new ObjectOutputStream( new FileOutputStream( tempSourcesFile ) ); ) {
@@ -259,21 +280,6 @@ public class Persister {
 
 		} catch ( IOException e ) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public void loadAlbumsAndTracks () {
-		try ( ObjectInputStream dataIn = new ObjectInputStream( new GZIPInputStream( new FileInputStream( dataFile ) ) ) ) {
-			// TODO: Maybe do this more carefully, give Library more control
-			// over it?
-			library.albums.addAll( (ArrayList <Album>) dataIn.readObject() );
-			library.tracks.addAll( (ArrayList <Track>) dataIn.readObject() );
-		} catch ( FileNotFoundException e ) {
-			System.out.println( "File not found: data, unable to load albuma and song lists, continuing." );
-		} catch ( IOException | ClassNotFoundException e ) {
-			// TODO:
 			e.printStackTrace();
 		}
 	}
@@ -487,7 +493,9 @@ public class Persister {
 					case DEFAULT_SHUFFLE_PLAYLISTS:
 					case DEFAULT_SHUFFLE_TRACKS:
 					case THEME:
+					case MAXIMIZED_ARTIST_PANE_HEIGHT:
 						loadMe.put( setting, value );
+						break;
 				}
 			}
 

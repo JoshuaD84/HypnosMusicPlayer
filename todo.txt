@@ -2,6 +2,8 @@ New Features
 	
 			
 Bug Fixes / Incremental Improvements
+	Persist the artwork pane size fix variable to file
+
 	Logging
 		Is it working once I export the jar and run it in an normal environment? It doesn't appear to be. 
 	
@@ -48,6 +50,8 @@ Post Beta fixes / updates / improvements
 		I fixed some places where this can happen. Are there others? Need to watch for them. 
 
 	Show play / pause icon on taskbar
+	
+	Dark theme for about tab settings
 	
 JavaFX stuff
 	hide/show via hotkeys while maximized toggles every 3 presses instead of every 2 presses. 
