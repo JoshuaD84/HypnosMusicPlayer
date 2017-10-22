@@ -1,5 +1,6 @@
 package net.joshuad.hypnos;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -503,26 +504,37 @@ public class CurrentList {
 	}
 	
 	public void setAlbum ( Album album ) {
-		setTracks ( album.getTracks() );
-		albumsSet ( Arrays.asList( album ) );
+		setAlbums ( Arrays.asList( album ) );
 	}
 	
 	public void setAlbums ( List<Album> albums ) {
 		List <Track> addMe = new ArrayList <Track> ();
 		
 		int albumsAdded = 0;
-		Album albumAdded = null;
+		
+		List <Album> missing = new ArrayList <Album> ();
 		
 		for ( Album album : albums ) {
-			if ( album != null ) {
+			if ( album == null ) {
+				continue;
+				
+			} else if ( !Files.isDirectory ( album.getPath() ) ) {
+				missing.add( album );
+				
+			} else {
 				addMe.addAll ( album.getTracks() );
 				albumsAdded++;
-				albumAdded = album;
 			}
 		}
 		
 		setTracks ( addMe );
 		albumsSet ( albums );
+		
+		Hypnos.getLibrary().albumsToUpdate.addAll( albums ); //TODO: pass library in at constructor rather than calling Hypnos.get
+		
+		if ( missing.size() > 0 ) {
+			Hypnos.warnUserAlbumsMissing ( missing );
+		}
 	}
 	
 	

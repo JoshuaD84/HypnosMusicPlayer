@@ -8,21 +8,22 @@ Bug Fixes / Incremental Improvements
 		
 	Data lost when computer turned off (logging out doesn't trigger, only a power down while hypnos is running)
 		I don't think this is happening any more. 
-				
-	Settings Window
-		Look at how I center Global hotkeys tab; center "settings" tab the same way
 		
 	Hotkeys aren't consumed, so they are passed to the current window. 
 		Check windows and OSX
 		Create website /help/linux-globalhotkey-consume/
-		
-	Deleted playlists aren't removed from hard drive
 	
+	
+	
+			
 Post Beta New Features		
 	Add default sort column choice, like shuffle and repeat
 					
 Post Beta fixes / updates / improvements 
-
+				
+	Settings Window
+		Look at how I center Global hotkeys tab; center "settings" tab the same way
+		
 	~incomplete/Grizzly Bear
 		F2 to show tag editor, no content in table
 		

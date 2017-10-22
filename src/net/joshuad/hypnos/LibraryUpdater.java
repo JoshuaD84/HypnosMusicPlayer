@@ -1,9 +1,11 @@
 package net.joshuad.hypnos;
 
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javafx.application.Platform;
+import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.FXUI;
 
 public class LibraryUpdater {
@@ -15,10 +17,12 @@ public class LibraryUpdater {
 	
 	private FXUI ui;
 	private Library library;
+	private AudioSystem player;
 	
-	public LibraryUpdater( Library library, FXUI ui ) {
+	public LibraryUpdater( Library library, AudioSystem player, FXUI ui ) {
 		this.ui = ui;
 		this.library = library;
+		this.player = player;
 		
 		Thread libraryUpdaterThread = new Thread( () -> {
 			while ( true ) {
@@ -116,24 +120,59 @@ public class LibraryUpdater {
 					
 					synchronized ( library.albumsToUpdate ) {
 						if ( !library.albumsToUpdate.isEmpty() ) {
-							while ( changeCount < MAX_CHANGES_PER_REQUEST && !library.albumsToUpdate.isEmpty() ) {
-								Album updateSource = library.albumsToUpdate.remove( 0 );
-								if ( library.albums.contains( updateSource ) ) {
-									Album updateMe = library.albums.get( library.albums.indexOf( updateSource ) );
-									try {
-										updateMe.updateData();
-									} catch ( Exception e ) {
-										library.albums.remove( updateMe );
+							synchronized ( library.albumsToUpdate ) {
+								while ( changeCount < MAX_CHANGES_PER_REQUEST && !library.albumsToUpdate.isEmpty() ) {
+									Album updateSource = library.albumsToUpdate.remove( 0 );
+									
+									if ( library.albums.contains( updateSource ) ) {
+										Album updateMe = library.albums.get( library.albums.indexOf( updateSource ) );
+										try {
+											updateMe.updateData();
+											
+											List <Album> currentListAlbums = player.getCurrentList().getState().getAlbums();
+											if ( currentListAlbums.size() == 1 && updateMe.equals( currentListAlbums.get( 0 ) ) ) {
+												
+												//There is a small window where we need to let the UI thread start playing the new album
+												//So we get an accurate currentTrack, so we give it a little time
+												//This is definitely a hack, but it works just fine. 
+												Thread.sleep( 100 ); 
+												
+												Track currentTrack = null;
+												
+												if ( !player.isStopped() ) {
+													currentTrack = player.getCurrentTrack();
+												}
+												 
+												player.getCurrentList().setAlbum( updateMe );
+												library.albumsToUpdate.remove( updateMe );
+												
+												if ( currentTrack != null ) {
+													for ( CurrentListTrack currentListTrack : player.getCurrentList().getItems() ) {
+														if ( currentListTrack.equals( currentTrack ) ) {
+															currentListTrack.setIsCurrentTrack( true );
+															break;
+														}
+													}
+												}
+											}
+											
+										} catch ( Exception e ) {
+											try {
+												library.albums.remove( updateMe );
+											} catch ( Exception e2 ) {}
+										}
+									} else {
+										//TODO: Should we also update? 
+										library.albums.add( updateSource );
 									}
-								} else {
-									library.albums.add( updateSource );
+									
+									changeCount += 2; //We charge two here because this is a costly transaction
+	 							}
+								
+								if ( changeCount >= MAX_CHANGES_PER_REQUEST ) {
+									ui.refreshAlbumTable();  //TODO: this may not be necessary. 
+									return;
 								}
-								changeCount += 2; //We charge two here because this is a costly transaction
- 							}
-							
-							if ( changeCount >= MAX_CHANGES_PER_REQUEST ) {
-								ui.refreshAlbumTable();  //TODO: this may not be necessary. 
-								return;
 							}
 						}
 					}

@@ -403,6 +403,10 @@ public class Hypnos extends Application {
 	public static void warnUserPlaylistsNotSaved ( ArrayList <Playlist> errors ) {
 		ui.warnUserPlaylistsNotSaved ( errors );
 	}
+
+	public static void warnUserAlbumsMissing ( List <Album> missing ) {
+		ui.warnUserAlbumsMissing ( missing );
+	}
 	
 	@SuppressWarnings("unchecked")
 	public void applyCLICommands ( ArrayList <SocketCommand> commands ) {
@@ -505,7 +509,7 @@ public class Hypnos extends Application {
 				ui.showMainWindow();
 				persister.loadDataAfterShowWindow();
 				
-				libraryUpdater = new LibraryUpdater ( library, ui );
+				libraryUpdater = new LibraryUpdater ( library, player, ui );
 				
 				applyCLICommands( commands );
 				

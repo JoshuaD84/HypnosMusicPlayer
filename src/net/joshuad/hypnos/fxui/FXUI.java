@@ -3879,6 +3879,42 @@ public class FXUI implements PlayerListener {
 		}
 	}
 	
+	public void warnUserAlbumsMissing ( List <Album> missing ) {
+		Platform.runLater( () -> {
+
+			Alert alert = new Alert( AlertType.ERROR );
+			alert.getDialogPane().applyCss();
+			double x = mainStage.getX() + mainStage.getWidth() / 2 - 220; //It'd be nice to use alert.getWidth() / 2, but it's NAN now. 
+			double y = mainStage.getY() + mainStage.getHeight() / 2 - 50;
+			
+			alert.setX( x );
+			alert.setY( y );
+			
+			alert.setTitle( "Unable to load Albums" );
+			alert.setHeaderText( "Albums have been deleted or moved." );
+				
+			String message = "Unable to load the following albums because the folder is missing. If you recently moved or renamed the folder " +
+				"hypnos will find and load the new location soon (as long as its in your library load path).";
+					
+			for ( Album album : missing ) {
+				if ( album != null ) {
+					message += "\n\n" + album.getPath();
+				}
+			}
+				
+			Text text = new Text( message );
+			
+			text.setWrappingWidth(500);
+			text.applyCss();
+			HBox holder = new HBox();
+			holder.getChildren().add( text );
+			holder.setPadding( new Insets ( 10, 10, 10, 10 ) );
+			alert.getDialogPane().setContent( holder );
+			
+			alert.showAndWait();
+		});
+	}
+	
 	public File promptUserForPlaylistFile() {
 		FileChooser fileChooser = new FileChooser();
 		FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter( "M3U Playlists", Arrays.asList( "*.m3u" ) );

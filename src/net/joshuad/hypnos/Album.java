@@ -40,19 +40,36 @@ public class Album implements Serializable {
 	}
 	
 	public String getAlbumArtist () {
-		return tracks.get( 0 ).getAlbumArtist();
+		if ( tracks.size() == 0 || tracks.get( 0 ) == null ) {
+			return "Unknown"; //TODO: Maybe cache the info
+		} else {
+			return tracks.get( 0 ).getAlbumArtist();
+		}
+			
 	}
 	
 	public String getYear () {
-		return tracks.get( 0 ).getYear();
+		if ( tracks.size() == 0 || tracks.get( 0 ) == null ) {
+			return "Unknown"; //TODO: Maybe cache the info
+		} else {
+			return tracks.get( 0 ).getYear();
+		}
 	}
 	
 	public String getSimpleTitle() {
-		return tracks.get( 0 ).getSimpleAlbumTitle();
+		if ( tracks.size() == 0 || tracks.get( 0 ) == null ) {
+			return "Unknown"; //TODO: Maybe cache the info
+		} else {
+			return tracks.get( 0 ).getSimpleAlbumTitle();
+		}
 	}
 	
 	public String getFullTitle () {
-		return tracks.get( 0 ).getFullAlbumTitle();
+		if ( tracks.size() == 0 || tracks.get( 0 ) == null ) {
+			return "Unknown"; //TODO: Maybe cache the info
+		} else {
+			return tracks.get( 0 ).getFullAlbumTitle();
+		}
 	}		
 	
 	public Path getPath () {
