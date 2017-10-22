@@ -3,6 +3,9 @@ New Features
 			
 Bug Fixes / Incremental Improvements
 
+	~incomplete/Grizzly Bear
+		F2 to show tag editor, no content in table
+
 	Artist Image - Clear Artist Image for this Track
 
 	Fix up tag window

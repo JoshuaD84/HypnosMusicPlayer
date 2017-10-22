@@ -96,12 +96,12 @@ public class Track implements Serializable {
 	private Integer discCount =  null;
 	private String releaseType = null;
 	
-	private boolean isLossless;
-	private long bitRate;
-	private int sampleRate;
-	private boolean isVBR;
-	private String encodingType;
-	private String format;
+	private boolean isLossless = false;
+	private long bitRate = -1;
+	private int sampleRate = -1;
+	private boolean isVBR = false;
+	private String encodingType = "";
+	private String format = "";
 	
 	private static final DirectoryStream.Filter<Path> imageFileFilter = new DirectoryStream.Filter<Path>() {
 		@Override
@@ -157,6 +157,7 @@ public class Track implements Serializable {
 			
 		} catch ( CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e1 ) {
 			LOGGER.log( Level.INFO, e1.getClass().toString() + " while read tags on file: " + trackFile.toString() + ", using file name." );
+			
 		} catch ( Exception e ) {
 			//This can happen sometimes TODO:
 		}
