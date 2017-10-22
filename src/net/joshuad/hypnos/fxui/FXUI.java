@@ -145,6 +145,9 @@ public class FXUI implements PlayerListener {
 	HBox trackFilterPane;
 	HBox playlistFilterPane;
 	HBox playlistControls;
+	HBox volumePane;
+	
+	Tooltip volumeDisabledTooltip = new Tooltip ( "Volume control not supported for tracks with this encoding." );
 	
 	Slider trackPositionSlider;
 	Slider volumeSlider;
@@ -806,7 +809,7 @@ public class FXUI implements PlayerListener {
 		volumeSlider.setOnMouseDragged ( volumeSliderHandler );
 		volumeSlider.setOnMouseClicked ( volumeSliderHandler );
 		
-		HBox volumePane = new HBox();
+		volumePane = new HBox();
 		volumePane.getChildren().addAll( volumeMuteButton, volumeSlider );
 		volumePane.setAlignment( Pos.CENTER );
 		volumePane.setSpacing( 5 );
@@ -3760,8 +3763,17 @@ public class FXUI implements PlayerListener {
 			
 			setImages( track );
 			
-			volumeSlider.setDisable( !player.volumeChangeSupported() );
-			volumeMuteButton.setDisable( !player.volumeChangeSupported() );
+			boolean disableVolume = !player.volumeChangeSupported();
+			
+			if ( disableVolume ) {
+				volumeSlider.setDisable( true );
+				volumeMuteButton.setDisable( true );
+				Tooltip.install( volumePane, volumeDisabledTooltip );
+			} else {
+				volumeSlider.setDisable( false );
+				volumeMuteButton.setDisable( false );
+				Tooltip.uninstall( volumePane, volumeDisabledTooltip );
+			}
 		});
 	}
 

@@ -21,8 +21,6 @@ Bug Fixes / Incremental Improvements
 	Hotkeys aren't consumed, so they are passed to the current window. 
 		Check windows and OSX
 		Create website /help/linux-globalhotkey-consume/
-		
-	Volume disabled indicator via tooltip
 			
 	Persister.loadCurrentList()
 		This is from trying to run a new version of hypnos after having data from a previous version. 
