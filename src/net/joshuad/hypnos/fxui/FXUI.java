@@ -2192,7 +2192,6 @@ public class FXUI implements PlayerListener {
 			if ( okToReplaceCurrentList() ) {
 				player.getCurrentList().setAlbums( albumTable.getSelectionModel().getSelectedItems() );
 				player.next( false );
-				//TODO: This doesn't work
 			}
 		});
 
@@ -2278,7 +2277,7 @@ public class FXUI implements PlayerListener {
 					
 					if ( doOverwrite ) {
 						player.getCurrentList().setAlbum( row.getItem() );
-						player.play();
+						player.next( false );
 					}
 				}
 			} );
@@ -2659,7 +2658,7 @@ public class FXUI implements PlayerListener {
 		playMenuItem.setOnAction( ( ActionEvent event ) -> {
 			if ( okToReplaceCurrentList() ) {
 				player.getCurrentList().setPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
-				player.play();
+				player.next( false );
 			}
 		});
 
@@ -2820,7 +2819,7 @@ public class FXUI implements PlayerListener {
 					boolean doOverwrite = okToReplaceCurrentList();
 					if ( doOverwrite ) {
 						player.getCurrentList().setPlaylist( row.getItem() );
-						player.play();
+						player.next( false );
 					}
 				}
 			});
@@ -3007,15 +3006,10 @@ public class FXUI implements PlayerListener {
 									if ( addMe instanceof CurrentListTrack ) {
 										tracksToCopy.add( (CurrentListTrack)addMe );
 									} else {
-										try {
-											CurrentListTrack newAddMe = new CurrentListTrack ( addMe );
-											player.getQueue().getData().remove ( index );
-											player.getQueue().getData().add( index, newAddMe );
-											tracksToCopy.add( newAddMe );
-											
-										} catch ( IOException e ) {
-											LOGGER.log( Level.WARNING, "Unable to convert queue track to CurrentListTrack, not adding to current list" );
-										}
+										CurrentListTrack newAddMe = new CurrentListTrack ( addMe );
+										player.getQueue().getData().remove ( index );
+										player.getQueue().getData().add( index, newAddMe );
+										tracksToCopy.add( newAddMe );
 									}
 								}
 							}
@@ -3334,15 +3328,10 @@ public class FXUI implements PlayerListener {
 										if ( addMe instanceof CurrentListTrack ) {
 											tracksToCopy.add( (CurrentListTrack)addMe );
 										} else {
-											try {
-												CurrentListTrack newAddMe = new CurrentListTrack ( addMe );
-												player.getQueue().getData().remove ( index );
-												player.getQueue().getData().add( index, newAddMe );
-												tracksToCopy.add( newAddMe );
-												
-											} catch ( IOException e1 ) {
-												LOGGER.log( Level.INFO, "Unable to convert queue track to CurrentListTrack, not adding to current list" );
-											}
+											CurrentListTrack newAddMe = new CurrentListTrack ( addMe );
+											player.getQueue().getData().remove ( index );
+											player.getQueue().getData().add( index, newAddMe );
+											tracksToCopy.add( newAddMe );
 										}
 									}
 								}

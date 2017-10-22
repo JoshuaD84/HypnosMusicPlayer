@@ -551,7 +551,7 @@ public class AudioSystem {
 			playTrack ( items.get( 0 ) );
 		} else if ( items.size() > 1 ) {
 			currentList.setTracks( items );
-			play();
+			next ( false );
 		}
 	}
 

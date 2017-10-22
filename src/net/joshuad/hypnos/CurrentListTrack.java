@@ -22,6 +22,8 @@ import javafx.beans.property.StringProperty;
 		
 		private transient BooleanProperty fileIsMissing = new SimpleBooleanProperty ( false );
 		
+		private boolean needsUpdate = false;
+		
 		public CurrentListTrack ( Path source ) throws IOException {
 			super ( source );
 			if ( Utils.isAlbumDirectory( source.getParent() ) ) {
@@ -31,9 +33,24 @@ import javafx.beans.property.StringProperty;
 			updateDisplayString();
 		}
 	
-		public CurrentListTrack ( Track source ) throws IOException {
-			super ( source.getPath(), source.getAlbumPath() );
+		public CurrentListTrack ( Track source ) {
+			super ( source );
+			needsUpdate = true;
 			updateDisplayString();
+		}
+		
+		public boolean needsUpdate () {
+			return needsUpdate;
+		}
+		
+		public void update() {
+			needsUpdate = false;
+			try {
+				refreshTagData();
+			} catch ( IOException e ) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		

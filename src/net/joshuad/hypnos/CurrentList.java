@@ -96,19 +96,24 @@ public class CurrentList {
 		Thread watcher = new Thread( () -> {
 			while ( true ) {
 				try {
-					synchronized ( items ) {
-						for ( CurrentListTrack track : items ) {
-							boolean isMissing = !Utils.isMusicFile( track.getPath() );
-							if ( !isMissing && track.isMissingFile() ) {
-								track.setIsMissingFile ( false );
-								
-							} else if ( isMissing && !track.isMissingFile() ) {
-								track.setIsMissingFile ( true );
-							}
+					for ( CurrentListTrack track : items ) {
+						boolean isMissing = !Utils.isMusicFile( track.getPath() );
+						
+						if ( !isMissing && track.isMissingFile() ) {
+							track.setIsMissingFile ( false );
+							
+						} else if ( isMissing && !track.isMissingFile() ) {
+							track.setIsMissingFile ( true );
+						}
+						
+						if ( track.needsUpdate() ) {
+							track.update();
+							break;
 						}
 					}
+
 				} catch ( ConcurrentModificationException e ) {
-					//This is kind of a hack, but whatever. If someone else is editing, stop and try again later.
+					//If the list is edited, stop what we're doing and start up again later. 
 				}
 				
 				try {
@@ -236,17 +241,10 @@ public class CurrentList {
 	}
 		
 	public void clearList() {
-		Runnable runMe = new Runnable() {
-			public void run() {
-				if ( items.size() > 0 ) {
-					listCleared();
-				}
-				items.clear();
-			}
-		};
-		
-		doThreadAware ( runMe );
-
+		if ( items.size() > 0 ) {
+			listCleared();
+		}
+		items.clear();
 	}
 	
 	public void removeTracksAtIndices ( List <Integer> indicies ) {
@@ -328,27 +326,15 @@ public class CurrentList {
 	}
 	
 	public void setTracks ( List <? extends Track> tracks ) {
-		Runnable runMe = new Runnable() {
-			public void run() {
-				clearList();
-				queue.clear();
-				appendTracks ( tracks );
-			}
-		};
-		
-		doThreadAware ( runMe );
+		clearList();
+		queue.clear();
+		appendTracks ( tracks );
 	}
 		
 	public void setTracksPathList ( List <Path> paths ) {
-		Runnable runMe = new Runnable() {
-			public void run() {
-				clearList();
-				queue.clear();
-				appendTracksPathList ( paths );
-			}
-		};
-		
-		doThreadAware ( runMe );
+		clearList();
+		queue.clear();
+		appendTracksPathList ( paths );
 	}
 	
 	public void appendTrack ( String location ) {
@@ -360,7 +346,7 @@ public class CurrentList {
 	}
 
 	public void appendTrack ( Track track ) {
-		insertTrackPathList ( items.size(), Arrays.asList( track.getPath() ) );
+		insertTracks ( items.size(), Arrays.asList( track ) );
 	}
 	
 	public void appendTracks ( List <? extends Track> tracks ) {
@@ -372,30 +358,44 @@ public class CurrentList {
 	}
 	
 	public void insertTracks ( int index, List<? extends Track> tracks ) {
-		Runnable runMe = new Runnable() {
-			public void run() {
-				if ( tracks == null || tracks.size() <= 0 ) {
-					LOGGER.fine( "Recieved a null or empty track list. No tracks loaded." );
-					return;
-				}
-				
-				ArrayList <Path> paths = new ArrayList <Path> ( tracks.size() );
-				
-				for ( Track track : tracks ) {
-					if ( track == null ) {
-						LOGGER.fine( "Recieved a null track. Skipping." );
-					} else {
-						paths.add ( track.getPath() );
-					}
-				}
-				
-				insertTrackPathList ( index, paths );
-
-			}
-		};
+		if ( tracks == null || tracks.size() <= 0 ) {
+			LOGGER.fine( "Recieved a null or empty track list. No tracks loaded." );
+			return;
+		}
 		
-		doThreadAware ( runMe );
-				
+		boolean startedEmpty = items.isEmpty();
+		
+		List <CurrentListTrack> addMe = new ArrayList <CurrentListTrack> ( tracks.size() );
+		
+		for ( Track track : tracks ) {
+			addMe.add( new CurrentListTrack ( track ) );
+		}
+		
+		int targetIndex = index;
+		synchronized ( items ) {
+			if ( index < 0 ) {
+				LOGGER.fine( "Asked to insert tracks at: " + index + ", inserting at 0 instead." );
+				targetIndex = 0;
+			} else if ( index > items.size() ) {
+				LOGGER.fine( "Asked to insert tracks past the end of current list. Inserting at end instead." );
+				targetIndex = items.size();
+			}
+		}
+		
+		int tracksAdded = 0;
+		for ( CurrentListTrack track : addMe ) {
+			addItem ( targetIndex, track );
+			targetIndex++;
+			tracksAdded++;
+		}
+		
+		if ( tracksAdded > 0 ) {
+			if ( startedEmpty ) {
+				tracksSet();
+			} else {
+				tracksAdded();
+			}
+		}
 	}
 	
 	public void insertTrackPathList ( int index, List <Path> paths ) {
@@ -448,13 +448,8 @@ public class CurrentList {
 	private void addItem ( int index, CurrentListTrack track ) {
 		if ( track == null ) return;
 		
-		Runnable runMe = new Runnable() {
-			public void run() {
-				items.add( index, track );
-			}
-		};
+		items.add( index, track );
 		
-		doThreadAware ( runMe );
 	}
 	
 	public void appendAlbum ( Album album ) {
@@ -511,87 +506,62 @@ public class CurrentList {
 	}
 	
 	public void setAlbum ( Album album ) {
-		Runnable runMe = new Runnable() {
-			public void run() {
-				setTracks ( album.getTracks() );
-				albumsSet ( Arrays.asList( album ) );
-			}
-		};
-		
-		doThreadAware ( runMe );
+		setTracks ( album.getTracks() );
+		albumsSet ( Arrays.asList( album ) );
 	}
 	
 	public void setAlbums ( List<Album> albums ) {
-		Runnable runMe = new Runnable() {
-			public void run() {
-				List <Track> addMe = new ArrayList <Track> ();
-				
-				int albumsAdded = 0;
-				Album albumAdded = null;
-				
-				for ( Album album : albums ) {
-					if ( album != null ) {
-						addMe.addAll ( album.getTracks() );
-						albumsAdded++;
-						albumAdded = album;
-					}
-				}
-				
-				setTracks ( addMe );
-				albumsSet ( albums );
-			}
-		};
+		List <Track> addMe = new ArrayList <Track> ();
 		
-		doThreadAware ( runMe );
+		int albumsAdded = 0;
+		Album albumAdded = null;
+		
+		for ( Album album : albums ) {
+			if ( album != null ) {
+				addMe.addAll ( album.getTracks() );
+				albumsAdded++;
+				albumAdded = album;
+			}
+		}
+		
+		setTracks ( addMe );
+		albumsSet ( albums );
 	}
 	
 	
 	public void appendPlaylist ( Playlist playlist ) {
-		Runnable runMe = new Runnable() {
-			public void run() {
-
-				boolean setAsPlaylist = false;
-				if ( items.size() == 0 ) setAsPlaylist = true;
-				
-				appendTracks ( playlist.getTracks() );
-				
-				if ( setAsPlaylist ) {
-					currentPlaylist = playlist;
-					playlistsSet ( Arrays.asList( playlist ) );
-				}
-			}
-		};
+		boolean setAsPlaylist = false;
+		if ( items.size() == 0 ) setAsPlaylist = true;
 		
-		doThreadAware ( runMe );
+		appendTracks ( playlist.getTracks() );
+		
+		if ( setAsPlaylist ) {
+			currentPlaylist = playlist;
+			playlistsSet ( Arrays.asList( playlist ) );
+		}
 	}
 	
 	public void appendPlaylists ( List<Playlist> playlists ) {
-		Runnable runMe = new Runnable() {
-			public void run() {
-				boolean startedEmpty = false;
-				if ( items.size() == 0 ) startedEmpty = true;
-				
-				int playlistsAdded = 0;
-				Playlist lastPlaylist = null;
-				for ( Playlist playlist : playlists ) {
-					if ( playlist != null ) {
-						appendTracks ( playlist.getTracks() );
-						lastPlaylist = playlist;
-						playlistsAdded++;
-					}
-				}
-				
-				if ( startedEmpty && playlistsAdded == 1 ) {
-					currentPlaylist = lastPlaylist;
-				}
-				
-				if ( startedEmpty ) {
-					playlistsSet ( playlists );
-				}
-			}
-		};
+		boolean startedEmpty = false;
+		if ( items.size() == 0 ) startedEmpty = true;
 		
-		doThreadAware ( runMe );
+		int playlistsAdded = 0;
+		Playlist lastPlaylist = null;
+		for ( Playlist playlist : playlists ) {
+			if ( playlist != null ) {
+				appendTracks ( playlist.getTracks() );
+				lastPlaylist = playlist;
+				playlistsAdded++;
+			}
+		}
+		
+		if ( startedEmpty && playlistsAdded == 1 ) {
+			currentPlaylist = lastPlaylist;
+		}
+		
+		if ( startedEmpty ) {
+			playlistsSet ( playlists );
+		}
 	}
 	
 	public void setPlaylist ( Playlist playlist ) {
@@ -599,32 +569,26 @@ public class CurrentList {
 	}
 	
 	public void setPlaylists ( List<Playlist> playlists ) {
-		Runnable runMe = new Runnable() {
-			public void run() {
-				List <Track> addMe = new ArrayList <Track> ();
-				
-				int playlistsAdded = 0;
-				Playlist playlistAdded = null;
-				
-				for ( Playlist playlist : playlists ) {
-					if ( playlist != null ) {
-						addMe.addAll ( playlist.getTracks() );
-						playlistsAdded++;
-						playlistAdded = playlist;
-					}
-				}
-				
-				setTracks ( addMe );
-				
-				if ( playlistsAdded == 1 ) {
-					currentPlaylist = playlistAdded;
-				}
-				
-				playlistsSet ( playlists );
-			}
-		};
+		List <Track> addMe = new ArrayList <Track> ();
 		
-		doThreadAware ( runMe );
+		int playlistsAdded = 0;
+		Playlist playlistAdded = null;
+		
+		for ( Playlist playlist : playlists ) {
+			if ( playlist != null ) {
+				addMe.addAll ( playlist.getTracks() );
+				playlistsAdded++;
+				playlistAdded = playlist;
+			}
+		}
+		
+		setTracks ( addMe );
+		
+		if ( playlistsAdded == 1 ) {
+			currentPlaylist = playlistAdded;
+		}
+		
+		playlistsSet ( playlists );
 	}
 	
 	public void notifyListenersStateChanged() {

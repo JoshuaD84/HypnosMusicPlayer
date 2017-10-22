@@ -110,6 +110,48 @@ public class Track implements Serializable {
 		}
 	};
 	
+	public Track ( Track track ) {
+		this.length = track.length;
+		this.trackFile = track.trackFile;
+		this.hasAlbum = track.hasAlbum;
+		this.albumDirectory = track.albumDirectory;
+		this.artist = track.artist;
+		this.title = track.title;
+		this.album = track.album;
+		this.date = track.date;
+		this.originalDate = track.originalDate;
+		this.trackNumber = track.trackNumber;
+		this.discSubtitle = track.discSubtitle;
+		this.discNumber = track.discNumber;
+		this.discCount = track.discCount;
+		this.releaseType = track.releaseType;
+		this.isLossless = track.isLossless;
+		this.bitRate = track.bitRate;
+		this.sampleRate = track.sampleRate;
+		this.isVBR = track.isVBR;
+		this.encodingType = track.encodingType;
+		this.format = track.format;
+		
+		/*for ( Field field : Track.class.getFields() ) {
+			if ( Modifier.isTransient( field.getModifiers() ) ) continue;
+			if ( Modifier.isStatic( field.getModifiers() ) ) continue;
+			
+			try {
+				Object thisValue = Track.class.getField( field.getName() ).get ( this );
+				Track.class.getField( field.getName() ).set ( this, thisValue );
+				
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (NoSuchFieldException e) {
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			}
+		}*/
+	}
+	
 	public Track ( Path trackPath ) throws IOException {
 		this.trackFile = trackPath.toFile();
 		Logger.getLogger( "org.jaudiotagger" ).setLevel( Level.OFF ); //TODO: this is wierd, can we do this top level? Not even in every constructor

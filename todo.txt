@@ -16,9 +16,7 @@ Bug Fixes / Incremental Improvements
 	Hotkeys aren't consumed, so they are passed to the current window. 
 		Check windows and OSX
 		Create website /help/linux-globalhotkey-consume/
-		
-	Play function is broken all over
-	
+			
 	Disable console to log -- creating duplicated entries. 
 	
 Post Beta fixes / updates / improvements 

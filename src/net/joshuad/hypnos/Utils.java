@@ -2,7 +2,6 @@ package net.joshuad.hypnos;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.DirectoryStream;
@@ -15,7 +14,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
@@ -182,13 +180,7 @@ public class Utils {
 			if ( track instanceof CurrentListTrack ) {
 				retMe.add ( (CurrentListTrack)track );
 			} else {
-				try {
-					retMe.add ( new CurrentListTrack ( track ) );
-				} catch ( FileNotFoundException e ) {
-					LOGGER.log( Level.INFO, "Unable to load track: " + track.getPath().toString() );
-				} catch ( IOException e ) {
-					e.printStackTrace();
-				}
+				retMe.add ( new CurrentListTrack ( track ) );
 			}
 		}
 		
