@@ -68,7 +68,6 @@ public class WavDecoder extends AbstractDecoder {
 			LOGGER.warning( "Error reading from wav file." );
 		}
 		
-		System.out.println ( " Returning false from play frame" );
 		return false;
 	}
 

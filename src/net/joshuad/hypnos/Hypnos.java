@@ -469,7 +469,6 @@ public class Hypnos extends Application {
 			determineOS();
 			setupRootDirectory(); 
 			setupConfigDirectory();
-			setupLogFile();
 			
 			setupJavaLibraryPath();
 			
@@ -480,6 +479,7 @@ public class Hypnos extends Application {
 			SingleInstanceController singleInstanceController = new SingleInstanceController();
 					
 			if ( singleInstanceController.isFirstInstance() ) {
+				setupLogFile();
 				library = new Library();
 				player = new AudioSystem();
 				startGlobalHotkeyListener();
