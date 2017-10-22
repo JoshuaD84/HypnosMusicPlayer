@@ -233,6 +233,8 @@ public class FXUI implements PlayerListener {
 	
 	private SimpleBooleanProperty promptBeforeOverwrite = new SimpleBooleanProperty ( true );
 	
+	boolean doPlaylistSaveWarning = true;
+	
 	public FXUI ( Stage stage, Library library, AudioSystem player, GlobalHotkeys hotkeys ) {
 		mainStage = stage;
 		this.library = library;
@@ -3869,40 +3871,42 @@ public class FXUI implements PlayerListener {
 	}
 
 	public void warnUserPlaylistsNotSaved ( List <Playlist> errors ) {
-		Platform.runLater( () -> {
-			Alert alert = new Alert( AlertType.ERROR );
-			alert.getDialogPane().applyCss();
-			double x = mainStage.getX() + mainStage.getWidth() / 2 - 220; //It'd be nice to use alert.getWidth() / 2, but it's NAN now. 
-			double y = mainStage.getY() + mainStage.getHeight() / 2 - 50;
-			
-			alert.setX( x );
-			alert.setY( y );
-			
-			alert.setTitle( "Warning" );
-			alert.setHeaderText( "Unable to save playlists." );
+		if ( doPlaylistSaveWarning ) {
+			Platform.runLater( () -> {
+				doPlaylistSaveWarning = false;
+				Alert alert = new Alert( AlertType.ERROR );
+				alert.getDialogPane().applyCss();
+				double x = mainStage.getX() + mainStage.getWidth() / 2 - 220; //It'd be nice to use alert.getWidth() / 2, but it's NAN now. 
+				double y = mainStage.getY() + mainStage.getHeight() / 2 - 50;
 				
-			String message = "Unable to save the following playlists to the default playlist directory. " +
-					"You may want to manually export them before exiting, so your data is not lost.\n";
+				alert.setX( x );
+				alert.setY( y );
+				
+				alert.setTitle( "Warning" );
+				alert.setHeaderText( "Unable to save playlists." );
 					
-			for ( Playlist playlist : errors ) {
-				
-				if ( playlist != null ) {
-					message += "\n" + playlist.getName();
+				String message = "Unable to save the following playlists to the default playlist directory. " +
+						"You may want to manually export them before exiting, so your data is not lost.\n";
+						
+				for ( Playlist playlist : errors ) {
+					
+					if ( playlist != null ) {
+						message += "\n" + playlist.getName();
+					}
 				}
-			}
+					
+				Text text = new Text( message );
 				
-			Text text = new Text( message );
-			
-			text.setWrappingWidth(500);
-			text.applyCss();
-			HBox holder = new HBox();
-			holder.getChildren().add( text );
-			holder.setPadding( new Insets ( 10, 10, 10, 10 ) );
-			alert.getDialogPane().setContent( holder );
-			
-			alert.showAndWait();
-			
-		});
+				text.setWrappingWidth(500);
+				text.applyCss();
+				HBox holder = new HBox();
+				holder.getChildren().add( text );
+				holder.setPadding( new Insets ( 10, 10, 10, 10 ) );
+				alert.getDialogPane().setContent( holder );
+				
+				alert.showAndWait();
+			});
+		}
 	}
 	
 	public File promptUserForPlaylistFile() {

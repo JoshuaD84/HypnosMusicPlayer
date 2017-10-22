@@ -22,8 +22,6 @@ Bug Fixes / Incremental Improvements
 		Check windows and OSX
 		Create website /help/linux-globalhotkey-consume/
 	
-	Playlist popup can keep popping up, that's annoying. Only display once?
-	
 Post Beta fixes / updates / improvements 
 
 	Sometimes there are duplicated tracks in the track list
