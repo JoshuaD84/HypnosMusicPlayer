@@ -9,9 +9,6 @@ Bug Fixes / Incremental Improvements
 	Fix up tag window
 		Group album issues?
 		Allow tracks to be clicked to bring up the tag editor window
-
-	Right Click a track > Add to Playlist , while that playlist is current and saved. 
-		It shows as being edited (*) but it shouldn't. 
 		
 	Data lost when computer turned off (logging out doesn't trigger, only a power down)
 		I don't think this is happening any more. 
@@ -48,6 +45,8 @@ Bug Fixes / Incremental Improvements
 	
 Post Beta fixes / updates / improvements 
 
+	Sometimes there are duplicated tracks in the track list
+	
 	Show images in tag window
 		Allow the deletion of embedded images
 		

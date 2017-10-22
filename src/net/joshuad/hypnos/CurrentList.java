@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import net.joshuad.hypnos.audio.AudioSystem;
@@ -449,9 +448,13 @@ public class CurrentList {
 	private void addItem ( int index, CurrentListTrack track ) {
 		if ( track == null ) return;
 		
-		Platform.runLater( () -> {
-			items.add( index, track );
-		});
+		Runnable runMe = new Runnable() {
+			public void run() {
+				items.add( index, track );
+			}
+		};
+		
+		doThreadAware ( runMe );
 	}
 	
 	public void appendAlbum ( Album album ) {
@@ -812,8 +815,9 @@ public class CurrentList {
 	
 	public void tracksAdded () {
 		if ( mode == Mode.PLAYLIST ) {
+			boolean listsMatch = true;
 			
-			if ( currentPlaylist != null && items.equals( currentPlaylist.getTracks() ) ) {
+			if ( currentPlaylist.getTracks().equals( items ) ) {
 				mode = Mode.PLAYLIST;			
 				
 			} else {
