@@ -193,7 +193,7 @@ public class Track implements Serializable {
 			fnArtist = trackFile.toPath().getParent().getParent().getFileName().toString();
 		} catch ( Exception e ) { 
 			//TODO: 
-			System.out.println ( "Unable to parse artist name from directory structure: " + trackFile.toString() );
+			e.printStackTrace();
 		}
 		
 		try {
@@ -221,7 +221,7 @@ public class Track implements Serializable {
 
 		} catch ( Exception e ) { 
 			//TODO: We get an exception with albums that have [] and maybe {} in their directory structure 
-			System.out.println( "Unable to parse album info from directory structure: " + trackFile.toString() );
+			e.printStackTrace();
 		}
 
 		boolean setByFileName = false;

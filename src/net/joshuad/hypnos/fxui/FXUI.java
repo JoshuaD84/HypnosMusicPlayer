@@ -1432,11 +1432,12 @@ public class FXUI implements PlayerListener {
 	//TODO: This function probably belongs in Library
 	public void addToPlaylist ( List <Track> tracks, Playlist playlist ) {
 		playlist.getTracks().addAll( tracks );
+		playlistTable.refresh(); 
+		
 		//TODO: playlist.equals ( playlist ) instead of name .equals ( name ) ?
 		if ( player.getCurrentPlaylist() != null && player.getCurrentPlaylist().getName().equals( playlist.getName() ) ) {
 			player.getCurrentList().appendTracks( tracks );
 		}
-		playlistTable.refresh(); 
 	}
 
 	public void setPromptBeforeOverwrite ( boolean prompt ) {

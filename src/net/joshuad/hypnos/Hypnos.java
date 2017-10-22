@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
@@ -259,10 +258,13 @@ public class Hypnos extends Application {
 			PrintWriter logOut = new PrintWriter ( new FileOutputStream ( logFile.toFile(), false ) );
 			logOut.print( logBuffer.toString() );
 			logOut.close();
+
+			TeeOutputStream fileOutTee = new TeeOutputStream ( originalOut, new FileOutputStream ( logFile.toFile() ) );
+			TeeOutputStream fileErrTee = new TeeOutputStream ( originalErr, new FileOutputStream ( logFile.toFile() ) );
 			
-			System.setOut( originalOut );
-			System.setErr( originalErr );
-			
+			System.setOut( new PrintStream ( fileOutTee ) );
+			System.setErr( new PrintStream ( fileErrTee ) );
+
 			FileHandler fileHandler = new FileHandler( logFile.toString(), true );     
 			fileHandler.setFormatter( new Formatter() {
 				SimpleDateFormat dateFormat = new SimpleDateFormat ( "MMM d, yyyy HH:mm:ss aaa" );
@@ -281,6 +283,7 @@ public class Hypnos extends Application {
 			} );
 			
 	        Logger.getLogger("").addHandler( fileHandler );
+	        
 		} catch ( IOException e ) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -313,7 +316,7 @@ public class Hypnos extends Application {
 				    @Override public void write(int b) throws IOException {}
 				}));
 			
-				LogManager.getLogManager().reset();
+				//LogManager.getLogManager().reset();
 				Logger logger = Logger.getLogger( GlobalScreen.class.getPackage().getName() );
 				logger.setLevel( Level.OFF );
 	

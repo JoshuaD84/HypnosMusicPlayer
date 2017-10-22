@@ -2,11 +2,13 @@ New Features
 	
 			
 Bug Fixes / Incremental Improvements
-	Persist the artwork pane size fix variable to file
 
-	Logging
-		Is it working once I export the jar and run it in an normal environment? It doesn't appear to be. 
-	
+	Artist Image - Clear Artist Image for this Track
+
+	Fix up tag window
+		Group album issues?
+		Allow tracks to be clicked to bring up the tag editor window
+
 	Right Click a track > Add to Playlist , while that playlist is current and saved. 
 		It shows as being edited (*) but it shouldn't. 
 		
