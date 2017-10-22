@@ -259,12 +259,6 @@ public class Hypnos extends Application {
 			logOut.print( logBuffer.toString() );
 			logOut.close();
 
-			TeeOutputStream fileOutTee = new TeeOutputStream ( originalOut, new FileOutputStream ( logFile.toFile() ) );
-			TeeOutputStream fileErrTee = new TeeOutputStream ( originalErr, new FileOutputStream ( logFile.toFile() ) );
-			
-			System.setOut( new PrintStream ( fileOutTee ) );
-			System.setErr( new PrintStream ( fileErrTee ) );
-
 			FileHandler fileHandler = new FileHandler( logFile.toString(), true );     
 			fileHandler.setFormatter( new Formatter() {
 				SimpleDateFormat dateFormat = new SimpleDateFormat ( "MMM d, yyyy HH:mm:ss aaa" );

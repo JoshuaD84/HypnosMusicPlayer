@@ -17,8 +17,8 @@ Bug Fixes / Incremental Improvements
 		Check windows and OSX
 		Create website /help/linux-globalhotkey-consume/
 			
-	Disable console to log -- creating duplicated entries. 
-	
+	Get rid of all System.out.print and printStackTraces -- they aren't visible in the UI log or logged to file
+		
 Post Beta fixes / updates / improvements 
 
 	~incomplete/Grizzly Bear
