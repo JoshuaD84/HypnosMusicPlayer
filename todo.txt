@@ -1,5 +1,4 @@
-New Features		
-	
+
 			
 Bug Fixes / Incremental Improvements
 
@@ -16,9 +15,10 @@ Bug Fixes / Incremental Improvements
 	Hotkeys aren't consumed, so they are passed to the current window. 
 		Check windows and OSX
 		Create website /help/linux-globalhotkey-consume/
-			
-	Get rid of all System.out.print and printStackTraces -- they aren't visible in the UI log or logged to file
-		
+	
+Post Beta New Features		
+	Add default sort column choice, like shuffle and repeat
+					
 Post Beta fixes / updates / improvements 
 
 	~incomplete/Grizzly Bear

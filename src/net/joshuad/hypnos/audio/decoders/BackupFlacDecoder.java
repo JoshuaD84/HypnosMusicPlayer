@@ -10,7 +10,6 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
-import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
@@ -59,9 +58,8 @@ public class BackupFlacDecoder extends AbstractDecoder {
 			} else {
 				audioOutput.write(data, 0, bytesRead);
 			}
-		} catch (IOException e ) {
-			//TODO: 
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.log ( Level.WARNING, "Error playing audio frame.", e );
 		}
 		
 		return false;
@@ -114,10 +112,9 @@ public class BackupFlacDecoder extends AbstractDecoder {
 				int bytesSkipped;
 				try {
 					bytesSkipped = decodedInput.read ( skippedData );
-				} catch ( IOException e ) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					return false; //TODO: Maybe return true? see OggPlayer or M4APlyaer same question
+				} catch ( Exception e ) {
+					LOGGER.log( Level.WARNING, "Unable to skip to " + seekPercent + "% in track: " + track.getPath(), e );
+					return true; 
 				}
 				bytesRead += bytesSkipped;
 			}
@@ -130,9 +127,8 @@ public class BackupFlacDecoder extends AbstractDecoder {
 		try {
 			audioOutput = (SourceDataLine) AudioSystem.getLine(info);
 			audioOutput.open( decoderFormat );
-		} catch ( LineUnavailableException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to get output line for audio.", e );
 			return false;
 		}
 		
@@ -159,7 +155,7 @@ public class BackupFlacDecoder extends AbstractDecoder {
 			return 0;
 
 		} catch ( Exception e ) {
-			e.printStackTrace( System.out );
+			LOGGER.info( "Unable to determine byte position for seek. May not be able to seek." );
 			return 0;
 		}
 	}

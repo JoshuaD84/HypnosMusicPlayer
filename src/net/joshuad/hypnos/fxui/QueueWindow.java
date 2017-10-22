@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
@@ -242,9 +243,6 @@ public class QueueWindow extends Stage {
 						case PLAYLIST_INFO:
 						case TRACK_LIST: {
 							List <Track> tracksToCopy = container.getTracks();
-							for ( Track track : tracksToCopy ) {
-								System.out.println ( track.getTitle() );
-							}
 							player.getQueue().addAllTracks( dropIndex, tracksToCopy );
 							
 						} break;
@@ -501,8 +499,8 @@ public class QueueWindow extends Stage {
 							if ( selectedTrack != null ) {
 								Desktop.getDesktop().open( selectedTrack.getPath().getParent().toFile() );
 							}
-						} catch ( IOException e ) {
-							e.printStackTrace();
+						} catch ( Exception e ) {
+							LOGGER.log( Level.INFO, "Unable to open local file browser.", e );
 						}
 					}
 				} );

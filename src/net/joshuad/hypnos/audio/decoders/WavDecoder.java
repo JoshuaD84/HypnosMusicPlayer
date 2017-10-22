@@ -1,6 +1,7 @@
 package net.joshuad.hypnos.audio.decoders;
 
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.sound.sampled.AudioFormat;
@@ -45,8 +46,7 @@ public class WavDecoder extends AbstractDecoder {
 				decodedInput.close();
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log( Level.INFO, "Unable to close input connection to file: " + track.getPath(), e );
 		}
 	}
 
@@ -76,9 +76,8 @@ public class WavDecoder extends AbstractDecoder {
 	
 		try {
 			decodedInput = AudioSystem.getAudioInputStream( track.getPath().toFile() );
-		} catch ( UnsupportedAudioFileException | IOException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to get setup decoder for track: " + track.getPath(), e );
 			return false;
 		}
 		
@@ -87,10 +86,9 @@ public class WavDecoder extends AbstractDecoder {
 			
 			try {
 				long bytesRead = decodedInput.skip ( getBytePosition ( seekPositionMS ) );
-			} catch ( IOException e ) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return false; //TODO: maybe return true? I don't think so. If it can't seek, probably best to stop? Maybe keep playing.. 
+			} catch ( Exception e ) {
+				LOGGER.log( Level.WARNING, "Unable to skip to " + seekPercent + "% in track: " + track.getPath(), e );
+				return true; 
 			}
 			clipStartTimeMS = seekPositionMS;
 		}
@@ -101,9 +99,8 @@ public class WavDecoder extends AbstractDecoder {
 		try {
 			audioOutput = (SourceDataLine) AudioSystem.getLine( info );
 			audioOutput.open( decoderFormat );
-		} catch ( LineUnavailableException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to get output line for audio.", e );
 			return false;
 		}
 		

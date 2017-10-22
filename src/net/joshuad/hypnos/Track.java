@@ -235,8 +235,7 @@ public class Track implements Serializable {
 		try {
 			fnArtist = trackFile.toPath().getParent().getParent().getFileName().toString();
 		} catch ( Exception e ) { 
-			//TODO: 
-			e.printStackTrace();
+			//No need to log this
 		}
 		
 		try {
@@ -264,7 +263,6 @@ public class Track implements Serializable {
 
 		} catch ( Exception e ) { 
 			//TODO: We get an exception with albums that have [] and maybe {} in their directory structure 
-			e.printStackTrace();
 		}
 
 		boolean setByFileName = false;
@@ -582,9 +580,8 @@ public class Track implements Serializable {
 		try {
 			byte[] imageBuffer = Files.readAllBytes( imagePath );
 			saveImageToID3 ( file, imageBuffer, 8, priority, overwriteAll, player );
-		} catch ( IOException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to read image data from file" + imagePath, e );
 		}
 	}
 	
@@ -668,9 +665,8 @@ public class Track implements Serializable {
 				player.unpause();
 			}
 			
-		} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException | CannotWriteException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to write image to tag: " + file, e );
 		}
 	}
 	
@@ -679,8 +675,7 @@ public class Track implements Serializable {
 			byte[] imageBuffer = Files.readAllBytes( imagePath );
 			setAndSaveAlbumImage ( imageBuffer, player );
 		} catch ( IOException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log( Level.WARNING, "Unable to read image data from image file (" + imagePath + ") can't set album image for track: " + getPath(), e );
 		}
 	}
 	
@@ -712,9 +707,8 @@ public class Track implements Serializable {
 
 			try {
 				Files.deleteIfExists( getAlbumPath().resolve( "front.png" ) );
-			} catch ( IOException e1 ) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			} catch ( Exception e ) {
+				LOGGER.log( Level.WARNING, "Unable to delete previous album cover: " + getAlbumPath().resolve( "front.png" ), e );
 			}
 			
 			try ( FileOutputStream fos = new FileOutputStream ( copyTo.toFile() ) ) {
@@ -723,8 +717,7 @@ public class Track implements Serializable {
 				fos.close();
 
 			} catch ( IOException e ) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.log( Level.WARNING, "Unable to write album image to disk: " + copyTo, e );
 			}
 			
 			Thread updaterThread = new Thread ( () -> {
@@ -879,14 +872,9 @@ public class Track implements Serializable {
 					}
 				}
 			}			
-			
-		} catch ( IOException | CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch ( NullPointerException e ) {
-			//TODO:
+	
 		} catch ( Exception e ) {
-			//TODO: this can happen sometimes
+			LOGGER.log( Level.INFO, "Unable to load artist image from tag.", e );
 		}
 		
 		return null;
@@ -949,13 +937,8 @@ public class Track implements Serializable {
 				}
 			}			
 			
-		} catch ( IOException | CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch ( NullPointerException e ) {
-			//TODO:
 		} catch ( Exception e ) {
-			//TODO: This can happen
+			LOGGER.log( Level.INFO, "Error when trying to load tag images for file" + getPath(), e );
 		}
 	
 		return null;
@@ -982,9 +965,8 @@ public class Track implements Serializable {
 			
 			refreshTagData();
 	
-		} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException | CannotWriteException  e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to save updated tag.", e );
 		}
 	}
 }

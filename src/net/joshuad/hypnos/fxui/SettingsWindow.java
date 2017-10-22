@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.EnumMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -58,6 +60,8 @@ import net.joshuad.hypnos.TagError;
 import net.joshuad.hypnos.audio.AudioSystem;
 
 public class SettingsWindow extends Stage {
+
+	private static final Logger LOGGER = Logger.getLogger( SettingsWindow.class.getName() );
 	
 	private FXUI ui;
 	private Library library;
@@ -230,8 +234,7 @@ public class SettingsWindow extends Stage {
 			    	try {
 						new ProcessBuilder("x-www-browser", url ).start();
 					} catch ( IOException e1 ) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						LOGGER.log( Level.INFO, "Unable to open web browser.", e1 );
 					}
 			    }
 			});
@@ -626,12 +629,8 @@ public class SettingsWindow extends Stage {
 						});
 					}
 				}
-			} catch ( FileNotFoundException ex ) {
-				System.err.println( ex );
-				// TODO:
-			} catch ( IOException e ) {
-				e.printStackTrace();
-				// TODO:
+			} catch ( Exception e ) {
+				LOGGER.log( Level.WARNING, "Unable to link log window to log file.", e );
 			}
 		});
 		
@@ -708,8 +707,7 @@ public class SettingsWindow extends Stage {
 			try {
 				new ProcessBuilder("x-www-browser", "http://hypnosplayer.org" ).start();
 			} catch ( IOException e1 ) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				LOGGER.log( Level.INFO, "Unable to open web browser.", e1 );
 			}
 		});
 		website.setStyle( "-fx-font-size: 20px; -fx-text-fill: #0A95C8" );
@@ -721,9 +719,8 @@ public class SettingsWindow extends Stage {
 		Image image = null;
 		try {
 			image = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) );
-		} catch ( FileNotFoundException e1 ) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		} catch ( Exception e1 ) {
+			LOGGER.log( Level.INFO, "Unable to load hypnos icon for settings -> about tab.", e1 );
 		}
 		ImageView logo = new ImageView( image );
 		logo.setFitWidth( 200 );
@@ -746,8 +743,7 @@ public class SettingsWindow extends Stage {
 			try {
 				new ProcessBuilder("x-www-browser", "http://joshuad.net" ).start();
 			} catch ( IOException e1 ) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				LOGGER.log( Level.INFO, "Unable to open web browser.", e1 );
 			}
 		});
 		
@@ -769,8 +765,7 @@ public class SettingsWindow extends Stage {
 			try {
 				new ProcessBuilder("x-www-browser", "https://github.com/JoshuaD84/HypnosMusicPlayer" ).start();
 			} catch ( IOException e1 ) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				LOGGER.log( Level.INFO, "Unable to open web browser.", e1 );
 			}
 		});
 		
@@ -789,8 +784,7 @@ public class SettingsWindow extends Stage {
 			try {
 				new ProcessBuilder("x-www-browser", "https://www.gnu.org/licenses/gpl-3.0-standalone.html" ).start();
 			} catch ( IOException e1 ) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				LOGGER.log( Level.INFO, "Unable to open web browser.", e1 );
 			}
 		});
 		

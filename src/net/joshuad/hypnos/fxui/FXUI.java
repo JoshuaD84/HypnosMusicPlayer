@@ -436,11 +436,11 @@ public class FXUI implements PlayerListener {
 
 	
 	private void setupFont() {
-		Path font, fontBold, stylesheet; 
+		Path fontPath, fontBold, stylesheet; 
 		switch ( Hypnos.getOS() ) {
 			
 			case OSX:
-				font = Hypnos.getRootDirectory().resolve( "resources/lucidagrande/lucidagrande.ttf" );
+				fontPath = Hypnos.getRootDirectory().resolve( "resources/lucidagrande/lucidagrande.ttf" );
 				fontBold = Hypnos.getRootDirectory().resolve( "resources/lucidagrande/lucidagrande-bold.ttf" );
 				stylesheet = Hypnos.getRootDirectory().resolve( "resources/style-font-osx.css" );
 				stylesheet = Hypnos.getRootDirectory().resolve( "resources/style-font-osx.css" );
@@ -452,26 +452,25 @@ public class FXUI implements PlayerListener {
 			case WIN_VISTA:
 			case WIN_XP:
 			case UNKNOWN:
-				font = Hypnos.getRootDirectory().resolve( "resources/calibri/calibri.ttf" );
+				fontPath = Hypnos.getRootDirectory().resolve( "resources/calibri/calibri.ttf" );
 				fontBold = Hypnos.getRootDirectory().resolve( "resources/calibri/calibri-bold.ttf" );
 				stylesheet = Hypnos.getRootDirectory().resolve( "resources/style-font-win.css" );
 				break;
 				
 			case NIX:
 			default:
-				font = Hypnos.getRootDirectory().resolve( "resources/dejavu/dejavusans.ttf" );
+				fontPath = Hypnos.getRootDirectory().resolve( "resources/dejavu/dejavusans.ttf" );
 				fontBold = Hypnos.getRootDirectory().resolve( "resources/dejavu/dejavusans-bold.ttf" );
 				stylesheet = Hypnos.getRootDirectory().resolve( "resources/style-font-nix.css" );
 				break;
 		}
 		
 		try {
-			Font fonat = Font.loadFont( new FileInputStream ( font.toFile() ), 12 ); //TODO: Rename. 
+			Font font = Font.loadFont( new FileInputStream ( fontPath.toFile() ), 12 ); //TODO: Rename. 
 			Font.loadFont( new FileInputStream ( fontBold.toFile() ), 12 );
 			scene.getStylesheets().add( "file:///" + stylesheet.toFile().getAbsolutePath().replace( "\\", "/" ) );
-		} catch ( FileNotFoundException e ) {
-			 //TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.log ( Level.INFO, "Unable to set font native to system, using default font.", e );
 		}
 		
 	}
@@ -588,28 +587,11 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public void toggleMinimized() {
-		//TODO: Fix this, and/or remove all the prints
-
-		System.out.println ( "Before call" );
-		System.out.println ( "\tisIconified(): " + mainStage.isIconified() );
-		System.out.println ( "\tisMaximized(): " + mainStage.isMaximized() );
-		System.out.println ();
-		
 		if ( mainStage.isIconified() ) {
-			System.out.println ( "Setting iconified to false" );
-			System.out.println ();
 			mainStage.setIconified( false );
 		} else {
-			System.out.println ( "Setting iconified to true" );
-			System.out.println ();
 			mainStage.setIconified( true );
 		}
-
-		System.out.println ( "After call" );
-		System.out.println ( "\tisIconified(): " + mainStage.isIconified() );
-		System.out.println ( "\tisMaximized(): " + mainStage.isMaximized() );
-		System.out.println ();
-		System.out.println ();
 	}
 
 	public void updatePlaylistMenuItems ( ObservableList <MenuItem> items, EventHandler <ActionEvent> eventHandler ) {
@@ -633,16 +615,16 @@ public class FXUI implements PlayerListener {
 			playImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/play.png" ).toFile() ) ) );
 			playImage.setFitHeight( 18 );
 			playImage.setFitWidth( 18 );
-		} catch ( FileNotFoundException e ) {
-			LOGGER.warning( "Unable to load play icon: resources/play.png" );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/play.png", e );
 		}
 		
 		try {
 			pauseImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/pause.png" ).toFile() ) ) );
 			pauseImage.setFitHeight( 18 );
 			pauseImage.setFitWidth( 18 );
-		} catch ( FileNotFoundException e ) {
-			LOGGER.warning( "Unable to load pause icon: resources/pause.png" );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load pause icon: resources/pause.png", e );
 		}
 		
 		togglePlayButton = new Button ( "" );
@@ -657,8 +639,8 @@ public class FXUI implements PlayerListener {
 			previousImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/previous.png" ).toFile() ) ) );
 			previousImage.setFitHeight( 18 );
 			previousImage.setFitWidth( 18 );
-		} catch ( FileNotFoundException e ) {
-			LOGGER.warning( "Unable to load previous icon: resources/previous.png" );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load previous icon: resources/previous.png", e );
 		}
 		
 		Button previousButton = new Button ( "" );
@@ -673,8 +655,8 @@ public class FXUI implements PlayerListener {
 			nextImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/next.png" ).toFile() ) ) );
 			nextImage.setFitHeight( 18 );
 			nextImage.setFitWidth( 18 );
-		} catch ( FileNotFoundException e ) {
-			System.out.println ( "Unable to load previous icon: resources/next.png" );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load previous icon: resources/next.png", e );
 		}
 		
 		Button nextButton = new Button ( "" );
@@ -689,8 +671,8 @@ public class FXUI implements PlayerListener {
 			stopImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/stop.png" ).toFile() ) ) );
 			stopImage.setFitHeight( 18 );
 			stopImage.setFitWidth( 18 );
-		} catch ( FileNotFoundException e ) {
-			LOGGER.warning( "Unable to load previous icon: resources/stop.png" );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load previous icon: resources/stop.png", e );
 		}
 		
 		Button stopButton = new Button ( "" );
@@ -983,8 +965,8 @@ public class FXUI implements PlayerListener {
 							if ( selectedTrack != null ) {
 								Desktop.getDesktop().open( selectedTrack.getPath().getParent().toFile() );
 							}
-						} catch ( IOException e ) {
-							e.printStackTrace();
+						} catch ( Exception e ) {
+							LOGGER.log( Level.INFO, "Unable to open local file browser.", e );
 						}
 					}
 				} );
@@ -1240,8 +1222,7 @@ public class FXUI implements PlayerListener {
 							}
 						}
 					} catch ( IOException e3 ) {
-						//TODO: 
-						e3.printStackTrace();
+						LOGGER.log( Level.WARNING, "Unable to get directory listing, artist tags not updated for album: " + albumPath, e3 );
 					}
 	
 					Platform.runLater( () -> setImages ( currentImagesTrack ) );
@@ -1249,9 +1230,8 @@ public class FXUI implements PlayerListener {
 				
 				workerThread.setDaemon( false );
 				workerThread.start();
-			} catch ( IOException e2 ) {
-				e2.printStackTrace();
-				//TODO:
+			} catch ( Exception e2 ) {
+				LOGGER.log( Level.WARNING, "Unable to load image data from file: " + imageFile, e2 );
 			}
 			
 		});
@@ -1279,9 +1259,8 @@ public class FXUI implements PlayerListener {
 							byte[] buffer = Files.readAllBytes( file.toPath() );
 							promptAndSaveArtistImage ( buffer );
 							break;
-						} catch ( IOException e ) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+						} catch ( Exception e ) {
+							LOGGER.log( Level.WARNING, "Unable to load data from image file: " + file.toString(), e );
 						}
 					}
 				}
@@ -1356,8 +1335,7 @@ public class FXUI implements PlayerListener {
 								}
 							}
 						} catch ( IOException e ) {
-							//TODO: 
-							e.printStackTrace();
+							LOGGER.log( Level.WARNING, "Unable to list files in directory, artist tags not updated for album: " + albumPath, e );
 						}
 
 						Platform.runLater( () -> setImages ( currentImagesTrack ) );
@@ -2228,7 +2206,7 @@ public class FXUI implements PlayerListener {
 					try {
 						Desktop.getDesktop().open( albumTable.getSelectionModel().getSelectedItem().getPath().toFile() );
 					} catch ( IOException e ) {
-						e.printStackTrace();
+						LOGGER.log( Level.INFO, "Unable to open native file browser.", e );
 					}
 				}
 			});
@@ -2485,8 +2463,8 @@ public class FXUI implements PlayerListener {
 							if ( selectedTrack != null ) {
 								Desktop.getDesktop().open( trackTable.getSelectionModel().getSelectedItem().getPath().getParent().toFile() );
 							}
-						} catch ( IOException e ) {
-							e.printStackTrace();
+						} catch ( Exception e ) {
+							LOGGER.log( Level.INFO, "Unable to open native file browser.", e );
 						}
 					}
 				} );
@@ -3189,8 +3167,8 @@ public class FXUI implements PlayerListener {
 					public void run () {
 						try {
 							Desktop.getDesktop().open( currentListTable.getSelectionModel().getSelectedItem().getPath().getParent().toFile() );
-						} catch ( IOException e ) {
-							e.printStackTrace();
+						} catch ( Exception e ) {
+							LOGGER.log( Level.INFO, "Unable to native file browser.", e );
 						}
 					}
 				} );
@@ -3390,9 +3368,10 @@ public class FXUI implements PlayerListener {
 
 	        objTimer.getKeyFrames().clear();
 	        objTimer.getKeyFrames().add(new KeyFrame(new Duration(350)));
-	    } catch (Exception e) {
-	        e.printStackTrace();
+	    } catch ( Exception e ) {
+	    	LOGGER.log( Level.INFO, "Unable accelerate tooltip popup speed.", e );
 	    }
+	    
 	}
 	
 

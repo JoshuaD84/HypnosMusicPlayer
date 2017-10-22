@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.sound.sampled.SourceDataLine;
 
@@ -18,6 +20,8 @@ import com.jcraft.jorbis.DspState;
 import com.jcraft.jorbis.Info;
 
 public class OggDecoderLogic {
+
+	private static final Logger LOGGER = Logger.getLogger( OggDecoderLogic.class.getName() );
 	
 	private BufferedInputStream encodedInput = null;
 	private File file;
@@ -237,9 +241,8 @@ public class OggDecoderLogic {
 
 		try {
 			totalBytesInStream = encodedInput.available();
-		} catch ( IOException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to read ogg file header:" + file, e );
 		}
 		return true;
 	}
@@ -251,9 +254,8 @@ public class OggDecoderLogic {
 			
 			encodedInput.skip( bytesToSkip );
 			
-		} catch ( IOException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to seek to " + percent + "% in ogg file:" + file, e );
 		}
 	}
 
@@ -458,8 +460,7 @@ public class OggDecoderLogic {
 				encodedInput.close();
 			}
 		} catch ( Exception e ) {
-			//TODO: 
-			e.printStackTrace();
+			LOGGER.log( Level.INFO, "Unable to close ogg file reader: " + file, e );
 		}
 	}
 

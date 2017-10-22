@@ -22,7 +22,6 @@ import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.BitstreamException;
 import javazoom.jl.decoder.Decoder;
 import javazoom.jl.decoder.Header;
-import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.decoder.SampleBuffer;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.fxui.FXUI;
@@ -159,9 +158,8 @@ public class MP3Decoder extends AbstractDecoder {
 			
 			encodedInput.closeFrame();
 			
-		} catch ( JavaLayerException e ) {
-			//TODO: 
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to decode frame for file:" + track.getFilename(), e );
 		}
 		
 		return false;

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -11,6 +13,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 	public class CurrentListTrack extends Track {
+		private static final Logger LOGGER = Logger.getLogger( CurrentListTrack.class.getName() );
 		
 		private static final long serialVersionUID = 1L;
 		
@@ -44,12 +47,11 @@ import javafx.beans.property.StringProperty;
 		}
 		
 		public void update() {
-			needsUpdate = false;
 			try {
 				refreshTagData();
-			} catch ( IOException e ) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				needsUpdate = false;
+			} catch ( Exception e ) {
+				LOGGER.log( Level.INFO, "Unable to refresh tag data for file: " + this.getFilename(), e );
 			}
 		}
 		

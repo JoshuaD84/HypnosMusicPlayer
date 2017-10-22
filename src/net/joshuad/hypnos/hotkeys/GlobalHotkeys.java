@@ -1,9 +1,7 @@
 package net.joshuad.hypnos.hotkeys;
 
-import java.lang.reflect.Field;
 import java.util.EnumMap;
 
-import org.jnativehook.NativeInputEvent;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
@@ -91,14 +89,15 @@ public class GlobalHotkeys implements NativeKeyListener {
 				if ( registeredHotkey != null && registeredHotkey.equals( lastKeyState ) ) {
 					Hypnos.doHotkeyAction ( hotkey );
 					
+					/*
 					try {
 						//This is an attempt to consume the hotkey. Doesn't work in X11
-						/*Field f = NativeInputEvent.class.getDeclaredField("reserved");
+						Field f = NativeInputEvent.class.getDeclaredField("reserved");
 						f.setAccessible(true);
-						f.setShort(e, (short) 0x01);*/
+						f.setShort(e, (short) 0x01);
 					} catch (Exception ex) {
 						ex.printStackTrace();
-					}
+					}*/
 				}
 			}
 		}

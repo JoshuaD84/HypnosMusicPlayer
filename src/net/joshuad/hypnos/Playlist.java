@@ -84,13 +84,9 @@ public class Playlist implements Serializable {
 						try {
 							playlist.addTrack ( new Track ( Paths.get ( line ) ) );
 						} catch ( Exception e ) {
-							//TODO: 
-							System.out.println ( "Error parsing line in playlist: " + path.toString() + ", continuing." );
-							System.out.println ( "\tLine: " + line );
+							LOGGER.info( "Error parsing line in playlist: " + path.toString() + "\n\tLine: " + line );
 						}
 					}
-						
-						
 				}
 			} catch ( Exception e ) {
 				LOGGER.info( "Error reading playlist file: " + path );

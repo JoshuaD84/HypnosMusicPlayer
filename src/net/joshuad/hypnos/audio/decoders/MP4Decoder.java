@@ -3,6 +3,7 @@ package net.joshuad.hypnos.audio.decoders;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.sound.sampled.AudioFormat;
@@ -55,8 +56,8 @@ public class MP4Decoder extends AbstractDecoder {
 				decoder.decodeFrame( frame.getData(), buffer );
 				byte[] bytes = buffer.getData();
 				audioOutput.write( bytes, 0, bytes.length );
-			} catch ( IOException e ) {
-				e.printStackTrace(); //TODO:
+			} catch ( Exception e ) {
+				LOGGER.log( Level.WARNING, "Unable to decode frame for file:" + track.getFilename(), e );
 			}
 			return false;
 			

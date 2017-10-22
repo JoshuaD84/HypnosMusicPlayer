@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import javax.swing.SwingUtilities;
 
@@ -283,7 +284,7 @@ public class HistoryWindow extends Stage {
 								Desktop.getDesktop().open( selectedTrack.getPath().getParent().toFile() );
 							}
 						} catch ( IOException e ) {
-							e.printStackTrace();
+							LOGGER.log( Level.INFO, "Unable to open native file browser.", e );
 						}
 					}
 				} );

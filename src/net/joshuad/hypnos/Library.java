@@ -410,9 +410,8 @@ public class Library {
 				watcherRegisterAll ( selectedPath );
 			}
 			
-		} catch ( IOException e ) {
-			System.out.println ("Unable to load some files in path: " + selectedPath.toString() );
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load some files in path: " + selectedPath.toString(), e );
 		}
 		fileWalker = null;
 	}
@@ -432,10 +431,8 @@ public class Library {
 				sourceToUpdate.remove( selectedPath );
 			}
 			
-			
-		} catch ( IOException e ) {
-			System.out.println ("Unable to load some files in path: " + selectedPath.toString() );
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load some files in path: " + selectedPath.toString(), e );
 		}
 		
 		fileWalker = null;

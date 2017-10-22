@@ -3,6 +3,7 @@ package net.joshuad.hypnos.fxui;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jaudiotagger.audio.AudioFileIO;
@@ -150,7 +151,6 @@ public class TagWindow extends Stage {
 
 	private void saveCurrentTags() {
 		Thread saverThread = new Thread( () -> {
-			long startTime = System.currentTimeMillis(); //TODO: DD
 			if ( tracks != null ) {
 				for ( Track track : tracks ) {
 					track.updateTagsAndSave( tagPairs );
@@ -164,7 +164,6 @@ public class TagWindow extends Stage {
 			ui.refreshQueueList();
 			ui.refreshHistory();
 			
-			System.out.print( "Elapsed: " + ( System.currentTimeMillis() - startTime ) ); //TODO: DD
 		});
 		saverThread.setDaemon( true );
 		saverThread.start();
@@ -217,8 +216,8 @@ public class TagWindow extends Stage {
 				}
 			}
 		
-		} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to set data for tag window.", e );
 		}
 	}
 }

@@ -7,8 +7,12 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SingleInstanceController {
+
+	private static final Logger LOGGER = Logger.getLogger( SingleInstanceController.class.getName() );
 	
 	int port = 49485;
 	
@@ -52,9 +56,8 @@ public class SingleInstanceController {
 						hypnos.applyCLICommands ( (ArrayList <SocketCommand>) dataIn );
 					}
 
-				} catch ( IOException | ClassNotFoundException e ) {
-					System.err.println ( "Read error at commandline parser" );
-					e.printStackTrace();
+				} catch ( Exception e ) {
+					LOGGER.log( Level.INFO, "Read error at commandline parser", e );
 				}
 			}
 		});
@@ -70,9 +73,8 @@ public class SingleInstanceController {
 			ObjectOutputStream out = new ObjectOutputStream( clientSocket.getOutputStream() );
 		){
 			out.writeObject( commands );
-		} catch ( IOException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.log( Level.INFO, "Difficulty sending commands through socket, UI may not accept commands." );
 		}
 	}
 }

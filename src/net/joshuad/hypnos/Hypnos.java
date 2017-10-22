@@ -253,12 +253,21 @@ public class Hypnos extends Application {
 	private void setupLogFile() {
 		logFile = configDirectory.resolve( "hypnos.log" );
 		try {
-			
 			logFile.toFile().createNewFile();
+		} catch ( Exception e ) {
+			LOGGER.log ( Level.WARNING, "Unable to create logfile", e );
+		}
+		
+		try {
 			PrintWriter logOut = new PrintWriter ( new FileOutputStream ( logFile.toFile(), false ) );
 			logOut.print( logBuffer.toString() );
 			logOut.close();
-
+			
+		} catch ( Exception e ) {
+			LOGGER.log ( Level.WARNING, "Unable to write initial log entries to log file", e );
+		}
+		
+		try {
 			FileHandler fileHandler = new FileHandler( logFile.toString(), true );     
 			fileHandler.setFormatter( new Formatter() {
 				SimpleDateFormat dateFormat = new SimpleDateFormat ( "MMM d, yyyy HH:mm:ss aaa" );
@@ -279,8 +288,7 @@ public class Hypnos extends Application {
 	        Logger.getLogger("").addHandler( fileHandler );
 	        
 		} catch ( IOException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log( Level.WARNING, "Unable to setup file handler for logger.", e );
 		}
 	}
 	
