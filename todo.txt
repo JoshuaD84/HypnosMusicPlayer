@@ -21,25 +21,8 @@ Bug Fixes / Incremental Improvements
 	Hotkeys aren't consumed, so they are passed to the current window. 
 		Check windows and OSX
 		Create website /help/linux-globalhotkey-consume/
-			
-	Persister.loadCurrentList()
-		This is from trying to run a new version of hypnos after having data from a previous version. 
-		Jul 15, 2017 5:42:38 PM net.joshuad.hypnos.Hypnos start
-		SEVERE: Exception caught at top level of Hypnos. Exiting.
-		java.lang.ClassCastException: java.util.ArrayList cannot be cast to net.joshuad.hypnos.CurrentListState
-			at net.joshuad.hypnos.Persister.loadCurrentList(Unknown Source)
-			at net.joshuad.hypnos.Persister.loadDataBeforeShowWindow(Unknown Source)
-			at net.joshuad.hypnos.Hypnos.start(Unknown Source)
-			at com.sun.javafx.application.LauncherImpl.lambda$launchApplication1$8(LauncherImpl.java:863)
-			at com.sun.javafx.application.PlatformImpl.lambda$runAndWait$7(PlatformImpl.java:326)
-			at com.sun.javafx.application.PlatformImpl.lambda$null$5(PlatformImpl.java:295)
-			at java.security.AccessController.doPrivileged(Native Method)
-			at com.sun.javafx.application.PlatformImpl.lambda$runLater$6(PlatformImpl.java:294)
-			at com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:95)
-			at com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
-			at com.sun.glass.ui.gtk.GtkApplication.lambda$null$5(GtkApplication.java:139)
-			at java.lang.Thread.run(Thread.java:748)
-
+	
+	Playlist popup can keep popping up, that's annoying. Only display once?
 	
 Post Beta fixes / updates / improvements 
 

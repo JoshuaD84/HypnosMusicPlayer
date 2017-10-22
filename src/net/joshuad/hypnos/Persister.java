@@ -6,7 +6,6 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -22,6 +21,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -124,33 +124,30 @@ public class Persister {
 			for ( String pathString : searchPaths ) {
 				library.requestUpdateSource( Paths.get( pathString ) );
 			}
-		} catch ( FileNotFoundException e ) {
-			System.out.println( "File not found: sources, unable to load library source location list, continuing." );
-		} catch ( IOException | ClassNotFoundException e ) {
-			e.printStackTrace(); // TODO:
+			
+		} catch ( Exception e ) {
+			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to read library source directory list from disk, continuing." );
 		}
+		
 	}
 
 	public void loadCurrentList () {
 		try ( ObjectInputStream currentListIn = new ObjectInputStream( new FileInputStream( currentFile ) ); ) {
 			player.getCurrentList().setState ( (CurrentListState)currentListIn.readObject() );
-		} catch ( FileNotFoundException e ) {
-			System.out.println( "File not found: current, unable to load current playlist, continuing." );
-		} catch ( IOException | ClassNotFoundException e ) {
-			// TODO:
-			e.printStackTrace();
+		
+		} catch ( Exception e ) {
+			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to read current list from disk, continuing." );
 		}
+		
 	}
 
 	@SuppressWarnings("unchecked")
 	public void loadQueue () {
 		try ( ObjectInputStream queueIn = new ObjectInputStream( new FileInputStream( queueFile ) ); ) {
 			player.getQueue().addAllTracks( (ArrayList <Track>) queueIn.readObject() );
-		} catch ( FileNotFoundException e ) {
-			System.out.println( "File not found: queue, unable to load queue, continuing." );
-		} catch ( IOException | ClassNotFoundException e ) {
-			// TODO:
-			e.printStackTrace();
+			
+		} catch ( Exception e ) {
+			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to read queue data from disk, continuing." );
 		}
 	}
 
@@ -158,11 +155,9 @@ public class Persister {
 	public void loadHistory () {
 		try ( ObjectInputStream historyIn = new ObjectInputStream( new FileInputStream( historyFile ) ); ) {
 			player.getHistory().setData( (ArrayList <Track>) historyIn.readObject() );
-		} catch ( FileNotFoundException e ) {
-			System.out.println( "File not found: history, unable to load queue, continuing." );
-		} catch ( IOException | ClassNotFoundException e ) {
-			// TODO:
-			e.printStackTrace();
+		
+		} catch ( Exception e ) {
+			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to read history from disk, continuing." );
 		}
 	}
 	
@@ -170,11 +165,8 @@ public class Persister {
 	public void loadHotkeys () {
 		try ( ObjectInputStream hotkeysIn = new ObjectInputStream( new FileInputStream( hotkeysFile ) ); ) {
 			hotkeys.setMap( (EnumMap <Hotkey, KeyState>) hotkeysIn.readObject() );
-		} catch ( FileNotFoundException e ) {
-			System.out.println( "File not found: history, unable to load queue, continuing." );
-		} catch ( IOException | ClassNotFoundException e ) {
-			// TODO:
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to read hotkeys from disk, continuing." );
 		}
 	}
 
@@ -184,17 +176,8 @@ public class Persister {
 			library.albums.addAll( (ArrayList <Album>) dataIn.readObject() );
 			library.tracks.addAll( (ArrayList <Track>) dataIn.readObject() );
 			
-		} catch ( FileNotFoundException e ) {
-			System.out.println( "File not found: data, unable to load albums and song lists, continuing." );
-		} catch ( IOException e ) {
-			// TODO:
-			e.printStackTrace();
-		} catch ( ClassNotFoundException | ClassCastException e ) {
-			//TODO: 
-			
 		} catch ( Exception e ) {
-			//TODO: 
-			
+			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to read library data from disk, continuing." );
 		}
 	}
 
@@ -211,9 +194,8 @@ public class Persister {
 
 			Files.move( tempSourcesFile.toPath(), sourcesFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
 			
-		} catch ( IOException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to save library source directory list to disk, continuing." );
 		}
 		
 	}
@@ -227,9 +209,8 @@ public class Persister {
 
 			Files.move( tempCurrentFile.toPath(), currentFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
 
-		} catch ( IOException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to save current list to disk, continuing." );
 		}
 	}
 
@@ -243,9 +224,8 @@ public class Persister {
 			
 			Files.move( tempQueueFile.toPath(), queueFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
 
-		} catch ( IOException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to save queue to disk, continuing." );
 		}
 	}
 
@@ -261,9 +241,8 @@ public class Persister {
 			
 			Files.move( tempHistoryFile.toPath(), historyFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
 
-		} catch ( IOException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to save history to disk, continuing." );
 		}
 	}
 	
@@ -278,9 +257,8 @@ public class Persister {
 			
 			Files.move( tempHotkeysFile.toPath(), hotkeysFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
 
-		} catch ( IOException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to save hotkeys to disk, continuing." );
 		}
 	}
 
@@ -310,9 +288,8 @@ public class Persister {
 			
 			Files.move( tempDataFile.toPath(), dataFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
 
-		} catch ( IOException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to save library data to disk, continuing." );
 		}
 	}
 
@@ -327,8 +304,7 @@ public class Persister {
 			}
 
 		} catch ( IOException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log( Level.WARNING, "Unable to load playlists from disk.", e );
 		}
 	}
 
@@ -444,9 +420,8 @@ public class Persister {
 			
 			Files.move( tempSettingsFile.toPath(), settingsFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
 
-		} catch ( IOException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to save settings to disk, continuing." );
 		}
 	}
 
@@ -499,11 +474,8 @@ public class Persister {
 				}
 			}
 
-		} catch ( FileNotFoundException e ) {
-			System.out.println( "File not found: settings, unable to load user settings, using defaults. Continuing." );
-		} catch ( IOException e ) {
-			// TODO:
-			e.printStackTrace();
+		} catch ( Exception e ) {
+			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to read settings from disk, continuing." );
 		}
 
 		ui.applySettings( loadMe );
