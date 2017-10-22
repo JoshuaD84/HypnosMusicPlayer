@@ -1390,7 +1390,7 @@ public class FXUI implements PlayerListener {
 				public void run() {
 					Image albumImage = track.getAlbumCoverImage();
 					Image artistImage = track.getAlbumArtistImage();
-				
+									
 					if ( !this.isInterrupted() ) { 
 						
 						Platform.runLater( () -> {
@@ -3595,7 +3595,13 @@ public class FXUI implements PlayerListener {
 				switch ( setting ) {
 					//TODO: These don't belong here. 
 					case TRACK:
-						Track track = new Track ( Paths.get( value ) );
+						Path trackPath = Paths.get( value );
+						Path albumPath = null;
+						if ( Utils.isAlbumDirectory( trackPath.toAbsolutePath().getParent() ) ) {
+							albumPath = trackPath.toAbsolutePath().getParent();
+						}
+						Track track = new Track ( trackPath, albumPath );
+						setImages( track );
 						player.playTrack( track, true );
 						break;
 						

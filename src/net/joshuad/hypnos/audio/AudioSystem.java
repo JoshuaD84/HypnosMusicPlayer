@@ -196,7 +196,6 @@ public class AudioSystem {
 			while ( currentListIterator.hasNext() ) {
 				if ( currentListIterator.next().getIsCurrentTrack() ) {
 					if ( currentListIterator.hasNext() ) {
-						System.out.println ( "Here." ); //TODO: DD
 						playTrack( currentListIterator.next(), startPaused );
 						didSomething = true;
 						

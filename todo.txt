@@ -3,27 +3,29 @@ New Features
 			
 Bug Fixes / Incremental Improvements
 
-	~incomplete/Grizzly Bear
-		F2 to show tag editor, no content in table
-
 	Fix up tag window
 		Group album issues?
 		Allow tracks to be clicked to bring up the tag editor window
 		
 	Data lost when computer turned off (logging out doesn't trigger, only a power down)
 		I don't think this is happening any more. 
-		
-	Show images when loading program and track is paused at start
-		
+				
 	Settings Window
 		Look at how I center Global hotkeys tab; center "settings" tab the same way
 		
 	Hotkeys aren't consumed, so they are passed to the current window. 
 		Check windows and OSX
 		Create website /help/linux-globalhotkey-consume/
+		
+	Play function is broken all over
+	
+	Disable console to log -- creating duplicated entries. 
 	
 Post Beta fixes / updates / improvements 
 
+	~incomplete/Grizzly Bear
+		F2 to show tag editor, no content in table
+		
 	Sometimes there are duplicated tracks in the track list
 	
 	Show images in tag window
