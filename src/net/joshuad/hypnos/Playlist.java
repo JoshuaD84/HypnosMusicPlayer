@@ -162,4 +162,16 @@ public class Playlist implements Serializable {
 			playlistOut.flush();
 		} 
 	}
+	
+	public String getBaseFilename() {
+		String fileSafeName = getName().replaceAll("\\W+", "");
+		
+		if ( fileSafeName.length() > 12 ) {
+			fileSafeName = fileSafeName.substring( 0, 12 );
+		}
+		
+		String baseFileName =  fileSafeName + getName().hashCode();
+		
+		return baseFileName;
+	}
 }

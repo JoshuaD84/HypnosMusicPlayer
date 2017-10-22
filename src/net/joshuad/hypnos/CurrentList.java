@@ -106,8 +106,12 @@ public class CurrentList {
 						}
 						
 						if ( track.needsUpdate() ) {
-							track.update();
-							break;
+							try {
+								track.update();
+								Thread.sleep( 100 );
+							} catch ( Exception e ) {
+								//No need to log anything, UI should show it
+							}
 						}
 					}
 

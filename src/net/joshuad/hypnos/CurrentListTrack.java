@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javafx.beans.property.BooleanProperty;
@@ -46,13 +45,9 @@ import javafx.beans.property.StringProperty;
 			return needsUpdate;
 		}
 		
-		public void update() {
-			try {
-				refreshTagData();
-				needsUpdate = false;
-			} catch ( Exception e ) {
-				LOGGER.log( Level.INFO, "Unable to refresh tag data for file: " + this.getFilename(), e );
-			}
+		public void update() throws Exception {
+			refreshTagData();
+			needsUpdate = false;
 		}
 		
 		
@@ -122,6 +117,9 @@ import javafx.beans.property.StringProperty;
 		
 		public void setIsMissingFile ( boolean missing ) {
 			fileIsMissing.set( missing );
+			if ( missing ) {
+				setIsCurrentTrack( false );
+			}
 		}
 		
 		private void readObject ( ObjectInputStream in ) throws IOException, ClassNotFoundException {

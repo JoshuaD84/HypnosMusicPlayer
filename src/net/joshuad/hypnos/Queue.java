@@ -120,7 +120,6 @@ public class Queue {
 	
 	public synchronized Track getNextTrack ( ) {
 		if ( queue.isEmpty() ) {
-			//TODO: throw new QueueException();
 			return null;
 		}
 		Track nextTrack = queue.remove ( 0 );

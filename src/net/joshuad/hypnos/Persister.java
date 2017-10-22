@@ -333,16 +333,22 @@ public class Persister {
 		}
 	}
 	
+	public void deletePlaylistFile ( Playlist playlist ) {
+		String baseFileName = playlist.getBaseFilename();
+		Path targetFile = playlistsDirectory.toPath().resolve (  baseFileName + ".m3u" );
+		
+		try {
+			Files.deleteIfExists( targetFile );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to delete playlist file: " + targetFile, e );
+		}
+	}
+	
+	
 	//Assumptions: playlist != null, playlist.name is not null or empty, and no playlists in library have the same name. 
 	private void saveLibaryPlaylist ( Playlist playlist ) throws IOException {
 		
-		String fileSafeName = playlist.getName().replaceAll("\\W+", "");
-		
-		if ( fileSafeName.length() > 12 ) {
-			fileSafeName = fileSafeName.substring( 0, 12 );
-		}
-		
-		String baseFileName =  fileSafeName + playlist.getName().hashCode();
+		String baseFileName = playlist.getBaseFilename();
 		Path targetFile = playlistsDirectory.toPath().resolve (  baseFileName + ".m3u" );
 		Path backupFile = playlistsDirectory.toPath().resolve ( baseFileName + ".m3u.backup" );
 		Path tempFile = playlistsDirectory.toPath().resolve ( baseFileName + ".m3u.temp" );

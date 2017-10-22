@@ -53,9 +53,12 @@ public class LibraryUpdater {
 					
 					//TODO: make sure these don't violate MAX_CHANGES like above, but whatever do it later not gonna happen. 
 					synchronized ( library.playlistsToRemove ) {
-						library.playlists.removeAll( library.playlistsToRemove );
+						for ( Playlist deleteMe : library.playlistsToRemove ) {
+							library.playlists.remove ( deleteMe );
+							Hypnos.getPersister().deletePlaylistFile( deleteMe );
+						}
+						
 						library.playlistsToRemove.clear();
-
 						ui.updatePlaylistPlaceholder();
 					}
 				

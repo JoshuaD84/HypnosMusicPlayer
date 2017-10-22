@@ -15,6 +15,8 @@ Bug Fixes / Incremental Improvements
 	Hotkeys aren't consumed, so they are passed to the current window. 
 		Check windows and OSX
 		Create website /help/linux-globalhotkey-consume/
+		
+	Deleted playlists aren't removed from hard drive
 	
 Post Beta New Features		
 	Add default sort column choice, like shuffle and repeat
