@@ -44,7 +44,7 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 					library.addTracks( album.getTracks() );
 					
 					return FileVisitResult.SKIP_SIBLINGS;
-				} catch ( IOException e ) {
+				} catch ( Exception e ) {
 					LOGGER.log( Level.INFO, "Unable to load album track", e );
 					return FileVisitResult.CONTINUE;
 				}
@@ -56,7 +56,7 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 					if ( !library.containsTrack( track ) ) {
 						library.addTrack( track );
 					}
-				} catch ( IOException e ) { 
+				} catch ( Exception e ) { 
 					LOGGER.log( Level.INFO, "Unable to load track", e );
 				}
 

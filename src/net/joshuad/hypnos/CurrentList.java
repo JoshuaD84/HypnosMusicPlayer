@@ -1,6 +1,5 @@
 package net.joshuad.hypnos;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -275,42 +274,36 @@ public class CurrentList {
 	
 	
 	public void moveTracks ( List<Integer> fromLocations, int toLocation ) {
-		Runnable runMe = new Runnable() {
-			public void run() {
-				if ( fromLocations == null ) {
-					LOGGER.fine( "Recieved a null list, ignoring request." );
-					return;
-				}
-				
-				if ( fromLocations.size() == 0 ) {
-					LOGGER.fine( "Recieved an empty list, ignoring request." );
-					return;
-				}
-						
-				ArrayList <CurrentListTrack> tracksToMove = new ArrayList <CurrentListTrack> ( fromLocations.size() );
-				
-				for ( int index : fromLocations ) {
-					if ( index >= 0 && index < items.size() ) {
-						tracksToMove.add( items.get( index ) );
-					}
-				}
-				
-				for ( int k = fromLocations.size() - 1; k >= 0; k-- ) {
-					int index = fromLocations.get( k ).intValue();
-					if ( index >= 0 && index < items.size() ) {
-						items.remove ( index );
-					}
-				}
+		if ( fromLocations == null ) {
+			LOGGER.fine( "Recieved a null list, ignoring request." );
+			return;
+		}
 		
-				if ( tracksToMove.size() > 0 ) {
-					items.addAll( toLocation, tracksToMove );
-					listReordered();
-				}
+		if ( fromLocations.size() == 0 ) {
+			LOGGER.fine( "Recieved an empty list, ignoring request." );
+			return;
+		}
+				
+		ArrayList <CurrentListTrack> tracksToMove = new ArrayList <CurrentListTrack> ( fromLocations.size() );
+		
+		for ( int index : fromLocations ) {
+			if ( index >= 0 && index < items.size() ) {
+				tracksToMove.add( items.get( index ) );
 			}
-		};
+		}
 		
-		doThreadAware ( runMe );
-		
+		for ( int k = fromLocations.size() - 1; k >= 0; k-- ) {
+			int index = fromLocations.get( k ).intValue();
+			if ( index >= 0 && index < items.size() ) {
+				items.remove ( index );
+			}
+		}
+
+		if ( tracksToMove.size() > 0 ) {
+			if ( toLocation > items.size() ) toLocation = items.size();
+			items.addAll( toLocation, tracksToMove );
+			listReordered();
+		}
 	}
 	
 	public void setTrack ( String location ) {
@@ -427,7 +420,7 @@ public class CurrentList {
 						addItem ( targetIndex, new CurrentListTrack ( path ) );
 						targetIndex++;
 						tracksAdded++;
-					} catch ( IOException | NullPointerException e ) {
+					} catch ( Exception e ) {
 						LOGGER.info( " -- Couldn't load track: " + path.toString() + ". Skipping." );
 					}
 				}

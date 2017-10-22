@@ -1,4 +1,4 @@
-
+New Features
 			
 Bug Fixes / Incremental Improvements
 
@@ -6,7 +6,7 @@ Bug Fixes / Incremental Improvements
 		Group album issues?
 		Allow tracks to be clicked to bring up the tag editor window
 		
-	Data lost when computer turned off (logging out doesn't trigger, only a power down)
+	Data lost when computer turned off (logging out doesn't trigger, only a power down while hypnos is running)
 		I don't think this is happening any more. 
 				
 	Settings Window

@@ -121,7 +121,7 @@ public class MP4Decoder extends AbstractDecoder {
 			}
 		
 		} catch ( IOException | LineUnavailableException e ) {
-			//TODO: logging
+			LOGGER.log( Level.WARNING, "Unable to get output line for audio, for file: " + track.getFilename(), e );
 			return false;
 		}
 		

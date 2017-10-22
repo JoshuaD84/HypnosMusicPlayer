@@ -241,8 +241,13 @@ public class Hypnos extends Application {
 		File configDirectory = Hypnos.getConfigDirectory().toFile();
 		
 		if ( !configDirectory.exists() ) {
-			boolean created = configDirectory.mkdirs();
-			// TODO: check created
+			LOGGER.info( "Config directory doesn't exist, creating: " + Hypnos.getConfigDirectory() );
+			try {
+				boolean created = configDirectory.mkdirs();
+			} catch ( Exception e ) {
+				LOGGER.info( "Unable to create config directory, data will not be saved." );
+				//TODO: Actually notify user?
+			}
 		}
 
 		if ( !configDirectory.isDirectory() ) {

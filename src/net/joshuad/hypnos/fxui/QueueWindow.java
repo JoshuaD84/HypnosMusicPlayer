@@ -318,7 +318,7 @@ public class QueueWindow extends Stage {
 					for ( Path path : pathsToAdd ) {
 						try {
 							tracksToAdd.add( new Track ( path ) );
-						} catch ( IOException e ) {
+						} catch ( Exception e ) {
 							LOGGER.info ( "Error loading track: " + path );
 						}
 					}
@@ -411,7 +411,7 @@ public class QueueWindow extends Stage {
 				for ( Path path : pathsToAdd ) {
 					try {
 						tracksToAdd.add( new Track ( path ) );
-					} catch ( IOException e ) {
+					} catch ( Exception e ) {
 						LOGGER.info ( "Error loading track: " + path );
 					}
 				}
@@ -558,10 +558,7 @@ public class QueueWindow extends Stage {
 		for ( Track track : queueTable.getItems() ) {
 			try {
 				track.refreshTagData();
-			} catch ( IOException e ) {
-				LOGGER.info( "Unable to update the tag info for track in queue, removing it: " + track.getFilename() );
-				queueTable.getItems().remove( track );
-			}
+			} catch ( Exception e ) {}
 		}
 		queueTable.refresh();
 	}

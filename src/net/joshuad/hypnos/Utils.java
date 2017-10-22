@@ -209,16 +209,23 @@ public class Utils {
 			for ( Path child : stream ) {
 				if ( isAlbumDirectory ( child ) ) {
 					entries++;
-					Album album = new Album ( child );
-					int matchPercent = FuzzySearch.weightedRatio( directoryName, prepareArtistForCompare ( album.getAlbumArtist() ) );
-					if ( matchPercent < 90 ) return false;
-					
+					try {
+						Album album = new Album ( child );
+						int matchPercent = FuzzySearch.weightedRatio( directoryName, prepareArtistForCompare ( album.getAlbumArtist() ) );
+						if ( matchPercent < 90 ) return false;
+					} catch ( Exception e ) {
+						continue;
+					}					
 					
 				} else if ( isMusicFile( child ) ) {
 					entries++;
-					Track track = new Track ( child );
-					int matchPercent = FuzzySearch.weightedRatio( directoryName, prepareArtistForCompare ( track.getAlbumArtist() ) );
-					if ( matchPercent < 90 ) return false;
+					try {
+						Track track = new Track ( child );
+						int matchPercent = FuzzySearch.weightedRatio( directoryName, prepareArtistForCompare ( track.getAlbumArtist() ) );
+						if ( matchPercent < 90 ) return false;
+					} catch ( Exception e ) {
+						continue;
+					}
 				}
 			}
 		} catch ( IOException e ) {
@@ -270,23 +277,27 @@ public class Utils {
 				}
 				
 				if ( Utils.isMusicFile( child ) ) {
-					Track track = new Track ( child );
-					if ( albumName == null ) {
-						albumName = prepareAlbumForCompare ( track.getSimpleAlbumTitle() );
-						artistName = prepareArtistForCompare ( track.getAlbumArtist() );
-						
-					} else {
-						int albumMatchPercent = FuzzySearch.weightedRatio( albumName, prepareAlbumForCompare ( track.getSimpleAlbumTitle() ) );
-						if ( albumMatchPercent < 90 ) {
-							return false;
+					try {
+						Track track = new Track ( child );
+						if ( albumName == null ) {
+							albumName = prepareAlbumForCompare ( track.getSimpleAlbumTitle() );
+							artistName = prepareArtistForCompare ( track.getAlbumArtist() );
+							
+						} else {
+							int albumMatchPercent = FuzzySearch.weightedRatio( albumName, prepareAlbumForCompare ( track.getSimpleAlbumTitle() ) );
+							if ( albumMatchPercent < 90 ) {
+								return false;
+							}
+							
+							int artistMatchPercent = FuzzySearch.weightedRatio( artistName, prepareArtistForCompare ( track.getAlbumArtist() ) );
+							if ( artistMatchPercent < 90 ) {
+								return false;
+							}
 						}
-						
-						int artistMatchPercent = FuzzySearch.weightedRatio( artistName, prepareArtistForCompare ( track.getAlbumArtist() ) );
-						if ( artistMatchPercent < 90 ) {
-							return false;
-						}
+						hasChildTrack = true;
+					} catch ( Exception e ) {
+						continue;
 					}
-					hasChildTrack = true;
 				}
 			}
 		} catch ( IOException e ) {

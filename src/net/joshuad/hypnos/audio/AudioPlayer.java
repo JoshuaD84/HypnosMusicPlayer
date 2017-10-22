@@ -311,7 +311,7 @@ public class AudioPlayer {
 				decoder = new MP3Decoder ( track );
 				break;
 				
-			case AAC:
+			case M4A:
 				decoder = new MP4Decoder ( track );
 				break;
 				

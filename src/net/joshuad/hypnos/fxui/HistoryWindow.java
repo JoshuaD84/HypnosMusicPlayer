@@ -202,7 +202,6 @@ public class HistoryWindow extends Stage {
 			}
 		};
 		
-		//TODO: I don't know if this is right; 
 		library.getPlaylistSorted().addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
 			ui.updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		});
@@ -337,18 +336,10 @@ public class HistoryWindow extends Stage {
 	}
 
 	public void refresh () {
-		List <Track> removeMe = new ArrayList <Track> ();
 		for ( Track track : historyTable.getItems() ) {
 			try {
 				track.refreshTagData();
-			} catch ( IOException e ) {
-				LOGGER.info( "Unable to update the tag info for track in history, removing it: " + track.getFilename() );
-				removeMe.add( track );
-			}
+			} catch ( Exception e ) {}
 		}
-
-		historyTable.getItems().removeAll( removeMe );
-		historyTable.refresh();
 	}
-
 }

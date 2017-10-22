@@ -377,7 +377,7 @@ public class FXUI implements PlayerListener {
 
 		primaryContainer.prefWidthProperty().bind( scene.widthProperty() );
 		primaryContainer.prefHeightProperty().bind( scene.heightProperty() );
-		primaryContainer.setPadding( new Insets( 0 ) ); // TODO:
+		primaryContainer.setPadding( new Insets( 0 ) ); 
 		primaryContainer.setCenter( primarySplitPane );
 		primaryContainer.setTop( transport );
 
@@ -466,7 +466,7 @@ public class FXUI implements PlayerListener {
 		}
 		
 		try {
-			Font font = Font.loadFont( new FileInputStream ( fontPath.toFile() ), 12 ); //TODO: Rename. 
+			Font font = Font.loadFont( new FileInputStream ( fontPath.toFile() ), 12 ); 
 			Font.loadFont( new FileInputStream ( fontBold.toFile() ), 12 );
 			scene.getStylesheets().add( "file:///" + stylesheet.toFile().getAbsolutePath().replace( "\\", "/" ) );
 		} catch ( Exception e ) {
@@ -2357,7 +2357,6 @@ public class FXUI implements PlayerListener {
 		trackTable.getSortOrder().add( albumColumn );
 		trackTable.getSortOrder().add( trackColumn );
 		FixedWidthCustomResizePolicy resizePolicy = new FixedWidthCustomResizePolicy();
-		// TODO resizePolicy.registerColumns ( lengthColumn );
 		trackTable.setColumnResizePolicy( resizePolicy );
 		
 		emptyTrackListLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
@@ -3291,7 +3290,10 @@ public class FXUI implements PlayerListener {
 							
 							currentListTable.getSelectionModel().clearSelection();
 							for ( int k = 0; k < draggedIndices.size(); k++ ) {
-								currentListTable.getSelectionModel().select( dropIndex + k );
+								int selectIndex = dropIndex + k;
+								if ( selectIndex < currentListTable.getItems().size() ) {
+									currentListTable.getSelectionModel().select( dropIndex + k );
+								}
 							}
 						} break;
 						
@@ -3532,12 +3534,11 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public void refreshCurrentList () {
-		for ( Track track : currentListTable.getItems() ) {
+		for ( CurrentListTrack track : currentListTable.getItems() ) {
 			try {
 				track.refreshTagData();
-			} catch ( IOException e ) {
-				LOGGER.info( "Unable to update the tag info for track on current list, removing it from the list: " + track.getFilename() );
-				currentListTable.getItems().remove( track );
+			} catch ( Exception e ) {
+				track.setIsMissingFile( true ); //TODO: Do we want to make another flag or rename isMissingFile?
 			}
 		}
 		currentListTable.refresh();
@@ -3552,11 +3553,6 @@ public class FXUI implements PlayerListener {
 		trackTable.refresh();
 	}
 
-	//TODO: get rid of this. Use a listener paradigm instead
-	public Slider getPositionSlider () {
-		return trackPositionSlider;
-	}
-	
 	public void applySettings( EnumMap<Persister.Setting, String> settings ) {
 		settings.forEach( ( setting, value )-> {
 			try {

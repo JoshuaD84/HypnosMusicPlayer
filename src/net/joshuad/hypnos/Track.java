@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.channels.ClosedByInterruptException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,7 +18,6 @@ import java.util.logging.Logger;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.CannotWriteException;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.FieldKey;
@@ -48,7 +48,11 @@ public class Track implements Serializable {
 		MP3 ( "mp3" ),
 		OGG ( "ogg" ),
 		WAV ( "wav" ),
-		AAC ( "m4a" ),
+		M4A ( "m4a" ),
+		M4B ( "m4b" ),
+		M4R ( "m4r" ),
+		AAC ( "AAC" ),
+		
 		UNKNOWN ( "" );
 		
 		final String extension;
@@ -152,12 +156,12 @@ public class Track implements Serializable {
 		}*/
 	}
 	
-	public Track ( Path trackPath ) throws IOException {
+	public Track ( Path trackPath ) throws Exception {
 		this.trackFile = trackPath.toFile();
 		refreshTagData();
 	}
 	
-	public Track ( Path trackPath, Path albumPath ) throws IOException {
+	public Track ( Path trackPath, Path albumPath ) throws Exception {
 		this ( trackPath );
 		if ( albumPath != null ) {
 			this.albumDirectory = albumPath.toFile();
@@ -172,55 +176,46 @@ public class Track implements Serializable {
 		}
 	}
 		
-	//TODO: Why does it catch all other exceptions but throw IO? 
-	public void refreshTagData() throws IOException {
+	public void refreshTagData() throws Exception {
 		Tag tag = null;
-		try {
-			Logger.getLogger( "org.jaudiotagger" ).setLevel( Level.OFF ); 
-			AudioFile audioFile = getAudioFile();
-			
-			length = audioFile.getAudioHeader().getTrackLength();
-			tag = audioFile.getTag();
-			
-			isLossless = audioFile.getAudioHeader().isLossless();
-			bitRate = audioFile.getAudioHeader().getBitRateAsNumber();
-			sampleRate = audioFile.getAudioHeader().getSampleRateAsNumber();
-			isVBR = audioFile.getAudioHeader().isVariableBitRate();
-			encodingType = audioFile.getAudioHeader().getEncodingType();
-			format = audioFile.getAudioHeader().getFormat();
-
-			parseArtist( tag );
-			parseTitle( tag ); 
-			parseAlbum( tag );
-			parseDate( tag );
-			parseTrackNumber( tag );
-			parseDiscInfo( tag );
-			parseReleaseType( tag );	
-			
-		} catch ( CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e1 ) {
-			LOGGER.log( Level.INFO, e1.getClass().toString() + " while read tags on file: " + trackFile.toString() + ", using file name." );
-			
-		} catch ( Exception e ) {
-			//This can happen sometimes TODO:
-		}
+		Logger.getLogger( "org.jaudiotagger" ).setLevel( Level.OFF ); 
+		AudioFile audioFile = getAudioFile();
 		
+		length = audioFile.getAudioHeader().getTrackLength();
+		tag = audioFile.getTag();
+		
+		isLossless = audioFile.getAudioHeader().isLossless();
+		bitRate = audioFile.getAudioHeader().getBitRateAsNumber();
+		sampleRate = audioFile.getAudioHeader().getSampleRateAsNumber();
+		isVBR = audioFile.getAudioHeader().isVariableBitRate();
+		encodingType = audioFile.getAudioHeader().getEncodingType();
+		format = audioFile.getAudioHeader().getFormat();
+
+		parseArtist( tag );
+		parseTitle( tag ); 
+		parseAlbum( tag );
+		parseDate( tag );
+		parseTrackNumber( tag );
+		parseDiscInfo( tag );
+		parseReleaseType( tag );	
 		parseFileName();
 	}
 	
 	private AudioFile getAudioFile() throws IOException, CannotReadException, TagException, ReadOnlyFileException, InvalidAudioFrameException {
+		
 		int i = trackFile.toString().lastIndexOf('.');
 		String extension = "";
 		if( i > 0 ) {
 		    extension = trackFile.toString().substring(i+1).toLowerCase();
 		}
 		
-		if ( extension.matches( "aac" ) || extension.matches( "m4r" ) ) {
-			//TODO: Do this better
+		if ( extension.matches( Format.AAC.getExtension() ) || extension.matches( Format.M4R.getExtension() ) ) {
 			return AudioFileIO.readAs( trackFile, "m4a" );
 			
 		} else {
 			return AudioFileIO.read( trackFile );
 		}
+
 		
 	}
 	
@@ -275,7 +270,7 @@ public class Track implements Serializable {
 	}
 	
 	private void parseArtist( Tag tag ) {
-		//TODO: Do we want to do antyhing with FieldKey.ARTISTS or .ALBUM_ARTISTS or .ALBUM_ARTIST_SORT?
+		// Do we want to do antyhing with FieldKey.ARTISTS or .ALBUM_ARTISTS or .ALBUM_ARTIST_SORT?
 		if ( tag != null ) {
 			albumArtist = tag.getFirst ( FieldKey.ALBUM_ARTIST );
 			artist = tag.getFirst ( FieldKey.ARTIST );
@@ -375,11 +370,13 @@ public class Track implements Serializable {
 			} catch ( UnsupportedOperationException e ) {
 				//No problem, it doesn't exist for this file format
 			}
+			
+			
 			try {
 				discCount = Integer.valueOf( tag.getFirst ( FieldKey.DISC_TOTAL ) );
 			} catch ( NumberFormatException e ) {
 				if ( ! tag.getFirst ( FieldKey.DISC_TOTAL ).equals( "" ) ) {
-					//TODO: LOGGER.log( Level.INFO, "Invalid disc count: " + tag.getFirst ( FieldKey.DISC_TOTAL )  + " - " + trackFile.toString() );
+					tagErrorsToAdd.add( new TagError ( getPath(), "Invalid disc total format: " + tag.getFirst ( FieldKey.DISC_TOTAL ), TagError.Severity.MAJOR ) );
 				}
 			} catch ( UnsupportedOperationException e ) {
 				//No problem, it doesn't exist for this file format
@@ -525,7 +522,6 @@ public class Track implements Serializable {
 				return "AAC " + bitRate;
 			}
 		} else {
-			//TODO: probably worth logging this
 			return encodingType;
 		}
 	}
@@ -544,19 +540,19 @@ public class Track implements Serializable {
 		} else if ( testExtension.equals( Format.OGG.getExtension() ) ) {
 			return Format.OGG;
 			
-		} else if ( testExtension.equals( Format.AAC.getExtension() ) ) {
-			return Format.AAC;
+		} else if ( testExtension.equals( Format.M4A.getExtension() ) ) {
+			return Format.M4A;
 			
 		} else if ( testExtension.equals( Format.WAV.getExtension() ) ) {
 			return Format.WAV;
 			
-		} else if ( testExtension.equals( "m4b" ) ) { //TODO: do this right
-			return Format.AAC;
+		} else if ( testExtension.equals( Format.M4B.getExtension() ) ) {
+			return Format.M4B;
 			
-		} else if ( testExtension.equals( "m4r" ) ) { //TODO: do this right
-			return Format.AAC;
+		} else if ( testExtension.equals( Format.M4R.getExtension() ) ) {
+			return Format.M4R;
 			
-		} else if ( testExtension.equals( "aac" ) ) { //TODO: do this right
+		} else if ( testExtension.equals( Format.AAC.getExtension() ) ) {
 			return Format.AAC;
 		
 		} else {
@@ -772,8 +768,8 @@ public class Track implements Serializable {
 						}
 					}
 				
-				} catch ( IOException e ) {
-					//TODO: I think we can ignore this one. 
+				} catch ( Exception e ) {
+					LOGGER.log( Level.INFO, "Unable to get directory listing: " + this.getPath().getParent(), e ); 
 				}
 				
 				for ( Path test : otherFiles ) {
@@ -808,10 +804,10 @@ public class Track implements Serializable {
 					} 
 				}
 			}			
-		} catch ( NullPointerException | IOException | CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
-			//TODO: ?
+		} catch ( ClosedByInterruptException e ) {
+			//Do nothing
 		} catch ( Exception e ) {
-			//TODO: This can happen
+			LOGGER.log( Level.INFO, "Unable to load album image from tag for file: " + getFilename(), e );
 		}
 		
 		Path bestPath = getPreferredAlbumCoverPath ();
@@ -834,10 +830,8 @@ public class Track implements Serializable {
 				}
 			}			
 			
-		} catch ( NullPointerException | IOException | CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
-			//I don't think we need to do anything here; if we can't load an image from tags, that's OK. 
 		} catch ( Exception e ) {
-			//TODO: This can happen
+			LOGGER.log( Level.INFO, "Unable to load album image from tag for file: " + getFilename(), e );
 		}
 
 		Path otherPaths = getSecondaryAlbumCoverPath ();
@@ -862,7 +856,7 @@ public class Track implements Serializable {
 	
 	private Image getTagArtistImage () {
 		try {
-			List<Artwork> artworkList = getAudioFile().getTag().getArtworkList(); //TODO: This line can throw a NPE
+			List<Artwork> artworkList = getAudioFile().getTag().getArtworkList(); 
 			if ( artworkList != null ) {
 				for ( Artwork artwork : artworkList ) {
 					
@@ -874,7 +868,7 @@ public class Track implements Serializable {
 			}			
 	
 		} catch ( Exception e ) {
-			LOGGER.log( Level.INFO, "Unable to load artist image from tag.", e );
+			LOGGER.log( Level.INFO, "Unable to load artist image from tag for file: " + getFilename(), e );
 		}
 		
 		return null;

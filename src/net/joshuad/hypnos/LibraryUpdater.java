@@ -117,7 +117,11 @@ public class LibraryUpdater {
 								Album updateSource = library.albumsToUpdate.remove( 0 );
 								if ( library.albums.contains( updateSource ) ) {
 									Album updateMe = library.albums.get( library.albums.indexOf( updateSource ) );
-									//TODO: I don't see any update taking place here. 
+									try {
+										updateMe.updateData();
+									} catch ( Exception e ) {
+										library.albums.remove( updateMe );
+									}
 								} else {
 									library.albums.add( updateSource );
 								}

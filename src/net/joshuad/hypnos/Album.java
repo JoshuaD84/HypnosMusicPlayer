@@ -17,19 +17,22 @@ public class Album implements Serializable {
 	private File directory;
 	ArrayList <Track> tracks;
 	
-	Album ( Path albumDirectory ) throws IOException {
+	Album ( Path albumDirectory ) throws Exception {
 		this.directory = albumDirectory.toFile();
 		
-
+		updateData();
+	}
+	
+	public void updateData () throws Exception {
 		tracks = new ArrayList <Track> ();
 		
 		try (
-			DirectoryStream <Path> albumDirectoryStream = Files.newDirectoryStream ( albumDirectory, Utils.musicFileFilter );	
+			DirectoryStream <Path> albumDirectoryStream = Files.newDirectoryStream ( directory.toPath(), Utils.musicFileFilter );	
 		) {
 			tracks = new ArrayList <Track> ();
 					
 			for ( Path trackPath : albumDirectoryStream ) {
-				tracks.add( new Track ( trackPath, albumDirectory ) );
+				tracks.add( new Track ( trackPath, directory.toPath() ) );
 			}
 			
 			tracks.sort ( Comparator.comparing( Track::getTrackNumber ) );

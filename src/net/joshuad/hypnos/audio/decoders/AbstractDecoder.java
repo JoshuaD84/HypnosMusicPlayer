@@ -22,7 +22,6 @@ public abstract class AbstractDecoder {
 	public void initialize() {
 		boolean streamOpened = openStreamsAt ( 0 );
 		if ( streamOpened == false ) {
-			//TODO: handle this better? 
 			throw new IllegalStateException ( "Unable to open stream" );
 		}
 		
@@ -120,7 +119,7 @@ public abstract class AbstractDecoder {
 				return 1;
 			}
 		} catch ( Exception e ) {
-			//TODO: Log? I don't know
+			LOGGER.info ( "Unable to get volume percent, assuming 100%: " + track.getFilename() );
 			return 1;
 		}
 	}

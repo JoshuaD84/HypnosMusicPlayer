@@ -372,7 +372,7 @@ public class PlaylistInfoWindow extends Stage {
 					for ( Path path : pathsToAdd ) {
 						try {
 							tracksToAdd.add( new Track ( path ) );
-						} catch ( IOException e ) {
+						} catch ( Exception e ) {
 							LOGGER.info ( "Error loading track: " + path );
 						}
 					}
