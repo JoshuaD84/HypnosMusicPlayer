@@ -14,6 +14,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -49,6 +50,7 @@ import javafx.stage.WindowEvent;
 import net.joshuad.hypnos.CurrentList.DefaultRepeatMode;
 import net.joshuad.hypnos.CurrentList.DefaultShuffleMode;
 import net.joshuad.hypnos.Hypnos;
+import net.joshuad.hypnos.Hypnos.OS;
 import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys.Hotkey;
@@ -89,7 +91,7 @@ public class SettingsWindow extends Stage {
 		initModality( Modality.NONE );
 		initOwner( ui.getMainStage() );		
 		setWidth ( 500 );
-		setHeight ( 600 );
+		setHeight ( 650 );
 		setTitle( "Config and Info" );
 		Pane root = new Pane();
 		Scene scene = new Scene( root );
@@ -208,12 +210,40 @@ public class SettingsWindow extends Stage {
 		}
 		
 		Label clearHotkeyLabel = new Label ( "(Use <ESC> to erase a global hotkey)" );
-		clearHotkeyLabel.setPadding( new Insets ( 20, 0, 0, 0 ) );
+		clearHotkeyLabel.setPadding( new Insets ( 20, 0, 20, 0 ) );
 		clearHotkeyLabel.setWrapText( true );
 		clearHotkeyLabel.setTextAlignment( TextAlignment.CENTER );
 		globalContent.add( clearHotkeyLabel, 0, row, 2, 1 );
 		GridPane.setHalignment( clearHotkeyLabel, HPos.CENTER );
 		row++;
+		
+		if ( Hypnos.getOS() == OS.NIX ) {
+			
+			Hyperlink consumeHotkeyNote = new Hyperlink ( "Note: On Linux global hotkeys can not be consumed. Click here to read how to address this problem." );
+
+			String url = "http://www.hypnosplayer.org/help/linux-global-hotkey-consume/";
+			consumeHotkeyNote.setTooltip( new Tooltip ( url ) );
+			
+			consumeHotkeyNote.setOnAction(new EventHandler<ActionEvent>() {
+			    @Override
+			    public void handle(ActionEvent e) {
+			    	try {
+						new ProcessBuilder("x-www-browser", url ).start();
+					} catch ( IOException e1 ) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+			    }
+			});
+			
+			consumeHotkeyNote.setPadding( new Insets ( 0, 0, 0, 0 ) );
+			consumeHotkeyNote.setWrapText( true );
+			consumeHotkeyNote.setTextAlignment( TextAlignment.CENTER );
+			globalContent.add( consumeHotkeyNote, 0, row, 2, 1 );
+			GridPane.setHalignment( consumeHotkeyNote, HPos.CENTER );
+			row++;
+			
+		}
 		
 		return hotkeysTab;
 	}

@@ -6,8 +6,6 @@ Bug Fixes / Incremental Improvements
 	~incomplete/Grizzly Bear
 		F2 to show tag editor, no content in table
 
-	Artist Image - Clear Artist Image for this Track
-
 	Fix up tag window
 		Group album issues?
 		Allow tracks to be clicked to bring up the tag editor window
@@ -18,12 +16,16 @@ Bug Fixes / Incremental Improvements
 	Data lost when computer turned off (logging out doesn't trigger, only a power down)
 		I don't think this is happening any more. 
 		
+	Show images when loading program and track is paused at start
+		
 	Settings Window
 		Look at how I center Global hotkeys tab; center "settings" tab the same way
 		
 	Hotkeys aren't consumed, so they are passed to the current window. 
 		Check windows and OSX
-		for Linux, just add a label to the dialog and tell them to consume the hotkey using some other program
+		Create website /help/linux-globalhotkey-consume/
+		
+	Volume disabled indicator via tooltip
 			
 	Persister.loadCurrentList()
 		This is from trying to run a new version of hypnos after having data from a previous version. 
@@ -45,6 +47,10 @@ Bug Fixes / Incremental Improvements
 
 	
 Post Beta fixes / updates / improvements 
+
+	Show images in tag window
+		Allow the deletion of embedded images
+		
 	Change css selector for .scroll-bar:horizontal to an applied class, so only chosen h-scrollbars are hidden
 
 	Library load and unload time
