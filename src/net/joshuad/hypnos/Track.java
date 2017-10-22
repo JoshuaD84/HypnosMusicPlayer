@@ -154,7 +154,6 @@ public class Track implements Serializable {
 	
 	public Track ( Path trackPath ) throws IOException {
 		this.trackFile = trackPath.toFile();
-		Logger.getLogger( "org.jaudiotagger" ).setLevel( Level.OFF ); //TODO: this is wierd, can we do this top level? Not even in every constructor
 		refreshTagData();
 	}
 	
@@ -177,6 +176,7 @@ public class Track implements Serializable {
 	public void refreshTagData() throws IOException {
 		Tag tag = null;
 		try {
+			Logger.getLogger( "org.jaudiotagger" ).setLevel( Level.OFF ); 
 			AudioFile audioFile = getAudioFile();
 			
 			length = audioFile.getAudioHeader().getTrackLength();
