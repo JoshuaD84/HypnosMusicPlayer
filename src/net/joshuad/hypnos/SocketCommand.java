@@ -11,7 +11,7 @@ public class SocketCommand implements Serializable {
 		SET_TRACKS
 	}
 	
-	//TODO: Maybe change these to enums
+	//REFACTOR: Maybe change these to enums
 	public static final int NEXT = 0;
 	public static final int PREVIOUS = 1;
 	public static final int PAUSE = 2;

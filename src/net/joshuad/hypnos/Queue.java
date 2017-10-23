@@ -95,7 +95,6 @@ public class Queue {
 	}
 	
 	public synchronized Track get ( int index ) {
-		//TODO: Error checking, or just pass it through and let an error happen? 
 		return queue.get( index );
 	}
 	

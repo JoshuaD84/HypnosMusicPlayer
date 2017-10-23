@@ -263,7 +263,7 @@ public class HistoryWindow extends Stage {
 					ArrayList<Integer> removeMeIndices = new ArrayList<Integer> ( selectedIndices );
 					
 					for ( int k = removeMeIndices.size() - 1; k >= 0 ; k-- ) {
-						//TODO: probably put the remove code somewhere else. 
+						//REFACTOR: probably put the remove code somewhere else. 
 						historyTable.getItems().remove( removeMeIndices.get( k ).intValue() );
 					}
 				}

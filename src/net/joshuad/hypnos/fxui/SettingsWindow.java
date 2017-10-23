@@ -645,7 +645,6 @@ public class SettingsWindow extends Stage {
 						try {
 							Thread.sleep( 1000 );
 						} catch ( InterruptedException ie ) {
-							// TODO:
 						}
 					} else {
 						Platform.runLater( () -> {

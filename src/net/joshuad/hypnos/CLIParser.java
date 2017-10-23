@@ -17,7 +17,7 @@ public class CLIParser {
 
 	private static final Logger LOGGER = Logger.getLogger( CLIParser.class.getName() );
 	
-	//TODO: Combine these into an Enum with the things in SingleInstanceController and the strings in constructor below. 
+	//REFACTOR: Combine these into an Enum with the things in SingleInstanceController and the strings in constructor below. 
 	private static final String HELP = "help";
 	private static final String NEXT = "next";
 	private static final String PREVIOUS = "previous";

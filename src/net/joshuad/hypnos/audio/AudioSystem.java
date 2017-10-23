@@ -226,7 +226,6 @@ public class AudioSystem {
 			if ( repeatMode == RepeatMode.REPEAT ) {
 				
 				shuffleTracksPlayedCounter = 1;
-				// TODO: I think there may be issues with multithreading here.
 				// TODO: Ban the most recent X tracks from playing
 				int currentListSize = currentList.getItems().size();
 				int collisionWindowSize = currentListSize / 3; // TODO: Fine tune this amount
@@ -482,7 +481,7 @@ public class AudioSystem {
 	
 	
 	
-//TODO: Make these a listener interface, and add this object as a listener to player? 	
+//REFACTOR: Make these a listener interface, and add this object as a listener to player? 	
 	
 	void playerStopped ( StopReason reason ) { 
 		if ( reason == StopReason.TRACK_FINISHED ) {
@@ -541,7 +540,7 @@ public class AudioSystem {
 	
 
 	public void playItems ( List <Track> items ) {
-		//TODO: maybe break this into two separate functions and have the UI determine whether to set tracks or just play
+		//REFACTOR: maybe break this into two separate functions and have the UI determine whether to set tracks or just play
 		if ( items.size() == 1 ) {
 			playTrack ( items.get( 0 ) );
 		} else if ( items.size() > 1 ) {

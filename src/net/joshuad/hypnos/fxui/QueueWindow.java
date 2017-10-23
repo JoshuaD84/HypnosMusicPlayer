@@ -107,7 +107,7 @@ public class QueueWindow extends Stage {
 		titleColumn.setMaxWidth ( 45000 );
 		
 		numberColumn.setCellValueFactory( new Callback <CellDataFeatures <Track, String>, ObservableValue <String>>() {
-			@SuppressWarnings("rawtypes") //TODO: Figure out how to get rid of this. 
+			@SuppressWarnings("rawtypes") //REFACTOR: Figure out how to get rid of this. 
 			@Override
 			public ObservableValue <String> call ( CellDataFeatures <Track, String> p ) {
 				return new ReadOnlyObjectWrapper ( p.getValue() );

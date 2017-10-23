@@ -114,7 +114,7 @@ import net.joshuad.hypnos.audio.AudioSystem.StopReason;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
 
-@SuppressWarnings({ "rawtypes", "unchecked" }) // TODO: Maybe get rid of this when I understand things better
+@SuppressWarnings({ "rawtypes", "unchecked" }) // REFACTOR: Maybe get rid of this when I understand things better
 public class FXUI implements PlayerListener {
 	
 	private static final Logger LOGGER = Logger.getLogger( FXUI.class.getName() );
@@ -247,8 +247,6 @@ public class FXUI implements PlayerListener {
 		baseStylesheet = new File ( Hypnos.getRootDirectory() + File.separator + "resources" + File.separator + "style.css" );
 		darkStylesheet = new File ( Hypnos.getRootDirectory() + File.separator + "resources" + File.separator + "style-dark.css" );
 		
-		//TODO: If we launch the jar from a different directory, it doesn't shwo the icon
-		//we need to get the directory of the jar and load the image from there, not just from the current directory
 		try {
 			mainStage.getIcons().add( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) ) );
 		} catch ( FileNotFoundException e ) {
@@ -540,7 +538,7 @@ public class FXUI implements PlayerListener {
 		return isDarkTheme;
 	}
 		
-	//TODO: Does this function need to exist? 
+	//REFACTOR: Does this function need to exist? 
 	private void removeFromCurrentList ( List<Integer> removeMe ) {
 		
 		if ( !removeMe.isEmpty() ) {
@@ -1205,7 +1203,7 @@ public class FXUI implements PlayerListener {
 			try {
 				byte[] buffer = Files.readAllBytes( imageFile.toPath() );
 				
-				//TODO: put this code in a function, it's duplciated below. 
+				//REFACTOR: put this code in a function, it's duplciated below. 
 				
 				if ( !track.hasAlbumDirectory() ) return;
 				
@@ -1322,7 +1320,7 @@ public class FXUI implements PlayerListener {
 					
 				case ALBUM:
 					
-					//TODO: put this code in a function, it's duplicated above. 
+					//REFACTOR: put this code in a function, it's duplicated above. 
 					Utils.saveImageToDisk( albumPath.resolve( "artist.png" ), buffer );
 					setImages ( currentImagesTrack );
 					Thread workerThread = new Thread ( () -> {
@@ -1410,7 +1408,7 @@ public class FXUI implements PlayerListener {
 		}
 	}
 	
-	//TODO: This function probably belongs in Library
+	//REFACTOR: This function probably belongs in Library
 	public void addToPlaylist ( List <Track> tracks, Playlist playlist ) {
 		playlist.getTracks().addAll( tracks );
 		playlistTable.refresh(); 
@@ -1485,7 +1483,7 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public void promptAndSavePlaylist ( List <Track> tracks ) { 
-	//TODO: This should probably be refactored into promptForPlaylistName and <something>.savePlaylist( name, items )
+	//REFACTOR: This should probably be refactored into promptForPlaylistName and <something>.savePlaylist( name, items )
 		String defaultName = "";
 		if ( player.getCurrentPlaylist() != null ) {
 			defaultName = player.getCurrentPlaylist().getName();
@@ -2650,7 +2648,6 @@ public class FXUI implements PlayerListener {
 		});
 		
 		infoMenuItem.setOnAction( ( ActionEvent event ) -> {
-			//TODO: Multiple selections, deal with or is this ok? 
 			playlistInfoWindow.setPlaylist ( playlistTable.getSelectionModel().getSelectedItem() );
 			playlistInfoWindow.show();
 		});
@@ -2753,7 +2750,7 @@ public class FXUI implements PlayerListener {
 		playlistTable.setOnDragOver( event -> {
 			Dragboard db = event.getDragboard();
 			if ( db.hasFiles() ) {
-				//TODO: I can check for file extensions...
+				//REFACTOR: I can check for file extensions...
 				event.acceptTransferModes( TransferMode.COPY );
 				event.consume();
 			}
@@ -2830,7 +2827,7 @@ public class FXUI implements PlayerListener {
 						event.consume();
 					}
 				} else if ( db.hasFiles() ) {
-					//TODO: I can check for file extensions...
+					//REFACTOR: I can check for file extensions...
 					event.acceptTransferModes( TransferMode.COPY );
 					event.consume();
 				}
@@ -2923,7 +2920,6 @@ public class FXUI implements PlayerListener {
 		currentListTable.setColumnResizePolicy( resizePolicy );
 
 		resizePolicy.registerColumns( yearColumn, trackColumn );
-		// TODO: Length column policy
 		currentListTable.setPlaceholder( new Label( "No tracks in playlist." ) );
 		currentListTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 
@@ -2944,7 +2940,7 @@ public class FXUI implements PlayerListener {
 			Dragboard db = event.getDragboard();
 
 			if ( db.hasContent( DRAGGED_TRACKS ) ) {
-				//TODO: This code is duplicated below. Put it in a function. 
+				//REFACTOR: This code is duplicated below. Put it in a function. 
 
 				DraggedTrackContainer container = (DraggedTrackContainer) db.getContent( DRAGGED_TRACKS );
 				
@@ -3009,7 +3005,6 @@ public class FXUI implements PlayerListener {
 						player.getCurrentList().appendTrack ( droppedPath );
 						
 					} else if ( Files.isDirectory( droppedPath ) ) {
-						//TODO: Better to have this function return a list of paths
 						player.getCurrentList().appendTracksPathList ( Utils.getAllTracksInDirectory( droppedPath ) );
 					} else if ( Utils.isPlaylistFile ( droppedPath ) ) {
 						Playlist playlist = Playlist.loadPlaylist( droppedPath );
@@ -3073,8 +3068,7 @@ public class FXUI implements PlayerListener {
 				browseMenuItem.fire();
 				e.consume();
 				
-					
-			} else if ( e.getCode() == KeyCode.R && e.isShiftDown() //TODO: Put this on the hotkey list? 
+			} else if ( e.getCode() == KeyCode.R && e.isShiftDown() //PENDING: Put this on the hotkey list? 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isMetaDown() ) {
 				shuffleMenuItem.fire();
 				e.consume();
@@ -3326,7 +3320,7 @@ public class FXUI implements PlayerListener {
 					event.consume();
 
 				} else if ( db.hasFiles() ) {
-					//TODO: this code is in a bunch of places. We should probably make it a function
+					//REFACTOR: this code is in a bunch of places. We should probably make it a function
 					ArrayList <Path> tracksToAdd = new ArrayList<Path> ();
 					
 					for ( File file : db.getFiles() ) {
@@ -3557,7 +3551,7 @@ public class FXUI implements PlayerListener {
 		settings.forEach( ( setting, value )-> {
 			try {
 				switch ( setting ) {
-					//TODO: These don't belong here. 
+					//REFACTOR: These don't belong here. 
 					case TRACK:
 						Path trackPath = Paths.get( value );
 						Path albumPath = null;

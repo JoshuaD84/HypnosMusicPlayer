@@ -530,7 +530,7 @@ public class CurrentList {
 		setTracks ( addMe );
 		albumsSet ( albums );
 		
-		Hypnos.getLibrary().albumsToUpdate.addAll( albums ); //TODO: pass library in at constructor rather than calling Hypnos.get
+		Hypnos.getLibrary().albumsToUpdate.addAll( albums ); //REFACTOR: pass library in at constructor rather than calling Hypnos.get
 		
 		if ( missing.size() > 0 ) {
 			Hypnos.warnUserAlbumsMissing ( missing );

@@ -165,7 +165,7 @@ public class MP3Decoder extends AbstractDecoder {
 		return false;
 	}
 	
-	//TODO: maybe just inline this and get rid of the function; it's only called in one place. 
+	//REFACTOR: maybe just inline this and get rid of the function; it's only called in one place. 
 	private byte[] convertToBytes ( short[] samples ) {
 		
 		byte[] b = new byte[ samples.length*2];

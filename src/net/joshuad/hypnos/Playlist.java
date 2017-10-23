@@ -67,33 +67,32 @@ public class Playlist implements Serializable {
 	public static Playlist loadPlaylist ( Path path ) {
 		if ( path.toString().toLowerCase().endsWith( ".m3u" ) ) {
 			
-			Playlist playlist = new Playlist( "NoName" );
+			Playlist playlist = new Playlist( path.getFileName().toString() );
 			
 			try (
 					FileReader fileReader = new FileReader( path.toFile() );
 			) {
 				BufferedReader m3uIn = new BufferedReader ( fileReader );
 				for ( String line; (line = m3uIn.readLine()) != null; ) {
-					if ( line.startsWith( "#Name:" ) ) {
-						String name = line.split( ":" )[1].trim(); //TODO: OOB error checking on index
-						playlist.setName( name );
-					} else if ( line.isEmpty() ) {
-						//Do nothing
-						
-					} else if ( !line.startsWith( "#" ) ) {
-						try {
-							playlist.addTrack ( new Track ( Paths.get ( line ) ) );
-						} catch ( Exception e ) {
-							LOGGER.info( "Error parsing line in playlist: " + path.toString() + "\n\tLine: " + line );
+
+					try {
+						if ( line.startsWith( "#Name:" ) ) {
+							String name = line.split( ":" )[1].trim(); 
+							playlist.setName( name );
+						} else if ( line.isEmpty() ) {
+							//Do nothing
+							
+						} else if ( !line.startsWith( "#" ) ) {
+								playlist.addTrack ( new Track ( Paths.get ( line ) ) );
 						}
+					} catch ( Exception e ) {
+						LOGGER.info( "Error parsing line in playlist: " + path.toString() + "\n\tLine: " + line );
 					}
 				}
 			} catch ( Exception e ) {
 				LOGGER.info( "Error reading playlist file: " + path );
 				return null;
 			}
-			
-			//TODO: If name isn't set, set it to the file name, so we have something. 
 			
 			return playlist;
 		}

@@ -310,7 +310,6 @@ public class Library {
 	}
 	
 	public void addPlaylist ( Playlist playlist ) {
-		//TODO: name checking? 
 		playlistsToAdd.add( playlist );
 	}
 	
@@ -544,7 +543,7 @@ public class Library {
 
 			if ( eventKind == StandardWatchEventKinds.ENTRY_CREATE ) {
 				if ( Files.isDirectory( child ) ) {
-					sourceToAdd.add( child ); //TODO: is this the right function call? 
+					sourceToAdd.add( child );  
 				} else {
 					sourceToAdd.add( child.getParent() );
 				}

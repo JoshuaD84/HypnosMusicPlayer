@@ -116,7 +116,7 @@ public class LibraryLocationWindow extends Stage {
 
 		DirectoryChooser chooser = new DirectoryChooser();
 		chooser.setTitle( "Music Folder" );
-		File defaultDirectory = new File( System.getProperty( "user.home" ) ); // TODO: start windows on desktop maybe.
+		File defaultDirectory = new File( System.getProperty( "user.home" ) ); // PENDING: start windows on desktop maybe.
 		chooser.setInitialDirectory( defaultDirectory );
 
 		Button addButton = new Button( "+ Add" );
