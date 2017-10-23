@@ -83,7 +83,7 @@ public class Playlist implements Serializable {
 							//Do nothing
 							
 						} else if ( !line.startsWith( "#" ) ) {
-								playlist.addTrack ( new Track ( Paths.get ( line ) ) );
+							playlist.addTrack ( new Track ( Paths.get ( line ) ) );
 						}
 					} catch ( Exception e ) {
 						LOGGER.info( "Error parsing line in playlist: " + path.toString() + "\n\tLine: " + line );

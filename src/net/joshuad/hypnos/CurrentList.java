@@ -109,7 +109,7 @@ public class CurrentList {
 						if ( track.needsUpdate() ) {
 							try {
 								track.update();
-								Thread.sleep( 100 );
+								//Thread.sleep( 10 );
 							} catch ( Exception e ) {
 								//No need to log anything, UI should show it
 							}

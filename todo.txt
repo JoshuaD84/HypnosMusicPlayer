@@ -2,9 +2,19 @@ New Features
 			
 Bug Fixes / Incremental Improvements
 
+	Playlist track album propegation
+		Right now I have it updating in currentListWatcher
+		An alternative is to write the album data out to playlist file as a comment I think that might b egood
+
 	Hotkeys aren't consumed, so they are passed to the current window. 
 		Check windows and OSX
 		Create website /help/linux-globalhotkey-consume/
+		
+	MusicFileVisitor > visitFile ->Info: Unable to load Track -- Give more info about track
+	
+	Sort tag window columns automatically - Location, Error Message, Filename
+	
+	No Tag Errors empty table label
 			
 Post Beta New Features		
 	Add default sort column choice, like shuffle and repeat
@@ -57,8 +67,6 @@ Refactor / organize my code.
 	use observable values for all of the track and album stuff, so we don't have to do refreshes
 	
 	a better structure for persister
-	
-	a better structure for tag error log
 	
 	a better structure for hotkey commands (maybe combine with commandline commands?)
 
@@ -175,9 +183,7 @@ Future Features, maybe:
 	System tray
 
 	Tag Window, next and previous button
-	
-	Dark Stylesheet 
-	
+		
 	Drag and drop from misc places to system
 		playlist table -> m3u
 		track table, history, queue, info windows, current table -> single tracks
@@ -187,19 +193,10 @@ Future Features, maybe:
 			
 	Add tag image info to tag window
 	
-	Make the tag error window more user-friendly. 
-	
 	backup playlists
 	
-	Playlist sync issues
-		Adding tracks to a playlist doesn't refresh the playlist info screen
-		CurrentList == Playlist doesn't edit when playlist info window is edited
-		Create a PLAYLIST_REORDERED option
-		
 	Warn before discarding unsaved playlist -- button order (Yes, no, cancel instead of No, Yes, Cancel)	
 		
-	Font for volume warning window
-	
 	
 	
 		

@@ -36,7 +36,8 @@ import javafx.beans.property.StringProperty;
 		}
 	
 		public CurrentListTrack ( Track source ) {
-			super ( source );
+			super ( source );		
+			this.albumDirectory = getPath().getParent().toFile();
 			needsUpdate = true;
 			updateDisplayString();
 		}
@@ -45,8 +46,25 @@ import javafx.beans.property.StringProperty;
 			return needsUpdate;
 		}
 		
+		public void setNeedsUpdate ( boolean needsUpdate ) {
+			this.needsUpdate = needsUpdate;
+		}
+		
 		public void update() throws Exception {
+			long startTime = System.currentTimeMillis();
+			
 			refreshTagData();
+			
+			System.out.println ( "Refresh tag data: " + ( System.currentTimeMillis() - startTime  ) );
+			startTime = System.currentTimeMillis();
+			
+			if ( Utils.isAlbumDirectory( getPath().getParent() ) ) {
+				this.albumDirectory = getPath().getParent().toFile();
+			} else {
+				this.albumDirectory = null;
+			}
+
+			System.out.println ( "album directory: " + ( System.currentTimeMillis() - startTime ) );
 			needsUpdate = false;
 		}
 		

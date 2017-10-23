@@ -879,7 +879,6 @@ public class Track implements Serializable {
 			Image tagArtistImage = getTagArtistImage();
 			if ( tagArtistImage != null ) return tagArtistImage;
 		}
-		
 		if ( hasAlbumDirectory() ) {
 	
 			if ( this.getPath().getParent() != null ) {
@@ -931,7 +930,7 @@ public class Track implements Serializable {
 			}			
 			
 		} catch ( Exception e ) {
-			LOGGER.log( Level.INFO, "Error when trying to load tag images for file" + getPath(), e );
+			LOGGER.log( Level.INFO, e.getClass().getCanonicalName() + ": Error when trying to load tag images for file" + getPath(), e );
 		}
 	
 		return null;
