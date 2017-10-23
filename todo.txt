@@ -15,6 +15,14 @@ Bug Fixes / Incremental Improvements
 	Sort tag window columns automatically - Location, Error Message, Filename
 	
 	No Tag Errors empty table label
+	
+	Dirty Mushrooms - Try to edit tag -- No table
+	
+	Typing in filter pane changes images, i don't like that. 
+	
+	Tag Window change "Track" to "Track #"
+	
+	Skip tracks on current list with missing file, don't let them stop playing
 			
 Post Beta New Features		
 	Add default sort column choice, like shuffle and repeat
