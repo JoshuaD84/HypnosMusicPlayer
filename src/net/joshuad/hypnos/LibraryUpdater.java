@@ -78,7 +78,7 @@ public class LibraryUpdater {
 					}
 					
 					
-					library.playlistsToUpdate.clear(); //TODO: update playlists. 
+					library.playlistsToUpdate.clear(); //PENDING: update playlists. 
 
 					ui.updatePlaylistPlaceholder();
 					
@@ -158,7 +158,6 @@ public class LibraryUpdater {
 											} catch ( Exception e2 ) {}
 										}
 									} else {
-										//TODO: Should we also update? 
 										library.albums.add( updateSource );
 									}
 									
@@ -198,9 +197,11 @@ public class LibraryUpdater {
 						if ( !library.tracksToAdd.isEmpty() ) {
 							while ( changeCount < MAX_CHANGES_PER_REQUEST && !library.tracksToAdd.isEmpty() ) {
 								Track track = library.tracksToAdd.remove( 0 );
-								library.tracks.add( track );
-								library.tagErrors.addAll( track.getTagErrors() );
-								changeCount++;
+								if ( !library.containsTrack( track ) ) {
+									library.tracks.add( track );
+									library.tagErrors.addAll( track.getTagErrors() );
+								}
+								changeCount+=2;
 							}
 
 

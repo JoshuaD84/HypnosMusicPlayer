@@ -70,6 +70,7 @@ public class Hypnos extends Application {
 	private static boolean isStandalone = false;
 	private static boolean isDeveloping = false;
 	private static boolean disableHotkeys = false;
+	private static boolean globalHotkeysDisabled = false;
 	
 	private static Persister persister;
 	private static AudioSystem player;
@@ -140,9 +141,9 @@ public class Hypnos extends Application {
 		isDeveloping = Boolean.getBoolean( "hypnos.developing" );
 		disableHotkeys = Boolean.getBoolean( "hypnos.disableglobalhotkeys" );
 		
-		if ( isStandalone ) LOGGER.info ( "Running as standalone" );
-		if ( isDeveloping ) LOGGER.info ( "Running on development port" );
-		if ( isDeveloping ) LOGGER.info ( "Global hotkeys disabled" );
+		if ( isStandalone ) LOGGER.info ( "Running as standalone by system properties set at program launch" );
+		if ( isDeveloping ) LOGGER.info ( "Running on development port by system properties set at program launch" );
+		if ( isDeveloping ) LOGGER.info ( "Global hotkeys disabled by system properties set at program launch" );
 	}
 	
 	private void determineOS() {
@@ -196,9 +197,9 @@ public class Hypnos extends Application {
 	}
 	
 	private void setupConfigDirectory () {
-		// TODO: We might want to make a few fall-throughs if these locations
+		// PENDING: We might want to make a few fall-throughs if these locations
 		// don't exist.
-		// TODO: Test this on each OS. 
+		// TODO: Test this on OSX 
 		String home = System.getProperty( "user.home" );
 
 		if ( Hypnos.isStandalone() ) {
@@ -331,7 +332,7 @@ public class Hypnos extends Application {
 				
 			} catch ( NativeHookException ex ) {
 				LOGGER.warning( "There was a problem registering the global hotkey listeners. Global Hotkeys are disabled." );
-				//TODO: set a boolean and put an indicator in the UI somewhere? 
+				globalHotkeysDisabled = true;
 			} finally {
 				System.setOut( out );
 			}
@@ -341,11 +342,17 @@ public class Hypnos extends Application {
 		
 		if ( !disableHotkeys ) {
 			GlobalScreen.addNativeKeyListener( hotkeys );
+		} else {
+			globalHotkeysDisabled = true;
 		}
 	}
 	
-	public static boolean hotkeysEnabled () {
-		return ui.hotkeysEnabled();
+	public static boolean globalHotkeysDisabled() {
+		return globalHotkeysDisabled;
+	}
+	
+	public static boolean hotkeysDisabledForConfig () {
+		return ui.hotkeysDisabledForConfig();
 	}
 
 	public static void doHotkeyAction ( Hotkey hotkey ) {
@@ -364,16 +371,18 @@ public class Hypnos extends Application {
 					ui.toggleMinimized();
 					break;
 				case SKIP_BACK:
-					//TODO: 
+					long target = player.getPositionMS() - 5000 ;
+					if ( target < 0 ) target = 0;
+					player.seekMS( target ); 
 					break;
 				case SKIP_FORWARD:
-					//TODO: 
+					player.seekMS( player.getPositionMS() + 5000 ); 
 					break;
 				case STOP:
 					player.stop( StopReason.USER_REQUESTED );
 					break;
 				case TOGGLE_MUTE:
-					//TODO: 
+					player.toggleMute();
 					break;
 				case TOGGLE_PAUSE:
 					player.togglePause();
@@ -461,6 +470,14 @@ public class Hypnos extends Application {
 						case SocketCommand.VOLUME_UP:
 							player.incrementVolume();
 							break;
+						case SocketCommand.SEEK_BACK:
+							long target = player.getPositionMS() - 5000 ;
+							if ( target < 0 ) target = 0;
+							player.seekMS( target ); 
+							break;
+						case SocketCommand.SEEK_FORWARD:
+							player.seekMS( player.getPositionMS() + 5000 ); 
+							break;
 					}
 				} 
 			}
@@ -514,6 +531,7 @@ public class Hypnos extends Application {
 				applyCLICommands( commands );
 				
 				singleInstanceController.startCLICommandListener ( this );
+				
 				library.startLoader( persister );
 				
 				LOGGER.info( "Hypnos finished loading." );

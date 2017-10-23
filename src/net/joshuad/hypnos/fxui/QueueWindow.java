@@ -248,7 +248,7 @@ public class QueueWindow extends Stage {
 						} break;
 						
 						case CURRENT_LIST: {
-							//TODO: Should I refactor this? 
+							//PENDING: Should I refactor this? 
 							synchronized ( player.getCurrentList() ) {
 								ArrayList <CurrentListTrack> tracksToCopy = new ArrayList <CurrentListTrack> (  );
 								for ( int index : draggedIndices ) {
@@ -368,7 +368,7 @@ public class QueueWindow extends Stage {
 					} break;
 					
 					case CURRENT_LIST: {
-						//TODO: should I refactor this
+						//PENDING: should I refactor this
 						synchronized ( player.getCurrentList() ) {
 							ArrayList <CurrentListTrack> tracksToCopy = new ArrayList <CurrentListTrack> (  );
 							for ( int index : draggedIndices ) {
@@ -489,7 +489,7 @@ public class QueueWindow extends Stage {
 		});
 		
 		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			// TODO: This is the better way, once openjdk and openjfx supports
+			// PENDING: This is the better way, once openjdk and openjfx supports
 			// it: getHostServices().showDocument(file.toURI().toString());
 			@Override
 			public void handle ( ActionEvent event ) {

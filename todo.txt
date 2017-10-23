@@ -14,6 +14,9 @@ Post Beta New Features
 	Album list - Display disc and release type in different color font
 					
 Post Beta fixes / updates / improvements 
+
+	Show something on art boxes to differentiate between artist and album, especially when drag & dropping
+	
 	Icons on popup windows
 			
 	~incomplete/Grizzly Bear

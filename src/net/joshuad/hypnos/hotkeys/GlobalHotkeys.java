@@ -83,7 +83,7 @@ public class GlobalHotkeys implements NativeKeyListener {
 	public void nativeKeyPressed ( NativeKeyEvent e ) {
 		lastKeyState = new KeyState ( e.getKeyCode(), e.getModifiers() );
 		
-		if ( Hypnos.hotkeysEnabled() ) {
+		if ( !Hypnos.hotkeysDisabledForConfig() ) {
 			for ( Hotkey hotkey : hotkeyMap.keySet() ) {
 				KeyState registeredHotkey = hotkeyMap.get( hotkey );
 				if ( registeredHotkey != null && registeredHotkey.equals( lastKeyState ) ) {

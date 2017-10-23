@@ -237,6 +237,14 @@ public class SettingsWindow extends Stage {
 		GridPane.setHalignment( clearHotkeyLabel, HPos.CENTER );
 		row++;
 		
+		if ( Hypnos.globalHotkeysDisabled() ) {
+			Label disabledNote = new Label ( "Hotkeys are currently disabled by system. See the log for more info." );
+			globalContent.add( disabledNote, 0, row, 2, 1 );
+			disabledNote.setPadding( new Insets ( 0, 0, 20, 0 ) );
+			GridPane.setHalignment( disabledNote, HPos.CENTER );
+			row++;
+		}
+		
 		if ( Hypnos.getOS() == OS.NIX ) {
 			
 			Hyperlink consumeHotkeyNote = new Hyperlink ( "Note: On Linux global hotkeys can not be consumed. Click here to read how to address this problem." );
@@ -824,7 +832,7 @@ public class SettingsWindow extends Stage {
 		});
 
 		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			// TODO: This is the better way, once openjdk and openjfx supports
+			// PENDING: This is the better way, once openjdk and openjfx supports
 			// it: getHostServices().showDocument(file.toURI().toString());
 			@Override
 			public void handle ( ActionEvent event ) {
@@ -993,16 +1001,16 @@ public class SettingsWindow extends Stage {
 		return aboutTab;
 	}
 
-	public boolean hotkeysEnabled () {
-		if ( tabPane == null ) return true;
-		if ( hotkeysTab == null ) return true;
-		if ( !this.isShowing() ) return true;
+	public boolean hotkeysDisabledForConfig () {
+		if ( tabPane == null ) return false;
+		if ( hotkeysTab == null ) return false;
+		if ( !this.isShowing() ) return false;
 		
 		if ( tabPane.getSelectionModel().getSelectedItem().equals( this.hotkeysTab ) )  {
-			return false;
+			return true;
 		}
 		
-		return true;
+		return false;
 	}
 
 }

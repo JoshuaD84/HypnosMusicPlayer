@@ -271,7 +271,7 @@ public class HistoryWindow extends Stage {
 		});
 
 		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			// TODO: This is the better way, once openjdk and openjfx supports
+			// PENDING: This is the better way, once openjdk and openjfx supports
 			// it: getHostServices().showDocument(file.toURI().toString());
 			@Override
 			public void handle ( ActionEvent event ) {

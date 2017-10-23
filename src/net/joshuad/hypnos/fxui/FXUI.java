@@ -954,7 +954,7 @@ public class FXUI implements PlayerListener {
 		});
 
 		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			// TODO: This is the better way, once openjdk and openjfx supports
+			// PENDING: This is the better way, once openjdk and openjfx supports
 			// it: getHostServices().showDocument(file.toURI().toString());
 			@Override
 			public void handle ( ActionEvent event ) {
@@ -1044,10 +1044,9 @@ public class FXUI implements PlayerListener {
 				
 				Utils.saveImageToDisk( targetFile.toPath(), imageBytes );
 			} catch ( IOException ex ) {
-				//TODO: Show UI error. 
-				
+				notifyUserError ( ex.getClass().getCanonicalName() + ": Unable to export image. See log for more information." );
+				LOGGER.log( Level.WARNING, "Unable to export album image.", ex );
 			}
-			
 		});
 				
 		albumImagePane = new BorderPane();
@@ -1173,8 +1172,8 @@ public class FXUI implements PlayerListener {
 				
 				Utils.saveImageToDisk( targetFile.toPath(), imageBytes );
 			} catch ( IOException ex ) {
-				//TODO: Show UI error. 
-				
+				notifyUserError ( ex.getClass().getCanonicalName() + ": Unable to export image. See log for more information." );
+				LOGGER.log( Level.WARNING, "Unable to export artist image.", ex );
 			}
 		});
 		
@@ -1318,7 +1317,7 @@ public class FXUI implements PlayerListener {
 				case ALL:
 					Utils.saveImageToDisk( artistPath.resolve( "artist.png" ), buffer );
 					setImages ( currentImagesTrack );
-					//TODO: What about ID3 tags? Set them only if they're not already set?  
+					//PENDING: What about ID3 tags? Set them only if they're not already set?  
 					break;
 					
 				case ALBUM:
@@ -2450,7 +2449,7 @@ public class FXUI implements PlayerListener {
 		});
 
 		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			// TODO: This is the better way, once openjdk and openjfx supports
+			// PENDING: This is the better way, once openjdk and openjfx supports
 			// it: getHostServices().showDocument(file.toURI().toString());
 			@Override
 			public void handle ( ActionEvent event ) {
@@ -3158,7 +3157,7 @@ public class FXUI implements PlayerListener {
 		} );
 
 		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			// TODO: This is the better way, once openjdk and openjfx supports
+			// PENDING: This is the better way, once openjdk and openjfx supports
 			// it: getHostServices().showDocument(file.toURI().toString());
 			@Override
 			public void handle ( ActionEvent event ) {
@@ -3803,8 +3802,8 @@ public class FXUI implements PlayerListener {
 		
 	}
 
-	public boolean hotkeysEnabled () {
-		return settingsWindow.hotkeysEnabled();
+	public boolean hotkeysDisabledForConfig () {
+		return settingsWindow.hotkeysDisabledForConfig();
 	}
 
 	public void refreshHotkeyList () {

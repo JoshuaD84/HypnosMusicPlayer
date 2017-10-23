@@ -26,7 +26,7 @@ public class Utils {
 
 	private static transient final Logger LOGGER = Logger.getLogger( Utils.class.getName() );
 	
-	private static String[] musicExtStrings = new String[] { "flac", "mp3", "ogg", "m4a", "m4b", "m4r", "aac", "wav" }; //TODO: use Track.Format instead
+	private static String[] musicExtStrings = new String[] { "flac", "mp3", "ogg", "m4a", "m4b", "m4r", "aac", "wav" }; //PENDING: use Track.Format instead
 	private static String[] imageExtStrings = new String[] { "jpg", "png", "gif" };
 	private static String[] playlistExtStrings = new String[] { "m3u" };
 		

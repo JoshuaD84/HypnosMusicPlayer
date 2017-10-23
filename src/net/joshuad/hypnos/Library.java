@@ -324,14 +324,8 @@ public class Library {
 		}
 	}
 	
-	/*TODO 
-	 * public void removeTagError ( TagError error ) {
-		tagErrorsToRemove.add ( error );
-	}*/
-	
 	private void removeOneSource() {
 
-		//TODO: What is this and what is it doing? 
 		while ( fileWalker != null ) {
 			try {
 				Thread.sleep( 20 );

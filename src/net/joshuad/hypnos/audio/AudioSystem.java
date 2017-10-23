@@ -484,8 +484,7 @@ public class AudioSystem {
 	
 //TODO: Make these a listener interface, and add this object as a listener to player? 	
 	
-	void playerStopped ( StopReason reason ) { //TODO: 'user requested' is a bad title. Probably make this an enum and give it different options
-		
+	void playerStopped ( StopReason reason ) { 
 		if ( reason == StopReason.TRACK_FINISHED ) {
 			next ( false );
 		}
@@ -512,10 +511,6 @@ public class AudioSystem {
 	void playerTrackPositionChanged ( int positionMS, int lengthMS ) {
 		notifyListenersPositionChanged ( positionMS, lengthMS );
 	}
-	
-	
-
-	//TODO: why are these here instead of in CurrentList?
 	
 	public void playTrack ( Track track ) {
 		playTrack ( track, false );

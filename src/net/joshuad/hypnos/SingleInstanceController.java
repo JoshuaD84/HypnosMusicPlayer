@@ -39,7 +39,6 @@ public class SingleInstanceController {
 	public boolean startCLICommandListener( Hypnos hypnos ) {
 		
 		if ( !isFirstInstance ) {
-			//TODO: throw the error, or log it? 
 			throw new IllegalStateException( "Cannot start a command line listener if we are not the first instance." );
 		}
 			

@@ -260,7 +260,7 @@ public class Track implements Serializable {
 			fnTitle = fnTitle.replaceAll( " - ", "" ).replaceAll( fnArtist, "" ).replaceAll( fnAlbum, "" ).replaceAll( fnYear, "" );
 
 		} catch ( Exception e ) { 
-			//TODO: We get an exception with albums that have [] and maybe {} in their directory structure 
+			//PENDING: We get an exception with albums that have [] and maybe {} in their directory structure 
 		}
 
 		boolean setByFileName = false;

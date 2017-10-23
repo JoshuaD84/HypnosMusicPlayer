@@ -82,7 +82,7 @@ public class AlbumInfoWindow extends Stage {
 		HBox.setHgrow( locationField, Priority.ALWAYS );
 		Button browseButton = new Button( "Browse" );
 		browseButton.setOnAction( new EventHandler <ActionEvent>() {
-			// TODO: This is the better way, once openjdk and openjfx supports
+			// PENDING: Future - This is the better way, once openjdk and openjfx supports
 			// it: getHostServices().showDocument(file.toURI().toString());
 			@Override
 			public void handle ( ActionEvent event ) {
