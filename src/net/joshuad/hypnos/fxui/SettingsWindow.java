@@ -413,6 +413,7 @@ public class SettingsWindow extends Stage {
 		});
 		
 		HBox themeBox = new HBox();
+		themeBox.setAlignment( Pos.TOP_CENTER );	
 		themeBox.getChildren().addAll( themeLabel, lightTheme, darkTheme );
 		
 		
@@ -429,7 +430,7 @@ public class SettingsWindow extends Stage {
 		});
 				
 		HBox warnBox = new HBox();
-		warnBox.setAlignment( Pos.CENTER_LEFT );
+		warnBox.setAlignment( Pos.TOP_CENTER );
 		warnBox.getChildren().addAll( warnCheckBox, warnLabel );
 						
 		GridPane shuffleGrid = new GridPane();
@@ -597,6 +598,9 @@ public class SettingsWindow extends Stage {
 			}
 		});
 		row++;
+		
+
+		shuffleGrid.setAlignment( Pos.TOP_CENTER );	
 		
 		settingsPane.getChildren().addAll( shuffleGrid, themeBox, warnBox );
 		
