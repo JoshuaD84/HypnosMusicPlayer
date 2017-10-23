@@ -1,5 +1,6 @@
 package net.joshuad.hypnos;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -80,11 +81,6 @@ public class LibraryUpdater {
 					library.playlistsToUpdate.clear(); //TODO: update playlists. 
 
 					ui.updatePlaylistPlaceholder();
-					
-					synchronized ( Track.tagErrorsToAdd ) { //TODO: decide where to put this. 
-						library.tagErrors.addAll ( Track.tagErrorsToAdd );
-						Track.tagErrorsToAdd.clear();
-					}
 					
 					synchronized ( library.albumsToRemove ) {
 						if ( !library.albumsToRemove.isEmpty() ) {
@@ -180,13 +176,14 @@ public class LibraryUpdater {
 					synchronized ( library.tracksToRemove ) {
 						if ( !library.tracksToRemove.isEmpty() ) {
 							while ( changeCount < MAX_CHANGES_PER_REQUEST && !library.tracksToRemove.isEmpty() ) {
-								boolean removed = library.tracks.remove( library.tracksToRemove.remove( 0 ) );
+								Track removeMe = library.tracksToRemove.remove( 0 );
+								boolean removed = library.tracks.remove( removeMe );
+								library.tagErrors.removeAll( removeMe.getTagErrors() );
 								
 								if ( removed ) {
 									changeCount++;
 								}
 							}
-
 
 							ui.updateTrackListPlaceholder();
 							
@@ -200,7 +197,9 @@ public class LibraryUpdater {
 					synchronized ( library.tracksToAdd ) {
 						if ( !library.tracksToAdd.isEmpty() ) {
 							while ( changeCount < MAX_CHANGES_PER_REQUEST && !library.tracksToAdd.isEmpty() ) {
-								library.tracks.add( library.tracksToAdd.remove( 0 ) );
+								Track track = library.tracksToAdd.remove( 0 );
+								library.tracks.add( track );
+								library.tagErrors.addAll( track.getTagErrors() );
 								changeCount++;
 							}
 
@@ -214,7 +213,40 @@ public class LibraryUpdater {
 						}
 					}
 	
-					library.tracksToUpdate.clear();	//TODO: Update tracks
+					synchronized ( library.tracksToUpdate ) {
+						if ( !library.tracksToUpdate.isEmpty() ) {
+							while ( changeCount < MAX_CHANGES_PER_REQUEST && !library.tracksToUpdate.isEmpty() ) {
+								Track track = library.tracksToUpdate.remove( 0 );
+								
+								List <TagError> removeMe = new ArrayList <TagError> ();
+								for ( TagError error : library.tagErrors ) {
+									if ( error.getTrack().equals( track ) ) {
+										removeMe.add( error );
+									}
+								}
+								
+								library.tagErrors.removeAll( removeMe );
+								
+								try { 
+									track.refreshTagData();
+								} catch ( Exception e ) {
+									LOGGER.log ( Level.INFO, "Error updating track info.", e );
+								} 
+								
+								library.tagErrors.addAll( track.getTagErrors() );
+								
+								changeCount ++;
+							}
+
+
+							ui.updateTrackListPlaceholder();
+							
+							if ( changeCount >= MAX_CHANGES_PER_REQUEST ) {
+								ui.refreshTrackTable(); //TODO: this may not be necessary. 
+								return;
+							}
+						}
+					}
 					
 				
 					

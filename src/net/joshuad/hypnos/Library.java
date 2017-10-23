@@ -80,6 +80,8 @@ public class Library {
 	private Vector <Path> sourceToRemove = new Vector <Path>();
 	private Vector <Path> sourceToUpdate = new Vector <Path>();
 	
+	//Vector <TagError> tagErrorsToRemove = new Vector <TagError> ();
+	
 	private boolean purgeOrphansAndMissing = true;
 	
 	public Library() {
@@ -281,7 +283,7 @@ public class Library {
 		}
 	}
 	
-	void addTrack ( Track track ) {
+	public void addTrack ( Track track ) {
 		if ( containsTrack( track ) ) {
 			tracksToUpdate.add ( track );
 		} else {
@@ -321,6 +323,11 @@ public class Library {
 			removePlaylist ( playlist );
 		}
 	}
+	
+	/*TODO 
+	 * public void removeTagError ( TagError error ) {
+		tagErrorsToRemove.add ( error );
+	}*/
 	
 	private void removeOneSource() {
 
@@ -372,6 +379,10 @@ public class Library {
 				
 				synchronized ( tracks ) {
 					tracks.clear();
+				}
+				
+				synchronized ( tagErrors ) {
+					tagErrors.clear();
 				}
 			});
 			

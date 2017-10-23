@@ -381,7 +381,7 @@ public class Persister {
 			
 			if ( savedToTemp ) {
 				try {
-					Files.move( tempFile, targetFile, StandardCopyOption.REPLACE_EXISTING );
+					Files.copy( tempFile, targetFile, StandardCopyOption.REPLACE_EXISTING );
 					movedFromTemp = true;
 				} catch ( IOException e ) {
 					movedFromTemp = false;

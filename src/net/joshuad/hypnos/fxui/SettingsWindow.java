@@ -1,19 +1,25 @@
 package net.joshuad.hypnos.fxui;
 
+import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.SwingUtilities;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -23,12 +29,16 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -39,8 +49,11 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -54,10 +67,13 @@ import net.joshuad.hypnos.CurrentList.DefaultShuffleMode;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Hypnos.OS;
 import net.joshuad.hypnos.Library;
+import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys.Hotkey;
 import net.joshuad.hypnos.TagError;
+import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.audio.AudioSystem;
+import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 
 public class SettingsWindow extends Stage {
 
@@ -94,7 +110,7 @@ public class SettingsWindow extends Stage {
 
 		initModality( Modality.NONE );
 		initOwner( ui.getMainStage() );		
-		setWidth ( 500 );
+		setWidth ( 700 );
 		setHeight ( 650 );
 		setTitle( "Config and Info" );
 		Pane root = new Pane();
@@ -659,22 +675,21 @@ public class SettingsWindow extends Stage {
 		pane.getChildren().add( headerLabel );
 
 		
-		
 		TableColumn<TagError, String> pathColumn = new TableColumn<TagError, String> ( "Location" );
+		TableColumn<TagError, String> filenameColumn = new TableColumn<TagError, String> ( "Filename" );
 		TableColumn<TagError, String> messageColumn = new TableColumn<TagError, String> ( "Error Message" );
-		TableColumn<TagError, String> severityColumn = new TableColumn<TagError, String> ( "Severity" );
 
-		pathColumn.setCellValueFactory( new PropertyValueFactory <TagError, String>( "PathDisplay" ) );
+		pathColumn.setCellValueFactory( new PropertyValueFactory <TagError, String>( "FolderDisplay" ) );
+		filenameColumn.setCellValueFactory( new PropertyValueFactory <TagError, String>( "FilenameDisplay" ) );
 		messageColumn.setCellValueFactory( new PropertyValueFactory <TagError, String>( "Message" ) );
-		severityColumn.setCellValueFactory( new PropertyValueFactory <TagError, String>( "SeverityDisplay" ) );
 
-		pathColumn.setMaxWidth( 45000 );
-		messageColumn.setMaxWidth( 45000 );
-		severityColumn.setMaxWidth( 10000 );
+		pathColumn.setMaxWidth( 30000 );
+		filenameColumn.setMaxWidth ( 40000 );
+		messageColumn.setMaxWidth( 30000 );
 
 
 		TableView <TagError> table = new TableView <TagError> ();
-		table.getColumns().addAll( pathColumn, messageColumn, severityColumn );
+		table.getColumns().addAll( pathColumn, filenameColumn, messageColumn );
 
 		library.getTagErrorsSorted().comparatorProperty().bind( table.comparatorProperty() );
 		
@@ -684,6 +699,184 @@ public class SettingsWindow extends Stage {
 		table.setItems( library.getTagErrorsSorted() );
 		table.prefWidthProperty().bind( pane.widthProperty() );
 		table.prefHeightProperty().bind( pane.heightProperty() );
+		
+		ContextMenu trackContextMenu = new ContextMenu();
+		MenuItem playMenuItem = new MenuItem( "Play" );
+		MenuItem appendMenuItem = new MenuItem( "Append" );
+		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
+		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
+		MenuItem infoMenuItem = new MenuItem( "Info" );
+		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
+		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
+		trackContextMenu.getItems().addAll( playMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, browseMenuItem, addToPlaylistMenuItem );
+		
+		MenuItem newPlaylistButton = new MenuItem( "<New>" );
+
+		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
+
+		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent e ) {
+				List <Track> tracks = new ArrayList <Track> ();
+				
+				for ( TagError error : table.getSelectionModel().getSelectedItems() ) {
+					tracks.add( error.getTrack() );
+				}
+				
+				ui.promptAndSavePlaylist ( tracks );
+			}
+		});
+
+		EventHandler<ActionEvent> addToPlaylistHandler = new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				List <Track> tracks = new ArrayList <Track> ();
+				
+				for ( TagError error : table.getSelectionModel().getSelectedItems() ) {
+					tracks.add( error.getTrack() );
+				}
+				
+				Playlist playlist = (Playlist) ((MenuItem) event.getSource()).getUserData();
+				ui.addToPlaylist ( tracks, playlist );
+			}
+		};
+
+		library.getPlaylistSorted().addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
+			ui.updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
+		} );
+
+		ui.updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
+		
+		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				List <Track> tracks = new ArrayList <Track> ();
+				
+				for ( TagError error : table.getSelectionModel().getSelectedItems() ) {
+					tracks.add( error.getTrack() );
+				}
+				
+				
+				if ( tracks.size() == 1 ) {
+					player.playItems( tracks );
+					
+				} else if ( tracks.size() > 1 ) {
+					if ( ui.okToReplaceCurrentList() ) {
+						player.playItems( tracks );
+					}
+				}
+			}
+		});
+
+		appendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				List <Track> tracks = new ArrayList <Track> ();
+				
+				for ( TagError error : table.getSelectionModel().getSelectedItems() ) {
+					tracks.add( error.getTrack() );
+				}
+				
+				player.getCurrentList().appendTracks ( tracks );
+			}
+		});
+		
+		enqueueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				List <Track> tracks = new ArrayList <Track> ();
+				
+				for ( TagError error : table.getSelectionModel().getSelectedItems() ) {
+					tracks.add( error.getTrack() );
+				}
+				
+				player.getQueue().addAllTracks( tracks );
+			}
+		});
+		
+		editTagMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				List <Track> tracks = new ArrayList <Track> ();
+				
+				for ( TagError error : table.getSelectionModel().getSelectedItems() ) {
+					if ( error != null ) {
+						tracks.add( error.getTrack() );
+					}
+				}
+				
+				ui.tagWindow.setTracks( tracks, null );
+				ui.tagWindow.show();
+			}
+		});
+		
+		
+		infoMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				ui.trackInfoWindow.setTrack( table.getSelectionModel().getSelectedItem().getTrack() );
+				ui.trackInfoWindow.show();
+			}
+		});
+
+		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			// TODO: This is the better way, once openjdk and openjfx supports
+			// it: getHostServices().showDocument(file.toURI().toString());
+			@Override
+			public void handle ( ActionEvent event ) {
+				SwingUtilities.invokeLater( new Runnable() {
+					public void run () {
+						try {
+							TagError selectedTrack = table.getSelectionModel().getSelectedItem();
+							if ( selectedTrack != null ) {
+								Desktop.getDesktop().open( table.getSelectionModel().getSelectedItem().getPath().getParent().toFile() );
+							}
+						} catch ( Exception e ) {
+							LOGGER.log( Level.INFO, "Unable to open native file browser.", e );
+						}
+					}
+				} );
+			}
+		});
+		
+		table.setRowFactory( tv -> {
+			TableRow <TagError> row = new TableRow <>();
+
+			row.setContextMenu( trackContextMenu );
+			
+			row.setOnMouseClicked( event -> {
+				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
+					ui.tagWindow.setTracks( Arrays.asList ( row.getItem().getTrack() ), null );
+					ui.tagWindow.show();
+				}
+			});
+			
+			row.setOnDragDetected( event -> {
+				if ( !row.isEmpty() ) {
+					ArrayList <Integer> indices = new ArrayList <Integer>( table.getSelectionModel().getSelectedIndices() );
+					ArrayList <Track> tracks = new ArrayList <Track>( );
+					for ( Integer index : indices ) {
+						TagError error = table.getItems().get( index );
+						if ( error != null ) {
+							tracks.add( error.getTrack() );
+						}
+					}
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, null, DragSource.TAG_ERROR_LIST );
+					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
+					db.setDragView( row.snapshot( null, null ) );
+					ClipboardContent cc = new ClipboardContent();
+					cc.put( FXUI.DRAGGED_TRACKS, dragObject );
+					db.setContent( cc );
+					event.consume();
+				}
+			});
+			
+			return row;
+		});
+		
+		
+		
+		
 		
 		pane.getChildren().addAll( table );
 		

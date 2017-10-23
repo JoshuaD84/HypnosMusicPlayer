@@ -2,25 +2,20 @@ New Features
 			
 Bug Fixes / Incremental Improvements
 
-	Fix up tag window
-		Group album issues?
-		Allow tracks to be clicked to bring up the tag editor window
-		
-	Data lost when computer turned off (logging out doesn't trigger, only a power down while hypnos is running)
-		I don't think this is happening any more. 
-		
 	Hotkeys aren't consumed, so they are passed to the current window. 
 		Check windows and OSX
 		Create website /help/linux-globalhotkey-consume/
-	
-	
-	
 			
 Post Beta New Features		
 	Add default sort column choice, like shuffle and repeat
+	
+	Persist sort options
+	
+	Display release type in different color font
 					
 Post Beta fixes / updates / improvements 
-				
+	Icons on popup windows
+	
 	Settings Window
 		Look at how I center Global hotkeys tab; center "settings" tab the same way
 		

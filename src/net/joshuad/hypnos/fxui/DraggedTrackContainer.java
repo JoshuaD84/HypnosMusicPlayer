@@ -16,6 +16,7 @@ public class DraggedTrackContainer implements Serializable {
 		ALBUM_LIST,
 		TRACK_LIST,
 		PLAYLIST_LIST,
+		TAG_ERROR_LIST,
 		PLAYLIST_INFO,
 		ALBUM_INFO,
 		QUEUE,

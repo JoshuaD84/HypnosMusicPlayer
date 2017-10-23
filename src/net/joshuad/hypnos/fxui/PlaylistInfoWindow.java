@@ -1,7 +1,6 @@
 package net.joshuad.hypnos.fxui;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -306,6 +305,7 @@ public class PlaylistInfoWindow extends Stage {
 						case ALBUM_INFO:
 						case HISTORY: 
 						case CURRENT_LIST:
+						case TAG_ERROR_LIST:
 						case QUEUE: {
 							List <Track> tracksToCopy = container.getTracks();
 							trackTable.getItems().addAll( dropIndex, tracksToCopy );

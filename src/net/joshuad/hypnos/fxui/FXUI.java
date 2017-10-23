@@ -1248,10 +1248,9 @@ public class FXUI implements PlayerListener {
 		
 		artistImagePane.setOnDragDropped( event -> {
 			Dragboard db = event.getDragboard();
+
 			if ( db.hasFiles() ) {
 				List <File> files = db.getFiles();
-				event.setDropCompleted( true );
-				event.consume();
 				
 				for ( File file : files ) {
 					if ( Utils.isImageFile( file ) ) {
@@ -1268,15 +1267,15 @@ public class FXUI implements PlayerListener {
 			} else {
 				for ( DataFormat contentType : db.getContentTypes() ) {
 					if ( contentType == DataFormat.lookupMimeType("application/octet-stream" ) ) {
+						
 						ByteBuffer buffer = (ByteBuffer)db.getContent( contentType );
 						promptAndSaveArtistImage ( buffer.array() );
 					}
 				}
-				
-				event.setDropCompleted( true );
-				event.consume();
-				
 			}
+			
+			event.setDropCompleted( true );
+			event.consume();		
 		});
 	}
 	
@@ -2259,7 +2258,7 @@ public class FXUI implements PlayerListener {
 					}
 				}
 			} );
-			
+
 			row.setOnDragOver( event -> {
 				Dragboard db = event.getDragboard();
 				if ( db.hasFiles() ) {
@@ -2954,6 +2953,7 @@ public class FXUI implements PlayerListener {
 					case TRACK_LIST:
 					case ALBUM_INFO:
 					case PLAYLIST_INFO:
+					case TAG_ERROR_LIST:
 					case HISTORY: {
 						player.getCurrentList().appendTracks ( container.getTracks() );
 					
@@ -3279,6 +3279,7 @@ public class FXUI implements PlayerListener {
 						case TRACK_LIST:
 						case ALBUM_INFO:
 						case PLAYLIST_INFO:
+						case TAG_ERROR_LIST:
 						case HISTORY: {
 							player.getCurrentList().insertTracks( dropIndex, Utils.convertTrackList( container.getTracks() ) );
 						} break;
