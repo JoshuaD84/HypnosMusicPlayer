@@ -12,15 +12,9 @@ Bug Fixes / Incremental Improvements
 		
 	MusicFileVisitor > visitFile ->Info: Unable to load Track -- Give more info about track
 	
-	Sort tag window columns automatically - Location, Error Message, Filename
-	
-	No Tag Errors empty table label
-	
 	Dirty Mushrooms - Try to edit tag -- No table
 	
 	Typing in filter pane changes images, i don't like that. 
-	
-	Tag Window change "Track" to "Track #"
 			
 Post Beta New Features		
 	Add default sort column choice, like shuffle and repeat
@@ -55,6 +49,8 @@ Post Beta fixes / updates / improvements
 	Show play / pause icon on taskbar
 	
 	Dark theme for about tab settings
+	
+	Tag Window change "Track" to "Track #"
 	
 JavaFX stuff
 	hide/show via hotkeys while maximized toggles every 3 presses instead of every 2 presses. 

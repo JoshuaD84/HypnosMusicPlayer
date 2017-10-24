@@ -701,6 +701,7 @@ public class SettingsWindow extends Stage {
 		TableView <TagError> table = new TableView <TagError> ();
 		table.getColumns().addAll( pathColumn, filenameColumn, messageColumn );
 		table.getSortOrder().addAll( pathColumn, messageColumn, filenameColumn );
+		table.setPlaceholder( new Label( "There are no tag errors." ) );
 
 		library.getTagErrorsSorted().comparatorProperty().bind( table.comparatorProperty() );
 		
