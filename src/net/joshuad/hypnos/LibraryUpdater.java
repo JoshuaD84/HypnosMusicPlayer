@@ -138,7 +138,7 @@ public class LibraryUpdater {
 												if ( !player.isStopped() ) {
 													currentTrack = player.getCurrentTrack();
 												}
-												 
+												//TODO: This causes the artwork to disappear. 
 												player.getCurrentList().setAlbum( updateMe );
 												library.albumsToUpdate.remove( updateMe );
 												

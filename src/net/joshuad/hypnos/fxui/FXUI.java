@@ -1352,6 +1352,8 @@ public class FXUI implements PlayerListener {
 	
 	private Thread imageLoader = null;
 	public void setImages ( Track track ) {
+		(new Exception()).printStackTrace(); //TODO: DD
+		
 		currentImagesTrack = track;
 		if ( track != null && Files.exists( track.getPath() ) ) {
 			if ( imageLoader != null ) {
@@ -2232,11 +2234,16 @@ public class FXUI implements PlayerListener {
 		});
 		
 		albumTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
+			
 		    if ( newSelection != null ) {
 		    	setImages ( newSelection.getTracks().get( 0 ) );
 		    	albumInfoWindow.setAlbum( newSelection );
+		    	
+		    } else if ( player.getCurrentTrack() != null ) {
+		    	setImages ( player.getCurrentTrack() );
+		    	
 		    } else {
-		    	setImages ( null );
+		    	//Do nothing, leave the old artwork there. We can set to null if we like that better, I don't think so though
 		    }
 		});
 
@@ -2504,8 +2511,12 @@ public class FXUI implements PlayerListener {
 		    if (newSelection != null) {
 		    	setImages ( newSelection );
 		    	trackInfoWindow.setTrack( newSelection );
+		    	
+		    } else if ( player.getCurrentTrack() != null ) {
+		    	setImages ( player.getCurrentTrack() );
+		    	
 		    } else {
-		     	setImages ( null );
+		    	//Do nothing, leave the old artwork there. We can set to null if we like that better, I don't think so though
 		    }
 		});
 		

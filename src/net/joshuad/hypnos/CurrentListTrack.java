@@ -51,12 +51,7 @@ import javafx.beans.property.StringProperty;
 		}
 		
 		public void update() throws Exception {
-			long startTime = System.currentTimeMillis();
-			
 			refreshTagData();
-			
-			System.out.println ( "Refresh tag data: " + ( System.currentTimeMillis() - startTime  ) );
-			startTime = System.currentTimeMillis();
 			
 			if ( Utils.isAlbumDirectory( getPath().getParent() ) ) {
 				this.albumDirectory = getPath().getParent().toFile();
@@ -64,7 +59,6 @@ import javafx.beans.property.StringProperty;
 				this.albumDirectory = null;
 			}
 
-			System.out.println ( "album directory: " + ( System.currentTimeMillis() - startTime ) );
 			needsUpdate = false;
 		}
 		
