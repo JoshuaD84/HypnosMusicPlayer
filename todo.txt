@@ -13,8 +13,6 @@ Bug Fixes / Incremental Improvements
 	MusicFileVisitor > visitFile ->Info: Unable to load Track -- Give more info about track
 	
 	Dirty Mushrooms - Try to edit tag -- No table
-	
-	Renaming a playlist leaves the old file in place. 
 				
 Post Beta New Features		
 	Add default sort column choice, like shuffle and repeat

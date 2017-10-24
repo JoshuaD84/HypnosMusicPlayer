@@ -1530,12 +1530,20 @@ public class FXUI implements PlayerListener {
 			Playlist replaceMe = null;
 			String enteredName = result.get().trim();
 
-			library.removePlaylist( playlist );
-			playlist.setName ( enteredName );
-			library.addPlaylist( playlist );
-			playlistTable.refresh();
+			renamePlaylist ( playlist, enteredName );
 		}
 	}
+	
+	public void renamePlaylist ( Playlist playlist, String rawName ) {
+		String oldFileBasename = playlist.getBaseFilename();
+		library.removePlaylist( playlist );
+		playlist.setName ( rawName );
+		library.addPlaylist( playlist );
+		playlistTable.refresh();
+		Hypnos.getPersister().saveLibraryPlaylists();
+		Hypnos.getPersister().deletePlaylistFile( oldFileBasename );
+	}
+		
 
 	public void setupCurrentListControlPane () {
 

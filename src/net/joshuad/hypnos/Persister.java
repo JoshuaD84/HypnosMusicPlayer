@@ -334,8 +334,11 @@ public class Persister {
 	}
 	
 	public void deletePlaylistFile ( Playlist playlist ) {
-		String baseFileName = playlist.getBaseFilename();
-		Path targetFile = playlistsDirectory.toPath().resolve (  baseFileName + ".m3u" );
+		deletePlaylistFile ( playlist.getBaseFilename() );
+	}
+	
+	public void deletePlaylistFile ( String basename ) {
+		Path targetFile = playlistsDirectory.toPath().resolve (  basename + ".m3u" );
 		
 		try {
 			Files.deleteIfExists( targetFile );
