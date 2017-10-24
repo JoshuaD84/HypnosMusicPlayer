@@ -59,38 +59,37 @@ public class AudioPlayer {
 					stopRequested = false;
 				}	
 
-				if ( trackRequested != null ) {
-					
-					synchronized ( trackRequested ) {
-						
-						if ( decoder != null ) {
-							decoder.closeAllResources();
-						}
-						
-						try {
-							decoder = getDecoder ( trackRequested );
-							
-						} catch ( IllegalStateException e ) {
-							LOGGER.info( "Unable to play file: " + track.getFilename() );
-							trackRequested = null;
-						}
+				Track currentRequest = trackRequested;
+				trackRequested = null;
 
-						if ( decoder != null ) {
-							track = trackRequested;
-							setDecoderVolume( volumePercent );
-							controller.playerStarted( trackRequested );
-							updateTrackPosition();
-							state = PlayState.PLAYING;
-							
-						} else {
-							LOGGER.info( "Unable to initialize decoder for: " + trackRequested.getFilename() );
-							state = PlayState.STOPPED;
-						}
+				if ( currentRequest != null ) {
 
-						trackRequested = null;
-						stopRequested = false;
+					if ( decoder != null ) {
+						decoder.closeAllResources();
 					}
-				}
+					
+					try {
+						decoder = getDecoder ( currentRequest );
+						
+					} catch ( IllegalStateException e ) {
+						decoder = null;
+					}
+
+					if ( decoder != null ) {
+						track = currentRequest;
+						stopRequested = false;
+						setDecoderVolume( volumePercent );
+						controller.playerStarted( currentRequest );
+						updateTrackPosition();
+						state = PlayState.PLAYING;
+						
+					} else {
+						stopRequested = false;
+						LOGGER.info( "Unable to initialize decoder for: " + currentRequest.getFilename() );
+						state = PlayState.STOPPED;
+						controller.playerStopped( StopReason.UNABLE_TO_START_TRACK );
+					}
+				} 
 
 				if ( volumeErrorRequested ) {
 					state = PlayState.STOPPED;
@@ -204,6 +203,7 @@ public class AudioPlayer {
 	public void requestPlayTrack ( Track track, boolean startPaused ) {
 		trackRequested = track;
 		pauseRequested = startPaused;
+		System.out.println ( "Request heard." ); //TODO:
 	}
 	
 	public void requestSeekPercent ( double seekPercent ) {

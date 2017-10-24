@@ -28,6 +28,7 @@ public class AudioSystem {
 		END_OF_CURRENT_LIST,
 		EMPTY_LIST,
 		WRITING_TO_TAG,
+		UNABLE_TO_START_TRACK,
 		ERROR
 	}
 
@@ -481,11 +482,21 @@ public class AudioSystem {
 	
 	
 	
-//REFACTOR: Make these a listener interface, and add this object as a listener to player? 	
+	//REFACTOR: Make these a listener interface, and add this object as a listener to player? 	
 	
+	private int consecutiveFailedToStartCount = 0;
 	void playerStopped ( StopReason reason ) { 
 		if ( reason == StopReason.TRACK_FINISHED ) {
 			next ( false );
+			consecutiveFailedToStartCount = 0;
+			
+		} else if ( reason == StopReason.UNABLE_TO_START_TRACK ) {
+
+			consecutiveFailedToStartCount++;
+			
+			if ( consecutiveFailedToStartCount <= currentList.getItems().size() ) {
+				next ( false );
+			} 
 		}
 		
 		notifyListenersStopped ( history.getLastTrack(), reason );
@@ -521,6 +532,7 @@ public class AudioSystem {
 	                                                                 
 	public void playTrack ( Track track, boolean startPaused, boolean addToPreviousNextStack ) {
 		
+		System.out.println ( "Requesting play: " + track.getFilename() + ", startPaused: " + startPaused ); //TODO: DD
 		player.requestPlayTrack( track, startPaused );
 		
 		for ( CurrentListTrack listTrack : currentList.getItems() ) {
