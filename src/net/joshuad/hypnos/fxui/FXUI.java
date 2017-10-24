@@ -1352,7 +1352,6 @@ public class FXUI implements PlayerListener {
 	
 	private Thread imageLoader = null;
 	public void setImages ( Track track ) {
-		(new Exception()).printStackTrace(); //TODO: DD
 		
 		currentImagesTrack = track;
 		if ( track != null && Files.exists( track.getPath() ) ) {
@@ -3362,7 +3361,7 @@ public class FXUI implements PlayerListener {
 		});
 	}
 
-	public void hackTooltipStartTiming() {
+	private void hackTooltipStartTiming() {
 	    try {
 	    	Tooltip tooltip = new Tooltip ();
 	        Field fieldBehavior = tooltip.getClass().getDeclaredField("BEHAVIOR");
@@ -3953,6 +3952,10 @@ public class FXUI implements PlayerListener {
 		alert.getDialogPane().setContent( holder );
 		
 		alert.showAndWait(); 
+	}
+	
+	public Track getCurrentImagesTrack() {
+		return currentImagesTrack;
 	}
 }
 

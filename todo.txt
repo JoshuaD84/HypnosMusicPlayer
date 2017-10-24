@@ -14,8 +14,8 @@ Bug Fixes / Incremental Improvements
 	
 	Dirty Mushrooms - Try to edit tag -- No table
 	
-	Typing in filter pane changes images, i don't like that. 
-			
+	Renaming a playlist leaves the old file in place. 
+				
 Post Beta New Features		
 	Add default sort column choice, like shuffle and repeat
 	

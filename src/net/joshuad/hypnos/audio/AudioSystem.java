@@ -532,7 +532,6 @@ public class AudioSystem {
 	                                                                 
 	public void playTrack ( Track track, boolean startPaused, boolean addToPreviousNextStack ) {
 		
-		System.out.println ( "Requesting play: " + track.getFilename() + ", startPaused: " + startPaused ); //TODO: DD
 		player.requestPlayTrack( track, startPaused );
 		
 		for ( CurrentListTrack listTrack : currentList.getItems() ) {

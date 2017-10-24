@@ -141,9 +141,9 @@ public class Hypnos extends Application {
 		isDeveloping = Boolean.getBoolean( "hypnos.developing" );
 		disableHotkeys = Boolean.getBoolean( "hypnos.disableglobalhotkeys" );
 		
-		if ( isStandalone ) LOGGER.info ( "Running as standalone by system properties set at program launch" );
-		if ( isDeveloping ) LOGGER.info ( "Running on development port by system properties set at program launch" );
-		if ( isDeveloping ) LOGGER.info ( "Global hotkeys disabled by system properties set at program launch" );
+		if ( isStandalone ) LOGGER.info ( "Running as standalone - requested by system properties set at program launch" );
+		if ( isDeveloping ) LOGGER.info ( "Running on development port - requested by system properties set at program launch" );
+		if ( isDeveloping ) LOGGER.info ( "Global hotkeys disabled - requested by system properties set at program launch" );
 	}
 	
 	private void determineOS() {

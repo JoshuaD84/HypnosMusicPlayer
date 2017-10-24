@@ -203,7 +203,6 @@ public class AudioPlayer {
 	public void requestPlayTrack ( Track track, boolean startPaused ) {
 		trackRequested = track;
 		pauseRequested = startPaused;
-		System.out.println ( "Request heard." ); //TODO:
 	}
 	
 	public void requestSeekPercent ( double seekPercent ) {
