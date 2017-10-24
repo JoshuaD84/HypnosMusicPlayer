@@ -684,7 +684,6 @@ public class SettingsWindow extends Stage {
 		headerLabel.setTextAlignment( TextAlignment.CENTER );
 		headerLabel.setStyle( "-fx-font-size: 20px; -fx-font-weight: bold" );
 		pane.getChildren().add( headerLabel );
-
 		
 		TableColumn<TagError, String> pathColumn = new TableColumn<TagError, String> ( "Location" );
 		TableColumn<TagError, String> filenameColumn = new TableColumn<TagError, String> ( "Filename" );
@@ -701,6 +700,7 @@ public class SettingsWindow extends Stage {
 
 		TableView <TagError> table = new TableView <TagError> ();
 		table.getColumns().addAll( pathColumn, filenameColumn, messageColumn );
+		table.getSortOrder().addAll( pathColumn, messageColumn, filenameColumn );
 
 		library.getTagErrorsSorted().comparatorProperty().bind( table.comparatorProperty() );
 		
