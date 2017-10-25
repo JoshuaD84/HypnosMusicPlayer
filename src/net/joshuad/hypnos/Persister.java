@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import net.joshuad.hypnos.LibraryUpdater.LoaderSpeed;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.FXUI;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
@@ -40,7 +41,7 @@ public class Persister {
 		SHUFFLE, REPEAT, HIDE_ALBUM_TRACKS, WINDOW_MAXIMIZED, PRIMARY_SPLIT_PERCENT, 
 		CURRENT_LIST_SPLIT_PERCENT, ART_SPLIT_PERCENT, WINDOW_X_POSITION, WINDOW_Y_POSITION, 
 		WINDOW_WIDTH, WINDOW_HEIGHT, TRACK, TRACK_POSITION, TRACK_NUMBER, VOLUME, LIBRARY_TAB,
-		PROMPT_BEFORE_OVERWRITE, THEME,
+		PROMPT_BEFORE_OVERWRITE, THEME, LOADER_SPEED,
 		DEFAULT_SHUFFLE_TRACKS, DEFAULT_SHUFFLE_ALBUMS, DEFAULT_SHUFFLE_PLAYLISTS,
 		DEFAULT_REPEAT_TRACKS, DEFAULT_REPEAT_ALBUMS, DEFAULT_REPEAT_PLAYLISTS,
 		MAXIMIZED_ARTIST_PANE_HEIGHT
@@ -423,6 +424,8 @@ public class Persister {
 				String valueOut = value == null ? "null" : value.toString();
 				settingsOut.printf( "%s: %s\n", key, valueOut );
 			} );
+			
+			settingsOut.printf( "%s: %s\n", Setting.LOADER_SPEED, Hypnos.getLoaderSpeed() );
 
 			settingsOut.flush();
 			settingsOut.close();
@@ -479,6 +482,10 @@ public class Persister {
 					case THEME:
 					case MAXIMIZED_ARTIST_PANE_HEIGHT:
 						loadMe.put( setting, value );
+						break;
+					case LOADER_SPEED:
+						Hypnos.setLoaderSpeed( LoaderSpeed.valueOf( value ) );
+					default:
 						break;
 				}
 			}

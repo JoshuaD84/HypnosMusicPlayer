@@ -100,6 +100,7 @@ import net.joshuad.hypnos.CurrentListState;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Library;
+import net.joshuad.hypnos.LibraryUpdater.LoaderSpeed;
 import net.joshuad.hypnos.Persister;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
@@ -3388,6 +3389,9 @@ public class FXUI implements PlayerListener {
 	    
 	}
 	
+	public void setLoaderSpeedDisplay ( LoaderSpeed speed ) {
+		this.libraryLocationWindow.setLoaderSpeedDisplay ( speed );
+	}
 
 	public void updateAlbumListPlaceholder() {
 
@@ -3691,6 +3695,11 @@ public class FXUI implements PlayerListener {
 						} else {
 							removeDarkTheme();
 						}
+						break;
+						
+					case LOADER_SPEED:
+					default:
+						//Do nothing
 						break;
 				}
 			} catch ( Exception e ) {

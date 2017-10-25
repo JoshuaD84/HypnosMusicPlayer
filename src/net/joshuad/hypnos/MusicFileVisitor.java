@@ -17,8 +17,14 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 	
 	Library library;
 	
+	private static long sleepTime = 2;
+	
 	public MusicFileVisitor ( Library library ) {
 		this.library = library;
+	}
+	
+	public static void setSleepTimeBetweenVisits ( long timeMS ) {
+		sleepTime = timeMS;
 	}
 	
 	@Override
@@ -29,7 +35,7 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 		}
 
 		try {
-			Thread.sleep( 2 );
+			Thread.sleep( sleepTime );
 		} catch ( InterruptedException e ) {
 			LOGGER.fine ( "Sleep interrupted during walk break." );
 		}

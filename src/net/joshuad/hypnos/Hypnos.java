@@ -29,6 +29,7 @@ import org.jnativehook.NativeHookException;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
+import net.joshuad.hypnos.LibraryUpdater.LoaderSpeed;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.StopReason;
 import net.joshuad.hypnos.fxui.FXUI;
@@ -75,12 +76,14 @@ public class Hypnos extends Application {
 	private static Persister persister;
 	private static AudioSystem player;
 	private static FXUI ui;
-	private LibraryUpdater libraryUpdater;
+	private static LibraryUpdater libraryUpdater;
 	private static Library library;
-	private GlobalHotkeys hotkeys;
+	private static GlobalHotkeys hotkeys;
 	
 	private static PrintStream originalOut;
 	private static PrintStream originalErr;
+	
+	private static LoaderSpeed loaderSpeed = LoaderSpeed.HIGH;
 	
 	private static ByteArrayOutputStream logBuffer; //Used to store log info until log file is initialized
 	
@@ -120,7 +123,49 @@ public class Hypnos extends Application {
 	public static Library getLibrary() {
 		return library;
 	}
-
+	
+	public static LoaderSpeed getLoaderSpeed ( ) {
+		return loaderSpeed;
+	}
+	
+	public static void setLoaderSpeed ( LoaderSpeed speed ) {
+		/*Items that have background loading threads
+		 * CurrentList -> updates missing tracks, relinks files, updates track data, etc. on current list.
+		 * Library -> LoaderThread
+		 * LibraryUpdater -> updaterThread
+		 * MusicFileVisitor -> has a sleep increment
+		 * AudioPlayer -> PlayerThread
+		 */
+		
+		loaderSpeed = speed;
+		
+		switch ( speed ) {
+			case LOW:
+				MusicFileVisitor.setSleepTimeBetweenVisits( 150 );
+				library.setLoaderSleepTimeMS( 250 );
+				libraryUpdater.setMaxChangesPerUpdate ( 500 );
+				libraryUpdater.setSleepTimeMS( 60 );
+				break;
+				
+			case MED:
+				MusicFileVisitor.setSleepTimeBetweenVisits( 50 );
+				library.setLoaderSleepTimeMS( 50 );
+				libraryUpdater.setMaxChangesPerUpdate ( 2000 );
+				libraryUpdater.setSleepTimeMS( 15 );
+				break;
+				
+			case HIGH:
+				MusicFileVisitor.setSleepTimeBetweenVisits( 0 );
+				library.setLoaderSleepTimeMS( 0 );
+				libraryUpdater.setMaxChangesPerUpdate ( 20000 );
+				libraryUpdater.setSleepTimeMS( 2 );
+				break;
+		}
+		//TODO: 
+		
+		ui.setLoaderSpeedDisplay ( speed );
+		
+	}
 	
 	private static void startLogToBuffer() {
 		originalOut = System.out;
@@ -525,6 +570,7 @@ public class Hypnos extends Application {
 				startGlobalHotkeyListener();
 				
 				ui = new FXUI ( stage, library, player, hotkeys );
+				libraryUpdater = new LibraryUpdater ( library, player, ui );
 				
 				persister = new Persister ( ui, library, player, hotkeys );
 				
@@ -532,12 +578,11 @@ public class Hypnos extends Application {
 				ui.showMainWindow();
 				persister.loadDataAfterShowWindow();
 				
-				libraryUpdater = new LibraryUpdater ( library, player, ui );
-				
 				applyCLICommands( commands );
 				
 				singleInstanceController.startCLICommandListener ( this );
 				
+				libraryUpdater.start();
 				library.startLoader( persister );
 				
 				LOGGER.info( "Hypnos finished loading." );

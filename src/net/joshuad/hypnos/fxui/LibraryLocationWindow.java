@@ -15,8 +15,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -29,7 +31,9 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Library;
+import net.joshuad.hypnos.LibraryUpdater.LoaderSpeed;
 
 public class LibraryLocationWindow extends Stage {
 
@@ -39,6 +43,8 @@ public class LibraryLocationWindow extends Stage {
 
 	Scene scene;
 	
+	Slider prioritySlider;
+	
 	public LibraryLocationWindow ( Stage mainStage, Library library ) {
 		super();
 		this.library = library;
@@ -46,7 +52,7 @@ public class LibraryLocationWindow extends Stage {
 		initModality( Modality.NONE );
 		initOwner( mainStage );
 		setTitle( "Music Search Locations" );
-		setWidth( 350 );
+		setWidth( 400 );
 		setHeight( 500 );
 		Pane root = new Pane();
 		scene = new Scene( root );
@@ -161,12 +167,61 @@ public class LibraryLocationWindow extends Stage {
 		controlBox.prefWidthProperty().bind( widthProperty() );
 		controlBox.setPadding( new Insets( 5 ) );
 		
+		Label priorityLabel = new Label ( "Load Speed:" );
+		priorityLabel.setTooltip ( new Tooltip ( "How much resources to consume while loading and updating the library.\n(If your computer or hypnos is choppy while loading, try turning this down.)" ) );
+		priorityLabel.setPadding( new Insets ( 0, 10, 0, 0 ) );
+		
+		prioritySlider = new Slider ( 1, 3, 1 );
+		prioritySlider.prefWidthProperty().bind( widthProperty().subtract( 150 ) );
+		prioritySlider.setShowTickMarks( true );
+		prioritySlider.setMinorTickCount( 0 );
+		prioritySlider.setMajorTickUnit( 1 );
+		prioritySlider.setShowTickLabels( true );
+		prioritySlider.setSnapToTicks( true );
+		
+		prioritySlider.valueProperty().addListener( new ChangeListener <Number>() {
+			public void changed ( ObservableValue <? extends Number> oldValueObs, Number oldValue, Number newValue ) {
+				switch ( newValue.intValue() ) {
+					case 1:
+						Hypnos.setLoaderSpeed( LoaderSpeed.LOW );
+						break;
+					case 2:
+						Hypnos.setLoaderSpeed( LoaderSpeed.MED );
+						break;
+					case 3:
+						Hypnos.setLoaderSpeed( LoaderSpeed.HIGH );
+						break;
+				}
+			}
+		} );
+		
+		HBox priorityBox = new HBox();
+		priorityBox.getChildren().addAll( priorityLabel, prioritySlider);
+		priorityBox.setAlignment( Pos.CENTER );
+		priorityBox.prefWidthProperty().bind( widthProperty() );
+		priorityBox.setPadding( new Insets( 5 ) );
+		
 		primaryPane.prefWidthProperty().bind( root.widthProperty() );
 		primaryPane.prefHeightProperty().bind( root.heightProperty() );
 		musicSourceTable.prefHeightProperty().bind( root.heightProperty().subtract( controlBox.heightProperty() ) );
 
-		primaryPane.getChildren().addAll( musicSourceTable, controlBox );
+		primaryPane.getChildren().addAll( musicSourceTable, priorityBox, controlBox );
 		root.getChildren().add( primaryPane );
 		setScene( scene );
 	}
+	
+	public void setLoaderSpeedDisplay ( LoaderSpeed speed ) {
+		switch ( speed ) {
+			case LOW:
+				prioritySlider.setValue( 1 );
+				break;
+			case MED:
+				prioritySlider.setValue( 2 );
+				break;
+			case HIGH:
+				prioritySlider.setValue( 3 );
+				break;
+		}
+	}
+	
 }

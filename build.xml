@@ -63,7 +63,7 @@
 	<target name="dist-nix" depends="jar" description="Make a .tar.gz without a JRE for linux distribution">
 		<sequential>
 			<delete dir="${temp}" />
-			<mkdir dir="${temp}/Hypnos" />
+			<mkdir dir="${temp}/hypnos" />
 			
 			<copy todir="${temp}/Hypnos" >
 				<fileset dir="stage" >

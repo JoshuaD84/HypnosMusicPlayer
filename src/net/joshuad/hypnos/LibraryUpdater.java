@@ -11,21 +11,27 @@ import net.joshuad.hypnos.fxui.FXUI;
 
 public class LibraryUpdater {
 	private static final Logger LOGGER = Logger.getLogger( LibraryUpdater.class.getName() );
+	
+	public enum LoaderSpeed {
+		LOW, MED, HIGH
+	}
 
-	private static final int MAX_CHANGES_PER_REQUEST = 2000;
-
+	private int maxChangesPerUpdate = 2000;
+	private int sleepTimeMS = 15;
+	
 	private boolean runLaterPending = false;
 	
 	private FXUI ui;
 	private Library library;
 	private AudioSystem player;
+	private Thread libraryUpdaterThread;
 	
 	public LibraryUpdater( Library library, AudioSystem player, FXUI ui ) {
 		this.ui = ui;
 		this.library = library;
 		this.player = player;
 		
-		Thread libraryUpdaterThread = new Thread( () -> {
+		libraryUpdaterThread = new Thread( () -> {
 			while ( true ) {
 				if( !runLaterPending ) {
 					updateLibrary();
@@ -40,7 +46,18 @@ public class LibraryUpdater {
 		});
 		
 		libraryUpdaterThread.setDaemon( true );
+	}
+	
+	public void start () {
 		libraryUpdaterThread.start();
+	}
+	
+	public void setMaxChangesPerUpdate ( int max ) {
+		this.maxChangesPerUpdate = max;
+	}
+	
+	public void setSleepTimeMS ( int timeMS ) {
+		this.sleepTimeMS = timeMS;
 	}
 	
 	private void updateLibrary () { 
@@ -84,14 +101,14 @@ public class LibraryUpdater {
 					
 					synchronized ( library.albumsToRemove ) {
 						if ( !library.albumsToRemove.isEmpty() ) {
-							while ( changeCount < MAX_CHANGES_PER_REQUEST && !library.albumsToRemove.isEmpty() ) {
+							while ( changeCount < maxChangesPerUpdate && !library.albumsToRemove.isEmpty() ) {
 								library.albums.remove( library.albumsToRemove.remove( 0 ) );
 								changeCount++;
 							}
 							
 							ui.updateAlbumListPlaceholder();
 
-							if ( changeCount >= MAX_CHANGES_PER_REQUEST ) {
+							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshAlbumTable(); //TODO: this may not be necessary. 
 								return;
 							}
@@ -100,14 +117,14 @@ public class LibraryUpdater {
 						
 					synchronized ( library.albumsToAdd ) {
 						if ( !library.albumsToAdd.isEmpty() ) {
-							while ( changeCount < MAX_CHANGES_PER_REQUEST && !library.albumsToAdd.isEmpty() ) {
+							while ( changeCount < maxChangesPerUpdate && !library.albumsToAdd.isEmpty() ) {
 								library.albums.add( library.albumsToAdd.remove( 0 ) );
 								changeCount++;
 							}
 							
 							ui.updateAlbumListPlaceholder();
 
-							if ( changeCount >= MAX_CHANGES_PER_REQUEST ) {
+							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshAlbumTable();  //TODO: this may not be necessary. 
 								return;
 							}
@@ -117,7 +134,7 @@ public class LibraryUpdater {
 					synchronized ( library.albumsToUpdate ) {
 						if ( !library.albumsToUpdate.isEmpty() ) {
 							synchronized ( library.albumsToUpdate ) {
-								while ( changeCount < MAX_CHANGES_PER_REQUEST && !library.albumsToUpdate.isEmpty() ) {
+								while ( changeCount < maxChangesPerUpdate && !library.albumsToUpdate.isEmpty() ) {
 									Album updateSource = library.albumsToUpdate.remove( 0 );
 									
 									if ( library.albums.contains( updateSource ) ) {
@@ -170,7 +187,7 @@ public class LibraryUpdater {
 									changeCount += 2; //We charge two here because this is a costly transaction
 	 							}
 								
-								if ( changeCount >= MAX_CHANGES_PER_REQUEST ) {
+								if ( changeCount >= maxChangesPerUpdate ) {
 									ui.refreshAlbumTable();  //TODO: this may not be necessary. 
 									return;
 								}
@@ -180,19 +197,22 @@ public class LibraryUpdater {
 					
 					synchronized ( library.tracksToRemove ) {
 						if ( !library.tracksToRemove.isEmpty() ) {
-							while ( changeCount < MAX_CHANGES_PER_REQUEST && !library.tracksToRemove.isEmpty() ) {
+							while ( changeCount < maxChangesPerUpdate && !library.tracksToRemove.isEmpty() ) {
 								Track removeMe = library.tracksToRemove.remove( 0 );
-								boolean removed = library.tracks.remove( removeMe );
-								library.tagErrors.removeAll( removeMe.getTagErrors() );
 								
-								if ( removed ) {
-									changeCount++;
+								if ( removeMe != null ) {
+									boolean removed = library.tracks.remove( removeMe );
+									library.tagErrors.removeAll( removeMe.getTagErrors() );
+									
+									if ( removed ) {
+										changeCount++;
+									}
 								}
 							}
 
 							ui.updateTrackListPlaceholder();
 							
-							if ( changeCount >= MAX_CHANGES_PER_REQUEST ) {
+							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshTrackTable(); //TODO: this may not be necessary. 
 								return;
 							}
@@ -201,7 +221,7 @@ public class LibraryUpdater {
 						
 					synchronized ( library.tracksToAdd ) {
 						if ( !library.tracksToAdd.isEmpty() ) {
-							while ( changeCount < MAX_CHANGES_PER_REQUEST && !library.tracksToAdd.isEmpty() ) {
+							while ( changeCount < maxChangesPerUpdate && !library.tracksToAdd.isEmpty() ) {
 								Track track = library.tracksToAdd.remove( 0 );
 								if ( !library.containsTrack( track ) ) {
 									library.tracks.add( track );
@@ -213,7 +233,7 @@ public class LibraryUpdater {
 
 							ui.updateTrackListPlaceholder();
 							
-							if ( changeCount >= MAX_CHANGES_PER_REQUEST ) {
+							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshTrackTable(); //TODO: this may not be necessary. 
 								return;
 							}
@@ -222,7 +242,7 @@ public class LibraryUpdater {
 	
 					synchronized ( library.tracksToUpdate ) {
 						if ( !library.tracksToUpdate.isEmpty() ) {
-							while ( changeCount < MAX_CHANGES_PER_REQUEST && !library.tracksToUpdate.isEmpty() ) {
+							while ( changeCount < maxChangesPerUpdate && !library.tracksToUpdate.isEmpty() ) {
 								Track track = library.tracksToUpdate.remove( 0 );
 								
 								List <TagError> removeMe = new ArrayList <TagError> ();
@@ -248,7 +268,7 @@ public class LibraryUpdater {
 
 							ui.updateTrackListPlaceholder();
 							
-							if ( changeCount >= MAX_CHANGES_PER_REQUEST ) {
+							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshTrackTable(); //TODO: this may not be necessary. 
 								return;
 							}

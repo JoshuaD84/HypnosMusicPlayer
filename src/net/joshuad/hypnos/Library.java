@@ -84,6 +84,8 @@ public class Library {
 	
 	private boolean purgeOrphansAndMissing = true;
 	
+	private int loaderSleepTimeMS = 50;
+	
 	public Library() {
 		modifiedFileDelayedUpdater = new ModifiedFileUpdaterThread( this );
 		if ( watcher == null ) {
@@ -124,9 +126,13 @@ public class Library {
 						albumTrackDataChangedSinceLastSave = true;
 						
 					} else if ( purgeOrphansAndMissing && albumsToRemove.isEmpty() && tracksToRemove.isEmpty() ) {
-						purgeMissingFiles();
-						purgeOrphans();
+						boolean missingFiles = purgeMissingFiles();
+						boolean orphans = purgeOrphans();
 						purgeOrphansAndMissing = false;
+						
+						if ( missingFiles || orphans ) {
+							albumTrackDataChangedSinceLastSave = true;
+						}
 					
 					} else {
 						processWatcherEvents();
@@ -150,7 +156,7 @@ public class Library {
 					}
 					
 					try {
-						Thread.sleep( 50 );
+						Thread.sleep( loaderSleepTimeMS );
 						purgeCounter++;
 						
 						if ( purgeCounter > 20 ) {
@@ -168,6 +174,10 @@ public class Library {
 		
 		loaderThread.setDaemon( true );
 		loaderThread.start();
+	}
+	
+	public void setLoaderSleepTimeMS ( int timeMS ) {
+		this.loaderSleepTimeMS = timeMS;
 	}
 	
 	public void requestUpdateSources ( List<Path> paths ) {
@@ -444,23 +454,28 @@ public class Library {
 		watcherRegisterAll ( selectedPath );
 	}
 	
-	private void purgeMissingFiles() {
+	private boolean purgeMissingFiles() {
+		boolean changed = false;
 		ArrayList <Album> albumsCopy = new ArrayList <Album> ( albums );
 		for ( Album album : albumsCopy ) {
 			if ( !Files.exists( album.getPath() ) || !Files.isDirectory( album.getPath() ) ) {
 				removeAlbum ( album );
+				changed = true;
 			}
 		}
 		
 		ArrayList <Track> tracksCopy = new ArrayList <Track> ( tracks );
 		for ( Track track : tracksCopy ) {
 			if ( !Files.exists( track.getPath() ) || !Files.isRegularFile( track.getPath() ) ) {
-				removeTrack ( track);
+				removeTrack ( track );
+				changed = true;
 			}
 		}
+		return changed;
 	}
 	
-	private void purgeOrphans () {
+	private boolean purgeOrphans () {
+		boolean changed = false;
 		ArrayList <Album> albumsCopy = new ArrayList <Album> ( albums );
 		for ( Album album : albumsCopy ) {
 			boolean hasParent = false;
@@ -475,6 +490,7 @@ public class Library {
 				ArrayList <Track> albumTracks = album.getTracks();
 				if ( albumTracks != null ) {
 					tracksToRemove.addAll( albumTracks );
+					changed = true;
 				}
 			}
 		}
@@ -490,8 +506,10 @@ public class Library {
 			
 			if ( !hasParent ) {
 				tracksToRemove.add( track );
+				changed = true;
 			}
 		}
+		return changed;
 	}
 	
 	private void watcherRegisterAll ( final Path start ) {

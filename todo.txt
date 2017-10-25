@@ -1,4 +1,6 @@
 New Features
+		
+			
 			
 Bug Fixes / Incremental Improvements
 
@@ -6,8 +8,9 @@ Bug Fixes / Incremental Improvements
 		Check windows and OSX
 		Create website /help/linux-globalhotkey-consume/
 	
-	Dirty Mushrooms - Try to edit tag -- No table
-				
+	When removing all sources, it takes a long time to remove everything (5+ seconds)
+	
+					
 Post Beta New Features		
 	Add default sort column choice, like shuffle and repeat
 	
