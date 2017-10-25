@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.KeyNotFoundException;
@@ -177,7 +178,13 @@ public class TagWindow extends Stage {
 			
 			Track firstTrack = tracks.get( 0 );
 			
-			Tag firstTag = AudioFileIO.read( firstTrack.getPath().toFile() ).getTag();
+			AudioFile firstAudioFile = AudioFileIO.read( firstTrack.getPath().toFile() );
+			
+			Tag firstTag = firstAudioFile.getTag();
+			
+			if ( firstTag == null ) {
+				firstTag = firstAudioFile.createDefaultTag();
+			}
 			
 			for ( FieldKey key : supportedTags ) {
 				
@@ -196,7 +203,14 @@ public class TagWindow extends Stage {
 			for ( int k = 1 ; k < tracks.size() ; k++ ) {
 				
 				Track track = tracks.get ( k );
-				Tag tag = AudioFileIO.read( track.getPath().toFile() ).getTag();
+				
+				AudioFile audioFile = AudioFileIO.read( track.getPath().toFile() );
+				
+				Tag tag = audioFile.getTag();
+				
+				if ( tag == null ) {
+					tag = audioFile.createDefaultTag();
+				}
 				
 				for ( MultiFileTagPair tagPair : tagPairs ) {
 					FieldKey key = tagPair.getKey();

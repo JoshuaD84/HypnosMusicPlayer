@@ -2,15 +2,9 @@ New Features
 			
 Bug Fixes / Incremental Improvements
 
-	Playlist track album propegation
-		Right now I have it updating in currentListWatcher
-		An alternative is to write the album data out to playlist file as a comment I think that might b egood
-
 	Hotkeys aren't consumed, so they are passed to the current window. 
 		Check windows and OSX
 		Create website /help/linux-globalhotkey-consume/
-		
-	MusicFileVisitor > visitFile ->Info: Unable to load Track -- Give more info about track
 	
 	Dirty Mushrooms - Try to edit tag -- No table
 				

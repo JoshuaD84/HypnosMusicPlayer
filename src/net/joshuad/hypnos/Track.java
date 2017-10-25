@@ -793,20 +793,29 @@ public class Track implements Serializable {
 			return null;
 		}
 		
+		List<Artwork> artworkList = null;
 		try {
-			List<Artwork> artworkList = getAudioFile().getTag().getArtworkList();
-			if ( artworkList != null ) {
-				for ( Artwork artwork : artworkList ) {
-					if ( artwork.getPictureType() == 3 ) {	
-						Image coverImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
-						if ( coverImage != null ) return coverImage;
-					} 
-				}
-			}			
-		} catch ( ClosedByInterruptException e ) {
-			//Do nothing
+			artworkList = getAudioFile().getTag().getArtworkList(); //This line can throw a NPE
 		} catch ( Exception e ) {
-			LOGGER.log( Level.INFO, "Unable to load album image from tag for file: " + getFilename(), e );
+			//Do nothing, there is no artwork in this file, no big deal. 
+		}
+		if ( artworkList != null ) {
+			try {
+				
+				artworkList = getAudioFile().getTag().getArtworkList();
+				if ( artworkList != null ) {
+					for ( Artwork artwork : artworkList ) {
+						if ( artwork.getPictureType() == 3 ) {	
+							Image coverImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
+							if ( coverImage != null ) return coverImage;
+						} 
+					}
+				}			
+			} catch ( ClosedByInterruptException e ) {
+				//Do nothing
+			} catch ( Exception e ) {
+				LOGGER.log( Level.INFO, "Unable to load album image from tag for file: " + getFilename(), e );
+			}
 		}
 		
 		Path bestPath = getPreferredAlbumCoverPath ();
@@ -815,8 +824,14 @@ public class Track implements Serializable {
 			return new Image( bestPath.toUri().toString() );
 		}
 		
+		artworkList = null;
 		try {
-			List<Artwork> artworkList = getAudioFile().getTag().getArtworkList();
+			artworkList = getAudioFile().getTag().getArtworkList(); //This line can throw a NPE
+		} catch ( Exception e ) {
+			//Do nothing, there is no artwork in this file, no big deal. 
+		}
+		
+		try {
 			if ( artworkList != null ) {
 				for ( Artwork artwork : artworkList ) {
 					if ( artwork.getPictureType() == 0 ) {
@@ -909,8 +924,14 @@ public class Track implements Serializable {
 			if ( tagArtistImage != null ) return tagArtistImage;
 		}
 		
+		List<Artwork> artworkList = null;
 		try {
-			List<Artwork> artworkList = getAudioFile().getTag().getArtworkList(); //This line can throw a NPE
+			artworkList = getAudioFile().getTag().getArtworkList(); //This line can throw a NPE
+		} catch ( Exception e ) {
+			//Do nothing, there is no artwork in this file, no big deal. 
+		}
+		
+		try {
 			if ( artworkList != null ) {
 				for ( Artwork artwork : artworkList ) {
 					

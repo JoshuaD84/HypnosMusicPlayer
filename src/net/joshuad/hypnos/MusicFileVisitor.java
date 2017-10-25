@@ -57,7 +57,7 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 						library.addTrack( track );
 					}
 				} catch ( Exception e ) { 
-					LOGGER.log( Level.INFO, "Unable to load track", e );
+					LOGGER.log( Level.INFO, e.getClass().getCanonicalName() + ": Unable to load track: " + file, e );
 				}
 
 				return FileVisitResult.CONTINUE;
