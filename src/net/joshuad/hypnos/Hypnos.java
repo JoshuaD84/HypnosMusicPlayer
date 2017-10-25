@@ -40,7 +40,7 @@ public class Hypnos extends Application {
 
 	private static final Logger LOGGER = Logger.getLogger( Hypnos.class.getName() );
 	
-	private static String versionString = "Beta 1 - 2017/10/16";
+	private static String versionString = "Beta 1 - 2017/10/25";
 
 	public enum ExitCode {
 		NORMAL,

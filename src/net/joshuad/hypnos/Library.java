@@ -112,7 +112,6 @@ public class Library {
 			public void run() {
 				int purgeCounter = 0;
 				while ( true ) {
-					
 					if ( !sourceToRemove.isEmpty() ) {
 						removeOneSource();
 						albumTrackDataChangedSinceLastSave = true;
@@ -135,7 +134,7 @@ public class Library {
 						}
 					
 					} else {
-						processWatcherEvents();
+						processWatcherEvents(); //Note: this blocks for 250ms, see function
 					}
 
 					if ( System.currentTimeMillis() - lastSaveTime > SAVE_ALL_INTERVAL ) {

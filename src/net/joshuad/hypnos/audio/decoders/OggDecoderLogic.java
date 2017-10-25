@@ -19,6 +19,8 @@ import com.jcraft.jorbis.Comment;
 import com.jcraft.jorbis.DspState;
 import com.jcraft.jorbis.Info;
 
+//TODO: This class doesn't handle errors very well. 
+
 public class OggDecoderLogic {
 
 	private static final Logger LOGGER = Logger.getLogger( OggDecoderLogic.class.getName() );
