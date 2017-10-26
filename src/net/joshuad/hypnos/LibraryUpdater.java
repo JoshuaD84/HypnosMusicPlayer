@@ -154,7 +154,7 @@ public class LibraryUpdater {
 												
 												Track currentTrack = null;
 												Track currentArtImages = ui.getCurrentImagesTrack();
-												List <CurrentListTrack> selectedItems = ui.getSelectedTracks();
+												List <CurrentListTrack> selectedItems = new ArrayList<> ( ui.getSelectedTracks() );
 												
 												if ( !player.isStopped() ) {
 													currentTrack = player.getCurrentTrack();
