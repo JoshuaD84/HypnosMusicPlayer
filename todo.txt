@@ -1,13 +1,22 @@
 New Features		
 			
 Bug Fixes / Incremental Improvements
-	After jumping to a queue song that's not on the list, resume playing where we left off. 
-
 	Hotkeys aren't consumed, so they are passed to the current window. 
 		Check windows and OSX
 		Create website /help/linux-globalhotkey-consume/
 		
-	Tag auto fix button
+	Play and next don't work when stopped and no items selected on current list
+	
+	Spamming next causes a lock in the player thread. 
+	
+	Bug
+		Load an album
+		Delete a track (says Playlist - New *)
+		close hypnos
+		reopen hypnos
+		it shows the list correctly briefly, but then updates the list to the old current album. Don't do that. 
+		
+	
 					
 Post Beta New Features		
 	Add default sort column choice, like shuffle and repeat
@@ -16,8 +25,16 @@ Post Beta New Features
 	
 	Album list - Display disc and release type in different color font
 					
+	Tag auto fix button
+	
+	
 Post Beta fixes / updates / improvements 
 
+	Setup a currentList.updateAlbum and updatePlaylist system
+		Doesn't change artwork
+		CurrentplayingTrack is the same one
+		updates data and locations
+		
 	When removing all sources, it takes a long time to remove everything (5+ seconds)
 		This is because of the processWatcherEvents function taking lots of time on load. 
 		

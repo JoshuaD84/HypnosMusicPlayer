@@ -559,6 +559,20 @@ public class FXUI implements PlayerListener {
 		return currentListTable.getSelectionModel().getSelectedItem();
 	}
 	
+	public ObservableList <CurrentListTrack> getSelectedTracks () {
+		return currentListTable.getSelectionModel().getSelectedItems();
+	}
+	
+	public void setSelectedTracks ( List <CurrentListTrack> selectMe ) {
+		currentListTable.getSelectionModel().clearSelection();
+		
+		if ( selectMe != null ) {
+			for ( CurrentListTrack track : selectMe ) {
+				currentListTable.getSelectionModel().select( track );
+			}
+		}
+	}
+	
 	public void updateTransport ( int timeElapsedS, int timeRemainingS, double percent ) {
 		Platform.runLater( new Runnable() {
 			public void run () {

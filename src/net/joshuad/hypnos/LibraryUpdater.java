@@ -154,6 +154,7 @@ public class LibraryUpdater {
 												
 												Track currentTrack = null;
 												Track currentArtImages = ui.getCurrentImagesTrack();
+												List <CurrentListTrack> selectedItems = ui.getSelectedTracks();
 												
 												if ( !player.isStopped() ) {
 													currentTrack = player.getCurrentTrack();
@@ -162,6 +163,7 @@ public class LibraryUpdater {
 												player.getCurrentList().setAlbum( updateMe );
 												
 												ui.setImages( currentArtImages );
+												ui.setSelectedTracks ( selectedItems );
 												
 												library.albumsToUpdate.remove( updateMe ); //prevent an infinite loop
 												
@@ -169,6 +171,7 @@ public class LibraryUpdater {
 													for ( CurrentListTrack currentListTrack : player.getCurrentList().getItems() ) {
 														if ( currentListTrack.equals( currentTrack ) ) {
 															currentListTrack.setIsCurrentTrack( true );
+															currentListTrack.setIsLastCurrentListTrack( true );
 															break;
 														}
 													}

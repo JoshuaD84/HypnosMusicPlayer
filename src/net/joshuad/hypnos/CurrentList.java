@@ -258,7 +258,12 @@ public class CurrentList {
 				int tracksRemoved = 0;
 				for ( int k = indicies.size() - 1; k >= 0; k-- ) {
 					if ( indicies.get( k ) >= 0 && indicies.get ( k ) < items.size() ) {
-						items.remove ( indicies.get( k ).intValue() );
+						CurrentListTrack itemRemoved = items.remove ( indicies.get( k ).intValue() );
+						
+						if ( indicies.get( k ) > 0 && itemRemoved.isLastCurrentListTrack() ) {
+							items.get( indicies.get( k ) - 1 ).setIsLastCurrentListTrack( true );
+						}
+							
 						tracksRemoved++;
 					}
 				}

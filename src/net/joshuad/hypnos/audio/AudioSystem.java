@@ -195,7 +195,7 @@ public class AudioSystem {
 			boolean didSomething = false;
 			
 			while ( currentListIterator.hasNext() ) {
-				if ( currentListIterator.next().getIsCurrentTrack() ) {
+				if ( currentListIterator.next().isLastCurrentListTrack() ) {
 					if ( currentListIterator.hasNext() ) {
 						playTrack( currentListIterator.next(), startPaused );
 						didSomething = true;
@@ -539,7 +539,12 @@ public class AudioSystem {
 		}
 		
 		if ( track instanceof CurrentListTrack ) {
+			for ( CurrentListTrack listTrack : currentList.getItems() ) {
+				listTrack.setIsLastCurrentListTrack( false );
+			}
+			
 			((CurrentListTrack)track).setIsCurrentTrack( true );
+			((CurrentListTrack)track).setIsLastCurrentListTrack( true );
 		}
 		
 		if ( addToPreviousNextStack ) {

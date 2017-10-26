@@ -17,6 +17,7 @@ import javafx.beans.property.StringProperty;
 		private static final long serialVersionUID = 1L;
 		
 		private boolean isCurrentTrack = false; 
+		private boolean lastCurrentListTrack = false;
 		
 		private ArrayList <Integer> queueIndex = new ArrayList <Integer> ();
 		
@@ -70,6 +71,14 @@ import javafx.beans.property.StringProperty;
 		
 		public boolean getIsCurrentTrack ( ) {
 			return isCurrentTrack;
+		}
+		
+		public void setIsLastCurrentListTrack ( boolean last ) {
+			this.lastCurrentListTrack = last;
+		}
+		
+		public boolean isLastCurrentListTrack ()  {
+			return lastCurrentListTrack;
 		}
 		
 		public ArrayList <Integer> getQueueIndices() {
