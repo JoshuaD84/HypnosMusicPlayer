@@ -16,8 +16,9 @@ Bug Fixes / Incremental Improvements
 		reopen hypnos
 		it shows the list correctly briefly, but then updates the list to the old current album. Don't do that. 
 		
-	
-					
+	Bug
+		Artwork blinks briefly due to libraryUpdater. albumstoUpdate
+		
 Post Beta New Features		
 	Add default sort column choice, like shuffle and repeat
 	

@@ -1368,7 +1368,6 @@ public class FXUI implements PlayerListener {
 	private Thread imageLoader = null;
 	public void setImages ( Track track ) {
 		
-		currentImagesTrack = track;
 		if ( track != null && Files.exists( track.getPath() ) ) {
 			if ( imageLoader != null ) {
 				imageLoader.interrupt();
@@ -1386,6 +1385,7 @@ public class FXUI implements PlayerListener {
 						Platform.runLater( () -> {
 							setAlbumImage( albumImage );
 							setArtistImage( artistImage );
+							currentImagesTrack = track;
 						});
 					}
 				}
@@ -1393,6 +1393,9 @@ public class FXUI implements PlayerListener {
 			
 			imageLoader.setDaemon( true );
 			imageLoader.start();
+			
+		} else if ( track == null && currentImagesTrack != null ) {
+			setImages ( currentImagesTrack );
 			
 		} else {
 			setAlbumImage ( null );
