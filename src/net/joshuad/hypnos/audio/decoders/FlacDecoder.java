@@ -26,14 +26,15 @@ public class FlacDecoder extends AbstractDecoder {
 
 	@Override
 	public void closeAllResources() {
-		audioOutput.stop();
+		
+		audioOutput.stop(); 
 		audioOutput.close();
 		try {
 			if ( decodedInput != null ) {
 				decodedInput.close();
 			}
 			
-		} catch ( IOException e) {
+		} catch ( IOException e ) {
 			LOGGER.log ( Level.INFO, "Unable to close flac file reader for: " + track.getPath() );
 		}
 	}
@@ -77,10 +78,10 @@ public class FlacDecoder extends AbstractDecoder {
 
 			decodedInput = new FlacDecoderLogic ( track.getPath().toAbsolutePath().toFile() );
 			if ( decodedInput.numSamples == 0 ) throw new FlacDecoderLogic.FormatException("Unknown audio length");
-		} catch (IOException e) {
+		} catch ( IOException e ) {
 			String message = "Unable to decode flac file:" + track.getPath().toString();
 			LOGGER.log( Level.WARNING, message );
-			FXUI.notifyUserError ( message );
+			FXUI.notifyUserError( message );
 			return false;
 		}
 		

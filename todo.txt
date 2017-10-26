@@ -7,8 +7,6 @@ Bug Fixes / Incremental Improvements
 		
 	Play and next don't work when stopped and no items selected on current list
 	
-	Spamming next causes a lock in the player thread. 
-	
 	Bug
 		Load an album
 		Delete a track (says Playlist - New *)

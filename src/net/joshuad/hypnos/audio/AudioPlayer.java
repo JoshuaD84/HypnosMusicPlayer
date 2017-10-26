@@ -34,6 +34,8 @@ public class AudioPlayer {
 	AudioSystem controller;
 	Track track;
 
+	private long lastTrackLoadedAt = 0;
+
 	private double volumePercent = 1;
 	
 	public AudioPlayer( AudioSystem controller ) {
@@ -59,15 +61,19 @@ public class AudioPlayer {
 					stopRequested = false;
 				}	
 
-				Track currentRequest = trackRequested;
-				trackRequested = null;
+				
 
-				if ( currentRequest != null ) {
+				if ( trackRequested != null && ( System.currentTimeMillis() - lastTrackLoadedAt ) > 500 ) {
+					
+					Track currentRequest = trackRequested;
+					trackRequested = null;
+					
+					lastTrackLoadedAt = System.currentTimeMillis();
 
 					if ( decoder != null ) {
 						decoder.closeAllResources();
 					}
-					
+
 					try {
 						decoder = getDecoder ( currentRequest );
 						
@@ -89,6 +95,7 @@ public class AudioPlayer {
 						state = PlayState.STOPPED;
 						controller.playerStopped( StopReason.UNABLE_TO_START_TRACK );
 					}
+
 				} 
 
 				if ( volumeErrorRequested ) {
@@ -100,7 +107,6 @@ public class AudioPlayer {
 					Hypnos.warnUserVolumeNotSet();
 				}
 				
-
 				if ( state != PlayState.STOPPED ) {
 						
 					if ( pauseRequested ) {
@@ -122,7 +128,7 @@ public class AudioPlayer {
 						updateTrackPosition();
 						seekPercentRequested = NO_REQUEST;
 					}
-					
+
 					if ( seekMSRequested != NO_REQUEST ) {
 						decoder.seekTo ( seekMSRequested / (double)( track.getLengthS() * 1000 ) );
 						updateTrackPosition();
@@ -135,9 +141,9 @@ public class AudioPlayer {
 						volumePercent = decoder.getVolumePercent();
 						volumePercentRequested = NO_REQUEST;
 					}
-					
+
 					if ( state == PlayState.PLAYING ) {
-						
+
 						boolean finishedPlaying = decoder.playSingleFrame();
 						updateTrackPosition();
 						
