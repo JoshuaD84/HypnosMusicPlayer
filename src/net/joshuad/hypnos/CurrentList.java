@@ -815,6 +815,7 @@ public class CurrentList {
 			
 		} else if ( mode == Mode.ALBUM ) {
 			mode = Mode.PLAYLIST_UNSAVED;
+			this.currentAlbums.clear();
 
 		}
 		

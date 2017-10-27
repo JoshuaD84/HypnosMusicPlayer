@@ -4,19 +4,7 @@ Bug Fixes / Incremental Improvements
 	Hotkeys aren't consumed, so they are passed to the current window. 
 		Check windows and OSX
 		Create website /help/linux-globalhotkey-consume/
-		
-	Play and next don't work when stopped and no items selected on current list
-	
-	Bug
-		Load an album
-		Delete a track (says Playlist - New *)
-		close hypnos
-		reopen hypnos
-		it shows the list correctly briefly, but then updates the list to the old current album. Don't do that. 
-		
-	Bug
-		Artwork blinks briefly due to libraryUpdater. albumstoUpdate
-		
+
 Post Beta New Features		
 	Add default sort column choice, like shuffle and repeat
 	
