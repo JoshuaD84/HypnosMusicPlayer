@@ -40,7 +40,7 @@ public class Hypnos extends Application {
 
 	private static final Logger LOGGER = Logger.getLogger( Hypnos.class.getName() );
 	
-	private static String versionString = "Beta 1 - 2017/10/25";
+	private static String versionString = "Beta 1 Preview - 2017/10/27";
 
 	public enum ExitCode {
 		NORMAL,
@@ -224,7 +224,7 @@ public class Hypnos extends Application {
 			os = OS.UNKNOWN;
 		}
 		
-		LOGGER.config ( "Operating System: " + os.getDisplayName() );
+		LOGGER.info ( "Operating System: " + os.getDisplayName() );
 	}
 	
 	
@@ -254,7 +254,7 @@ public class Hypnos extends Application {
 			final String x = File.separator;
 			switch ( getOS() ) {
 				case NIX:
-					configDirectory = Paths.get( home + x + ".hypnos" );
+					configDirectory = Paths.get( home + x + ".config/hypnos" );
 					break;
 				case OSX:
 					configDirectory = Paths.get( home + x + "Preferences" + x + "Hypnos" );

@@ -1,6 +1,7 @@
 <project name="Hypnos Music Player" default="compile" basedir=".">
 	
-	<property name="version" value="beta1" />
+	<property name="version" value="beta1-preview" />
+	<property name="version-tag" value="${version}" />
 	
 	<property name="src" location="src"/>
 	<property name="build" location="bin"/>
@@ -10,7 +11,10 @@
 	<property name="temp" location="temp" />
 	<property name="packaging" location="packaging/" />
 		
-	<property name="jarFile" location="${stage}/hypnos.jar"/>
+	<property name="jarFile" location="${stage}/hypnos.jar" />
+	<property name="appImageTool" location="${packaging}/appimagetool-x86_64.AppImage" />
+	
+	<buildnumber file="${packaging}/build.num"/>
 
 	<path id="class.path">
 		<fileset dir="${stage}/lib">
@@ -18,9 +22,14 @@
 		</fileset>
 		<pathelement location="${jarFile}" />
 	</path>
-
+	<tstamp>
+	  <format property="TODAY"
+	          pattern="yyyy-dd-MM"
+	          locale="en,US"/>
+	</tstamp>
+	
 	<target name="init">
-		<tstamp/>
+		<tstamp />
 		<mkdir dir="${build}"/>
 	</target>
 
@@ -60,35 +69,66 @@
       	</java>
     </target>
 	
-	<target name="dist-nix" depends="jar" description="Make a .tar.gz without a JRE for linux distribution">
+	<target name="dist-nix-64bit" depends="jar" description="Make an AppImage for 64 bit Linux">
 		<sequential>
 			<delete dir="${temp}" />
-			<mkdir dir="${temp}/hypnos" />
+			<mkdir dir="${temp}/" />
 			
-			<copy todir="${temp}/Hypnos" >
+			<copy todir="${temp}/Hypnos.AppDir" >
+				<fileset dir="packaging/Hypnos.AppDir" />
+			</copy>	
+			
+			<copy todir="${temp}/Hypnos.AppDir/usr/bin" >
 				<fileset dir="stage" >
 					<exclude name="**/config/**" />
+					<exclude name="**/bin/**" />
 				</fileset>
 			</copy>
-
-			<copy file="${packaging}/nix/hypnos" tofile="${temp}/Hypnos/hypnos" />
 			
-			<tar destfile="${dist}/hypnos-${version}-nix.tgz" longfile="gnu" compression="gzip">
-	
-				<tarfileset dir="${temp}" filemode="755">
-					<include name="**/hypnos" />
-				</tarfileset>
-				
-				<tarfileset dir="${temp}">
-					<include name="**/*" />
-					<exclude name="**/hypnos" />
-				</tarfileset>
-			</tar>
-	
+			<copy todir="${temp}/Hypnos.AppDir/usr/bin/jre" >
+				<fileset dir="${packaging}/jres/linux-64bit" />
+			</copy>
+			
+			<exec executable="${appImageTool}">
+				<arg value="${temp}/Hypnos.AppDir" />
+				<arg value="--runtime-file" />
+				<arg value="${packaging}/runtime-x86_64" />
+				<arg value="${dist}/Hypnos-${version}-nix-64bit_${TODAY}_b${build.number}.AppImage" />
+			</exec>
 			<delete dir="${temp}" />
 		</sequential>
 	</target>
-	
+
+	<target name="dist-nix-32bit" depends="jar" description="Make an AppImage for 64 bit Linux">
+		<sequential>
+			<delete dir="${temp}" />
+			<mkdir dir="${temp}/" />
+			
+			<copy todir="${temp}/Hypnos.AppDir" >
+				<fileset dir="packaging/Hypnos.AppDir" />
+			</copy>	
+			
+			<copy todir="${temp}/Hypnos.AppDir/usr/bin" >
+				<fileset dir="stage" >
+					<exclude name="**/config/**" />
+					<exclude name="**/bin/**" />
+				</fileset>
+			</copy>
+			
+			<copy todir="${temp}/Hypnos.AppDir/usr/bin/jre" >
+				<fileset dir="${packaging}/jres/linux-32bit" />
+			</copy>
+			
+			<exec executable="${appImageTool}">
+				<arg value="${temp}/Hypnos.AppDir" />
+				<arg value="--runtime-file" />
+				<arg value="${packaging}/runtime-i686" />
+				<arg value="${dist}/Hypnos-${version}-nix-32bit_${TODAY}_b${build.number}.AppImage" />
+			</exec>
+			<delete dir="${temp}" />
+		</sequential>
+	</target>
+
 	<property name="launch4j.dir" location="/home/joshua/.local/opt/launch4j" />
 	<taskdef 
 		name="launch4j" 
@@ -113,7 +153,7 @@
 			</mappedresources>
 		</copy>
 		
-		<zip destfile="${dist}/hypnos-${version}-win.zip">
+		<zip destfile="${dist}/hypnos-${version}-win_${TODAY}_b${build.number}.zip">
 			<fileset dir="${temp}" />
 		</zip>
 		
@@ -140,7 +180,7 @@
 		</copy>
 		
 		
-		<tar destfile="${dist}/hypnos-${version}-osx.tgz" longfile="gnu" compression="gzip">
+		<tar destfile="${dist}/hypnos-${version}-osx_${TODAY}_b${build.number}.tgz" longfile="gnu" compression="gzip">
 
 			<tarfileset dir="${temp}" filemode="755">
 				<include name="**/Hypnos" />
@@ -156,6 +196,9 @@
 
 		<delete dir="${temp}" />
 		
+	</target>
+	
+	<target name="dist-all" depends="dist-nix-32bit, dist-nix-64bit, dist-osx, dist-win" description="Make all distribution files.">
 	</target>
 
 

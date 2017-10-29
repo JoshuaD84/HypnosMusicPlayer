@@ -1,9 +1,19 @@
 New Features		
 			
+
+
+
 Bug Fixes / Incremental Improvements
-	Hotkeys aren't consumed, so they are passed to the current window. 
-		Check windows and OSX
-		Create website /help/linux-globalhotkey-consume/
+	Play a new album, let the first track play until the end. It will loop ? Can't reproduce
+
+	Too many operating systems don't have the right font glyphs. Use images. 
+
+	Move linux config directory to ~/.config/hypnos
+	
+	Popup saying "Hypnos is already running."
+	
+	https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
+
 
 Post Beta New Features		
 	Add default sort column choice, like shuffle and repeat
