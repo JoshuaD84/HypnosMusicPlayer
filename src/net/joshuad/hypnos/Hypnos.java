@@ -28,6 +28,10 @@ import org.jnativehook.NativeHookException;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.scene.Scene;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.joshuad.hypnos.LibraryUpdater.LoaderSpeed;
 import net.joshuad.hypnos.audio.AudioSystem;
@@ -593,7 +597,9 @@ public class Hypnos extends Application {
 				if ( commands.size() > 0 ) {
 					System.out.println ( "Commands sent to currently running Hypnos." );
 				} else {
-					System.out.println ( "Hypnos is already running." );
+					String message = "Hypnos is already running.";
+					System.out.println ( message );
+					FXUI.notifyUserHypnosRunning();
 				}
 				
 				System.exit ( 0 ); //We don't use Hypnos.exit here intentionally. 

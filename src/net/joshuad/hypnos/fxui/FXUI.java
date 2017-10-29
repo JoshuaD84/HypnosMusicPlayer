@@ -3493,9 +3493,30 @@ public class FXUI implements PlayerListener {
 		mainStage.setMaximized( value );
 	}
 	
+	public static void notifyUserHypnosRunning() {
+		Alert alert = new Alert ( AlertType.INFORMATION );
+		Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+		try {
+			Image icon = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) );
+			stage.getIcons().add( icon );
+		} catch ( Exception e ) {}
+		
+		alert.setTitle( "Information" );
+		alert.setHeaderText( "Unable to launch Hypnos" );
+		alert.setContentText( "Hypnos is already running, and only one instance can run at a time. If you don't see it, please try terminating the orphaned process and try again." );
+		alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+		alert.showAndWait();
+		
+	}
 	public static void notifyUserError ( String message ) { 
 		
 		Alert alert = new Alert ( AlertType.ERROR );
+		Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+		try {
+			Image icon = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) );
+			stage.getIcons().add( icon );
+		} catch ( Exception e ) {}
+		
 		alert.setTitle( "Error" );
 		alert.setContentText( message );
 		alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
