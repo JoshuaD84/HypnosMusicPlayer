@@ -28,10 +28,6 @@ import org.jnativehook.NativeHookException;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.scene.Scene;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.joshuad.hypnos.LibraryUpdater.LoaderSpeed;
 import net.joshuad.hypnos.audio.AudioSystem;
@@ -126,6 +122,10 @@ public class Hypnos extends Application {
 	
 	public static Library getLibrary() {
 		return library;
+	}
+	
+	public static FXUI getUI() {
+		return ui;
 	}
 	
 	public static LoaderSpeed getLoaderSpeed ( ) {

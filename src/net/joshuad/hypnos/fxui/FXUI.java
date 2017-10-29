@@ -143,6 +143,13 @@ public class FXUI implements PlayerListener {
 	ImageView previousImage;
 	
 	ImageView[] volumeImages = new ImageView[ 4 ];
+	
+	ImageView currentListClearImage, albumFilterClearImage, trackFilterClearImage, playlistFilterClearImage;
+	ImageView settingsImage;
+	ImageView noRepeatImage, repeatImage, repeatOneImage, sequentialImage, shuffleImage;
+	ImageView exportImage, saveImage, loadTracksImage;
+	ImageView queueImage, historyImage;
+	ImageView addSourceTracksImage, addSourceAlbumsImage, addSourcePlaylistsImage;
 
 	HBox albumFilterPane;
 	HBox trackFilterPane;
@@ -169,10 +176,10 @@ public class FXUI implements PlayerListener {
 		"You haven't created any playlists, make a playlist on the right and click 💾 to save it for later." );
 
 	Label emptyTrackListLabel = new Label( 
-		"No tracks loaded, click on the + button, or drop folders here, to add to your library." );
+		"No tracks loaded. To add to your library, click on the + button or drop folders here." );
 	
 	Label emptyAlbumListLabel = new Label(
-		"No albums loaded, click on the + button, or drop folders here, to add to your library." );
+		"No albums loaded. To add to your library, click on the + button or drop folders here." );
 	
 	Label filteredAlbumListLabel = new Label( "No albums match." );
 	Label filteredTrackListLabel = new Label( "No tracks match." );
@@ -232,6 +239,14 @@ public class FXUI implements PlayerListener {
 		darkThemeTransportButtons.setSaturation( -1 );
 		darkThemeTransportButtons.setHue( 1 );
 		darkThemeTransportButtons.setBrightness( .55 );
+	}
+	
+	private ColorAdjust darkThemeButtons = new ColorAdjust(); 
+	
+	{
+		darkThemeButtons.setSaturation( -1 );
+		darkThemeButtons.setHue( 1 );
+		darkThemeButtons.setBrightness( .75 );
 	}
 	
 	private SimpleBooleanProperty promptBeforeOverwrite = new SimpleBooleanProperty ( true );
@@ -512,8 +527,139 @@ public class FXUI implements PlayerListener {
 			volumeImages[3].setFitHeight( volFitHeight );
 		} catch ( Exception e ) {
 			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/vol-3.png", e );
+		}
+		
+		try {
+			settingsImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/config.png" ).toFile() ) ) );
+			settingsImage.setFitWidth( 24 );
+			settingsImage.setFitHeight( 24 );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/config.png", e );
+		}
+		
+		double currentListControlsButtonFitWidth = 15;
+		double currentListControlsButtonFitHeight = 15;
+		
+		try {
+			noRepeatImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/no-repeat.png" ).toFile() ) ) );
+			noRepeatImage.setFitWidth( currentListControlsButtonFitWidth );
+			noRepeatImage.setFitHeight( currentListControlsButtonFitHeight );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/no-repeat.png", e );
+		}
+		
+		try {
+			repeatImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/repeat.png" ).toFile() ) ) );
+			repeatImage.setFitWidth( currentListControlsButtonFitWidth );
+			repeatImage.setFitHeight( currentListControlsButtonFitHeight );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/repeat.png", e );
+		}
+		
+		
+		try {
+			repeatOneImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/repeat-one.png" ).toFile() ) ) );
+			repeatOneImage.setFitWidth( currentListControlsButtonFitWidth );
+			repeatOneImage.setFitHeight( currentListControlsButtonFitHeight );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/repeatOne.png", e );
+		}
+		
+		try {
+			sequentialImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/sequential.png" ).toFile() ) ) );
+			sequentialImage.setFitWidth( currentListControlsButtonFitWidth );
+			sequentialImage.setFitHeight( currentListControlsButtonFitHeight );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/sequential.png", e );
+		}
+		
+		try {
+			shuffleImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/shuffle.png" ).toFile() ) ) );
+			shuffleImage.setFitWidth( currentListControlsButtonFitWidth );
+			shuffleImage.setFitHeight( currentListControlsButtonFitHeight );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/shuffle.png", e );
+		}
+		
+		try {
+			queueImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/queue.png" ).toFile() ) ) );
+			queueImage.setFitWidth( currentListControlsButtonFitWidth );
+			queueImage.setFitHeight( currentListControlsButtonFitHeight );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/queue.png", e );
+		}
+		
+		try {
+			historyImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/history.png" ).toFile() ) ) );
+			historyImage.setFitWidth( currentListControlsButtonFitWidth );
+			historyImage.setFitHeight( currentListControlsButtonFitHeight );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/history.png", e );
+		}
+		
+		try {
+			Image image = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/add.png" ).toFile() ) );
+
+			addSourceTracksImage = new ImageView ( image );
+			addSourceAlbumsImage = new ImageView ( image );
+			addSourcePlaylistsImage = new ImageView ( image );
+			
+			addSourceTracksImage.setFitWidth( currentListControlsButtonFitWidth );
+			addSourceTracksImage.setFitHeight( currentListControlsButtonFitHeight );
+			addSourceAlbumsImage.setFitWidth( currentListControlsButtonFitWidth );
+			addSourceAlbumsImage.setFitHeight( currentListControlsButtonFitHeight );
+			addSourcePlaylistsImage.setFitWidth( currentListControlsButtonFitWidth );
+			addSourcePlaylistsImage.setFitHeight( currentListControlsButtonFitHeight );
+			
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/add.png", e );
+		}
+		
+		try {
+			exportImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/export.png" ).toFile() ) ) );
+			exportImage.setFitWidth( currentListControlsButtonFitWidth );
+			exportImage.setFitHeight( currentListControlsButtonFitHeight );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/export.png", e );
+		}
+		
+		try {
+			saveImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/save.png" ).toFile() ) ) );
+			saveImage.setFitWidth( currentListControlsButtonFitWidth );
+			saveImage.setFitHeight( currentListControlsButtonFitHeight );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/save.png", e );
+		}
+		
+		try {
+			loadTracksImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/load.png" ).toFile() ) ) );
+			loadTracksImage.setFitWidth( currentListControlsButtonFitWidth );
+			loadTracksImage.setFitHeight( currentListControlsButtonFitHeight );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/load.png", e );
+		}
+		
+		try {
+			Image clearImage = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/clear.png" ).toFile() ) );
+			
+			currentListClearImage = new ImageView ( clearImage );
+			albumFilterClearImage = new ImageView ( clearImage );
+			trackFilterClearImage = new ImageView ( clearImage );
+			playlistFilterClearImage = new ImageView ( clearImage );
+
+			currentListClearImage.setFitWidth( 12 );
+			currentListClearImage.setFitHeight( 12 );
+			albumFilterClearImage.setFitWidth( 12 );
+			albumFilterClearImage.setFitHeight( 12 );
+			trackFilterClearImage.setFitWidth( 12 );
+			trackFilterClearImage.setFitHeight( 12 );
+			playlistFilterClearImage.setFitWidth( 12 );
+			playlistFilterClearImage.setFitHeight( 12 );
+			
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/clear.png", e );
 		}	
-	}
+	}		
 	
 	public void applyBaseTheme() {
 		String baseSheet = "file:///" + baseStylesheet.getAbsolutePath().replace( "\\", "/" );
@@ -551,11 +697,30 @@ public class FXUI implements PlayerListener {
 			if ( previousImage != null ) previousImage.setEffect( darkThemeTransportButtons );
 			if ( pauseImage != null ) pauseImage.setEffect( darkThemeTransportButtons );
 			if ( playImage != null ) playImage.setEffect( darkThemeTransportButtons );
+			if ( settingsImage != null ) settingsImage.setEffect( darkThemeTransportButtons );
 			
 			for ( int k = 0; k < volumeImages.length; k++ ) {
 				if ( volumeImages[k] != null ) volumeImages[k].setEffect( darkThemeTransportButtons );
 			}
-				
+
+			if ( currentListClearImage != null ) currentListClearImage.setEffect( darkThemeButtons );
+			if ( albumFilterClearImage != null ) albumFilterClearImage.setEffect( darkThemeButtons );
+			if ( trackFilterClearImage != null ) trackFilterClearImage.setEffect( darkThemeButtons );
+			if ( playlistFilterClearImage != null ) playlistFilterClearImage.setEffect( darkThemeButtons );
+			
+			if ( noRepeatImage != null ) noRepeatImage.setEffect( darkThemeButtons );
+			if ( repeatImage != null ) repeatImage.setEffect( darkThemeButtons );
+			if ( repeatOneImage != null ) repeatOneImage.setEffect( darkThemeButtons );
+			if ( sequentialImage != null ) sequentialImage.setEffect( darkThemeButtons );
+			if ( shuffleImage != null ) shuffleImage.setEffect( darkThemeButtons );
+			if ( exportImage != null ) exportImage.setEffect( darkThemeButtons );
+			if ( saveImage != null ) saveImage.setEffect( darkThemeButtons );
+			if ( loadTracksImage != null ) loadTracksImage.setEffect( darkThemeButtons );
+			if ( queueImage != null ) queueImage.setEffect( darkThemeButtons );
+			if ( historyImage != null ) historyImage.setEffect( darkThemeButtons );
+			if ( addSourceTracksImage != null ) addSourceTracksImage.setEffect( darkThemeButtons );
+			if ( addSourceAlbumsImage != null ) addSourceAlbumsImage.setEffect( darkThemeButtons );
+			if ( addSourcePlaylistsImage != null ) addSourcePlaylistsImage.setEffect( darkThemeButtons );
 		}
 	}
 	
@@ -579,10 +744,30 @@ public class FXUI implements PlayerListener {
 		if ( previousImage != null ) previousImage.setEffect( null );
 		if ( pauseImage != null ) pauseImage.setEffect( null );
 		if ( playImage != null ) playImage.setEffect( null );
+		if ( settingsImage != null ) settingsImage.setEffect( null );
 		
 		for ( int k = 0; k < volumeImages.length; k++ ) {
 			if ( volumeImages[k] != null ) volumeImages[k].setEffect( null );
 		}
+
+		if ( currentListClearImage != null ) currentListClearImage.setEffect( null );
+		if ( albumFilterClearImage != null ) albumFilterClearImage.setEffect( null );
+		if ( trackFilterClearImage != null ) trackFilterClearImage.setEffect( null );
+		if ( playlistFilterClearImage != null ) playlistFilterClearImage.setEffect( null );
+		
+		if ( noRepeatImage != null ) noRepeatImage.setEffect( null );
+		if ( repeatImage != null ) repeatImage.setEffect( null );
+		if ( repeatOneImage != null ) repeatOneImage.setEffect( null );
+		if ( sequentialImage != null ) sequentialImage.setEffect( null );
+		if ( shuffleImage != null ) shuffleImage.setEffect( null );
+		if ( exportImage != null ) exportImage.setEffect( null );
+		if ( saveImage != null ) saveImage.setEffect( null );
+		if ( loadTracksImage != null ) loadTracksImage.setEffect( null );
+		if ( queueImage != null ) queueImage.setEffect( null );
+		if ( historyImage != null ) historyImage.setEffect( null );
+		if ( addSourceTracksImage != null ) addSourceTracksImage.setEffect( null );
+		if ( addSourceAlbumsImage != null ) addSourceAlbumsImage.setEffect( null );
+		if ( addSourcePlaylistsImage != null ) addSourcePlaylistsImage.setEffect( null );
 	}
 	
 	public boolean isDarkTheme() {
@@ -878,7 +1063,8 @@ public class FXUI implements PlayerListener {
 		controls.setSpacing( 10 );
 		controls.setAlignment( Pos.CENTER );
 
-		Button settingsButton = new Button ( "⚙" );
+		Button settingsButton = new Button ( );
+		settingsButton.setGraphic( settingsImage );
 		settingsButton.setPadding( new Insets ( 0, 5, 0, 5 ) );
 		settingsButton.getStyleClass().add( "settingsButton" );
 		settingsButton.setTooltip( new Tooltip( "Configuration and Information" ) );
@@ -1613,18 +1799,59 @@ public class FXUI implements PlayerListener {
 		Hypnos.getPersister().saveLibraryPlaylists();
 		Hypnos.getPersister().deletePlaylistFile( oldFileBasename );
 	}
-		
+	
+	private void updateShuffleButtonImages() {
+		switch ( player.getShuffleMode() ) {
+			
+			case SHUFFLE:
+				toggleShuffleButton.setGraphic( shuffleImage );
+				break;
+				
+			case SEQUENTIAL: //Fall through
+			default:
+				toggleShuffleButton.setGraphic( sequentialImage );
+				
+				break;
+			
+		}
+	}
+	
+	private void updateRepeatButtonImages() {
+		switch ( player.getRepeatMode() ) {
+			
+			case REPEAT:
+				toggleRepeatButton.setGraphic( repeatImage );
+				break;
+			case REPEAT_ONE_TRACK:
+				toggleRepeatButton.setGraphic( repeatOneImage );
+				break;
+				
+			default: //Fall through
+			case PLAY_ONCE:
+				toggleRepeatButton.setGraphic( noRepeatImage );
+				break;
+		}
+	}
 
 	public void setupCurrentListControlPane () {
 
-		toggleRepeatButton = new Button( player.getRepeatMode().getSymbol() );
-		toggleShuffleButton = new Button( player.getShuffleMode().getSymbol() );
-		showQueueButton = new Button ( "Q" );
-		showHistoryButton = new Button ( "H" );
-		loadTracksButton = new Button( "⏏" );
-		savePlaylistButton = new Button( "💾" );
-		exportPlaylistButton = new Button ( "↗" );
-		clearCurrentListButton = new Button ( "✘" );
+		toggleRepeatButton = new Button( );
+		toggleShuffleButton = new Button( );
+		showQueueButton = new Button ( );
+		showHistoryButton = new Button ( );
+		loadTracksButton = new Button( );
+		savePlaylistButton = new Button( );
+		exportPlaylistButton = new Button ();
+		clearCurrentListButton = new Button ( );
+		
+		clearCurrentListButton.setGraphic( currentListClearImage );
+		exportPlaylistButton.setGraphic( exportImage );
+		savePlaylistButton.setGraphic( saveImage );
+		loadTracksButton.setGraphic( loadTracksImage );
+		showQueueButton.setGraphic( queueImage );
+		showHistoryButton.setGraphic( historyImage );
+		updateRepeatButtonImages();
+		updateShuffleButtonImages();
 		
 		toggleRepeatButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
 		toggleShuffleButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
@@ -1753,9 +1980,7 @@ public class FXUI implements PlayerListener {
 			@Override
 			public void handle ( ActionEvent e ) {
 				player.toggleRepeatMode();
-
-				toggleRepeatButton.setText( player.getRepeatMode().getSymbol() );
-
+				updateRepeatButtonImages();
 			}
 		});
 
@@ -1763,7 +1988,7 @@ public class FXUI implements PlayerListener {
 			@Override
 			public void handle ( ActionEvent e ) {
 				player.toggleShuffleMode();
-				toggleShuffleButton.setText( player.getShuffleMode().getSymbol() );
+				updateShuffleButtonImages();
 			}
 		});
 
@@ -1891,9 +2116,10 @@ public class FXUI implements PlayerListener {
 			}
 		});
 		
-		Button settingsButton = new Button( "+" );
-		settingsButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
-		settingsButton.setOnAction( new EventHandler <ActionEvent>() {
+		Button libraryButton = new Button( );
+		libraryButton.setGraphic ( addSourcePlaylistsImage );
+		libraryButton.setMinSize( 30, Button.USE_PREF_SIZE );
+		libraryButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
 				if ( libraryLocationWindow.isShowing() ) {
@@ -1904,7 +2130,9 @@ public class FXUI implements PlayerListener {
 			}
 		});
 		
-		Button clearButton = new Button ( "✘" );
+		Button clearButton = new Button ( );
+		clearButton.setGraphic( playlistFilterClearImage );
+		
 		clearButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
 		clearButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -1914,11 +2142,11 @@ public class FXUI implements PlayerListener {
 		});
 		
 
-		settingsButton.setTooltip( new Tooltip( "Add or Remove Music Folders" ) );
+		libraryButton.setTooltip( new Tooltip( "Add or Remove Music Folders" ) );
 		filterBox.setTooltip ( new Tooltip ( "Filter/Search playlists" ) );
 		clearButton.setTooltip( new Tooltip( "Clear the filter text" ) );
 
-		playlistFilterPane.getChildren().addAll( settingsButton, filterBox, clearButton );
+		playlistFilterPane.getChildren().addAll( libraryButton, filterBox, clearButton );
 	}
 
 	public void setupTrackFilterPane () {
@@ -1944,9 +2172,10 @@ public class FXUI implements PlayerListener {
 			}
 		});
 		
-		Button settingsButton = new Button( "+" );
-		settingsButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
-		settingsButton.setOnAction( new EventHandler <ActionEvent>() {
+		Button libraryButton = new Button( );
+		libraryButton.setGraphic( addSourceTracksImage );
+		libraryButton.setMinSize( 30, Button.USE_PREF_SIZE );
+		libraryButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
 				if ( libraryLocationWindow.isShowing() ) {
@@ -1957,7 +2186,9 @@ public class FXUI implements PlayerListener {
 			}
 		} );
 		
-		Button clearButton = new Button ( "✘" );
+		Button clearButton = new Button ( );
+		clearButton.setGraphic( trackFilterClearImage );
+		
 		clearButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
 		clearButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -1966,7 +2197,7 @@ public class FXUI implements PlayerListener {
 			}
 		});
 
-		settingsButton.setTooltip( new Tooltip( "Add or Remove Music Folders" ) );
+		libraryButton.setTooltip( new Tooltip( "Add or Remove Music Folders" ) );
 		trackFilterBox.setTooltip ( new Tooltip ( "Filter/Search tracks" ) );
 		clearButton.setTooltip( new Tooltip( "Clear the filter text" ) );
 		
@@ -1974,7 +2205,7 @@ public class FXUI implements PlayerListener {
 		checkBoxMargins.setPadding( new Insets ( 4, 0, 0, 6 ) );
 		checkBoxMargins.getChildren().add( trackListCheckBox );
 		
-		trackFilterPane.getChildren().addAll( settingsButton, trackFilterBox, clearButton, checkBoxMargins );
+		trackFilterPane.getChildren().addAll( libraryButton, trackFilterBox, clearButton, checkBoxMargins );
 	}
 	
 	public boolean acceptTrackFilterChange ( Track track, Object oldValue, Object newValueIn ) {
@@ -2070,9 +2301,10 @@ public class FXUI implements PlayerListener {
 			}
 		});
 
-		Button settingsButton = new Button( "+" );
-		settingsButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
-		settingsButton.setOnAction( new EventHandler <ActionEvent>() {
+		Button libraryButton = new Button( );
+		libraryButton.setGraphic( addSourceAlbumsImage );
+		libraryButton.setMinSize( 30, Button.USE_PREF_SIZE );
+		libraryButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
 				if ( libraryLocationWindow.isShowing() ) {
@@ -2083,7 +2315,9 @@ public class FXUI implements PlayerListener {
 			}
 		} );
 
-		Button clearButton = new Button( "✘" );
+		Button clearButton = new Button( );
+		clearButton.setGraphic( albumFilterClearImage );
+		
 		clearButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
 		clearButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -2093,11 +2327,11 @@ public class FXUI implements PlayerListener {
 		});
 		
 
-		settingsButton.setTooltip( new Tooltip( "Add or Remove Music Folders" ) );
+		libraryButton.setTooltip( new Tooltip( "Add or Remove Music Folders" ) );
 		filterBox.setTooltip ( new Tooltip ( "Filter/Search albums" ) );
 		clearButton.setTooltip( new Tooltip( "Clear the filter text" ) );
 
-		albumFilterPane.getChildren().addAll( settingsButton, filterBox, clearButton );
+		albumFilterPane.getChildren().addAll( libraryButton, filterBox, clearButton );
 	}
 
 	public void setupTrackListCheckBox() {
@@ -3462,7 +3696,7 @@ public class FXUI implements PlayerListener {
 		this.libraryLocationWindow.setLoaderSpeedDisplay ( speed );
 	}
 
-	public void updateAlbumListPlaceholder() {
+	public void updateLibraryListPlaceholder() {
 
 		if ( library.getAlbums().isEmpty() ) {
 			if ( albumTable.getPlaceholder() != emptyAlbumListLabel ) {
@@ -3473,10 +3707,7 @@ public class FXUI implements PlayerListener {
 				albumTable.setPlaceholder( filteredAlbumListLabel );
 			}
 		}
-	}
-	
-	public void updateTrackListPlaceholder() {
-
+		
 		if ( library.getTracks().isEmpty() ) {
 			if ( trackTable.getPlaceholder() != emptyTrackListLabel ) {
 				trackTable.setPlaceholder( emptyTrackListLabel );
@@ -3486,10 +3717,7 @@ public class FXUI implements PlayerListener {
 				trackTable.setPlaceholder( filteredTrackListLabel );
 			}
 		}
-	}
-	
-	public void updatePlaylistPlaceholder() {
-
+		
 		if ( library.getPlaylists().isEmpty() ) {
 			if ( !playlistTable.getPlaceholder().equals( emptyPlaylistLabel ) ) {
 				playlistTable.setPlaceholder( emptyPlaylistLabel );
@@ -3500,7 +3728,7 @@ public class FXUI implements PlayerListener {
 			}
 		}
 	}
-	
+
 	public void setShowAlbumTracks ( final boolean newValue ) {
 		Platform.runLater( () -> {
 			trackListCheckBox.setSelected( newValue );
@@ -3590,9 +3818,7 @@ public class FXUI implements PlayerListener {
 			
 		hackTooltipStartTiming();
 	
-		updateAlbumListPlaceholder();
-		updateTrackListPlaceholder();
-		updatePlaylistPlaceholder();
+		updateLibraryListPlaceholder();
 	}
 
 
@@ -3900,7 +4126,7 @@ public class FXUI implements PlayerListener {
 	@Override
 	public void playerShuffleModeChanged ( ShuffleMode newMode ) {
 		Platform.runLater( () -> {
-			toggleShuffleButton.setText( newMode.getSymbol() );
+			updateShuffleButtonImages();
 		});
 		
 	}
@@ -3908,7 +4134,7 @@ public class FXUI implements PlayerListener {
 	@Override
 	public void playerRepeatModeChanged ( RepeatMode newMode ) {
 		Platform.runLater( () -> {
-			toggleRepeatButton.setText( newMode.getSymbol() );
+			updateRepeatButtonImages();
 		});
 		
 	}

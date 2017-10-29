@@ -386,6 +386,8 @@ public class Library {
 				synchronized ( tagErrors ) {
 					tagErrors.clear();
 				}
+				
+				Hypnos.getUI().updateLibraryListPlaceholder(); //REFACTOR: This desn't really belong here. 
 			});
 			
 		} else {

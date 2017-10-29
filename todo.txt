@@ -5,10 +5,10 @@ New Features
 
 Bug Fixes / Incremental Improvements
 	Play a new album, let the first track play until the end. It will loop ? Can't reproduce
-
-	Too many operating systems don't have the right font glyphs. Use images. 
 	
 	https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
+	
+	Settings button hover color -- should be blue
 
 
 Post Beta New Features		

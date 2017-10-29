@@ -81,7 +81,7 @@ public class LibraryUpdater {
 						}
 						
 						library.playlistsToRemove.clear();
-						ui.updatePlaylistPlaceholder();
+						ui.updateLibraryListPlaceholder();
 					}
 				
 					synchronized ( library.playlistsToAdd ) {
@@ -97,7 +97,7 @@ public class LibraryUpdater {
 					
 					library.playlistsToUpdate.clear(); //PENDING: update playlists. 
 
-					ui.updatePlaylistPlaceholder();
+					ui.updateLibraryListPlaceholder();
 					
 					synchronized ( library.albumsToRemove ) {
 						if ( !library.albumsToRemove.isEmpty() ) {
@@ -106,7 +106,7 @@ public class LibraryUpdater {
 								changeCount++;
 							}
 							
-							ui.updateAlbumListPlaceholder();
+							ui.updateLibraryListPlaceholder();
 
 							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshAlbumTable(); //TODO: this may not be necessary. 
@@ -122,7 +122,7 @@ public class LibraryUpdater {
 								changeCount++;
 							}
 							
-							ui.updateAlbumListPlaceholder();
+							ui.updateLibraryListPlaceholder();
 
 							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshAlbumTable();  //TODO: this may not be necessary. 
@@ -213,7 +213,7 @@ public class LibraryUpdater {
 								}
 							}
 
-							ui.updateTrackListPlaceholder();
+							ui.updateLibraryListPlaceholder();
 							
 							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshTrackTable(); //TODO: this may not be necessary. 
@@ -234,7 +234,7 @@ public class LibraryUpdater {
 							}
 
 
-							ui.updateTrackListPlaceholder();
+							ui.updateLibraryListPlaceholder();
 							
 							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshTrackTable(); //TODO: this may not be necessary. 
@@ -269,7 +269,7 @@ public class LibraryUpdater {
 							}
 
 
-							ui.updateTrackListPlaceholder();
+							ui.updateLibraryListPlaceholder();
 							
 							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshTrackTable(); //TODO: this may not be necessary. 
