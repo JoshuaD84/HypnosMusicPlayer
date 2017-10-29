@@ -141,6 +141,8 @@ public class FXUI implements PlayerListener {
 	ImageView stopImage;
 	ImageView nextImage;
 	ImageView previousImage;
+	
+	ImageView[] volumeImages = new ImageView[ 4 ];
 
 	HBox albumFilterPane;
 	HBox trackFilterPane;
@@ -255,6 +257,7 @@ public class FXUI implements PlayerListener {
 		}
 		
 		setupFont();
+		loadImages();
 		setupAlbumTable();
 		setupTrackListCheckBox();
 		setupAlbumFilterPane();
@@ -474,6 +477,44 @@ public class FXUI implements PlayerListener {
 		
 	}
 	
+	private void loadImages() {
+		//REFACTOR: Move all image loading into here. 
+		double volFitWidth = 55 * .58;
+		double volFitHeight = 45 * .58;
+		
+		try {
+			volumeImages[0] = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/vol-0.png" ).toFile() ) ) );
+			volumeImages[0].setFitWidth( volFitWidth );
+			volumeImages[0].setFitHeight( volFitHeight );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/vol-0.png", e );
+		}
+		
+		try {
+			volumeImages[1] = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/vol-1.png" ).toFile() ) ) );
+			volumeImages[1].setFitWidth( volFitWidth );
+			volumeImages[1].setFitHeight( volFitHeight );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/vol-1.png", e );
+		}
+
+		try {
+			volumeImages[2] = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/vol-2.png" ).toFile() ) ) );
+			volumeImages[2].setFitWidth( volFitWidth );
+			volumeImages[2].setFitHeight( volFitHeight );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/vol-2.png", e );
+		}
+		
+		try {
+			volumeImages[3] = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/vol-3.png" ).toFile() ) ) );
+			volumeImages[3].setFitWidth( volFitWidth );
+			volumeImages[3].setFitHeight( volFitHeight );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/vol-3.png", e );
+		}	
+	}
+	
 	public void applyBaseTheme() {
 		String baseSheet = "file:///" + baseStylesheet.getAbsolutePath().replace( "\\", "/" );
 		scene.getStylesheets().add( baseSheet ); 
@@ -510,6 +551,11 @@ public class FXUI implements PlayerListener {
 			if ( previousImage != null ) previousImage.setEffect( darkThemeTransportButtons );
 			if ( pauseImage != null ) pauseImage.setEffect( darkThemeTransportButtons );
 			if ( playImage != null ) playImage.setEffect( darkThemeTransportButtons );
+			
+			for ( int k = 0; k < volumeImages.length; k++ ) {
+				if ( volumeImages[k] != null ) volumeImages[k].setEffect( darkThemeTransportButtons );
+			}
+				
 		}
 	}
 	
@@ -533,6 +579,10 @@ public class FXUI implements PlayerListener {
 		if ( previousImage != null ) previousImage.setEffect( null );
 		if ( pauseImage != null ) pauseImage.setEffect( null );
 		if ( playImage != null ) playImage.setEffect( null );
+		
+		for ( int k = 0; k < volumeImages.length; k++ ) {
+			if ( volumeImages[k] != null ) volumeImages[k].setEffect( null );
+		}
 	}
 	
 	public boolean isDarkTheme() {
@@ -774,7 +824,8 @@ public class FXUI implements PlayerListener {
 			player.seekPercent( trackPositionSlider.getValue() / trackPositionSlider.getMax() );
 		});
 		
-		volumeMuteButton = new Button ( "🔊" );
+		volumeMuteButton = new Button ( );
+		volumeMuteButton.setGraphic( volumeImages[3] );
 		volumeMuteButton.getStyleClass().add( "volumeLabel" );
 		volumeMuteButton.setMinWidth( 30 );
 		volumeMuteButton.setPadding( new Insets ( 0, 5, 0, 5 ) );
@@ -789,6 +840,7 @@ public class FXUI implements PlayerListener {
 		volumeSlider.setMin( 0 );
 		volumeSlider.setMax( 100 );
 		volumeSlider.setPrefWidth( 100 );
+		volumeSlider.setValue( 100 );
 		volumeSlider.setTooltip( new Tooltip ( "Control Volume" ) );
 
 		
@@ -3834,13 +3886,13 @@ public class FXUI implements PlayerListener {
 			volumeSlider.setValue( newVolumePercent * ( max - min ) );
 			
 			if ( newVolumePercent == 0 ) {
-				volumeMuteButton.setText ( "🔇" );
+				volumeMuteButton.setGraphic( volumeImages[0] );
 			} else if ( newVolumePercent > 0 && newVolumePercent <= .33f ) {
-				volumeMuteButton.setText ( "🔈" );
+				volumeMuteButton.setGraphic( volumeImages[1] );
 			} else if ( newVolumePercent > .33f && newVolumePercent <= .66f ) {
-				volumeMuteButton.setText ( "🔉" );
+				volumeMuteButton.setGraphic( volumeImages[2] );
 			} else if ( newVolumePercent > .66f ) {
-				volumeMuteButton.setText ( "🔊" );
+				volumeMuteButton.setGraphic( volumeImages[3] );
 			}
 		});
 	}
