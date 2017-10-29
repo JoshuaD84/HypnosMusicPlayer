@@ -1,15 +1,10 @@
 New Features		
 			
 
-
-
-Bug Fixes / Incremental Improvements
-	Play a new album, let the first track play until the end. It will loop ? Can't reproduce
-	
+Bug Fixes / Incremental Improvements	
 	https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
 	
-	Settings button hover color -- should be blue
-
+	Put a filter on images when in light theme to make them slightly grey
 
 Post Beta New Features		
 	Add default sort column choice, like shuffle and repeat
@@ -19,6 +14,10 @@ Post Beta New Features
 	Album list - Display disc and release type in different color font
 					
 	Tag auto fix button
+	
+	Settings button hover color -- should be blue
+	
+	Manifest details - set version and other info, read it into Hypnos, show in About tab
 	
 	
 Post Beta fixes / updates / improvements 
@@ -136,9 +135,6 @@ OS Specific
 	    Standalone build (32-bit)
 		Rename java process to Hypnos
 		
-	Windows <= 7
-		Font rendering on utf glyphs
-		
 	Linux
 		Debian Installer
 	    redhat installer
@@ -168,9 +164,7 @@ OS Specific
 		What other systems don't support? How to handle? 
 		https://stackoverflow.com/questions/29995727/java-systemtray-icon-does-not-always-work
 		
-	Embed and use a font with all needed UTF glyphs
-		≡✘⏏💾⇉🔀⇥🔁🔂🔇🔈🔉🔊⚙
-		
+	Use local fonts? 		
 		DejaVu Sans - The thing I'm using on nix
 		Calibri - Windows
 		Lucida Grande - OSX

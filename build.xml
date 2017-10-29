@@ -24,7 +24,7 @@
 	</path>
 	<tstamp>
 	  <format property="TODAY"
-	          pattern="yyyy-dd-MM"
+	          pattern="yyyy-MM-dd"
 	          locale="en,US"/>
 	</tstamp>
 	
