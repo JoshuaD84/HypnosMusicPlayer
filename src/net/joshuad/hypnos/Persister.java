@@ -105,6 +105,18 @@ public class Persister {
 		loadHotkeys();
 		ui.refreshHotkeyList();
 	}
+	
+	public void saveAllData( EnumMap <Setting, ? extends Object> fromPlayer, EnumMap <Setting, ? extends Object> fromUI ) {
+		createNecessaryFolders();
+		saveAlbumsAndTracks();
+		saveSources();
+		saveCurrentList();
+		saveQueue();
+		saveHistory();
+		saveLibraryPlaylists();
+		saveSettings( fromPlayer, fromUI );
+		saveHotkeys();	
+	}
 
 	public void saveAllData () {
 		createNecessaryFolders();
@@ -405,10 +417,14 @@ public class Persister {
 			
 		}
 	}
-
-	public void saveSettings () {
+	
+	public void saveSettings() {
 		EnumMap <Setting, ? extends Object> fromPlayer = player.getSettings();
 		EnumMap <Setting, ? extends Object> fromUI = ui.getSettings();
+		saveSettings ( fromPlayer, fromUI );
+	}
+
+	public void saveSettings ( EnumMap <Setting, ? extends Object> fromPlayer, EnumMap <Setting, ? extends Object> fromUI ) {
 		
 		File tempSettingsFile = new File ( settingsFile.toString() + ".temp" );
 

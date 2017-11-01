@@ -17,7 +17,7 @@ Testing pre-beta release info
 	
 	Windows 7 and windows 10 - Can't open web browser when clicking links in about tab
 	
-	Unable to load track - need ore info in error log
+	Unable to load track - need more info in error log
 	
 	Windows 7 - Current list play triangle looks a little bad, can we do that with an image instead of font? 
 	

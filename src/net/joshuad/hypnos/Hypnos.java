@@ -15,6 +15,7 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -30,6 +31,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import net.joshuad.hypnos.LibraryUpdater.LoaderSpeed;
+import net.joshuad.hypnos.Persister.Setting;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.StopReason;
 import net.joshuad.hypnos.fxui.FXUI;
@@ -540,8 +542,10 @@ public class Hypnos extends Application {
 	}
 
 	public static void exit ( ExitCode exitCode ) {
-		persister.saveAllData();
+		EnumMap <Setting, ? extends Object> fromPlayer = player.getSettings();
+		EnumMap <Setting, ? extends Object> fromUI = ui.getSettings();
 		player.stop ( StopReason.USER_REQUESTED );
+		persister.saveAllData( fromPlayer, fromUI );
 		System.exit ( exitCode.ordinal() );
 	}
 	
