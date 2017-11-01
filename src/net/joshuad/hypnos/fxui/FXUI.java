@@ -1853,14 +1853,26 @@ public class FXUI implements PlayerListener {
 		updateRepeatButtonImages();
 		updateShuffleButtonImages();
 		
-		toggleRepeatButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
-		toggleShuffleButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
-		showQueueButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
-		showHistoryButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );;
-		loadTracksButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
-		savePlaylistButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
-		exportPlaylistButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
-		clearCurrentListButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
+		float width = 33;
+		float height = 26;
+		
+		toggleRepeatButton.setMinSize( width, height );
+		toggleShuffleButton.setMinSize( width, height );
+		showQueueButton.setMinSize( width, height );
+		showHistoryButton.setMinSize( width, height );
+		loadTracksButton.setMinSize( width, height );
+		savePlaylistButton.setMinSize( width, height );
+		exportPlaylistButton.setMinSize( width, height );
+		clearCurrentListButton.setMinSize( width, height );
+		
+		toggleRepeatButton.setPrefSize( width, height );
+		toggleShuffleButton.setPrefSize( width, height );
+		showQueueButton.setPrefSize( width, height );
+		showHistoryButton.setPrefSize( width, height );
+		loadTracksButton.setPrefSize( width, height );
+		savePlaylistButton.setPrefSize( width, height );
+		exportPlaylistButton.setPrefSize( width, height );
+		clearCurrentListButton.setPrefSize( width, height );
 		
 		toggleRepeatButton.setTooltip( new Tooltip( "Toggle Repeat Type" ) );
 		toggleShuffleButton.setTooltip( new Tooltip( "Toggle Shuffle" ) );
@@ -2116,9 +2128,15 @@ public class FXUI implements PlayerListener {
 			}
 		});
 		
+		double width = 33;
+		double height = 26;
+		
+		filterBox.setPrefHeight( height );
+		
 		Button libraryButton = new Button( );
 		libraryButton.setGraphic ( addSourcePlaylistsImage );
-		libraryButton.setMinSize( 30, Button.USE_PREF_SIZE );
+		libraryButton.setMinSize( width, height );
+		libraryButton.setPrefSize( width, height );
 		libraryButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
@@ -2132,8 +2150,8 @@ public class FXUI implements PlayerListener {
 		
 		Button clearButton = new Button ( );
 		clearButton.setGraphic( playlistFilterClearImage );
-		
-		clearButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
+		clearButton.setMinSize( width, height );
+		clearButton.setPrefSize( width, height );
 		clearButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
@@ -2172,9 +2190,15 @@ public class FXUI implements PlayerListener {
 			}
 		});
 		
+		double width = 33;
+		double height = 26;
+
+		trackFilterBox.setPrefHeight( height );
+		
 		Button libraryButton = new Button( );
 		libraryButton.setGraphic( addSourceTracksImage );
-		libraryButton.setMinSize( 30, Button.USE_PREF_SIZE );
+		libraryButton.setMinSize( width, height );
+		libraryButton.setPrefSize( width, height );
 		libraryButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
@@ -2188,8 +2212,8 @@ public class FXUI implements PlayerListener {
 		
 		Button clearButton = new Button ( );
 		clearButton.setGraphic( trackFilterClearImage );
-		
-		clearButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
+		clearButton.setMinSize( width, height );
+		clearButton.setPrefSize( width, height );
 		clearButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
@@ -2300,10 +2324,17 @@ public class FXUI implements PlayerListener {
 				filterBox.clear();
 			}
 		});
+		
+		
+		float width = 33;
+		float height = 26;
 
+		filterBox.setPrefHeight( height );
+		
 		Button libraryButton = new Button( );
 		libraryButton.setGraphic( addSourceAlbumsImage );
-		libraryButton.setMinSize( 30, Button.USE_PREF_SIZE );
+		libraryButton.setMinSize( width, height );
+		libraryButton.setPrefSize( width, height );
 		libraryButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
@@ -2317,8 +2348,8 @@ public class FXUI implements PlayerListener {
 
 		Button clearButton = new Button( );
 		clearButton.setGraphic( albumFilterClearImage );
-		
-		clearButton.setMinSize( Button.USE_PREF_SIZE, Button.USE_PREF_SIZE );
+		clearButton.setMinSize( width, height );
+		clearButton.setPrefSize( width, height );
 		clearButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {

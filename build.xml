@@ -146,6 +146,8 @@
 		<copy todir="${temp}/Hypnos/" >
 			<fileset dir="stage" >
 				<exclude name="**/config/**" />
+				<exclude name="**/bin/**" />
+				<exclude name="hypnos.jar" />
 			</fileset>
 			<mappedresources>
 				<fileset dir="${packaging}/jres/win" />

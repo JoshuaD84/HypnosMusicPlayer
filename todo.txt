@@ -4,7 +4,27 @@ New Features
 Bug Fixes / Incremental Improvements	
 	https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
 	
-	Put a filter on images when in light theme to make them slightly grey
+	When loading tracks from a playlist, make sure files that are missing are shown in red
+	
+Testing pre-beta release info
+	Windows 10 & windows 7 - can't control volume on any track
+			
+	Windows 7 - Playlist empty list has a bad character, try using textflow and embedding that image, or just use the word save
+	
+	Windows 7 & Windows 10 - The settings button doens't have enough top-margin. It's right against the top bar, looks bad
+	
+	Windows 7 - Font in error log is ugly
+	
+	Windows 7 and windows 10 - Can't open web browser when clicking links in about tab
+	
+	Unable to load track - need ore info in error log
+	
+	Windows 7 - Current list play triangle looks a little bad, can we do that with an image instead of font? 
+	
+	From alpha to beta - Playlists was a file, now is a folder. Delete the file or we can't save playlists.
+	
+	Maria - She has a folder with russian characters. It messes up saving playlists. 
+	
 
 Post Beta New Features		
 	Add default sort column choice, like shuffle and repeat
@@ -18,6 +38,14 @@ Post Beta New Features
 	Settings button hover color -- should be blue
 	
 	Manifest details - set version and other info, read it into Hypnos, show in About tab
+	
+	Loader status % complete thing
+	
+	Put a filter on images when in light theme to make them slightly grey (or dampen the actual images).
+	
+	Have the 2nd instance of hypnos call --bring-to-front or whatever it's called
+	
+	Volume sliders get jammed against right side at low widths. 
 	
 	
 Post Beta fixes / updates / improvements 
