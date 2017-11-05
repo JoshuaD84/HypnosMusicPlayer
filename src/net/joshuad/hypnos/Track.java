@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.audio.AudioHeader;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
@@ -153,12 +154,12 @@ public class Track implements Serializable {
 		}*/
 	}
 	
-	public Track ( Path trackPath ) throws Exception {
+	public Track ( Path trackPath ) {
 		this.trackFile = trackPath.toFile();
 		refreshTagData();
 	}
 	
-	public Track ( Path trackPath, Path albumPath ) throws Exception {
+	public Track ( Path trackPath, Path albumPath ) {
 		this ( trackPath );
 		if ( albumPath != null ) {
 			this.albumDirectory = albumPath.toFile();
@@ -177,30 +178,36 @@ public class Track implements Serializable {
 		return tagErrors;
 	}
 	
-	public void refreshTagData() throws Exception {
+	public void refreshTagData() {
 		Tag tag = null;
 		Logger.getLogger( "org.jaudiotagger" ).setLevel( Level.OFF ); 
-		AudioFile audioFile = getAudioFile();
 		
-		length = audioFile.getAudioHeader().getTrackLength();
-		tag = audioFile.getTag();
-		
-		isLossless = audioFile.getAudioHeader().isLossless();
-		bitRate = audioFile.getAudioHeader().getBitRateAsNumber();
-		sampleRate = audioFile.getAudioHeader().getSampleRateAsNumber();
-		isVBR = audioFile.getAudioHeader().isVariableBitRate();
-		encodingType = audioFile.getAudioHeader().getEncodingType();
-		format = audioFile.getAudioHeader().getFormat();
-		
-		tagErrors.clear();
+		try {
+			AudioFile audioFile = getAudioFile();
+			AudioHeader audioHeader = audioFile.getAudioHeader();
+			length = audioHeader.getTrackLength();
+			tag = audioFile.getTag();
+			
+			isLossless = audioHeader.isLossless();
+			bitRate = audioHeader.getBitRateAsNumber();
+			sampleRate = audioHeader.getSampleRateAsNumber();
+			isVBR = audioHeader.isVariableBitRate();
+			encodingType = audioHeader.getEncodingType();
+			format = audioHeader.getFormat();
+			
+			tagErrors.clear();
 
-		parseArtist( tag );
-		parseTitle( tag ); 
-		parseAlbum( tag );
-		parseDate( tag );
-		parseTrackNumber( tag );
-		parseDiscInfo( tag );
-		parseReleaseType( tag );	
+			parseArtist( tag );
+			parseTitle( tag ); 
+			parseAlbum( tag );
+			parseDate( tag );
+			parseTrackNumber( tag );
+			parseDiscInfo( tag );
+			parseReleaseType( tag );	
+		} catch ( Exception e ) {
+			//TODO: Make a note somewhere
+		}
+
 		parseFileName();
 	}
 	
@@ -254,6 +261,7 @@ public class Track implements Serializable {
 					fnAlbum = parentName;
 				}
 			}
+			//TODO: parse track number
 			
 			fnTitle = trackFile.toPath().getFileName().toString();
 

@@ -6,6 +6,12 @@ Bug Fixes / Incremental Improvements
 	
 	When loading tracks from a playlist, make sure files that are missing are shown in red
 	
+	I got rid of the possibility of a Track throwing an exception while loading.  
+		I feel like I should be doing more responsible things there.
+		Why couldn't I load it? Can I make a note? Do I need to? 
+		Plan: Watch for problems. I feel like maybe no problems will arise.
+		Also: Eventually remove all the catch ( Exception ) i have when loading tracks (search for calls to the two constructors)
+	
 Testing pre-beta release info
 	Windows 10 & windows 7 - can't control volume on any track
 			
@@ -24,6 +30,7 @@ Testing pre-beta release info
 	From alpha to beta - Playlists was a file, now is a folder. Delete the file or we can't save playlists.
 	
 	Maria - She has a folder with russian characters. It messes up saving playlists. 
+		E:\Music\Music\Русское\Зоя Ященко\Белая Гвардия\(1992) Белая Гвардия
 	
 
 Post Beta New Features		

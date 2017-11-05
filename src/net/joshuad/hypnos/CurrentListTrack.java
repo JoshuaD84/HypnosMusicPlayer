@@ -27,7 +27,7 @@ import javafx.beans.property.StringProperty;
 		
 		private boolean needsUpdate = false;
 		
-		public CurrentListTrack ( Path source ) throws Exception {
+		public CurrentListTrack ( Path source ) {
 			super ( source );
 			if ( Utils.isAlbumDirectory( source.getParent() ) ) {
 				this.albumDirectory = source.getParent().toFile();

@@ -106,6 +106,7 @@ public class Persister {
 		ui.refreshHotkeyList();
 	}
 	
+	//REFACTOR: I don't think this way of doing things is very great, two almost identical functions. W/e it works for now. 
 	public void saveAllData( EnumMap <Setting, ? extends Object> fromPlayer, EnumMap <Setting, ? extends Object> fromUI ) {
 		createNecessaryFolders();
 		saveAlbumsAndTracks();
