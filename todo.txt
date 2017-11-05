@@ -3,24 +3,16 @@ New Features
 
 Bug Fixes / Incremental Improvements	
 	https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
-	
-	When loading tracks from a playlist, make sure files that are missing are shown in red
-	
+		
 	I got rid of the possibility of a Track throwing an exception while loading.  
 		I feel like I should be doing more responsible things there.
 		Why couldn't I load it? Can I make a note? Do I need to? 
 		Plan: Watch for problems. I feel like maybe no problems will arise.
 		Also: Eventually remove all the catch ( Exception ) i have when loading tracks (search for calls to the two constructors)
 	
-Testing pre-beta release info
-	Windows 10 & windows 7 - can't control volume on any track
-			
-	Windows 7 - Playlist empty list has a bad character, try using textflow and embedding that image, or just use the word save
-	
+Testing pre-beta release info		
 	Windows 7 & Windows 10 - The settings button doens't have enough top-margin. It's right against the top bar, looks bad
-	
-	Windows 7 - Font in error log is ugly
-	
+		
 	Windows 7 and windows 10 - Can't open web browser when clicking links in about tab
 	
 	Unable to load track - need more info in error log

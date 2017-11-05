@@ -173,7 +173,7 @@ public class FXUI implements PlayerListener {
 	Tooltip currentTrackTooltip;
 	
 	Label emptyPlaylistLabel = new Label( 
-		"You haven't created any playlists, make a playlist on the right and click 💾 to save it for later." );
+		"You haven't created any playlists, make a playlist on the right and click the save button." );
 
 	Label emptyTrackListLabel = new Label( 
 		"No tracks loaded. To add to your library, click on the + button or drop folders here." );

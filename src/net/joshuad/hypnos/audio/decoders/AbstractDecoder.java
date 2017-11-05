@@ -75,8 +75,7 @@ public abstract class AbstractDecoder {
 		}
 		
 		try {
-			FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.VOLUME );
-			volume = (FloatControl)audioOutput.getControl( FloatControl.Type.MASTER_GAIN );
+			FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.MASTER_GAIN );
 		} catch ( Exception e ) {
 			masterGainSupported = false;
 		}
