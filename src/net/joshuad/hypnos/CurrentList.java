@@ -106,7 +106,7 @@ public class CurrentList {
 							track.setIsMissingFile ( true );
 						}
 						
-						if ( track.needsUpdate() ) {
+						if ( track.needsUpdateFromDisk() ) {
 							try {
 								track.update();
 								//Thread.sleep( 10 );

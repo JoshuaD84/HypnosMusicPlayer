@@ -1,5 +1,5 @@
 New Features		
-			
+	Save Log button
 
 Bug Fixes / Incremental Improvements	
 	https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
@@ -68,6 +68,7 @@ Post Beta fixes / updates / improvements
 	
 	Show images in tag window
 		Allow the deletion of embedded images
+		https://stackoverflow.com/questions/17067481/javafx-2-tableview-different-cell-factory-depending-on-the-data-inside-the-cel
 		
 	Change css selector for .scroll-bar:horizontal to an applied class, so only chosen h-scrollbars are hidden
 

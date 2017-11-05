@@ -211,7 +211,6 @@ public class Persister {
 		} catch ( Exception e ) {
 			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to save library source directory list to disk, continuing." );
 		}
-		
 	}
 
 	public void saveCurrentList () {

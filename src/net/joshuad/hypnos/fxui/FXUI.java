@@ -98,6 +98,7 @@ import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.CurrentList;
 import net.joshuad.hypnos.CurrentListState;
 import net.joshuad.hypnos.CurrentListTrack;
+import net.joshuad.hypnos.CurrentListTrackState;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.LibraryUpdater.LoaderSpeed;
@@ -150,6 +151,8 @@ public class FXUI implements PlayerListener {
 	ImageView exportImage, saveImage, loadTracksImage;
 	ImageView queueImage, historyImage;
 	ImageView addSourceTracksImage, addSourceAlbumsImage, addSourcePlaylistsImage;
+	
+	Image repeatImageSource, playImageSource, pauseImageSource;
 
 	HBox albumFilterPane;
 	HBox trackFilterPane;
@@ -398,7 +401,8 @@ public class FXUI implements PlayerListener {
 		primaryContainer.setCenter( primarySplitPane );
 		primaryContainer.setTop( transport );
 
-		mainStage.setTitle( PROGRAM_NAME );
+		
+		mainStage.setTitle( ( Hypnos.isDeveloping() ? "Dev - " : "" ) + PROGRAM_NAME );
 
 		((Group) scene.getRoot()).getChildren().addAll( primaryContainer );
 		mainStage.setScene( scene );
@@ -450,7 +454,9 @@ public class FXUI implements PlayerListener {
 		player.addPlayerListener ( this );
 	}
 	
-
+	public ColorAdjust getDarkThemeTransportButtonsAdjust () {
+		return darkThemeTransportButtons;
+	}
 	
 	private void setupFont() {
 		Path fontPath, fontBold, stylesheet; 
@@ -549,7 +555,8 @@ public class FXUI implements PlayerListener {
 		}
 		
 		try {
-			repeatImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/repeat.png" ).toFile() ) ) );
+			repeatImageSource = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/repeat.png" ).toFile() ) );
+			repeatImage = new ImageView ( repeatImageSource );
 			repeatImage.setFitWidth( currentListControlsButtonFitWidth );
 			repeatImage.setFitHeight( currentListControlsButtonFitHeight );
 		} catch ( Exception e ) {
@@ -860,7 +867,8 @@ public class FXUI implements PlayerListener {
 		pauseImage = null;
 		
 		try {
-			playImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/play.png" ).toFile() ) ) );
+			playImageSource = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/play.png" ).toFile() ) );
+			playImage = new ImageView ( playImageSource );
 			playImage.setFitHeight( 18 );
 			playImage.setFitWidth( 18 );
 		} catch ( Exception e ) {
@@ -868,7 +876,8 @@ public class FXUI implements PlayerListener {
 		}
 		
 		try {
-			pauseImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/pause.png" ).toFile() ) ) );
+			pauseImageSource = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/pause.png" ).toFile() ) );
+			pauseImage = new ImageView ( pauseImageSource );
 			pauseImage.setFitHeight( 18 );
 			pauseImage.setFitWidth( 18 );
 		} catch ( Exception e ) {
@@ -3240,13 +3249,18 @@ public class FXUI implements PlayerListener {
 		titleColumn.setMaxWidth( 25000 );
 		lengthColumn.setMaxWidth( 8000 );
 		
-		playingColumn.setCellValueFactory( new PropertyValueFactory ( "display" ) );
+		playingColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, CurrentListTrackState>( "displayState" ) );
 		artistColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "artist" ) );
 		yearColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, Integer>( "year" ) );
 		albumColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "fullAlbumTitle" ) );
 		titleColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "title" ) );
 		trackColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, Integer>( "trackNumber" ) );
 		lengthColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "lengthDisplay" ) );
+
+		playingColumn.setCellFactory ( column -> { 
+				return new CurrentListTrackStateCell( this, playImageSource, pauseImageSource ); 
+			} 
+		);
 		
 		trackColumn.setCellFactory( column -> {
 			return new TableCell <CurrentListTrack, Integer>() {
@@ -3278,7 +3292,8 @@ public class FXUI implements PlayerListener {
 
 		playingColumn.setMaxWidth( 38 );
 		playingColumn.setMinWidth( 38 );
-
+		playingColumn.setResizable( false );
+		
 		currentListTable.setOnDragOver( event -> {
 			
 			Dragboard db = event.getDragboard();
@@ -4121,6 +4136,7 @@ public class FXUI implements PlayerListener {
 	public void playerPaused () {
 		Platform.runLater( () -> {
 			togglePlayButton.setGraphic( playImage );
+			currentListTable.refresh(); //To get the play/pause image to update. 
 		});
 	}
 
@@ -4129,6 +4145,7 @@ public class FXUI implements PlayerListener {
 	public void playerUnpaused () {
 		Platform.runLater( () -> {
 			togglePlayButton.setGraphic( pauseImage );
+			currentListTable.refresh();//To get the play/pause image to update. 
 		});
 		
 	}
@@ -4340,4 +4357,78 @@ class LineNumbersCellFactory<T, E> implements Callback<TableColumn<T, E>, TableC
             }
         };
     }
+}
+
+class CurrentListTrackStateCell extends TableCell <CurrentListTrack, CurrentListTrackState> {
+	
+	private ImageView pauseImage, playImage;
+	private FXUI ui;
+	private boolean isDarkTheme = false;
+	
+	public CurrentListTrackStateCell ( FXUI ui, Image playImageSource, Image pauseImageSource ) {
+		this.ui = ui;
+		
+		playImage = new ImageView ( playImageSource );
+		playImage.setFitHeight( 13 );
+		playImage.setFitWidth( 13 );
+		
+		pauseImage = new ImageView ( pauseImageSource );
+		pauseImage.setFitHeight( 13 );
+		pauseImage.setFitWidth( 13 );
+
+		setContentDisplay ( ContentDisplay.LEFT );
+		setGraphicTextGap ( 2 );
+		this.setAlignment( Pos.CENTER_LEFT );
+	}
+	
+	protected void updateImageThemes ( ) {
+		if ( ui.isDarkTheme() && !isDarkTheme ) {
+			playImage.setEffect( ui.getDarkThemeTransportButtonsAdjust() );
+			pauseImage.setEffect( ui.getDarkThemeTransportButtonsAdjust() );
+			
+		} else if ( !ui.isDarkTheme() && isDarkTheme ) {
+			playImage.setEffect( null );
+			pauseImage.setEffect( null );
+		}
+		
+	}
+	
+	@Override
+	protected void updateItem ( CurrentListTrackState state, boolean empty ) {
+		super.updateItem( state, empty );
+		
+		updateImageThemes();
+
+		if ( state != null ) {
+			if ( state.getIsCurrentTrack() ) {
+				
+				ImageView playPauseImage = ui.player.isPaused() ? pauseImage : playImage;
+				
+				if ( state.getQueueIndices().size() > 0 ) {
+					setGraphic ( playPauseImage );
+					setText ( "+" );
+					
+				} else {
+					setGraphic ( playPauseImage );
+					setText ( null );
+				}
+
+			} else if ( state.getQueueIndices().size() == 1 ) {
+				setText ( state.getQueueIndices().get( 0 ).toString() );
+				setGraphic ( null );
+				
+			} else if ( state.getQueueIndices().size() >= 1 ) {
+				setText ( state.getQueueIndices().get( 0 ).toString() + "+" );
+				setGraphic ( null );
+				
+			} else {
+				setText ( "" );
+				setGraphic ( null );
+				
+			}
+		} else {
+			setText( null );
+			setGraphic( null );
+		}
+	}
 }
