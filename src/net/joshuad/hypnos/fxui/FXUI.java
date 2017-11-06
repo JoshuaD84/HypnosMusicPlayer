@@ -1074,7 +1074,17 @@ public class FXUI implements PlayerListener {
 
 		Button settingsButton = new Button ( );
 		settingsButton.setGraphic( settingsImage );
-		settingsButton.setPadding( new Insets ( 0, 5, 0, 5 ) );
+		
+		switch ( Hypnos.getOS() ) {
+			case WIN_10: case WIN_7: case WIN_8: case WIN_UNKNOWN: case WIN_VISTA: case WIN_XP:
+				settingsButton.setPadding( new Insets ( 5, 5, 0, 5 ) );
+				break;
+				
+			case NIX: case OSX: case UNKNOWN:
+				settingsButton.setPadding( new Insets ( 0, 5, 0, 5 ) );
+				break;
+		}
+		
 		settingsButton.getStyleClass().add( "settingsButton" );
 		settingsButton.setTooltip( new Tooltip( "Configuration and Information" ) );
 		

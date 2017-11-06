@@ -12,9 +12,7 @@ Bug Fixes / Incremental Improvements
 		
 	Power being cut still erases all data
 	
-Testing pre-beta release info		
-	Windows 7 & Windows 10 - The settings button doens't have enough top-margin. It's right against the top bar, looks bad
-		
+Testing pre-beta release info				
 	Windows 7 and windows 10 - Can't open web browser when clicking links in about tab
 	
 	Unable to load track - need more info in error log
