@@ -56,14 +56,10 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 				}
 				
 			} else {
-				try {
-					Track track = new Track( file );
-	
-					if ( !library.containsTrack( track ) ) {
-						library.addTrack( track );
-					}
-				} catch ( Exception e ) { 
-					LOGGER.log( Level.INFO, e.getClass().getCanonicalName() + ": Unable to load track: " + file, e );
+				Track track = new Track( file );
+
+				if ( !library.containsTrack( track ) ) {
+					library.addTrack( track );
 				}
 
 				return FileVisitResult.CONTINUE;

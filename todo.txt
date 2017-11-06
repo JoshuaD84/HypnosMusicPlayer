@@ -8,7 +8,6 @@ Bug Fixes / Incremental Improvements
 		I feel like I should be doing more responsible things there.
 		Why couldn't I load it? Can I make a note? Do I need to? 
 		Plan: Watch for problems. I feel like maybe no problems will arise.
-		Also: Eventually remove all the catch ( Exception ) i have when loading tracks (search for calls to the two constructors)
 		
 	Power being cut still erases all data
 	
@@ -19,7 +18,11 @@ Testing pre-beta release info
 	 	
 
 Post Beta New Features		
+	Art pane min size is annoying
+	
 	Add default sort column choice, like shuffle and repeat
+	
+	Current list - sort by > drop list. 
 	
 	Persist sort options
 	

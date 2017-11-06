@@ -316,11 +316,7 @@ public class QueueWindow extends Stage {
 					ArrayList <Track> tracksToAdd = new ArrayList<Track> ( pathsToAdd.size() );
 					
 					for ( Path path : pathsToAdd ) {
-						try {
-							tracksToAdd.add( new Track ( path ) );
-						} catch ( Exception e ) {
-							LOGGER.info ( "Error loading track: " + path );
-						}
+						tracksToAdd.add( new Track ( path ) );
 					}
 										
 					if ( !tracksToAdd.isEmpty() ) {
@@ -410,11 +406,7 @@ public class QueueWindow extends Stage {
 				ArrayList <Track> tracksToAdd = new ArrayList<Track> ( pathsToAdd.size() );
 				
 				for ( Path path : pathsToAdd ) {
-					try {
-						tracksToAdd.add( new Track ( path ) );
-					} catch ( Exception e ) {
-						LOGGER.info ( "Error loading track: " + path );
-					}
+					tracksToAdd.add( new Track ( path ) );
 				}
 				
 				if ( !tracksToAdd.isEmpty() ) {

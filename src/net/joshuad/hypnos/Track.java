@@ -138,7 +138,8 @@ public class Track implements Serializable {
 		this.encodingType = track.encodingType;
 		this.format = track.format;
 		
-		/*for ( Field field : Track.class.getFields() ) {
+		/* REFACTOR - Something like this, to avoid programmer mistakes. 
+		   for ( Field field : Track.class.getFields() ) {
 			if ( Modifier.isTransient( field.getModifiers() ) ) continue;
 			if ( Modifier.isStatic( field.getModifiers() ) ) continue;
 			
