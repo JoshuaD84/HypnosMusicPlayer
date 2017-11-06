@@ -17,8 +17,6 @@ Testing pre-beta release info
 	
 	Unable to load track - need more info in error log
 	 	
-	From alpha to beta - Playlists was a file, now is a folder. Delete the file or we can't save playlists.
-	
 
 Post Beta New Features		
 	Add default sort column choice, like shuffle and repeat

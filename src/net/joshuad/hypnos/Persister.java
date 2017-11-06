@@ -84,9 +84,26 @@ public class Persister {
 	}
 
 	private void createNecessaryFolders () {
-
+		if ( !playlistsDirectory.isDirectory() ) {
+			try {
+				Files.delete( playlistsDirectory.toPath() );
+				LOGGER.info( "Playlists directory location existed but was not a directory. Removed: " + playlistsDirectory.toString() ); 
+			} catch ( IOException e ) {
+				LOGGER.warning( e.getClass().getCanonicalName() 
+					+ ": Playlists directory exists but is a normal file, and I can't remove it."
+					+ " Playlist data may be lost after program is terminated."
+					+ playlistsDirectory.toString()
+				);
+			}
+		}
+		
 		if ( !playlistsDirectory.exists() ) {
-			boolean playlistDir = playlistsDirectory.mkdirs();
+			boolean playlistDirCreated = playlistsDirectory.mkdirs(); //TODO: boolean never read
+			if ( playlistDirCreated ) {
+				LOGGER.info( "Playlist directory did not exist. Created: " + playlistsDirectory.toString() ); 
+			} else {
+				LOGGER.warning( "Cannot create playlists directory. Playlist data may be lost after program is terminated." + playlistsDirectory.toString() );
+			}
 		}
 	}
 
