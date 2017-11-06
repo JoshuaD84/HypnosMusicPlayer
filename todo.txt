@@ -13,9 +13,7 @@ Bug Fixes / Incremental Improvements
 	
 Testing pre-beta release info				
 	Windows 7 and windows 10 - Can't open web browser when clicking links in about tab
-	
-	Unable to load track - need more info in error log
-	 	
+		 	
 
 Post Beta New Features		
 	Art pane min size is annoying

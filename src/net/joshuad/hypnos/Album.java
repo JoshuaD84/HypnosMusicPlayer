@@ -23,6 +23,7 @@ public class Album implements Serializable {
 		updateData();
 	}
 	
+	//TODO: look at this exception and decide if we should be throwing it or handling it right here. 
 	public void updateData () throws Exception {
 		tracks = new ArrayList <Track> ();
 		

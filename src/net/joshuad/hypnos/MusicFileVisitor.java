@@ -4,7 +4,6 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /* Note: this class is not designed for repeat uses. */
@@ -51,7 +50,7 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 					
 					return FileVisitResult.SKIP_SIBLINGS;
 				} catch ( Exception e ) {
-					LOGGER.log( Level.INFO, "Unable to load album track", e );
+					LOGGER.info( e.getClass().getCanonicalName() + ": Unable to load album track. " + file.toAbsolutePath().toString() );
 					return FileVisitResult.CONTINUE;
 				}
 				
