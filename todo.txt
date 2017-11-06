@@ -9,6 +9,8 @@ Bug Fixes / Incremental Improvements
 		Why couldn't I load it? Can I make a note? Do I need to? 
 		Plan: Watch for problems. I feel like maybe no problems will arise.
 		Also: Eventually remove all the catch ( Exception ) i have when loading tracks (search for calls to the two constructors)
+		
+	Power being cut still erases all data
 	
 Testing pre-beta release info		
 	Windows 7 & Windows 10 - The settings button doens't have enough top-margin. It's right against the top bar, looks bad
@@ -16,13 +18,8 @@ Testing pre-beta release info
 	Windows 7 and windows 10 - Can't open web browser when clicking links in about tab
 	
 	Unable to load track - need more info in error log
-	
-	Windows 7 - Current list play triangle looks a little bad, can we do that with an image instead of font? 
-	
+	 	
 	From alpha to beta - Playlists was a file, now is a folder. Delete the file or we can't save playlists.
-	
-	Maria - She has a folder with russian characters. It messes up saving playlists. 
-		E:\Music\Music\Русское\Зоя Ященко\Белая Гвардия\(1992) Белая Гвардия
 	
 
 Post Beta New Features		

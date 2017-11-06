@@ -3,9 +3,11 @@ package net.joshuad.hypnos;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.nio.file.Path;
@@ -43,9 +45,9 @@ public class Playlist implements Serializable {
 		
 		if ( playlistPath.toString().toLowerCase().endsWith( ".m3u" ) ) {
 			try (
-					FileReader fileReader = new FileReader( playlistPath.toFile() );
+				FileInputStream fileInput = new FileInputStream( playlistPath.toFile() );
 			) {
-				BufferedReader m3uIn = new BufferedReader ( fileReader );
+				BufferedReader m3uIn = new BufferedReader ( new InputStreamReader ( fileInput, "UTF8" ) );
 				for ( String line; (line = m3uIn.readLine()) != null; ) {
 					if ( line.isEmpty() ) {
 						//Do nothing
@@ -70,9 +72,9 @@ public class Playlist implements Serializable {
 			Playlist playlist = new Playlist( path.getFileName().toString() );
 			
 			try (
-					FileReader fileReader = new FileReader( path.toFile() );
+				FileInputStream fileInput = new FileInputStream( path.toFile() );
 			) {
-				BufferedReader m3uIn = new BufferedReader ( fileReader );
+				BufferedReader m3uIn = new BufferedReader ( new InputStreamReader ( fileInput, "UTF8" ) );
 				for ( String line; (line = m3uIn.readLine()) != null; ) {
 
 					try {
@@ -146,8 +148,8 @@ public class Playlist implements Serializable {
 			throw new IOException ( "Null file specified." );
 		}
 		
-		try ( FileWriter fileWriter = new FileWriter( file ) ) {
-			PrintWriter playlistOut = new PrintWriter( new BufferedWriter( fileWriter ) );
+		try ( FileOutputStream fileOut = new FileOutputStream( file ) ) {
+			PrintWriter playlistOut = new PrintWriter( new BufferedWriter( new OutputStreamWriter ( fileOut, "UTF8" ) ) );
 			playlistOut.println( "#EXTM3U" );
 			
 			playlistOut.printf( "#Name: %s\n\n", getName() );
