@@ -37,9 +37,7 @@ Post Beta New Features
 	
 	Put a filter on images when in light theme to make them slightly grey (or dampen the actual images).
 	
-	Have the 2nd instance of hypnos call --bring-to-front or whatever it's called
-	
-	Volume sliders get jammed against right side at low widths. 
+	Have the 2nd instance of hypnos call --bring-to-front or whatever it's called if there are no arguments to second instance call
 	
 	
 Post Beta fixes / updates / improvements 
