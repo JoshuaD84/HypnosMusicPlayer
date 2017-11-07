@@ -1,5 +1,4 @@
 New Features		
-	Save Log button
 
 Bug Fixes / Incremental Improvements	
 	https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
@@ -11,10 +10,18 @@ Bug Fixes / Incremental Improvements
 		
 	Power being cut still erases all data
 	
+	Ok this should address a number of issues that people have been having including this one. Please test and let me know if this issue can be closed.
+		JNativeHook-2.1.1-rc  
+			https://oss.sonatype.org/content/repositories/snapshots/com/1stleg/jnativehook/2.1.SNAPSHOT/jnativehook-2.1.20170730.201417-33.jar
+		JNativeHook-2.0.4-rc  
+			https://oss.sonatype.org/content/repositories/snapshots/com/1stleg/jnativehook/2.0.SNAPSHOT/jnativehook-2.0.20170730.201637-41.jar
+	
 Testing pre-beta release info				
 
 Post Beta New Features		
 	Art pane min size is annoying
+	
+	Bug report dialog
 	
 	Add default sort column choice, like shuffle and repeat
 	
@@ -38,6 +45,7 @@ Post Beta New Features
 	
 	
 Post Beta fixes / updates / improvements 
+	Add line breaks to the logger all the way through.
 
 	Hide the library table drop down
 		drag vertical divider all the way left then back to center, the drop down appears. Hide it. 
@@ -77,6 +85,8 @@ Post Beta fixes / updates / improvements
 	Dark theme for about tab settings
 	
 	Tag Window change "Track" to "Track #"
+	
+	Revisit fonts -- Do we need to include the font files? 
 	
 JavaFX stuff
 	hide/show via hotkeys while maximized toggles every 3 presses instead of every 2 presses. 
@@ -160,8 +170,6 @@ OS Specific
 		
 	Linux
 		use a compiled launcher rather than a script -- this will make the appimage nicer I think
-		Standalone build - Linux64 embedded JRE
-		Standalone build - Linux32 embedded JRE
 		Rename java process to Hypnos
 		
 		Gnome3 
@@ -184,20 +192,8 @@ OS Specific
 		What other systems don't support? How to handle? 
 		https://stackoverflow.com/questions/29995727/java-systemtray-icon-does-not-always-work
 		
-	Use local fonts? 		
-		DejaVu Sans - The thing I'm using on nix
-		Calibri - Windows
-		Lucida Grande - OSX
-		
-			try { 
-			    Font.loadFont(new FileInputStream(new File("stage/font/dejavu/DejaVuSans.ttf")), 12);
-			    Font.loadFont(new FileInputStream(new File("stage/font/dejavu/DejaVuSans-Bold.ttf")), 12);
-				File stylesheet = new File ( "stage/font/font.css" );
-			    scene.getStylesheets().add( "file:///" + stylesheet.getAbsolutePath().replace( "\\", "/" ) ); 
-		    } catch (FileNotFoundException e) {
-		    	//TODO: 
-		    	e.printStackTrace();
-		    }
+
+
 
 
 Future Features, maybe:

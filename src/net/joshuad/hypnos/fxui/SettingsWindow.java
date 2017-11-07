@@ -5,7 +5,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -27,6 +28,7 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
@@ -59,6 +61,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -659,8 +662,41 @@ public class SettingsWindow extends Stage {
 		
 		logReader.setDaemon( true );
 		logReader.start();
-		 
-		logPane.getChildren().add( logView );
+		
+		
+		Button exportButton = new Button ( "Export Log File" );
+		
+		exportButton.setOnAction( ( ActionEvent event ) -> {
+			
+			FileChooser fileChooser = new FileChooser();
+			FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter( 
+				"Log Files", Arrays.asList( "*.log", "*.txt" ) );
+			
+			fileChooser.getExtensionFilters().add( fileExtensions );
+			fileChooser.setTitle( "Export Log File" );
+			fileChooser.setInitialFileName( "hypnos.log" );
+			File targetFile = fileChooser.showSaveDialog( this );
+			
+			if ( targetFile == null ) return; 
+	
+			if ( !targetFile.toString().toLowerCase().endsWith(".log") && !targetFile.toString().toLowerCase().endsWith(".txt") ) {
+				targetFile = targetFile.toPath().resolveSibling ( targetFile.getName() + ".log" ).toFile();
+			}
+			
+			try {
+				Files.copy( Hypnos.getLogFile(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
+			} catch ( Exception ex ) {
+				FXUI.notifyUserError ( ex.getClass().getCanonicalName() + ": Unable to export log file." );
+				LOGGER.log( Level.WARNING, "Unable to export log file.", ex );
+			}
+		});
+			
+		HBox exportBox = new HBox();
+		exportBox.setAlignment( Pos.TOP_CENTER );
+		exportBox.getChildren().add ( exportButton );
+		exportBox.setPadding( new Insets ( 5, 0, 0, 0 ) );
+		
+		logPane.getChildren().addAll( logView, exportBox );
 		
 		return logTab;
 	}

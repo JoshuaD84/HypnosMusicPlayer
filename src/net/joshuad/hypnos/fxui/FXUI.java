@@ -1276,7 +1276,7 @@ public class FXUI implements PlayerListener {
 			Track track = currentImagesTrack;
 			if ( track == null ) return;
 			
-			FileChooser fileChooser = new FileChooser();
+			FileChooser fileChooser = new FileChooser(); //TODO: maybe only instantianate this once
 			FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter( 
 				"Image Files", Arrays.asList( "*.jpg", "*.jpeg", "*.png" ) );
 			
