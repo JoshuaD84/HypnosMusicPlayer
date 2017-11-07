@@ -4127,6 +4127,7 @@ public class FXUI implements PlayerListener {
 			currentTrackTooltip.setText( 
 				"Album: " + track.getSimpleAlbumTitle() + "\n" +
 				"Year: " + track.getYear() + "\n" +
+				"Length: " + Utils.getLengthDisplay( track.getLengthS() ) + "\n" + 
 				"Encoding: " + track.getShortEncodingString()
 			);
 			

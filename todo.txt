@@ -15,11 +15,14 @@ Bug Fixes / Incremental Improvements
 			https://oss.sonatype.org/content/repositories/snapshots/com/1stleg/jnativehook/2.1.SNAPSHOT/jnativehook-2.1.20170730.201417-33.jar
 		JNativeHook-2.0.4-rc  
 			https://oss.sonatype.org/content/repositories/snapshots/com/1stleg/jnativehook/2.0.SNAPSHOT/jnativehook-2.0.20170730.201637-41.jar
+		
 	
 Testing pre-beta release info				
 
 Post Beta New Features		
 	Art pane min size is annoying
+	
+	Library Source Directories - highlight in red if they are missing. 
 	
 	Bug report dialog
 	

@@ -536,7 +536,7 @@ public class Library {
 			);
 		
 		} catch ( IOException e ) {
-			LOGGER.log( Level.INFO, "Unable to watch directory for changes: " + start.toString() + "\n" + e.getMessage() );
+			LOGGER.log( Level.INFO, "Unable to watch directory for changes: " + start.toString() );
 		}
 	}
 	
