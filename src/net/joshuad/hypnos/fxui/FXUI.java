@@ -300,6 +300,7 @@ public class FXUI implements PlayerListener {
 		trackInfoWindow = new TrackInfoWindow ( this );
 
 		applyBaseTheme();
+		applyDarkTheme();
 		
 		artSplitPane = new SplitPane();
 		artSplitPane.getItems().addAll( albumImagePane, artistImagePane );

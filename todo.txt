@@ -20,7 +20,7 @@ Post Beta New Features
 	
 	Current list - sort by > drop list. 
 	
-	Persist sort options
+	Persist column sort options
 	
 	Album list - Display disc and release type in different color font
 					
@@ -38,6 +38,9 @@ Post Beta New Features
 	
 	
 Post Beta fixes / updates / improvements 
+
+	Hide the library table drop down
+		drag vertical divider all the way left then back to center, the drop down appears. Hide it. 
 
 	Setup a currentList.updateAlbum and updatePlaylist system
 		Doesn't change artwork
