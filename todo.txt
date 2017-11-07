@@ -6,14 +6,12 @@ Bug Fixes / Incremental Improvements
 		
 	I got rid of the possibility of a Track throwing an exception while loading.  
 		I feel like I should be doing more responsible things there.
-		Why couldn't I load it? Can I make a note? Do I need to? 
+		Why couldn't I load it? Can I make a note, maybe in the tag error log? Do I need to? 
 		Plan: Watch for problems. I feel like maybe no problems will arise.
 		
 	Power being cut still erases all data
 	
 Testing pre-beta release info				
-	Windows 7 and windows 10 - Can't open web browser when clicking links in about tab
-		 	
 
 Post Beta New Features		
 	Art pane min size is annoying
@@ -96,6 +94,8 @@ Refactor / organize my code.
 	a better structure for persister
 	
 	a better structure for hotkey commands (maybe combine with commandline commands?)
+	
+	Move all the file browser calls into a single function
 
 Decoders
 	Mp4
@@ -156,10 +156,7 @@ OS Specific
 		Rename java process to Hypnos
 		
 	Linux
-		Debian Installer
-	    redhat installer
-	    pacman installer
-		use a compiled launcher rather than a script -- it allows shell double click. 
+		use a compiled launcher rather than a script -- this will make the appimage nicer I think
 		Standalone build - Linux64 embedded JRE
 		Standalone build - Linux32 embedded JRE
 		Rename java process to Hypnos

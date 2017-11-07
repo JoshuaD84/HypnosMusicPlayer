@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -4349,6 +4350,48 @@ public class FXUI implements PlayerListener {
 	
 	public Track getCurrentImagesTrack() {
 		return currentImagesTrack;
+	}
+	
+	public void openWebBrowser ( String url ) {
+		
+		switch ( Hypnos.getOS() ) {
+			case NIX: {
+				try {
+					new ProcessBuilder("x-www-browser", url ).start();
+				} catch ( Exception e ) {
+					LOGGER.log( Level.INFO, "Unable to open web browser.", e );
+				}
+				break;
+			}
+				
+			case OSX: {
+				Runtime rt = Runtime.getRuntime();
+				try {
+					rt.exec("open " + url);
+				} catch ( Exception e ) {
+					LOGGER.log( Level.INFO, "Unable to open web browser.", e );
+				}
+				break;
+			}
+				
+			case WIN_10: case WIN_7: case WIN_8: case WIN_UNKNOWN: case WIN_VISTA: case WIN_XP:
+			case UNKNOWN: {
+				
+				try {
+					Desktop.getDesktop().browse( new URI ( url ) );
+					
+				} catch ( Exception e ) {
+					try {
+						Runtime rt = Runtime.getRuntime();
+						rt.exec("rundll32 url.dll,FileProtocolHandler " + url);
+						
+					} catch ( Exception e2 ) {
+						LOGGER.log( Level.INFO, "Unable to open web browser.", e );
+					}
+				}
+				break;
+			}
+		}
 	}
 }
 

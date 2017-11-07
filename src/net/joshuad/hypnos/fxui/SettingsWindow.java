@@ -255,11 +255,7 @@ public class SettingsWindow extends Stage {
 			consumeHotkeyNote.setOnAction(new EventHandler<ActionEvent>() {
 			    @Override
 			    public void handle(ActionEvent e) {
-			    	try {
-						new ProcessBuilder("x-www-browser", url ).start();
-					} catch ( IOException e1 ) {
-						LOGGER.log( Level.INFO, "Unable to open web browser.", e1 );
-					}
+			    	ui.openWebBrowser( url );
 			    }
 			});
 			
@@ -906,14 +902,11 @@ public class SettingsWindow extends Stage {
 		Label name = new Label ( "Hypnos Music Player" );
 		name.setStyle( "-fx-font-size: 36px; -fx-text-fill: #020202" );
 		
-		Hyperlink website = new Hyperlink ( "http://www.hypnosplayer.org" );
-		website.setTooltip( new Tooltip ( "http://www.hypnosplayer.org" ) );
+		String url = "http://www.hypnosplayer.org";
+		Hyperlink website = new Hyperlink ( url );
+		website.setTooltip( new Tooltip ( url ) );
 		website.setOnAction( ( ActionEvent e ) -> {
-			try {
-				new ProcessBuilder("x-www-browser", "http://hypnosplayer.org" ).start();
-			} catch ( IOException e1 ) {
-				LOGGER.log( Level.INFO, "Unable to open web browser.", e1 );
-			}
+			ui.openWebBrowser( url );
 		});
 		website.setStyle( "-fx-font-size: 20px; -fx-text-fill: #0A95C8" );
 
@@ -940,16 +933,14 @@ public class SettingsWindow extends Stage {
 		Label authorLabel = new Label ( "Author:" );
 		authorLabel.setStyle( "-fx-text-fill: #020202" );
 		Hyperlink authorLink = new Hyperlink ( "Joshua Hartwell" );
+		
+		String authorURL = "http://joshuad.net";
 
-		authorLink.setTooltip( new Tooltip ( "http://joshuad.net" ) );
+		authorLink.setTooltip( new Tooltip ( authorURL ) );
 		
 		authorLink.setStyle( "-fx-text-fill: #0A95C8" );
 		authorLink.setOnAction( ( ActionEvent e ) -> {
-			try {
-				new ProcessBuilder("x-www-browser", "http://joshuad.net" ).start();
-			} catch ( IOException e1 ) {
-				LOGGER.log( Level.INFO, "Unable to open web browser.", e1 );
-			}
+			ui.openWebBrowser( authorURL );
 		});
 		
 		authorBox.getChildren().addAll( authorLabel, authorLink );
@@ -963,15 +954,12 @@ public class SettingsWindow extends Stage {
 		sourceLabel.setStyle( "-fx-text-fill: #020202" );
 		Hyperlink sourceLink = new Hyperlink ( "GitHub" );
 
-		sourceLink.setTooltip( new Tooltip ( "https://github.com/JoshuaD84/HypnosMusicPlayer" ) );
+		String githubURL = "https://github.com/JoshuaD84/HypnosMusicPlayer";
+		sourceLink.setTooltip( new Tooltip ( githubURL ) );
 		
 		sourceLink.setStyle( "-fx-text-fill: #0A95C8" );
 		sourceLink.setOnAction( ( ActionEvent e ) -> {
-			try {
-				new ProcessBuilder("x-www-browser", "https://github.com/JoshuaD84/HypnosMusicPlayer" ).start();
-			} catch ( IOException e1 ) {
-				LOGGER.log( Level.INFO, "Unable to open web browser.", e1 );
-			}
+			ui.openWebBrowser( githubURL );
 		});
 		
 
@@ -984,13 +972,11 @@ public class SettingsWindow extends Stage {
 		licenseLabel.setStyle( "-fx-text-fill: #020202" );
 		Hyperlink licenseLink = new Hyperlink ( "GNU GPLv3" );
 		licenseLink.setStyle( "-fx-text-fill: #0A95C8" );
-		licenseLink.setTooltip ( new Tooltip ( "https://www.gnu.org/licenses/gpl-3.0-standalone.html" ) );
+		
+		String gplurl = "https://www.gnu.org/licenses/gpl-3.0-standalone.html";
+		licenseLink.setTooltip ( new Tooltip ( url ) );
 		licenseLink.setOnAction( ( ActionEvent e ) -> {
-			try {
-				new ProcessBuilder("x-www-browser", "https://www.gnu.org/licenses/gpl-3.0-standalone.html" ).start();
-			} catch ( IOException e1 ) {
-				LOGGER.log( Level.INFO, "Unable to open web browser.", e1 );
-			}
+			ui.openWebBrowser( gplurl );
 		});
 		
 		licenseBox.getChildren().addAll( licenseLabel, licenseLink );
