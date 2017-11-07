@@ -10,8 +10,10 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.URLDecoder;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -315,6 +317,25 @@ public class Hypnos extends Application {
 	
 	private void setupLogFile() {
 		logFile = configDirectory.resolve( "hypnos.log" );
+		Path logFileBackup = configDirectory.resolve( "hypnos.log.1" );
+		Path logFileBackup2 = configDirectory.resolve( "hypnos.log.2" );
+		
+		if ( Files.exists( logFileBackup ) ) {
+			try {
+				Files.move( logFileBackup, logFileBackup2, StandardCopyOption.REPLACE_EXISTING );
+			} catch ( Exception e ) {
+				LOGGER.log ( Level.WARNING, e.getClass().getCanonicalName() + ": Unable to create 2nd backup logfile" );
+			}
+		}
+		
+		if ( Files.exists( logFile ) ) {
+			try {
+				Files.move( logFile, logFileBackup, StandardCopyOption.REPLACE_EXISTING );
+			} catch ( Exception e ) {
+				LOGGER.log ( Level.WARNING, e.getClass().getCanonicalName() + ": Unable to create 1st backup logfile" );
+			}
+		}
+				
 		try {
 			logFile.toFile().createNewFile();
 		} catch ( Exception e ) {
