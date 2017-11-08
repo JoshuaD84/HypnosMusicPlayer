@@ -1,25 +1,15 @@
 New Features		
 
 Bug Fixes / Incremental Improvements	
-	https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
-		
-	I got rid of the possibility of a Track throwing an exception while loading.  
-		I feel like I should be doing more responsible things there.
-		Why couldn't I load it? Can I make a note, maybe in the tag error log? Do I need to? 
-		Plan: Watch for problems. I feel like maybe no problems will arise.
 		
 	Power being cut still erases all data
-	
-	Ok this should address a number of issues that people have been having including this one. Please test and let me know if this issue can be closed.
-		JNativeHook-2.1.1-rc  
-			https://oss.sonatype.org/content/repositories/snapshots/com/1stleg/jnativehook/2.1.SNAPSHOT/jnativehook-2.1.20170730.201417-33.jar
-		JNativeHook-2.0.4-rc  
-			https://oss.sonatype.org/content/repositories/snapshots/com/1stleg/jnativehook/2.0.SNAPSHOT/jnativehook-2.0.20170730.201637-41.jar
-		
-	
-Testing pre-beta release info				
 
-Post Beta New Features		
+
+
+Post Beta New Features	
+
+	https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
+		
 	Art pane min size is annoying
 	
 	Library Source Directories - highlight in red if they are missing. 
@@ -48,6 +38,15 @@ Post Beta New Features
 	
 	
 Post Beta fixes / updates / improvements 
+
+	
+	Ok this should address a number of issues that people have been having including this one. Please test and let me know if this issue can be closed.
+		JNativeHook-2.1.1-rc  
+			https://oss.sonatype.org/content/repositories/snapshots/com/1stleg/jnativehook/2.1.SNAPSHOT/jnativehook-2.1.20170730.201417-33.jar
+		JNativeHook-2.0.4-rc  
+			https://oss.sonatype.org/content/repositories/snapshots/com/1stleg/jnativehook/2.0.SNAPSHOT/jnativehook-2.0.20170730.201637-41.jar
+
+
 	Add line breaks to the logger all the way through.
 
 	Hide the library table drop down
@@ -94,6 +93,10 @@ Post Beta fixes / updates / improvements
 JavaFX stuff
 	hide/show via hotkeys while maximized toggles every 3 presses instead of every 2 presses. 
 		https://stackoverflow.com/questions/45269173/stage-seticonified-and-stage-isiconified-not-acting-properly
+				
+	Showing any dialog prevents window drag resize. 
+		http://bugs.java.com/bugdatabase/view_bug.do?bug_id=8140491
+		https://stackoverflow.com/questions/33134791/javafx-stage-cant-be-resized-after-showing-a-dialog
 	
 	While loading the library, the table view scrolls a little bit. 
 	

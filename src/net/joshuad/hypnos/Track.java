@@ -206,7 +206,7 @@ public class Track implements Serializable {
 			parseDiscInfo( tag );
 			parseReleaseType( tag );	
 		} catch ( Exception e ) {
-			//TODO: Make a note somewhere
+			tagErrors.add( new TagError ( TagErrorType.CANNOT_READ_TAG, this ) );
 		}
 
 		parseFileName();
@@ -652,7 +652,7 @@ public class Track implements Serializable {
 			long currentPositionMS = 0;
 			Track currentTrack = null;
 			
-			if ( player.getCurrentTrack().getPath().equals( file.toPath() ) && player.isPlaying() ) {
+			if ( player.getCurrentTrack() != null && player.getCurrentTrack().getPath().equals( file.toPath() ) && player.isPlaying() ) {
 
 				currentPositionMS = player.getPositionMS();
 				currentTrack = player.getCurrentTrack();

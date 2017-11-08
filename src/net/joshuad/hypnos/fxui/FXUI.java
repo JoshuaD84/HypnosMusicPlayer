@@ -1352,6 +1352,7 @@ public class FXUI implements PlayerListener {
 			if ( track == null ) return;
 			
 			Dragboard db = event.getDragboard();
+			
 			if ( db.hasFiles() ) {
 				List <File> files = db.getFiles();
 				event.setDropCompleted( true );
@@ -1359,8 +1360,12 @@ public class FXUI implements PlayerListener {
 				
 				for ( File file : files ) {
 					if ( Utils.isImageFile( file ) ) {
-						track.setAndSaveAlbumImage ( file.toPath(), player );
-						break;
+						try {
+							track.setAndSaveAlbumImage ( file.toPath(), player );
+							break;
+						} catch ( Exception e ) {
+							LOGGER.log( Level.WARNING, "Unable to set album image from file: " + file.toString(), e );
+						}
 					}
 				}
 				
@@ -1368,9 +1373,14 @@ public class FXUI implements PlayerListener {
 		
 			} else {
 				for ( DataFormat contentType : db.getContentTypes() ) {
-					if ( contentType == DataFormat.lookupMimeType("application/octet-stream" ) ) {
-						ByteBuffer buffer = (ByteBuffer)db.getContent( contentType );
-						track.setAndSaveAlbumImage( buffer.array(), player );
+
+					try {
+						if ( contentType == DataFormat.lookupMimeType("application/octet-stream" ) ) {
+							ByteBuffer buffer = (ByteBuffer)db.getContent( contentType );
+							track.setAndSaveAlbumImage( buffer.array(), player );
+						}
+					} catch ( Exception e ) {
+						LOGGER.log( Level.WARNING, "Unable to set album image from drop source.", e );
 					}
 				}
 				
@@ -1520,8 +1530,13 @@ public class FXUI implements PlayerListener {
 		});
 		
 		artistImagePane.setOnDragDropped( event -> {
+			
+			Track track = currentImagesTrack;
+			
+			if ( track == null ) return;
+			
 			Dragboard db = event.getDragboard();
-
+			
 			if ( db.hasFiles() ) {
 				List <File> files = db.getFiles();
 				
@@ -1532,17 +1547,21 @@ public class FXUI implements PlayerListener {
 							promptAndSaveArtistImage ( buffer );
 							break;
 						} catch ( Exception e ) {
-							LOGGER.log( Level.WARNING, "Unable to load data from image file: " + file.toString(), e );
+							LOGGER.log( Level.WARNING, "Unable to set artist image from file: " + file.toString(), e );
 						}
 					}
 				}
 		
 			} else {
 				for ( DataFormat contentType : db.getContentTypes() ) {
-					if ( contentType == DataFormat.lookupMimeType("application/octet-stream" ) ) {
-						
-						ByteBuffer buffer = (ByteBuffer)db.getContent( contentType );
-						promptAndSaveArtistImage ( buffer.array() );
+					try {
+						if ( contentType == DataFormat.lookupMimeType("application/octet-stream" ) ) {
+							
+							ByteBuffer buffer = (ByteBuffer)db.getContent( contentType );
+							promptAndSaveArtistImage ( buffer.array() );
+						} 
+					} catch ( Exception e ) {
+						LOGGER.log( Level.WARNING, "Unable to set artist image from drop source.", e );
 					}
 				}
 			}
