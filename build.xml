@@ -99,7 +99,7 @@
 		</sequential>
 	</target>
 
-	<target name="dist-nix-32bit" depends="jar" description="Make an AppImage for 64 bit Linux">
+	<target name="dist-nix-32bit" depends="jar" description="Make an AppImage for 32 bit Linux">
 		<sequential>
 			<delete dir="${temp}" />
 			<mkdir dir="${temp}/" />

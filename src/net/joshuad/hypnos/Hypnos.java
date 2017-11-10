@@ -322,7 +322,7 @@ public class Hypnos extends Application {
 		
 		if ( Files.exists( logFileBackup ) ) {
 			try {
-				Files.move( logFileBackup, logFileBackup2, StandardCopyOption.REPLACE_EXISTING );
+				Files.move( logFileBackup, logFileBackup2, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 			} catch ( Exception e ) {
 				LOGGER.log ( Level.WARNING, e.getClass().getCanonicalName() + ": Unable to create 2nd backup logfile" );
 			}
@@ -330,7 +330,7 @@ public class Hypnos extends Application {
 		
 		if ( Files.exists( logFile ) ) {
 			try {
-				Files.move( logFile, logFileBackup, StandardCopyOption.REPLACE_EXISTING );
+				Files.move( logFile, logFileBackup, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 			} catch ( Exception e ) {
 				LOGGER.log ( Level.WARNING, e.getClass().getCanonicalName() + ": Unable to create 1st backup logfile" );
 			}

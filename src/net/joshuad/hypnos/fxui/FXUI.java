@@ -1962,7 +1962,6 @@ public class FXUI implements PlayerListener {
 			}
 		});
 		
-		
 		exportPlaylistButton.setOnAction( ( ActionEvent e ) -> {
 			File targetFile = promptUserForPlaylistFile();
 			if ( targetFile == null ) {
@@ -3315,7 +3314,7 @@ public class FXUI implements PlayerListener {
 		albumTable.getSortOrder().add( trackColumn );
 		currentListTable.setEditable( false );
 		currentListTable.setItems( player.getCurrentList().getItems() );
-
+		
 		FixedWidthCustomResizePolicy resizePolicy = new FixedWidthCustomResizePolicy();
 		currentListTable.setColumnResizePolicy( resizePolicy );
 

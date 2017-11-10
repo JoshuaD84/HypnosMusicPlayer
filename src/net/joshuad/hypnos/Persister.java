@@ -223,7 +223,7 @@ public class Persister {
 			sourcesOut.flush();
 			sourcesOut.close();
 
-			Files.move( tempSourcesFile.toPath(), sourcesFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
+			Files.move( tempSourcesFile.toPath(), sourcesFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 			
 		} catch ( Exception e ) {
 			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to save library source directory list to disk, continuing." );
@@ -237,7 +237,7 @@ public class Persister {
 			currentListOut.flush();
 			currentListOut.close();
 
-			Files.move( tempCurrentFile.toPath(), currentFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
+			Files.move( tempCurrentFile.toPath(), currentFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE );
 
 		} catch ( Exception e ) {
 			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to save current list to disk, continuing." );
@@ -252,7 +252,7 @@ public class Persister {
 			queueListOut.flush();
 			queueListOut.close();
 			
-			Files.move( tempQueueFile.toPath(), queueFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
+			Files.move( tempQueueFile.toPath(), queueFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 
 		} catch ( Exception e ) {
 			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to save queue to disk, continuing." );
@@ -269,7 +269,7 @@ public class Persister {
 			historyListOut.flush();
 			historyListOut.close();
 			
-			Files.move( tempHistoryFile.toPath(), historyFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
+			Files.move( tempHistoryFile.toPath(), historyFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 
 		} catch ( Exception e ) {
 			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to save history to disk, continuing." );
@@ -285,7 +285,7 @@ public class Persister {
 			hotkeysOut.flush();
 			hotkeysOut.close();
 			
-			Files.move( tempHotkeysFile.toPath(), hotkeysFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
+			Files.move( tempHotkeysFile.toPath(), hotkeysFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 
 		} catch ( Exception e ) {
 			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to save hotkeys to disk, continuing." );
@@ -316,7 +316,7 @@ public class Persister {
 			compressedOut.flush();
 			compressedOut.close();
 			
-			Files.move( tempDataFile.toPath(), dataFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
+			Files.move( tempDataFile.toPath(), dataFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 
 		} catch ( Exception e ) {
 			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to save library data to disk, continuing." );
@@ -399,7 +399,7 @@ public class Persister {
 			
 			if ( Files.exists( targetFile ) ) {
 				try {
-					Files.move( targetFile, backupFile, StandardCopyOption.REPLACE_EXISTING );
+					Files.move( targetFile, backupFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 				} catch ( IOException e2 ) {
 					LOGGER.info( "Unable to move existing playlist file to backup location (" + backupFile.toString() +
 						") will continue trying to save current playlist, overwriting the existing file." + 
@@ -414,7 +414,7 @@ public class Persister {
 			
 			if ( savedToTemp ) {
 				try {
-					Files.copy( tempFile, targetFile, StandardCopyOption.REPLACE_EXISTING );
+					Files.move( tempFile, targetFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 					movedFromTemp = true;
 				} catch ( IOException e ) {
 					movedFromTemp = false;
@@ -463,7 +463,7 @@ public class Persister {
 			settingsOut.flush();
 			settingsOut.close();
 			
-			Files.move( tempSettingsFile.toPath(), settingsFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
+			Files.move( tempSettingsFile.toPath(), settingsFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 
 		} catch ( Exception e ) {
 			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to save settings to disk, continuing." );
