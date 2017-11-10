@@ -2417,7 +2417,7 @@ public class FXUI implements PlayerListener {
 			}
 		});
 		
-		trackListCheckBox.setTooltip( new Tooltip( "" ) );
+		trackListCheckBox.setTooltip( new Tooltip( "Only show tracks not in albums" ) );
 	}
 
 	public void setupAlbumTable () {
