@@ -84,7 +84,7 @@ public class Persister {
 	}
 
 	private void createNecessaryFolders () {
-		if ( !playlistsDirectory.isDirectory() ) {
+		if ( playlistsDirectory.exists() && !playlistsDirectory.isDirectory() ) {
 			try {
 				Files.delete( playlistsDirectory.toPath() );
 				LOGGER.info( "Playlists directory location existed but was not a directory. Removed: " + playlistsDirectory.toString() ); 
