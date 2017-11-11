@@ -1,14 +1,14 @@
-New Features		
-
-Bug Fixes / Incremental Improvements	
-		
+BETA Deployment Issues
 	32 bit linux binary seems to have problems.
 	
-	Tooltip on "hide album tracks" checkbox
+	Do I need a 64bit windows version? 
+
+
+
+
+Post Beta TODO	
+	current list play/ause images don't change colors immediately. Have to play a new track to get updateImageThemes() to call.
 	
-
-Post Beta New Features	
-
 	https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
 		
 	Art pane min size is annoying
@@ -29,14 +29,29 @@ Post Beta New Features
 	
 	Manifest details - set version and other info, read it into Hypnos, show in About tab
 	
+	I don't like the way the library line wraps in the manifest. Can we make this nicer in ant? 
+	
 	Loader status % complete thing
 	
 	Put a filter on images when in light theme to make them slightly grey (or dampen the actual images).
 	
 	Have the 2nd instance of hypnos call --bring-to-front or whatever it's called if there are no arguments to second instance call
 	
+	System tray
+
+	Tag Window, next and previous button
+		
+	Drag and drop from misc places to system
+		playlist table -> m3u
+		track table, history, queue, info windows, current table -> single tracks
+		album table -> folder
 	
-Post Beta fixes / updates / improvements 
+	Tab in settings window for in-program hotkeys. 
+				
+	backup playlists
+	
+	Warn before discarding unsaved playlist -- button order (Yes, no, cancel instead of No, Yes, Cancel)	
+		
 
 	On a very small screen (800x600) hypnos is too big and it doesn't fit. 
 	
@@ -45,9 +60,6 @@ Post Beta fixes / updates / improvements
 			https://oss.sonatype.org/content/repositories/snapshots/com/1stleg/jnativehook/2.1.SNAPSHOT/jnativehook-2.1.20170730.201417-33.jar
 		JNativeHook-2.0.4-rc  
 			https://oss.sonatype.org/content/repositories/snapshots/com/1stleg/jnativehook/2.0.SNAPSHOT/jnativehook-2.0.20170730.201637-41.jar
-
-
-	Add line breaks to the logger all the way through.
 
 	Hide the library table drop down
 		drag vertical divider all the way left then back to center, the drop down appears. Hide it. 
@@ -79,9 +91,6 @@ Post Beta fixes / updates / improvements
 	
 	have filter boxes share text, so they feel like one box. 
 	
-	UI thread crashes a lot. When it does, I can't resize window
-		I fixed some places where this can happen. Are there others? Need to watch for them. 
-
 	Show play / pause icon on taskbar
 	
 	Dark theme for about tab settings
@@ -201,26 +210,6 @@ OS Specific
 
 
 
-
-Future Features, maybe:
-
-	System tray
-
-	Tag Window, next and previous button
-		
-	Drag and drop from misc places to system
-		playlist table -> m3u
-		track table, history, queue, info windows, current table -> single tracks
-		album table -> folder
-	
-	Tab in settings window for in-program hotkeys. 
-			
-	Add tag image info to tag window
-	
-	backup playlists
-	
-	Warn before discarding unsaved playlist -- button order (Yes, no, cancel instead of No, Yes, Cancel)	
-		
 	
 	
 		

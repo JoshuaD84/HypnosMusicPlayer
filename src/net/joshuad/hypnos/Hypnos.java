@@ -4,11 +4,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,9 +20,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumMap;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -44,8 +52,6 @@ public class Hypnos extends Application {
 
 	private static final Logger LOGGER = Logger.getLogger( Hypnos.class.getName() );
 	
-	private static String versionString = "Beta 1 Preview - 2017/10/27";
-
 	public enum ExitCode {
 		NORMAL,
 		UNKNOWN_ERROR,
@@ -69,6 +75,9 @@ public class Hypnos extends Application {
 	}
 	
 	private static OS os = OS.UNKNOWN;
+	private static String build;
+	private static String version;
+	private static String buildDate;
 	private static Path rootDirectory;
 	private static Path configDirectory;
 	private static Path logFile;
@@ -91,13 +100,38 @@ public class Hypnos extends Application {
 	
 	private static ByteArrayOutputStream logBuffer; //Used to store log info until log file is initialized
 	
+	private static Handler consoleHandler;
+	
+	private static Formatter logFormat = new Formatter() {
+		SimpleDateFormat dateFormat = new SimpleDateFormat ( "MMM d, yyyy HH:mm:ss aaa" );
+		public String format ( LogRecord record ) {
+			
+			String retMe = dateFormat.format( new Date ( record.getMillis() ) )
+				  + " " + record.getLoggerName()
+				  + " " + record.getSourceMethodName()
+				  + "\n"
+				  + record.getLevel() + ": " + record.getMessage()
+				  + "\n\n";
+			
+			return retMe;
+			
+		}
+	};
 	
 	public static OS getOS() {
 		return os;
 	}
 	
-	public static String getVersionString () {
-		return versionString;
+	public static String getVersion() {
+		return version;
+	}
+	
+	public static String getBuild() {
+		return build;
+	}
+	
+	public static String getBuildDate() {
+		return buildDate;
 	}
 	
 	public static boolean isStandalone() {
@@ -175,6 +209,12 @@ public class Hypnos extends Application {
 		
 	}
 	
+	private static void setupInitialLoggerFormat () {
+		consoleHandler = new ConsoleHandler();
+		consoleHandler.setFormatter( logFormat );
+		Logger.getLogger( "" ).getHandlers()[0].setFormatter( logFormat );
+	}
+	
 	private static void startLogToBuffer() {
 		originalOut = System.out;
 		originalErr = System.err;
@@ -233,6 +273,41 @@ public class Hypnos extends Application {
 		}
 		
 		LOGGER.info ( "Operating System: " + os.getDisplayName() );
+	}
+	
+	public String determineVersionInfo () {
+		@SuppressWarnings("rawtypes")
+		Enumeration resEnum;
+		try {
+			resEnum = Thread.currentThread().getContextClassLoader().getResources( JarFile.MANIFEST_NAME );
+			while ( resEnum.hasMoreElements() ) {
+				try {
+					URL url = (URL) resEnum.nextElement();
+					
+					if ( url.getFile().toLowerCase().contains( "hypnos" ) ) {
+						try ( 
+							InputStream is = url.openStream();
+						) {
+							if ( is != null ) {
+								Manifest manifest = new Manifest( is );
+								Attributes mainAttribs = manifest.getMainAttributes();
+								if ( mainAttribs.getValue( "Hypnos" ) != null ) {
+									version = mainAttribs.getValue( "Implementation-Version" );
+									build = mainAttribs.getValue ( "Build-Number" );
+									buildDate = mainAttribs.getValue ( "Build-Date" );
+									LOGGER.info ( "Version: " + version + ", Build: " + build + ", Build Date: " + buildDate );
+								}
+							}
+						}
+					}
+				} catch ( Exception e ) {
+					// Silently ignore wrong manifests on classpath?
+				}
+			}
+		} catch ( Exception e1 ) {
+			// Silently ignore wrong manifests on classpath?
+		}
+		return null;
 	}
 	
 	
@@ -353,22 +428,9 @@ public class Hypnos extends Application {
 		
 		try {
 			FileHandler fileHandler = new FileHandler( logFile.toString(), true );     
-			fileHandler.setFormatter( new Formatter() {
-				SimpleDateFormat dateFormat = new SimpleDateFormat ( "MMM d, yyyy HH:mm:ss aaa" );
-				public String format ( LogRecord record ) {
-					
-					String retMe = dateFormat.format( new Date ( record.getMillis() ) )
-						  + " " + record.getLoggerName()
-						  + " " + record.getSourceMethodName()
-						  + "\n"
-						  + record.getLevel() + ": " + record.getMessage()
-						  + "\n";
-					
-					return retMe;
-					
-				}
-			} );
+			fileHandler.setFormatter( logFormat );
 			
+			Logger.getLogger( "" ).removeHandler( consoleHandler );
 	        Logger.getLogger("").addHandler( fileHandler );
 	        
 		} catch ( IOException e ) {
@@ -579,12 +641,15 @@ public class Hypnos extends Application {
 	public void start ( Stage stage ) {
 		try {
 			startLogToBuffer();
+			setupInitialLoggerFormat();
 			parseSystemProperties();
 			determineOS();
 			setupRootDirectory(); 
 			setupConfigDirectory();
 			
 			setupJavaLibraryPath();
+			
+			determineVersionInfo();
 			
 			String[] args = getParameters().getRaw().toArray ( new String[0] );
 			CLIParser parser = new CLIParser( );
@@ -640,3 +705,4 @@ public class Hypnos extends Application {
 		launch( args ); //This calls start()
 	}
 }
+

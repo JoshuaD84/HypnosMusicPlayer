@@ -4460,12 +4460,13 @@ class CurrentListTrackStateCell extends TableCell <CurrentListTrack, CurrentList
 		if ( ui.isDarkTheme() && !isDarkTheme ) {
 			playImage.setEffect( ui.getDarkThemeTransportButtonsAdjust() );
 			pauseImage.setEffect( ui.getDarkThemeTransportButtonsAdjust() );
+			isDarkTheme = true;
 			
 		} else if ( !ui.isDarkTheme() && isDarkTheme ) {
 			playImage.setEffect( null );
-			pauseImage.setEffect( null );
+			pauseImage.setEffect( null );	
+			isDarkTheme = false;
 		}
-		
 	}
 	
 	@Override

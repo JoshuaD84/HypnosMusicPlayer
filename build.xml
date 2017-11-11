@@ -1,6 +1,7 @@
 <project name="Hypnos Music Player" default="compile" basedir=".">
 	
-	<property name="version" value="beta1-preview" />
+	<property name="version" value="Beta 1 Preview" />
+	<property name="version-simple" value="beta1-preview" />
 	<property name="version-tag" value="${version}" />
 	
 	<property name="src" location="src"/>
@@ -49,6 +50,10 @@
 													lib/jl1.0.1.jar lib/jnativehook-2.0.2.jar 
 													lib/jogg-0.0.7.jar lib/jorbis-0.0.15.jar
 													" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Build-Date" value="${TODAY}" />
+				<attribute name="Build-Number" value="${build.number}" />
+				<attribute name="Hypnos" value="true" />
 			</manifest>
 		</jar>
 	</target>
@@ -66,6 +71,7 @@
       	<java jar="${jarFile}" fork="true">
       		<sysproperty key="hypnos.standalone" value="true" />
       		<sysproperty key="hypnos.developing" value="true" />
+      		<sysproperty key="hypnos.disableglobalhotkeys" value="true" />
       	</java>
     </target>
 	
@@ -93,7 +99,7 @@
 				<arg value="${temp}/Hypnos.AppDir" />
 				<arg value="--runtime-file" />
 				<arg value="${packaging}/runtime-x86_64" />
-				<arg value="${dist}/Hypnos-${version}-nix-64bit_${TODAY}_b${build.number}.AppImage" />
+				<arg value="${dist}/Hypnos-nix-64bit-${version-simple}_${TODAY}_b${build.number}.AppImage" />
 			</exec>
 			<delete dir="${temp}" />
 		</sequential>
@@ -123,7 +129,7 @@
 				<arg value="${temp}/Hypnos.AppDir" />
 				<arg value="--runtime-file" />
 				<arg value="${packaging}/runtime-i686" />
-				<arg value="${dist}/Hypnos-${version}-nix-32bit_${TODAY}_b${build.number}.AppImage" />
+				<arg value="${dist}/Hypnos-nix-32bit-${version-simple}_${TODAY}_b${build.number}.AppImage" />
 			</exec>
 			<delete dir="${temp}" />
 		</sequential>
@@ -155,7 +161,7 @@
 			</mappedresources>
 		</copy>
 		
-		<zip destfile="${dist}/hypnos-${version}-win_${TODAY}_b${build.number}.zip">
+		<zip destfile="${dist}/hypnos-win-${version-simple}_${TODAY}_b${build.number}.zip">
 			<fileset dir="${temp}" />
 		</zip>
 		
@@ -182,7 +188,7 @@
 		</copy>
 		
 		
-		<tar destfile="${dist}/hypnos-${version}-osx_${TODAY}_b${build.number}.tgz" longfile="gnu" compression="gzip">
+		<tar destfile="${dist}/hypnos-osx-${version-simple}_${TODAY}_b${build.number}.tgz" longfile="gnu" compression="gzip">
 
 			<tarfileset dir="${temp}" filemode="755">
 				<include name="**/Hypnos" />

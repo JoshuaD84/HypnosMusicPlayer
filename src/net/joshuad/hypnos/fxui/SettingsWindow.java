@@ -648,10 +648,6 @@ public class SettingsWindow extends Stage {
 					} else {
 						Platform.runLater( () -> {
 							logView.appendText( line + "\n" );
-
-							if ( line.matches( "^[A-Z]+:.*" ) ) {
-								logView.appendText( "\n" );
-							}
 						});
 					}
 				}
@@ -946,7 +942,8 @@ public class SettingsWindow extends Stage {
 		});
 		website.setStyle( "-fx-font-size: 20px; -fx-text-fill: #0A95C8" );
 
-		Label versionNumber = new Label ( Hypnos.getVersionString() );
+		Label versionNumber = new Label ( Hypnos.getVersion() + ", Build: " + Hypnos.getBuild() + "\n" + Hypnos.getBuildDate() );
+		versionNumber.setTextAlignment( TextAlignment.CENTER );
 		versionNumber.setStyle( "-fx-font-size: 16px; -fx-text-fill: #020202" );
 		versionNumber.setPadding( new Insets ( 0, 0, 20, 0 ) );
 		
