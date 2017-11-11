@@ -1,7 +1,7 @@
 <project name="Hypnos Music Player" default="compile" basedir=".">
 	
-	<property name="version" value="Beta 1 Preview" />
-	<property name="version-simple" value="beta1-preview" />
+	<property name="version" value="Beta 1" />
+	<property name="version-simple" value="beta1" />
 	<property name="version-tag" value="${version}" />
 	
 	<property name="src" location="src"/>

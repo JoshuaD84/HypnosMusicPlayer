@@ -1,12 +1,4 @@
-BETA Deployment Issues
-	32 bit linux binary seems to have problems.
-	
-	Do I need a 64bit windows version? 
-
-
-
-
-Post Beta TODO	
+TODO	
 	current list play/ause images don't change colors immediately. Have to play a new track to get updateImageThemes() to call.
 	
 	https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
@@ -20,6 +12,8 @@ Post Beta TODO
 	Add default sort column choice, like shuffle and repeat
 		
 	Persist column sort options
+	
+	Strip out the sdk from the 64bit jdk, and only include the jre -- see what I did for the 32 bit setup
 	
 	Album list - Display disc and release type in different color font
 					
