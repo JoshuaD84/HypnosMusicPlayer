@@ -680,7 +680,7 @@ public class SettingsWindow extends Stage {
 			}
 			
 			try {
-				Files.copy( Hypnos.getLogFile(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE );
+				Files.copy( Hypnos.getLogFile(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING );
 			} catch ( Exception ex ) {
 				FXUI.notifyUserError ( ex.getClass().getCanonicalName() + ": Unable to export log file." );
 				LOGGER.log( Level.WARNING, "Unable to export log file.", ex );
