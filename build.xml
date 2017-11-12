@@ -97,8 +97,6 @@
 			
 			<exec executable="${appImageTool}">
 				<arg value="${temp}/Hypnos.AppDir" />
-				<arg value="--runtime-file" />
-				<arg value="${packaging}/runtime-x86_64" />
 				<arg value="${dist}/Hypnos-nix-64bit-${version-simple}_${TODAY}_b${build.number}.AppImage" />
 			</exec>
 			<delete dir="${temp}" />

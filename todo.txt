@@ -20,9 +20,7 @@ TODO
 	Tag auto fix button
 	
 	Settings button hover color -- should be blue
-	
-	Manifest details - set version and other info, read it into Hypnos, show in About tab
-	
+		
 	I don't like the way the library line wraps in the manifest. Can we make this nicer in ant? 
 	
 	Loader status % complete thing
@@ -92,6 +90,9 @@ TODO
 	Tag Window change "Track" to "Track #"
 	
 	Revisit fonts -- Do we need to include the font files? 
+	
+	Trying to play back https://archive.org/download/testmp3testfile/mpthreetest.mp3 using 
+	http://hypnosplayer.org/download/beta1/Hypnos-nix-64bit-beta1.AppImage on Xubuntu 16.04 gives a very high-pitch voice, not how it should sound.
 	
 JavaFX stuff
 	hide/show via hotkeys while maximized toggles every 3 presses instead of every 2 presses. 
