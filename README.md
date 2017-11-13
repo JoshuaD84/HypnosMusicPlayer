@@ -21,7 +21,7 @@ Hypnos is still under early development. In my limited testing, it has been very
 
 ## Download
 
-Visit [HypnosPlayer.org](https://github.com/JoshuaD84/HypnosMusicPlayer) to download for Windows, Linux, or OSX. 
+Visit [HypnosPlayer.org](http://hypnosplayer.org) to download for Windows, Linux, or OSX. 
 
 ## Setup and Running
 
