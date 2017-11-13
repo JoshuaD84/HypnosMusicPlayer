@@ -1,4 +1,12 @@
 TODO	
+	Opening m3us at the commandline doesn't work right. It puts the m3u on the current list instead of parsing it
+	
+	Make the volume button a little smaller
+	
+	Tray Icon
+	
+	Play mounted audio cd
+	
 	current list play/ause images don't change colors immediately. Have to play a new track to get updateImageThemes() to call.
 	
 	https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
