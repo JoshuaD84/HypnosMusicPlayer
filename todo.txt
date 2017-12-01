@@ -1,5 +1,13 @@
 TODO	
+	Playback locks sometimes, haven't figured out why
+	
+	Current list jump-to or filter or something
+	
+	Lyrics
+	
 	Opening m3us at the commandline doesn't work right. It puts the m3u on the current list instead of parsing it
+	
+	Play CDs
 	
 	Make the volume button a little smaller
 	
@@ -7,7 +15,7 @@ TODO
 	
 	Play mounted audio cd
 	
-	current list play/ause images don't change colors immediately. Have to play a new track to get updateImageThemes() to call.
+	current list play/pause images don't change colors immediately. Have to play a new track to get updateImageThemes() to call.
 	
 	https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
 		
@@ -114,6 +122,10 @@ JavaFX stuff
 	
 	Tiny drop shadow on transport buttons when in dark theme. It's the line HBox, VBox, #transport { ... -fx-background-color: #222222 ... }
 	
+	Table header alignment:
+		Platform.runLater(() -> tableView.refresh());
+		https://stackoverflow.com/questions/37423748/javafx-tablecolumns-headers-not-aligned-with-cells-due-to-vertical-scrollbar
+	
 Refactor / organize my code. 
  	Make LibraryUpdater part of Library. Is there a way to abstract out the Platform -> RunLater part? I feel like we're just stuck w/ that, which kind of ties to us JavaFX. 
  		Maybe ui.runMe ( Runnable ), and then the UI can decide whether to launch a new thread, have a thread idling, do it on this thread, or use something like Platform.runLater()	
@@ -209,80 +221,4 @@ OS Specific
 		What systems do support? 
 		What other systems don't support? How to handle? 
 		https://stackoverflow.com/questions/29995727/java-systemtray-icon-does-not-always-work
-		
 
-
-
-	
-	
-		
-Label localLabel = new Label ( "Hypnos Hotkeys" );
-		localLabel.setPadding( new Insets ( 0, 0, 10, 0 ) );
-		localLabel.setWrapText( true );
-		localLabel.setTextAlignment( TextAlignment.CENTER );
-		localLabel.setStyle( "-fx-alignment: center; -fx-font-size: 20px; -fx-font-weight: bold" );
-		globalContent.add( localLabel, 0, row, 2, 1 );
-		GridPane.setHalignment( localLabel, HPos.CENTER );
-		row++;
-		
-		Label localDescriptionLabel = new Label ( "These hotkeys will work whenever hypnos has focus." );
-		localDescriptionLabel.setPadding( new Insets ( 0, 0, 20, 0 ) );
-		localDescriptionLabel.setWrapText( true );
-		localDescriptionLabel.setTextAlignment( TextAlignment.CENTER );
-		globalContent.add( localDescriptionLabel, 0, row, 2, 1 );
-		GridPane.setHalignment( localDescriptionLabel, HPos.CENTER );
-		row++;
-		
-		Label clearLabel = new Label ( "Clear Selection:" );
-		Label queueLabel = new Label ( "Enqueue:" );
-		Label editLabel = new Label ( "Edit:" );
-		Label infoLabel = new Label ( "Info:" );
-		Label browseLabel = new Label ( "Browse Filesystem:" );
-		Label playLabel = new Label ( "Play:" );
-		Label appendLabel = new Label ( "Append:" );
-		Label removeLabel = new Label ( "Remove:" );
-		Label cropLabel = new Label ( "Crop:" );
-		
-		clearLabel.setTextAlignment ( TextAlignment.RIGHT );
-		queueLabel.setTextAlignment ( TextAlignment.RIGHT );
-		editLabel.setTextAlignment ( TextAlignment.RIGHT );
-		infoLabel.setTextAlignment ( TextAlignment.RIGHT );
-		browseLabel.setTextAlignment ( TextAlignment.RIGHT );
-		playLabel.setTextAlignment ( TextAlignment.RIGHT );
-		appendLabel.setTextAlignment ( TextAlignment.RIGHT );
-		removeLabel.setTextAlignment ( TextAlignment.RIGHT );
-		cropLabel.setTextAlignment ( TextAlignment.RIGHT );
-		
-				
-		Label clearValue = new Label ( "Escape" );
-		Label queueValue = new Label ( "Q" );
-		Label editValue = new Label ( "F2" );
-		Label infoValue = new Label ( "F3" );
-		Label browseValue = new Label ( "F4" );
-		Label playValue = new Label ( "Enter" );
-		Label appendValue = new Label ( "Shift + Enter" );
-		Label removeValue = new Label ( "Delete" );
-		Label cropValue = new Label ( "Shift + Delete" );
-		
-		clearValue.setTextAlignment ( TextAlignment.RIGHT );
-		queueValue.setTextAlignment ( TextAlignment.RIGHT );
-		editLabel.setTextAlignment ( TextAlignment.RIGHT );
-		infoLabel.setTextAlignment ( TextAlignment.RIGHT );
-		browseLabel.setTextAlignment ( TextAlignment.RIGHT );
-		playLabel.setTextAlignment ( TextAlignment.RIGHT );
-		appendLabel.setTextAlignment ( TextAlignment.RIGHT );
-		removeLabel.setTextAlignment ( TextAlignment.RIGHT );
-		cropLabel.setTextAlignment ( TextAlignment.RIGHT );
-		
-		
-		localContent.add( clearLabel, 0, row );
-		localContent.add( clearValue, 1, row );
-		localContent.add( queueLabel, 2, row );
-		localContent.add( queueValue, 3, row );
-		row++;
-		
-		localContent.add( editLabel, 0, row );
-		localContent.add( editValue, 1, row );
-		localContent.add( infoLabel, 2, row );
-		localContent.add( infoValue, 3, row );
-		row++;	
