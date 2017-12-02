@@ -144,12 +144,13 @@ public class QueueWindow extends Stage {
 		MenuItem appendMenuItem = new MenuItem( "Append" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem infoMenuItem = new MenuItem( "Info" );
+		MenuItem lyricsMenuItem = new MenuItem( "Lyrics" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		MenuItem cropMenuItem = new MenuItem( "Crop" );
 		MenuItem removeMenuItem = new MenuItem( "Remove from Queue" );
 		contextMenu.getItems().addAll( 
-			playMenuItem, appendMenuItem, editTagMenuItem, infoMenuItem, 
+			playMenuItem, appendMenuItem, editTagMenuItem, infoMenuItem, lyricsMenuItem,
 			browseMenuItem, addToPlaylistMenuItem, cropMenuItem, removeMenuItem 
 		);
 		
@@ -478,6 +479,14 @@ public class QueueWindow extends Stage {
 		infoMenuItem.setOnAction( event -> {
 			ui.trackInfoWindow.setTrack( queueTable.getSelectionModel().getSelectedItem() );
 			ui.trackInfoWindow.show();
+		});
+		
+		lyricsMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				ui.lyricsWindow.setTrack( queueTable.getSelectionModel().getSelectedItem() );
+				ui.lyricsWindow.show();
+			}
 		});
 		
 		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {

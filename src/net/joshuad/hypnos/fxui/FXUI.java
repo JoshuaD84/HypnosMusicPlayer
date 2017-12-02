@@ -200,6 +200,7 @@ public class FXUI implements PlayerListener {
 	HistoryWindow historyWindow;
 	SettingsWindow settingsWindow;
 	TrackInfoWindow trackInfoWindow;
+	LyricsWindow lyricsWindow;
 
 	Button togglePlayButton;
 	Button toggleRepeatButton;
@@ -298,6 +299,7 @@ public class FXUI implements PlayerListener {
 		historyWindow = new HistoryWindow ( this, library, player );
 		settingsWindow = new SettingsWindow ( this, library, hotkeys, player );
 		trackInfoWindow = new TrackInfoWindow ( this );
+		lyricsWindow = new LyricsWindow ( this );
 
 		applyBaseTheme();
 		applyDarkTheme();
@@ -683,6 +685,7 @@ public class FXUI implements PlayerListener {
 		historyWindow.getScene().getStylesheets().add( baseSheet );
 		settingsWindow.getScene().getStylesheets().add( baseSheet );
 		trackInfoWindow.getScene().getStylesheets().add( baseSheet );
+		lyricsWindow.getScene().getStylesheets().add( baseSheet );
 	}
 	
 	public void applyDarkTheme() {
@@ -700,6 +703,7 @@ public class FXUI implements PlayerListener {
 			historyWindow.getScene().getStylesheets().add( darkSheet );
 			settingsWindow.getScene().getStylesheets().add( darkSheet );
 			trackInfoWindow.getScene().getStylesheets().add( darkSheet );
+			lyricsWindow.getScene().getStylesheets().add( darkSheet );
 			
 			if ( stopImage != null ) stopImage.setEffect( darkThemeTransportButtons );
 			if ( nextImage != null ) nextImage.setEffect( darkThemeTransportButtons );
@@ -747,6 +751,7 @@ public class FXUI implements PlayerListener {
 		historyWindow.getScene().getStylesheets().remove( darkSheet );
 		settingsWindow.getScene().getStylesheets().remove( darkSheet );
 		trackInfoWindow.getScene().getStylesheets().remove( darkSheet );
+		lyricsWindow.getScene().getStylesheets().remove( darkSheet );
 		
 		if ( stopImage != null ) stopImage.setEffect( null );
 		if ( nextImage != null ) nextImage.setEffect( null );
@@ -1130,15 +1135,14 @@ public class FXUI implements PlayerListener {
 		currentTrackTooltip = new Tooltip ( "" );
 		currentTrackButton.setTooltip( currentTrackTooltip );
 		
-		ContextMenu trackContextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem appendMenuItem = new MenuItem( "Append" );
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem infoMenuItem = new MenuItem( "Info" );
+		MenuItem lyricsMenuItem = new MenuItem( "Lyrics" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
-		trackContextMenu.getItems().addAll( playMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, browseMenuItem, addToPlaylistMenuItem );
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
@@ -1227,6 +1231,14 @@ public class FXUI implements PlayerListener {
 			}
 		});
 
+		lyricsMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				lyricsWindow.setTrack( player.getCurrentTrack() );
+				lyricsWindow.show();
+			}
+		});
+		
 		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			// PENDING: This is the better way, once openjdk and openjfx supports
 			// it: getHostServices().showDocument(file.toURI().toString());
@@ -1249,7 +1261,7 @@ public class FXUI implements PlayerListener {
 		
 		
 		ContextMenu currentTrackButtonMenu = new ContextMenu();
-		currentTrackButtonMenu.getItems().addAll( playMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, browseMenuItem, addToPlaylistMenuItem );
+		currentTrackButtonMenu.getItems().addAll( playMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, lyricsMenuItem, browseMenuItem, addToPlaylistMenuItem );
 		
 		currentTrackButton.setContextMenu( currentTrackButtonMenu );
 		
@@ -2466,7 +2478,7 @@ public class FXUI implements PlayerListener {
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
-		MenuItem infoMenuItem = new MenuItem( "Info" );
+		MenuItem infoMenuItem = new MenuItem( "Track List" );
 		
 		albumTable.setOnKeyPressed( ( KeyEvent e ) -> {
 			if ( e.getCode() == KeyCode.ESCAPE 
@@ -2758,9 +2770,10 @@ public class FXUI implements PlayerListener {
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem infoMenuItem = new MenuItem( "Info" );
+		MenuItem lyricsMenuItem = new MenuItem( "Lyrics" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
-		trackContextMenu.getItems().addAll( playMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, browseMenuItem, addToPlaylistMenuItem );
+		trackContextMenu.getItems().addAll( playMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, lyricsMenuItem, browseMenuItem, addToPlaylistMenuItem );
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
@@ -2833,6 +2846,14 @@ public class FXUI implements PlayerListener {
 			public void handle ( ActionEvent event ) {
 				trackInfoWindow.setTrack( trackTable.getSelectionModel().getSelectedItem() );
 				trackInfoWindow.show();
+			}
+		});
+		
+		lyricsMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				lyricsWindow.setTrack( trackTable.getSelectionModel().getSelectedItem() );
+				lyricsWindow.show();
 			}
 		});
 
@@ -3017,7 +3038,7 @@ public class FXUI implements PlayerListener {
 		MenuItem appendMenuItem = new MenuItem( "Append" );		
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem renameMenuItem = new MenuItem( "Rename" );
-		MenuItem infoMenuItem = new MenuItem( "Info" );
+		MenuItem infoMenuItem = new MenuItem( "Track List" );
 		MenuItem exportMenuItem = new MenuItem( "Export" );
 		MenuItem removeMenuItem = new MenuItem( "Remove" );
 		contextMenu.getItems().addAll( playMenuItem, appendMenuItem, enqueueMenuItem, renameMenuItem, infoMenuItem, exportMenuItem, removeMenuItem );
@@ -3426,6 +3447,7 @@ public class FXUI implements PlayerListener {
 		MenuItem shuffleMenuItem = new MenuItem( "Shuffle Items" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem infoMenuItem = new MenuItem( "Info" );
+		MenuItem lyricsMenuItem = new MenuItem( "Lyrics" );
 		MenuItem cropMenuItem = new MenuItem( "Crop" );
 		MenuItem removeMenuItem = new MenuItem( "Remove" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
@@ -3479,7 +3501,7 @@ public class FXUI implements PlayerListener {
 
 		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
 		contextMenu.getItems().addAll( 
-			playMenuItem, queueMenuItem, shuffleMenuItem, editTagMenuItem, infoMenuItem, 
+			playMenuItem, queueMenuItem, shuffleMenuItem, editTagMenuItem, infoMenuItem, lyricsMenuItem,
 			browseMenuItem, addToPlaylistMenuItem, cropMenuItem, removeMenuItem 
 		);
 		
@@ -3540,6 +3562,14 @@ public class FXUI implements PlayerListener {
 			public void handle ( ActionEvent event ) {
 				trackInfoWindow.setTrack( currentListTable.getSelectionModel().getSelectedItem() );
 				trackInfoWindow.show();
+			}
+		});
+		
+		lyricsMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				lyricsWindow.setTrack( currentListTable.getSelectionModel().getSelectedItem() );
+				lyricsWindow.show();
 			}
 		});
 

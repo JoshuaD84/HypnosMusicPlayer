@@ -1,7 +1,8 @@
-package net.joshuad.hypnos.lyrics;
+package net.joshuad.hypnos.lyrics.parsers;
 
 import java.io.IOException;
 import java.text.Normalizer;
+import java.util.logging.Logger;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -10,18 +11,21 @@ import org.jsoup.select.Elements;
 
 import net.joshuad.hypnos.Track;
 
-public class MetroParser {
+public class MusixScraper extends AbstractScraper {
+
+	private static transient final Logger LOGGER = Logger.getLogger( MusixScraper.class.getName() );
 	
-	private String root = "http://www.metrolyrics.com/";
+	public MusixScraper() {
+		baseURL = "https://www.musixmatch.com/";
+	}
 	
-	public MetroParser() {}
-	
+	@Override
 	public String getLyrics ( Track track ) {
 
-		String lyrics = getLyrics ( track.getArtist(), track.getTitle() );
+		String lyrics = getLyrics ( track.getAlbumArtist(), track.getTitle() );
 		
 		if ( lyrics == null ) {
-			lyrics = getLyrics ( track.getAlbumArtist(), track.getTitle() );
+			lyrics = getLyrics ( track.getArtist(), track.getTitle() );
 		}
 		
 		return lyrics;
@@ -32,24 +36,26 @@ public class MetroParser {
 		String artistBase = makeURLReady ( artist );
 		String songBase = makeURLReady ( song );
 		
-		String url = root + songBase + "-lyrics-" + artistBase + ".html";
+		String url = baseURL + "lyrics/" + artistBase + "/" + songBase;
+		
+		System.out.println ( "Trying: " + url );
 		
 		String lyrics = null;
 		
 		try {
 			Document doc = Jsoup.connect( url ).get();
-			Elements verses = doc.getElementsByClass( "verse" );
+			Elements verses = doc.getElementsByClass( "mxm-lyrics" );
 			lyrics = cleanPreserveLineBreaks ( verses.html() ).replaceAll( "\n ", "\n" );
 			
 		} catch ( IOException e ) {
-			//TODO: logging? 
+			LOGGER.info( "Unable to find lyrics for: " + artist + " - " + song );
 		}
 		
 		return lyrics;
 	}
 	
 	private  String makeURLReady ( String string ) {
-		return Normalizer.normalize( string, Normalizer.Form.NFD ).replaceAll( " ", "-" ).replaceAll( "['\",.]", "" ).toLowerCase();
+		return Normalizer.normalize( string, Normalizer.Form.NFD ).replaceAll( "['\",.]", "" ).replaceAll( " ", "-" ).toLowerCase();
 	}
 	
 	public static String cleanPreserveLineBreaks ( String bodyHtml ) {
@@ -59,8 +65,8 @@ public class MetroParser {
 	
 	
 	public static void main ( String [] args ) {
-		MetroParser parser = new MetroParser();
-		String result = parser.getLyrics( "keane", "time to go" );
+		MusixScraper parser = new MusixScraper();
+		String result = parser.getLyrics( "a-ha", "take on me" );
 		System.out.println ( result );
 	}
 }

@@ -3,8 +3,6 @@ TODO
 	
 	Current list jump-to or filter or something
 	
-	Lyrics
-	
 	Opening m3us at the commandline doesn't work right. It puts the m3u on the current list instead of parsing it
 	
 	Play CDs
@@ -97,7 +95,9 @@ TODO
 
 	Library load and unload time
 	
-	have filter boxes share text, so they feel like one box. 
+	have filter boxes share text, so they feel like one box.
+	
+	Center "Hypnos Running" window on all screens 
 	
 	Show play / pause icon on taskbar
 	

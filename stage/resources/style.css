@@ -47,6 +47,10 @@
    -fx-text-fill: cornflowerblue;
 }
 
+.lyricsTextArea .scroll-pane .content .text {
+    -fx-text-alignment: center;
+}
+
 .volumeButton:pressed {
    -fx-text-fill: grey;
 }
@@ -58,4 +62,4 @@
 .scroll-bar:horizontal { /*This selects all tables right now, probably not ideal.*/
 	-fx-font-size: .01px;
 }
-	
+

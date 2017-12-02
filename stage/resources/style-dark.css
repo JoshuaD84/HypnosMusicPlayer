@@ -28,6 +28,16 @@ HBox, VBox, #transport {
 	-fx-background-color: #111111;
 }
 
+#lyricsContainer, #lyricsContainer Text, #lyricsContainer TextFlow { 
+	-fx-background-color: rgb( 20, 20, 20 );
+	-fx-background: rgb( 20, 20, 20 );
+}
+
+#lyricsText, #lyricsTitle {
+	-fx-text-fill: rgb( 175, 175, 175 );
+    -fx-fill: rgb( 175, 175, 175 );
+}
+
 #playlist-controls {
 	-fx-background-color: #303030;
 }

@@ -10,8 +10,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.joshuad.hypnos.Track;
-import net.joshuad.hypnos.lyrics.Lyrics;
-import net.joshuad.hypnos.lyrics.MetroParser;
+import net.joshuad.hypnos.lyrics.LyricsFetcher;
+import net.joshuad.hypnos.lyrics.parsers.MetroScraper;
 
 public class TrackInfoWindow extends Stage {
 	
@@ -73,12 +73,6 @@ public class TrackInfoWindow extends Stage {
 		
 		if ( track == null ) return;
 
-		String lyrics = Lyrics.get ( track );
-		
-		if ( lyrics == null ) {
-			lyrics = "<Unable to find lyrics for this song>";
-		}
-
 		table.getItems().add ( new TrackFieldPair ( "Title", track.getTitle() ) );
 		table.getItems().add ( new TrackFieldPair ( "Artist", track.getArtist() ) );
 		table.getItems().add ( new TrackFieldPair ( "Album", track.getFullAlbumTitle() ) );
@@ -87,8 +81,6 @@ public class TrackInfoWindow extends Stage {
 		table.getItems().add ( new TrackFieldPair ( "File Name", track.getPath().getFileName().toString() ) );
 		table.getItems().add ( new TrackFieldPair ( "File Location", track.getPath().getParent().toString() ) );
 		table.getItems().add ( new TrackFieldPair ( "Encoding", track.getShortEncodingString() ) );
-		table.getItems().add ( new TrackFieldPair ( "Lyrics", lyrics ) );
-		
 	}
 }
 

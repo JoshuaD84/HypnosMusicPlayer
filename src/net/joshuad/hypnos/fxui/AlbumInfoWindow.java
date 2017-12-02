@@ -185,9 +185,10 @@ public class AlbumInfoWindow extends Stage {
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem infoMenuItem = new MenuItem( "Info" );
+		MenuItem lyricsMenuItem = new MenuItem( "Lyrics" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		contextMenu.getItems().addAll ( 
-			playMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, addToPlaylistMenuItem 
+			playMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, lyricsMenuItem, addToPlaylistMenuItem 
 		);
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
@@ -232,6 +233,14 @@ public class AlbumInfoWindow extends Stage {
 			ui.trackInfoWindow.show();
 		});
 
+		lyricsMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				ui.lyricsWindow.setTrack( trackTable.getSelectionModel().getSelectedItem() );
+				ui.lyricsWindow.show();
+			}
+		});
+		
 		playMenuItem.setOnAction( event -> {
 			List <Track> selectedItems =  new ArrayList<Track> ( trackTable.getSelectionModel().getSelectedItems() );
 			

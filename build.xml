@@ -1,7 +1,7 @@
 <project name="Hypnos Music Player" default="compile" basedir=".">
 	
-	<property name="version" value="Beta 1" />
-	<property name="version-simple" value="beta1" />
+	<property name="version" value="Beta 2 Nightly" />
+	<property name="version-simple" value="beta2-nightly" />
 	<property name="version-tag" value="${version}" />
 	
 	<property name="src" location="src"/>
@@ -48,7 +48,7 @@
 													lib/fuzzywuzzy-1.1.8.jar lib/jaad-0.8.4-nospi.jar
 													lib/jaudiotagger-2.2.6-SNAPSHOT.jar lib/jflac-1.2.jar
 													lib/jl1.0.1.jar lib/jnativehook-2.0.2.jar 
-													lib/jogg-0.0.7.jar lib/jorbis-0.0.15.jar
+													lib/jogg-0.0.7.jar lib/jorbis-0.0.15.jar lib/jsoup-1.11.2.jar
 													" />
 				<attribute name="Implementation-Version" value="${version}" />
 				<attribute name="Build-Date" value="${TODAY}" />
