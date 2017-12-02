@@ -58,7 +58,7 @@ public class AZScraper extends AbstractScraper {
 	}
 	
 	private  String makeURLReady ( String string ) {
-		return Normalizer.normalize( string, Normalizer.Form.NFD ).replaceAll( "['\",. ]", "" ).toLowerCase();
+		return Normalizer.normalize( string, Normalizer.Form.NFD ).replaceAll( "['\"\\/,. ]", "" ).toLowerCase();
 	}
 	
 	public static String cleanPreserveLineBreaks ( String bodyHtml ) {
@@ -70,7 +70,7 @@ public class AZScraper extends AbstractScraper {
 	
 	public static void main ( String [] args ) {
 		AZScraper parser = new AZScraper();
-		String result = parser.getLyrics( "Joanna Newsom", "Sadie" );
+		String result = parser.getLyrics( "Regina Spektor", "Apres Moi" );
 		System.out.println ( result );
 	}
 }

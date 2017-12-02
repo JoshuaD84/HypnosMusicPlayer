@@ -45,9 +45,9 @@ public class LyricsFetcher {
 	private List <AbstractScraper> parseOrder = new ArrayList <AbstractScraper> ();
 	
 	public LyricsFetcher () {
+		parseOrder.add ( azParser );
 		parseOrder.add ( geniusParser );
 		parseOrder.add ( metroParser );
-		parseOrder.add ( azParser );
 		parseOrder.add ( musixParser );
 	}
 	

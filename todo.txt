@@ -1,4 +1,11 @@
 TODO	
+
+	Lyric Scrapers
+		Symbol handling - &!@#%^❦+=?<>
+		Björk
+		
+		
+		
 	Playback locks sometimes, haven't figured out why
 	
 	Current list jump-to or filter or something

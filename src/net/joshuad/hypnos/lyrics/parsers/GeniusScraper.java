@@ -53,7 +53,7 @@ public class GeniusScraper extends AbstractScraper {
 	}
 	
 	private  String makeURLReady ( String string ) {
-		return Normalizer.normalize( string, Normalizer.Form.NFD ).replaceAll( "['\",.]", "" ).replaceAll( " ", "-" ).toLowerCase();
+		return Normalizer.normalize( string, Normalizer.Form.NFD ).replaceAll( "['\",.]", "" ).replaceAll( "[\\/ ]", "-" ).toLowerCase();
 	}
 	
 	public static String cleanPreserveLineBreaks ( String bodyHtml ) {
@@ -66,7 +66,7 @@ public class GeniusScraper extends AbstractScraper {
 	
 	public static void main ( String [] args ) {
 		GeniusScraper parser = new GeniusScraper();
-		String result = parser.getLyrics( "Joanna Newsom", "Sadie" );
+		String result = parser.getLyrics( "Bright Eyes", "Easy/Lucky/Free" );
 		System.out.println ( result );
 	}
 }

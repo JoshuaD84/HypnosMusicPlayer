@@ -38,8 +38,6 @@ public class MusixScraper extends AbstractScraper {
 		
 		String url = baseURL + "lyrics/" + artistBase + "/" + songBase;
 		
-		System.out.println ( "Trying: " + url );
-		
 		String lyrics = null;
 		
 		try {
@@ -51,11 +49,15 @@ public class MusixScraper extends AbstractScraper {
 			LOGGER.info( "Unable to find lyrics for: " + artist + " - " + song );
 		}
 		
+		if ( lyrics.matches( "^Restricted Lyrics.*" ) ) {
+			lyrics = null;
+		}
+		
 		return lyrics;
 	}
 	
 	private  String makeURLReady ( String string ) {
-		return Normalizer.normalize( string, Normalizer.Form.NFD ).replaceAll( "['\",.]", "" ).replaceAll( " ", "-" ).toLowerCase();
+		return Normalizer.normalize( string, Normalizer.Form.NFD ).replaceAll( "['\",.]", "" ).replaceAll( "[\\/ ]", "-" ).toLowerCase();
 	}
 	
 	public static String cleanPreserveLineBreaks ( String bodyHtml ) {
@@ -66,7 +68,7 @@ public class MusixScraper extends AbstractScraper {
 	
 	public static void main ( String [] args ) {
 		MusixScraper parser = new MusixScraper();
-		String result = parser.getLyrics( "a-ha", "take on me" );
+		String result = parser.getLyrics( "Andrew Bird", "Action Adventure" );
 		System.out.println ( result );
 	}
 }

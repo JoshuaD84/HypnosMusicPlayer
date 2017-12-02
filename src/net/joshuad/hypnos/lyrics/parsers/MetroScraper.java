@@ -48,17 +48,24 @@ public class MetroScraper extends AbstractScraper {
 		} catch ( IOException e ) {
 			LOGGER.info( "Unable to find lyrics for: " + artist + " - " + song );
 		}
+		if ( lyrics.isEmpty() ) {
+			lyrics = null;
+			LOGGER.info( "Unable to find lyrics for: " + artist + " - " + song );
+		}
 		
 		return lyrics;
 	}
 	
 	private  String makeURLReady ( String string ) {
-		return Normalizer.normalize( string, Normalizer.Form.NFD ).replaceAll( "['\",.-]", "" ).replaceAll( " ", "-" ).toLowerCase();
+		//TODO: Unfortunately it doesn't appear that MetroScraper has a standard for handling "/".
+		//Sometimes it replaces it with - and sometims with an empty string
+		//See Bon Iver - Beth/Rest and Bright Eyes - Easy/Lucky/Free
+		return Normalizer.normalize( string, Normalizer.Form.NFD ).replaceAll( "[\\/'\",.-]", "" ).replaceAll( "[ ]", "-" ).toLowerCase();
 	}
 	
 	public static void main ( String [] args ) {
 		MetroScraper parser = new MetroScraper();
-		String result = parser.getLyrics( "a-ha", "take on me" );
-		System.out.println ( result );
+		String result = parser.getLyrics( "Regina Spektor", "Après Moi" );
+		System.out.println ( "result:\n" + result );
 	}
 }
