@@ -1,10 +1,8 @@
 TODO	
-
-	Lyric Scrapers
-		Symbol handling - &!@#%^❦+=?<>
-		Björk
-		
-		
+	
+	The hack to reload the first track isn't working. Sometimes the delay is too long and the tracks aren't sync'd, so the first track plays twice
+	
+	Albums aren't updating on the album list when you edit tags. Probably because they're behind in the update queue or I broke album.update
 		
 	Playback locks sometimes, haven't figured out why
 	

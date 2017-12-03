@@ -11,7 +11,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.lyrics.LyricsFetcher;
-import net.joshuad.hypnos.lyrics.parsers.MetroScraper;
+import net.joshuad.hypnos.lyrics.scrapers.MetroScraper;
 
 public class TrackInfoWindow extends Stage {
 	

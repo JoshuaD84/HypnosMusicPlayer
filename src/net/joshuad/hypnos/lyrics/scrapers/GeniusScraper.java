@@ -1,15 +1,17 @@
-package net.joshuad.hypnos.lyrics.parsers;
+package net.joshuad.hypnos.lyrics.scrapers;
 
 import java.io.IOException;
 import java.text.Normalizer;
 import java.util.logging.Logger;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
-import net.joshuad.hypnos.Track;
+import net.joshuad.hypnos.lyrics.Lyrics;
+import net.joshuad.hypnos.lyrics.LyricsFetcher;
 
 public class GeniusScraper extends AbstractScraper {
 	private static transient final Logger LOGGER = Logger.getLogger( GeniusScraper.class.getName() );
@@ -19,19 +21,7 @@ public class GeniusScraper extends AbstractScraper {
 	}
 	
 	@Override
-	public String getLyrics ( Track track ) {
-		String lyrics = null;
-
-		lyrics = getLyrics ( track.getAlbumArtist(), track.getTitle() );
-		
-		if ( lyrics == null ) {
-			lyrics = getLyrics ( track.getArtist(), track.getTitle() );
-		}
-		
-		return lyrics;
-	}
-	
-	public String getLyrics ( String artist, String song ) {
+	public Lyrics getLyrics ( String artist, String song ) {
 		
 		String artistBase = makeURLReady ( artist );
 		String songBase = makeURLReady ( song );
@@ -46,17 +36,23 @@ public class GeniusScraper extends AbstractScraper {
 			lyrics = cleanPreserveLineBreaks ( verses.html() ).replaceAll( "\n +", "\n" ).replaceAll( "^\\s*", "" );
 			
 		} catch ( IOException e ) {
-			LOGGER.info( "Unable to find lyrics for: " + artist + " - " + song );
+			return new Lyrics ( "", LyricsFetcher.LyricSite.GENIUS, url, Lyrics.ScrapeError.NOT_FOUND );
 		}
 		
-		return lyrics;
+		return new Lyrics ( StringEscapeUtils.unescapeHtml4 ( lyrics ), LyricsFetcher.LyricSite.GENIUS, url );
 	}
 	
-	private  String makeURLReady ( String string ) {
-		return Normalizer.normalize( string, Normalizer.Form.NFD ).replaceAll( "['\",.]", "" ).replaceAll( "[\\/ ]", "-" ).toLowerCase();
+	private String makeURLReady ( String string ) {
+		return Normalizer.normalize( string, Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" )
+				.replaceAll( "&", "and" )
+				.replaceAll ( "@", "at" )
+				.replaceAll ( "[#%]", "" )
+				.replaceAll ( "[+] ?", "" )
+				.replaceAll ( "[?]", "" )
+				.replaceAll( "['\",.!]", "" ).replaceAll( "[\\/= ]", "-" ).toLowerCase();
 	}
 	
-	public static String cleanPreserveLineBreaks ( String bodyHtml ) {
+	private static String cleanPreserveLineBreaks ( String bodyHtml ) {
 		String prettyPrintedBodyFragment = Jsoup.clean( bodyHtml, "", Whitelist.none().addTags( "br", "p" ), new Document.OutputSettings().prettyPrint( true ) );
 		prettyPrintedBodyFragment = prettyPrintedBodyFragment.replaceAll ( "(?i)<br */?>", "\n" ).replaceAll ( "(?i)< */? *p *>", "\n\n" );
 		
@@ -66,7 +62,13 @@ public class GeniusScraper extends AbstractScraper {
 	
 	public static void main ( String [] args ) {
 		GeniusScraper parser = new GeniusScraper();
-		String result = parser.getLyrics( "Bright Eyes", "Easy/Lucky/Free" );
-		System.out.println ( result );
+		
+		Lyrics result = parser.getLyrics( "Sufjan Stevens", "Impossible Soul" );
+		
+		if ( result.hadScrapeError() ) {
+			System.out.println ( "Error: " + result.getError() );
+		} else {
+			System.out.println ( result.getLyrics() );
+		}
 	}
 }

@@ -17,5 +17,7 @@
 	<classpathentry kind="lib" path="stage/lib/jorbis-0.0.15.jar"/>
 	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/stage/lib/commons-io-2.5.jar"/>
 	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/stage/lib/jsoup-1.11.2.jar"/>
+	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/stage/lib/commons-text-1.1.jar"/>
+	<classpathentry kind="lib" path="/d/programming/workspace/MusicPlayer/stage/lib/commons-lang3-3.7.jar"/>
 	<classpathentry kind="output" path="stage/bin"/>
 </classpath>

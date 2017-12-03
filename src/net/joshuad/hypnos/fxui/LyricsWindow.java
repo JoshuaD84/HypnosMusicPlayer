@@ -1,11 +1,15 @@
 package net.joshuad.hypnos.fxui;
 
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -14,6 +18,7 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.joshuad.hypnos.Track;
+import net.joshuad.hypnos.lyrics.Lyrics;
 import net.joshuad.hypnos.lyrics.LyricsFetcher;
 
 public class LyricsWindow extends Stage {
@@ -27,8 +32,12 @@ public class LyricsWindow extends Stage {
 	private TextFlow titleFlow;
 	private Text titleText;
 	
-	TextArea lyricsArea;
-	Label headerLabel = new Label ( "" );
+	private TextArea lyricsArea;
+	private Label headerLabel = new Label ( "" );
+	private Hyperlink sourceHyperlink = new Hyperlink ( "" );
+	private Tooltip sourceTooltip = new Tooltip ( "" );
+	Label sourceLabel = new Label ( "Source:" );
+	private String sourceURL = null;
 	
 	public LyricsWindow ( FXUI ui ) {
 		super();
@@ -57,8 +66,25 @@ public class LyricsWindow extends Stage {
 		lyricsArea.setEditable( false );
 		lyricsArea.setWrapText( true );
 		lyricsArea.getStyleClass().add( "lyricsTextArea" );
+		lyricsPane.getChildren().add( lyricsArea );
 		
-		lyricsPane.getChildren().addAll( lyricsArea );
+		sourceHyperlink = new Hyperlink ( "" );
+		sourceHyperlink.setVisited( true );
+		sourceHyperlink.setTooltip( sourceTooltip );
+		sourceHyperlink.setVisible( false );
+		sourceHyperlink.setOnAction( ( ActionEvent e ) -> {
+			if ( sourceURL != null && !sourceURL.isEmpty() ) {
+				ui.openWebBrowser( sourceURL );
+			}
+		});
+
+		sourceLabel.setVisible( false );
+		
+		HBox sourceBox = new HBox();
+		sourceBox.getChildren().addAll ( sourceLabel, sourceHyperlink );
+		sourceBox.setAlignment( Pos.CENTER );
+		
+		lyricsPane.getChildren().add( sourceBox );
 
 		lyricsArea.prefHeightProperty().bind( lyricsPane.heightProperty().subtract( headerLabel.heightProperty() ) );
 		lyricsArea.prefWidthProperty().bind( lyricsPane.widthProperty() );
@@ -77,16 +103,24 @@ public class LyricsWindow extends Stage {
 
 		headerLabel.setText( track.getArtist() + " - " + track.getTitle() );
 		lyricsArea.setText( "loading..." );
+		sourceHyperlink.setVisible( false );
+		sourceLabel.setVisible( false );
 		
 		Thread lyricThread = new Thread () {
 			public void run() {
-				String lyricsString = lyricsParser.get( track );
+				Lyrics lyrics = lyricsParser.get( track );
 				
 				Platform.runLater( () -> {
-					if ( lyricsString != null ) {
-						lyricsArea.setText( lyricsString );
+					if ( !lyrics.hadScrapeError() ) {
+						lyricsArea.setText( lyrics.getLyrics() );
+						sourceHyperlink.setText( lyrics.getSite().getName() );
+						sourceURL = lyrics.getSourceURL();
+						sourceTooltip.setText( lyrics.getSourceURL() );
+						sourceHyperlink.setVisible( true );
+						sourceLabel.setVisible( true );
 					} else {
 						lyricsArea.setText( "Unable to load lyrics for this song." );
+						sourceURL = "";
 					}
 				});
 			}

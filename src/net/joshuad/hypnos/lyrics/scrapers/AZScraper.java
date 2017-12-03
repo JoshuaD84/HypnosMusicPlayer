@@ -1,15 +1,17 @@
-package net.joshuad.hypnos.lyrics.parsers;
+package net.joshuad.hypnos.lyrics.scrapers;
 
 import java.io.IOException;
 import java.text.Normalizer;
 import java.util.logging.Logger;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.safety.Whitelist;
 
-import net.joshuad.hypnos.Track;
+import net.joshuad.hypnos.lyrics.Lyrics;
+import net.joshuad.hypnos.lyrics.LyricsFetcher;
 
 public class AZScraper extends AbstractScraper {
 	private static transient final Logger LOGGER = Logger.getLogger( AZScraper.class.getName() );
@@ -19,19 +21,7 @@ public class AZScraper extends AbstractScraper {
 	}
 	
 	@Override
-	public String getLyrics ( Track track ) {
-		String lyrics = null;
-
-		lyrics = getLyrics ( track.getAlbumArtist(), track.getTitle() );
-		
-		if ( lyrics == null ) {
-			lyrics = getLyrics ( track.getArtist(), track.getTitle() );
-		}
-		
-		return lyrics;
-	}
-	
-	public String getLyrics ( String artist, String song ) {
+	public Lyrics getLyrics ( String artist, String song ) {
 		
 		String artistBase = makeURLReady ( artist );
 		String songBase = makeURLReady ( song );
@@ -51,14 +41,20 @@ public class AZScraper extends AbstractScraper {
 			lyrics = cleanPreserveLineBreaks ( verses.html() ).replaceAll( "\n +", "\n" ).replaceAll( "^\\s*", "" );
 			
 		} catch ( IOException e ) {
-			LOGGER.info( "Unable to find lyrics for: " + artist + " - " + song );
+			return new Lyrics ( "", LyricsFetcher.LyricSite.AZ, url, Lyrics.ScrapeError.NOT_FOUND );
 		}
-		
-		return lyrics;
+
+		return new Lyrics ( StringEscapeUtils.unescapeHtml4 ( lyrics ), LyricsFetcher.LyricSite.AZ, url );
 	}
 	
 	private  String makeURLReady ( String string ) {
-		return Normalizer.normalize( string, Normalizer.Form.NFD ).replaceAll( "['\"\\/,. ]", "" ).toLowerCase();
+		return Normalizer.normalize( string, Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" )
+			.replaceAll ( "& ", "" ).replaceAll( "&", "" )
+			.replaceAll ( "@ ", "" ).replaceAll( "@", "" )
+			.replaceAll ( "# ", "" ).replaceAll( "#", "" )
+			.replaceAll( "[%+=]", "" )
+			.replaceAll ( "[?]", "" )
+			.replaceAll( "['\"\\/,.! ]", "" ).toLowerCase();
 	}
 	
 	public static String cleanPreserveLineBreaks ( String bodyHtml ) {
@@ -70,7 +66,12 @@ public class AZScraper extends AbstractScraper {
 	
 	public static void main ( String [] args ) {
 		AZScraper parser = new AZScraper();
-		String result = parser.getLyrics( "Regina Spektor", "Apres Moi" );
-		System.out.println ( result );
+		Lyrics result = parser.getLyrics( "Rilo Kiley", "Silver Lining" );
+		
+		if ( result.hadScrapeError() ) {
+			System.out.println ( "Error: " + result.getError() );
+		} else {
+			System.out.println ( result.getLyrics() );
+		}
 	}
 }
