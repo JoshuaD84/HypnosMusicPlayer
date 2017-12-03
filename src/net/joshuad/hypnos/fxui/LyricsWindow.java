@@ -66,6 +66,7 @@ public class LyricsWindow extends Stage {
 		lyricsArea.setEditable( false );
 		lyricsArea.setWrapText( true );
 		lyricsArea.getStyleClass().add( "lyricsTextArea" );
+		lyricsArea.setStyle("-fx-focus-color: transparent; -fx-faint-focus-color: transparent");
 		lyricsPane.getChildren().add( lyricsArea );
 		
 		sourceHyperlink = new Hyperlink ( "" );

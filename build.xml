@@ -45,7 +45,7 @@
 			<manifest>
 				<attribute name="Main-Class" value="net.joshuad.hypnos.Hypnos" />
 				<attribute name="Class-Path" value="lib/commons-cli-1.4.jar lib/commons-io-2.5.jar
-													lib/commons-text-1.1.jar lib/commons-lang3-3.7
+													lib/commons-text-1.1.jar lib/commons-lang3-3.7.jar
 													lib/fuzzywuzzy-1.1.8.jar lib/jaad-0.8.4-nospi.jar
 													lib/jaudiotagger-2.2.6-SNAPSHOT.jar lib/jflac-1.2.jar
 													lib/jl1.0.1.jar lib/jnativehook-2.0.2.jar 
