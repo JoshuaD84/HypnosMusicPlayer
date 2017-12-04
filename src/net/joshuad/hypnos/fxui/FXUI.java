@@ -201,6 +201,7 @@ public class FXUI implements PlayerListener {
 	SettingsWindow settingsWindow;
 	TrackInfoWindow trackInfoWindow;
 	LyricsWindow lyricsWindow;
+	JumpWindow jumpWindow;
 
 	Button togglePlayButton;
 	Button toggleRepeatButton;
@@ -300,6 +301,7 @@ public class FXUI implements PlayerListener {
 		settingsWindow = new SettingsWindow ( this, library, hotkeys, player );
 		trackInfoWindow = new TrackInfoWindow ( this );
 		lyricsWindow = new LyricsWindow ( this );
+		jumpWindow = new JumpWindow ( this, library, player );
 
 		applyBaseTheme();
 		applyDarkTheme();
@@ -686,6 +688,7 @@ public class FXUI implements PlayerListener {
 		settingsWindow.getScene().getStylesheets().add( baseSheet );
 		trackInfoWindow.getScene().getStylesheets().add( baseSheet );
 		lyricsWindow.getScene().getStylesheets().add( baseSheet );
+		jumpWindow.getScene().getStylesheets().add( baseSheet );
 	}
 	
 	public void applyDarkTheme() {
@@ -704,6 +707,7 @@ public class FXUI implements PlayerListener {
 			settingsWindow.getScene().getStylesheets().add( darkSheet );
 			trackInfoWindow.getScene().getStylesheets().add( darkSheet );
 			lyricsWindow.getScene().getStylesheets().add( darkSheet );
+			jumpWindow.getScene().getStylesheets().add( darkSheet );
 			
 			if ( stopImage != null ) stopImage.setEffect( darkThemeTransportButtons );
 			if ( nextImage != null ) nextImage.setEffect( darkThemeTransportButtons );
@@ -752,6 +756,7 @@ public class FXUI implements PlayerListener {
 		settingsWindow.getScene().getStylesheets().remove( darkSheet );
 		trackInfoWindow.getScene().getStylesheets().remove( darkSheet );
 		lyricsWindow.getScene().getStylesheets().remove( darkSheet );
+		jumpWindow.getScene().getStylesheets().remove( darkSheet );
 		
 		if ( stopImage != null ) stopImage.setEffect( null );
 		if ( nextImage != null ) nextImage.setEffect( null );
@@ -789,7 +794,7 @@ public class FXUI implements PlayerListener {
 	}
 		
 	//REFACTOR: Does this function need to exist? 
-	private void removeFromCurrentList ( List<Integer> removeMe ) {
+	void removeFromCurrentList ( List<Integer> removeMe ) {
 		
 		if ( !removeMe.isEmpty() ) {
 			player.getCurrentList().removeTracksAtIndices ( removeMe );
@@ -1115,20 +1120,7 @@ public class FXUI implements PlayerListener {
 		currentTrackButton.setOnMouseClicked( ( MouseEvent event ) -> {
 			
 			if ( event.getButton() == MouseButton.PRIMARY ) {
-				Track current = player.getCurrentTrack();
-				if ( current != null ) {
-					synchronized ( currentListTable.getItems() ) {
-						int itemIndex = currentListTable.getItems().indexOf( current );
-						
-						if ( itemIndex != -1 && itemIndex < currentListTable.getItems().size() ) {
-							currentListTable.requestFocus();
-							currentListTable.getSelectionModel().clearAndSelect( itemIndex );
-							currentListTable.getFocusModel().focus( itemIndex );
-							currentListTable.scrollTo( itemIndex );
-						}
-					}
-					setImages( current );
-				}
+				selectCurrentTrack();
 			}
 		});
 		
@@ -1271,7 +1263,27 @@ public class FXUI implements PlayerListener {
 		transport.setPadding( new Insets( 0, 0, 10, 0 ) );
 		transport.setSpacing( 5 );
 		transport.setId( "transport" );
-		
+	}
+	
+	public void selectCurrentTrack () {
+		Track current = player.getCurrentTrack();
+		selectTrackOnCurrentList ( current );
+	}
+	
+	public void selectTrackOnCurrentList ( Track selectMe ) {
+		if ( selectMe != null ) {
+			synchronized ( currentListTable.getItems() ) {
+				int itemIndex = currentListTable.getItems().indexOf( selectMe );
+				
+				if ( itemIndex != -1 && itemIndex < currentListTable.getItems().size() ) {
+					currentListTable.requestFocus();
+					currentListTable.getSelectionModel().clearAndSelect( itemIndex );
+					currentListTable.getFocusModel().focus( itemIndex );
+					currentListTable.scrollTo( itemIndex );
+				}
+			}
+			setImages( selectMe );
+		}
 	}
 	
 	public void setupAlbumImage () {
@@ -3332,7 +3344,7 @@ public class FXUI implements PlayerListener {
 		
 		currentListTable = new TableView();
 		currentListTable.getColumns().addAll( playingColumn, trackColumn, artistColumn, yearColumn, albumColumn, titleColumn, lengthColumn );
-		albumTable.getSortOrder().add( trackColumn );
+		albumTable.getSortOrder().add( trackColumn ); //TODO: This doesn't belong here. 
 		currentListTable.setEditable( false );
 		currentListTable.setItems( player.getCurrentList().getItems() );
 		
@@ -3473,6 +3485,11 @@ public class FXUI implements PlayerListener {
 			} else if ( e.getCode() == KeyCode.Q
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				queueMenuItem.fire();
+				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.J
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				jumpWindow.show();
 				e.consume();
 				
 			} else if ( e.getCode() == KeyCode.F2

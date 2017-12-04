@@ -44,12 +44,12 @@ public class GeniusScraper extends AbstractScraper {
 	
 	private String makeURLReady ( String string ) {
 		return Normalizer.normalize( string, Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" )
-				.replaceAll( "&", "and" )
-				.replaceAll ( "@", "at" )
-				.replaceAll ( "[#%]", "" )
-				.replaceAll ( "[+] ?", "" )
-				.replaceAll ( "[?]", "" )
-				.replaceAll( "['\",.!]", "" ).replaceAll( "[\\/= ]", "-" ).toLowerCase();
+			.replaceAll( "&", "and" )
+			.replaceAll ( "@", "at" )
+			.replaceAll ( "[#%]", "" )
+			.replaceAll ( "[+] ?", "" )
+			.replaceAll ( "[?]", "" )
+			.replaceAll( "['\",.!]", "" ).replaceAll( "[\\/= ]", "-" ).toLowerCase();
 	}
 	
 	private static String cleanPreserveLineBreaks ( String bodyHtml ) {

@@ -1,4 +1,5 @@
 TODO	
+	I don't know if albums will form from tracks after they have loaded and been identified as not an album
 	
 	The hack to reload the first track isn't working. Sometimes the delay is too long and the tracks aren't sync'd, so the first track plays twice
 	
@@ -6,17 +7,26 @@ TODO
 		
 	Playback locks sometimes, haven't figured out why
 	
-	Current list jump-to or filter or something
+	Queue Right click menu -> Replace current list with queue
+	
+	Current list jump / filter 
+		ctrl + etner to play next
+		
+	Play Next button -> put item at front of queue
+	
+	Put current list operations in a dropdown menu where the "X" is. 
+		Move "Shuffle list" to this menu
+		
+	Put shuffle, repeat, queue, and history on transport somewhere.
 	
 	Opening m3us at the commandline doesn't work right. It puts the m3u on the current list instead of parsing it
-	
-	Play CDs
 	
 	Make the volume button a little smaller
 	
 	Tray Icon
 	
 	Play mounted audio cd
+		http://www.jsresources.org/examples/CddaPlayer.java.html
 	
 	current list play/pause images don't change colors immediately. Have to play a new track to get updateImageThemes() to call.
 	
@@ -31,6 +41,9 @@ TODO
 	Add default sort column choice, like shuffle and repeat
 		
 	Persist column sort options
+	
+	Hide some columns
+		https://stackoverflow.com/questions/27696578/javafx8-anchoring-tableview-columns-contextmenu-immediately-below-the-the-colu
 	
 	Strip out the sdk from the 64bit jdk, and only include the jre -- see what I did for the 32 bit setup
 	
