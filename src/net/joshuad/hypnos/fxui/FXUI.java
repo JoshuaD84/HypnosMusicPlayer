@@ -1,6 +1,8 @@
 package net.joshuad.hypnos.fxui;
 
 import java.awt.Desktop;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -3910,6 +3912,15 @@ public class FXUI implements PlayerListener {
 		alert.setHeaderText( "Unable to launch Hypnos" );
 		alert.setContentText( "Hypnos is already running, and only one instance can run at a time. If you don't see it, please try terminating the orphaned process and try again." );
 		alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+		
+		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		int width = gd.getDisplayMode().getWidth();
+		int height = gd.getDisplayMode().getHeight();
+		
+		//NOTE: I can't get the alert's width and height yet, so i just have to eyeball it. Hopefully this is good. 
+		alert.setX ( width / 2 - 320 / 2 );
+		alert.setY ( height / 2 - 300 / 2 );
+		
 		alert.showAndWait();
 		
 	}

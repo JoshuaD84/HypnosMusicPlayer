@@ -19,7 +19,6 @@ public class Queue {
 		addTrack ( queue.size(), track );
 	}
 				
-				
 	public synchronized void addTrack ( int index, Track track ) {
 		if ( index < 0 ) {
 			LOGGER.fine ( "Asked to add a track at index: " + index + ", adding at 0 instead." );

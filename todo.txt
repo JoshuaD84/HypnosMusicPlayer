@@ -1,5 +1,5 @@
 TODO	
-	I don't know if albums will form from tracks after they have loaded and been identified as not an album
+	I don't know if albums will form from tracks after they have loaded and been identified as not an album, then id3 tags edited.
 	
 	The hack to reload the first track isn't working. Sometimes the delay is too long and the tracks aren't sync'd, so the first track plays twice
 	
@@ -9,8 +9,7 @@ TODO
 	
 	Queue Right click menu -> Replace current list with queue
 	
-	Current list jump / filter 
-		ctrl + etner to play next
+	Current list jump: ctrl + enter to play next
 		
 	Play Next button -> put item at front of queue
 	
@@ -114,8 +113,6 @@ TODO
 	Library load and unload time
 	
 	have filter boxes share text, so they feel like one box.
-	
-	Center "Hypnos Running" window on all screens 
 	
 	Show play / pause icon on taskbar
 	

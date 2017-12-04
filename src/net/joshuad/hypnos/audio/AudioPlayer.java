@@ -221,7 +221,6 @@ public class AudioPlayer {
 		} else {
 			seekMSRequested += diffMS;
 		}
-		
 	}
 
 	public void requestSeekMS ( long seekMS ) {
