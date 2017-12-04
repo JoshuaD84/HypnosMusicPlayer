@@ -559,29 +559,43 @@ public class Hypnos extends Application {
 	
 	@SuppressWarnings("unchecked")
 	public void applyCLICommands ( ArrayList <SocketCommand> commands ) {
-		Platform.runLater( () -> {
-			for ( SocketCommand command : commands ) {
-				if ( command.getType() == SocketCommand.CommandType.SET_TRACKS ) {
-					ArrayList<Path> newList = new ArrayList<Path>();
-					
-					for ( File file : (List<File>) command.getObject() ) {
-						if ( file.isDirectory() ) {
-							newList.addAll( Utils.getAllTracksInDirectory( file.toPath() ) );
-						} else {
-							newList.add( file.toPath() );
+		
+		for ( SocketCommand command : commands ) {
+			if ( command.getType() == SocketCommand.CommandType.SET_TRACKS ) {
+				ArrayList<Path> newList = new ArrayList<Path>();
+				
+				for ( File file : (List<File>) command.getObject() ) {
+					if ( file.isDirectory() ) {
+						newList.addAll( Utils.getAllTracksInDirectory( file.toPath() ) );
+						
+					} else if ( Utils.isPlaylistFile( file.toPath() ) ) {
+						//TODO: It's kind of lame to load the tracks here just to discard them and load them again a few seconds later
+						//Maybe modify loadPlaylist so i can just ask for the specified paths, without loading tag data
+						Playlist playlist = Playlist.loadPlaylist( file.toPath() );
+						for ( Track track : playlist.getTracks() ) {
+							newList.add( track.getPath() );
 						}
-					}
-					
-					if ( newList.size() > 0 ) {
-						player.getCurrentList().setTracksPathList( newList );
+						
+					} else if ( Utils.isMusicFile( file.toPath() ) ) {
+						newList.add( file.toPath() );
+						
+					} else {
+						LOGGER.info( "Recived non-music, non-playlist file: " + file );
 					}
 				}
+				
+				if ( newList.size() > 0 ) {
+					Platform.runLater( () -> {
+						player.getCurrentList().setTracksPathList( newList );
+					});
+				}
 			}
-	
-			for ( SocketCommand command : commands ) {
-				if ( command.getType() == SocketCommand.CommandType.CONTROL ) {
-					int action = (Integer)command.getObject();
-	
+		}
+
+		for ( SocketCommand command : commands ) {
+			if ( command.getType() == SocketCommand.CommandType.CONTROL ) {
+				int action = (Integer)command.getObject();
+				Platform.runLater( () -> {
 					switch ( action ) {
 						case SocketCommand.NEXT: 
 							player.next();
@@ -619,9 +633,9 @@ public class Hypnos extends Application {
 							player.seekMS( player.getPositionMS() + 5000 ); 
 							break;
 					}
-				} 
-			}
-		});
+				});
+			} 
+		}
 	}
 
 	public static void exit ( ExitCode exitCode ) {

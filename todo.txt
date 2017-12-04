@@ -17,8 +17,8 @@ TODO
 		Move "Shuffle list" to this menu
 		
 	Put shuffle, repeat, queue, and history on transport somewhere.
-	
-	Opening m3us at the commandline doesn't work right. It puts the m3u on the current list instead of parsing it
+		
+	What happens if you send a non-music file through the socket at cli? 
 	
 	Make the volume button a little smaller
 	

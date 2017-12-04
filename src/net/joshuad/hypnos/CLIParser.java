@@ -1,6 +1,8 @@
 package net.joshuad.hypnos;
 
 import java.io.File;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -83,7 +85,6 @@ public class CLIParser {
 			if ( line.hasOption( TOGGLE_PAUSE ) ) {
 				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SocketCommand.TOGGLE_PAUSE ) );
 			}
-
 			
 			if ( line.hasOption( PAUSE ) ) {
 				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SocketCommand.PAUSE ) );
@@ -115,8 +116,11 @@ public class CLIParser {
 			
 			
 			ArrayList<File> filesToLoad = new ArrayList<File> ();
+			String baseDir = System.getProperty("user.dir");
 			for ( String leftOverArgument : line.getArgList() ) {
-				filesToLoad.add( Paths.get( leftOverArgument ).toFile() );
+				Path absolutePath = FileSystems.getDefault().getPath( Paths.get( leftOverArgument ).toString() ).normalize().toAbsolutePath();
+				System.out.println ( absolutePath.toString() );
+				filesToLoad.add( absolutePath.toFile() );
 			}
 			
 			if ( filesToLoad.size() > 0 ) {
