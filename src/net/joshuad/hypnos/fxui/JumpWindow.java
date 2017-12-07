@@ -148,6 +148,7 @@ public class JumpWindow extends Stage {
 			trackFilterBox.clear();
 			trackTable.getSelectionModel().clearSelection();
 			trackTable.getSelectionModel().selectFirst();
+			trackFilterBox.requestFocus();
 		} );
 		
 		double width = 33;
