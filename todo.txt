@@ -5,13 +5,15 @@ TODO
 	
 	Albums aren't updating on the album list when you edit tags. Probably because they're behind in the update queue or I broke album.update
 		
-	Playback locks sometimes, haven't figured out why
+	Playback locks sometimes, haven't figured out why. Probably that thing we put a delay on needs a longer delay
 	
-	Queue Right click menu -> Replace current list with queue
+	Sigur Ros () doesn't load. 
+	
+	Queue Right click menu -> Replace current list with queue & add to current list
 	
 	Current list jump: ctrl + enter to play next
 		
-	Play Next button -> put item at front of queue
+	Play Next right click option -> put item at front of queue
 	
 	Put current list operations in a dropdown menu where the "X" is. 
 		Move "Shuffle list" to this menu

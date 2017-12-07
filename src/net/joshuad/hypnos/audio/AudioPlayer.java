@@ -61,8 +61,6 @@ public class AudioPlayer {
 					stopRequested = false;
 				}	
 
-				
-
 				if ( trackRequested != null && ( System.currentTimeMillis() - lastTrackLoadedAt ) > 500 ) {
 					
 					Track currentRequest = trackRequested;
@@ -95,7 +93,6 @@ public class AudioPlayer {
 						state = PlayState.STOPPED;
 						controller.playerStopped( StopReason.UNABLE_TO_START_TRACK );
 					}
-
 				} 
 
 				if ( volumeErrorRequested ) {
