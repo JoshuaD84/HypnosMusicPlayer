@@ -114,12 +114,10 @@ public class CLIParser {
 				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SocketCommand.SEEK_FORWARD ) );
 			}
 			
-			
 			ArrayList<File> filesToLoad = new ArrayList<File> ();
 			String baseDir = System.getProperty("user.dir");
 			for ( String leftOverArgument : line.getArgList() ) {
 				Path absolutePath = FileSystems.getDefault().getPath( Paths.get( leftOverArgument ).toString() ).normalize().toAbsolutePath();
-				System.out.println ( absolutePath.toString() );
 				filesToLoad.add( absolutePath.toFile() );
 			}
 			
@@ -133,7 +131,4 @@ public class CLIParser {
 		
 		return retMe;
 	}
-	
-	
-
 }
