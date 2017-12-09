@@ -58,6 +58,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Slider;
@@ -152,7 +153,7 @@ public class FXUI implements PlayerListener {
 	ImageView settingsImage;
 	ImageView noRepeatImage, repeatImage, repeatOneImage, sequentialImage, shuffleImage;
 	ImageView exportImage, saveImage, loadTracksImage;
-	ImageView queueImage, historyImage;
+	ImageView queueImage, historyImage, menuImage;
 	ImageView addSourceTracksImage, addSourceAlbumsImage, addSourcePlaylistsImage;
 	
 	Image repeatImageSource, playImageSource, pauseImageSource;
@@ -612,6 +613,15 @@ public class FXUI implements PlayerListener {
 			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/history.png", e );
 		}
 		
+		
+		try {
+			menuImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/menu.png" ).toFile() ) ) );
+			menuImage.setFitWidth( currentListControlsButtonFitWidth );
+			menuImage.setFitHeight( currentListControlsButtonFitHeight );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/history.png", e );
+		}
+		
 		try {
 			Image image = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/add.png" ).toFile() ) );
 
@@ -732,6 +742,7 @@ public class FXUI implements PlayerListener {
 			if ( repeatOneImage != null ) repeatOneImage.setEffect( darkThemeButtons );
 			if ( sequentialImage != null ) sequentialImage.setEffect( darkThemeButtons );
 			if ( shuffleImage != null ) shuffleImage.setEffect( darkThemeButtons );
+			if ( menuImage != null ) menuImage.setEffect( darkThemeButtons );
 			if ( exportImage != null ) exportImage.setEffect( darkThemeButtons );
 			if ( saveImage != null ) saveImage.setEffect( darkThemeButtons );
 			if ( loadTracksImage != null ) loadTracksImage.setEffect( darkThemeButtons );
@@ -781,6 +792,7 @@ public class FXUI implements PlayerListener {
 		if ( repeatOneImage != null ) repeatOneImage.setEffect( null );
 		if ( sequentialImage != null ) sequentialImage.setEffect( null );
 		if ( shuffleImage != null ) shuffleImage.setEffect( null );
+		if ( menuImage != null ) menuImage.setEffect( null );
 		if ( exportImage != null ) exportImage.setEffect( null );
 		if ( saveImage != null ) saveImage.setEffect( null );
 		if ( loadTracksImage != null ) loadTracksImage.setEffect( null );
@@ -1974,87 +1986,6 @@ public class FXUI implements PlayerListener {
 			}
 		});
 
-		savePlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				promptAndSavePlaylist( new ArrayList <Track>( player.getCurrentList().getItems() ) );
-			}
-		});
-		
-		clearCurrentListButton.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				player.getCurrentList().clearList();
-			}
-		});
-		
-		exportPlaylistButton.setOnAction( ( ActionEvent e ) -> {
-			File targetFile = promptUserForPlaylistFile();
-			if ( targetFile == null ) {
-				return;
-			}
-			
-			CurrentListState state = player.getCurrentList().getState();
-			
-			Playlist saveMe = null; 
-		
-			switch ( state.getMode() ) {
-				case ALBUM:
-				case ALBUM_REORDERED: {
-					saveMe = new Playlist( targetFile.getName(), Utils.convertCurrentTrackList( state.getItems() ) );
-			
-				} break;
-				
-				case PLAYLIST:
-				case PLAYLIST_UNSAVED: {
-					saveMe = state.getPlaylist();
-					if ( saveMe == null ) saveMe = new Playlist( targetFile.getName() );
-					saveMe.setTracks( Utils.convertCurrentTrackList( state.getItems() ) );
-		
-				} break;
-				
-				case EMPTY:
-					break;
-				
-			}
-			
-			try {
-				saveMe.saveAs( targetFile );
-				
-			} catch ( IOException e1 ) {
-				alertUser ( AlertType.ERROR, "Warning", "Unable to save playlist.", "Unable to save the playlist to the specified location", 400 );
-			}
-		});
-		
-		loadTracksButton.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				FileChooser fileChooser = new FileChooser();
-				
-				ArrayList <String> filters = new ArrayList <String> ();
-				
-				for ( String ending : Utils.musicExtensions ) {
-					filters.add( "*." + ending );
-				}
-				
-				FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter( "Audio Files", filters );
-				fileChooser.getExtensionFilters().add( fileExtensions );
-				List <File> selectedFiles = fileChooser.showOpenMultipleDialog( mainStage );
-				
-				if ( selectedFiles == null ) {
-					return;
-				}
-				
-				ArrayList <Path> paths = new ArrayList <Path> ();
-				for ( File file : selectedFiles ) {
-					paths.add( file.toPath() );
-				}
-				
-				player.getCurrentList().setTracksPathList( paths );
-					
-			}
-		});
-
 		toggleRepeatButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
@@ -2147,9 +2078,118 @@ public class FXUI implements PlayerListener {
 		repeatAll.setOnAction( ( actionEvent ) -> { player.setRepeatMode( RepeatMode.REPEAT ); });
 		repeatOne.setOnAction( ( actionEvent ) -> { player.setRepeatMode( RepeatMode.REPEAT_ONE_TRACK ); });
 		
-
+		MenuButton currentListMenu = new MenuButton ( "" );
+		currentListMenu.setTooltip ( new Tooltip ( "Current List Controls" ) );
+		currentListMenu.setGraphic ( menuImage );
+		MenuItem currentListClear = new MenuItem ( "Clear" );
+		MenuItem currentListSave = new MenuItem ( "Save" );
+		MenuItem currentListExport = new MenuItem ( "Export" );
+		MenuItem currentListLoad = new MenuItem ( "Load Files" );
+		MenuItem currentListShuffle = new MenuItem ( "Shuffle" );
+		
+		currentListClear.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent e ) {
+				player.getCurrentList().clearList();
+			}
+		});
+		
+		currentListSave.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent e ) {
+				promptAndSavePlaylist( new ArrayList <Track>( player.getCurrentList().getItems() ) );
+			}
+		});
+		
+		currentListShuffle.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				List<Integer> selectedIndices = currentListTable.getSelectionModel().getSelectedIndices();
+				
+				if ( selectedIndices.size() < 2 ) {
+					player.shuffleList();
+					
+				} else {
+					player.getCurrentList().shuffleItems( selectedIndices );
+				}
+			}
+		});
+		
+		currentListLoad.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent e ) {
+				FileChooser fileChooser = new FileChooser();
+				
+				ArrayList <String> filters = new ArrayList <String> ();
+				
+				for ( String ending : Utils.musicExtensions ) {
+					filters.add( "*." + ending );
+				}
+				
+				FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter( "Audio Files", filters );
+				fileChooser.getExtensionFilters().add( fileExtensions );
+				List <File> selectedFiles = fileChooser.showOpenMultipleDialog( mainStage );
+				
+				if ( selectedFiles == null ) {
+					return;
+				}
+				
+				ArrayList <Path> paths = new ArrayList <Path> ();
+				for ( File file : selectedFiles ) {
+					paths.add( file.toPath() );
+				}
+				
+				player.getCurrentList().setTracksPathList( paths );
+					
+			}
+		});
+		
+		currentListExport.setOnAction( ( ActionEvent e ) -> {
+			File targetFile = promptUserForPlaylistFile();
+			if ( targetFile == null ) {
+				return;
+			}
+			
+			CurrentListState state = player.getCurrentList().getState();
+			
+			Playlist saveMe = null; 
+		
+			switch ( state.getMode() ) {
+				case ALBUM:
+				case ALBUM_REORDERED: {
+					saveMe = new Playlist( targetFile.getName(), Utils.convertCurrentTrackList( state.getItems() ) );
+			
+				} break;
+				
+				case PLAYLIST:
+				case PLAYLIST_UNSAVED: {
+					saveMe = state.getPlaylist();
+					if ( saveMe == null ) saveMe = new Playlist( targetFile.getName() );
+					saveMe.setTracks( Utils.convertCurrentTrackList( state.getItems() ) );
+		
+				} break;
+				
+				case EMPTY:
+					break;
+				
+			}
+			
+			try {
+				saveMe.saveAs( targetFile );
+				
+			} catch ( IOException e1 ) {
+				alertUser ( AlertType.ERROR, "Warning", "Unable to save playlist.", "Unable to save the playlist to the specified location", 400 );
+			}
+		});
+		
+		currentListMenu.getItems().addAll ( currentListClear, currentListShuffle, currentListExport, currentListSave, currentListLoad );
+		
+		
+		//playlistControls.getChildren().addAll( toggleShuffleButton, toggleRepeatButton, showQueueButton, showHistoryButton,
+		//currentPlayingListInfo, currentListLength, loadTracksButton, exportPlaylistButton, savePlaylistButton, clearCurrentListButton );
+		
 		playlistControls.getChildren().addAll( toggleShuffleButton, toggleRepeatButton, showQueueButton, showHistoryButton,
-			currentPlayingListInfo, currentListLength, loadTracksButton, exportPlaylistButton, savePlaylistButton, clearCurrentListButton );
+				currentPlayingListInfo, currentListLength, currentListMenu );
 	}
 
 	public void setupPlaylistFilterPane () {
@@ -3458,7 +3498,6 @@ public class FXUI implements PlayerListener {
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem queueMenuItem = new MenuItem( "Enqueue" );
-		MenuItem shuffleMenuItem = new MenuItem( "Shuffle Items" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem infoMenuItem = new MenuItem( "Info" );
 		MenuItem lyricsMenuItem = new MenuItem( "Lyrics" );
@@ -3509,10 +3548,6 @@ public class FXUI implements PlayerListener {
 				browseMenuItem.fire();
 				e.consume();
 				
-			} else if ( e.getCode() == KeyCode.R && e.isShiftDown() //PENDING: Put this on the hotkey list? 
-			&& !e.isControlDown() && !e.isAltDown() && !e.isMetaDown() ) {
-				shuffleMenuItem.fire();
-				e.consume();
 			}
 		});
 		
@@ -3520,7 +3555,7 @@ public class FXUI implements PlayerListener {
 
 		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
 		contextMenu.getItems().addAll( 
-			playMenuItem, queueMenuItem, shuffleMenuItem, editTagMenuItem, infoMenuItem, lyricsMenuItem,
+			playMenuItem, queueMenuItem, editTagMenuItem, infoMenuItem, lyricsMenuItem,
 			browseMenuItem, addToPlaylistMenuItem, cropMenuItem, removeMenuItem 
 		);
 		
@@ -3550,20 +3585,6 @@ public class FXUI implements PlayerListener {
 			@Override
 			public void handle ( ActionEvent event ) {
 				player.getQueue().addAllTracks( currentListTable.getSelectionModel().getSelectedItems() );
-			}
-		});
-		
-		shuffleMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				List<Integer> selectedIndices = currentListTable.getSelectionModel().getSelectedIndices();
-				
-				if ( selectedIndices.size() < 2 ) {
-					player.shuffleList();
-					
-				} else {
-					player.getCurrentList().shuffleItems( selectedIndices );
-				}
 			}
 		});
 		

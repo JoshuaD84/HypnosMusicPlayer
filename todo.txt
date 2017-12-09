@@ -14,10 +14,7 @@ TODO
 	Current list jump: ctrl + enter to play next
 		
 	Play Next right click option -> put item at front of queue
-	
-	Put current list operations in a dropdown menu where the "X" is. 
-		Move "Shuffle list" to this menu
-		
+
 	Put shuffle, repeat, queue, and history on transport somewhere.
 		
 	What happens if you send a non-music file through the socket at cli? 
