@@ -40,19 +40,10 @@
 
 .volumeButton {
    -fx-background-color: transparent;
-   -fx-pref-width: 50px;
-}
-
-.volumeButton:hover {
-   -fx-text-fill: cornflowerblue;
 }
 
 .lyricsTextArea .scroll-pane .content .text {
     -fx-text-alignment: center;
-}
-
-.volumeButton:pressed {
-   -fx-text-fill: grey;
 }
 
 .tooltip {

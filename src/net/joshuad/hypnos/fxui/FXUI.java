@@ -509,8 +509,8 @@ public class FXUI implements PlayerListener {
 	
 	private void loadImages() {
 		//REFACTOR: Move all image loading into here. 
-		double volFitWidth = 55 * .58;
-		double volFitHeight = 45 * .58;
+		double volFitWidth = 55 * .52;
+		double volFitHeight = 45 * .52;
 		
 		try {
 			volumeImages[0] = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/vol-0.png" ).toFile() ) ) );
@@ -1047,7 +1047,6 @@ public class FXUI implements PlayerListener {
 		volumeMuteButton = new Button ( );
 		volumeMuteButton.setGraphic( volumeImages[3] );
 		volumeMuteButton.getStyleClass().add( "volumeLabel" );
-		volumeMuteButton.setMinWidth( 30 );
 		volumeMuteButton.setPadding( new Insets ( 0, 5, 0, 5 ) );
 		volumeMuteButton.getStyleClass().add( "volumeButton" );
 		volumeMuteButton.setTooltip( new Tooltip ( "Toggle Mute" ) );

@@ -1,4 +1,5 @@
 TODO	
+
 	I don't know if albums will form from tracks after they have loaded and been identified as not an album, then id3 tags edited.
 	
 	The hack to reload the first track isn't working. Sometimes the delay is too long and the tracks aren't sync'd, so the first track plays twice
@@ -16,8 +17,6 @@ TODO
 	Put shuffle, repeat, queue, and history on transport somewhere.
 		
 	What happens if you send a non-music file through the socket at cli? 
-	
-	Make the volume button a little smaller
 	
 	Tray Icon
 	
@@ -40,9 +39,7 @@ TODO
 	
 	Hide some columns
 		https://stackoverflow.com/questions/27696578/javafx8-anchoring-tableview-columns-contextmenu-immediately-below-the-the-colu
-	
-	Strip out the sdk from the 64bit jdk, and only include the jre -- see what I did for the 32 bit setup
-	
+		
 	Album list - Display disc and release type in different color font
 					
 	Tag auto fix button
