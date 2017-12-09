@@ -7,13 +7,13 @@ TODO
 		
 	Playback locks sometimes, haven't figured out why. Probably that thing we put a delay on needs a longer delay
 	
-	Sigur Ros () doesn't load. 
+	Sigur Ros () doesn't load.
+	
+	Persisted Queue getting erased at some point after program start
 	
 	Queue Right click menu -> Replace current list with queue & add to current list
 	
 	Current list jump: ctrl + enter to play next
-		
-	Play Next right click option -> put item at front of queue
 
 	Put shuffle, repeat, queue, and history on transport somewhere.
 		

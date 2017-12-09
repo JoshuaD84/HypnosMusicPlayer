@@ -1143,6 +1143,7 @@ public class FXUI implements PlayerListener {
 		
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem appendMenuItem = new MenuItem( "Append" );
+		MenuItem playNextMenuItem = new MenuItem( "Play Next" );
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem infoMenuItem = new MenuItem( "Info" );
@@ -1199,6 +1200,16 @@ public class FXUI implements PlayerListener {
 				Track currentTrack = player.getCurrentTrack();
 				if ( currentTrack != null ) {
 					player.getCurrentList().appendTrack ( currentTrack );
+				}
+			}
+		});
+		
+		playNextMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				Track currentTrack = player.getCurrentTrack();
+				if ( currentTrack != null ) {
+					player.getQueue().queueTrack( 0, currentTrack );
 				}
 			}
 		});
@@ -1267,7 +1278,8 @@ public class FXUI implements PlayerListener {
 		
 		
 		ContextMenu currentTrackButtonMenu = new ContextMenu();
-		currentTrackButtonMenu.getItems().addAll( playMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, lyricsMenuItem, browseMenuItem, addToPlaylistMenuItem );
+		currentTrackButtonMenu.getItems().addAll( playMenuItem, appendMenuItem, playNextMenuItem, 
+			enqueueMenuItem, editTagMenuItem, infoMenuItem, lyricsMenuItem, browseMenuItem, addToPlaylistMenuItem );
 		
 		currentTrackButton.setContextMenu( currentTrackButtonMenu );
 		
@@ -2528,6 +2540,7 @@ public class FXUI implements PlayerListener {
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem appendMenuItem = new MenuItem( "Append" );
+		MenuItem playNextMenuItem = new MenuItem( "Play Next" );
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
@@ -2568,7 +2581,7 @@ public class FXUI implements PlayerListener {
 		});
 		
 		contextMenu.getItems().addAll( 
-			playMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, 
+			playMenuItem, appendMenuItem, playNextMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, 
 			browseMenuItem, addToPlaylistMenuItem
 		);
 		
@@ -2624,6 +2637,10 @@ public class FXUI implements PlayerListener {
 			player.getCurrentList().appendAlbums( albumTable.getSelectionModel().getSelectedItems() );
 		});
 
+		playNextMenuItem.setOnAction( event -> {
+			player.getQueue().queueAllAlbums( albumTable.getSelectionModel().getSelectedItems(), 0 );
+		});
+		
 		enqueueMenuItem.setOnAction( event -> {
 			player.getQueue().queueAllAlbums( albumTable.getSelectionModel().getSelectedItems() );
 		});
@@ -2820,6 +2837,7 @@ public class FXUI implements PlayerListener {
 
 		ContextMenu trackContextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
+		MenuItem playNextMenuItem = new MenuItem( "Play Next" );
 		MenuItem appendMenuItem = new MenuItem( "Append" );
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
@@ -2827,7 +2845,9 @@ public class FXUI implements PlayerListener {
 		MenuItem lyricsMenuItem = new MenuItem( "Lyrics" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
-		trackContextMenu.getItems().addAll( playMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, lyricsMenuItem, browseMenuItem, addToPlaylistMenuItem );
+		trackContextMenu.getItems().addAll ( 
+			playMenuItem, playNextMenuItem, appendMenuItem, enqueueMenuItem, 
+			editTagMenuItem, infoMenuItem, lyricsMenuItem, browseMenuItem, addToPlaylistMenuItem );
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
@@ -2874,6 +2894,13 @@ public class FXUI implements PlayerListener {
 			@Override
 			public void handle ( ActionEvent event ) {
 				player.getCurrentList().appendTracks ( trackTable.getSelectionModel().getSelectedItems() );
+			}
+		});
+		
+		playNextMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				player.getQueue().queueAllTracks( trackTable.getSelectionModel().getSelectedItems(), 0 );
 			}
 		});
 		
@@ -3090,12 +3117,14 @@ public class FXUI implements PlayerListener {
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem appendMenuItem = new MenuItem( "Append" );		
+		MenuItem playNextMenuItem = new MenuItem( "Play Next" );
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem renameMenuItem = new MenuItem( "Rename" );
 		MenuItem infoMenuItem = new MenuItem( "Track List" );
 		MenuItem exportMenuItem = new MenuItem( "Export" );
 		MenuItem removeMenuItem = new MenuItem( "Remove" );
-		contextMenu.getItems().addAll( playMenuItem, appendMenuItem, enqueueMenuItem, renameMenuItem, infoMenuItem, exportMenuItem, removeMenuItem );
+		contextMenu.getItems().addAll( playMenuItem, appendMenuItem, playNextMenuItem, enqueueMenuItem, 
+				renameMenuItem, infoMenuItem, exportMenuItem, removeMenuItem );
 
 		playMenuItem.setOnAction( ( ActionEvent event ) -> {
 			if ( okToReplaceCurrentList() ) {
@@ -3106,6 +3135,10 @@ public class FXUI implements PlayerListener {
 
 		appendMenuItem.setOnAction( ( ActionEvent event ) -> {
 			player.getCurrentList().appendPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
+		});
+		
+		playNextMenuItem.setOnAction( ( ActionEvent event ) -> {
+			player.getQueue().queueAllPlaylists( playlistTable.getSelectionModel().getSelectedItems(), 0 );
 		});
 		
 		enqueueMenuItem.setOnAction( ( ActionEvent event ) -> {
@@ -3497,6 +3530,7 @@ public class FXUI implements PlayerListener {
 
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
+		MenuItem playNextMenuItem = new MenuItem( "Play Next" );
 		MenuItem queueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem infoMenuItem = new MenuItem( "Info" );
@@ -3555,7 +3589,7 @@ public class FXUI implements PlayerListener {
 
 		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
 		contextMenu.getItems().addAll( 
-			playMenuItem, queueMenuItem, editTagMenuItem, infoMenuItem, lyricsMenuItem,
+			playMenuItem, playNextMenuItem, queueMenuItem, editTagMenuItem, infoMenuItem, lyricsMenuItem,
 			browseMenuItem, addToPlaylistMenuItem, cropMenuItem, removeMenuItem 
 		);
 		
@@ -3580,6 +3614,13 @@ public class FXUI implements PlayerListener {
 
 		updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 
+		
+		playNextMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				player.getQueue().queueAllTracks( currentListTable.getSelectionModel().getSelectedItems(), 0 );
+			}
+		});
 		
 		queueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override

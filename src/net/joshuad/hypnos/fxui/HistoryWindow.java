@@ -106,6 +106,7 @@ public class HistoryWindow extends Stage {
 		ContextMenu trackContextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem appendMenuItem = new MenuItem( "Append" );
+		MenuItem playNextMenuItem = new MenuItem( "Play Next" );
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem infoMenuItem = new MenuItem( "Info" );
@@ -114,7 +115,7 @@ public class HistoryWindow extends Stage {
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		MenuItem removeMenuItem = new MenuItem( "Remove from History" );
 		trackContextMenu.getItems().addAll( 
-			playMenuItem, appendMenuItem, enqueueMenuItem,
+			playMenuItem, appendMenuItem, playNextMenuItem, enqueueMenuItem,
 			editTagMenuItem, infoMenuItem, lyricsMenuItem, browseMenuItem, addToPlaylistMenuItem, removeMenuItem 
 		);
 		
@@ -222,6 +223,13 @@ public class HistoryWindow extends Stage {
 						player.playItems( selectedItems );
 					}
 				}
+			}
+		});
+		
+		playNextMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				player.getQueue().queueAllTracks( historyTable.getSelectionModel().getSelectedItems(), 0 );
 			}
 		});
 		

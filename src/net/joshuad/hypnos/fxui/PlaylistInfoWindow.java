@@ -112,13 +112,14 @@ public class PlaylistInfoWindow extends Stage {
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem appendMenuItem = new MenuItem( "Append" );
+		MenuItem playNextMenuItem = new MenuItem( "Play Next" );
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem infoMenuItem = new MenuItem( "Info" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		MenuItem removeMenuItem = new MenuItem ( "Remove" );
 		contextMenu.getItems().addAll ( 
-			playMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, addToPlaylistMenuItem, removeMenuItem 
+			playMenuItem, appendMenuItem, playNextMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, addToPlaylistMenuItem, removeMenuItem 
 		);
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
@@ -175,6 +176,10 @@ public class PlaylistInfoWindow extends Stage {
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				removeMenuItem.fire();
 			}
+		});
+		
+		playNextMenuItem.setOnAction( event -> {
+			player.getQueue().queueAllTracks( trackTable.getSelectionModel().getSelectedItems(), 0 );
 		});
 		
 		enqueueMenuItem.setOnAction( event -> {

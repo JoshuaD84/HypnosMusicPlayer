@@ -31,16 +31,21 @@ public class Queue {
 		}
 			
 		queue.add( index, track );
-		
-		if ( track instanceof CurrentListTrack ) {
-			((CurrentListTrack)track).addQueueIndex( queue.size() );
-		}
+		updateQueueIndexes();
 	}
 	
 	public synchronized void queueAllAlbums ( List<? extends Album> albums ) {
 		for ( Album album : albums ) {
 			queueAllTracks( album.getTracks() );
 		}
+	}
+	
+	public synchronized void queueAllAlbums ( List<? extends Album> albums, int index ) {
+		List <Track> tracks = new ArrayList <Track> ();
+		for ( Album album : albums ) {
+			tracks.addAll ( album.getTracks() );
+		}
+		queueAllTracks( tracks, index );
 	}
 
 	public synchronized void queueAllPlaylists ( List<? extends Playlist> playlists ) {
@@ -49,17 +54,33 @@ public class Queue {
 		}
 	}
 	
+	public synchronized void queueAllPlaylists ( List<? extends Playlist> playlists, int index ) {
+		List <Track> tracks = new ArrayList <Track> ();
+		for ( Playlist playlist : playlists ) {
+			tracks.addAll ( playlist.getTracks() );
+		}
+		queueAllTracks( tracks, index );
+	}
+	
 	public synchronized void queueAllTracks ( List<? extends Track> tracks ) {
 		for ( Track track : tracks ) {
 			queueTrack ( track );
 		}
 	}
 	
-	public synchronized void queueAllTracks ( int index, List<? extends Track> tracks ) {
-		int insertIndex = index;
-		for ( Track track : tracks ) {
-			queueTrack ( insertIndex, track );
-			insertIndex++;
+	public synchronized void queueAllTracks ( List<? extends Track> tracks, int index ) {
+		if ( index < 0 ) {
+			LOGGER.fine ( "Asked to add a tracks at index: " + index + ", adding at 0 instead." );
+			index = 0;
+		}
+		
+		if ( index > queue.size() ) { 
+			LOGGER.fine ( "Asked to add a tracks at index: " + index + ", which is beyond the end of the queue. Adding at the end instead." );
+			index = queue.size();
+		}
+			
+		for ( int k = 0; k < tracks.size(); k++ ) {
+			queueTrack ( index + k, tracks.get ( k ) );
 		}
 	}
 	

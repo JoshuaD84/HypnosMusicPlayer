@@ -283,6 +283,7 @@ public class JumpWindow extends Stage {
 
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
+		MenuItem playNextMenuItem = new MenuItem( "Play Next" );
 		MenuItem queueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem shuffleMenuItem = new MenuItem( "Shuffle Items" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
@@ -341,7 +342,7 @@ public class JumpWindow extends Stage {
 
 		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
 		contextMenu.getItems().addAll( 
-			playMenuItem, queueMenuItem, shuffleMenuItem, editTagMenuItem, infoMenuItem, lyricsMenuItem,
+			playMenuItem, playNextMenuItem, queueMenuItem, shuffleMenuItem, editTagMenuItem, infoMenuItem, lyricsMenuItem,
 			browseMenuItem, addToPlaylistMenuItem, cropMenuItem, removeMenuItem 
 		);
 		
@@ -366,6 +367,13 @@ public class JumpWindow extends Stage {
 
 		ui.updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 
+		
+		playNextMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				player.getQueue().queueAllTracks( trackTable.getSelectionModel().getSelectedItems(), 0 );
+			}
+		});
 		
 		queueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override

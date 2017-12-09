@@ -244,7 +244,7 @@ public class QueueWindow extends Stage {
 						case PLAYLIST_INFO:
 						case TRACK_LIST: {
 							List <Track> tracksToCopy = container.getTracks();
-							player.getQueue().queueAllTracks( dropIndex, tracksToCopy );
+							player.getQueue().queueAllTracks( tracksToCopy, dropIndex );
 							
 						} break;
 						
@@ -257,7 +257,7 @@ public class QueueWindow extends Stage {
 										tracksToCopy.add( player.getCurrentList().getItems().get( index ) );
 									}
 								}
-								player.getQueue().queueAllTracks( dropIndex, tracksToCopy );
+								player.getQueue().queueAllTracks( tracksToCopy, dropIndex );
 							}
 						} break;
 
@@ -278,7 +278,7 @@ public class QueueWindow extends Stage {
 							
 							dropIndex = Math.min( player.getQueue().size(), row.getIndex() );
 							
-							player.getQueue().queueAllTracks( dropIndex, tracksToMove );
+							player.getQueue().queueAllTracks( tracksToMove, dropIndex );
 							
 							queueTable.getSelectionModel().clearSelection();
 							for ( int k = 0; k < draggedIndices.size(); k++ ) {
@@ -322,7 +322,7 @@ public class QueueWindow extends Stage {
 										
 					if ( !tracksToAdd.isEmpty() ) {
 						int dropIndex = row.isEmpty() ? dropIndex = player.getQueue().size() : row.getIndex();
-						player.getQueue().queueAllTracks( Math.min( dropIndex, player.getQueue().size() ), tracksToAdd );
+						player.getQueue().queueAllTracks( tracksToAdd, Math.min( dropIndex, player.getQueue().size() ) );
 					}
 
 					event.setDropCompleted( true );
