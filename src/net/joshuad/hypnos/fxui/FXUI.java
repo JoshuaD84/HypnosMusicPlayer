@@ -2061,11 +2061,30 @@ public class FXUI implements PlayerListener {
 		});
 		
 		final ContextMenu queueButtonMenu = new ContextMenu();
-		MenuItem clearQueue = new MenuItem ( "Clear" );
+		MenuItem clearQueue = new MenuItem ( "Clear Queue" );
+		MenuItem replaceWithQueue = new MenuItem ( "Replace list with queue" );
+		MenuItem dumpQueueBefore = new MenuItem ( "Prepend to list" );
+		MenuItem dumpQueueAfter = new MenuItem ( "Append to list" );
+		queueButtonMenu.getItems().addAll( clearQueue, replaceWithQueue, dumpQueueBefore, dumpQueueAfter );
+		showQueueButton.setContextMenu( queueButtonMenu );
+		
 		clearQueue.setOnAction(  ( ActionEvent e ) -> { player.getQueue().clear(); });
 		
-		queueButtonMenu.getItems().addAll( clearQueue );
-		showQueueButton.setContextMenu( queueButtonMenu );
+		replaceWithQueue.setOnAction( ( ActionEvent e ) -> { 
+			player.getCurrentList().clearList();
+			player.getCurrentList().appendTracks ( player.getQueue().getData() );
+			player.getQueue().clear(); 
+		});
+		
+		dumpQueueAfter.setOnAction( ( ActionEvent e ) -> { 
+			player.getCurrentList().appendTracks ( player.getQueue().getData() );
+			player.getQueue().clear(); 
+		});
+		
+		dumpQueueBefore.setOnAction( ( ActionEvent e ) -> { 
+			player.getCurrentList().insertTracks( 0, player.getQueue().getData() );
+			player.getQueue().clear(); 
+		});
 		
 		final ContextMenu shuffleButtonMenu = new ContextMenu();
 		toggleShuffleButton.setContextMenu( shuffleButtonMenu );
