@@ -178,7 +178,7 @@ public class PlaylistInfoWindow extends Stage {
 		});
 		
 		enqueueMenuItem.setOnAction( event -> {
-			player.getQueue().addAllTracks( trackTable.getSelectionModel().getSelectedItems() );
+			player.getQueue().queueAllTracks( trackTable.getSelectionModel().getSelectedItems() );
 		});
 		
 		infoMenuItem.setOnAction( event -> {

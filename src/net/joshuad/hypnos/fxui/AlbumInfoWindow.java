@@ -216,7 +216,7 @@ public class AlbumInfoWindow extends Stage {
 		ui.updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		
 		enqueueMenuItem.setOnAction( event -> {
-			player.getQueue().addAllTracks( trackTable.getSelectionModel().getSelectedItems() );
+			player.getQueue().queueAllTracks( trackTable.getSelectionModel().getSelectedItems() );
 		});
 			
 		editTagMenuItem.setOnAction( event -> {

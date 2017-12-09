@@ -1208,7 +1208,7 @@ public class FXUI implements PlayerListener {
 			public void handle ( ActionEvent event ) {
 				Track currentTrack = player.getCurrentTrack();
 				if ( currentTrack != null ) {
-					player.getQueue().addTrack( currentTrack );
+					player.getQueue().queueTrack( currentTrack );
 				}
 			}
 		});
@@ -2625,7 +2625,7 @@ public class FXUI implements PlayerListener {
 		});
 
 		enqueueMenuItem.setOnAction( event -> {
-			player.getQueue().addAllAlbums( albumTable.getSelectionModel().getSelectedItems() );
+			player.getQueue().queueAllAlbums( albumTable.getSelectionModel().getSelectedItems() );
 		});
 		
 		editTagMenuItem.setOnAction( event -> {
@@ -2880,7 +2880,7 @@ public class FXUI implements PlayerListener {
 		enqueueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.getQueue().addAllTracks( trackTable.getSelectionModel().getSelectedItems() );
+				player.getQueue().queueAllTracks( trackTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 		
@@ -3109,7 +3109,7 @@ public class FXUI implements PlayerListener {
 		});
 		
 		enqueueMenuItem.setOnAction( ( ActionEvent event ) -> {
-			player.getQueue().addAllPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
+			player.getQueue().queueAllPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
 		});
 		
 		renameMenuItem.setOnAction( ( ActionEvent event ) -> {
@@ -3584,7 +3584,7 @@ public class FXUI implements PlayerListener {
 		queueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.getQueue().addAllTracks( currentListTable.getSelectionModel().getSelectedItems() );
+				player.getQueue().queueAllTracks( currentListTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 		

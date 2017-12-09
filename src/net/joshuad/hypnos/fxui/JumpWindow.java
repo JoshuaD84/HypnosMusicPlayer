@@ -118,7 +118,7 @@ public class JumpWindow extends Stage {
 				Track playMe = trackTable.getSelectionModel().getSelectedItem();
 				
 				if ( event.isShiftDown() ) {
-					player.getQueue().addTrack ( playMe );
+					player.getQueue().queueTrack ( playMe );
 					
 				} else {
 					player.playTrack ( playMe );
@@ -370,7 +370,7 @@ public class JumpWindow extends Stage {
 		queueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.getQueue().addAllTracks( trackTable.getSelectionModel().getSelectedItems() );
+				player.getQueue().queueAllTracks( trackTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 		

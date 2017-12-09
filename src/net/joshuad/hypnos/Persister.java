@@ -175,7 +175,7 @@ public class Persister {
 	@SuppressWarnings("unchecked")
 	public void loadQueue () {
 		try ( ObjectInputStream queueIn = new ObjectInputStream( new FileInputStream( queueFile ) ); ) {
-			player.getQueue().addAllTracks( (ArrayList <Track>) queueIn.readObject() );
+			player.getQueue().queueAllTracks( (ArrayList <Track>) queueIn.readObject() );
 			
 		} catch ( Exception e ) {
 			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to read queue data from disk, continuing." );

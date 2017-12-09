@@ -228,7 +228,7 @@ public class HistoryWindow extends Stage {
 		enqueueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.getQueue().addAllTracks( historyTable.getSelectionModel().getSelectedItems() );
+				player.getQueue().queueAllTracks( historyTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 		

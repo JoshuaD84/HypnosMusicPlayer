@@ -830,7 +830,7 @@ public class SettingsWindow extends Stage {
 					tracks.add( error.getTrack() );
 				}
 				
-				player.getQueue().addAllTracks( tracks );
+				player.getQueue().queueAllTracks( tracks );
 			}
 		});
 		

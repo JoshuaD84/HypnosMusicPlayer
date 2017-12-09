@@ -15,11 +15,11 @@ public class Queue {
 	
 	public Queue() {}
 	
-	public synchronized void addTrack ( Track track ) {
-		addTrack ( queue.size(), track );
+	public synchronized void queueTrack ( Track track ) {
+		queueTrack ( queue.size(), track );
 	}
 				
-	public synchronized void addTrack ( int index, Track track ) {
+	public synchronized void queueTrack ( int index, Track track ) {
 		if ( index < 0 ) {
 			LOGGER.fine ( "Asked to add a track at index: " + index + ", adding at 0 instead." );
 			index = 0;
@@ -37,28 +37,28 @@ public class Queue {
 		}
 	}
 	
-	public synchronized void addAllAlbums ( List<? extends Album> albums ) {
+	public synchronized void queueAllAlbums ( List<? extends Album> albums ) {
 		for ( Album album : albums ) {
-			addAllTracks( album.getTracks() );
+			queueAllTracks( album.getTracks() );
 		}
 	}
 
-	public synchronized void addAllPlaylists ( List<? extends Playlist> playlists ) {
+	public synchronized void queueAllPlaylists ( List<? extends Playlist> playlists ) {
 		for ( Playlist playlist : playlists ) {
-			addAllTracks ( playlist.getTracks() );
+			queueAllTracks ( playlist.getTracks() );
 		}
 	}
 	
-	public synchronized void addAllTracks ( List<? extends Track> tracks ) {
+	public synchronized void queueAllTracks ( List<? extends Track> tracks ) {
 		for ( Track track : tracks ) {
-			addTrack ( track );
+			queueTrack ( track );
 		}
 	}
 	
-	public synchronized void addAllTracks ( int index, List<? extends Track> tracks ) {
+	public synchronized void queueAllTracks ( int index, List<? extends Track> tracks ) {
 		int insertIndex = index;
 		for ( Track track : tracks ) {
-			addTrack ( insertIndex, track );
+			queueTrack ( insertIndex, track );
 			insertIndex++;
 		}
 	}

@@ -244,7 +244,7 @@ public class QueueWindow extends Stage {
 						case PLAYLIST_INFO:
 						case TRACK_LIST: {
 							List <Track> tracksToCopy = container.getTracks();
-							player.getQueue().addAllTracks( dropIndex, tracksToCopy );
+							player.getQueue().queueAllTracks( dropIndex, tracksToCopy );
 							
 						} break;
 						
@@ -257,7 +257,7 @@ public class QueueWindow extends Stage {
 										tracksToCopy.add( player.getCurrentList().getItems().get( index ) );
 									}
 								}
-								player.getQueue().addAllTracks( dropIndex, tracksToCopy );
+								player.getQueue().queueAllTracks( dropIndex, tracksToCopy );
 							}
 						} break;
 
@@ -278,7 +278,7 @@ public class QueueWindow extends Stage {
 							
 							dropIndex = Math.min( player.getQueue().size(), row.getIndex() );
 							
-							player.getQueue().addAllTracks( dropIndex, tracksToMove );
+							player.getQueue().queueAllTracks( dropIndex, tracksToMove );
 							
 							queueTable.getSelectionModel().clearSelection();
 							for ( int k = 0; k < draggedIndices.size(); k++ ) {
@@ -322,7 +322,7 @@ public class QueueWindow extends Stage {
 										
 					if ( !tracksToAdd.isEmpty() ) {
 						int dropIndex = row.isEmpty() ? dropIndex = player.getQueue().size() : row.getIndex();
-						player.getQueue().addAllTracks( Math.min( dropIndex, player.getQueue().size() ), tracksToAdd );
+						player.getQueue().queueAllTracks( Math.min( dropIndex, player.getQueue().size() ), tracksToAdd );
 					}
 
 					event.setDropCompleted( true );
@@ -361,7 +361,7 @@ public class QueueWindow extends Stage {
 					case TAG_ERROR_LIST:
 					case TRACK_LIST: {
 						List <Track> tracksToCopy = container.getTracks();
-						player.getQueue().addAllTracks( tracksToCopy );
+						player.getQueue().queueAllTracks( tracksToCopy );
 					} break;
 					
 					case CURRENT_LIST: {
@@ -373,7 +373,7 @@ public class QueueWindow extends Stage {
 									tracksToCopy.add( player.getCurrentList().getItems().get( index ) );
 								}
 							}
-							player.getQueue().addAllTracks( tracksToCopy );
+							player.getQueue().queueAllTracks( tracksToCopy );
 						}
 					} break;
 					
@@ -411,7 +411,7 @@ public class QueueWindow extends Stage {
 				}
 				
 				if ( !tracksToAdd.isEmpty() ) {
-					player.getQueue().addAllTracks( tracksToAdd );
+					player.getQueue().queueAllTracks( tracksToAdd );
 				}
 
 				event.setDropCompleted( true );
