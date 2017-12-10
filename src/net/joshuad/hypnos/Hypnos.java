@@ -581,7 +581,7 @@ public class Hypnos extends Application {
 						newList.add( file.toPath() );
 						
 					} else {
-						LOGGER.info( "Recived non-music, non-playlist file: " + file );
+						LOGGER.info( "Recived non-music, non-playlist file, ignoring: " + file );
 					}
 				}
 				
