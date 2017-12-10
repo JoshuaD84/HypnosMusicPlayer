@@ -210,11 +210,9 @@ public class FXUI implements PlayerListener {
 	Button toggleRepeatButton;
 	Button toggleShuffleButton;
 	Button showQueueButton;
-	Button savePlaylistButton;
-	Button exportPlaylistButton;
 	Button showHistoryButton;
-	Button loadTracksButton;
-	Button clearCurrentListButton;
+	MenuItem currentListSave;
+	MenuItem currentListExport;
 
 	ResizableImageView albumImage;
 	ResizableImageView artistImage;
@@ -429,13 +427,12 @@ public class FXUI implements PlayerListener {
 		};
 				
 		primaryContainer.setOnKeyPressed( ( KeyEvent e ) -> { 
-
 			if ( e.getCode() == KeyCode.S && e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				savePlaylistButton.fire();
+				currentListSave.fire();
 				e.consume();
 				
 			} else if ( e.getCode() == KeyCode.E && e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				exportPlaylistButton.fire();
+				currentListExport.fire();
 				e.consume();
 				
 			} else if ( e.getCode() == KeyCode.UP && !e.isControlDown() && e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
@@ -1930,15 +1927,7 @@ public class FXUI implements PlayerListener {
 		toggleShuffleButton = new Button( );
 		showQueueButton = new Button ( );
 		showHistoryButton = new Button ( );
-		loadTracksButton = new Button( );
-		savePlaylistButton = new Button( );
-		exportPlaylistButton = new Button ();
-		clearCurrentListButton = new Button ( );
 		
-		clearCurrentListButton.setGraphic( currentListClearImage );
-		exportPlaylistButton.setGraphic( exportImage );
-		savePlaylistButton.setGraphic( saveImage );
-		loadTracksButton.setGraphic( loadTracksImage );
 		showQueueButton.setGraphic( queueImage );
 		showHistoryButton.setGraphic( historyImage );
 		updateRepeatButtonImages();
@@ -1951,28 +1940,16 @@ public class FXUI implements PlayerListener {
 		toggleShuffleButton.setMinSize( width, height );
 		showQueueButton.setMinSize( width, height );
 		showHistoryButton.setMinSize( width, height );
-		loadTracksButton.setMinSize( width, height );
-		savePlaylistButton.setMinSize( width, height );
-		exportPlaylistButton.setMinSize( width, height );
-		clearCurrentListButton.setMinSize( width, height );
 		
 		toggleRepeatButton.setPrefSize( width, height );
 		toggleShuffleButton.setPrefSize( width, height );
 		showQueueButton.setPrefSize( width, height );
 		showHistoryButton.setPrefSize( width, height );
-		loadTracksButton.setPrefSize( width, height );
-		savePlaylistButton.setPrefSize( width, height );
-		exportPlaylistButton.setPrefSize( width, height );
-		clearCurrentListButton.setPrefSize( width, height );
 		
 		toggleRepeatButton.setTooltip( new Tooltip( "Toggle Repeat Type" ) );
 		toggleShuffleButton.setTooltip( new Tooltip( "Toggle Shuffle" ) );
 		showQueueButton.setTooltip( new Tooltip( "Show Queue" ) );
 		showHistoryButton.setTooltip( new Tooltip( "Show Play History" ) );
-		loadTracksButton.setTooltip( new Tooltip( "Load tracks from the filesystem" ) );
-		savePlaylistButton.setTooltip( new Tooltip( "Save this playlist" ) );
-		exportPlaylistButton.setTooltip( new Tooltip( "Export current list as m3u" ) );
-		clearCurrentListButton.setTooltip( new Tooltip( "Clear the current list" ) );
 		
 		showQueueButton.setOnAction ( new EventHandler <ActionEvent>() {
 			public void handle ( ActionEvent e ) {
@@ -2112,8 +2089,8 @@ public class FXUI implements PlayerListener {
 		currentListMenu.setTooltip ( new Tooltip ( "Current List Controls" ) );
 		currentListMenu.setGraphic ( menuImage );
 		MenuItem currentListClear = new MenuItem ( "Clear" );
-		MenuItem currentListSave = new MenuItem ( "Save" );
-		MenuItem currentListExport = new MenuItem ( "Export" );
+		currentListSave = new MenuItem ( "Save" );
+		currentListExport = new MenuItem ( "Export" );
 		MenuItem currentListLoad = new MenuItem ( "Load Files" );
 		MenuItem currentListShuffle = new MenuItem ( "Shuffle" );
 		
