@@ -44,8 +44,6 @@ TODO
 	
 	Put a filter on images when in light theme to make them slightly grey (or dampen the actual images).
 	
-	Have the 2nd instance of hypnos call --bring-to-front or whatever it's called if there are no arguments to second instance call
-
 	Tag Window, next and previous button
 		
 	Drag and drop from misc places to system
@@ -53,13 +51,10 @@ TODO
 		track table, history, queue, info windows, current table -> single tracks
 		album table -> folder
 	
-	Tab in settings window for in-program hotkeys. 
-				
-	backup playlists
+	Consistent in-program hotkeys & tab in settings window for in-program hotkeys. 
 	
 	Warn before discarding unsaved playlist -- button order (Yes, no, cancel instead of No, Yes, Cancel)	
 		
-
 	On a very small screen (800x600) hypnos is too big and it doesn't fit. 
 	
 	Ok this should address a number of issues that people have been having including this one. Please test and let me know if this issue can be closed.

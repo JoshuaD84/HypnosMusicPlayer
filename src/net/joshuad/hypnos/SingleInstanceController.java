@@ -6,7 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,12 +51,14 @@ public class SingleInstanceController {
 					
 					Object dataIn = in.readObject();
 					
-					if ( dataIn instanceof ArrayList ) {
-						hypnos.applyCLICommands ( (ArrayList <SocketCommand>) dataIn );
+					System.out.println ( dataIn.getClass().getCanonicalName() );
+					
+					if ( dataIn instanceof List ) {
+						hypnos.applyCLICommands ( (List <SocketCommand>) dataIn );
 					}
-
+					
 				} catch ( Exception e ) {
-					LOGGER.log( Level.INFO, "Read error at commandline parser", e );
+					LOGGER.log( Level.INFO, e.getClass() + ": Read error at commandline parser", e );
 				}
 			}
 		});
@@ -66,7 +68,7 @@ public class SingleInstanceController {
 		return true;
 	}
 	
-	public void sendCommandsThroughSocket( ArrayList <SocketCommand> commands ) {
+	public void sendCommandsThroughSocket( List <SocketCommand> commands ) {
 		try (
 			Socket clientSocket = new Socket( InetAddress.getByName(null), port );
 			ObjectOutputStream out = new ObjectOutputStream( clientSocket.getOutputStream() );

@@ -23,6 +23,7 @@ public class SocketCommand implements Serializable {
 	public static final int VOLUME_UP = 8;
 	public static final int SEEK_FORWARD = 9;
 	public static final int SEEK_BACK = 10;
+	public static final int SHOW = 11;
 	
 	
 	private CommandType type;

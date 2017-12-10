@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.Enumeration;
@@ -558,7 +559,7 @@ public class Hypnos extends Application {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void applyCLICommands ( ArrayList <SocketCommand> commands ) {
+	public void applyCLICommands ( List <SocketCommand> commands ) {
 		
 		for ( SocketCommand command : commands ) {
 			if ( command.getType() == SocketCommand.CommandType.SET_TRACKS ) {
@@ -632,6 +633,9 @@ public class Hypnos extends Application {
 						case SocketCommand.SEEK_FORWARD:
 							player.seekMS( player.getPositionMS() + 5000 ); 
 							break;
+						case SocketCommand.SHOW:
+							ui.restoreWindow();
+							break;
 					}
 				});
 			} 
@@ -701,6 +705,9 @@ public class Hypnos extends Application {
 				if ( commands.size() > 0 ) {
 					System.out.println ( "Commands sent to currently running Hypnos." );
 				} else {
+					singleInstanceController.sendCommandsThroughSocket( Arrays.asList(
+							new SocketCommand ( SocketCommand.CommandType.CONTROL, SocketCommand.SHOW )
+					) );
 					String message = "Hypnos is already running.";
 					System.out.println ( message );
 					FXUI.notifyUserHypnosRunning();
