@@ -237,9 +237,6 @@ public class FXUI implements PlayerListener {
 	
 	private boolean isDarkTheme = false;
 	
-	private double artistPaneHeightWhileMaximized = 0;
-	private boolean ignoreNextArtPaneChange = false;
-	
 	private ColorAdjust darkThemeTransportButtons = new ColorAdjust(); 
 	
 	{
@@ -259,6 +256,7 @@ public class FXUI implements PlayerListener {
 	private SimpleBooleanProperty promptBeforeOverwrite = new SimpleBooleanProperty ( true );
 	
 	boolean doPlaylistSaveWarning = true;
+	
 	
 	public FXUI ( Stage stage, Library library, AudioSystem player, GlobalHotkeys hotkeys ) {
 		mainStage = stage;
@@ -318,28 +316,6 @@ public class FXUI implements PlayerListener {
 		currentListSplitPane = new SplitPane();
 		currentListSplitPane.setOrientation( Orientation.VERTICAL );
 		currentListSplitPane.getItems().addAll( currentPlayingPane, artSplitPane );
-		
-		currentListSplitPane.getDividers().get( 0 ).positionProperty().addListener ( 
-			( ObservableValue <? extends Number> item, Number oldValue, Number newValue ) -> {
-				if ( !ignoreNextArtPaneChange ) {
-					if ( isMaximized() ) {
-						artistPaneHeightWhileMaximized = newValue.doubleValue();
-					}
-				} else {
-					ignoreNextArtPaneChange = false;
-				}
-			}
-		);
-		
-		stage.maximizedProperty().addListener(new ChangeListener<Boolean>() {
-		    @Override
-		    public void changed( ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue ) {
-				ignoreNextArtPaneChange = true;
-				if ( artistPaneHeightWhileMaximized != 0 && newValue == true ) {
-					currentListSplitPane.getDividers().get( 0 ).setPosition( artistPaneHeightWhileMaximized );
-				}
-		    }
-		});
 
 		BorderPane albumListPane = new BorderPane();
 		albumFilterPane.prefWidthProperty().bind( albumListPane.widthProperty() );
@@ -407,7 +383,12 @@ public class FXUI implements PlayerListener {
 		primaryContainer.setPadding( new Insets( 0 ) ); 
 		primaryContainer.setCenter( primarySplitPane );
 		primaryContainer.setTop( transport );
-
+		
+		SplitPane.setResizableWithParent( libraryPane, Boolean.FALSE );
+		SplitPane.setResizableWithParent( artSplitPane, Boolean.FALSE );
+		SplitPane.setResizableWithParent( currentListSplitPane, Boolean.FALSE );
+		SplitPane.setResizableWithParent( primarySplitPane, Boolean.FALSE );
+		SplitPane.setResizableWithParent( currentPlayingPane, Boolean.FALSE );
 		
 		mainStage.setTitle( ( Hypnos.isDeveloping() ? "Dev - " : "" ) + PROGRAM_NAME );
 
@@ -4037,7 +4018,6 @@ public class FXUI implements PlayerListener {
 			retMe.put ( Setting.WINDOW_Y_POSITION, mainStage.getY() );
 			retMe.put ( Setting.WINDOW_WIDTH, mainStage.getWidth() );
 			retMe.put ( Setting.WINDOW_HEIGHT, mainStage.getHeight() );
-			retMe.put ( Setting.MAXIMIZED_ARTIST_PANE_HEIGHT, artistPaneHeightWhileMaximized );
 		}
 		
 		retMe.put ( Setting.PRIMARY_SPLIT_PERCENT, getPrimarySplitPercent() );
@@ -4191,9 +4171,6 @@ public class FXUI implements PlayerListener {
 						libraryPane.getSelectionModel().select( Integer.valueOf ( value ) );
 						break;
 					
-					case MAXIMIZED_ARTIST_PANE_HEIGHT:
-						artistPaneHeightWhileMaximized = Double.valueOf( value );
-						
 					case PROMPT_BEFORE_OVERWRITE:
 						promptBeforeOverwrite.setValue( Boolean.valueOf( value ) );
 						break;

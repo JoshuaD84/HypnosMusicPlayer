@@ -24,9 +24,7 @@ TODO
 	current list play/pause images don't change colors immediately. Have to play a new track to get updateImageThemes() to call.
 	
 	https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
-		
-	Art pane min size is annoying
-	
+			
 	Library Source Directories - highlight in red if they are missing. 
 	
 	Bug report dialog
