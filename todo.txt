@@ -13,9 +13,7 @@ TODO
 	Volume Slider doesn't feel right. Do some math formual instead of linear
 	
 	Volume slider in windows goes past 100%
-			
-	Current list jump: ctrl + enter to play next
-		
+					
 	What happens if you send a non-music file through the socket at cli? 
 	
 	Tray Icon
