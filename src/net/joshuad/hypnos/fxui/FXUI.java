@@ -152,7 +152,6 @@ public class FXUI implements PlayerListener {
 	ImageView currentListClearImage, albumFilterClearImage, trackFilterClearImage, playlistFilterClearImage;
 	ImageView settingsImage;
 	ImageView noRepeatImage, repeatImage, repeatOneImage, sequentialImage, shuffleImage;
-	ImageView exportImage, saveImage, loadTracksImage;
 	ImageView queueImage, historyImage, menuImage;
 	ImageView addSourceTracksImage, addSourceAlbumsImage, addSourcePlaylistsImage;
 	
@@ -617,31 +616,7 @@ public class FXUI implements PlayerListener {
 		} catch ( Exception e ) {
 			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/add.png", e );
 		}
-		
-		try {
-			exportImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/export.png" ).toFile() ) ) );
-			exportImage.setFitWidth( currentListControlsButtonFitWidth );
-			exportImage.setFitHeight( currentListControlsButtonFitHeight );
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/export.png", e );
-		}
-		
-		try {
-			saveImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/save.png" ).toFile() ) ) );
-			saveImage.setFitWidth( currentListControlsButtonFitWidth );
-			saveImage.setFitHeight( currentListControlsButtonFitHeight );
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/save.png", e );
-		}
-		
-		try {
-			loadTracksImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/load.png" ).toFile() ) ) );
-			loadTracksImage.setFitWidth( currentListControlsButtonFitWidth );
-			loadTracksImage.setFitHeight( currentListControlsButtonFitHeight );
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/load.png", e );
-		}
-		
+			
 		try {
 			Image clearImage = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/clear.png" ).toFile() ) );
 			
@@ -721,9 +696,6 @@ public class FXUI implements PlayerListener {
 			if ( sequentialImage != null ) sequentialImage.setEffect( darkThemeButtons );
 			if ( shuffleImage != null ) shuffleImage.setEffect( darkThemeButtons );
 			if ( menuImage != null ) menuImage.setEffect( darkThemeButtons );
-			if ( exportImage != null ) exportImage.setEffect( darkThemeButtons );
-			if ( saveImage != null ) saveImage.setEffect( darkThemeButtons );
-			if ( loadTracksImage != null ) loadTracksImage.setEffect( darkThemeButtons );
 			if ( queueImage != null ) queueImage.setEffect( darkThemeButtons );
 			if ( historyImage != null ) historyImage.setEffect( darkThemeButtons );
 			if ( addSourceTracksImage != null ) addSourceTracksImage.setEffect( darkThemeButtons );
@@ -771,9 +743,6 @@ public class FXUI implements PlayerListener {
 		if ( sequentialImage != null ) sequentialImage.setEffect( null );
 		if ( shuffleImage != null ) shuffleImage.setEffect( null );
 		if ( menuImage != null ) menuImage.setEffect( null );
-		if ( exportImage != null ) exportImage.setEffect( null );
-		if ( saveImage != null ) saveImage.setEffect( null );
-		if ( loadTracksImage != null ) loadTracksImage.setEffect( null );
 		if ( queueImage != null ) queueImage.setEffect( null );
 		if ( historyImage != null ) historyImage.setEffect( null );
 		if ( addSourceTracksImage != null ) addSourceTracksImage.setEffect( null );
