@@ -34,7 +34,8 @@ public class AudioPlayer {
 	AudioSystem controller;
 	Track track;
 
-	private long lastTrackLoadedAt = 0;
+	private static final long FRAME_COUNT_THAT_MUST_PLAY = 5;
+	private long framesPlayedSinceLoad = FRAME_COUNT_THAT_MUST_PLAY;
 
 	private double volumePercent = 1;
 	
@@ -61,12 +62,12 @@ public class AudioPlayer {
 					stopRequested = false;
 				}	
 
-				if ( trackRequested != null && ( System.currentTimeMillis() - lastTrackLoadedAt ) > 500 ) {
+				if ( trackRequested != null && framesPlayedSinceLoad >= FRAME_COUNT_THAT_MUST_PLAY ) {
 					
 					Track currentRequest = trackRequested;
 					trackRequested = null;
 					
-					lastTrackLoadedAt = System.currentTimeMillis();
+					framesPlayedSinceLoad = 0;
 
 					if ( decoder != null ) {
 						decoder.closeAllResources();
@@ -142,6 +143,7 @@ public class AudioPlayer {
 					if ( state == PlayState.PLAYING ) {
 
 						boolean finishedPlaying = decoder.playSingleFrame();
+						framesPlayedSinceLoad++;
 						updateTrackPosition();
 						
 						if ( finishedPlaying ) {

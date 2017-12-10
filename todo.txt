@@ -5,9 +5,7 @@ TODO
 	The hack to reload the first track isn't working. Sometimes the delay is too long and the tracks aren't sync'd, so the first track plays twice
 	
 	Albums aren't updating on the album list when you edit tags. Probably because they're behind in the update queue or I broke album.update
-		
-	Playback locks sometimes, haven't figured out why. Probably that thing we put a delay on needs a longer delay
-	
+			
 	Sigur Ros () doesn't load.
 	
 	Volume Slider doesn't feel right. Do some math formual instead of linear
@@ -95,8 +93,6 @@ TODO
 	Show images in tag window
 		Allow the deletion of embedded images
 		https://stackoverflow.com/questions/17067481/javafx-2-tableview-different-cell-factory-depending-on-the-data-inside-the-cel
-		
-	Change css selector for .scroll-bar:horizontal to an applied class, so only chosen h-scrollbars are hidden
 
 	Library load and unload time
 		
