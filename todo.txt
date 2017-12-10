@@ -14,8 +14,6 @@ TODO
 					
 	What happens if you send a non-music file through the socket at cli? 
 	
-	Tray Icon
-	
 	Play mounted audio cd
 		http://www.jsresources.org/examples/CddaPlayer.java.html
 	
@@ -47,8 +45,6 @@ TODO
 	Put a filter on images when in light theme to make them slightly grey (or dampen the actual images).
 	
 	Have the 2nd instance of hypnos call --bring-to-front or whatever it's called if there are no arguments to second instance call
-	
-	System tray
 
 	Tag Window, next and previous button
 		
@@ -105,10 +101,16 @@ TODO
 	Trying to play back https://archive.org/download/testmp3testfile/mpthreetest.mp3 using 
 	http://hypnosplayer.org/download/beta1/Hypnos-nix-64bit-beta1.AppImage on Xubuntu 16.04 gives a very high-pitch voice, not how it should sound.
 	
-	
+
 	
 	
 JavaFX stuff
+		
+	Tray Icon
+		I have a few demos that are all terrible. It looks like we need to wait for JavaFX to get this going for us. 
+		Or maybe just show an icon with no menus. Kinda hate that. How do we exit? 
+	
+	
 	hide/show via hotkeys while maximized toggles every 3 presses instead of every 2 presses. 
 		https://stackoverflow.com/questions/45269173/stage-seticonified-and-stage-isiconified-not-acting-properly
 				
@@ -123,7 +125,6 @@ JavaFX stuff
 	Table header alignment:
 		Platform.runLater(() -> tableView.refresh());
 		https://stackoverflow.com/questions/37423748/javafx-tablecolumns-headers-not-aligned-with-cells-due-to-vertical-scrollbar
-	
 	
 	
 Refactor / organize my code. 
