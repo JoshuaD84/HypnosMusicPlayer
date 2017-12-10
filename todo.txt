@@ -1,5 +1,14 @@
 TODO	
 
+	Overwite a playlist -> Get prompted -> Select "Yes" to save -> Hit cancel on the next dialog -> Thing is overwritten. Instead cancel the change.
+		
+	Make all alerts and prompts use theme
+		FXUI.promptAndSavePlaylist
+		FXUI.alertUser
+		
+		Change color on alert default buttons:
+			https://stackoverflow.com/questions/47744440/css-selector-for-default-button-in-a-javafx-alert
+	
 	I don't know if albums will form from tracks after they have loaded and been identified as not an album, then id3 tags edited.
 	
 	The hack to reload the first track isn't working. Sometimes the delay is too long and the tracks aren't sync'd, so the first track plays twice
@@ -36,7 +45,9 @@ TODO
 					
 	Tag auto fix button
 	
-	Settings button hover color -- should be blue
+	Hover effects on transparent image buttons
+		Settings Button
+		Volume button
 		
 	I don't like the way the library line wraps in the manifest. Can we make this nicer in ant? 
 	
@@ -93,11 +104,6 @@ TODO
 	
 	Revisit fonts -- Do we need to include the font files? 
 	
-	Trying to play back https://archive.org/download/testmp3testfile/mpthreetest.mp3 using 
-	http://hypnosplayer.org/download/beta1/Hypnos-nix-64bit-beta1.AppImage on Xubuntu 16.04 gives a very high-pitch voice, not how it should sound.
-	
-
-	
 	
 JavaFX stuff
 		
@@ -137,6 +143,10 @@ Refactor / organize my code.
 	Move all the file browser calls into a single function
 
 Decoders
+
+	Trying to play back https://archive.org/download/testmp3testfile/mpthreetest.mp3 using 
+	http://hypnosplayer.org/download/beta1/Hypnos-nix-64bit-beta1.AppImage on Xubuntu 16.04 gives a very high-pitch voice, not how it should sound.
+	
 	Mp4
 		buffered input stream on the random access File stream
 		

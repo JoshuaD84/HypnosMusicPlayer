@@ -51,6 +51,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
@@ -149,11 +150,13 @@ public class FXUI implements PlayerListener {
 	
 	ImageView[] volumeImages = new ImageView[ 4 ];
 	
-	ImageView currentListClearImage, albumFilterClearImage, trackFilterClearImage, playlistFilterClearImage;
+	ImageView albumFilterClearImage, trackFilterClearImage, playlistFilterClearImage;
 	ImageView settingsImage;
 	ImageView noRepeatImage, repeatImage, repeatOneImage, sequentialImage, shuffleImage;
 	ImageView queueImage, historyImage, menuImage;
 	ImageView addSourceTracksImage, addSourceAlbumsImage, addSourcePlaylistsImage;
+	
+	Image warningAlertImageSource;
 	
 	Image repeatImageSource, playImageSource, pauseImageSource;
 
@@ -532,6 +535,7 @@ public class FXUI implements PlayerListener {
 		double currentListControlsButtonFitWidth = 15;
 		double currentListControlsButtonFitHeight = 15;
 		
+		//TODO: Fix warning messages
 		try {
 			noRepeatImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/no-repeat.png" ).toFile() ) ) );
 			noRepeatImage.setFitWidth( currentListControlsButtonFitWidth );
@@ -546,7 +550,7 @@ public class FXUI implements PlayerListener {
 			repeatImage.setFitWidth( currentListControlsButtonFitWidth );
 			repeatImage.setFitHeight( currentListControlsButtonFitHeight );
 		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/repeat.png", e );
+			LOGGER.log( Level.WARNING, "Unable to load repeat icon: resources/repeat.png", e );
 		}
 		
 		
@@ -596,7 +600,7 @@ public class FXUI implements PlayerListener {
 			menuImage.setFitWidth( currentListControlsButtonFitWidth );
 			menuImage.setFitHeight( currentListControlsButtonFitHeight );
 		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/history.png", e );
+			LOGGER.log( Level.WARNING, "Unable to load w icon: resources/history.png", e );
 		}
 		
 		try {
@@ -616,17 +620,20 @@ public class FXUI implements PlayerListener {
 		} catch ( Exception e ) {
 			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/add.png", e );
 		}
+		
+		try {
+			warningAlertImageSource = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/alert-warning.png" ).toFile() ) );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load warning alert icon: resources/alert-warning.png", e );
+		}
 			
 		try {
 			Image clearImage = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/clear.png" ).toFile() ) );
 			
-			currentListClearImage = new ImageView ( clearImage );
 			albumFilterClearImage = new ImageView ( clearImage );
 			trackFilterClearImage = new ImageView ( clearImage );
 			playlistFilterClearImage = new ImageView ( clearImage );
 
-			currentListClearImage.setFitWidth( 12 );
-			currentListClearImage.setFitHeight( 12 );
 			albumFilterClearImage.setFitWidth( 12 );
 			albumFilterClearImage.setFitHeight( 12 );
 			trackFilterClearImage.setFitWidth( 12 );
@@ -658,8 +665,8 @@ public class FXUI implements PlayerListener {
 	
 	public void applyDarkTheme() {
 		if ( !isDarkTheme ) {
-			isDarkTheme = true;
 			String darkSheet = "file:///" + darkStylesheet.getAbsolutePath().replace( "\\", "/" );
+			isDarkTheme = true;
 			scene.getStylesheets().add( darkSheet ); 
 			libraryLocationWindow.getScene().getStylesheets().add( darkSheet );
 			settingsWindow.getScene().getStylesheets().add( darkSheet );
@@ -684,8 +691,6 @@ public class FXUI implements PlayerListener {
 			for ( int k = 0; k < volumeImages.length; k++ ) {
 				if ( volumeImages[k] != null ) volumeImages[k].setEffect( darkThemeTransportButtons );
 			}
-
-			if ( currentListClearImage != null ) currentListClearImage.setEffect( darkThemeButtons );
 			if ( albumFilterClearImage != null ) albumFilterClearImage.setEffect( darkThemeButtons );
 			if ( trackFilterClearImage != null ) trackFilterClearImage.setEffect( darkThemeButtons );
 			if ( playlistFilterClearImage != null ) playlistFilterClearImage.setEffect( darkThemeButtons );
@@ -732,7 +737,6 @@ public class FXUI implements PlayerListener {
 			if ( volumeImages[k] != null ) volumeImages[k].setEffect( null );
 		}
 
-		if ( currentListClearImage != null ) currentListClearImage.setEffect( null );
 		if ( albumFilterClearImage != null ) albumFilterClearImage.setEffect( null );
 		if ( trackFilterClearImage != null ) trackFilterClearImage.setEffect( null );
 		if ( playlistFilterClearImage != null ) playlistFilterClearImage.setEffect( null );
@@ -1737,7 +1741,8 @@ public class FXUI implements PlayerListener {
 		}
 			
 		Alert alert = new Alert( AlertType.CONFIRMATION );
-		alert.getDialogPane().applyCss();
+		
+		
 		double x = mainStage.getX() + mainStage.getWidth() / 2 - 220; //It'd be nice to use alert.getWidth() / 2, but it's NAN now. 
 		double y = mainStage.getY() + mainStage.getHeight() / 2 - 50;
 		
@@ -1748,15 +1753,39 @@ public class FXUI implements PlayerListener {
 			@Override
 			protected Node createDetailsButton () {
 				CheckBox optOut = new CheckBox();
+				optOut.setPadding( new Insets ( 0, 20, 0, 0 ) );
 				optOut.setText( "Do not ask again" );
 				optOut.setOnAction( e -> {
 					promptBeforeOverwrite.set( !optOut.isSelected() );
 				});
 				return optOut;
 			}
+			
+			@Override
+			protected Node createButtonBar () {
+				//This lets me specify my own button order below
+				ButtonBar node = (ButtonBar) super.createButtonBar();
+				node.setButtonOrder( ButtonBar.BUTTON_ORDER_NONE );
+				return node;
+			}
+			
 		});
+
+		if ( warningAlertImageSource != null ) {
+			ImageView warningImage = new ImageView ( warningAlertImageSource );
+			if ( isDarkTheme() ) {
+				warningImage.setEffect( darkThemeButtons );
+			}
+				
+			warningImage.setFitHeight( 50 );
+			warningImage.setFitWidth( 50 );
+			alert.setGraphic( warningImage );
+		}
 		
-		alert.getDialogPane().getButtonTypes().addAll( ButtonType.YES, ButtonType.NO, ButtonType.CANCEL );
+		setAlertWindowIcon ( alert );
+		applyCurrentTheme ( alert );
+
+		alert.getDialogPane().getButtonTypes().addAll( ButtonType.YES, ButtonType.NO,  ButtonType.CANCEL );
 		alert.getDialogPane().setContentText( "You have an unsaved playlist, do you wish to save it?" );
 		alert.getDialogPane().setExpandableContent( new Group() );
 		alert.getDialogPane().setExpanded( false );
@@ -1789,6 +1818,7 @@ public class FXUI implements PlayerListener {
 			defaultName = player.getCurrentPlaylist().getName();
 		}
 		TextInputDialog dialog = new TextInputDialog( defaultName );
+		
 
 		dialog.setX( mainStage.getX() + mainStage.getWidth() / 2 - 150 );
 		dialog.setY( mainStage.getY() + mainStage.getHeight() / 2 - 100 );
@@ -3914,11 +3944,7 @@ public class FXUI implements PlayerListener {
 	
 	public static void notifyUserHypnosRunning() {
 		Alert alert = new Alert ( AlertType.INFORMATION );
-		Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-		try {
-			Image icon = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) );
-			stage.getIcons().add( icon );
-		} catch ( Exception e ) {}
+		setAlertWindowIcon ( alert );
 		
 		alert.setTitle( "Information" );
 		alert.setHeaderText( "Unable to launch Hypnos" );
@@ -3934,8 +3960,27 @@ public class FXUI implements PlayerListener {
 		alert.setY ( height / 2 - 300 / 2 );
 		
 		alert.showAndWait();
-		
 	}
+	
+	public static void setAlertWindowIcon ( Alert alert ) {
+		Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+		try {
+			Image icon = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) );
+			stage.getIcons().add( icon );
+		} catch ( Exception e ) {
+			LOGGER.log ( Level.INFO, "Unable to set icon on alert.", e ); 
+		}
+	}
+	
+	public void applyCurrentTheme ( Alert alert ) {
+		String darkSheet = "file:///" + darkStylesheet.getAbsolutePath().replace( "\\", "/" );
+		if ( isDarkTheme() ) {
+			((Stage) alert.getDialogPane().getScene().getWindow()).getScene().getStylesheets().add( darkSheet );
+		} else {
+			libraryLocationWindow.getScene().getStylesheets().remove( darkSheet );
+		}
+	}
+		
 	public static void notifyUserError ( String message ) { 
 		
 		Alert alert = new Alert ( AlertType.ERROR );
@@ -4421,6 +4466,12 @@ public class FXUI implements PlayerListener {
 		
 		alert.setTitle( title );
 		alert.setHeaderText( header );
+
+		setAlertWindowIcon ( alert );
+		
+		//TODO: I want to do this, but I need more stuff in the dark theme. Try it and see
+		//applyCurrentTheme ( alert );
+		
 						
 		Text text = new Text( content );
 		
@@ -4572,5 +4623,14 @@ class CurrentListTrackStateCell extends TableCell <CurrentListTrack, CurrentList
 			setText( null );
 			setGraphic( null );
 		}
+	}
+}
+
+class FixedOrderButtonDialog extends DialogPane {
+	@Override
+	protected Node createButtonBar () {
+		ButtonBar node = (ButtonBar) super.createButtonBar();
+		node.setButtonOrder( ButtonBar.BUTTON_ORDER_NONE );
+		return node;
 	}
 }
