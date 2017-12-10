@@ -30,7 +30,7 @@ class ResizableImageView extends ImageView {
 
 	@Override
 	public double minHeight(double width) {
-		return 100;
+		return 0;
 	}
 
 	@Override

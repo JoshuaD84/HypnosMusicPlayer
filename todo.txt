@@ -13,8 +13,6 @@ TODO
 	Persisted Queue getting erased at some point after program start
 		
 	Current list jump: ctrl + enter to play next
-
-	Put shuffle, repeat, queue, and history on transport somewhere.
 		
 	What happens if you send a non-music file through the socket at cli? 
 	
@@ -113,6 +111,9 @@ TODO
 	Trying to play back https://archive.org/download/testmp3testfile/mpthreetest.mp3 using 
 	http://hypnosplayer.org/download/beta1/Hypnos-nix-64bit-beta1.AppImage on Xubuntu 16.04 gives a very high-pitch voice, not how it should sound.
 	
+	
+	
+	
 JavaFX stuff
 	hide/show via hotkeys while maximized toggles every 3 presses instead of every 2 presses. 
 		https://stackoverflow.com/questions/45269173/stage-seticonified-and-stage-isiconified-not-acting-properly
@@ -128,6 +129,8 @@ JavaFX stuff
 	Table header alignment:
 		Platform.runLater(() -> tableView.refresh());
 		https://stackoverflow.com/questions/37423748/javafx-tablecolumns-headers-not-aligned-with-cells-due-to-vertical-scrollbar
+	
+	
 	
 Refactor / organize my code. 
  	Make LibraryUpdater part of Library. Is there a way to abstract out the Platform -> RunLater part? I feel like we're just stuck w/ that, which kind of ties to us JavaFX. 
