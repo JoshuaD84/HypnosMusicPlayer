@@ -639,7 +639,7 @@ public class Track implements Serializable {
 
 			Artwork artwork = new StandardArtwork();
 			artwork.setBinaryData( buffer );
-			artwork.setPictureType( type ); //See ID3 specifications for why 8 
+			artwork.setPictureType( type ); 
 			
 			tag.addField( artwork );
 			

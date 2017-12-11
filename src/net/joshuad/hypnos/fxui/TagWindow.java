@@ -17,7 +17,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
@@ -26,6 +25,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -67,7 +67,8 @@ public class TagWindow extends Stage {
 		this.initOwner( ui.getMainStage() );
 		this.setTitle( "Tag Editor" );
 		this.setWidth( 600 );
-		Group root = new Group();
+		this.setHeight ( 700 );
+		Pane root = new Pane();
 		Scene scene = new Scene( root );
 		VBox primaryPane = new VBox();
 		
@@ -101,9 +102,16 @@ public class TagWindow extends Stage {
 		tagTable.prefWidthProperty().bind( this.widthProperty() );
 		
 		setupControlPanel();
-		
+
 		primaryPane.getChildren().addAll( tagTable, controlPanel );
 		root.getChildren().add( primaryPane );
+		
+		tagTable.prefHeightProperty().bind( primaryPane.heightProperty().subtract( controlPanel.heightProperty() ) );
+		tagTable.prefWidthProperty().bind( primaryPane.widthProperty() );
+		
+		primaryPane.prefWidthProperty().bind( root.widthProperty() );
+		primaryPane.prefHeightProperty().bind( root.heightProperty() );
+		
 		setScene( scene );
 	}
 	
