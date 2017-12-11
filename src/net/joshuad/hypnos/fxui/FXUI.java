@@ -1307,6 +1307,7 @@ public class FXUI implements PlayerListener {
 			
 			fileChooser.getExtensionFilters().add( fileExtensions );
 			fileChooser.setTitle( "Export Album Image" );
+			fileChooser.setInitialFileName( "album.png" );
 			File targetFile = fileChooser.showSaveDialog( mainStage );
 			
 			if ( targetFile == null ) return; 
@@ -1445,6 +1446,7 @@ public class FXUI implements PlayerListener {
 			
 			fileChooser.getExtensionFilters().add( fileExtensions );
 			fileChooser.setTitle( "Export Artist Image" );
+			fileChooser.setInitialFileName( "artist.png" );
 			File targetFile = fileChooser.showSaveDialog( mainStage );
 			
 			if ( targetFile == null ) return; 
@@ -4066,6 +4068,10 @@ public class FXUI implements PlayerListener {
 	
 	public void refreshHistory() {
 		historyWindow.refresh();
+	}
+	
+	public void refreshImages() {
+		setImages ( getCurrentImagesTrack() );
 	}
 	
 	public void refreshCurrentList () {

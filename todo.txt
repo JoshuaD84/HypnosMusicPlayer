@@ -1,23 +1,53 @@
-TODO	
-
-	Overwite a playlist -> Get prompted -> Select "Yes" to save -> Hit cancel on the next dialog -> Thing is overwritten. Instead cancel the change.
+TODO
+	Library	
+		I don't know if albums will form from tracks after they have loaded and been identified as not an album, then id3 tags edited.
+	
+		Sigur Ros () doesn't load.
 		
+		Albums aren't updating on the album list when you edit tags. Probably because they're behind in the update queue or I broke album.update
+		
+		Sometimes there are duplicated tracks in the track list
+		
+		When removing all sources, it takes a long time to remove everything (5+ seconds)
+			This is because of the processWatcherEvents function taking lots of time on load. 
+			
+		Setup a currentList.updateAlbum and updatePlaylist system
+			Doesn't change artwork
+			CurrentplayingTrack is the same one
+			updates data and locations
+			
+		Library load and unload time
+	
+	
+	Library Source Directories - highlight in red if they are missing. 
+	
+	Overwite a playlist -> Get prompted -> Select "Yes" to save -> Hit cancel on the next dialog -> Thing is overwritten. Instead cancel the change.
+	
 	Make all alerts and prompts use theme
 		FXUI.promptAndSavePlaylist
 		FXUI.alertUser
 		
 		Change color on alert default buttons:
 			https://stackoverflow.com/questions/47744440/css-selector-for-default-button-in-a-javafx-alert
+			
+	Lyric search - if they all fail, try removing all parenthesied text from song name and try again
 	
-	I don't know if albums will form from tracks after they have loaded and been identified as not an album, then id3 tags edited.
+	
+	Export playlist as a folder
+		Copy all of the music files into that folder. Prepend them with index number? 
+		Warn if the total copy is larger than X MB or more than X tracks
+		
+
+	
 	
 	The hack to reload the first track isn't working. Sometimes the delay is too long and the tracks aren't sync'd, so the first track plays twice
 	
-	Albums aren't updating on the album list when you edit tags. Probably because they're behind in the update queue or I broke album.update
 			
-	Sigur Ros () doesn't load.
+	
 	
 	Volume Slider 
+		Slide it down to mute, then click mute button. Strange stuff happens. 
+		
 		doesn't feel right. Do some math formual instead of linear
 		in windows goes past 100%
 						
@@ -28,7 +58,6 @@ TODO
 	
 	https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
 			
-	Library Source Directories - highlight in red if they are missing. 
 	
 	Bug report dialog
 	
@@ -54,6 +83,7 @@ TODO
 	Put a filter on images when in light theme to make them slightly grey (or dampen the actual images).
 	
 	Tag Window, next and previous button
+		If we're looking at a single currentListTrack, add them and cycle through current list. That's it. 
 		
 	Drag and drop from misc places to system
 		playlist table -> m3u
@@ -71,43 +101,13 @@ TODO
 	Hide the library table drop down
 		drag vertical divider all the way left then back to center, the drop down appears. Hide it. 
 
-	Setup a currentList.updateAlbum and updatePlaylist system
-		Doesn't change artwork
-		CurrentplayingTrack is the same one
-		updates data and locations
-		
-	When removing all sources, it takes a long time to remove everything (5+ seconds)
-		This is because of the processWatcherEvents function taking lots of time on load. 
-		
 	Show something on art boxes to differentiate between artist and album, especially when drag & dropping
 				
 	~incomplete/Grizzly Bear
 		F2 to show tag editor, no content in table
 		
-	Sometimes there are duplicated tracks in the track list
-	
-	Show images in tag window
-		Allow the deletion of embedded images
-		https://stackoverflow.com/questions/17067481/javafx-2-tableview-different-cell-factory-depending-on-the-data-inside-the-cel
-		
-		
-		Album:
-			artwork.getPictureType() == 3  //ID3 COVER_FRONT
-			artwork.getPictureType() == 0  //ID3 OTHER
-			artwork.getPictureType() == 6  //ID3 MEDIA
-			
-		Artist:
-			artwork.getPictureType() == 8  //ID3 ARTIST
-			artwork.getPictureType() == 7  //ID3 LEAD_ARTIST
-			artwork.getPictureType() == 12 //ID3 ILLUSTRATION
-			artwork.getPictureType() == 13 //ID3 BAND/ARTIST LOGO TYPEt
-
-	Library load and unload time
-		
 	Dark theme for about tab settings
-	
-	Tag Window change "Track" to "Track #"
-	
+		
 	Revisit fonts -- Do we need to include the font files? 
 	
 	

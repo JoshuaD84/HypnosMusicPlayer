@@ -3,6 +3,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.file.DirectoryStream;
@@ -32,6 +33,7 @@ import org.jaudiotagger.tag.images.StandardArtwork;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
+import net.joshuad.hypnos.MultiFileImageTagPair.ImageFieldKey;
 import net.joshuad.hypnos.TagError.TagErrorType;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.StopReason;
@@ -597,12 +599,58 @@ public class Track implements Serializable {
 	public static void saveAlbumImageToTag ( File file, byte[] buffer, AudioSystem player ) {
 		saveImageToID3 ( file, buffer, 3, null, true, player );
 	}
+		
+	private static void deleteImageFromID3 ( File file, int type, AudioSystem player ) { 
+		try {
+			AudioFile audioFile = AudioFileIO.read( file );
+			Tag tag = audioFile.getTag();
+
+			if ( tag instanceof ID3v1Tag ) {
+				tag = new ID3v23Tag ( (ID3v1Tag)tag );
+			}
+
+			tag.deleteField( FieldKey.CUSTOM4 );
+
+			List <Artwork> artworkList = tag.getArtworkList();
+
+			tag.deleteArtworkField();
 			
+			for ( Artwork artwork : artworkList ) {
+				if ( artwork.getPictureType() != type ) {
+					tag.addField( artwork );
+				}
+			}
+			
+			boolean pausedPlayer = false;
+			long currentPositionMS = 0;
+			Track currentTrack = null;
+			
+			if ( player.getCurrentTrack() != null && player.getCurrentTrack().getPath().equals( file.toPath() ) && player.isPlaying() ) {
+
+				currentPositionMS = player.getPositionMS();
+				currentTrack = player.getCurrentTrack();
+				player.stop( StopReason.WRITING_TO_TAG );
+				pausedPlayer = true;
+			}
+				
+			audioFile.setTag( tag );
+			AudioFileIO.write( audioFile );
+			
+			if ( pausedPlayer ) {
+				player.playTrack( currentTrack, true );
+				player.seekMS( currentPositionMS );
+				player.unpause();
+			}
+			
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to delete image from tag: " + file, e );
+		}
+		
+	}
 	
 	private static void saveImageToID3 ( File file, byte[] buffer, int type, ArtistTagImagePriority priority, boolean overwriteAll, AudioSystem player ) {
 
 		try {
-			
 			AudioFile audioFile = AudioFileIO.read( file );
 			Tag tag = audioFile.getTag();
 
@@ -965,7 +1013,7 @@ public class Track implements Serializable {
 		return null;
 	}
 	
-	public void updateTagsAndSave ( List<MultiFileTagPair> tagPairs ) {
+	public void updateTagsAndSave ( List<MultiFileTextTagPair> textTagPairs, List<MultiFileImageTagPair> imageTagPairs, AudioSystem player ) {
 		try {
 			AudioFile audioFile = AudioFileIO.read( getPath().toFile() );
 			Tag tag = audioFile.getTag();
@@ -974,7 +1022,7 @@ public class Track implements Serializable {
 				tag = new ID3v23Tag ( (ID3v1Tag)tag );
 			}
 			
-			for ( MultiFileTagPair tagPair : tagPairs ) { 
+			for ( MultiFileTextTagPair tagPair : textTagPairs ) { 
 				
 				if ( !tagPair.isMultiValue() ) {
 					tag.setField( tagPair.getKey(), tagPair.getValue() );
@@ -984,11 +1032,28 @@ public class Track implements Serializable {
 			audioFile.setTag( tag );
 			AudioFileIO.write( audioFile );
 			
+			for ( MultiFileImageTagPair tagPair : imageTagPairs ) {
+				if ( !tagPair.isMultiValue() && tagPair.imageDataChanged() ) {
+					
+					if ( tagPair.getImageData() == null ) {
+						deleteImageFromID3 ( getPath().toFile(), ImageFieldKey.getIndexFromKey( tagPair.getKey() ), player );
+					} else {
+						saveImageToID3 ( getPath().toFile(), tagPair.getImageData(), ImageFieldKey.getIndexFromKey( tagPair.getKey() ), 
+							ArtistTagImagePriority.TRACK, true, player );
+					}
+				}
+			}
+			
 			refreshTagData();
 	
 		} catch ( Exception e ) {
 			LOGGER.log( Level.WARNING, "Unable to save updated tag.", e );
 		}
+	}
+	
+	private void readObject ( ObjectInputStream in ) throws IOException, ClassNotFoundException {
+		in.defaultReadObject();
+		tagErrors = new Vector <TagError> ();
 	}
 }
 

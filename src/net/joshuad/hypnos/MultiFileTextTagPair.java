@@ -2,13 +2,13 @@ package net.joshuad.hypnos;
 
 import org.jaudiotagger.tag.FieldKey;
 
-public class MultiFileTagPair {
+public class MultiFileTextTagPair {
 	
 	private FieldKey key;
 	private String value;
 	private boolean multiValue = false;
 	
-	public MultiFileTagPair ( FieldKey key, String value ) {
+	public MultiFileTextTagPair ( FieldKey key, String value ) {
 		this.key = key;
 		this.value = value;
 	}
