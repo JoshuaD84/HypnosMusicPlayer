@@ -32,7 +32,7 @@ public class FlacDecoder extends AbstractDecoder {
 			
 			audioOutput = null;
 			try {
-				Thread.sleep ( 5 ); 
+				Thread.sleep ( 6 ); 
 				//This sleep fixes the close problem.
 				//I tried 20 and 5, both seemed good. Didn't try others. 
 				//Also removed some extranous called to this function across my decoders
@@ -40,7 +40,6 @@ public class FlacDecoder extends AbstractDecoder {
 				LOGGER.info( "Interrupted while trying to sleep before closing Source Data Line." );
 				//IF this fires, it could cause the lock bug, so if you see this error you know what happened. 
 			}
-			
 			closeMe.close(); //This is the call that can hard lock forever 
 		}
 		

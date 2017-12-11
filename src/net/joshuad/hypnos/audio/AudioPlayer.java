@@ -53,9 +53,10 @@ public class AudioPlayer {
 			try {
 				if ( state != PlayState.STOPPED && stopRequested ) {
 					state = PlayState.STOPPED;
-					decoder.closeAllResources();
-					controller.playerStopped( StopReason.USER_REQUESTED );
+					AbstractDecoder closeMe = decoder;
 					decoder = null;
+					closeMe.closeAllResources();
+					controller.playerStopped( StopReason.USER_REQUESTED );
 					stopRequested = false;
 				}	
 
