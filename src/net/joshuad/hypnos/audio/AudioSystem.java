@@ -400,7 +400,9 @@ public class AudioSystem {
 		EnumMap <Persister.Setting, Object> retMe = new EnumMap <Persister.Setting, Object> ( Persister.Setting.class );
 		
 		if ( !player.isStopped() ) {
-			retMe.put ( Setting.TRACK, player.getTrack().getPath().toString() );
+			if ( player.getTrack() != null ) {
+				retMe.put ( Setting.TRACK, player.getTrack().getPath().toString() );
+			}
 			retMe.put ( Setting.TRACK_POSITION, player.getPositionMS() );
 			retMe.put ( Setting.TRACK_NUMBER, getCurrentTrackIndex() );
 		}

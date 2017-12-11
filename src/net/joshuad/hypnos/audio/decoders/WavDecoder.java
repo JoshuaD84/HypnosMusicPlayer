@@ -35,7 +35,6 @@ public class WavDecoder extends AbstractDecoder {
 	@Override
 	public void closeAllResources() {
 		if ( audioOutput != null ) {
-			audioOutput.stop();
 			audioOutput.close();
 		}
 		
@@ -56,12 +55,12 @@ public class WavDecoder extends AbstractDecoder {
 			int bytesRead = decodedInput.read ( data, 0, data.length );
 			
 			if ( bytesRead < 0 ) {
-				closeAllResources();
 				return true;
 				
 			} else {
 				audioOutput.write(data, 0, bytesRead);
 			}
+			
 		} catch ( IOException e ) {
 			LOGGER.warning( "Error reading from wav file." );
 		}

@@ -34,7 +34,6 @@ public class BackupFlacDecoder extends AbstractDecoder {
 	
 	@Override
 	public void closeAllResources () {
-		audioOutput.stop();
 		audioOutput.close();
 		try {
 			decodedInput.close();
@@ -52,7 +51,6 @@ public class BackupFlacDecoder extends AbstractDecoder {
 			int bytesRead = decodedInput.read ( data, 0, data.length );
 			
 			if ( bytesRead < 0 ) {
-				closeAllResources();
 				return true;
 				
 			} else {

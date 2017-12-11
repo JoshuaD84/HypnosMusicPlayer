@@ -19,6 +19,9 @@ public class FlacDecoder extends AbstractDecoder {
 	
 	private FlacDecoderLogic decodedInput;
 	
+	private boolean resourcesOpened = false;
+	private boolean resourcesClosed = false;
+	
 	public FlacDecoder ( Track track ) {
 		this.track = track;
 		initialize();
@@ -27,15 +30,35 @@ public class FlacDecoder extends AbstractDecoder {
 	@Override
 	public void closeAllResources() {
 		
-		audioOutput.stop(); 
-		audioOutput.close();
-		try {
-			if ( decodedInput != null ) {
-				decodedInput.close();
+		if ( !resourcesClosed ) {
+			resourcesClosed = true;
+			System.out.println ( "-6" ); //TODO: DD
+			if ( audioOutput.isOpen() ) {
+				SourceDataLine closeMe = audioOutput;
+				audioOutput = null;
+				try {
+					Thread.sleep ( 5 ); //This sleep fixes the close problem. 
+				} catch ( InterruptedException e ) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				System.out.println ( "-5" ); //TODO: DD
+				closeMe.close(); //TODO: This is where the lock occurs. 
 			}
 			
-		} catch ( IOException e ) {
-			LOGGER.log ( Level.INFO, "Unable to close flac file reader for: " + track.getPath() );
+			System.out.println ( "-4" ); //TODO: DD
+			try {
+				if ( decodedInput != null ) {
+					System.out.println ( "-3" ); //TODO: DD
+					decodedInput.close();
+				}
+				
+			} catch ( IOException e ) {
+				LOGGER.log ( Level.INFO, "Unable to close flac file reader for: " + track.getPath() );
+			}
+			System.out.println ( "-2" ); //TODO: DD
+		} else {
+			LOGGER.warning( "Tried to close resources twice. Ignored." );
 		}
 	}
 
@@ -49,7 +72,7 @@ public class FlacDecoder extends AbstractDecoder {
 			if (temp != null) samples = (long[][])temp[0];
 							
 			if (samples == null) { // End of stream
-				closeAllResources();
+				//closeAllResources(); //TODO: DELETE THIS? It is called twice. 
 				return true;
 			}
 			
@@ -74,20 +97,21 @@ public class FlacDecoder extends AbstractDecoder {
 
 	@Override
 	public boolean openStreamsAt ( double seekPercent ) {
-		try {
-
-			decodedInput = new FlacDecoderLogic ( track.getPath().toAbsolutePath().toFile() );
-			if ( decodedInput.numSamples == 0 ) throw new FlacDecoderLogic.FormatException("Unknown audio length");
-		} catch ( IOException e ) {
-			String message = "Unable to decode flac file:" + track.getPath().toString();
-			LOGGER.log( Level.WARNING, message );
-			FXUI.notifyUserError( message );
-			return false;
-		}
-		
+		if ( !resourcesOpened ) {
+			try {
+	
+				decodedInput = new FlacDecoderLogic ( track.getPath().toAbsolutePath().toFile() );
+				if ( decodedInput.numSamples == 0 ) throw new FlacDecoderLogic.FormatException("Unknown audio length");
+			} catch ( IOException e ) {
+				String message = "Unable to decode flac file:" + track.getPath().toString();
+				LOGGER.log( Level.WARNING, message );
+				FXUI.notifyUserError( message );
+				return false;
+			}
+			
 			AudioFormat outputFormat = new AudioFormat ( decodedInput.sampleRate, decodedInput.sampleDepth, decodedInput.numChannels, true, false );
 			DataLine.Info datalineInfo = new DataLine.Info( SourceDataLine.class, outputFormat );
-
+	
 			try {
 				audioOutput = (SourceDataLine) AudioSystem.getLine( datalineInfo );
 				audioOutput.open( outputFormat );
@@ -129,10 +153,14 @@ public class FlacDecoder extends AbstractDecoder {
 				
 				clipStartTimeMS = (long)( ( track.getLengthS() * 1000 ) * seekPercent );
 			}
-
+	
 			audioOutput.start();
 		
-		return true;
+			return true;
+		} else {
+			LOGGER.warning( "Tried to open resources twice. Ignored." );
+			return false;
+		}
 	}
 }
 

@@ -26,7 +26,6 @@ public class OggDecoder extends AbstractDecoder {
 	
 	@Override
 	public void closeAllResources () {
-		audioOutput.stop();
 		audioOutput.close();
 		if ( decoder != null ) {
 			decoder.close();

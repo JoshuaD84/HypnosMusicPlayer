@@ -34,7 +34,7 @@ public class AudioPlayer {
 	AudioSystem controller;
 	Track track;
 
-	private static final long FRAME_COUNT_THAT_MUST_PLAY = 5;
+	private static final long FRAME_COUNT_THAT_MUST_PLAY = 0;
 	private long framesPlayedSinceLoad = FRAME_COUNT_THAT_MUST_PLAY;
 
 	private double volumePercent = 1;
@@ -54,15 +54,18 @@ public class AudioPlayer {
 		
 		while ( true ) {
 			try {
+				System.out.println ( state + " != " + PlayState.STOPPED + " && " + stopRequested ); //TODO: DD 
 				if ( state != PlayState.STOPPED && stopRequested ) {
 					state = PlayState.STOPPED;
+					System.out.println ( " -10" ); //TODO: DD
 					decoder.closeAllResources();
+					System.out.println ( " -9" ); //TODO: DD
 					controller.playerStopped( StopReason.USER_REQUESTED );
 					decoder = null;
 					stopRequested = false;
 				}	
 
-				if ( trackRequested != null && framesPlayedSinceLoad >= FRAME_COUNT_THAT_MUST_PLAY ) {
+				if ( trackRequested != null && ( state == PlayState.STOPPED || framesPlayedSinceLoad >= FRAME_COUNT_THAT_MUST_PLAY ) ) {
 					
 					Track currentRequest = trackRequested;
 					trackRequested = null;
@@ -70,35 +73,45 @@ public class AudioPlayer {
 					framesPlayedSinceLoad = 0;
 
 					if ( decoder != null ) {
+						System.out.println ( "-8" ); //TODO: DD
 						decoder.closeAllResources();
+						System.out.println ( "-7" ); //TODO: DD
 					}
 
 					try {
+						System.out.println ( "A" ); //TODO: DD
 						decoder = getDecoder ( currentRequest );
+						System.out.println ( "B" ); //TODO: DD
 						
 					} catch ( IllegalStateException e ) {
 						decoder = null;
 					}
 
 					if ( decoder != null ) {
+
+						System.out.println ( "C" ); //TODO: DD
 						track = currentRequest;
-						stopRequested = false;
 						setDecoderVolume( volumePercent );
 						controller.playerStarted( currentRequest );
 						updateTrackPosition();
 						state = PlayState.PLAYING;
+						System.out.println ( "D" ); //TODO: DD
 						
 					} else {
+						System.out.println ( "E" ); //TODO: DD
 						stopRequested = false;
 						LOGGER.info( "Unable to initialize decoder for: " + currentRequest.getFilename() );
 						state = PlayState.STOPPED;
 						controller.playerStopped( StopReason.UNABLE_TO_START_TRACK );
+						System.out.println ( "F" ); //TODO: DD
 					}
 				} 
 
+				System.out.println ( "G" ); //TODO: DD
 				if ( volumeErrorRequested ) {
 					state = PlayState.STOPPED;
 					decoder.closeAllResources();
+					System.out.println ( "H" ); //TODO: DD
 					controller.playerStopped( StopReason.ERROR );
 					decoder = null;					
 					volumeErrorRequested = false;
@@ -106,43 +119,56 @@ public class AudioPlayer {
 				}
 				
 				if ( state != PlayState.STOPPED ) {
-						
+
+					System.out.println ( "I" ); //TODO: DD
 					if ( pauseRequested ) {
 						pauseRequested = false;
 						state = PlayState.PAUSED;
 						controller.playerPaused();
 						decoder.pause();
+						System.out.println ( "I+" ); //TODO: DD
 					}
-					
+
+					System.out.println ( "J" ); //TODO: DD
 					if ( unpauseRequested ) {
 						unpauseRequested = false;
 						state = PlayState.PLAYING;
 						controller.playerUnpaused();
 						decoder.unpause();
+						System.out.println ( "J+" ); //TODO: DD
 					}
+					System.out.println ( "K" ); //TODO: DD
 					
 					if ( seekPercentRequested != NO_REQUEST ) {
 						decoder.seekTo ( seekPercentRequested );
 						updateTrackPosition();
 						seekPercentRequested = NO_REQUEST;
+						System.out.println ( "K+" ); //TODO: DD
 					}
 
+					System.out.println ( "L" ); //TODO: DD
 					if ( seekMSRequested != NO_REQUEST ) {
 						decoder.seekTo ( seekMSRequested / (double)( track.getLengthS() * 1000 ) );
 						updateTrackPosition();
 						seekMSRequested = NO_REQUEST;
+						System.out.println ( "L+" ); //TODO: DD
 					}
-					
+
+					System.out.println ( "M" ); //TODO: DD
 					if ( volumePercentRequested != NO_REQUEST ) {
 						setDecoderVolume ( volumePercentRequested );
 						controller.volumeChanged ( volumePercentRequested );
 						volumePercent = decoder.getVolumePercent();
 						volumePercentRequested = NO_REQUEST;
+						System.out.println ( "M+" ); //TODO: DD
 					}
 
+					System.out.println ( "N" ); //TODO: DD
 					if ( state == PlayState.PLAYING ) {
 
+						System.out.println ( "O" ); //TODO: DD
 						boolean finishedPlaying = decoder.playSingleFrame();
+						System.out.println ( "P" ); //TODO: DD
 						framesPlayedSinceLoad++;
 						updateTrackPosition();
 						
@@ -151,28 +177,35 @@ public class AudioPlayer {
 							decoder = null;
 							state = PlayState.STOPPED;
 							controller.playerStopped( StopReason.TRACK_FINISHED );
+							System.out.println ( "P+" ); //TODO: DD
 						} 				
-						
+
+						System.out.println ( "Q" ); //TODO: DD
 					} else {
+						System.out.println ( "R" ); //TODO: DD
 						try {
 							Thread.sleep( 10 );
 						} catch ( InterruptedException e ) {
 							LOGGER.fine( "Interrupted while paused." );
 						}
+						System.out.println ( "S" ); //TODO: DD
 					}
 					
 				} else { 
+					System.out.println ( "T" ); //TODO: DD
 					try {
 						Thread.sleep( 20 );
 					} catch ( InterruptedException e ) {
 						LOGGER.fine ( "Interrupted while stopped" );
 					}
+					System.out.println ( "U" ); //TODO: DD
 				}
 				
 			} catch ( Exception e ) {
 				//Note: We catch everything here because this loop has to keep running no matter what, or the program can't play music. 
 				LOGGER.log( Level.WARNING, "Exception in AudioPlayer Loop.", e );
 			}
+			System.out.println ( "\n" ); //TODO: DD
 		}
 	}
 	
@@ -202,6 +235,7 @@ public class AudioPlayer {
 	}
 	
 	public void requestStop () {
+		System.out.println ( "Stop requested" ); //TODO: DD
 		stopRequested = true;
 	}
 	

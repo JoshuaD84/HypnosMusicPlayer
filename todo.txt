@@ -18,79 +18,112 @@ TODO
 			
 		Library load and unload time
 	
-	
-	Library Source Directories - highlight in red if they are missing. 
-	
-	Overwite a playlist -> Get prompted -> Select "Yes" to save -> Hit cancel on the next dialog -> Thing is overwritten. Instead cancel the change.
-	
-	Make all alerts and prompts use theme
-		FXUI.promptAndSavePlaylist
-		FXUI.alertUser
+	Playback Engine
+		Maybe don't start the player thread until the very end. It's starting kinda early and looping. May be delaying start up time
 		
-		Change color on alert default buttons:
-			https://stackoverflow.com/questions/47744440/css-selector-for-default-button-in-a-javafx-alert
+		Program occasionally locks in decoders.closeAllResources() -> audioOutput.close(). 
+			Information gathered:
+				audioOutput.stop() could cause the problem, but was an unnecessary call, so I removed it. 
+					Will this cause problems when I have a pool? Won't I have to call stop on the lines
+					
+				Guaranteeing that 2 or 5 frames play through the line before closing reduces the problem significantly
+				but I was still able to generate a freeze by going crazy on the UI
+				
+				There were other bugs in my loop thread with stopRequested and state causing similar freezes, but I fixed those.
+				
+				If I cause a stop in one program and then launch another completely separate program, it also locks, but in a different place
+					I didn't confirm 100%, but I'm pretty sure it's at Decoder.openStreamsAt() -> audioOutput.open()
+					
+				I should be able to write a pretty simple proof of bug. Putting anything else aside, I should do that and post it around.
+					AudioFormat outputFormat = new AudioFormat ( 44100, 16, 2, true, false ); 
+					DataLine.Info datalineInfo = new DataLine.Info( SourceDataLine.class, outputFormat );
+					SourceDataLine audioOutput = (SourceDataLine) AudioSystem.getLine( datalineInfo );
+					audioOutput.open( outputFormat );
 			
-	Lyric search - if they all fail, try removing all parenthesied text from song name and try again
+			Plan: 
+				Setup a pool for line outs, spawn new ones as needed, and pull from the pool when you can.
+				Keep track of how many could potentially get open. How many is too many? 
 	
-	
-	Export playlist as a folder
-		Copy all of the music files into that folder. Prepend them with index number? 
-		Warn if the total copy is larger than X MB or more than X tracks
 		
+	UI
+	
+		Library Source Directories - highlight in red if they are missing. 
+		
+		Overwite a playlist -> Get prompted -> Select "Yes" to save -> Hit cancel on the next dialog -> Thing is overwritten. Instead cancel the change.
+		
+		Make all alerts and prompts use theme
+			FXUI.promptAndSavePlaylist
+			FXUI.alertUser
+			
+			Change color on alert default buttons:
+				https://stackoverflow.com/questions/47744440/css-selector-for-default-button-in-a-javafx-alert
+				
+		Lyric search - if they all fail, try removing all parenthesied text from song name and try again
+		
+		
+		Export playlist as a folder
+			Copy all of the music files into that folder. Prepend them with index number? 
+			Warn if the total copy is larger than X MB or more than X tracks
+			
 
+		The hack to reload the first track isn't working. Sometimes the delay is too long and the tracks aren't sync'd, so the first track plays twice
 	
-	
-	The hack to reload the first track isn't working. Sometimes the delay is too long and the tracks aren't sync'd, so the first track plays twice
-	
+		Volume Slider 
+			Slide it down to mute, then click mute button. Strange stuff happens. 
 			
+			doesn't feel right. Do some math formual instead of linear
+			in windows goes past 100%
 	
+		Bug report dialog
 	
-	Volume Slider 
-		Slide it down to mute, then click mute button. Strange stuff happens. 
+		current list play/pause images don't change colors immediately. Have to play a new track to get updateImageThemes() to call.
 		
-		doesn't feel right. Do some math formual instead of linear
-		in windows goes past 100%
-						
-	Play mounted audio cd
-		http://www.jsresources.org/examples/CddaPlayer.java.html
+		Add default sort column choice, like shuffle and repeat
+		
+		Persist column sort options
+		
+		Album list - Display disc and release type in different color font
 	
-	current list play/pause images don't change colors immediately. Have to play a new track to get updateImageThemes() to call.
+		Hide some columns
+			https://stackoverflow.com/questions/27696578/javafx8-anchoring-tableview-columns-contextmenu-immediately-below-the-the-colu
+			
+		Hover effects on transparent image buttons
+			Settings Button
+			Volume button
+		
+		Loader status % complete thing
+		
+		Put a filter on images when in light theme to make them slightly grey (or dampen the actual images).
+		
+		Tag Window, next and previous button
+			If we're looking at a single currentListTrack, add next and previous buttons and cycle through current list. That's it. 
+			
+		Dark theme for about tab settings
+			
+		Revisit fonts -- Do we need to include the font files? 
+						
+		~incomplete/Grizzly Bear
+			F2 to show tag editor, no content in table
+		
+		Hide the library table drop down
+			drag vertical divider all the way left then back to center, the drop down appears. Hide it. 
+	
+		Show something on art boxes to differentiate between artist and album, especially when drag & dropping
+	
+		Drag and drop from misc places to system
+			playlist table -> m3u
+			track table, history, queue, info windows, current table -> single tracks
+			album table -> folder
+			
+		Consistent in-program hotkeys & tab in settings window for in-program hotkeys. 
+	
 	
 	https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
 			
-	
-	Bug report dialog
-	
-	Add default sort column choice, like shuffle and repeat
-		
-	Persist column sort options
-	
-	Hide some columns
-		https://stackoverflow.com/questions/27696578/javafx8-anchoring-tableview-columns-contextmenu-immediately-below-the-the-colu
-		
-	Album list - Display disc and release type in different color font
-					
 	Tag auto fix button
 	
-	Hover effects on transparent image buttons
-		Settings Button
-		Volume button
-		
 	I don't like the way the library line wraps in the manifest. Can we make this nicer in ant? 
 	
-	Loader status % complete thing
-	
-	Put a filter on images when in light theme to make them slightly grey (or dampen the actual images).
-	
-	Tag Window, next and previous button
-		If we're looking at a single currentListTrack, add them and cycle through current list. That's it. 
-		
-	Drag and drop from misc places to system
-		playlist table -> m3u
-		track table, history, queue, info windows, current table -> single tracks
-		album table -> folder
-	
-	Consistent in-program hotkeys & tab in settings window for in-program hotkeys. 
 		
 	Ok this should address a number of issues that people have been having including this one. Please test and let me know if this issue can be closed.
 		JNativeHook-2.1.1-rc  
@@ -98,18 +131,9 @@ TODO
 		JNativeHook-2.0.4-rc  
 			https://oss.sonatype.org/content/repositories/snapshots/com/1stleg/jnativehook/2.0.SNAPSHOT/jnativehook-2.0.20170730.201637-41.jar
 
-	Hide the library table drop down
-		drag vertical divider all the way left then back to center, the drop down appears. Hide it. 
 
-	Show something on art boxes to differentiate between artist and album, especially when drag & dropping
-				
-	~incomplete/Grizzly Bear
-		F2 to show tag editor, no content in table
-		
-	Dark theme for about tab settings
-		
-	Revisit fonts -- Do we need to include the font files? 
-	
+
+
 	
 JavaFX stuff
 		
@@ -149,6 +173,9 @@ Refactor / organize my code.
 	Move all the file browser calls into a single function
 
 Decoders
+
+	Play mounted audio cd
+		http://www.jsresources.org/examples/CddaPlayer.java.html
 
 	Trying to play back https://archive.org/download/testmp3testfile/mpthreetest.mp3 using 
 	http://hypnosplayer.org/download/beta1/Hypnos-nix-64bit-beta1.AppImage on Xubuntu 16.04 gives a very high-pitch voice, not how it should sound.

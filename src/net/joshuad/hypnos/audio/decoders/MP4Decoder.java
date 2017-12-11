@@ -36,7 +36,6 @@ public class MP4Decoder extends AbstractDecoder {
 	
 	@Override
 	public void closeAllResources () {
-		audioOutput.stop();
 		audioOutput.close();
 		
 		if ( input != null ) {

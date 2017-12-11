@@ -64,7 +64,7 @@ public abstract class AbstractDecoder {
 	public boolean volumeChangeSupported() {
 		
 		if ( audioOutput == null ) {
-			return false;
+			return true;
 		}
 		
 		boolean volumeSupported = true, masterGainSupported = true;
@@ -89,7 +89,11 @@ public abstract class AbstractDecoder {
 		
 	
 	public long getPositionMS() {
-		return (long)( audioOutput.getMicrosecondPosition() / 1e3 ) + clipStartTimeMS;
+		if ( audioOutput != null ) {
+			return (long)( audioOutput.getMicrosecondPosition() / 1e3 ) + clipStartTimeMS;
+		} else {
+			return 0;
+		}
 	}
 	
 	public Track getTrack () {
@@ -118,7 +122,7 @@ public abstract class AbstractDecoder {
 				return 1;
 			}
 		} catch ( Exception e ) {
-			LOGGER.info ( "Unable to get volume percent, assuming 100%: " + track.getFilename() );
+			LOGGER.info ( "Unable to get volume percent, assuming 100%"  );
 			return 1;
 		}
 	}

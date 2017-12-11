@@ -146,7 +146,6 @@ public class MP3Decoder extends AbstractDecoder {
 			Header header = encodedInput.readFrame();
 			
 			if ( header == null ) {
-				closeAllResources();
 				return true; 
 			}
 
