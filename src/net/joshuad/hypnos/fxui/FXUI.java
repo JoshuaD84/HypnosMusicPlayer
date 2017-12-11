@@ -45,6 +45,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -3997,9 +3998,19 @@ public class FXUI implements PlayerListener {
 	}
 
 	public void showMainWindow() {
+		
+		Rectangle2D screenSize = javafx.stage.Screen.getPrimary().getVisualBounds();
 
+		if ( !mainStage.isMaximized() && mainStage.getWidth() > screenSize.getWidth() ) {
+			mainStage.setWidth( screenSize.getWidth() * .8f );
+		}
+		
+		if ( !mainStage.isMaximized() && mainStage.getHeight() > screenSize.getHeight() ) {
+			mainStage.setHeight( screenSize.getHeight() * .8f );
+		}
+		
 		mainStage.show();
-	
+		
 		// This stuff has to be done after setScene
 		StackPane thumb = (StackPane) trackPositionSlider.lookup( ".thumb" );
 		thumb.setVisible( false );
