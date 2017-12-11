@@ -18,33 +18,6 @@ TODO
 			
 		Library load and unload time
 	
-	Playback Engine
-		Maybe don't start the player thread until the very end. It's starting kinda early and looping. May be delaying start up time
-		
-		Program occasionally locks in decoders.closeAllResources() -> audioOutput.close(). 
-			Information gathered:
-				audioOutput.stop() could cause the problem, but was an unnecessary call, so I removed it. 
-					Will this cause problems when I have a pool? Won't I have to call stop on the lines
-					
-				Guaranteeing that 2 or 5 frames play through the line before closing reduces the problem significantly
-				but I was still able to generate a freeze by going crazy on the UI
-				
-				There were other bugs in my loop thread with stopRequested and state causing similar freezes, but I fixed those.
-				
-				If I cause a stop in one program and then launch another completely separate program, it also locks, but in a different place
-					I didn't confirm 100%, but I'm pretty sure it's at Decoder.openStreamsAt() -> audioOutput.open()
-					
-				I should be able to write a pretty simple proof of bug. Putting anything else aside, I should do that and post it around.
-					AudioFormat outputFormat = new AudioFormat ( 44100, 16, 2, true, false ); 
-					DataLine.Info datalineInfo = new DataLine.Info( SourceDataLine.class, outputFormat );
-					SourceDataLine audioOutput = (SourceDataLine) AudioSystem.getLine( datalineInfo );
-					audioOutput.open( outputFormat );
-			
-			Plan: 
-				Setup a pool for line outs, spawn new ones as needed, and pull from the pool when you can.
-				Keep track of how many could potentially get open. How many is too many? 
-	
-		
 	UI
 	
 		Library Source Directories - highlight in red if they are missing. 
