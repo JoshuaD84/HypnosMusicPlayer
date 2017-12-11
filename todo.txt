@@ -89,6 +89,18 @@ TODO
 	Show images in tag window
 		Allow the deletion of embedded images
 		https://stackoverflow.com/questions/17067481/javafx-2-tableview-different-cell-factory-depending-on-the-data-inside-the-cel
+		
+		
+		Album:
+			artwork.getPictureType() == 3  //ID3 COVER_FRONT
+			artwork.getPictureType() == 0  //ID3 OTHER
+			artwork.getPictureType() == 6  //ID3 MEDIA
+			
+		Artist:
+			artwork.getPictureType() == 8  //ID3 ARTIST
+			artwork.getPictureType() == 7  //ID3 LEAD_ARTIST
+			artwork.getPictureType() == 12 //ID3 ILLUSTRATION
+			artwork.getPictureType() == 13 //ID3 BAND/ARTIST LOGO TYPEt
 
 	Library load and unload time
 		

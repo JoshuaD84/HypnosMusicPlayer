@@ -75,6 +75,8 @@ public class TagWindow extends Stage {
 		tagColumn = new TableColumn( "Tag" );
 		valueColumn = new TableColumn( "Value" );
 		
+		tagColumn.setStyle( "-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold; -fx-padding: 0 10 0 0; ");
+		
 		tagColumn.setMaxWidth( 350000 );
 		valueColumn.setMaxWidth( 650000 );
 		valueColumn.setEditable( true );
@@ -158,7 +160,7 @@ public class TagWindow extends Stage {
 			if ( tracks != null ) {
 				for ( Track track : tracks ) {
 					track.updateTagsAndSave( tagPairs );
-					ui.library.addTrack( track ); //This just causes the track to be updated, probably should rename the function
+					ui.library.addTrack( track ); //TODO: This just causes the track to be updated, probably should rename the function
 				}
 			}
 			

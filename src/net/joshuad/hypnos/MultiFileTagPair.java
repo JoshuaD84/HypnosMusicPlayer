@@ -3,7 +3,7 @@ package net.joshuad.hypnos;
 import org.jaudiotagger.tag.FieldKey;
 
 public class MultiFileTagPair {
-		
+	
 	private FieldKey key;
 	private String value;
 	private boolean multiValue = false;
@@ -29,7 +29,13 @@ public class MultiFileTagPair {
 	}
 	
 	public String getTagName () {
-		return key.toString();
+		String retMe = key.toString();
+		
+		if ( key == FieldKey.TRACK ) retMe = "TRACK NUMBER";
+		else if ( key == FieldKey.DISC_NO ) retMe = "DISC NUMBER";
+		else if ( key == FieldKey.MUSICBRAINZ_RELEASE_TYPE ) retMe = "RELEASE TYPE";
+		
+		return retMe.replaceAll( "_", " " );
 	}
 	
 	public FieldKey getKey() {
