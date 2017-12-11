@@ -810,11 +810,10 @@ public class Track implements Serializable {
 		}
 		if ( artworkList != null ) {
 			try {
-				
 				artworkList = getAudioFile().getTag().getArtworkList();
 				if ( artworkList != null ) {
 					for ( Artwork artwork : artworkList ) {
-						if ( artwork.getPictureType() == 3 ) {	
+						if ( artwork.getPictureType() == 3 ) {	//see ID3 specification for why 3
 							Image coverImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
 							if ( coverImage != null ) return coverImage;
 						} 
