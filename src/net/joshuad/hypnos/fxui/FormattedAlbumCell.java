@@ -71,7 +71,10 @@ public class FormattedAlbumCell extends TableCell <AlbumInfoSource, String> {
 			if ( discSubtitle != null && !discSubtitle.equals( "" ) ) {
 				albumDisc.setText(  " (" + discSubtitle + ")" );
 				
-			} else if ( ( discCount == null || discCount > 1 ) && discNumber != null ) {
+			} else if ( discCount == null && discNumber != null && discNumber > 1 ) {
+				albumDisc.setText(  " (Disc " + discNumber + ")" );
+				
+			} else if ( discCount != null && discCount > 1 && discNumber != null ) {
 				albumDisc.setText(  " (Disc " + discNumber + ")" );
 				
 			} else {

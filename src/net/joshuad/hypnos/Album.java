@@ -42,7 +42,7 @@ public class Album implements Serializable, AlbumInfoSource {
 	
 	public String getAlbumArtist () {
 		if ( tracks.size() == 0 || tracks.get( 0 ) == null ) {
-			return "Unknown"; //TODO: Maybe cache the info
+			return null; //TODO: Maybe cache the info
 		} else {
 			return tracks.get( 0 ).getAlbumArtist();
 		}
@@ -51,7 +51,7 @@ public class Album implements Serializable, AlbumInfoSource {
 	
 	public String getYear () {
 		if ( tracks.size() == 0 || tracks.get( 0 ) == null ) {
-			return "Unknown"; //TODO: Maybe cache the info
+			return null; //TODO: Maybe cache the info
 		} else {
 			return tracks.get( 0 ).getYear();
 		}
@@ -59,7 +59,7 @@ public class Album implements Serializable, AlbumInfoSource {
 	
 	public String getAlbumTitle () {
 		if ( tracks.size() == 0 || tracks.get( 0 ) == null ) {
-			return "Unknown"; //TODO: Maybe cache the info
+			return null; //TODO: Maybe cache the info
 		} else {
 			return tracks.get( 0 ).getAlbumTitle();
 		}
@@ -67,7 +67,7 @@ public class Album implements Serializable, AlbumInfoSource {
 	
 	public String getFullAlbumTitle () {
 		if ( tracks.size() == 0 || tracks.get( 0 ) == null ) {
-			return "Unknown"; //TODO: Maybe cache the info
+			return null; //TODO: Maybe cache the info
 		} else {
 			return tracks.get( 0 ).getFullAlbumTitle();
 		}
@@ -75,7 +75,7 @@ public class Album implements Serializable, AlbumInfoSource {
 	
 	public Integer getDiscNumber() {
 		if ( tracks.size() == 0 || tracks.get( 0 ) == null ) {
-			return 0; //TODO: Maybe cache the info
+			return null; //TODO: Maybe cache the info
 		} else {
 			return tracks.get( 0 ).getDiscNumber();
 		}
@@ -83,7 +83,7 @@ public class Album implements Serializable, AlbumInfoSource {
 	
 	public Integer getDiscCount() {
 		if ( tracks.size() == 0 || tracks.get( 0 ) == null ) {
-			return 0; //TODO: Maybe cache the info
+			return null; //TODO: Maybe cache the info
 		} else {
 			return tracks.get( 0 ).getDiscCount();
 		}
@@ -91,7 +91,7 @@ public class Album implements Serializable, AlbumInfoSource {
 	
 	public String getReleaseType () {
 		if ( tracks.size() == 0 || tracks.get( 0 ) == null ) {
-			return "Unknown"; //TODO: Maybe cache the info
+			return null; //TODO: Maybe cache the info
 		} else {
 			return tracks.get( 0 ).getReleaseType();
 		}
@@ -99,7 +99,7 @@ public class Album implements Serializable, AlbumInfoSource {
 	
 	public String getDiscSubtitle () {
 		if ( tracks.size() == 0 || tracks.get( 0 ) == null ) {
-			return ""; //TODO: Maybe cache the info
+			return null; //TODO: Maybe cache the info
 		} else {
 			return tracks.get( 0 ).getDiscSubtitle();
 		}
@@ -107,7 +107,7 @@ public class Album implements Serializable, AlbumInfoSource {
 	
 	public String getTitle () {
 		if ( tracks.size() == 0 || tracks.get( 0 ) == null ) {
-			return "Unknown"; //TODO: Maybe cache the info
+			return null; //TODO: Maybe cache the info
 		} else {
 			return tracks.get( 0 ).getTitle();
 		}
