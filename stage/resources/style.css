@@ -20,9 +20,9 @@
    -fx-text-fill: grey;
 }
 
-.file-missing {
-	-fx-text-fill: firebrick;
-	-fx-text-background-color: firebrick;
+.file-missing, .file-missing .tableAlbumName, .file-missing .tableAlbumDisc, .file-missing .tableAlbumType {
+	-fx-text-fill: hsb(0, 81%, 70%);
+	-fx-text-background-color: hsb(0, 81%, 70%);
 }
 
 .settingsButton {
