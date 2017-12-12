@@ -240,17 +240,13 @@ public class FXUI implements PlayerListener {
 	
 	private boolean isDarkTheme = false;
 	
-	private ColorAdjust darkThemeTransportButtons = new ColorAdjust(); 
-	
-	{
+	private ColorAdjust darkThemeTransportButtons = new ColorAdjust(); {
 		darkThemeTransportButtons.setSaturation( -1 );
 		darkThemeTransportButtons.setHue( 1 );
 		darkThemeTransportButtons.setBrightness( .55 );
 	}
 	
-	private ColorAdjust darkThemeButtons = new ColorAdjust(); 
-	
-	{
+	private ColorAdjust darkThemeButtons = new ColorAdjust(); {
 		darkThemeButtons.setSaturation( -1 );
 		darkThemeButtons.setHue( 1 );
 		darkThemeButtons.setBrightness( .75 );

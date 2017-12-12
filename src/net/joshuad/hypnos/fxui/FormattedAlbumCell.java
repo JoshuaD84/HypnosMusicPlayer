@@ -3,6 +3,7 @@ package net.joshuad.hypnos.fxui;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
+import javafx.scene.control.TableRow;
 import javafx.scene.text.TextFlow;
 import net.joshuad.hypnos.AlbumInfoSource;
 
@@ -29,22 +30,27 @@ public class FormattedAlbumCell extends TableCell <AlbumInfoSource, String> {
 			}
 		};
 
-		//setContentDisplay( ContentDisplay.GRAPHIC_ONLY );
+		setContentDisplay( ContentDisplay.GRAPHIC_ONLY );
 		setGraphic( flow );
 		flow.setMinWidth( Double.MAX_VALUE );
 	}
-
+	
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void updateItem ( String text, boolean empty ) {
-		
 		super.updateItem( text, empty );
-		if ( empty || text == null ) {
+		
+		TableRow <AlbumInfoSource> row = this.getTableRow();
+		AlbumInfoSource item = null;
+		
+		if ( row != null ) item = row.getItem();
+		
+		if ( empty || text == null || row == null || item == null ) {
 			albumName.setText ( "" );
 			albumType.setText ( "" );
 			albumDisc.setText ( "" );
 			this.setText ( "" );
 		} else {
-			AlbumInfoSource item = (AlbumInfoSource)this.getTableRow().getItem();
 			String title = item.getAlbumTitle();
 			String releaseType = item.getReleaseType();
 			String discSubtitle = item.getDiscSubtitle();
