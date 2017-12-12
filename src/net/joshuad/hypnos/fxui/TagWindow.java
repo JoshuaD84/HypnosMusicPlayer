@@ -40,6 +40,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -49,6 +52,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import net.joshuad.hypnos.Album;
+import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.MultiFileImageTagPair;
 import net.joshuad.hypnos.MultiFileImageTagPair.ImageFieldKey;
 import net.joshuad.hypnos.MultiFileTextTagPair;
@@ -75,7 +79,7 @@ public class TagWindow extends Stage {
 	final ObservableList <MultiFileTextTagPair> textTagPairs = FXCollections.observableArrayList();
 	final ObservableList <MultiFileImageTagPair> imageTagPairs = FXCollections.observableArrayList();
 	
-	HBox controlPanel = new HBox();
+	BorderPane controlPanel = new BorderPane();
 	
 	TableColumn textTagColumn;
 	TableColumn textValueColumn;
@@ -83,6 +87,9 @@ public class TagWindow extends Stage {
 	TableColumn imageTagColumn;
 	TableColumn imageValueColumn;
 	TableColumn imageDeleteColumn;
+	
+	Button previousButton;
+	Button nextButton;
 	
 	FXUI ui;
 	
@@ -132,10 +139,6 @@ public class TagWindow extends Stage {
 		textTagPane.getChildren().addAll( textTagTable );
 		textTagTable.prefHeightProperty().bind( textTagPane.heightProperty() );
 		textTagTable.prefWidthProperty().bind( textTagPane.widthProperty() );
-		
-		
-		
-		
 		
 		VBox imageTagPane = new VBox();
 		
@@ -355,6 +358,17 @@ public class TagWindow extends Stage {
 		primaryPane.prefWidthProperty().bind( root.widthProperty() );
 		primaryPane.prefHeightProperty().bind ( root.heightProperty() );
 		
+		scene.addEventFilter( KeyEvent.KEY_PRESSED, new EventHandler <KeyEvent>() {
+			@Override
+			public void handle ( KeyEvent t ) {
+				if ( t.getCode() == KeyCode.RIGHT && t.isControlDown() ) {
+					nextButton.fire();
+				} else if ( t.getCode() == KeyCode.LEFT && t.isControlDown() ) {
+					previousButton.fire();
+				}
+			}
+		});
+
 		setScene( scene );
 	}
 	
@@ -363,9 +377,9 @@ public class TagWindow extends Stage {
 		Button revertButton = new Button ( "Revert" );
 		Button cancelButton = new Button ( "Cancel" );
 		
-		saveButton.setPrefWidth( 100 );
-		revertButton.setMinWidth( 100 );
-		cancelButton.setMinWidth( 100 );
+		saveButton.setPrefWidth( 80 );
+		revertButton.setMinWidth( 80 );
+		cancelButton.setMinWidth( 80 );
 		
 		saveButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -389,18 +403,80 @@ public class TagWindow extends Stage {
 				stage.hide();
 			}
 		});
-
-		controlPanel.setAlignment( Pos.CENTER );
-		controlPanel.getChildren().addAll ( cancelButton, revertButton, saveButton );
+		
+		previousButton = new Button ( "< Save & Prev" );
+		previousButton.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent e ) {
+				saveCurrentTags();
+				loadAtOffset ( -1 );
+			}
+		});
+		
+		nextButton = new Button ( "Save & Next >" );
+		nextButton.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent e ) {
+				saveCurrentTags();
+				loadAtOffset ( 1 );
+			}
+		});
+		
+		
+		
+		HBox centerPanel = new HBox();
+		centerPanel.getChildren().addAll ( cancelButton, revertButton, saveButton );
+		centerPanel.setAlignment( Pos.CENTER );
+		
+		controlPanel.setCenter ( centerPanel );
+		controlPanel.setLeft ( previousButton );
+		controlPanel.setRight ( nextButton );
 		controlPanel.prefWidthProperty().bind( this.widthProperty() );
 		controlPanel.setPadding( new Insets( 5 ) );
 	}
+	
+	private void loadAtOffset ( int offset ) {
+		if ( albums != null ) {
+			List <Album> albumList = ui.library.getAlbumsSorted();
+			if ( albumList == null || albumList.size() == 0 ) return;
+			int thisIndex = albumList.indexOf( albums.get ( 0 ) );
+			int targetIndex = 0;
+			if ( thisIndex != -1 ) targetIndex = ( thisIndex + albumList.size() + offset ) % albumList.size();
+			FieldKey[] hidden = hiddenTextTagsList == null ? null : hiddenTextTagsList.toArray( new FieldKey[hiddenTextTagsList.size()] );
+			Album nextAlbum = albumList.get( targetIndex );
+			if ( nextAlbum != null ) setTracks ( nextAlbum.getTracks(), Arrays.asList( nextAlbum ), hidden ); 
+			
+		} else if ( tracks != null && tracks.get( 0 ) instanceof CurrentListTrack ) { 
+			List <CurrentListTrack> currentList = ui.player.getCurrentList().getItems();
+			if ( currentList == null || currentList.size() == 0 ) return;
+			int thisIndex = currentList.indexOf( tracks.get ( 0 ) );
+			int targetIndex = 0;
+			if ( thisIndex != -1 ) targetIndex = ( thisIndex + currentList.size() + offset ) % currentList.size();
+			FieldKey[] hidden = hiddenTextTagsList == null ? null : hiddenTextTagsList.toArray( new FieldKey[hiddenTextTagsList.size()] );
+			Track nextTrack = currentList.get( targetIndex );
+			if ( nextTrack != null ) setTracks ( Arrays.asList( nextTrack ), albums, hidden ); 
+			
+		} else { 
+			List <Track> trackList = ui.library.getTracksSorted();
+			if ( trackList == null || trackList.size() == 0 ) return;
+			int thisIndex = trackList.indexOf( tracks.get ( 0 ) );
+			int targetIndex = 0;
+			if ( thisIndex != -1 ) targetIndex = ( thisIndex + trackList.size() + offset ) % trackList.size();
+			FieldKey[] hidden = hiddenTextTagsList == null ? null : hiddenTextTagsList.toArray( new FieldKey[hiddenTextTagsList.size()] );
+			Track nextTrack = trackList.get( targetIndex );
+			if ( nextTrack != null ) setTracks ( Arrays.asList( nextTrack ), albums, hidden ); 
+		}
+	}
 
 	private void saveCurrentTags() {
+		List <Track> saveMe = tracks;
+		List <MultiFileTextTagPair> saveMeTextPairs = new ArrayList <>( textTagPairs );
+		List <MultiFileImageTagPair> saveMeImagePairs = new ArrayList <>( imageTagPairs );
+		
 		Thread saverThread = new Thread( () -> {
-			if ( tracks != null ) {
-				for ( Track track : tracks ) {
-					track.updateTagsAndSave( textTagPairs, imageTagPairs, ui.player );
+			if ( saveMe != null ) {
+				for ( Track track : saveMe ) {
+					track.updateTagsAndSave( saveMeTextPairs, saveMeImagePairs, ui.player );
 					ui.library.addTrack( track ); //TODO: This just causes the track to be updated, probably should rename the function
 				}
 			}
@@ -424,8 +500,27 @@ public class TagWindow extends Stage {
 		this.hiddenTextTagsList = Arrays.asList( hiddenTags );
 		this.tracks = tracks;
 		this.albums = albumsToRefresh;
-
+		
 		if ( tracks.size() <= 0 ) return;
+		
+		if ( tracks.size() == 1 ) {
+			previousButton.setDisable( false );
+			nextButton.setDisable ( false );
+			previousButton.setVisible( true );
+			nextButton.setVisible( true );
+			
+		} else if ( albums != null && albums.size() == 1 ) {
+			previousButton.setDisable( false );
+			nextButton.setDisable ( false );
+			previousButton.setVisible( true );
+			nextButton.setVisible( true );
+			
+		} else {
+			previousButton.setDisable( true );
+			nextButton.setDisable ( true );
+			previousButton.setVisible( false );
+			nextButton.setVisible( false );
+		}
 		
 		try {
 			
