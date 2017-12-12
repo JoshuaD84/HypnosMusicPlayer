@@ -31,14 +31,14 @@ public class FormattedAlbumCell extends TableCell <AlbumInfoSource, String> {
 		};
 
 		setContentDisplay( ContentDisplay.GRAPHIC_ONLY );
-		setGraphic( flow );
 		flow.setMinWidth( Double.MAX_VALUE );
+		setGraphic ( flow );
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void updateItem ( String text, boolean empty ) {
-		super.updateItem( text, empty );
+		super.updateItem ( text, empty );
 		
 		TableRow <AlbumInfoSource> row = this.getTableRow();
 		AlbumInfoSource item = null;
@@ -49,29 +49,31 @@ public class FormattedAlbumCell extends TableCell <AlbumInfoSource, String> {
 			albumName.setText ( "" );
 			albumType.setText ( "" );
 			albumDisc.setText ( "" );
-			this.setText ( "" );
+			this.setText ( null );
+			
 		} else {
 			String title = item.getAlbumTitle();
 			String releaseType = item.getReleaseType();
 			String discSubtitle = item.getDiscSubtitle();
 			Integer discCount = item.getDiscCount();
 			Integer discNumber = item.getDiscNumber();
-
+			
 			this.setText ( text );
 			
 			albumName.setText( title );
 			
-			if ( !releaseType.equals( "" ) ) {
+			if ( releaseType != null && !releaseType.equals( "" ) ) {
 				albumType.setText ( " [" + releaseType + "]" );
 			} else {
 				albumType.setText( "" );
 			}
 			
-			if ( !discSubtitle.equals( "" ) ) {
+			if ( discSubtitle != null && !discSubtitle.equals( "" ) ) {
 				albumDisc.setText(  " (" + discSubtitle + ")" );
 				
 			} else if ( ( discCount == null || discCount > 1 ) && discNumber != null ) {
 				albumDisc.setText(  " (Disc " + discNumber + ")" );
+				
 			} else {
 				albumDisc.setText( "" );
 			}
