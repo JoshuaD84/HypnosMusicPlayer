@@ -22,15 +22,14 @@ TODO
 	UI
 		tracks with missing files are removed from the current list if you close and reopen hypnos. They should stay
 		
-		
+		Double click an album to play it, hit stop. The playing indicator stays. Double click the track, hit stop. it doesn't stay. Fix. 
+				
 		Sorting
 			Table sort on Album (Disc 9) Album (Disc 10) is wrong - See Radiohead Towering above the rest
 			http://www.davekoelle.com/alphanum.html
 			
 			Track Table Sort by - Is currently sorting by letter instead of by number.
-			
-		Track Table - Maybe only show simple album name
-				
+							
 		Library Source Directories - highlight in red if they are missing. 
 		
 		Overwite a playlist -> Get prompted -> Select "Yes" to save -> Hit cancel on the next dialog -> Thing is overwritten. Instead cancel the change.
@@ -42,13 +41,10 @@ TODO
 		Export playlist as a folder
 			Copy all of the music files into that folder. Prepend them with index number? 
 			Warn if the total copy is larger than X MB or more than X tracks
-
-		The hack to reload the first track isn't working. Sometimes the delay is too long and the tracks aren't sync'd, so the first track plays twice
 	
 		Volume Slider 
 			Slide it down to mute, then click mute button. Strange stuff happens. 
-			
-			doesn't feel right. Do some math formual instead of linear
+			doesn't feel right. Do some math formula instead of linear
 			in windows goes past 100%
 	
 		Bug report dialog
@@ -58,15 +54,14 @@ TODO
 		Add default sort column choice, like shuffle and repeat
 		
 		Persist column sort options
-		
-		Album list - Display disc and release type in different color font
-	
+			
 		Hide some columns
 			https://stackoverflow.com/questions/27696578/javafx8-anchoring-tableview-columns-contextmenu-immediately-below-the-the-colu
 			
 		Hover effects on transparent image buttons
 			Settings Button
 			Volume button
+			https://stackoverflow.com/questions/47765228/is-it-possible-to-set-tthe-hsv-for-a-color-adjust-via-css
 		
 		Loader status % complete thing
 		

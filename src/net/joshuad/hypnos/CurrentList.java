@@ -535,8 +535,6 @@ public class CurrentList {
 		setTracks ( addMe );
 		albumsSet ( albums );
 		
-		Hypnos.getLibrary().albumsToUpdate.addAll( albums ); //REFACTOR: pass library in at constructor rather than calling Hypnos.get
-		
 		if ( missing.size() > 0 ) {
 			Hypnos.warnUserAlbumsMissing ( missing );
 		}
@@ -845,5 +843,28 @@ public class CurrentList {
 
 		notifyListenersStateChanged();
 	}
+
+	public void setAndPlayAlbum ( Album album ) {
+		setAndPlayAlbums( Arrays.asList( album ) );
+	}
+	
+	public void setAndPlayAlbums ( List <Album> albums ) {
+		setAlbums( albums );
+		player.next( false );
+		Hypnos.getLibrary().albumsToUpdate.addAll( albums );  //TODO: pass library in don't call Hypnos.get()
+	}
+	
+	public void setAndPlayPlaylist ( Playlist playlist ) {
+		setAndPlayPlaylists( Arrays.asList( playlist ) );
+	}
+
+	public void setAndPlayPlaylists ( List <Playlist> playlists ) {
+		setPlaylists( playlists );
+		player.next( false );
+		//Hypnos.getLibrary().albumsToUpdate.addAll( playlists );  //TODO: update the playlist from disc?
+		
+	}
+
+	
 	
 }

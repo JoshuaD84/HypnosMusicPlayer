@@ -56,6 +56,7 @@ public class AudioPlayer {
 		while ( true ) {
 			try {
 				if ( state != PlayState.STOPPED && stopRequested ) {
+					track = null;
 					state = PlayState.STOPPED;
 					AbstractDecoder closeMe = decoder;
 					decoder = null;
@@ -67,6 +68,7 @@ public class AudioPlayer {
 				if ( trackRequested != null ) {
 					
 					Track currentRequest = trackRequested;
+					track = currentRequest;
 					trackRequested = null;
 					
 					if ( decoder != null ) {
@@ -94,6 +96,7 @@ public class AudioPlayer {
 						state = PlayState.STOPPED;
 						controller.playerStopped( StopReason.UNABLE_TO_START_TRACK );
 					}
+					
 				} 
 
 				if ( volumeErrorRequested ) {
@@ -244,8 +247,8 @@ public class AudioPlayer {
 	}
 		
 	public Track getTrack() {
-		if ( isStopped() ) {
-			return null;
+		if ( trackRequested != null ) { 
+			return trackRequested;
 		} else {
 			return track;
 		}

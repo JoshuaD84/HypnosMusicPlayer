@@ -2609,8 +2609,7 @@ public class FXUI implements PlayerListener {
 		
 		playMenuItem.setOnAction( event -> {
 			if ( okToReplaceCurrentList() ) {
-				player.getCurrentList().setAlbums( albumTable.getSelectionModel().getSelectedItems() );
-				player.next( false );
+				player.getCurrentList().setAndPlayAlbums( albumTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 
@@ -2701,11 +2700,8 @@ public class FXUI implements PlayerListener {
 
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					boolean doOverwrite = okToReplaceCurrentList();
-					
-					if ( doOverwrite ) {
-						player.getCurrentList().setAlbum( row.getItem() );
-						player.next( false );
+					if ( okToReplaceCurrentList() ) {
+						player.getCurrentList().setAndPlayAlbum( row.getItem() );
 					}
 				}
 			} );
@@ -3109,8 +3105,7 @@ public class FXUI implements PlayerListener {
 
 		playMenuItem.setOnAction( ( ActionEvent event ) -> {
 			if ( okToReplaceCurrentList() ) {
-				player.getCurrentList().setPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
-				player.next( false );
+				player.getCurrentList().setAndPlayPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 
@@ -3273,8 +3268,7 @@ public class FXUI implements PlayerListener {
 				if ( event.getClickCount() == 2 && !row.isEmpty() ) {
 					boolean doOverwrite = okToReplaceCurrentList();
 					if ( doOverwrite ) {
-						player.getCurrentList().setPlaylist( row.getItem() );
-						player.next( false );
+						player.getCurrentList().setAndPlayPlaylist( row.getItem() );
 					}
 				}
 			});

@@ -102,13 +102,11 @@ public class AudioSystem {
 	}
 	
 	public void stop ( StopReason reason ) {
-		//if ( player != null ) { Can't we assume player isn't null?  2017/09/20 I removed this. JDH
-			Track track = player.getTrack();
-			if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( false );
-			player.requestStop();
+		Track track = player.getTrack();
+		if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( false );
+		player.requestStop();
 
-			notifyListenersStopped( player.getTrack(), reason ); 
-		//}
+		notifyListenersStopped( track, reason ); 
 		
 		shuffleTracksPlayedCounter = 0;
 	}

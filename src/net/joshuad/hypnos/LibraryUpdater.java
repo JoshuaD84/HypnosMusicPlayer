@@ -147,25 +147,16 @@ public class LibraryUpdater {
 											//TODO: handle this when we have multiple discs loaded
 											if ( currentListAlbums.size() == 1 && updateMe.equals( currentListAlbums.get( 0 ) ) ) {
 												
-												//There is a small window where we need to let the UI thread start playing the new album
-												//So we get an accurate currentTrack, so we give it a little time
-												//This is definitely a hack, but it works just fine. 
-												Thread.sleep( 100 ); 
-												
-												Track currentTrack = null;
 												Track currentArtImages = ui.getCurrentImagesTrack();
 												List <CurrentListTrack> selectedItems = new ArrayList<> ( ui.getSelectedTracks() );
 												
-												if ( !player.isStopped() ) {
-													currentTrack = player.getCurrentTrack();
-												}
+												Track currentTrack = player.getCurrentTrack();
 												
 												player.getCurrentList().setAlbum( updateMe );
+												library.albumsToUpdate.remove( updateMe ); //prevent an infinite loop
 												
 												ui.setImages( currentArtImages );
 												ui.setSelectedTracks ( selectedItems );
-												
-												library.albumsToUpdate.remove( updateMe ); //prevent an infinite loop
 												
 												if ( currentTrack != null ) {
 													for ( CurrentListTrack currentListTrack : player.getCurrentList().getItems() ) {
