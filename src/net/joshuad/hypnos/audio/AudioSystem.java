@@ -102,11 +102,15 @@ public class AudioSystem {
 	}
 	
 	public void stop ( StopReason reason ) {
-		Track track = player.getTrack();
-		if ( track instanceof CurrentListTrack ) ((CurrentListTrack)track).setIsCurrentTrack( false );
-		player.requestStop();
+		Track stoppedTrack = player.getTrack();
 
-		notifyListenersStopped( track, reason ); 
+		player.requestStop();
+		
+		for ( CurrentListTrack track : currentList.getItems() ) {
+			track.setIsCurrentTrack( false );
+		}
+
+		notifyListenersStopped( stoppedTrack, reason ); 
 		
 		shuffleTracksPlayedCounter = 0;
 	}
