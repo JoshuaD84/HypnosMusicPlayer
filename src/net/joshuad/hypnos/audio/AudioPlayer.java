@@ -35,15 +35,19 @@ public class AudioPlayer {
 	Track track;
 
 	private double volumePercent = 1;
+	Thread playerThread;
 	
 	public AudioPlayer( AudioSystem controller ) {
 		this.controller = controller;
 		
-		Thread playerThread = new Thread ( () -> {
+		playerThread = new Thread ( () -> {
 			runPlayerThread();
 		});
 		
 		playerThread.setDaemon( true );
+	}
+	
+	public void start() {
 		playerThread.start();
 	}
 	

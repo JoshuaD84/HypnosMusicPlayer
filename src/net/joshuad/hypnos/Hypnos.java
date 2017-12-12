@@ -690,10 +690,11 @@ public class Hypnos extends Application {
 				ui.showMainWindow();
 				persister.loadDataAfterShowWindow();
 				
+				player.start();
+				
 				applyCLICommands( commands );
-				
 				singleInstanceController.startCLICommandListener ( this );
-				
+
 				libraryUpdater.start();
 				library.startLoader( persister );
 				

@@ -71,6 +71,10 @@ public class AudioSystem {
 		currentList = new CurrentList( this, queue );
 	}
 	
+	public void start() {
+		player.start();
+	}
+	
 	public void unpause () {
 		player.requestUnpause();
 	}

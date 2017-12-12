@@ -1,8 +1,5 @@
 TODO
 
-	
-	
-	
 	Library	
 		I don't know if albums will form from tracks after they have loaded and been identified as not an album, then id3 tags edited.
 	
@@ -21,10 +18,7 @@ TODO
 			updates data and locations
 			
 		Library load and unload time
-	
-	Playback Engine
-        Maybe don't start the player thread until the very end. It's starting kinda early and looping. May be delaying start up time
-	
+		
 	UI
 		tracks with missing files are removed from the current list if you close and reopen hypnos. They should stay
 		
@@ -78,9 +72,6 @@ TODO
 		
 		Put a filter on images when in light theme to make them slightly grey (or dampen the actual images).
 		
-		Tag Window, next and previous button
-			If we're looking at a single currentListTrack, add next and previous buttons and cycle through current list. That's it. 
-						
 		Revisit fonts -- Do we need to include the font files? 
 						
 		~incomplete/Grizzly Bear
