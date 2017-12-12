@@ -929,10 +929,12 @@ public class SettingsWindow extends Stage {
 		VBox aboutPane = new VBox();
 		aboutTab.setContent( aboutPane );
 		aboutPane.setStyle( "-fx-background-color: wheat" );
+		aboutPane.getStyleClass().add( "aboutPaneBack" );
 		
 		aboutPane.setAlignment( Pos.CENTER );
 		Label name = new Label ( "Hypnos Music Player" );
 		name.setStyle( "-fx-font-size: 36px; -fx-text-fill: #020202" );
+		name.getStyleClass().add( "aboutPaneText" );
 		
 		String url = "http://www.hypnosplayer.org";
 		Hyperlink website = new Hyperlink ( url );
@@ -941,11 +943,13 @@ public class SettingsWindow extends Stage {
 			ui.openWebBrowser( url );
 		});
 		website.setStyle( "-fx-font-size: 20px; -fx-text-fill: #0A95C8" );
+		aboutPane.getStyleClass().add( "aboutPaneURL" );
 
 		Label versionNumber = new Label ( Hypnos.getVersion() + ", Build: " + Hypnos.getBuild() + "\n" + Hypnos.getBuildDate() );
 		versionNumber.setTextAlignment( TextAlignment.CENTER );
 		versionNumber.setStyle( "-fx-font-size: 16px; -fx-text-fill: #020202" );
 		versionNumber.setPadding( new Insets ( 0, 0, 20, 0 ) );
+		versionNumber.getStyleClass().add( "aboutPaneText" );
 		
 		Image image = null;
 		try {
@@ -964,6 +968,7 @@ public class SettingsWindow extends Stage {
 		authorBox.setPadding ( new Insets ( 20, 0, 0, 0 ) );
 		authorBox.setStyle( "-fx-font-size: 16px; -fx-background-color: transparent;" );
 		Label authorLabel = new Label ( "Author:" );
+		authorLabel.getStyleClass().add( "aboutPaneText" );
 		authorLabel.setStyle( "-fx-text-fill: #020202" );
 		Hyperlink authorLink = new Hyperlink ( "Joshua Hartwell" );
 		
@@ -975,6 +980,7 @@ public class SettingsWindow extends Stage {
 		authorLink.setOnAction( ( ActionEvent e ) -> {
 			ui.openWebBrowser( authorURL );
 		});
+		authorLink.getStyleClass().add( "aboutPaneURL" );
 		
 		authorBox.getChildren().addAll( authorLabel, authorLink );
 		
@@ -985,7 +991,9 @@ public class SettingsWindow extends Stage {
 		sourceBox.setStyle( "-fx-background-color: transparent" );
 		Label sourceLabel = new Label ( "Source Code:" );
 		sourceLabel.setStyle( "-fx-text-fill: #020202" );
+		sourceLabel.getStyleClass().add( "aboutPaneText" );
 		Hyperlink sourceLink = new Hyperlink ( "GitHub" );
+		sourceLink.getStyleClass().add( "aboutPaneURL" );
 
 		String githubURL = "https://github.com/JoshuaD84/HypnosMusicPlayer";
 		sourceLink.setTooltip( new Tooltip ( githubURL ) );
@@ -1003,8 +1011,10 @@ public class SettingsWindow extends Stage {
 		licenseBox.setAlignment( Pos.CENTER );
 		Label licenseLabel = new Label ( "License:" );
 		licenseLabel.setStyle( "-fx-text-fill: #020202" );
+		licenseLabel.getStyleClass().add( "aboutPaneText" );
 		Hyperlink licenseLink = new Hyperlink ( "GNU GPLv3" );
 		licenseLink.setStyle( "-fx-text-fill: #0A95C8" );
+		licenseLink.getStyleClass().add( "aboutPaneURL" );
 		
 		String gplurl = "https://www.gnu.org/licenses/gpl-3.0-standalone.html";
 		licenseLink.setTooltip ( new Tooltip ( url ) );

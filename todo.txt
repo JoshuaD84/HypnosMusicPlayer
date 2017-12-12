@@ -23,7 +23,7 @@ TODO
 	
 	UI
 		Track Table
-			Sort by - Sorts by letter isntead of by number.
+			Sort by - Is currently sorting by letter instead of by number.
 			Maybe only show simple album name
 				
 		Library Source Directories - highlight in red if they are missing. 

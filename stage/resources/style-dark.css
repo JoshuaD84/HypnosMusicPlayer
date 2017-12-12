@@ -5,7 +5,6 @@ Basic color scheme:
 	Brown: HSB ( 35, 65%, N% )
 	Magenta: HSB ( 305, 65%, N% )
 	Grey Any Value
-	
 */
 
 .root, HBox, VBox {
@@ -125,3 +124,15 @@ HBox, VBox, #transport {
 .tableAlbumType {
 	-fx-text-fill:  hsb( 215, 40%, 45% ); 
 }
+
+.aboutPaneBack {
+	-fx-background-color: HSB( 215, 65%, 15% ) !important;
+}
+
+.aboutPaneText {
+	-fx-text-fill: HSB( 0, 0%, 70% ) !important;
+}
+
+.aboutPaneURL {}
+
+
