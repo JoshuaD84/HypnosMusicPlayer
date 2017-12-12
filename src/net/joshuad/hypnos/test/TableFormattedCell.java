@@ -31,7 +31,7 @@ public class TableFormattedCell extends Application {
 			displayName.setStyle( "-fx-font-weight: bold" );
 			displayLanguage = new Label();
 			displayLanguage.setStyle( "-fx-font-style: italic; -fx-text-fill: darkviolet" );
-			flow = new TextFlow( displayName, displayLanguage );/* {
+			flow = new TextFlow( displayName, displayLanguage ) {
 
 				@Override
 				protected double computePrefHeight ( double width ) {
@@ -40,10 +40,11 @@ public class TableFormattedCell extends Application {
 					return super.computePrefHeight( -1 );
 				}
 
-			};*/
+			};
 
 			setContentDisplay( ContentDisplay.GRAPHIC_ONLY );
 			setGraphic( flow );
+			flow.setMinWidth( Double.MAX_VALUE );
 		}
 
 		@Override
@@ -57,24 +58,30 @@ public class TableFormattedCell extends Application {
 				displayLanguage.setText( item.getDisplayLanguage() );
 			}
 		}
-
 	}
 
 	private Parent getContent () {
 		TableView <Locale> table = new TableView <>( FXCollections.observableArrayList( Locale.getAvailableLocales() ) );
 		table.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
+		
 		TableColumn <Locale, String> countryCode = new TableColumn <>( "CountryCode" );
 		countryCode.setCellValueFactory( new PropertyValueFactory <>( "country" ) );
+		
 		TableColumn <Locale, String> language = new TableColumn <>( "Language" );
 		language.setCellValueFactory( new PropertyValueFactory <>( "language" ) );
 		table.getColumns().addAll( countryCode, language );
 
+		
+		
 		TableColumn <Locale, Locale> local = new TableColumn <>( "Locale" );
 		local.setCellValueFactory( c -> new SimpleObjectProperty <>( c.getValue() ) );
 		local.setCellFactory( e -> new MyCell() );
-
 		table.getColumns().addAll( local );
 
+
+		
+		
+		
 		BorderPane pane = new BorderPane( table );
 		return pane;
 	}

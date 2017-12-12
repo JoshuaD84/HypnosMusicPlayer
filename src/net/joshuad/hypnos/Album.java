@@ -10,7 +10,7 @@ import java.util.Comparator;
 
 import javafx.scene.image.Image;
 
-public class Album implements Serializable {
+public class Album implements Serializable, AlbumInfoSource {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -57,21 +57,62 @@ public class Album implements Serializable {
 		}
 	}
 	
-	public String getSimpleTitle() {
+	public String getAlbumTitle () {
 		if ( tracks.size() == 0 || tracks.get( 0 ) == null ) {
 			return "Unknown"; //TODO: Maybe cache the info
 		} else {
-			return tracks.get( 0 ).getSimpleAlbumTitle();
+			return tracks.get( 0 ).getAlbumTitle();
 		}
 	}
 	
-	public String getFullTitle () {
+	public String getFullAlbumTitle () {
 		if ( tracks.size() == 0 || tracks.get( 0 ) == null ) {
 			return "Unknown"; //TODO: Maybe cache the info
 		} else {
 			return tracks.get( 0 ).getFullAlbumTitle();
 		}
-	}		
+	}
+	
+	public Integer getDiscNumber() {
+		if ( tracks.size() == 0 || tracks.get( 0 ) == null ) {
+			return 0; //TODO: Maybe cache the info
+		} else {
+			return tracks.get( 0 ).getDiscNumber();
+		}
+	}
+	
+	public Integer getDiscCount() {
+		if ( tracks.size() == 0 || tracks.get( 0 ) == null ) {
+			return 0; //TODO: Maybe cache the info
+		} else {
+			return tracks.get( 0 ).getDiscCount();
+		}
+	}
+	
+	public String getReleaseType () {
+		if ( tracks.size() == 0 || tracks.get( 0 ) == null ) {
+			return "Unknown"; //TODO: Maybe cache the info
+		} else {
+			return tracks.get( 0 ).getReleaseType();
+		}
+	}	
+	
+	public String getDiscSubtitle () {
+		if ( tracks.size() == 0 || tracks.get( 0 ) == null ) {
+			return ""; //TODO: Maybe cache the info
+		} else {
+			return tracks.get( 0 ).getDiscSubtitle();
+		}
+	}
+	
+	public String getTitle () {
+		if ( tracks.size() == 0 || tracks.get( 0 ) == null ) {
+			return "Unknown"; //TODO: Maybe cache the info
+		} else {
+			return tracks.get( 0 ).getTitle();
+		}
+	}
+	
 	
 	public Path getPath () {
 		return directory.toPath();
@@ -107,6 +148,10 @@ public class Album implements Serializable {
 			}
 		}
 		return null;
+	}
+	
+	public Album getThis() {
+		return this;
 	}
 }
 

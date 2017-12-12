@@ -652,13 +652,13 @@ public class CurrentList {
 				Album album = albums.get( k );
 						
 				if ( !initialized ) {
-					simpleTitle = album.getSimpleTitle();
+					simpleTitle = album.getAlbumTitle();
 					year = album.getYear();
 					artist = album.getAlbumArtist();
 					initialized = true;
 					
 				} else {
-					if ( !album.getSimpleTitle().equals( simpleTitle ) 
+					if ( !album.getAlbumTitle().equals( simpleTitle ) 
 					||   !album.getAlbumArtist().equals( artist )
 					||   !album.getYear().equals( year )
 					){

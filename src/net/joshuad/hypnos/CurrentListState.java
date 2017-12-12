@@ -49,6 +49,7 @@ public class CurrentListState implements Serializable {
 		return Collections.unmodifiableList( tracks );
 	}
 	
+	//TODO: Change this to allow colors somehow
 	public String getDisplayString() {
 
 		String retMe = "";
@@ -59,11 +60,11 @@ public class CurrentListState implements Serializable {
 				
 			} else if ( albums.size() == 1 ) {
 				Album album = albums.get( 0 );
-				retMe = "Album: " + album.getAlbumArtist() + " - " + album.getYear() + " - " + album.getFullTitle();
+				retMe = "Album: " + album.getAlbumArtist() + " - " + album.getYear() + " - " + album.getFullAlbumTitle();
 				
 			} else {
 				Album album = albums.get( 0 );
-				retMe ="Album: " + album.getAlbumArtist() + " - " + album.getYear() + " - " + album.getSimpleTitle();
+				retMe ="Album: " + album.getAlbumArtist() + " - " + album.getYear() + " - " + album.getFullAlbumTitle();
 				
 			}
 			

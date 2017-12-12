@@ -30,14 +30,6 @@
    -fx-font-size: 32px;
 }
 
-.settingsButton:hover {
-   -fx-text-fill: cornflowerblue;
-}
-
-.settingsButton:pressed {
-   -fx-text-fill: grey;
-}
-
 .volumeButton {
    -fx-background-color: transparent;
 }
@@ -53,4 +45,5 @@
 .scroll-bar:horizontal { /*This selects all tables right now, probably not ideal.*/
 	-fx-font-size: .01px;
 }
+
 

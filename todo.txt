@@ -22,6 +22,10 @@ TODO
         Maybe don't start the player thread until the very end. It's starting kinda early and looping. May be delaying start up time
 	
 	UI
+		Track Table
+			Sort by - Sorts by letter isntead of by number.
+			Maybe only show simple album name
+				
 		Library Source Directories - highlight in red if they are missing. 
 		
 		Overwite a playlist -> Get prompted -> Select "Yes" to save -> Hit cancel on the next dialog -> Thing is overwritten. Instead cancel the change.
@@ -29,17 +33,12 @@ TODO
 		Make all alerts and prompts use theme
 			FXUI.promptAndSavePlaylist
 			FXUI.alertUser
-			
-			Change color on alert default buttons:
-				https://stackoverflow.com/questions/47744440/css-selector-for-default-button-in-a-javafx-alert
-				
+							
 		Lyric search - if they all fail, try removing all parenthesied text from song name and try again
-		
 		
 		Export playlist as a folder
 			Copy all of the music files into that folder. Prepend them with index number? 
 			Warn if the total copy is larger than X MB or more than X tracks
-			
 
 		The hack to reload the first track isn't working. Sometimes the delay is too long and the tracks aren't sync'd, so the first track plays twice
 	

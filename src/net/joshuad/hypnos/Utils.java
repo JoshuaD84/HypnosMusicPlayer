@@ -276,11 +276,11 @@ public class Utils {
 				if ( Utils.isMusicFile( child ) ) {
 					Track track = new Track ( child );
 					if ( albumName == null ) {
-						albumName = prepareAlbumForCompare ( track.getSimpleAlbumTitle() );
+						albumName = prepareAlbumForCompare ( track.getAlbumTitle() );
 						artistName = prepareArtistForCompare ( track.getAlbumArtist() );
 						
 					} else {
-						int albumMatchPercent = FuzzySearch.weightedRatio( albumName, prepareAlbumForCompare ( track.getSimpleAlbumTitle() ) );
+						int albumMatchPercent = FuzzySearch.weightedRatio( albumName, prepareAlbumForCompare ( track.getAlbumTitle() ) );
 						if ( albumMatchPercent < 90 ) {
 							return false;
 						}

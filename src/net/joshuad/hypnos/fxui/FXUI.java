@@ -2398,8 +2398,8 @@ public class FXUI implements PlayerListener {
 	
 					matchableText.add( Normalizer.normalize( album.getAlbumArtist(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
 					matchableText.add( album.getAlbumArtist().toLowerCase() );
-					matchableText.add( Normalizer.normalize( album.getFullTitle(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-					matchableText.add( album.getFullTitle().toLowerCase() );
+					matchableText.add( Normalizer.normalize( album.getFullAlbumTitle(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+					matchableText.add( album.getFullAlbumTitle().toLowerCase() );
 					matchableText.add( Normalizer.normalize( album.getYear(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
 					matchableText.add( album.getYear().toLowerCase() );
 	
@@ -2484,11 +2484,13 @@ public class FXUI implements PlayerListener {
 	public void setupAlbumTable () {
 		TableColumn artistColumn = new TableColumn( "Artist" );
 		TableColumn yearColumn = new TableColumn( "Year" );
-		TableColumn albumColumn = new TableColumn( "Album" );
 
 		artistColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "albumArtist" ) );
 		yearColumn.setCellValueFactory( new PropertyValueFactory <Album, Integer>( "year" ) );
-		albumColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "fullTitle" ) );
+		
+		TableColumn albumColumn = new TableColumn( "Album" );
+		albumColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "FullAlbumTitle" ) );
+		albumColumn.setCellFactory( e -> new FormattedAlbumCell() );
 
 		artistColumn.setMaxWidth( 45000 );
 		yearColumn.setMaxWidth( 10000 );
@@ -2774,6 +2776,8 @@ public class FXUI implements PlayerListener {
 		lengthColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "LengthDisplay" ) );
 		trackColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "TrackNumber" ) );
 		albumColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "fullAlbumTitle" ) );
+		
+		albumColumn.setCellFactory( f -> new FormattedAlbumCell() );
 
 		artistColumn.setSortType( TableColumn.SortType.ASCENDING );
 
@@ -3379,6 +3383,10 @@ public class FXUI implements PlayerListener {
 		titleColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "title" ) );
 		trackColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, Integer>( "trackNumber" ) );
 		lengthColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "lengthDisplay" ) );
+		
+
+		albumColumn.setCellFactory( e -> new FormattedAlbumCell() );
+		
 
 		playingColumn.setCellFactory ( column -> { 
 				return new CurrentListTrackStateCell( this, playImageSource, pauseImageSource ); 
@@ -4271,7 +4279,7 @@ public class FXUI implements PlayerListener {
 			
 			currentTrackButton.setText( track.getArtist() + " - " + track.getTitle() );
 			currentTrackTooltip.setText( 
-				"Album: " + track.getSimpleAlbumTitle() + "\n" +
+				"Album: " + track.getAlbumTitle() + "\n" +
 				"Year: " + track.getYear() + "\n" +
 				"Length: " + Utils.getLengthDisplay( track.getLengthS() ) + "\n" + 
 				"Encoding: " + track.getShortEncodingString()
@@ -4587,7 +4595,7 @@ class CurrentListTrackStateCell extends TableCell <CurrentListTrack, CurrentList
 
 		setContentDisplay ( ContentDisplay.LEFT );
 		setGraphicTextGap ( 2 );
-		this.setAlignment( Pos.CENTER_LEFT );
+		this.setAlignment( Pos.BOTTOM_LEFT );
 	}
 	
 	protected void updateImageThemes ( ) {

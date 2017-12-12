@@ -38,7 +38,7 @@ import net.joshuad.hypnos.TagError.TagErrorType;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.StopReason;
 
-public class Track implements Serializable {
+public class Track implements Serializable, AlbumInfoSource {
 	
 	private static final long serialVersionUID = 1L;
 	public static final int NO_TRACK_NUMBER = -885533;
@@ -468,16 +468,12 @@ public class Track implements Serializable {
 		}
 	}
 	
-	public String getSimpleAlbumTitle () {
+	public String getAlbumTitle () {
 		return album;
 	}
 	
 	public String getFullAlbumTitle () {
 		String retMe = album;
-		
-		if ( releaseType != null && !releaseType.equals("") && !releaseType.matches( "(?i:album)" ) ) {
-			retMe += " [" + Utils.toReleaseTitleCase( releaseType ) + "]";
-		}
 		
 		if ( discSubtitle != null && !discSubtitle.equals( "" ) ) {
 			retMe += " (" + discSubtitle + ")";
@@ -489,8 +485,32 @@ public class Track implements Serializable {
 			retMe += " (Disc " + discNumber + ")";
 		}
 		
+		if ( releaseType != null && !releaseType.equals("") && !releaseType.matches( "(?i:album)" ) ) {
+			retMe += " [" + Utils.toReleaseTitleCase( releaseType ) + "]";
+		}
+		
 		return retMe;
 	}		
+	
+	public Integer getDiscNumber() {
+		return discNumber;
+	}
+	
+	public Integer getDiscCount() {
+		return discCount;
+	}
+	
+	public String getReleaseType () {
+		if ( releaseType != null && !releaseType.matches( "(?i:album)" ) ) {
+			return Utils.toReleaseTitleCase( releaseType );
+		} else {
+			return null;
+		}
+	}
+	
+	public String getDiscSubtitle () {
+		return discSubtitle;
+	}
 	
 	public String getTitle () {
 		return title;
