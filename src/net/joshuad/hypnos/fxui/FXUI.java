@@ -2771,10 +2771,8 @@ public class FXUI implements PlayerListener {
 		titleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
 		lengthColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "LengthDisplay" ) );
 		trackColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "TrackNumber" ) );
-		albumColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "fullAlbumTitle" ) );
+		albumColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "albumTitle" ) );
 		
-		albumColumn.setCellFactory( f -> new FormattedAlbumCell() );
-
 		artistColumn.setSortType( TableColumn.SortType.ASCENDING );
 
 		artistColumn.setMaxWidth( 45000 );
