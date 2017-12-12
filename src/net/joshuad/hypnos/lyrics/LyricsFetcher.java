@@ -64,6 +64,21 @@ public class LyricsFetcher {
 			if ( !lyrics.hadScrapeError() )  break;
 		}
 		
+		if ( lyrics.hadScrapeError() ) {
+			String simplifiedTrackTitle = track.getTitle().replaceAll( " ?\\(.*\\)", "" );
+			
+			if ( !simplifiedTrackTitle.equals( track.getTitle() ) ) {
+				for ( AbstractScraper parser : parseOrder ) {
+					
+					lyrics = parser.getLyrics ( track.getAlbumArtist(), simplifiedTrackTitle );
+					if ( !lyrics.hadScrapeError() )  break;
+					
+					lyrics = parser.getLyrics ( track.getArtist(), simplifiedTrackTitle );
+					if ( !lyrics.hadScrapeError() )  break;
+				}
+			}
+		}
+	
 		return lyrics;			
 	}
 	

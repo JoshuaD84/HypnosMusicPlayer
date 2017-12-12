@@ -33,9 +33,7 @@ TODO
 		Make all alerts and prompts use theme
 			FXUI.promptAndSavePlaylist
 			FXUI.alertUser
-							
-		Lyric search - if they all fail, try removing all parenthesied text from song name and try again
-		
+									
 		Export playlist as a folder
 			Copy all of the music files into that folder. Prepend them with index number? 
 			Warn if the total copy is larger than X MB or more than X tracks
@@ -71,9 +69,7 @@ TODO
 		
 		Tag Window, next and previous button
 			If we're looking at a single currentListTrack, add next and previous buttons and cycle through current list. That's it. 
-			
-		Dark theme for about tab settings
-			
+						
 		Revisit fonts -- Do we need to include the font files? 
 						
 		~incomplete/Grizzly Bear
@@ -91,7 +87,22 @@ TODO
 			
 		Consistent in-program hotkeys & tab in settings window for in-program hotkeys. 
 	
-	
+		Stylesheet issues
+			Dec 12, 2017 00:02:44 AM javafx.css calculateValue
+			WARNING: Could not resolve '-fx-control-inner-background' while resolving lookups for '-fx-highlight-fill' from rule '*.text-input' in stylesheet jar:file:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/jfxrt.jar!/com/sun/javafx/scene/control/skin/modena/modena.bss
+			
+			Dec 12, 2017 00:02:44 AM javafx.css calculateValue
+			WARNING: Could not resolve '-fx-text-inner-color' while resolving lookups for '-fx-text-fill' from rule '*.text-input' in stylesheet jar:file:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/jfxrt.jar!/com/sun/javafx/scene/control/skin/modena/modena.bss
+			
+			Dec 12, 2017 00:02:44 AM javafx.css calculateValue
+			WARNING: Could not resolve '-fx-text-inner-color' while resolving lookups for '-fx-highlight-text-fill' from rule '*.text-input' in stylesheet jar:file:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/jfxrt.jar!/com/sun/javafx/scene/control/skin/modena/modena.bss
+			
+			Dec 12, 2017 00:02:44 AM javafx.css calculateValue
+			WARNING: Could not resolve '-fx-text-box-border' while resolving lookups for '-fx-background-color' from rule '*.text-input' in stylesheet jar:file:/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/jfxrt.jar!/com/sun/javafx/scene/control/skin/modena/modena.bss
+			
+			Dec 12, 2017 00:02:44 AM javafx.css calculateValue
+			WARNING: Could not resolve '-fx-control-inner-background' while resolving lookups for '-fx-prompt-text-fill' from rule '*.text-input' in stylesheet file:////d/programming/workspace/MusicPlayer/stage/resources/style-dark.css
+			
 	https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
 			
 	Tag auto fix button
