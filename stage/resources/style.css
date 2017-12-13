@@ -46,4 +46,8 @@
 	-fx-font-size: .01px;
 }
 
+.tab-down-button, .tab-down-button .arrow {
+	-fx-padding: 0;
+}
+
 
