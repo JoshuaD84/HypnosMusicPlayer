@@ -593,15 +593,13 @@ public class AudioSystem {
 				player.requestVolumePercent( unmutedVolume );
 				unmutedVolume = null;
 			} else { 
-				player.requestVolumePercent( 100 );
+				player.requestVolumePercent( 1 );
 			}
 		} else {
 			unmutedVolume = player.getVolumePercent();
 			player.requestVolumePercent( 0 );
 		}
 	}
-
-	
 }
 
 

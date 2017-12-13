@@ -237,7 +237,13 @@ public class AudioPlayer {
 		if ( volumePercent < 0 ) {
 			LOGGER.info( "Volume requested to be turned down below 0. Setting to 0 instead." );
 			volumePercent = 0;
+		} 
+		
+		if ( volumePercent > 1 ) {
+			LOGGER.info( "Volume requested to be more than 1 (i.e. 100%). Setting to 1 instead." );
+			volumePercent = 1;
 		}
+		
 		this.volumePercentRequested = volumePercent;
 		this.volumePercent = volumePercent;
 		
@@ -374,8 +380,12 @@ public class AudioPlayer {
 	}
 
 	public double getVolumePercent () {
-		if ( decoder != null ) {
+		if ( volumePercentRequested != NO_REQUEST ) {
+			return volumePercentRequested;
+			
+		} else if ( decoder != null ) {
 			return decoder.getVolumePercent();
+			
 		} else {
 			return volumePercent;
 		}

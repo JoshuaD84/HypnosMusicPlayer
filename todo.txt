@@ -45,7 +45,6 @@ TODO
 			Warn if the total copy is larger than X MB or more than X tracks
 	
 		Volume Slider 
-			Slide it down to mute, then click mute button. Strange stuff happens. 
 			doesn't feel right. Do some math formula instead of linear
 			in windows goes past 100%
 	
