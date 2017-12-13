@@ -1003,10 +1003,7 @@ public class FXUI implements PlayerListener {
 		volumeMuteButton.setPadding( new Insets ( 0, 5, 0, 5 ) );
 		volumeMuteButton.getStyleClass().add( "volumeButton" );
 		volumeMuteButton.setTooltip( new Tooltip ( "Toggle Mute" ) );
-		
-		volumeMuteButton.setOnAction( ( ActionEvent e ) -> {
-			player.toggleMute();
-		});
+		volumeMuteButton.setOnAction( e -> player.toggleMute() );
 		
 		volumeSlider = new Slider();
 		volumeSlider.setMin( 0 );
@@ -1016,7 +1013,6 @@ public class FXUI implements PlayerListener {
 		volumeSlider.setMinWidth( 80 );
 		volumeSlider.setTooltip( new Tooltip ( "Control Volume" ) );
 		volumeSlider.setPadding( new Insets ( 0, 10, 0, 0 ) );
-
 		
 		EventHandler<MouseEvent> volumeSliderHandler = new EventHandler<MouseEvent> () {
 			@Override
@@ -1025,7 +1021,6 @@ public class FXUI implements PlayerListener {
 				double max = volumeSlider.getMax();
 				double percent = (volumeSlider.getValue() - min) / (max - min);
 				player.setVolumePercent( percent ); //Note: this works because min is 0 
-				
 			}
 		};
 		
