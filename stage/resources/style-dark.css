@@ -42,6 +42,10 @@ HBox, VBox, #transport {
 	-fx-background-color: #111111;
 }
 
+.context-menu {
+  -fx-background-color: #2D2D2D;
+}
+
 #lyricsContainer, #lyricsContainer Text, #lyricsContainer TextFlow { 
 	-fx-background-color: rgb( 20, 20, 20 );
 	-fx-background: rgb( 20, 20, 20 );
