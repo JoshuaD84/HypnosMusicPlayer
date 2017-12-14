@@ -688,9 +688,9 @@ public class Hypnos extends Application {
 				
 				persister.loadDataBeforeShowWindow();
 				ui.showMainWindow();
+				persister.loadDataAfterShowWindow();
 				
 				Thread finishLoadingThread = new Thread ( () -> {
-					persister.loadDataAfterShowWindow();
 					player.start();
 					
 					applyCLICommands( commands );
