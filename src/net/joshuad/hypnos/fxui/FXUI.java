@@ -1622,6 +1622,13 @@ public class FXUI implements PlayerListener {
 			
 			ArtistImageSaveDialog prompt = new ArtistImageSaveDialog ( mainStage, choices );
 			
+			String darkSheet = "file:///" + darkStylesheet.getAbsolutePath().replace( "\\", "/" );
+			if ( isDarkTheme() ) {
+				prompt.getScene().getStylesheets().add( darkSheet );
+			} else {
+				prompt.getScene().getStylesheets().remove( darkSheet );
+			}
+			
 			prompt.showAndWait();
 			
 			ArtistImageSaveDialog.Choice choice = prompt.getSelectedChoice();
@@ -1850,7 +1857,8 @@ public class FXUI implements PlayerListener {
 			defaultName = player.getCurrentPlaylist().getName();
 		}
 		TextInputDialog dialog = new TextInputDialog( defaultName );
-		
+		applyCurrentTheme ( dialog );
+		setDialogIcon ( dialog );
 
 		dialog.setX( mainStage.getX() + mainStage.getWidth() / 2 - 150 );
 		dialog.setY( mainStage.getY() + mainStage.getHeight() / 2 - 100 );
@@ -1885,6 +1893,8 @@ public class FXUI implements PlayerListener {
 		dialog.setY( mainStage.getY() + mainStage.getHeight() / 2 - 100 );
 		dialog.setTitle( "Rename Playlist" );
 		dialog.setHeaderText( null );
+		applyCurrentTheme( dialog );
+		setDialogIcon( dialog );
 		Optional <String> result = dialog.showAndWait();
 		
 		if ( result.isPresent() ) {
@@ -2550,7 +2560,7 @@ public class FXUI implements PlayerListener {
 		albumTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 
 		library.getAlbumsSorted().comparatorProperty().bind( albumTable.comparatorProperty() );
-
+		
 		albumTable.getSortOrder().add( albumArtistColumn );
 		albumTable.getSortOrder().add( albumYearColumn );
 		albumTable.getSortOrder().add( albumAlbumColumn );
@@ -3255,7 +3265,8 @@ public class FXUI implements PlayerListener {
 			if ( deleteMe.size() == 0 ) return;
 			
 			Alert alert = new Alert( AlertType.CONFIRMATION );
-			alert.getDialogPane().applyCss();
+			applyCurrentTheme( alert );
+			setAlertWindowIcon( alert );
 			double x = mainStage.getX() + mainStage.getWidth() / 2 - 220; //It'd be nice to use alert.getWidth() / 2, but it's NAN now. 
 			double y = mainStage.getY() + mainStage.getHeight() / 2 - 50;
 			
@@ -4104,23 +4115,41 @@ public class FXUI implements PlayerListener {
 		}
 	}
 	
+	public static void setDialogIcon ( TextInputDialog dialog ) {
+		Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+		try {
+			Image icon = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) );
+			stage.getIcons().add( icon );
+		} catch ( Exception e ) {
+			LOGGER.log ( Level.INFO, "Unable to set icon on alert.", e ); 
+		}
+	}
+	
 	public void applyCurrentTheme ( Alert alert ) {
 		String darkSheet = "file:///" + darkStylesheet.getAbsolutePath().replace( "\\", "/" );
 		if ( isDarkTheme() ) {
 			((Stage) alert.getDialogPane().getScene().getWindow()).getScene().getStylesheets().add( darkSheet );
 		} else {
-			libraryLocationWindow.getScene().getStylesheets().remove( darkSheet );
+			((Stage) alert.getDialogPane().getScene().getWindow()).getScene().getStylesheets().remove( darkSheet );
+		}
+	}
+	
+	public void applyCurrentTheme ( TextInputDialog dialog ) {
+		String darkSheet = "file:///" + darkStylesheet.getAbsolutePath().replace( "\\", "/" );
+		if ( isDarkTheme() ) {
+			((Stage) dialog.getDialogPane().getScene().getWindow()).getScene().getStylesheets().add( darkSheet );
+		
+		} else {
+			((Stage) dialog.getDialogPane().getScene().getWindow()).getScene().getStylesheets().remove( darkSheet );
 		}
 	}
 		
 	public static void notifyUserError ( String message ) { 
+		//TODO: Make this not static so we can set the theme on it the right way and because it being static is bad. 
 		
 		Alert alert = new Alert ( AlertType.ERROR );
-		Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-		try {
-			Image icon = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) );
-			stage.getIcons().add( icon );
-		} catch ( Exception e ) {}
+		setAlertWindowIcon( alert );
+		
 		
 		alert.setTitle( "Error" );
 		alert.setContentText( message );
@@ -4588,9 +4617,11 @@ public class FXUI implements PlayerListener {
 	public void warnUserVolumeNotSet() {
 		Platform.runLater( () -> {
 			Alert alert = new Alert( AlertType.ERROR );
-			alert.getDialogPane().applyCss();
 			double x = mainStage.getX() + mainStage.getWidth() / 2 - 220; //It'd be nice to use alert.getWidth() / 2, but it's NAN now. 
 			double y = mainStage.getY() + mainStage.getHeight() / 2 - 50;
+			
+			setAlertWindowIcon( alert );
+			applyCurrentTheme( alert );
 			
 			alert.setX( x );
 			alert.setY( y );
@@ -4605,7 +4636,7 @@ public class FXUI implements PlayerListener {
 				"When you have done so, set Hypnos's volume to 100 and start play again.");
 			
 			text.setWrappingWidth(500);
-			text.applyCss();
+			text.getStyleClass().add( "alert-text" );
 			HBox holder = new HBox();
 			holder.getChildren().add( text );
 			holder.setPadding( new Insets ( 10, 10, 10, 10 ) );
@@ -4620,9 +4651,11 @@ public class FXUI implements PlayerListener {
 			Platform.runLater( () -> {
 				doPlaylistSaveWarning = false;
 				Alert alert = new Alert( AlertType.ERROR );
-				alert.getDialogPane().applyCss();
 				double x = mainStage.getX() + mainStage.getWidth() / 2 - 220; //It'd be nice to use alert.getWidth() / 2, but it's NAN now. 
 				double y = mainStage.getY() + mainStage.getHeight() / 2 - 50;
+
+				setAlertWindowIcon( alert );
+				applyCurrentTheme( alert );
 				
 				alert.setX( x );
 				alert.setY( y );
@@ -4643,7 +4676,7 @@ public class FXUI implements PlayerListener {
 				Text text = new Text( message );
 				
 				text.setWrappingWidth(500);
-				text.applyCss();
+				text.getStyleClass().add( "alert-text" );
 				HBox holder = new HBox();
 				holder.getChildren().add( text );
 				holder.setPadding( new Insets ( 10, 10, 10, 10 ) );
@@ -4658,12 +4691,14 @@ public class FXUI implements PlayerListener {
 		Platform.runLater( () -> {
 
 			Alert alert = new Alert( AlertType.ERROR );
-			alert.getDialogPane().applyCss();
 			double x = mainStage.getX() + mainStage.getWidth() / 2 - 220; //It'd be nice to use alert.getWidth() / 2, but it's NAN now. 
 			double y = mainStage.getY() + mainStage.getHeight() / 2 - 50;
 			
 			alert.setX( x );
 			alert.setY( y );
+
+			setAlertWindowIcon( alert );
+			applyCurrentTheme( alert );
 			
 			alert.setTitle( "Unable to load Albums" );
 			alert.setHeaderText( "Albums have been deleted or moved." );
@@ -4680,7 +4715,7 @@ public class FXUI implements PlayerListener {
 			Text text = new Text( message );
 			
 			text.setWrappingWidth(500);
-			text.applyCss();
+			text.getStyleClass().add( "alert-text" );
 			HBox holder = new HBox();
 			holder.getChildren().add( text );
 			holder.setPadding( new Insets ( 10, 10, 10, 10 ) );
@@ -4715,14 +4750,12 @@ public class FXUI implements PlayerListener {
 
 		setAlertWindowIcon ( alert );
 		
-		//TODO: I want to do this, but I need more stuff in the dark theme. Try it and see
-		//applyCurrentTheme ( alert );
-		
+		applyCurrentTheme ( alert );
 						
 		Text text = new Text( content );
 		
 		text.setWrappingWidth( textWidth );
-		text.applyCss();
+		text.getStyleClass().add( "alert-text" );
 		HBox holder = new HBox();
 		holder.getChildren().add( text );
 		holder.setPadding( new Insets ( 10, 10, 10, 10 ) );

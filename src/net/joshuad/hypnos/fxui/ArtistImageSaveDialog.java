@@ -1,6 +1,10 @@
 package net.joshuad.hypnos.fxui;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -9,12 +13,15 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import net.joshuad.hypnos.Hypnos;
 
 public class ArtistImageSaveDialog extends Stage {
+	private static final Logger LOGGER = Logger.getLogger( ArtistImageSaveDialog.class.getName() );
 	
 	public enum Choice {
 		ALL,
@@ -34,6 +41,13 @@ public class ArtistImageSaveDialog extends Stage {
 		VBox primaryPane = new VBox();
 		
 		this.setResizable( false );
+		
+		try {
+			Image icon = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) );
+			getIcons().add( icon );
+		} catch ( Exception e ) {
+			LOGGER.log ( Level.INFO, "Unable to set icon on Artist Image Save Dialog.", e ); 
+		}
 		
 		primaryPane.setPadding( new Insets ( 10, 10, 10, 10 ) );
 		primaryPane.setSpacing( 20 );

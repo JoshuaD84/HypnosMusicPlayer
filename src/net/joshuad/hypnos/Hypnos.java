@@ -40,6 +40,7 @@ import org.jnativehook.NativeHookException;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 import net.joshuad.hypnos.LibraryUpdater.LoaderSpeed;
 import net.joshuad.hypnos.Persister.Setting;

@@ -140,3 +140,18 @@ HBox, VBox, #transport {
 .aboutPaneURL {}
 
 
+
+
+
+.dialog-pane HBox {
+	-fx-background-color: #171717;
+}
+
+.alert-text {
+	-fx-fill: -fx-light-text-color;
+	-fx-font-size: 13px;
+ }
+
+.dialog-pane:header .header-panel {
+	-fx-background-color: #242424;
+}

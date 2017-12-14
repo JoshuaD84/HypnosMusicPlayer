@@ -21,26 +21,16 @@ TODO
 	UI
 		Double click on dividers to set them to position 0
 			https://stackoverflow.com/questions/47807305/how-to-detect-mouse-click-events-on-a-split-panes-divider
-			
-		I need to fix the no-resize column thing for last columns. It's a bigger issue now that we can hide columns.
-		
-		persist column info
-			sort options
-			ordering
 		
 		Drag and drop folder onto current list isn't putting the songs in the right position
 		
 		missing-data isn't removed when a track is deleted, so if you D&D into the playlist, you see missing sometimes
 		
 		tracks with missing files are removed from the current list if you close and reopen hypnos. They should stay
-							
+											
 		Library Source Directories - highlight in red if they are missing. 
 		
 		Overwite a playlist -> Get prompted -> Select "Yes" to save -> Hit cancel on the next dialog -> Thing is overwritten. Instead cancel the change.
-		
-		Make all alerts and prompts use theme
-			FXUI.promptAndSavePlaylist
-			FXUI.alertUser
 									
 		Export playlist as a folder
 			Copy all of the music files into that folder. Prepend them with index number? 
@@ -50,7 +40,6 @@ TODO
 			doesn't feel right. Do some math formula instead of linear
 			in windows goes past 100%
 	
-		Bug report dialog
 	
 		current list play/pause images don't change colors immediately. Have to play a new track to get updateImageThemes() to call.
 		
@@ -62,8 +51,6 @@ TODO
 			https://stackoverflow.com/questions/47765228/is-it-possible-to-set-tthe-hsv-for-a-color-adjust-via-css
 		
 		Loader status % complete thing
-		
-		Put a filter on images when in light theme to make them slightly grey (or dampen the actual images).
 
 		~incomplete/Grizzly Bear
 			F2 to show tag editor, no content in table
@@ -76,10 +63,7 @@ TODO
 		Consistent in-program hotkeys & tab in settings window for in-program hotkeys. 
 	
 	https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
-			
-	Tag auto fix button
-	
-	I don't like the way the library line wraps in the manifest. Can we make this nicer in ant? 
+				
 	
 	Ok this should address a number of issues that people have been having including this one. Please test and let me know if this issue can be closed.
 		JNativeHook-2.1.1-rc  
@@ -89,8 +73,21 @@ TODO
 
 
 
-
+After beta2 
+	I need to fix the no-resize column thing for last columns. It's a bigger issue now that we can hide columns.
 	
+	Tag auto fix button
+				
+	persist column info
+		sort options
+		ordering
+	
+	I don't like the way the library line wraps in the manifest. Can we make this nicer in ant? 
+	
+	Bug report dialog
+	
+	
+		
 JavaFX stuff
 	
 	DND Error that doesn't do any harm
