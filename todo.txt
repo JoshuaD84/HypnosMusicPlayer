@@ -70,9 +70,7 @@ TODO
 
 		~incomplete/Grizzly Bear
 			F2 to show tag editor, no content in table
-			
-		Show something on art boxes to differentiate between artist and album, especially when drag & dropping
-	
+		
 		Drag and drop from misc places to system
 			playlist table -> m3u
 			track table, history, queue, info windows, current table -> single tracks

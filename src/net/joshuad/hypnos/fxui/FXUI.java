@@ -93,7 +93,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
@@ -241,6 +240,7 @@ public class FXUI implements PlayerListener {
 	private double windowedY = 50;
 	
 	private Track currentImagesTrack = null;
+	private Album currentImagesAlbum = null;
 	
 	private File darkStylesheet;
 	private File baseStylesheet;
@@ -1612,8 +1612,12 @@ public class FXUI implements PlayerListener {
 				choices.add ( ArtistImageSaveDialog.Choice.ALL );
 			}
 			
-			if (albumPath != null ) {
+			if ( albumPath != null ) {
 				choices.add ( ArtistImageSaveDialog.Choice.ALBUM );
+			} 
+			
+			if ( currentImagesAlbum == null ) {
+				choices.add ( ArtistImageSaveDialog.Choice.TRACK );
 			} 
 			
 			ArtistImageSaveDialog prompt = new ArtistImageSaveDialog ( mainStage, choices );
@@ -1666,8 +1670,17 @@ public class FXUI implements PlayerListener {
 		}
 	}
 	
-	private Thread imageLoader = null;
 	public void setImages ( Track track ) {
+		setImages ( track, null );
+	}
+	
+	
+	public void setImages ( Album album ) {
+		setImages ( album.getTracks().get( 0 ), album );
+	}
+	
+	private Thread imageLoader = null;
+	public void setImages ( Track track, Album album ) {
 		
 		if ( track != null && Files.exists( track.getPath() ) ) {
 			if ( imageLoader != null ) {
@@ -1687,6 +1700,7 @@ public class FXUI implements PlayerListener {
 							setAlbumImage( albumImage );
 							setArtistImage( artistImage );
 							currentImagesTrack = track;
+							currentImagesAlbum = album;
 						});
 					}
 				}
@@ -1699,6 +1713,8 @@ public class FXUI implements PlayerListener {
 			setImages ( currentImagesTrack );
 			
 		} else {
+			currentImagesTrack = null;
+			currentImagesAlbum = null;
 			setAlbumImage ( null );
 			setArtistImage ( null );
 		}
@@ -2714,7 +2730,7 @@ public class FXUI implements PlayerListener {
 		albumTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
 			
 		    if ( newSelection != null ) {
-		    	setImages ( newSelection.getTracks().get( 0 ) );
+		    	setImages ( newSelection );
 		    	albumInfoWindow.setAlbum( newSelection );
 		    	
 		    } else if ( player.getCurrentTrack() != null ) {

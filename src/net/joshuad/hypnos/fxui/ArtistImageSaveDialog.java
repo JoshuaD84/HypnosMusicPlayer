@@ -74,6 +74,10 @@ public class ArtistImageSaveDialog extends Stage {
 			album.setDisable( true );
 		}
 		
+		if ( !choices.contains( Choice.TRACK ) ) {
+			track.setDisable( true );
+		}
+		
 		primaryPane.getChildren().addAll( info, controls, buttons );
 		
 		root.getChildren().add( primaryPane );
