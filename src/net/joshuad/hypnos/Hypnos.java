@@ -688,17 +688,22 @@ public class Hypnos extends Application {
 				
 				persister.loadDataBeforeShowWindow();
 				ui.showMainWindow();
-				persister.loadDataAfterShowWindow();
 				
-				player.start();
+				Thread finishLoadingThread = new Thread ( () -> {
+					persister.loadDataAfterShowWindow();
+					player.start();
+					
+					applyCLICommands( commands );
+					singleInstanceController.startCLICommandListener ( this );
+	
+					libraryUpdater.start();
+					library.startLoader( persister );
+					
+					LOGGER.info( "Hypnos finished loading." );
+				} );
 				
-				applyCLICommands( commands );
-				singleInstanceController.startCLICommandListener ( this );
-
-				libraryUpdater.start();
-				library.startLoader( persister );
-				
-				LOGGER.info( "Hypnos finished loading." );
+				finishLoadingThread.setDaemon( true );
+				finishLoadingThread.start();
 				
 								
 			} else {

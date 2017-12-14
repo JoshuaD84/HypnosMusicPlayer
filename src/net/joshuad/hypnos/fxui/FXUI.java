@@ -4127,7 +4127,6 @@ public class FXUI implements PlayerListener {
 		updateLibraryListPlaceholder();
 	}
 
-
 	public EnumMap <Persister.Setting, ? extends Object> getSettings () {
 		
 		EnumMap <Persister.Setting, Object> retMe = new EnumMap <Persister.Setting, Object> ( Persister.Setting.class );
