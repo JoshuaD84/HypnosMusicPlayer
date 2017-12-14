@@ -19,6 +19,9 @@ TODO
 		Library load and unload time
 		
 	UI
+		Double click on dividers to set them to position 0
+			https://stackoverflow.com/questions/47807305/how-to-detect-mouse-click-events-on-a-split-panes-divider
+			
 		I need to fix the no-resize column thing for last columns. It's a bigger issue now that we can hide columns.
 		
 		persist column info
@@ -30,12 +33,6 @@ TODO
 		missing-data isn't removed when a track is deleted, so if you D&D into the playlist, you see missing sometimes
 		
 		tracks with missing files are removed from the current list if you close and reopen hypnos. They should stay
-						
-		Sorting
-			Table sort on Album (Disc 9) Album (Disc 10) is wrong - See Radiohead Towering above the rest
-			http://www.davekoelle.com/alphanum.html
-			
-			Track Table Sort by - Is currently sorting by letter instead of by number.
 							
 		Library Source Directories - highlight in red if they are missing. 
 		

@@ -2515,6 +2515,9 @@ public class FXUI implements PlayerListener {
 		albumYearColumn = new TableColumn( "Year" );
 		albumAlbumColumn = new TableColumn( "Album" );
 
+		albumArtistColumn.setComparator( new AlphanumComparator() );
+		albumAlbumColumn.setComparator( new AlphanumComparator() );
+
 		albumArtistColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "albumArtist" ) );
 		albumYearColumn.setCellValueFactory( new PropertyValueFactory <Album, Integer>( "year" ) );
 		
@@ -2810,6 +2813,10 @@ public class FXUI implements PlayerListener {
 		trackNumberColumn = new TableColumn( "#" );
 		trackAlbumColumn = new TableColumn( "Album" );
 		trackTitleColumn = new TableColumn( "Title" );
+		
+		trackArtistColumn.setComparator( new AlphanumComparator() );
+		trackTitleColumn.setComparator( new AlphanumComparator() );
+		trackLengthColumn.setComparator( new AlphanumComparator() );
 
 		trackArtistColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Artist" ) );
 		trackTitleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
@@ -3133,6 +3140,9 @@ public class FXUI implements PlayerListener {
 		playlistLengthColumn = new TableColumn( "Length" );
 		playlistTracksColumn = new TableColumn( "Tracks" );
 
+		playlistLengthColumn.setComparator( new AlphanumComparator() );
+		
+		//TODO: Are these the right types? Integer/String look wrong. 
 		playlistNameColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "Name" ) );
 		playlistLengthColumn.setCellValueFactory( new PropertyValueFactory <Album, Integer>( "LengthDisplay" ) );
 		playlistTracksColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "SongCount" ) );
@@ -3443,6 +3453,10 @@ public class FXUI implements PlayerListener {
 		clTitleColumn = new TableColumn( "Title" );
 		clNumberColumn = new TableColumn( "#" );
 		clLengthColumn = new TableColumn( "Length" );
+		
+		clAlbumColumn.setComparator( new AlphanumComparator() );
+		clArtistColumn.setComparator( new AlphanumComparator() );
+		clTitleColumn.setComparator( new AlphanumComparator() );
 
 		clArtistColumn.setMaxWidth( 22000 );
 		clNumberColumn.setMaxWidth( 4000 );
