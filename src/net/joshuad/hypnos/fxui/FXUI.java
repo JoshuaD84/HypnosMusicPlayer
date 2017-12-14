@@ -4126,6 +4126,15 @@ public class FXUI implements PlayerListener {
 	
 		updateLibraryListPlaceholder();
 	}
+	
+	public void fixTables() {
+		Platform.runLater( () -> {
+			albumTable.refresh();
+			playlistTable.refresh();
+			trackTable.refresh();
+		});
+	}
+
 
 	public EnumMap <Persister.Setting, ? extends Object> getSettings () {
 		

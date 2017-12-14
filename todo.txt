@@ -167,11 +167,6 @@ JavaFX stuff
 	
 	Tiny drop shadow on transport buttons when in dark theme. It's the line HBox, VBox, #transport { ... -fx-background-color: #222222 ... }
 	
-	Table header alignment:
-		Platform.runLater(() -> tableView.refresh());
-		https://stackoverflow.com/questions/37423748/javafx-tablecolumns-headers-not-aligned-with-cells-due-to-vertical-scrollbar
-	
-	
 Refactor / organize my code. 
  	Make LibraryUpdater part of Library. Is there a way to abstract out the Platform -> RunLater part? I feel like we're just stuck w/ that, which kind of ties to us JavaFX. 
  		Maybe ui.runMe ( Runnable ), and then the UI can decide whether to launch a new thread, have a thread idling, do it on this thread, or use something like Platform.runLater()	

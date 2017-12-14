@@ -700,6 +700,10 @@ public class Hypnos extends Application {
 					library.startLoader( persister );
 					
 					LOGGER.info( "Hypnos finished loading." );
+					
+					try { Thread.sleep ( 2000 ); } catch ( InterruptedException e ) {}
+					
+					ui.fixTables();
 				} );
 				
 				finishLoadingThread.setDaemon( true );
