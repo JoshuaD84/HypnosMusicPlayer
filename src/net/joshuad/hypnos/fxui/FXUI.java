@@ -1335,6 +1335,21 @@ public class FXUI implements PlayerListener {
 			event.consume();
 		});
 		
+		albumImagePane.setOnDragEntered ( event -> {
+			albumImagePane.getChildren().clear( );
+			albumImagePane.setCenter( new Label ( "Drop Album Image Here" ) );
+		});
+		
+		albumImagePane.setOnDragExited( event -> {
+			albumImagePane.getChildren().clear( );
+			albumImagePane.setCenter( albumImage );
+		});
+		
+		albumImagePane.setOnDragDone( event -> {
+			albumImagePane.getChildren().clear( );
+			albumImagePane.setCenter( albumImage );
+		});
+		
 		albumImagePane.setOnDragDropped( event -> {
 			
 			Track track = currentImagesTrack;
@@ -1520,6 +1535,21 @@ public class FXUI implements PlayerListener {
 			event.consume();
 		});
 		
+		artistImagePane.setOnDragEntered ( event -> {
+			artistImagePane.getChildren().clear( );
+			artistImagePane.setCenter( new Label ( "Drop Artist Image Here" ) );
+		});
+		
+		artistImagePane.setOnDragExited( event -> {
+			artistImagePane.getChildren().clear( );
+			artistImagePane.setCenter( artistImage );
+		});
+		
+		artistImagePane.setOnDragDone( event -> {
+			artistImagePane.getChildren().clear( );
+			artistImagePane.setCenter( artistImage );
+		});
+		
 		artistImagePane.setOnDragDropped( event -> {
 			
 			Track track = currentImagesTrack;
@@ -1643,7 +1673,7 @@ public class FXUI implements PlayerListener {
 			if ( imageLoader != null ) {
 				imageLoader.interrupt();
 			}
-			
+						
 			FXUI ui = this;
 			
 			imageLoader = new Thread ( ) {
