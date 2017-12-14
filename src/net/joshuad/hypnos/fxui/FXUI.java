@@ -55,6 +55,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DialogPane;
@@ -166,6 +167,12 @@ public class FXUI implements PlayerListener {
 	HBox playlistFilterPane;
 	HBox playlistControls;
 	HBox volumePane;
+	
+	ContextMenu playlistColumnSelectorMenu, trackColumnSelectorMenu, albumColumnSelectorMenu, currentListColumnSelectorMenu;
+	TableColumn playlistNameColumn, playlistLengthColumn, playlistTracksColumn;
+	TableColumn trackArtistColumn, trackLengthColumn, trackNumberColumn, trackAlbumColumn, trackTitleColumn;
+	TableColumn albumArtistColumn, albumYearColumn, albumAlbumColumn;
+	TableColumn clPlayingColumn, clArtistColumn, clYearColumn, clAlbumColumn, clTitleColumn, clNumberColumn, clLengthColumn;
 	
 	Tooltip volumeDisabledTooltip = new Tooltip ( "Volume control not supported for tracks with this encoding." );
 	
@@ -2473,33 +2480,48 @@ public class FXUI implements PlayerListener {
 	}
 
 	public void setupAlbumTable () {
-		TableColumn artistColumn = new TableColumn( "Artist" );
-		TableColumn yearColumn = new TableColumn( "Year" );
+		albumArtistColumn = new TableColumn( "Artist" );
+		albumYearColumn = new TableColumn( "Year" );
+		albumAlbumColumn = new TableColumn( "Album" );
 
-		artistColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "albumArtist" ) );
-		yearColumn.setCellValueFactory( new PropertyValueFactory <Album, Integer>( "year" ) );
+		albumArtistColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "albumArtist" ) );
+		albumYearColumn.setCellValueFactory( new PropertyValueFactory <Album, Integer>( "year" ) );
 		
-		TableColumn albumColumn = new TableColumn( "Album" );
-		albumColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "FullAlbumTitle" ) );
-		albumColumn.setCellFactory( e -> new FormattedAlbumCell() );
+		albumAlbumColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "FullAlbumTitle" ) );
+		albumAlbumColumn.setCellFactory( e -> new FormattedAlbumCell() );
 
-		artistColumn.setMaxWidth( 45000 );
-		yearColumn.setMaxWidth( 10000 );
-		albumColumn.setMaxWidth( 45000 );
+		albumArtistColumn.setMaxWidth( 45000 );
+		albumYearColumn.setMaxWidth( 10000 );
+		albumAlbumColumn.setMaxWidth( 45000 );
+		
+		albumColumnSelectorMenu = new ContextMenu ();
+		CheckMenuItem artistMenuItem = new CheckMenuItem ( "Show Artist Column" );
+		CheckMenuItem yearMenuItem = new CheckMenuItem ( "Show Year Column" );
+		CheckMenuItem albumMenuItem = new CheckMenuItem ( "Show Album Column" );
+		artistMenuItem.setSelected( true );
+		yearMenuItem.setSelected( true );
+		albumMenuItem.setSelected( true );
+		albumColumnSelectorMenu.getItems().addAll( artistMenuItem, yearMenuItem, albumMenuItem );
+		albumArtistColumn.setContextMenu( albumColumnSelectorMenu );
+		albumYearColumn.setContextMenu( albumColumnSelectorMenu );
+		albumAlbumColumn.setContextMenu( albumColumnSelectorMenu );
+		artistMenuItem.selectedProperty().bindBidirectional( albumArtistColumn.visibleProperty() );
+		yearMenuItem.selectedProperty().bindBidirectional( albumYearColumn.visibleProperty() );
+		albumMenuItem.selectedProperty().bindBidirectional( albumAlbumColumn.visibleProperty() );
 
 		albumTable = new TableView();
-		albumTable.getColumns().addAll( artistColumn, yearColumn, albumColumn );
+		albumTable.getColumns().addAll( albumArtistColumn, albumYearColumn, albumAlbumColumn );
 		albumTable.setEditable( false );
 		albumTable.setItems( library.getAlbumsSorted() );
 		albumTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 
 		library.getAlbumsSorted().comparatorProperty().bind( albumTable.comparatorProperty() );
 
-		albumTable.getSortOrder().add( artistColumn );
-		albumTable.getSortOrder().add( yearColumn );
-		albumTable.getSortOrder().add( albumColumn );
+		albumTable.getSortOrder().add( albumArtistColumn );
+		albumTable.getSortOrder().add( albumYearColumn );
+		albumTable.getSortOrder().add( albumAlbumColumn );
 		FixedWidthCustomResizePolicy resizePolicy = new FixedWidthCustomResizePolicy();
-		resizePolicy.registerColumns( yearColumn );
+		resizePolicy.registerColumns( albumYearColumn );
 		
 		albumTable.setColumnResizePolicy( resizePolicy );
 		
@@ -2752,27 +2774,27 @@ public class FXUI implements PlayerListener {
 	}
 
 	public void setupTrackTable () {
-		TableColumn artistColumn = new TableColumn( "Artist" );
-		TableColumn lengthColumn = new TableColumn( "Length" );
-		TableColumn trackColumn = new TableColumn( "#" );
-		TableColumn albumColumn = new TableColumn( "Album" );
-		TableColumn titleColumn = new TableColumn( "Title" );
+		trackArtistColumn = new TableColumn( "Artist" );
+		trackLengthColumn = new TableColumn( "Length" );
+		trackNumberColumn = new TableColumn( "#" );
+		trackAlbumColumn = new TableColumn( "Album" );
+		trackTitleColumn = new TableColumn( "Title" );
 
-		artistColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Artist" ) );
-		titleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
-		lengthColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "LengthDisplay" ) );
-		trackColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "TrackNumber" ) );
-		albumColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "albumTitle" ) );
+		trackArtistColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Artist" ) );
+		trackTitleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
+		trackLengthColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "LengthDisplay" ) );
+		trackNumberColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "TrackNumber" ) );
+		trackAlbumColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "albumTitle" ) );
 		
-		artistColumn.setSortType( TableColumn.SortType.ASCENDING );
+		trackArtistColumn.setSortType( TableColumn.SortType.ASCENDING );
 
-		artistColumn.setMaxWidth( 45000 );
-		titleColumn.setMaxWidth( 45000 );
-		lengthColumn.setMaxWidth( 15000 );
-		albumColumn.setMaxWidth( 45000 );
-		trackColumn.setMaxWidth( 15000 );
+		trackArtistColumn.setMaxWidth( 45000 );
+		trackTitleColumn.setMaxWidth( 45000 );
+		trackLengthColumn.setMaxWidth( 15000 );
+		trackAlbumColumn.setMaxWidth( 45000 );
+		trackNumberColumn.setMaxWidth( 15000 );
 
-		trackColumn.setCellFactory( column -> {
+		trackNumberColumn.setCellFactory( column -> {
 			return new TableCell <Track, Integer>() {
 				@Override
 				protected void updateItem ( Integer value, boolean empty ) {
@@ -2786,17 +2808,41 @@ public class FXUI implements PlayerListener {
 				}
 			};
 		} );
+		
+		trackColumnSelectorMenu = new ContextMenu ();
+		CheckMenuItem artistMenuItem = new CheckMenuItem ( "Show Artist Column" );
+		CheckMenuItem albumMenuItem = new CheckMenuItem ( "Show Album Column" );
+		CheckMenuItem numberMenuItem = new CheckMenuItem ( "Show Track # Column" );
+		CheckMenuItem titleMenuItem = new CheckMenuItem ( "Show Title Column" );
+		CheckMenuItem lengthMenuItem = new CheckMenuItem ( "Show Length Column" );
+		artistMenuItem.setSelected( true );
+		albumMenuItem.setSelected( true );
+		numberMenuItem.setSelected( true );
+		titleMenuItem.setSelected( true );
+		lengthMenuItem.setSelected( true );
+		trackColumnSelectorMenu.getItems().addAll( artistMenuItem, albumMenuItem, numberMenuItem, titleMenuItem, lengthMenuItem );
+		trackArtistColumn.setContextMenu( trackColumnSelectorMenu );
+		trackAlbumColumn.setContextMenu( trackColumnSelectorMenu );
+		trackTitleColumn.setContextMenu( trackColumnSelectorMenu );
+		trackNumberColumn.setContextMenu( trackColumnSelectorMenu );
+		trackLengthColumn.setContextMenu( trackColumnSelectorMenu );
+		artistMenuItem.selectedProperty().bindBidirectional( trackArtistColumn.visibleProperty() );
+		albumMenuItem.selectedProperty().bindBidirectional( trackAlbumColumn.visibleProperty() );
+		numberMenuItem.selectedProperty().bindBidirectional( trackNumberColumn.visibleProperty() );
+		titleMenuItem.selectedProperty().bindBidirectional( trackTitleColumn.visibleProperty() );
+		lengthMenuItem.selectedProperty().bindBidirectional( trackLengthColumn.visibleProperty() );
+		
 		trackTable = new TableView();
-		trackTable.getColumns().addAll( artistColumn, albumColumn, trackColumn, titleColumn, lengthColumn );
+		trackTable.getColumns().addAll( trackArtistColumn, trackAlbumColumn, trackNumberColumn, trackTitleColumn, trackLengthColumn );
 		trackTable.setEditable( false );
 		trackTable.setItems( library.getTracksSorted() );
-
+		
 		library.getTracksSorted().comparatorProperty().bind( trackTable.comparatorProperty() );
 		
 		trackTable.getSelectionModel().clearSelection();
-		trackTable.getSortOrder().add( artistColumn );
-		trackTable.getSortOrder().add( albumColumn );
-		trackTable.getSortOrder().add( trackColumn );
+		trackTable.getSortOrder().add( trackArtistColumn );
+		trackTable.getSortOrder().add( trackAlbumColumn );
+		trackTable.getSortOrder().add( trackNumberColumn );
 		FixedWidthCustomResizePolicy resizePolicy = new FixedWidthCustomResizePolicy();
 		trackTable.setColumnResizePolicy( resizePolicy );
 		
@@ -3052,33 +3098,48 @@ public class FXUI implements PlayerListener {
 	}
 
 	public void setupPlaylistTable () {
-		TableColumn nameColumn = new TableColumn( "Playlist" );
-		TableColumn lengthColumn = new TableColumn( "Length" );
-		TableColumn tracksColumn = new TableColumn( "Tracks" );
+		playlistNameColumn = new TableColumn( "Playlist" );
+		playlistLengthColumn = new TableColumn( "Length" );
+		playlistTracksColumn = new TableColumn( "Tracks" );
 
-		nameColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "Name" ) );
-		lengthColumn.setCellValueFactory( new PropertyValueFactory <Album, Integer>( "LengthDisplay" ) );
-		tracksColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "SongCount" ) );
+		playlistNameColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "Name" ) );
+		playlistLengthColumn.setCellValueFactory( new PropertyValueFactory <Album, Integer>( "LengthDisplay" ) );
+		playlistTracksColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "SongCount" ) );
 
-		nameColumn.setSortType( TableColumn.SortType.ASCENDING );
+		playlistNameColumn.setSortType( TableColumn.SortType.ASCENDING );
 
-		nameColumn.setMaxWidth( 70000 );
-		lengthColumn.setMaxWidth( 15000 );
-		tracksColumn.setMaxWidth( 15000 );
+		playlistNameColumn.setMaxWidth( 70000 );
+		playlistLengthColumn.setMaxWidth( 15000 );
+		playlistTracksColumn.setMaxWidth( 15000 );
+		
+		playlistColumnSelectorMenu = new ContextMenu ();
+		CheckMenuItem nameMenuItem = new CheckMenuItem ( "Show Name Column" );
+		CheckMenuItem tracksMenuItem = new CheckMenuItem ( "Show Tracks Column" );
+		CheckMenuItem lengthMenuItem = new CheckMenuItem ( "Show Length Column" );
+		nameMenuItem.setSelected( true );
+		tracksMenuItem.setSelected( true );
+		lengthMenuItem.setSelected( true );
+		playlistColumnSelectorMenu.getItems().addAll( nameMenuItem, tracksMenuItem, lengthMenuItem );
+		playlistNameColumn.setContextMenu( playlistColumnSelectorMenu );
+		playlistTracksColumn.setContextMenu( playlistColumnSelectorMenu );
+		playlistLengthColumn.setContextMenu( playlistColumnSelectorMenu );
+		nameMenuItem.selectedProperty().bindBidirectional( playlistNameColumn.visibleProperty() );
+		tracksMenuItem.selectedProperty().bindBidirectional( playlistTracksColumn.visibleProperty() );
+		lengthMenuItem.selectedProperty().bindBidirectional( playlistLengthColumn.visibleProperty() );
 
-		playlistTable = new TableView();
-		playlistTable.getColumns().addAll( nameColumn, tracksColumn, lengthColumn );
+		playlistTable = new TableView<Playlist>();
+		playlistTable.getColumns().addAll( playlistNameColumn, playlistTracksColumn, playlistLengthColumn );
 		playlistTable.setEditable( false );
 		playlistTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 		playlistTable.setItems( library.getPlaylistSorted() );
 
 		library.getPlaylistSorted().comparatorProperty().bind( playlistTable.comparatorProperty() );
 
-		playlistTable.getSortOrder().add( nameColumn );
+		playlistTable.getSortOrder().add( playlistNameColumn );
 		playlistTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
 		
 		FixedWidthCustomResizePolicy resizePolicy = new FixedWidthCustomResizePolicy();
-		resizePolicy.registerColumns( tracksColumn );
+		resizePolicy.registerColumns( playlistTracksColumn );
 		playlistTable.setColumnResizePolicy( resizePolicy );
 
 		emptyPlaylistLabel.setWrapText( true );
@@ -3344,39 +3405,39 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public void setupCurrentListTable () {
-		TableColumn playingColumn = new TableColumn( "" );
-		TableColumn artistColumn = new TableColumn( "Artist" );
-		TableColumn yearColumn = new TableColumn( "Year" );
-		TableColumn albumColumn = new TableColumn( "Album" );
-		TableColumn titleColumn = new TableColumn( "Title" );
-		TableColumn trackColumn = new TableColumn( "#" );
-		TableColumn lengthColumn = new TableColumn( "Length" );
+		clPlayingColumn = new TableColumn( "" );
+		clArtistColumn = new TableColumn( "Artist" );
+		clYearColumn = new TableColumn( "Year" );
+		clAlbumColumn = new TableColumn( "Album" );
+		clTitleColumn = new TableColumn( "Title" );
+		clNumberColumn = new TableColumn( "#" );
+		clLengthColumn = new TableColumn( "Length" );
 
-		artistColumn.setMaxWidth( 22000 );
-		trackColumn.setMaxWidth( 4000 );
-		yearColumn.setMaxWidth( 8000 );
-		albumColumn.setMaxWidth( 25000 );
-		titleColumn.setMaxWidth( 25000 );
-		lengthColumn.setMaxWidth( 8000 );
+		clArtistColumn.setMaxWidth( 22000 );
+		clNumberColumn.setMaxWidth( 4000 );
+		clYearColumn.setMaxWidth( 8000 );
+		clAlbumColumn.setMaxWidth( 25000 );
+		clTitleColumn.setMaxWidth( 25000 );
+		clLengthColumn.setMaxWidth( 8000 );
 		
-		playingColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, CurrentListTrackState>( "displayState" ) );
-		artistColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "artist" ) );
-		yearColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, Integer>( "year" ) );
-		albumColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "fullAlbumTitle" ) );
-		titleColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "title" ) );
-		trackColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, Integer>( "trackNumber" ) );
-		lengthColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "lengthDisplay" ) );
-		
-
-		albumColumn.setCellFactory( e -> new FormattedAlbumCell() );
+		clPlayingColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, CurrentListTrackState>( "displayState" ) );
+		clArtistColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "artist" ) );
+		clYearColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, Integer>( "year" ) );
+		clAlbumColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "fullAlbumTitle" ) );
+		clTitleColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "title" ) );
+		clNumberColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, Integer>( "trackNumber" ) );
+		clLengthColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "lengthDisplay" ) );
 		
 
-		playingColumn.setCellFactory ( column -> { 
+		clAlbumColumn.setCellFactory( e -> new FormattedAlbumCell() );
+		
+
+		clPlayingColumn.setCellFactory ( column -> { 
 				return new CurrentListTrackStateCell( this, playImageSource, pauseImageSource ); 
 			} 
 		);
 		
-		trackColumn.setCellFactory( column -> {
+		clNumberColumn.setCellFactory( column -> {
 			return new TableCell <CurrentListTrack, Integer>() {
 				@Override
 				protected void updateItem ( Integer value, boolean empty ) {
@@ -3391,22 +3452,54 @@ public class FXUI implements PlayerListener {
 			};
 		});
 		
+		currentListColumnSelectorMenu = new ContextMenu ();
+		CheckMenuItem playingMenuItem = new CheckMenuItem ( "Show Playing Column" );
+		CheckMenuItem artistMenuItem = new CheckMenuItem ( "Show Artist Column" );
+		CheckMenuItem yearMenuItem = new CheckMenuItem ( "Show Year Column" );
+		CheckMenuItem albumMenuItem = new CheckMenuItem ( "Show Album Column" );
+		CheckMenuItem numberMenuItem = new CheckMenuItem ( "Show Track # Column" );
+		CheckMenuItem titleMenuItem = new CheckMenuItem ( "Show Title Column" );
+		CheckMenuItem lengthMenuItem = new CheckMenuItem ( "Show Length Column" );
+		playingMenuItem.setSelected( true );
+		artistMenuItem.setSelected( true );
+		yearMenuItem.setSelected( true );
+		albumMenuItem.setSelected( true );
+		numberMenuItem.setSelected( true );
+		titleMenuItem.setSelected( true );
+		lengthMenuItem.setSelected( true );
+		currentListColumnSelectorMenu.getItems().addAll( playingMenuItem, numberMenuItem,artistMenuItem, 
+			yearMenuItem, albumMenuItem,  titleMenuItem, lengthMenuItem );
+		clPlayingColumn.setContextMenu( currentListColumnSelectorMenu );
+		clArtistColumn.setContextMenu( currentListColumnSelectorMenu );
+		clYearColumn.setContextMenu( currentListColumnSelectorMenu );
+		clAlbumColumn.setContextMenu( currentListColumnSelectorMenu );
+		clTitleColumn.setContextMenu( currentListColumnSelectorMenu );
+		clNumberColumn.setContextMenu( currentListColumnSelectorMenu );
+		clLengthColumn.setContextMenu( currentListColumnSelectorMenu );
+		playingMenuItem.selectedProperty().bindBidirectional( clPlayingColumn.visibleProperty() );
+		artistMenuItem.selectedProperty().bindBidirectional( clArtistColumn.visibleProperty() );
+		yearMenuItem.selectedProperty().bindBidirectional( clYearColumn.visibleProperty() );
+		albumMenuItem.selectedProperty().bindBidirectional( clAlbumColumn.visibleProperty() );
+		numberMenuItem.selectedProperty().bindBidirectional( clNumberColumn.visibleProperty() );
+		titleMenuItem.selectedProperty().bindBidirectional( clTitleColumn.visibleProperty() );
+		lengthMenuItem.selectedProperty().bindBidirectional( clLengthColumn.visibleProperty() );
+		
 		currentListTable = new TableView();
-		currentListTable.getColumns().addAll( playingColumn, trackColumn, artistColumn, yearColumn, albumColumn, titleColumn, lengthColumn );
-		albumTable.getSortOrder().add( trackColumn ); //TODO: This doesn't belong here. 
+		currentListTable.getColumns().addAll( clPlayingColumn, clNumberColumn, clArtistColumn, clYearColumn, clAlbumColumn, clTitleColumn, clLengthColumn );
+		albumTable.getSortOrder().add( clNumberColumn ); //TODO: This doesn't belong here. 
 		currentListTable.setEditable( false );
 		currentListTable.setItems( player.getCurrentList().getItems() );
 		
 		FixedWidthCustomResizePolicy resizePolicy = new FixedWidthCustomResizePolicy();
 		currentListTable.setColumnResizePolicy( resizePolicy );
 
-		resizePolicy.registerColumns( yearColumn, trackColumn );
+		resizePolicy.registerColumns( clYearColumn, clNumberColumn );
 		currentListTable.setPlaceholder( new Label( "No tracks in playlist." ) );
 		currentListTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 
-		playingColumn.setMaxWidth( 38 );
-		playingColumn.setMinWidth( 38 );
-		playingColumn.setResizable( false );
+		clPlayingColumn.setMaxWidth( 38 );
+		clPlayingColumn.setMinWidth( 38 );
+		clPlayingColumn.setResizable( false );
 		
 		currentListTable.setOnDragOver( event -> {
 			
@@ -4008,6 +4101,22 @@ public class FXUI implements PlayerListener {
 		StackPane thumb = (StackPane) trackPositionSlider.lookup( ".thumb" );
 		thumb.setVisible( false );
 		
+		Node blankPlaylistHeader = playlistTable.lookup(".column-header-background");
+		blankPlaylistHeader.setOnContextMenuRequested ( 
+			event -> playlistColumnSelectorMenu.show( blankPlaylistHeader, event.getScreenX(), event.getScreenY() ) );
+		
+		Node blankTrackHeader = trackTable.lookup(".column-header-background");
+		blankTrackHeader.setOnContextMenuRequested ( 
+			event -> trackColumnSelectorMenu.show( blankTrackHeader, event.getScreenX(), event.getScreenY() ) );
+		
+		Node blankAlbumHeader = albumTable.lookup(".column-header-background");
+		blankAlbumHeader.setOnContextMenuRequested ( 
+			event -> albumColumnSelectorMenu.show( blankAlbumHeader, event.getScreenX(), event.getScreenY() ) );
+		
+		Node blankCurrentlistHeader = currentListTable.lookup(".column-header-background");
+		blankCurrentlistHeader.setOnContextMenuRequested ( 
+			event -> currentListColumnSelectorMenu.show( blankCurrentlistHeader, event.getScreenX(), event.getScreenY() ) );
+		
 		//These are the default positions.
 		primarySplitPane.setDividerPositions( .35d );
 		currentListSplitPane.setDividerPositions( .65d );
@@ -4050,6 +4159,25 @@ public class FXUI implements PlayerListener {
 		retMe.put ( Setting.PROMPT_BEFORE_OVERWRITE, promptBeforeOverwrite.getValue() );
 		retMe.put ( Setting.THEME, theme );
 		
+		retMe.put ( Setting.AL_TABLE_SHOW_ARTIST_COLUMN, albumArtistColumn.isVisible() );
+		retMe.put ( Setting.AL_TABLE_SHOW_YEAR_COLUMN, albumYearColumn.isVisible() );
+		retMe.put ( Setting.AL_TABLE_SHOW_ALBUM_COLUMN, albumAlbumColumn.isVisible() );
+		retMe.put ( Setting.TR_TABLE_SHOW_ARTIST_COLUMN, trackArtistColumn.isVisible() );
+		retMe.put ( Setting.TR_TABLE_SHOW_NUMBER_COLUMN, trackNumberColumn.isVisible() );
+		retMe.put ( Setting.TR_TABLE_SHOW_TITLE_COLUMN, trackTitleColumn.isVisible() );
+		retMe.put ( Setting.TR_TABLE_SHOW_ALBUM_COLUMN, trackAlbumColumn.isVisible() );
+		retMe.put ( Setting.TR_TABLE_SHOW_LENGTH_COLUMN, trackLengthColumn.isVisible() );
+		retMe.put ( Setting.PL_TABLE_SHOW_PLAYLIST_COLUMN, playlistNameColumn.isVisible() );
+		retMe.put ( Setting.PL_TABLE_SHOW_TRACKS_COLUMN, playlistTracksColumn.isVisible() );
+		retMe.put ( Setting.PL_TABLE_SHOW_LENGTH_COLUMN, playlistLengthColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_SHOW_PLAYING_COLUMN, clPlayingColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_SHOW_NUMBER_COLUMN, clNumberColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_SHOW_ARTIST_COLUMN, clArtistColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_SHOW_YEAR_COLUMN, clYearColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_SHOW_ALBUM_COLUMN, clAlbumColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_SHOW_TITLE_COLUMN, clTitleColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_SHOW_LENGTH_COLUMN, clLengthColumn.isVisible() );
+
 		return retMe;
 	}
 
@@ -4211,6 +4339,63 @@ public class FXUI implements PlayerListener {
 						break;
 						
 					case LOADER_SPEED:
+						//Do nothing
+						break;
+						
+					case AL_TABLE_SHOW_ARTIST_COLUMN:
+						albumArtistColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case AL_TABLE_SHOW_YEAR_COLUMN:
+						albumYearColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case AL_TABLE_SHOW_ALBUM_COLUMN:
+						albumAlbumColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case TR_TABLE_SHOW_ARTIST_COLUMN:
+						trackArtistColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case TR_TABLE_SHOW_NUMBER_COLUMN:
+						trackNumberColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case TR_TABLE_SHOW_TITLE_COLUMN:
+						trackTitleColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case TR_TABLE_SHOW_ALBUM_COLUMN:
+						trackAlbumColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case TR_TABLE_SHOW_LENGTH_COLUMN:
+						trackLengthColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case PL_TABLE_SHOW_PLAYLIST_COLUMN:
+						playlistNameColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case PL_TABLE_SHOW_TRACKS_COLUMN: 
+						playlistTracksColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case PL_TABLE_SHOW_LENGTH_COLUMN:
+						playlistLengthColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case CL_TABLE_SHOW_PLAYING_COLUMN:
+						clPlayingColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case CL_TABLE_SHOW_NUMBER_COLUMN:
+						clNumberColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case CL_TABLE_SHOW_ARTIST_COLUMN:
+						clArtistColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case CL_TABLE_SHOW_YEAR_COLUMN:
+						clYearColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case CL_TABLE_SHOW_ALBUM_COLUMN:
+						clAlbumColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case CL_TABLE_SHOW_TITLE_COLUMN:
+						clTitleColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case CL_TABLE_SHOW_LENGTH_COLUMN:
+						clLengthColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
 					default:
 						//Do nothing
 						break;

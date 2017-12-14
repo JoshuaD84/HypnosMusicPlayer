@@ -19,6 +19,12 @@ TODO
 		Library load and unload time
 		
 	UI
+		I need to fix the no-resize column thing for last columns. It's a bigger issue now that we can hide columns.
+		
+		persist column info
+			sort options
+			ordering
+		
 		Drag and drop folder onto current list isn't putting the songs in the right position
 		
 		missing-data isn't removed when a track is deleted, so if you D&D into the playlist, you see missing sometimes
@@ -52,12 +58,7 @@ TODO
 		current list play/pause images don't change colors immediately. Have to play a new track to get updateImageThemes() to call.
 		
 		Add default sort column choice, like shuffle and repeat
-		
-		Persist column sort options
-			
-		Hide some columns
-			https://stackoverflow.com/questions/27696578/javafx8-anchoring-tableview-columns-contextmenu-immediately-below-the-the-colu
-			
+					
 		Hover effects on transparent image buttons
 			Settings Button
 			Volume button
