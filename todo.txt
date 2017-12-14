@@ -67,9 +67,7 @@ TODO
 		Loader status % complete thing
 		
 		Put a filter on images when in light theme to make them slightly grey (or dampen the actual images).
-		
-		Revisit fonts -- Do we need to include the font files? 
-						
+
 		~incomplete/Grizzly Bear
 			F2 to show tag editor, no content in table
 			
@@ -104,7 +102,6 @@ TODO
 	
 	I don't like the way the library line wraps in the manifest. Can we make this nicer in ant? 
 	
-		
 	Ok this should address a number of issues that people have been having including this one. Please test and let me know if this issue can be closed.
 		JNativeHook-2.1.1-rc  
 			https://oss.sonatype.org/content/repositories/snapshots/com/1stleg/jnativehook/2.1.SNAPSHOT/jnativehook-2.1.20170730.201417-33.jar
@@ -254,8 +251,6 @@ OS Specific
 		
 		Gnome3 
 			Right click -> Open with -- loads the files to current list, but doesn't start playing. 
-			
-		Always use Dejavu font? 
 	
 	OSX
 		Does our package work? 
@@ -263,7 +258,6 @@ OS Specific
 		.DMG installer
 		Rename java process to Hypnos ?
 		
-		Always use LucidaGrande font?
 		Test global hotkeys
 	
 Some exceptions don't show in log. Looks like javafx thread stuff.

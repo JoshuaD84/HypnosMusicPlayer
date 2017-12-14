@@ -452,13 +452,9 @@ public class FXUI implements PlayerListener {
 	}
 	
 	private void setupFont() {
-		Path fontPath, fontBold, stylesheet; 
+		Path stylesheet; 
 		switch ( Hypnos.getOS() ) {
-			
 			case OSX:
-				fontPath = Hypnos.getRootDirectory().resolve( "resources/lucidagrande/lucidagrande.ttf" );
-				fontBold = Hypnos.getRootDirectory().resolve( "resources/lucidagrande/lucidagrande-bold.ttf" );
-				stylesheet = Hypnos.getRootDirectory().resolve( "resources/style-font-osx.css" );
 				stylesheet = Hypnos.getRootDirectory().resolve( "resources/style-font-osx.css" );
 				
 			case WIN_10:
@@ -468,27 +464,16 @@ public class FXUI implements PlayerListener {
 			case WIN_VISTA:
 			case WIN_XP:
 			case UNKNOWN:
-				fontPath = Hypnos.getRootDirectory().resolve( "resources/calibri/calibri.ttf" );
-				fontBold = Hypnos.getRootDirectory().resolve( "resources/calibri/calibri-bold.ttf" );
 				stylesheet = Hypnos.getRootDirectory().resolve( "resources/style-font-win.css" );
 				break;
 				
 			case NIX:
 			default:
-				fontPath = Hypnos.getRootDirectory().resolve( "resources/dejavu/dejavusans.ttf" );
-				fontBold = Hypnos.getRootDirectory().resolve( "resources/dejavu/dejavusans-bold.ttf" );
 				stylesheet = Hypnos.getRootDirectory().resolve( "resources/style-font-nix.css" );
 				break;
 		}
 		
-		try {
-			Font font = Font.loadFont( new FileInputStream ( fontPath.toFile() ), 12 ); 
-			Font.loadFont( new FileInputStream ( fontBold.toFile() ), 12 );
-			scene.getStylesheets().add( "file:///" + stylesheet.toFile().getAbsolutePath().replace( "\\", "/" ) );
-		} catch ( Exception e ) {
-			LOGGER.log ( Level.INFO, "Unable to set font native to system, using default font.", e );
-		}
-		
+		scene.getStylesheets().add( "file:///" + stylesheet.toFile().getAbsolutePath().replace( "\\", "/" ) );
 	}
 	
 	private void loadImages() {
