@@ -19,9 +19,6 @@ TODO
 		Library load and unload time
 		
 	UI
-		Double click on dividers to set them to position 0
-			https://stackoverflow.com/questions/47807305/how-to-detect-mouse-click-events-on-a-split-panes-divider
-		
 		Drag and drop folder onto current list isn't putting the songs in the right position
 		
 		missing-data isn't removed when a track is deleted, so if you D&D into the playlist, you see missing sometimes
@@ -32,10 +29,6 @@ TODO
 		
 		Overwite a playlist -> Get prompted -> Select "Yes" to save -> Hit cancel on the next dialog -> Thing is overwritten. Instead cancel the change.
 									
-		Export playlist as a folder
-			Copy all of the music files into that folder. Prepend them with index number? 
-			Warn if the total copy is larger than X MB or more than X tracks
-	
 		Volume Slider 
 			doesn't feel right. Do some math formula instead of linear
 			in windows goes past 100%
@@ -85,6 +78,10 @@ After beta2
 	I don't like the way the library line wraps in the manifest. Can we make this nicer in ant? 
 	
 	Bug report dialog
+	
+	Export playlist as a folder
+		Copy all of the music files into that folder. Prepend them with index number? 
+		Warn if the total copy is larger than X MB or more than X tracks
 	
 	
 		

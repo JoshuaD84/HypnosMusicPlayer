@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -246,6 +247,9 @@ public class FXUI implements PlayerListener {
 	private File baseStylesheet;
 	
 	private boolean isDarkTheme = false;
+	
+	private Double currentListSplitPaneRestoredPosition = null;
+	private Double primarySplitPaneRestoredPosition = null;
 	
 	private ColorAdjust darkThemeTransportButtons = new ColorAdjust(); {
 		darkThemeTransportButtons.setSaturation( -1 );
@@ -4191,10 +4195,53 @@ public class FXUI implements PlayerListener {
 		blankCurrentlistHeader.setOnContextMenuRequested ( 
 			event -> currentListColumnSelectorMenu.show( blankCurrentlistHeader, event.getScreenX(), event.getScreenY() ) );
 		
-		//These are the default positions.
-		primarySplitPane.setDividerPositions( .35d );
-		currentListSplitPane.setDividerPositions( .65d );
-		artSplitPane.setDividerPosition( 0, .51d ); // For some reason .5 doesn't work...
+		double primarySplitPaneDefault = .35d;
+		double currentListSplitPaneDefault = .75d;
+		double artSplitPaneDeafult = .51d;// For some reason .5 doesn't work...
+
+		primarySplitPane.setDividerPositions( primarySplitPaneDefault );
+		currentListSplitPane.setDividerPositions( currentListSplitPaneDefault );
+		artSplitPane.setDividerPosition( 0, artSplitPaneDeafult ); 
+		
+		Set<Node> dividers = primarySplitPane.lookupAll(".split-pane-divider");
+		
+		SimpleBooleanProperty mouseDragOnCurrentListDivider = new SimpleBooleanProperty ( false );
+		
+		for ( Node divider : dividers ) {
+			if ( divider.getParent() == currentListSplitPane ) {
+				divider.setOnMouseClicked( ( e ) -> {
+					if ( e.getClickCount() == 2 ) {
+						if ( currentListSplitPaneRestoredPosition != null && currentListSplitPane.getDividerPositions()[0] >= .99d  ) {
+							currentListSplitPane.setDividerPosition( 0, currentListSplitPaneRestoredPosition );
+							currentListSplitPaneRestoredPosition = null;
+						} else if ( currentListSplitPane.getDividerPositions()[0] >= .99d ) {
+							currentListSplitPane.setDividerPosition( 0, currentListSplitPaneDefault );
+						} else {
+							currentListSplitPaneRestoredPosition = currentListSplitPane.getDividerPositions()[0];
+							currentListSplitPane.setDividerPosition( 0, 1 );
+						}
+					}
+				});
+			} else if ( divider.getParent() == primarySplitPane ) {
+				divider.setOnMouseClicked( ( e ) -> {
+					if ( e.getClickCount() == 2 ) {
+						if ( primarySplitPaneRestoredPosition != null && primarySplitPane.getDividerPositions()[0] <= .01d ) {
+							primarySplitPane.setDividerPosition( 0, primarySplitPaneRestoredPosition );
+							primarySplitPaneRestoredPosition = null;
+						} else if ( primarySplitPane.getDividerPositions()[0] <= .01d ) {
+							primarySplitPane.setDividerPosition( 0, primarySplitPaneDefault );
+						} else {
+							primarySplitPaneRestoredPosition = primarySplitPane.getDividerPositions()[0];
+							primarySplitPane.setDividerPosition( 0, 0 );
+						}
+					}
+				});
+			}
+		}
+			
+		SplitPane.setResizableWithParent( artSplitPane, Boolean.FALSE );
+		SplitPane.setResizableWithParent( currentListSplitPane, Boolean.FALSE );
+		SplitPane.setResizableWithParent( primarySplitPane, Boolean.FALSE );
 			
 		hackTooltipStartTiming();
 	
