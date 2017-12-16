@@ -1,4 +1,4 @@
-package net.joshuad.hypnos.fxui;
+package net.joshuad.hypnos;
 
 /*
  * The Alphanum Algorithm is an improved sorting algorithm for strings

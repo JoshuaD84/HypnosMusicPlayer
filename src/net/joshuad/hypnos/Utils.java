@@ -13,6 +13,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -313,6 +314,9 @@ public class Utils {
 		TrackFinder finder = new TrackFinder ();
 		try {
 			Files.walkFileTree( startingDirectory, finder );
+			for ( Path path : finder.trackPaths ) {
+				System.out.println ( path.getFileName() );
+			}
 	    	return finder.trackPaths;
 	    	
 		} catch ( Exception e) {
@@ -349,13 +353,15 @@ class TrackFinder extends SimpleFileVisitor <Path> {
 	
 	ArrayList <Path> trackPaths = new ArrayList <Path> ();
 	
+	ArrayList <Path> addMe = new ArrayList <Path> ();
+	
 	@Override
 	public FileVisitResult visitFile ( Path path, BasicFileAttributes attr ) {
 
 		boolean isMusicFile = Utils.isMusicFile ( path );
 		
 		if ( isMusicFile ) {
-			trackPaths.add ( path );
+			addMe.add ( path );
 		} 
 		
 		return FileVisitResult.CONTINUE;
@@ -363,6 +369,9 @@ class TrackFinder extends SimpleFileVisitor <Path> {
 	
 	@Override
 	public FileVisitResult postVisitDirectory( Path dir, IOException exc ) {
+		Collections.sort( addMe );
+		trackPaths.addAll( addMe );
+		addMe.clear();
 		return FileVisitResult.CONTINUE;
 	}
 	

@@ -357,7 +357,7 @@ public class CurrentList {
 	}
 		
 	public void appendTracksPathList ( List <Path> paths ) {
-		insertTrackPathList ( items.size() - 1, paths );
+		insertTrackPathList ( items.size(), paths );
 	}
 	
 	public void insertTracks ( int index, List<? extends Track> tracks ) {
@@ -416,11 +416,11 @@ public class CurrentList {
 				int targetIndex = index;
 				synchronized ( items ) {
 					if ( index < 0 ) {
-						LOGGER.fine( "Asked to insert tracks at: " + index + ", inserting at 0 instead." );
+						LOGGER.info( "Asked to insert tracks at: " + index + ", inserting at 0 instead." );
 						targetIndex = 0;
 					} else if ( index > items.size() ) {
-						LOGGER.fine( "Asked to insert tracks past the end of current list. Inserting at end instead." );
-						targetIndex = items.size();
+						LOGGER.info( "Asked to insert tracks past the end of current list. Inserting at end instead." );
+						targetIndex = items.size() - 1;
 					}
 				}
 				
@@ -442,7 +442,13 @@ public class CurrentList {
 						tracksAdded();
 					}
 				}
+				//TODO: This is really bad practice, but it works for now. Refactor
+				//This fixes two problems -- red rows in current list not being white after deleting and D&D
+				//and the table not refreshing after drag & drop of folder
+				Hypnos.getUI().refreshCurrentList();
+			
 			}
+			
 		};
 		
 		doThreadAware ( runMe );
@@ -450,7 +456,7 @@ public class CurrentList {
 	
 	private void addItem ( int index, CurrentListTrack track ) {
 		if ( track == null ) return;
-		
+		//TODO: Check indexes for out of bounds. 
 		items.add( index, track );
 		
 	}

@@ -102,6 +102,7 @@ import javafx.stage.Window;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import net.joshuad.hypnos.Album;
+import net.joshuad.hypnos.AlphanumComparator;
 import net.joshuad.hypnos.CurrentList;
 import net.joshuad.hypnos.CurrentListState;
 import net.joshuad.hypnos.CurrentListTrack;
@@ -3634,26 +3635,29 @@ public class FXUI implements PlayerListener {
 
 		
 			} else if ( db.hasFiles() ) {
-				ArrayList <Track> tracksToAdd = new ArrayList();
+				ArrayList <Path> tracksToAdd = new ArrayList<Path> ();
+				
 				for ( File file : db.getFiles() ) {
 					Path droppedPath = Paths.get( file.getAbsolutePath() );
 					if ( Utils.isMusicFile( droppedPath ) ) {
-						player.getCurrentList().appendTrack ( droppedPath );
+						tracksToAdd.add ( droppedPath );
 						
 					} else if ( Files.isDirectory( droppedPath ) ) {
-						player.getCurrentList().appendTracksPathList ( Utils.getAllTracksInDirectory( droppedPath ) );
+						tracksToAdd.addAll ( Utils.getAllTracksInDirectory( droppedPath ) );
+						
 					} else if ( Utils.isPlaylistFile ( droppedPath ) ) {
-						Playlist playlist = Playlist.loadPlaylist( droppedPath );
-						if ( playlist != null ) {
-							player.getCurrentList().appendPlaylist ( playlist );
-						}
+						List<Path> paths = Playlist.getTrackPaths( droppedPath );
+						tracksToAdd.addAll( paths );
 					}
+				}
+				
+				if ( !tracksToAdd.isEmpty() ) {
+					player.getCurrentList().insertTrackPathList ( 0, tracksToAdd );
 				}
 
 				event.setDropCompleted( true );
 				event.consume();
-				currentListTable.refresh();
-			}
+			} 
 
 		});
 
@@ -3853,7 +3857,7 @@ public class FXUI implements PlayerListener {
 			});
 			
 			row.itemProperty().addListener( (obs, oldValue, newValue ) -> {
-				if ( newValue != null ) {
+				if ( newValue != null && row != null ) {
 			        if ( newValue.isMissingFile() ) {
 			            row.getStyleClass().add( "file-missing" );
 			        } else {
@@ -3863,7 +3867,7 @@ public class FXUI implements PlayerListener {
 		    });
 			
 			row.itemProperty().addListener( ( obs, oldValue, newTrackValue ) -> {
-				if ( newTrackValue != null ) {
+				if ( newTrackValue != null  && row != null ) {
 					newTrackValue.fileIsMissingProperty().addListener( ( o, old, newValue ) -> {
 						if ( newValue ) {
 							row.getStyleClass().add( "file-missing" );
@@ -3978,7 +3982,7 @@ public class FXUI implements PlayerListener {
 					}
 					
 					if ( !tracksToAdd.isEmpty() ) {
-						int dropIndex = row.isEmpty() ? dropIndex = trackTable.getItems().size() : row.getIndex();
+						int dropIndex = row.isEmpty() ? dropIndex = currentListTable.getItems().size() : row.getIndex();
 						player.getCurrentList().insertTrackPathList ( dropIndex, tracksToAdd );
 					}
 

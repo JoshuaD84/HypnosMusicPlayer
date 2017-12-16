@@ -17,9 +17,7 @@ TODO
 			
 		Library load and unload time
 		
-	UI
-		Drag and drop folder onto current list isn't putting the songs in the right position
-				
+	UI				
 		tracks with missing files are removed from the current list if you close and reopen hypnos. They should stay
 			Only when it's an album.
 			Line 153 of LibraryUpdater.updateLibrary().  Not sure how I want to handle this yet. 
