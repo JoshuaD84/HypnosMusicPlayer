@@ -700,6 +700,8 @@ public class FXUI implements PlayerListener {
 			if ( addSourceTracksImage != null ) addSourceTracksImage.setEffect( darkThemeButtons );
 			if ( addSourceAlbumsImage != null ) addSourceAlbumsImage.setEffect( darkThemeButtons );
 			if ( addSourcePlaylistsImage != null ) addSourcePlaylistsImage.setEffect( darkThemeButtons );
+			
+			currentListTable.refresh();
 		}
 	}
 	
@@ -746,6 +748,8 @@ public class FXUI implements PlayerListener {
 		if ( addSourceTracksImage != null ) addSourceTracksImage.setEffect( null );
 		if ( addSourceAlbumsImage != null ) addSourceAlbumsImage.setEffect( null );
 		if ( addSourcePlaylistsImage != null ) addSourcePlaylistsImage.setEffect( null );
+		
+		currentListTable.refresh();
 	}
 	
 	public boolean isDarkTheme() {

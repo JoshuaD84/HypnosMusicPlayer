@@ -1,5 +1,8 @@
 TODO
-	Library	
+	Refactor Library
+		Make a source directory a class, not just a path.
+			Library Source Directories - highlight in red if they are missing. 
+
 		An album will form from tracks if you edit them and they aren't currently an album. But an album won't split if you edit tags and make it not be an album.
 			Is this desired behavior? I feel like probably no -- it can create different states based on the same disk contents, which doesn't make sense
 			
@@ -21,15 +24,11 @@ TODO
 		tracks with missing files are removed from the current list if you close and reopen hypnos. They should stay
 			Only when it's an album.
 			Line 153 of LibraryUpdater.updateLibrary().  Not sure how I want to handle this yet. 
-											
-		Library Source Directories - highlight in red if they are missing. 
 									
 		Volume Slider 
 			doesn't feel right. Do some math formula instead of linear
 			in windows goes past 100%
-	
-		current list play/pause images don't change colors immediately. Have to play a new track to get updateImageThemes() to call.
-		
+			
 		Hover effects on transparent image buttons
 			Settings Button
 			Volume button

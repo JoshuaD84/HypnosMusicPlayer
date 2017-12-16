@@ -61,7 +61,6 @@ public class Library {
 	final FilteredList <TagError> tagErrorsFiltered = new FilteredList <TagError>( tagErrors, p -> true );
 	final SortedList <TagError> tagErrorsSorted = new SortedList <TagError>( tagErrorsFiltered );
 	
-
 	final ObservableList <Path> musicSourcePaths = FXCollections.observableArrayList();
 	
 	Vector <Album> albumsToAdd = new Vector <Album>();
@@ -79,9 +78,7 @@ public class Library {
 	private Vector <Path> sourceToAdd = new Vector <Path>();
 	private Vector <Path> sourceToRemove = new Vector <Path>();
 	private Vector <Path> sourceToUpdate = new Vector <Path>();
-	
-	//Vector <TagError> tagErrorsToRemove = new Vector <TagError> ();
-	
+		
 	private boolean purgeOrphansAndMissing = true;
 	
 	private int loaderSleepTimeMS = 50;
