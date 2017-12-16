@@ -14,25 +14,17 @@ import net.joshuad.hypnos.lyrics.scrapers.MusixScraper;
 public class LyricsFetcher {
 	private static transient final Logger LOGGER = Logger.getLogger( LyricsFetcher.class.getName() );
 	
-	//TODO: URLS
 	public enum LyricSite {
-		NONE ( "No Source", null ),
-		METRO ( "Metro Lyrics", null ),
-		GENIUS ( "Genius Lyrics", null ),
-		AZ ( "AZLyrics", null ),
-		MUSIX ( "MusixMatch", null );
+		NONE ( "No Source" ),
+		METRO ( "Metro Lyrics" ),
+		GENIUS ( "Genius Lyrics" ),
+		AZ ( "AZLyrics" ),
+		MUSIX ( "MusixMatch" );
 		
-		
-		private String baseURL;
 		private String name;
 		
-		LyricSite ( String name, String baseURL ) {
+		LyricSite ( String name ) {
 			this.name = name;
-			this.baseURL = baseURL;
-		}
-		
-		public String getURL() {
-			return baseURL;
 		}
 		
 		public String getName() {

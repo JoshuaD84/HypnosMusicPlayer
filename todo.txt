@@ -22,7 +22,9 @@ TODO
 		
 		Loader status % complete thing
 		
-	UI				
+	UI		
+		I need to fix the no-resize column thing for last columns. It's a bigger issue now that we can hide columns.
+			
 		tracks with missing files are removed from the current list if you close and reopen hypnos. They should stay
 			Only when it's an album.
 			Line 153 of LibraryUpdater.updateLibrary().  Not sure how I want to handle this yet. 
@@ -49,8 +51,6 @@ TODO
 
 
 After beta2 
-	I need to fix the no-resize column thing for last columns. It's a bigger issue now that we can hide columns.
-	
 	Tag auto fix button
 				
 	persist column info

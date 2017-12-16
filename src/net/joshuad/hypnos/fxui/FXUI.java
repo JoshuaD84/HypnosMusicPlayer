@@ -3552,7 +3552,7 @@ public class FXUI implements PlayerListener {
 		
 		currentListTable = new TableView();
 		currentListTable.getColumns().addAll( clPlayingColumn, clNumberColumn, clArtistColumn, clYearColumn, clAlbumColumn, clTitleColumn, clLengthColumn );
-		albumTable.getSortOrder().add( clNumberColumn ); //TODO: This doesn't belong here. 
+		currentListTable.getSortOrder().add( clNumberColumn ); 
 		currentListTable.setEditable( false );
 		currentListTable.setItems( player.getCurrentList().getItems() );
 		
