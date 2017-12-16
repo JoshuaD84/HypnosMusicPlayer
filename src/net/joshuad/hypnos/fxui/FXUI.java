@@ -3652,6 +3652,7 @@ public class FXUI implements PlayerListener {
 
 				event.setDropCompleted( true );
 				event.consume();
+				currentListTable.refresh();
 			}
 
 		});

@@ -1,6 +1,7 @@
 TODO
 	Library	
-		I don't know if albums will form from tracks after they have loaded and been identified as not an album, then id3 tags edited.
+		An album will form from tracks if you edit them and they aren't currently an album. But an album won't split if you edit tags and make it not be an album.
+			Is this desired behavior? I feel like probably no -- it can create different states based on the same disk contents, which doesn't make sense
 			
 		Albums aren't updating on the album list when you edit tags. Probably because they're behind in the update queue or I broke album.update
 		
@@ -18,9 +19,7 @@ TODO
 		
 	UI
 		Drag and drop folder onto current list isn't putting the songs in the right position
-		
-		missing-data selector isn't removed when a track is deleted, so if you D&D into the playlist, you see missing sometimes
-		
+				
 		tracks with missing files are removed from the current list if you close and reopen hypnos. They should stay
 			Only when it's an album.
 			Line 153 of LibraryUpdater.updateLibrary().  Not sure how I want to handle this yet. 
@@ -33,8 +32,6 @@ TODO
 	
 		current list play/pause images don't change colors immediately. Have to play a new track to get updateImageThemes() to call.
 		
-		Add default sort column choice, like shuffle and repeat
-					
 		Hover effects on transparent image buttons
 			Settings Button
 			Volume button
@@ -81,6 +78,8 @@ After beta2
 		track table, history, queue, info windows, current table -> single tracks
 		album table -> folder
 	
+	Add default sort column choice, like shuffle and repeat
+					
 		
 JavaFX stuff
 	
