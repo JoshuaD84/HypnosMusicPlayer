@@ -16,6 +16,9 @@ public class FuzzyTest {
 		evaluate ( "/d/music-hard-to-sort/Jon Rizzo/" );
 		evaluate ( "/d/music/John Frusciante/2009 - The Empyrean" );
 		evaluate ( "/d/music/John Frusciante/" );
+		evaluate ( "/d/music/Sigur Rós/2002 - ( )/" );
+		
+		//System.out.println ( "() == () ? " + FuzzySearch.weightedRatio( "()", "()" ) );
 	}
 	
 	public static void evaluate ( String location ) {

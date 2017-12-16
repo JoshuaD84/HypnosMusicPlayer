@@ -280,12 +280,19 @@ public class Utils {
 						artistName = prepareArtistForCompare ( track.getAlbumArtist() );
 						
 					} else {
+						/* We usually use weighted ratio, but that can return 0 for album names like   ()   
+						 * even if the strings are idential. 
+						 * In that case, we switch to straight ratio, which doesn't have this problem
+						 */
+						
 						int albumMatchPercent = FuzzySearch.weightedRatio( albumName, prepareAlbumForCompare ( track.getAlbumTitle() ) );
+						if ( albumMatchPercent == 0 ) albumMatchPercent = FuzzySearch.ratio( albumName, prepareAlbumForCompare ( track.getAlbumTitle() ) );
 						if ( albumMatchPercent < 90 ) {
 							return false;
 						}
 						
 						int artistMatchPercent = FuzzySearch.weightedRatio( artistName, prepareArtistForCompare ( track.getAlbumArtist() ) );
+						if ( artistMatchPercent == 0 ) albumMatchPercent = FuzzySearch.ratio( artistName, prepareAlbumForCompare ( track.getAlbumArtist() ) );
 						if ( artistMatchPercent < 90 ) {
 							return false;
 						}

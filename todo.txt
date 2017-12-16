@@ -1,9 +1,7 @@
 TODO
 	Library	
 		I don't know if albums will form from tracks after they have loaded and been identified as not an album, then id3 tags edited.
-	
-		Sigur Ros () doesn't load.
-		
+			
 		Albums aren't updating on the album list when you edit tags. Probably because they're behind in the update queue or I broke album.update
 		
 		Sometimes there are duplicated tracks in the track list
