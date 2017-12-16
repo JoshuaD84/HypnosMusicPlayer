@@ -1844,8 +1844,7 @@ public class FXUI implements PlayerListener {
 				return true;
 				
 			} else if (result.get() == ButtonType.YES ) {
-				promptAndSavePlaylist ( Utils.convertCurrentTrackList( player.getCurrentList().getItems() ) ); 
-				return true;
+				return promptAndSavePlaylist ( Utils.convertCurrentTrackList( player.getCurrentList().getItems() ) );
 			
 			} else {
 				return false;
@@ -1854,7 +1853,7 @@ public class FXUI implements PlayerListener {
 		return false;
 	}
 	
-	public void promptAndSavePlaylist ( List <Track> tracks ) { 
+	public boolean promptAndSavePlaylist ( List <Track> tracks ) { 
 	//REFACTOR: This should probably be refactored into promptForPlaylistName and <something>.savePlaylist( name, items )
 		String defaultName = "";
 		if ( player.getCurrentPlaylist() != null ) {
@@ -1888,7 +1887,9 @@ public class FXUI implements PlayerListener {
 			CurrentListState newState = new CurrentListState ( state.getItems(), state.getAlbums(), newPlaylist, CurrentList.Mode.PLAYLIST );
 			
 			player.getCurrentList().setState( newState );
+			return true;
 		}
+		return false;
 	}
 	
 	public void promptAndRenamePlaylist ( Playlist playlist ) {

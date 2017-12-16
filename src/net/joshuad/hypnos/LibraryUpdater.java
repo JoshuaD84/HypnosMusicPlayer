@@ -141,39 +141,38 @@ public class LibraryUpdater {
 										Album updateMe = library.albums.get( library.albums.indexOf( updateSource ) );
 										try {
 											updateMe.updateData();
-											
-											List <Album> currentListAlbums = player.getCurrentList().getState().getAlbums();
-											
-											//TODO: handle this when we have multiple discs loaded
-											if ( currentListAlbums.size() == 1 && updateMe.equals( currentListAlbums.get( 0 ) ) ) {
-												
-												Track currentArtImages = ui.getCurrentImagesTrack();
-												List <CurrentListTrack> selectedItems = new ArrayList<> ( ui.getSelectedTracks() );
-												
-												Track currentTrack = player.getCurrentTrack();
-												
-												player.getCurrentList().setAlbum( updateMe );
-												library.albumsToUpdate.remove( updateMe ); //prevent an infinite loop
-												
-												ui.setImages( currentArtImages );
-												ui.setSelectedTracks ( selectedItems );
-												
-												if ( currentTrack != null ) {
-													for ( CurrentListTrack currentListTrack : player.getCurrentList().getItems() ) {
-														if ( currentListTrack.equals( currentTrack ) ) {
-															currentListTrack.setIsCurrentTrack( true );
-															currentListTrack.setIsLastCurrentListTrack( true );
-															break;
-														}
-													}
-												}
-											}
-											
 										} catch ( Exception e ) {
 											try {
 												library.albums.remove( updateMe );
 											} catch ( Exception e2 ) {}
 										}
+										
+										List <Album> currentListAlbums = player.getCurrentList().getState().getAlbums();
+										
+										//TODO: handle this when we have multiple discs loaded
+										if ( currentListAlbums.size() == 1 && updateMe.equals( currentListAlbums.get( 0 ) ) ) {
+											
+											Track currentArtImages = ui.getCurrentImagesTrack();
+											List <CurrentListTrack> selectedItems = new ArrayList<> ( ui.getSelectedTracks() );
+											Track currentTrack = player.getCurrentTrack();
+											
+											player.getCurrentList().setAlbum( updateMe );
+											library.albumsToUpdate.remove( updateMe ); //prevent an infinite loop
+											
+											ui.setImages( currentArtImages );
+											ui.setSelectedTracks ( selectedItems );
+											
+											if ( currentTrack != null ) {
+												for ( CurrentListTrack currentListTrack : player.getCurrentList().getItems() ) {
+													if ( currentListTrack.equals( currentTrack ) ) {
+														currentListTrack.setIsCurrentTrack( true );
+														currentListTrack.setIsLastCurrentListTrack( true );
+														break;
+													}
+												}
+											}
+										}
+										
 									} else {
 										library.albums.add( updateSource );
 									}

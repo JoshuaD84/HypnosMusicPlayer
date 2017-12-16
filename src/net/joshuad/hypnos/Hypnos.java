@@ -708,7 +708,6 @@ public class Hypnos extends Application {
 				
 				finishLoadingThread.setDaemon( true );
 				finishLoadingThread.start();
-				
 								
 			} else {
 				singleInstanceController.sendCommandsThroughSocket( commands );
