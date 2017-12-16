@@ -456,9 +456,18 @@ public class CurrentList {
 	
 	private void addItem ( int index, CurrentListTrack track ) {
 		if ( track == null ) return;
-		//TODO: Check indexes for out of bounds. 
-		items.add( index, track );
 		
+		synchronized ( items ) {
+			int targetIndex = index;
+			if ( index < 0 ) {
+				LOGGER.info( "Asked to insert tracks at: " + index + ", inserting at 0 instead." );
+				targetIndex = 0;
+			} else if ( index > items.size() ) {
+				LOGGER.info( "Asked to insert tracks past the end of current list. Inserting at end instead." );
+				targetIndex = items.size() - 1;
+			}
+			items.add( targetIndex, track );
+		}
 	}
 	
 	public void appendAlbum ( Album album ) {

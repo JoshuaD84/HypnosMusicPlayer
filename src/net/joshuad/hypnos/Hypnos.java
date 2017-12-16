@@ -204,7 +204,6 @@ public class Hypnos extends Application {
 				libraryUpdater.setSleepTimeMS( 2 );
 				break;
 		}
-		//TODO: 
 		
 		ui.setLoaderSpeedDisplay ( speed );
 		

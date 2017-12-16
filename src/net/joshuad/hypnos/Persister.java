@@ -105,7 +105,7 @@ public class Persister {
 		}
 		
 		if ( !playlistsDirectory.exists() ) {
-			boolean playlistDirCreated = playlistsDirectory.mkdirs(); //TODO: boolean never read
+			boolean playlistDirCreated = playlistsDirectory.mkdirs(); 
 			if ( playlistDirCreated ) {
 				LOGGER.info( "Playlist directory did not exist. Created: " + playlistsDirectory.toString() ); 
 			} else {

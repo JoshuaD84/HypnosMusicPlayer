@@ -263,7 +263,7 @@ public class FXUI implements PlayerListener {
 		darkThemeButtons.setHue( 1 );
 		darkThemeButtons.setBrightness( .75 );
 	}
-	
+
 	private SimpleBooleanProperty promptBeforeOverwrite = new SimpleBooleanProperty ( true );
 	
 	boolean doPlaylistSaveWarning = true;
@@ -1005,7 +1005,7 @@ public class FXUI implements PlayerListener {
 		volumeMuteButton.getStyleClass().add( "volumeButton" );
 		volumeMuteButton.setTooltip( new Tooltip ( "Toggle Mute" ) );
 		volumeMuteButton.setOnAction( e -> player.toggleMute() );
-		
+
 		volumeSlider = new Slider();
 		volumeSlider.setMin( 0 );
 		volumeSlider.setMax( 100 );
@@ -1050,7 +1050,7 @@ public class FXUI implements PlayerListener {
 
 		Button settingsButton = new Button ( );
 		settingsButton.setGraphic( settingsImage );
-		
+
 		switch ( Hypnos.getOS() ) {
 			case WIN_10: case WIN_7: case WIN_8: case WIN_UNKNOWN: case WIN_VISTA: case WIN_XP:
 				settingsButton.setPadding( new Insets ( 5, 5, 0, 5 ) );
