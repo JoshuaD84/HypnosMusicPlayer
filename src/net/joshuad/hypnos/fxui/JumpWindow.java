@@ -187,8 +187,16 @@ public class JumpWindow extends Stage {
 		
 		HypnosResizePolicy resizePolicy = new HypnosResizePolicy();
 		trackTable.setColumnResizePolicy( resizePolicy );
-
+		artistColumn.setPrefWidth( 100 );
+		yearColumn.setPrefWidth( 60 );
+		albumColumn.setPrefWidth( 100 );
+		titleColumn.setPrefWidth( 100 ); 
+		artistColumn.setMinWidth( 1 );
+		yearColumn.setMinWidth( 1 );
+		albumColumn.setMinWidth( 1 );
+		titleColumn.setMinWidth( 1 ); 
 		resizePolicy.registerFixedWidthColumns( yearColumn );
+		
 		trackTable.setPlaceholder( new Label( "No tracks in playlist." ) );
 		trackTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 		
