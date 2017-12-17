@@ -53,7 +53,6 @@ public class HypnosResizePolicy implements Callback <TableView.ResizeFeatures, B
 	@SuppressWarnings({ "unchecked" })
 	@Override
 	public Boolean call ( TableView.ResizeFeatures feature ) {
-		System.out.println ( "Here" );
 
 		if ( feature != null ) {
 

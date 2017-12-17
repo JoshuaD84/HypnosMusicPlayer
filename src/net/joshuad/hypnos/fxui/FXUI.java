@@ -825,7 +825,6 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public void restoreWindow() {
-		System.out.println ( "Restore Window called." ); //TODO: DD
 		mainStage.setIconified( false );
 	}
 

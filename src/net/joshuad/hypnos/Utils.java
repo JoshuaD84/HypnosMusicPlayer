@@ -314,9 +314,6 @@ public class Utils {
 		TrackFinder finder = new TrackFinder ();
 		try {
 			Files.walkFileTree( startingDirectory, finder );
-			for ( Path path : finder.trackPaths ) {
-				System.out.println ( path.getFileName() );
-			}
 	    	return finder.trackPaths;
 	    	
 		} catch ( Exception e) {

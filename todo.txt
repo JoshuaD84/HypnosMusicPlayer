@@ -1,14 +1,72 @@
-TODO
-	Resize Policy
-		Windowed mode, shrink window until a scrollbar appears. Maximize window so scrollbar disappears -- Scrollbar width is still accounted for
-		
-		Scrollbar width is calculated wrong by 4 pixels. I have it hardcoded, but I posted a SE question
-			https://stackoverflow.com/questions/47852175/get-full-width-of-scrollbar-for-a-tableview
-		
-		CustomResizePolicy is not called when double clicking on table header dividers to shrink wrap	
-			https://stackoverflow.com/questions/47852239/customresizepolicy-not-triggering-when-a-columns-headers-divider-is-double-cli
-		
+Before Beta 2:
+	Tag Editor table - Images are being forced to be square
+	
+	After the current list has completely finished playing and stopped. If you try to play something (album, track, playlist) it does not start playing. 
+				
+	tracks with missing files are removed from the current list if you close and reopen hypnos. They should stay
+		Only when it's an album.
+		Line 153 of LibraryUpdater.updateLibrary().  Not sure how I want to handle this yet. 
+								
+	Volume Slider 
+		doesn't feel right. Do some math formula instead of linear
+		in windows goes past 100%
 
+	~incomplete/Grizzly Bear
+		F2 to show tag editor, no content in table
+		
+	Consistent in-program hotkeys & tab in settings window for in-program hotkeys. 
+		
+		Main Window, Anywhere except text input areas
+			Toggle Pause			Space 		
+			Back 5 seconds			Left		
+			Forward 5 seconds		Right		
+			Toggle Shuffle Mode		S			
+			Toggle Random Mode		R			
+			Previous				   			
+			Next				
+			Mute / Unmute			M	   			
+		
+		Transport
+		
+		Playlists, Albums, Tracks
+			Q 	 					queue item
+			Shift Q 				play next (front of queue)
+			F2						Tag Editor
+			F3						Track List / Info
+			F4						File System Browser
+			Enter					Play Selected Item(s)
+			Shift Enter				Append Item to current list
+	
+		Track
+			L						Lyrics for selected item
+			
+		Current List
+			J 						Jump Window
+			Ctrl + S				Save Current List as Playlist
+			Ctrl + O 				Open files 
+			Del						Delete selected Tracks
+			Shift + Del				Crop to selected Tracks
+			
+		
+		All Tables
+			Normal table hotkeys
+			
+		
+			
+	
+	https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
+				
+	Ok this should address a number of issues that people have been having including this one. Please test and let me know if this issue can be closed.
+		https://stackoverflow.com/questions/45262517/fatal-error-when-calling-showsavedialog-and-showopenmultipledialog
+		https://github.com/kwhat/jnativehook/issues/185
+		JNativeHook-2.1.1-rc  
+			https://oss.sonatype.org/content/repositories/snapshots/com/1stleg/jnativehook/2.1.SNAPSHOT/jnativehook-2.1.20170730.201417-33.jar
+		JNativeHook-2.0.4-rc  
+			https://oss.sonatype.org/content/repositories/snapshots/com/1stleg/jnativehook/2.0.SNAPSHOT/jnativehook-2.0.20170730.201637-41.jar
+
+
+
+General:
 	Refactor Library
 		Make a source directory a class, not just a path.
 			Library Source Directories - highlight in red if they are missing. 
@@ -32,35 +90,15 @@ TODO
 		
 		Loader status % complete thing
 		
-	UI		
-		After the current list has completely finished playing and stopped. If you try to play something (album, track, playlist) it does not start playing. 
-					
-		tracks with missing files are removed from the current list if you close and reopen hypnos. They should stay
-			Only when it's an album.
-			Line 153 of LibraryUpdater.updateLibrary().  Not sure how I want to handle this yet. 
-									
-		Volume Slider 
-			doesn't feel right. Do some math formula instead of linear
-			in windows goes past 100%
+	Resize Policy
+		Windowed mode, shrink window until a scrollbar appears. Maximize window so scrollbar disappears -- Scrollbar width is still accounted for
+		
+		Scrollbar width is calculated wrong by 4 pixels. I have it hardcoded, but I posted a SE question
+			https://stackoverflow.com/questions/47852175/get-full-width-of-scrollbar-for-a-tableview
+		
+		CustomResizePolicy is not called when double clicking on table header dividers to shrink wrap	
+			https://stackoverflow.com/questions/47852239/customresizepolicy-not-triggering-when-a-columns-headers-divider-is-double-cli
 
-		~incomplete/Grizzly Bear
-			F2 to show tag editor, no content in table
-			
-		Consistent in-program hotkeys & tab in settings window for in-program hotkeys. 
-	
-	https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
-				
-	Ok this should address a number of issues that people have been having including this one. Please test and let me know if this issue can be closed.
-		https://stackoverflow.com/questions/45262517/fatal-error-when-calling-showsavedialog-and-showopenmultipledialog
-		https://github.com/kwhat/jnativehook/issues/185
-		JNativeHook-2.1.1-rc  
-			https://oss.sonatype.org/content/repositories/snapshots/com/1stleg/jnativehook/2.1.SNAPSHOT/jnativehook-2.1.20170730.201417-33.jar
-		JNativeHook-2.0.4-rc  
-			https://oss.sonatype.org/content/repositories/snapshots/com/1stleg/jnativehook/2.0.SNAPSHOT/jnativehook-2.0.20170730.201637-41.jar
-
-
-
-After beta2 
 	Tag auto fix button
 				
 	persist column info
