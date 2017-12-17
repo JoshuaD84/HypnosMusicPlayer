@@ -1274,7 +1274,7 @@ public class FXUI implements PlayerListener {
 			Track track = currentImagesTrack;
 			if ( track == null ) return;
 			
-			FileChooser fileChooser = new FileChooser(); //TODO: maybe only instantianate this once
+			FileChooser fileChooser = new FileChooser(); 
 			FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter( 
 				"Image Files", Arrays.asList( "*.jpg", "*.jpeg", "*.png" ) );
 			
@@ -2543,10 +2543,6 @@ public class FXUI implements PlayerListener {
 		
 		albumAlbumColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "FullAlbumTitle" ) );
 		albumAlbumColumn.setCellFactory( e -> new FormattedAlbumCell() );
-
-		albumArtistColumn.setMaxWidth( 45000 );
-		albumYearColumn.setMaxWidth( 10000 );
-		albumAlbumColumn.setMaxWidth( 45000 );
 		
 		albumColumnSelectorMenu = new ContextMenu ();
 		CheckMenuItem artistMenuItem = new CheckMenuItem ( "Show Artist Column" );
@@ -2574,10 +2570,13 @@ public class FXUI implements PlayerListener {
 		albumTable.getSortOrder().add( albumArtistColumn );
 		albumTable.getSortOrder().add( albumYearColumn );
 		albumTable.getSortOrder().add( albumAlbumColumn );
-		FixedWidthCustomResizePolicy resizePolicy = new FixedWidthCustomResizePolicy();
-		resizePolicy.registerColumns( albumYearColumn );
 		
+		HypnosResizePolicy resizePolicy = new HypnosResizePolicy();
 		albumTable.setColumnResizePolicy( resizePolicy );
+		albumArtistColumn.setPrefWidth( 100 );
+		albumYearColumn.setPrefWidth( 60 );
+		albumAlbumColumn.setPrefWidth( 100 );
+		resizePolicy.registerColumns( albumYearColumn );
 		
 		emptyAlbumListLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
 		emptyAlbumListLabel.setWrapText( true );
@@ -2846,12 +2845,6 @@ public class FXUI implements PlayerListener {
 		
 		trackArtistColumn.setSortType( TableColumn.SortType.ASCENDING );
 
-		trackArtistColumn.setMaxWidth( 45000 );
-		trackTitleColumn.setMaxWidth( 45000 );
-		trackLengthColumn.setMaxWidth( 15000 );
-		trackAlbumColumn.setMaxWidth( 45000 );
-		trackNumberColumn.setMaxWidth( 15000 );
-
 		trackNumberColumn.setCellFactory( column -> {
 			return new TableCell <Track, Integer>() {
 				@Override
@@ -2901,8 +2894,15 @@ public class FXUI implements PlayerListener {
 		trackTable.getSortOrder().add( trackArtistColumn );
 		trackTable.getSortOrder().add( trackAlbumColumn );
 		trackTable.getSortOrder().add( trackNumberColumn );
-		FixedWidthCustomResizePolicy resizePolicy = new FixedWidthCustomResizePolicy();
+		
+		HypnosResizePolicy resizePolicy = new HypnosResizePolicy();
 		trackTable.setColumnResizePolicy( resizePolicy );
+		trackArtistColumn.setPrefWidth( 100 );
+		trackNumberColumn.setPrefWidth( 40 );
+		trackAlbumColumn.setPrefWidth( 100 );
+		trackTitleColumn.setPrefWidth( 100 );
+		trackLengthColumn.setPrefWidth( 60 );
+		resizePolicy.registerColumns( trackNumberColumn, trackLengthColumn );
 		
 		emptyTrackListLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
 		emptyTrackListLabel.setWrapText( true );
@@ -3168,10 +3168,6 @@ public class FXUI implements PlayerListener {
 		playlistTracksColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "SongCount" ) );
 
 		playlistNameColumn.setSortType( TableColumn.SortType.ASCENDING );
-
-		playlistNameColumn.setMaxWidth( 70000 );
-		playlistLengthColumn.setMaxWidth( 15000 );
-		playlistTracksColumn.setMaxWidth( 15000 );
 		
 		playlistColumnSelectorMenu = new ContextMenu ();
 		CheckMenuItem nameMenuItem = new CheckMenuItem ( "Show Name Column" );
@@ -3197,12 +3193,14 @@ public class FXUI implements PlayerListener {
 		library.getPlaylistSorted().comparatorProperty().bind( playlistTable.comparatorProperty() );
 
 		playlistTable.getSortOrder().add( playlistNameColumn );
-		playlistTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
 		
-		FixedWidthCustomResizePolicy resizePolicy = new FixedWidthCustomResizePolicy();
-		resizePolicy.registerColumns( playlistTracksColumn );
+		HypnosResizePolicy resizePolicy = new HypnosResizePolicy();
 		playlistTable.setColumnResizePolicy( resizePolicy );
-
+		playlistNameColumn.setPrefWidth( 100 );
+		playlistTracksColumn.setPrefWidth( 90 );
+		playlistLengthColumn.setPrefWidth( 90 );
+		resizePolicy.registerColumns( playlistTracksColumn, playlistLengthColumn );
+		
 		emptyPlaylistLabel.setWrapText( true );
 		emptyPlaylistLabel.setTextAlignment( TextAlignment.CENTER );
 		emptyPlaylistLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
@@ -3478,13 +3476,6 @@ public class FXUI implements PlayerListener {
 		clAlbumColumn.setComparator( new AlphanumComparator() );
 		clArtistColumn.setComparator( new AlphanumComparator() );
 		clTitleColumn.setComparator( new AlphanumComparator() );
-
-		clArtistColumn.setMaxWidth( 22000 );
-		clNumberColumn.setMaxWidth( 4000 );
-		clYearColumn.setMaxWidth( 8000 );
-		clAlbumColumn.setMaxWidth( 25000 );
-		clTitleColumn.setMaxWidth( 25000 );
-		clLengthColumn.setMaxWidth( 8000 );
 		
 		clPlayingColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, CurrentListTrackState>( "displayState" ) );
 		clArtistColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "artist" ) );
@@ -3494,10 +3485,9 @@ public class FXUI implements PlayerListener {
 		clNumberColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, Integer>( "trackNumber" ) );
 		clLengthColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "lengthDisplay" ) );
 		
-
 		clAlbumColumn.setCellFactory( e -> new FormattedAlbumCell() );
-		
 
+		//TODO: why two cell factories? Is that OK? 
 		clPlayingColumn.setCellFactory ( column -> { 
 				return new CurrentListTrackStateCell( this, playImageSource, pauseImageSource ); 
 			} 
@@ -3556,16 +3546,23 @@ public class FXUI implements PlayerListener {
 		currentListTable.setEditable( false );
 		currentListTable.setItems( player.getCurrentList().getItems() );
 		
-		FixedWidthCustomResizePolicy resizePolicy = new FixedWidthCustomResizePolicy();
+		HypnosResizePolicy resizePolicy = new HypnosResizePolicy();
 		currentListTable.setColumnResizePolicy( resizePolicy );
-
-		resizePolicy.registerColumns( clYearColumn, clNumberColumn );
+		resizePolicy.registerColumns( clYearColumn, clNumberColumn, clLengthColumn );
+		
 		currentListTable.setPlaceholder( new Label( "No tracks in playlist." ) );
 		currentListTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 
 		clPlayingColumn.setMaxWidth( 38 );
 		clPlayingColumn.setMinWidth( 38 );
 		clPlayingColumn.setResizable( false );
+
+		clArtistColumn.setPrefWidth( 100 );
+		clNumberColumn.setPrefWidth( 40 );
+		clYearColumn.setPrefWidth( 60 );
+		clAlbumColumn.setPrefWidth( 100 );
+		clTitleColumn.setPrefWidth( 100 );
+		clLengthColumn.setPrefWidth( 70 );
 		
 		currentListTable.setOnDragOver( event -> {
 			

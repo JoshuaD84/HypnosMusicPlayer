@@ -185,7 +185,7 @@ public class JumpWindow extends Stage {
 		trackTable.setEditable( false );
 		trackTable.setItems( currentListFiltered );
 		
-		FixedWidthCustomResizePolicy resizePolicy = new FixedWidthCustomResizePolicy();
+		HypnosResizePolicy resizePolicy = new HypnosResizePolicy();
 		trackTable.setColumnResizePolicy( resizePolicy );
 
 		resizePolicy.registerColumns( yearColumn );

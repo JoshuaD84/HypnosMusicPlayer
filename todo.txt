@@ -1,4 +1,14 @@
 TODO
+	Resize Policy
+		Windowed mode, shrink window until a scrollbar appears. Maximize window so scrollbar disappears -- Scrollbar width is still accounted for
+		
+		Scrollbar width is calculated wrong by 4 pixels. I have it hardcoded, but I posted a SE question
+			https://stackoverflow.com/questions/47852175/get-full-width-of-scrollbar-for-a-tableview
+		
+		CustomResizePolicy is not called when double clicking on table header dividers to shrink wrap	
+			https://stackoverflow.com/questions/47852239/customresizepolicy-not-triggering-when-a-columns-headers-divider-is-double-cli
+		
+
 	Refactor Library
 		Make a source directory a class, not just a path.
 			Library Source Directories - highlight in red if they are missing. 
@@ -23,8 +33,8 @@ TODO
 		Loader status % complete thing
 		
 	UI		
-		I need to fix the no-resize column thing for last columns. It's a bigger issue now that we can hide columns.
-			
+		After the current list has completely finished playing and stopped. If you try to play something (album, track, playlist) it does not start playing. 
+					
 		tracks with missing files are removed from the current list if you close and reopen hypnos. They should stay
 			Only when it's an album.
 			Line 153 of LibraryUpdater.updateLibrary().  Not sure how I want to handle this yet. 
