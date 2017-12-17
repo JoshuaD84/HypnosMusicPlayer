@@ -2580,7 +2580,10 @@ public class FXUI implements PlayerListener {
 		albumArtistColumn.setPrefWidth( 100 );
 		albumYearColumn.setPrefWidth( 60 );
 		albumAlbumColumn.setPrefWidth( 100 );
-		resizePolicy.registerColumns( albumYearColumn );
+		albumArtistColumn.setMinWidth( 1 );
+		albumYearColumn.setMinWidth( 1 );
+		albumAlbumColumn.setMinWidth( 1 );
+		resizePolicy.registerFixedWidthColumns( albumYearColumn );
 		
 		emptyAlbumListLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
 		emptyAlbumListLabel.setWrapText( true );
@@ -2910,7 +2913,12 @@ public class FXUI implements PlayerListener {
 		trackAlbumColumn.setPrefWidth( 100 );
 		trackTitleColumn.setPrefWidth( 100 );
 		trackLengthColumn.setPrefWidth( 60 );
-		resizePolicy.registerColumns( trackNumberColumn, trackLengthColumn );
+		trackArtistColumn.setMinWidth( 1 );
+		trackNumberColumn.setMinWidth( 1 );
+		trackAlbumColumn.setMinWidth( 1 );
+		trackTitleColumn.setMinWidth( 1 );
+		trackLengthColumn.setMinWidth( 1 );
+		resizePolicy.registerFixedWidthColumns( trackNumberColumn, trackLengthColumn );
 		
 		emptyTrackListLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
 		emptyTrackListLabel.setWrapText( true );
@@ -3214,7 +3222,10 @@ public class FXUI implements PlayerListener {
 		playlistNameColumn.setPrefWidth( 100 );
 		playlistTracksColumn.setPrefWidth( 90 );
 		playlistLengthColumn.setPrefWidth( 90 );
-		resizePolicy.registerColumns( playlistTracksColumn, playlistLengthColumn );
+		playlistNameColumn.setMinWidth( 1 );
+		playlistTracksColumn.setMinWidth( 1 );
+		playlistLengthColumn.setMinWidth( 1 );
+		resizePolicy.registerFixedWidthColumns( playlistTracksColumn, playlistLengthColumn );
 		
 		emptyPlaylistLabel.setWrapText( true );
 		emptyPlaylistLabel.setTextAlignment( TextAlignment.CENTER );
@@ -3567,7 +3578,6 @@ public class FXUI implements PlayerListener {
 		
 		HypnosResizePolicy resizePolicy = new HypnosResizePolicy();
 		currentListTable.setColumnResizePolicy( resizePolicy );
-		resizePolicy.registerColumns( clYearColumn, clNumberColumn, clLengthColumn );
 		
 		currentListTable.setPlaceholder( new Label( "No tracks in playlist." ) );
 		currentListTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
@@ -3582,6 +3592,15 @@ public class FXUI implements PlayerListener {
 		clAlbumColumn.setPrefWidth( 100 );
 		clTitleColumn.setPrefWidth( 100 );
 		clLengthColumn.setPrefWidth( 70 );
+		
+		clArtistColumn.setMinWidth( 1 );
+		clNumberColumn.setMinWidth( 1 );
+		clYearColumn.setMinWidth( 1 );
+		clAlbumColumn.setMinWidth( 1 );
+		clTitleColumn.setMinWidth( 1 );
+		clLengthColumn.setMinWidth( 1 );
+
+		resizePolicy.registerFixedWidthColumns( clYearColumn, clNumberColumn, clLengthColumn );
 		
 		currentListTable.setOnDragOver( event -> {
 			
