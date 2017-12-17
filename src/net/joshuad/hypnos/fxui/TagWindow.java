@@ -175,7 +175,10 @@ public class TagWindow extends Stage {
 						} else if ( imageData != null ) {
 							ImageView imageview = new ImageView( new Image( new ByteArrayInputStream( imageData ) ) );
 							imageview.setFitHeight( 80 );
-							imageview.setFitWidth( 80 );
+							imageview.setFitWidth( 220 );
+							imageview.setSmooth( true );
+							imageview.setCache( true );
+							imageview.setPreserveRatio( true );
 							setGraphic( imageview );
 							setText ( null );
 						} else if ( !empty ) {

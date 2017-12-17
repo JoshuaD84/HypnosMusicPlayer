@@ -23,10 +23,13 @@ Before Beta 2:
 			Volume Up				Alt + Up
 			Volume Down				Alt + Down
 			Toggle Shuffle Mode		S			
-			Toggle Random Mode		R			
+			Toggle Repeat Mode		R			
 			Previous				   			
 			Next				
-			Mute / Unmute			M	   			
+			Mute / Unmute			M	
+			Show Queue
+			Show History   	
+			Show Config	
 		
 		Playlists, Albums, Tracks
 			Q 	 					queue item
