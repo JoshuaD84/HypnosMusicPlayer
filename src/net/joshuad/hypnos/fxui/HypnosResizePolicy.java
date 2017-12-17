@@ -22,6 +22,7 @@ import net.joshuad.hypnos.Hypnos;
  * When the table's size is changed, the excess space is shared on a ratio basis between non-registered, resizable columns
  * 
  * If a column is manually resized, the delta is shared on a ratio basis between columns to that resized column's right only. 
+ * And that column's pref width is set to the resized amount. 
  * 
  * There are some narrow-case exceptions to these goals to avoid broken behavior.
  */
@@ -78,24 +79,49 @@ public class HypnosResizePolicy implements Callback <TableView.ResizeFeatures, B
 			if ( columnResized != null ) {
 				columnResized.impl_setWidth( columnResized.getWidth() + feature.getDelta() );
 			}
-			
-			
-			//keep trying to get rid of excess space until there is none
-			//"keep trying" means abandoning the least important promises, one at a time
-			//until there is no excess space.
-			double totalToDistribute = table.getWidth() - getScrollbarWidth ( table );
+
+			double totalToDistribute = table.getWidth() - getScrollbarWidth ( table ) - 4;
 			for ( TableColumn column : columns ) totalToDistribute -= column.getWidth();
 			
+			/*A partially completed idea for working with preferred widths. Abandoned for now, to pick up later. 
+			if ( columnResized == null ) {
+				//On table resize only (not on individual column resize)
+				//First distribute equally to columns which aren't their pref width
+				int prefWidthIncrement = 1;
+				while ( Math.abs( totalToDistribute ) > prefWidthIncrement ) {
+					boolean madeChangeThisLoop = false;
+					
+					for ( TableColumn column : columns ) {
+						if ( totalToDistribute > 0 && column.getWidth() < column.getPrefWidth() ) {
+							column.impl_setWidth( column.getWidth() + prefWidthIncrement );
+							madeChangeThisLoop = true;
+							totalToDistribute -= prefWidthIncrement;
+						} else if ( totalToDistribute < 0 && column.getWidth() > column.getPrefWidth() ) {
+							column.impl_setWidth( column.getWidth() - 1 );
+							madeChangeThisLoop = true;
+							totalToDistribute += prefWidthIncrement;
+						}
+					}
+					
+					if ( !madeChangeThisLoop) break;
+				}
+			}
+			*/
+						
 			int increment = 10;
 			while ( Math.abs ( totalToDistribute ) >= 1 ) {
 
 				double excessSpace = totalToDistribute < increment ? totalToDistribute : increment;
+				
 				for ( int attempt = 0; attempt < 5; attempt++ ) {
 					
 					if ( excessSpace != excessSpace || Math.abs( excessSpace ) < 1 ) break;
 					
 					List<TableColumn> columnsToShareExcessSpace = new ArrayList<>();
 					
+					//keep trying to get rid of excess space until there is none
+					//"keep trying" means abandoning the least important promises, one at a time
+					//until there is no excess space.
 					for ( TableColumn column : columns ) {
 						if ( !column.isResizable() ) continue; //we never break this promise
 						if ( attempt < 4 && column == columnResized ) continue;
@@ -126,6 +152,15 @@ public class HypnosResizePolicy implements Callback <TableView.ResizeFeatures, B
 				}
 			}
 			
+			/*A partially completed idea for working with preferred widths. Abandoned for now, to pick up later. 
+			if ( columnResized != null ) {
+				//On a manual resize, make these the new pref widths
+				for ( TableColumn column : columns ) {
+					column.setPrefWidth( column.getWidth() );
+				}
+			}
+			*/
+			
 			return true;
 		}
 		
@@ -140,7 +175,7 @@ public class HypnosResizePolicy implements Callback <TableView.ResizeFeatures, B
 				ScrollBar sb = (ScrollBar) node;
 				if ( sb.getOrientation() == Orientation.VERTICAL ) {
 					if ( sb.isVisible() ) {
-						scrollBarWidth = sb.getWidth() + 4;
+						scrollBarWidth = sb.getWidth();
 					}
 				}
 			}
