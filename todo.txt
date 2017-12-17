@@ -1,6 +1,10 @@
 Before Beta 2:
 	Tag Editor table - Images are being forced to be square
 	
+	Jump table - Columns squished
+	
+	Double click the split pane divider, columns get messed up
+	
 	After the current list has completely finished playing and stopped. If you try to play something (album, track, playlist) it does not start playing. 
 				
 	tracks with missing files are removed from the current list if you close and reopen hypnos. They should stay
@@ -17,31 +21,35 @@ Before Beta 2:
 	Consistent in-program hotkeys & tab in settings window for in-program hotkeys. 
 		
 		Main Window, Anywhere except text input areas
-			Toggle Pause			Space 		
-			Back 5 seconds			Left		
-			Forward 5 seconds		Right		
+			Toggle Pause			Space? Used for table and ctrl and arrows to do specific selects w/ keyboard
+			Back 5 seconds			Alt + Left	
+			Forward 5 seconds		Alt + Right		
+			Volume Up				Alt + Up
+			Volume Down				Alt + Down
 			Toggle Shuffle Mode		S			
 			Toggle Random Mode		R			
 			Previous				   			
 			Next				
 			Mute / Unmute			M	   			
 		
-		Transport
-		
 		Playlists, Albums, Tracks
 			Q 	 					queue item
 			Shift Q 				play next (front of queue)
 			F2						Tag Editor
-			F3						Track List / Info
+			F3						Track List / Info (not for playlists ?)
 			F4						File System Browser
 			Enter					Play Selected Item(s)
-			Shift Enter				Append Item to current list
+			Shift Enter				Append Item to current list (not current list)
+			Esc						Clear Selection							Do i like this? 
+			
+		Playlists
+			Del						Delete selected Playlists
 	
 		Track
-			L						Lyrics for selected item
+			L						Show Lyrics
 			
 		Current List
-			J 						Jump Window
+			J 						Show Jump Window				Maybe put this for everywhere
 			Ctrl + S				Save Current List as Playlist
 			Ctrl + O 				Open files 
 			Del						Delete selected Tracks

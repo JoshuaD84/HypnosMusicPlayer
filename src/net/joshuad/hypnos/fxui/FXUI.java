@@ -224,6 +224,7 @@ public class FXUI implements PlayerListener {
 	Button showHistoryButton;
 	MenuItem currentListSave;
 	MenuItem currentListExport;
+	MenuItem currentListLoad;
 
 	ResizableImageView albumImage;
 	ResizableImageView artistImage;
@@ -427,6 +428,10 @@ public class FXUI implements PlayerListener {
 				currentListExport.fire();
 				e.consume();
 				
+			} else if ( e.getCode() == KeyCode.O && e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				currentListLoad.fire();
+				e.consume();
+				
 			} else if ( e.getCode() == KeyCode.UP && !e.isControlDown() && e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				player.incrementVolume();
 				e.consume();
@@ -436,11 +441,11 @@ public class FXUI implements PlayerListener {
 				e.consume();
 				
 			} else if ( e.getCode() == KeyCode.RIGHT && !e.isControlDown() && e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				player.skipMS( 10000 );
+				player.skipMS( 5000 );
 				e.consume();
 				
 			} else if ( e.getCode() == KeyCode.LEFT && !e.isControlDown() && e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				player.skipMS( -10000 );
+				player.skipMS( -5000 );
 				e.consume();
 				
 			} 
@@ -2127,7 +2132,7 @@ public class FXUI implements PlayerListener {
 		MenuItem currentListClear = new MenuItem ( "Clear" );
 		currentListSave = new MenuItem ( "Save" );
 		currentListExport = new MenuItem ( "Export" );
-		MenuItem currentListLoad = new MenuItem ( "Load Files" );
+		currentListLoad = new MenuItem ( "Load Files" );
 		MenuItem currentListShuffle = new MenuItem ( "Shuffle" );
 		
 		currentListClear.setOnAction( new EventHandler <ActionEvent>() {
@@ -2606,6 +2611,10 @@ public class FXUI implements PlayerListener {
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				enqueueMenuItem.fire();
 				
+			} else if ( e.getCode() == KeyCode.Q && e.isShiftDown() 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+				playNextMenuItem.fire();
+				
 			} else if ( e.getCode() == KeyCode.F2 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				editTagMenuItem.fire();
@@ -3038,10 +3047,18 @@ public class FXUI implements PlayerListener {
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				albumTable.getSelectionModel().clearSelection();
 				
+			} else if ( e.getCode() == KeyCode.L
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				lyricsMenuItem.fire();
+				
 			} else if ( e.getCode() == KeyCode.Q 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				enqueueMenuItem.fire();
 				
+			} else if ( e.getCode() == KeyCode.Q && e.isShiftDown()
+			&& !e.isAltDown() && !e.isControlDown()  && !e.isMetaDown() ) {
+				playNextMenuItem.fire();
+							
 			} else if ( e.getCode() == KeyCode.F2 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				editTagMenuItem.fire();
@@ -3063,7 +3080,6 @@ public class FXUI implements PlayerListener {
 			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown() 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
 				appendMenuItem.fire();
-				
 			}
 		});
 		
@@ -3324,6 +3340,10 @@ public class FXUI implements PlayerListener {
 			} else if ( e.getCode() == KeyCode.Q
 			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
 				enqueueMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.Q && e.isShiftDown()
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+				playNextMenuItem.fire();
 
 			}  else if ( e.getCode() == KeyCode.ENTER
 			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
@@ -3693,11 +3713,21 @@ public class FXUI implements PlayerListener {
 			} else if ( e.getCode() == KeyCode.Q
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				queueMenuItem.fire();
+				e.consume();	
+				
+			} else if ( e.getCode() == KeyCode.Q && e.isShiftDown()
+			&& !e.isControlDown() && !e.isAltDown() && !e.isMetaDown() ) {
+				playNextMenuItem.fire();
 				e.consume();
 				
 			} else if ( e.getCode() == KeyCode.J
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				jumpWindow.show();
+				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.L
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				lyricsMenuItem.fire();
 				e.consume();
 				
 			} else if ( e.getCode() == KeyCode.F2
@@ -3713,6 +3743,11 @@ public class FXUI implements PlayerListener {
 			} else if ( e.getCode() == KeyCode.F4
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				browseMenuItem.fire();
+				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.ENTER
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				playMenuItem.fire();
 				e.consume();
 				
 			}
