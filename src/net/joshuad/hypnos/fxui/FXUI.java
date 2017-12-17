@@ -2898,7 +2898,7 @@ public class FXUI implements PlayerListener {
 		trackTable.getColumns().addAll( trackArtistColumn, trackAlbumColumn, trackNumberColumn, trackTitleColumn, trackLengthColumn );
 		trackTable.setEditable( false );
 		trackTable.setItems( library.getTracksSorted() );
-		
+
 		library.getTracksSorted().comparatorProperty().bind( trackTable.comparatorProperty() );
 		
 		trackTable.getSelectionModel().clearSelection();

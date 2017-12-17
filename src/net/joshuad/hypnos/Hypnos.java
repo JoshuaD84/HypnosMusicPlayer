@@ -725,7 +725,7 @@ public class Hypnos extends Application {
 			}
 			
 		} catch ( Exception e ) {
-			LOGGER.log( Level.SEVERE, "Exception caught at top level of Hypnos. Exiting.", e );
+			LOGGER.log( Level.SEVERE, e.getClass() + ":  Exception caught at top level of Hypnos. Exiting.", e );
 			exit ( ExitCode.UNKNOWN_ERROR );
 		}
 	}

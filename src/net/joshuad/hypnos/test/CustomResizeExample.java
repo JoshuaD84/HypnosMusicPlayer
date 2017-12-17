@@ -1,18 +1,25 @@
 	package net.joshuad.hypnos.test;
-	
+	 
+	import java.util.List;
 	import java.util.Locale;
+	import java.util.Set;
+	
 	import javafx.application.Application;
 	import javafx.beans.property.SimpleObjectProperty;
 	import javafx.collections.FXCollections;
+	import javafx.geometry.Orientation;
+	import javafx.scene.Node;
 	import javafx.scene.Parent;
 	import javafx.scene.Scene;
+	import javafx.scene.control.ScrollBar;
 	import javafx.scene.control.TableColumn;
 	import javafx.scene.control.TableView;
 	import javafx.scene.control.cell.PropertyValueFactory;
-	import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderPane;
 	import javafx.stage.Stage;
 	import javafx.util.Callback;
-	
+		
 	public class CustomResizeExample extends Application {
 	
 		@SuppressWarnings("unchecked")
@@ -29,6 +36,8 @@
 	
 			table.getColumns().addAll( local );
 			table.setColumnResizePolicy( new CustomResizePolicy() );
+			
+			
 	
 			BorderPane pane = new BorderPane( table );
 			return pane;
@@ -47,11 +56,50 @@
 	
 	@SuppressWarnings ( "rawtypes" ) 
 	class CustomResizePolicy implements Callback <TableView.ResizeFeatures, Boolean> {
+		
+		@SuppressWarnings("unchecked")
 		@Override
 		public Boolean call ( TableView.ResizeFeatures feature ) {
 			
-			System.out.println ( "Called" ); 
+			TableView table = feature.getTable();
+			List <TableColumn> columns = table.getVisibleLeafColumns();
+			double widthAvailable = table.getWidth() - getScrollbarWidth ( table );
 			
-			return TableView.CONSTRAINED_RESIZE_POLICY.call( feature );
+			Border border = table.getBorder();
+			
+			if ( border != null && border.getInsets() != null ) {
+				widthAvailable = table.getBorder().getInsets().getLeft() - table.getBorder().getInsets().getRight();
+			}
+				
+			
+			double forEachColumn = widthAvailable / columns.size();
+			
+			for ( TableColumn column : columns ) {
+				// This is depreciated, but if you look at Java's internal
+				// resize policies, they also use this to set width. 
+				//column.impl_setWidth( forEachColumn );
+				column.setMinWidth( forEachColumn );
+				column.setMaxWidth( forEachColumn );
+			}
+			
+			return true;
+			
+		}
+		
+		private double getScrollbarWidth ( TableView table ) {
+			double scrollBarWidth = 0;
+			Set <Node> nodes = table.lookupAll( ".scroll-bar" );
+			for ( final Node node : nodes ) {
+				if ( node instanceof ScrollBar ) {
+					ScrollBar sb = (ScrollBar) node;
+					if ( sb.getOrientation() == Orientation.VERTICAL ) {
+						if ( sb.isVisible() ) {
+							scrollBarWidth = sb.getWidth();
+						}
+					}
+				}
+			}
+			
+			return scrollBarWidth;
 		}
 	}
