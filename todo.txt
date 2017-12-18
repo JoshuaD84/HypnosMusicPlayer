@@ -3,7 +3,7 @@ Before Beta 2:
 		Only when it's an album.
 		Line 153 of LibraryUpdater.updateLibrary().  Not sure how I want to handle this yet. 
 		
-		If you have an album loaded, then add a track to switch to playlist mode, then close-reopen, it deletes teh track and switches back to album mode
+		Similarly, if you have an album loaded, then add a track to switch to playlist mode, then close-reopen, it deletes teh track and switches back to album mode
 	
 	Volume Slider 
 		doesn't feel right. Do some math formula instead of linear
@@ -11,6 +11,20 @@ Before Beta 2:
 
 	~incomplete/Grizzly Bear
 		F2 to show tag editor, no content in table
+	
+	Column sorting is case sensitive
+		I emailed the author of the alphanumcomparator. If he doesn't have that functionality, i should edit it in. 
+		
+	Windows Specific
+		Changing track position on slider changes volume back to 100%.
+		   Changing album artwork, same thing
+		
+		Volume Max is too high
+		
+		Dub side of the moon causes skipping
+		   Actually I think it's the library loader. I turned that down and it went away
+		
+		Delaying loading settings until after display is ugly. Stuff just sits there all wrong.
 		
 	Consistent in-program hotkeys & tab in settings window for in-program hotkeys. 
 		
@@ -174,6 +188,7 @@ JavaFX stuff
 		
 	hide/show via hotkeys while maximized toggles every 3 presses instead of every 2 presses. 
 		https://stackoverflow.com/questions/45269173/stage-seticonified-and-stage-isiconified-not-acting-properly
+		I think this is working correctly now? I updated the jvm from _131 to _151 and it seems good? 
 				
 	Showing any dialog prevents window drag resize. 
 		http://bugs.java.com/bugdatabase/view_bug.do?bug_id=8140491
