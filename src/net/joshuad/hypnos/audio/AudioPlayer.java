@@ -205,11 +205,13 @@ public class AudioPlayer {
 	
 	public void requestStop () {
 		stopRequested = true;
+		trackRequested = null;
 	}
 	
 	public void requestPlayTrack ( Track track, boolean startPaused ) {
 		trackRequested = track;
 		pauseRequested = startPaused;
+		stopRequested = false;
 	}
 	
 	public void requestSeekPercent ( double seekPercent ) {

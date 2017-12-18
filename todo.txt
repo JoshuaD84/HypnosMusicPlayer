@@ -1,6 +1,4 @@
 Before Beta 2:			
-	After the current list has completely finished playing and stopped. If you try to play something (album, track, playlist) it does not start playing. 
-				
 	tracks with missing files are removed from the current list if you close and reopen hypnos. They should stay
 		Only when it's an album.
 		Line 153 of LibraryUpdater.updateLibrary().  Not sure how I want to handle this yet. 
@@ -25,8 +23,8 @@ Before Beta 2:
 			Previous				   			
 			Next				
 			Mute / Unmute			M	
-			Show Queue
-			Show History   	
+			Show Queue				Ctrl + Q
+			Show History   			Ctrl + H
 			Show Config	
 		
 		Playlists, Albums, Tracks
