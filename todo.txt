@@ -2,6 +2,8 @@ Before Beta 2:
 	tracks with missing files are removed from the current list if you close and reopen hypnos. They should stay
 		Only when it's an album.
 		Line 153 of LibraryUpdater.updateLibrary().  Not sure how I want to handle this yet. 
+		
+		If you have an album loaded, then add a track to switch to playlist mode, then close-reopen, it deletes teh track and switches back to album mode
 	
 	Volume Slider 
 		doesn't feel right. Do some math formula instead of linear

@@ -1037,15 +1037,21 @@ public class Track implements Serializable, AlbumInfoSource {
 		try {
 			AudioFile audioFile = AudioFileIO.read( getPath().toFile() );
 			Tag tag = audioFile.getTag();
-		
-			if ( tag instanceof ID3v1Tag ) {
+			
+			if ( tag == null ) {
+				tag = audioFile.createDefaultTag();
+				
+			} else if ( tag instanceof ID3v1Tag ) {
 				tag = new ID3v23Tag ( (ID3v1Tag)tag );
 			}
 			
 			for ( MultiFileTextTagPair tagPair : textTagPairs ) { 
-				
 				if ( !tagPair.isMultiValue() ) {
-					tag.setField( tagPair.getKey(), tagPair.getValue() );
+					if ( tagPair.getValue().equals( "" ) ) {
+						tag.deleteField( tagPair.getKey() );
+					} else {
+						tag.setField( tagPair.getKey(), tagPair.getValue() );
+					}
 				}
 			}
 			
@@ -1067,6 +1073,7 @@ public class Track implements Serializable, AlbumInfoSource {
 			refreshTagData();
 	
 		} catch ( Exception e ) {
+			e.printStackTrace();
 			LOGGER.log( Level.WARNING, "Unable to save updated tag.", e );
 		}
 	}

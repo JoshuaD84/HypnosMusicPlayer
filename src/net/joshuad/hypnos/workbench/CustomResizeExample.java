@@ -17,7 +17,8 @@
 	import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
-	import javafx.stage.Stage;
+import javafx.scene.layout.Region;
+import javafx.stage.Stage;
 	import javafx.util.Callback;
 		
 	public class CustomResizeExample extends Application {
@@ -72,6 +73,18 @@ import javafx.scene.layout.BorderPane;
 			}
 				
 			
+			Region region = null;
+			Set<Node> nodes = table.lookupAll(".clipped-container");
+			for (Node node : nodes) {
+			    if (node instanceof Region) {
+			        region = (Region) node;
+			    }
+			}
+			for (TableColumn column : columns ) {
+			    column.setPrefWidth(region.getWidth() / table.getColumns().size());
+			}
+			
+			/*
 			double forEachColumn = widthAvailable / columns.size();
 			
 			for ( TableColumn column : columns ) {
@@ -80,7 +93,7 @@ import javafx.scene.layout.BorderPane;
 				//column.impl_setWidth( forEachColumn );
 				column.setMinWidth( forEachColumn );
 				column.setMaxWidth( forEachColumn );
-			}
+			}*/
 			
 			return true;
 			
