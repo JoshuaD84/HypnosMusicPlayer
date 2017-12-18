@@ -1,6 +1,4 @@
-Before Beta 2:
-	Tag Editor table - Images are being forced to be square
-			
+Before Beta 2:			
 	After the current list has completely finished playing and stopped. If you try to play something (album, track, playlist) it does not start playing. 
 				
 	tracks with missing files are removed from the current list if you close and reopen hypnos. They should stay
@@ -56,10 +54,7 @@ Before Beta 2:
 			
 		
 		All Tables
-			Normal table hotkeys
-			
-		
-			
+			Normal table hotkeys	
 	
 	https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
 				
@@ -76,7 +71,7 @@ Before Beta 2:
 General:
 	Resize Policy	
 		Do work with preferred widths. 
-	
+
 	Refactor Library
 		Make a source directory a class, not just a path.
 			Library Source Directories - highlight in red if they are missing. 
@@ -142,6 +137,8 @@ General:
 					
 		
 JavaFX stuff
+	Double clicking on table-column dividers doesn't call resize:
+		https://stackoverflow.com/questions/47852239/customresizepolicy-not-triggering-when-a-columns-headers-divider-is-double-cli
 	
 	DND Error that doesn't do any harm
 		Exception in thread "JavaFX Application Thread" java.lang.RuntimeException: dndGesture.dragboard is null in dragDropEnd

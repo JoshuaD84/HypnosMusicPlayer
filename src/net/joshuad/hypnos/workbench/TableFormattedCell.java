@@ -1,4 +1,4 @@
-package net.joshuad.hypnos.test;
+package net.joshuad.hypnos.workbench;
 
 import java.util.Locale;
 import java.util.logging.Logger;

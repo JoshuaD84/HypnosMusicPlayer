@@ -1,4 +1,4 @@
-package net.joshuad.hypnos.test;
+package net.joshuad.hypnos.workbench;
 
 import java.io.File;
 import java.io.IOException;

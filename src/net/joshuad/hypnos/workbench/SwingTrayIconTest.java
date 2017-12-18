@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package net.joshuad.hypnos.test;
+package net.joshuad.hypnos.workbench;
 /*
  * TrayIconDemo.java
  */

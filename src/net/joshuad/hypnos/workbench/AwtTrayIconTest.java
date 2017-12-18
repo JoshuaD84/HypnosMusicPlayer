@@ -1,4 +1,5 @@
-package net.joshuad.hypnos.test;
+package net.joshuad.hypnos.workbench;
+
 import javafx.application.*;
 import javafx.geometry.Pos;
 import javafx.scene.*;
@@ -14,7 +15,7 @@ import java.text.*;
 import java.util.*;
 
 // Java 8 code
-public class JavaFXTrayIconSample extends Application {
+public class AwtTrayIconTest extends Application {
 
     // one icon location is shared between the application tray icon and task bar icon.
     // you could also use multiple icons to allow for clean display of tray icons on hi-dpi devices.
@@ -107,7 +108,7 @@ public class JavaFXTrayIconSample extends Application {
             // if the user double-clicks on the tray icon, show the main app stage.
             trayIcon.addActionListener(event -> Platform.runLater(this::showStage));
 
-            // if the user selects the default menu item (which includes the app name), 
+            // if the user selects the default menu item (which includes the app name),
             // show the main app stage.
             java.awt.MenuItem openItem = new java.awt.MenuItem("hello, world");
             openItem.addActionListener(event -> Platform.runLater(this::showStage));

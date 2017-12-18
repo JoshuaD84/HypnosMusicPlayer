@@ -1,4 +1,4 @@
-package net.joshuad.hypnos.test;
+package net.joshuad.hypnos.workbench;
 
 public class VolumeTest {
 	

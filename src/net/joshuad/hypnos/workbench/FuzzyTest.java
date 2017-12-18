@@ -1,4 +1,4 @@
-package net.joshuad.hypnos.test;
+package net.joshuad.hypnos.workbench;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
