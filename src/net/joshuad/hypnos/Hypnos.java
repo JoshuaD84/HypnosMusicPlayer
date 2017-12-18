@@ -236,7 +236,7 @@ public class Hypnos extends Application {
 		
 		if ( isStandalone ) LOGGER.info ( "Running as standalone - requested by system properties set at program launch" );
 		if ( isDeveloping ) LOGGER.info ( "Running on development port - requested by system properties set at program launch" );
-		if ( isDeveloping ) LOGGER.info ( "Global hotkeys disabled - requested by system properties set at program launch" );
+		if ( disableHotkeys ) LOGGER.info ( "Global hotkeys disabled - requested by system properties set at program launch" );
 	}
 	
 	private void determineOS() {
