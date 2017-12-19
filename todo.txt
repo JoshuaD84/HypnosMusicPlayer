@@ -5,16 +5,15 @@ Before Beta 2:
 		
 		Similarly, if you have an album loaded, then add a track to switch to playlist mode, then close-reopen, it deletes teh track and switches back to album mode
 	
+	Fixed width column not staying fixed width after resize then window reshape
+	
 	Volume Slider 
 		doesn't feel right. Do some math formula instead of linear
 		in windows goes past 100%
 
 	~incomplete/Grizzly Bear
 		F2 to show tag editor, no content in table
-	
-	Column sorting is case sensitive
-		I emailed the author of the alphanumcomparator. If he doesn't have that functionality, i should edit it in. 
-		
+			
 	Windows Specific
 		Changing track position on slider changes volume back to 100%.
 		   Changing album artwork, same thing

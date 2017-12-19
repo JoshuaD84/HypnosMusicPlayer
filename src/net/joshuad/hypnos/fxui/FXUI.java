@@ -115,6 +115,7 @@ import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Track.ArtistTagImagePriority;
 import net.joshuad.hypnos.Utils;
+import net.joshuad.hypnos.AlphanumComparator.CaseHandling;
 import net.joshuad.hypnos.Persister.Setting;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.PlayerListener;
@@ -2539,8 +2540,8 @@ public class FXUI implements PlayerListener {
 		albumYearColumn = new TableColumn( "Year" );
 		albumAlbumColumn = new TableColumn( "Album" );
 
-		albumArtistColumn.setComparator( new AlphanumComparator() );
-		albumAlbumColumn.setComparator( new AlphanumComparator() );
+		albumArtistColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
+		albumAlbumColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
 
 		albumArtistColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "albumArtist" ) );
 		albumYearColumn.setCellValueFactory( new PropertyValueFactory <Album, Integer>( "year" ) );
@@ -2844,9 +2845,9 @@ public class FXUI implements PlayerListener {
 		trackAlbumColumn = new TableColumn( "Album" );
 		trackTitleColumn = new TableColumn( "Title" );
 		
-		trackArtistColumn.setComparator( new AlphanumComparator() );
-		trackTitleColumn.setComparator( new AlphanumComparator() );
-		trackLengthColumn.setComparator( new AlphanumComparator() );
+		trackArtistColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
+		trackTitleColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
+		trackLengthColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
 
 		trackArtistColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Artist" ) );
 		trackTitleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
@@ -3183,7 +3184,7 @@ public class FXUI implements PlayerListener {
 		playlistLengthColumn = new TableColumn( "Length" );
 		playlistTracksColumn = new TableColumn( "Tracks" );
 
-		playlistLengthColumn.setComparator( new AlphanumComparator() );
+		playlistLengthColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
 		
 		//TODO: Are these the right types? Integer/String look wrong. 
 		playlistNameColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "Name" ) );
@@ -3503,9 +3504,9 @@ public class FXUI implements PlayerListener {
 		clNumberColumn = new TableColumn( "#" );
 		clLengthColumn = new TableColumn( "Length" );
 		
-		clAlbumColumn.setComparator( new AlphanumComparator() );
-		clArtistColumn.setComparator( new AlphanumComparator() );
-		clTitleColumn.setComparator( new AlphanumComparator() );
+		clAlbumColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
+		clArtistColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
+		clTitleColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
 		
 		clPlayingColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, CurrentListTrackState>( "displayState" ) );
 		clArtistColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "artist" ) );

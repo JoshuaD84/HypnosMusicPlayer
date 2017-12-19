@@ -30,6 +30,8 @@ package net.joshuad.hypnos;
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+/* Modified by JDH - 2017/12/19 - To allow case-insensitive handling */
+
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -45,6 +47,21 @@ import java.util.stream.Collectors;
  */
 public class AlphanumComparator implements Comparator<String>
 {
+	
+	CaseHandling caseHandling = CaseHandling.CASE_SENSITIVE;
+	
+	public AlphanumComparator() {}
+	
+	public AlphanumComparator( CaseHandling caseHandling ) 
+	{
+		this.caseHandling = caseHandling;
+	}
+	
+	public enum CaseHandling 
+	{
+		CASE_INSENSITIVE, CASE_SENSITIVE
+	}
+	
     private final boolean isDigit(char ch)
     {
         return ((ch >= 48) && (ch <= 57));
@@ -86,6 +103,12 @@ public class AlphanumComparator implements Comparator<String>
     	if ((s1 == null) || (s2 == null)) 
     	{
     		return 0;
+    	}
+    	
+    	if (caseHandling == CaseHandling.CASE_INSENSITIVE) 
+    	{
+	    	s1 = s1.toLowerCase();
+	    	s2 = s2.toLowerCase();
     	}
 
         int thisMarker = 0;
