@@ -30,6 +30,16 @@ public abstract class AbstractDecoder {
 		}
 	}
 	
+	private static double volumeCurve ( double input ) {
+		//Stubs for functions if we want to implement this in the future. 
+		return input;
+	}
+	
+	private static double inverseVolumeCurve ( double input ) {
+		//Stubs for functions if we want to implement this in the future. 
+		return input;
+	}
+	
 	public void setVolumePercent ( double percent ) throws IllegalArgumentException {
 		
 		if ( audioOutput == null ) {
@@ -42,8 +52,8 @@ public abstract class AbstractDecoder {
 			
 			double min = volume.getMinimum();
 			double max = volume.getMaximum();
-			double value = (max - min) * percent + min;
-		
+			double value = (max - min) * volumeCurve ( percent ) + min;
+			
 			volume.setValue( (float)value );
 				
 			
@@ -52,8 +62,8 @@ public abstract class AbstractDecoder {
 			
 			double min = volume.getMinimum();
 			double max = volume.getMaximum();
-			double value = (max - min) * percent + min;
-		
+			double value = (max - min) * volumeCurve ( percent ) + min;
+			
 			volume.setValue( (float)value );
 			
 		} else {
@@ -108,7 +118,7 @@ public abstract class AbstractDecoder {
 				double max = volume.getMaximum();
 				double value = volume.getValue();
 				
-				return ( value - min ) / ( max - min );
+				return inverseVolumeCurve ( ( value - min ) / ( max - min ) );
 				
 			} else if ( audioOutput.isControlSupported( FloatControl.Type.MASTER_GAIN ) ) {
 				FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.MASTER_GAIN );
@@ -116,7 +126,7 @@ public abstract class AbstractDecoder {
 				double max = volume.getMaximum();
 				double value = volume.getValue();
 				
-				return ( value - min ) / ( max - min );
+				return inverseVolumeCurve ( ( value - min ) / ( max - min ) );
 				
 			} else {
 				return 1;

@@ -55,6 +55,7 @@ public class AlbumInfoWindow extends Stage {
 	FXUI ui;
 	AudioSystem player;
 	Library library;
+	Button browseButton;
 	
 	public AlbumInfoWindow( FXUI ui, Library library, AudioSystem player ) {
 		super();
@@ -80,7 +81,7 @@ public class AlbumInfoWindow extends Stage {
 		locationField.setMaxWidth( Double.MAX_VALUE );
 		
 		HBox.setHgrow( locationField, Priority.ALWAYS );
-		Button browseButton = new Button( "Browse" );
+		browseButton = new Button( "Browse" );
 		browseButton.setOnAction( new EventHandler <ActionEvent>() {
 			// PENDING: Future - This is the better way, once openjdk and openjfx supports
 			// it: getHostServices().showDocument(file.toURI().toString());
@@ -120,6 +121,17 @@ public class AlbumInfoWindow extends Stage {
 		
 		root.getChildren().add( primaryPane );
 		setScene( scene );
+		
+		scene.addEventFilter( KeyEvent.KEY_PRESSED, new EventHandler <KeyEvent>() {
+			@Override
+			public void handle ( KeyEvent e ) {
+				if ( e.getCode() == KeyCode.ESCAPE
+				&& !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() && !e.isAltDown() ) {
+					hide();
+					e.consume();
+				}
+			}
+		});
 	}
 
 	public void setAlbum ( Album album ) { 
@@ -268,7 +280,11 @@ public class AlbumInfoWindow extends Stage {
 			} else if ( e.getCode() == KeyCode.Q 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				enqueueMenuItem.fire();
-				
+			
+			} else if ( e.getCode() == KeyCode.Q  && e.isShiftDown()
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+				playNextMenuItem.fire();
+					
 			} else if ( e.getCode() == KeyCode.F2 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				editTagMenuItem.fire();
@@ -278,12 +294,22 @@ public class AlbumInfoWindow extends Stage {
 				infoMenuItem.fire();
 				e.consume();
 				
+			} else if ( e.getCode() == KeyCode.F4
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				browseButton.fire();
+				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.L
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				lyricsMenuItem.fire();
+				e.consume();
+
 			} else if ( e.getCode() == KeyCode.ENTER
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				playMenuItem.fire();
 				
-			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown() 
-			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+			} else if ( e.getCode() == KeyCode.ENTER && e.isControlDown()
+			&& !e.isAltDown() && !e.isShiftDown()  && !e.isMetaDown() ) {
 				appendMenuItem.fire();
 				
 			}

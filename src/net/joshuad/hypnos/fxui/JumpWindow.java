@@ -112,17 +112,18 @@ public class JumpWindow extends Stage {
 					this.hide();
 				}
 				event.consume();
-				
+			
 			} else if ( event.getCode() == KeyCode.ENTER ) {
+				
 				this.hide();
 				Track playMe = trackTable.getSelectionModel().getSelectedItem();
 				
 				if ( playMe != null ) {
 					
-					if ( event.isShiftDown() ) {
+					if ( event.isControlDown() ) {
 						player.getQueue().queueTrack ( playMe );
 						
-					} else if ( event.isControlDown() ) {
+					} else if ( event.isShiftDown() ) {
 						player.getQueue().queueTrack ( 0, playMe );
 					} else {
 						player.playTrack ( playMe );

@@ -1,12 +1,16 @@
 package net.joshuad.hypnos.fxui;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.SwingUtilities;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -32,6 +36,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.joshuad.hypnos.Album;
+import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
@@ -72,6 +77,17 @@ public class PlaylistInfoWindow extends Stage {
 		primaryPane.getChildren().addAll( trackTable );
 		root.getChildren().add( primaryPane );
 		setScene( scene );
+		
+		scene.addEventFilter( KeyEvent.KEY_PRESSED, new EventHandler <KeyEvent>() {
+			@Override
+			public void handle ( KeyEvent e ) {
+				if ( e.getCode() == KeyCode.ESCAPE
+				&& !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() && !e.isAltDown() ) {
+					hide();
+					e.consume();
+				}
+			}
+		});
 	}
 
 	public void setPlaylist ( Playlist playlist ) { 
@@ -116,10 +132,12 @@ public class PlaylistInfoWindow extends Stage {
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem infoMenuItem = new MenuItem( "Info" );
+		MenuItem lyricsMenuItem = new MenuItem( "Lyrics" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		MenuItem removeMenuItem = new MenuItem ( "Remove" );
 		contextMenu.getItems().addAll ( 
-			playMenuItem, appendMenuItem, playNextMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, addToPlaylistMenuItem, removeMenuItem 
+			playMenuItem, appendMenuItem, playNextMenuItem, enqueueMenuItem, editTagMenuItem, 
+			infoMenuItem, lyricsMenuItem, addToPlaylistMenuItem, removeMenuItem 
 		);
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
@@ -156,6 +174,10 @@ public class PlaylistInfoWindow extends Stage {
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				enqueueMenuItem.fire();
 				
+			} else if ( e.getCode() == KeyCode.Q && e.isShiftDown()
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+				playNextMenuItem.fire();
+					
 			} else if ( e.getCode() == KeyCode.F2 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				editTagMenuItem.fire();
@@ -164,12 +186,38 @@ public class PlaylistInfoWindow extends Stage {
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				infoMenuItem.fire();
 				
+			} else if ( e.getCode() == KeyCode.F3 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				infoMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.F4 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				// PENDING: This is the better way, once openjdk and openjfx supports
+				// it: getHostServices().showDocument(file.toURI().toString());
+				SwingUtilities.invokeLater( new Runnable() {
+					public void run () {
+						try {
+							Track selectedTrack = player.getCurrentTrack();
+							if ( selectedTrack != null ) {
+								//TODO: I don't love calling Hypnos directly here
+								Desktop.getDesktop().open( Hypnos.getPersister().getPlaylistDirectory() );
+							}
+						} catch ( Exception e ) {
+							LOGGER.log( Level.INFO, "Unable to open local file browser.", e );
+						}
+					}
+				} );
+				
+			} else if ( e.getCode() == KeyCode.L
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				lyricsMenuItem.fire();
+				
 			} else if ( e.getCode() == KeyCode.ENTER
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				playMenuItem.fire();
 				
-			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown() 
-			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+			} else if ( e.getCode() == KeyCode.ENTER && e.isControlDown() 
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				appendMenuItem.fire();
 				
 			} else if ( e.getCode() == KeyCode.DELETE
@@ -189,6 +237,14 @@ public class PlaylistInfoWindow extends Stage {
 		infoMenuItem.setOnAction( event -> {
 			ui.trackInfoWindow.setTrack( trackTable.getSelectionModel().getSelectedItem() );
 			ui.trackInfoWindow.show();
+		});
+		
+		lyricsMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				ui.lyricsWindow.setTrack( trackTable.getSelectionModel().getSelectedItem() );
+				ui.lyricsWindow.show();
+			}
 		});
 		
 		editTagMenuItem.setOnAction( event -> {

@@ -218,14 +218,11 @@ public class FXUI implements PlayerListener {
 	LyricsWindow lyricsWindow;
 	JumpWindow jumpWindow;
 
-	Button togglePlayButton;
-	Button toggleRepeatButton;
-	Button toggleShuffleButton;
-	Button showQueueButton;
-	Button showHistoryButton;
-	MenuItem currentListSave;
-	MenuItem currentListExport;
-	MenuItem currentListLoad;
+	Button togglePlayButton, previousButton, nextButton, stopButton;
+	Button showSettingsButton;
+	Button toggleRepeatButton, toggleShuffleButton;
+	Button showQueueButton, showHistoryButton;
+	MenuItem currentListSave, currentListExport, currentListLoad;
 
 	ResizableImageView albumImage;
 	ResizableImageView artistImage;
@@ -421,32 +418,94 @@ public class FXUI implements PlayerListener {
 		};
 				
 		primaryContainer.setOnKeyPressed( ( KeyEvent e ) -> { 
-			if ( e.getCode() == KeyCode.S && e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+			if ( e.getCode() == KeyCode.S && e.isControlDown() 
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				currentListSave.fire();
 				e.consume();
 				
-			} else if ( e.getCode() == KeyCode.E && e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+			} else if ( e.getCode() == KeyCode.E && e.isControlDown() 
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				currentListExport.fire();
 				e.consume();
 				
-			} else if ( e.getCode() == KeyCode.O && e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+			} else if ( e.getCode() == KeyCode.O && e.isControlDown() 
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				currentListLoad.fire();
 				e.consume();
 				
-			} else if ( e.getCode() == KeyCode.UP && !e.isControlDown() && e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				player.incrementVolume();
+			} else if ( e.getCode() == KeyCode.P && e.isControlDown() 
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				showSettingsButton.fire();
+				e.consume();
+			
+			} else if ( e.getCode() == KeyCode.J 
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				jumpWindow.show();
 				e.consume();
 				
-			} else if ( e.getCode() == KeyCode.DOWN && !e.isControlDown() && e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				player.decrementVolume();
+			} else if ( e.getCode() == KeyCode.S
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				toggleRepeatButton.fire();
 				e.consume();
 				
-			} else if ( e.getCode() == KeyCode.RIGHT && !e.isControlDown() && e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+			} else if ( e.getCode() == KeyCode.R
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				toggleShuffleButton.fire();
+				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.H
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				historyWindow.show();
+				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.Q && e.isControlDown() 
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				queueWindow.show();
+				e.consume();
+				
+			} else if ( ( e.getCode() == KeyCode.NUMPAD1 || e.getCode() == KeyCode.KP_UP ) 
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				player.skipMS( -5000 );
+				e.consume();
+				
+			} else if ( ( e.getCode() == KeyCode.NUMPAD2 || e.getCode() == KeyCode.KP_DOWN ) 
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				stopButton.fire();
+				e.consume();
+				
+			} else if ( ( e.getCode() == KeyCode.NUMPAD3 || e.getCode() == KeyCode.KP_RIGHT ) 
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				player.skipMS( 5000 );
 				e.consume();
 				
-			} else if ( e.getCode() == KeyCode.LEFT && !e.isControlDown() && e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				player.skipMS( -5000 );
+			} else if ( ( e.getCode() == KeyCode.NUMPAD4 || e.getCode() == KeyCode.KP_LEFT )
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				this.previousButton.fire();
+				e.consume();
+				
+			} else if ( ( e.getCode() == KeyCode.NUMPAD5 || e.getCode() == KeyCode.KP_UP ) 
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				togglePlayButton.fire();
+				e.consume();
+				
+			} else if ( ( e.getCode() == KeyCode.NUMPAD6 || e.getCode() == KeyCode.KP_DOWN ) 
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				nextButton.fire();
+				e.consume();
+				
+			} else if ( ( e.getCode() == KeyCode.NUMPAD7 || e.getCode() == KeyCode.KP_RIGHT ) 
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				player.decrementVolume();
+				e.consume();
+				
+			} else if ( ( e.getCode() == KeyCode.NUMPAD8 || e.getCode() == KeyCode.KP_LEFT )
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				volumeMuteButton.fire();
+				e.consume();
+				
+			} else if ( ( e.getCode() == KeyCode.NUMPAD9 || e.getCode() == KeyCode.KP_LEFT )
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				player.incrementVolume();
 				e.consume();
 				
 			} 
@@ -885,7 +944,7 @@ public class FXUI implements PlayerListener {
 			LOGGER.log( Level.WARNING, "Unable to load previous icon: resources/previous.png", e );
 		}
 		
-		Button previousButton = new Button ( "" );
+		previousButton = new Button ( "" );
 		previousButton.setGraphic( previousImage );
 		previousButton.setPrefSize( 42, 35 );
 		previousButton.setMinSize( 42, 35 );
@@ -901,7 +960,7 @@ public class FXUI implements PlayerListener {
 			LOGGER.log( Level.WARNING, "Unable to load previous icon: resources/next.png", e );
 		}
 		
-		Button nextButton = new Button ( "" );
+		nextButton = new Button ( "" );
 		nextButton.setGraphic( nextImage );
 		nextButton.setPrefSize( 42, 35 );
 		nextButton.setMinSize( 42, 35 );
@@ -917,7 +976,7 @@ public class FXUI implements PlayerListener {
 			LOGGER.log( Level.WARNING, "Unable to load previous icon: resources/stop.png", e );
 		}
 		
-		Button stopButton = new Button ( "" );
+		stopButton = new Button ( "" );
 		stopButton.setGraphic( stopImage );
 		stopButton.setPrefSize( 42, 35 );
 		stopButton.setMinSize( 42, 35 );
@@ -1053,23 +1112,23 @@ public class FXUI implements PlayerListener {
 		controls.setSpacing( 10 );
 		controls.setAlignment( Pos.CENTER );
 
-		Button settingsButton = new Button ( );
-		settingsButton.setGraphic( settingsImage );
+		showSettingsButton = new Button ( );
+		showSettingsButton.setGraphic( settingsImage );
 
 		switch ( Hypnos.getOS() ) {
 			case WIN_10: case WIN_7: case WIN_8: case WIN_UNKNOWN: case WIN_VISTA: case WIN_XP:
-				settingsButton.setPadding( new Insets ( 5, 5, 0, 5 ) );
+				showSettingsButton.setPadding( new Insets ( 5, 5, 0, 5 ) );
 				break;
 				
 			case NIX: case OSX: case UNKNOWN:
-				settingsButton.setPadding( new Insets ( 0, 5, 0, 5 ) );
+				showSettingsButton.setPadding( new Insets ( 0, 5, 0, 5 ) );
 				break;
 		}
 		
-		settingsButton.getStyleClass().add( "settingsButton" );
-		settingsButton.setTooltip( new Tooltip( "Configuration and Information" ) );
+		showSettingsButton.getStyleClass().add( "settingsButton" );
+		showSettingsButton.setTooltip( new Tooltip( "Configuration and Information" ) );
 		
-		settingsButton.setOnAction ( ( ActionEvent event ) -> {
+		showSettingsButton.setOnAction ( ( ActionEvent event ) -> {
 			settingsWindow.show();
 		});
 		
@@ -1081,7 +1140,7 @@ public class FXUI implements PlayerListener {
 		currentTrackButton.setPadding( new Insets ( 10, 0, 0, 0 ) );
 		currentTrackButton.getStyleClass().add( "trackName" );
 		playingTrackInfo.setCenter( currentTrackButton );
-		playingTrackInfo.setRight( settingsButton );
+		playingTrackInfo.setRight( showSettingsButton );
 		playingTrackInfo.setLeft( settingsWidthPadding );
 		
 		currentTrackButton.setOnMouseClicked( ( MouseEvent event ) -> {
@@ -2135,6 +2194,7 @@ public class FXUI implements PlayerListener {
 		currentListExport = new MenuItem ( "Export" );
 		currentListLoad = new MenuItem ( "Load Files" );
 		MenuItem currentListShuffle = new MenuItem ( "Shuffle" );
+		MenuItem jumpMenuItem = new MenuItem ( "Jump to Track" );
 		
 		currentListClear.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -2231,7 +2291,11 @@ public class FXUI implements PlayerListener {
 			}
 		});
 		
-		currentListMenu.getItems().addAll ( currentListClear, currentListShuffle, currentListExport, currentListSave, currentListLoad );
+		jumpMenuItem.setOnAction( ( ActionEvent e ) -> {
+			jumpWindow.show();
+		});
+		
+		currentListMenu.getItems().addAll ( currentListClear, currentListShuffle, jumpMenuItem, currentListExport, currentListSave, currentListLoad );
 		
 		
 		//playlistControls.getChildren().addAll( toggleShuffleButton, toggleRepeatButton, showQueueButton, showHistoryButton,
@@ -2636,8 +2700,8 @@ public class FXUI implements PlayerListener {
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				playMenuItem.fire();
 				
-			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown() 
-			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+			} else if ( e.getCode() == KeyCode.ENTER && e.isControlDown() 
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				appendMenuItem.fire();
 				
 			}
@@ -3054,7 +3118,7 @@ public class FXUI implements PlayerListener {
 		trackTable.setOnKeyPressed( ( KeyEvent e ) -> {
 			if ( e.getCode() == KeyCode.ESCAPE 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				albumTable.getSelectionModel().clearSelection();
+				trackTable.getSelectionModel().clearSelection();
 				
 			} else if ( e.getCode() == KeyCode.L
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
@@ -3086,8 +3150,8 @@ public class FXUI implements PlayerListener {
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				playMenuItem.fire();
 				
-			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown() 
-			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+			} else if ( e.getCode() == KeyCode.ENTER && e.isControlDown() 
+			&& !e.isShiftDown() && !e.isAltDown() && !e.isMetaDown() ) {
 				appendMenuItem.fire();
 			}
 		});
@@ -3361,8 +3425,8 @@ public class FXUI implements PlayerListener {
 			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
 				playMenuItem.fire();
 				
-			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown()
-			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+			} else if ( e.getCode() == KeyCode.ENTER && e.isControlDown()
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				appendMenuItem.fire();
 				
 			} else if ( e.getCode() == KeyCode.DELETE
@@ -3518,7 +3582,6 @@ public class FXUI implements PlayerListener {
 		
 		clAlbumColumn.setCellFactory( e -> new FormattedAlbumCell() );
 
-		//TODO: why two cell factories? Is that OK? 
 		clPlayingColumn.setCellFactory ( column -> { 
 				return new CurrentListTrackStateCell( this, playImageSource, pauseImageSource ); 
 			} 

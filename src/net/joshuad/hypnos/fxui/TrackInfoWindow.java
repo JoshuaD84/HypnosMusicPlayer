@@ -1,10 +1,13 @@
 package net.joshuad.hypnos.fxui;
 
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -64,6 +67,17 @@ public class TrackInfoWindow extends Stage {
 		
 		root.getChildren().add( primaryPane );
 		setScene( scene );
+		
+		scene.addEventFilter( KeyEvent.KEY_PRESSED, new EventHandler <KeyEvent>() {
+			@Override
+			public void handle ( KeyEvent e ) {
+				if ( e.getCode() == KeyCode.ESCAPE
+				&& !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() && !e.isAltDown() ) {
+					hide();
+					e.consume();
+				}
+			}
+		});
 		
 	}
 	

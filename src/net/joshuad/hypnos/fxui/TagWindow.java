@@ -363,12 +363,16 @@ public class TagWindow extends Stage {
 		
 		scene.addEventFilter( KeyEvent.KEY_PRESSED, new EventHandler <KeyEvent>() {
 			@Override
-			public void handle ( KeyEvent t ) {
-				if ( t.getCode() == KeyCode.RIGHT && t.isControlDown() ) {
+			public void handle ( KeyEvent e ) {
+				if ( e.getCode() == KeyCode.RIGHT && e.isControlDown() ) {
 					nextButton.fire();
-				} else if ( t.getCode() == KeyCode.LEFT && t.isControlDown() ) {
+					e.consume();
+					
+				} else if ( e.getCode() == KeyCode.LEFT && e.isControlDown() ) {
 					previousButton.fire();
-				}
+					e.consume();
+					
+				} 
 			}
 		});
 

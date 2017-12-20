@@ -879,6 +879,13 @@ public class SettingsWindow extends Stage {
 			}
 		});
 		
+		table.setOnKeyPressed( ( KeyEvent e ) -> {
+			if ( e.getCode() == KeyCode.ESCAPE 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				table.getSelectionModel().clearSelection();
+			}
+		});
+		
 		table.setRowFactory( tv -> {
 			TableRow <TagError> row = new TableRow <>();
 

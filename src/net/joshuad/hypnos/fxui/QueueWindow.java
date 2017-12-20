@@ -155,15 +155,22 @@ public class QueueWindow extends Stage {
 		);
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
-
+		
 		queueTable.setOnKeyPressed( ( KeyEvent e ) -> {
 			if ( e.getCode() == KeyCode.ESCAPE 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				queueTable.getSelectionModel().clearSelection();
+				if ( queueTable.getSelectionModel().getSelectedItems().size() > 0 ) {
+					queueTable.getSelectionModel().clearSelection();
+					System.out.println (" Consuming here" );
+					e.consume();
+				} else {
+					this.hide();
+				}
 
 			} else if ( e.getCode() == KeyCode.F2 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				editTagMenuItem.fire();
+				e.consume();
 			
 			} else if ( e.getCode() == KeyCode.F3
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
@@ -175,22 +182,30 @@ public class QueueWindow extends Stage {
 				browseMenuItem.fire();
 				e.consume();
 				
+			} else if ( e.getCode() == KeyCode.L
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				lyricsMenuItem.fire();
+				e.consume();
+				
 			} else if ( e.getCode() == KeyCode.ENTER
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				playMenuItem.fire();
+				e.consume();
 				
-			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown() 
-			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+			} else if ( e.getCode() == KeyCode.ENTER && e.isControlDown()
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				appendMenuItem.fire();
+				e.consume();
 				
 			} else if ( e.getCode() == KeyCode.DELETE
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				removeMenuItem.fire();
+				e.consume();
 						
 			} else if ( e.getCode() == KeyCode.DELETE && e.isShiftDown() 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
 				cropMenuItem.fire();
-				
+				e.consume();
 			}
 		});
 		

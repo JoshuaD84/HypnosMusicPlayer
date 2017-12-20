@@ -89,6 +89,10 @@ public class Persister {
 		
 		createNecessaryFolders();
 	}
+	
+	public File getPlaylistDirectory() {
+		return playlistsDirectory;
+	}
 
 	private void createNecessaryFolders () {
 		if ( playlistsDirectory.exists() && !playlistsDirectory.isDirectory() ) {

@@ -1,18 +1,73 @@
-Before Beta 2:			
+Before Beta 2:	
+	Jump to Track
+		Type stuff
+		close window
+		reopen window, table is broken
+		
+	Maybe move History button to current list menu
+	
+	Art area right click menu is bolded
+
+	Consistent in-program hotkeys & tab in settings window for in-program hotkeys. 
+		
+		Main Window, Anywhere except text input areas
+			Done		Forward 5 seconds		Numpad 1		
+			Done		Stop					Numpad 2	
+			Done		Back 5 seconds			Numpad 3	
+			Done		Previous				Numpad 4 
+			Done		Play / Pause			Numpad 5			
+			Done		Next					Numpad 6
+			Done		Volume Down				Numpad 7 
+			Done		Mute / Unmute			Numpad 8	
+			Done		Volume Up				Numpad 9
+			Done		Toggle Shuffle Mode		S			
+			Done		Toggle Repeat Mode		R	
+			Done		Show Jump Window		J	
+			Done		Show Queue				Ctrl + Q
+			Done		Show History   			Ctrl + H
+			Done		Show Config				Ctrl + P
+			Done		Ctrl + S				Save Current List as Playlist
+			Done		Ctrl + O 				Open files 
+			Done		Ctrl + E				Export current list as playlist
+		
+		Playlists, Albums, Tracks
+			Done		queue item						Q 	 					
+			Done		play next (front of queue)		Shift Q 				
+			Done		Tag Editor / Rename Playlist	F2						
+			Done		Track List / Info				F3						
+			Done		File System Browser             F4						
+			Done		Play Selected Item(s)           Enter					
+			Done		Append Item to current list     Ctrl Enter				
+			Done		Prepend to current List         Shift Enter				     			
+			
+		Playlists
+			Done		Delete selected Playlists		Del						
+	
+		Track
+			Done		Show Lyrics						L
+		
+		All Tables
+			Done		deselect						Esc
+							album, track, and playlist problem -- it currently closes window regardless. 
+			
+		Current List
+			Done 		Delete selected Tracks			Del
+			Done		Crop to selected Tracks			Shift + Del				
+			
+		Popup Windows
+			Done		Close Window					Esc	
+							tagWindow & settings Window - this is a little difficult because esc also stops editing a cell
+
+		
 	tracks with missing files are removed from the current list if you close and reopen hypnos. They should stay
 		Only when it's an album.
 		Line 153 of LibraryUpdater.updateLibrary().  Not sure how I want to handle this yet. 
 		
 		Similarly, if you have an album loaded, then add a track to switch to playlist mode, then close-reopen, it deletes teh track and switches back to album mode
+		
+		I think related -- the queue is cleared on restart
 	
 	Fixed width column not staying fixed width after resize then window reshape
-	
-	Volume Slider 
-		doesn't feel right. Do some math formula instead of linear
-		in windows goes past 100%
-
-	~incomplete/Grizzly Bear
-		F2 to show tag editor, no content in table
 			
 	Windows Specific
 		Changing track position on slider changes volume back to 100%.
@@ -25,54 +80,13 @@ Before Beta 2:
 		
 		Delaying loading settings until after display is ugly. Stuff just sits there all wrong.
 		
-	Consistent in-program hotkeys & tab in settings window for in-program hotkeys. 
-		
-		Main Window, Anywhere except text input areas
-			Toggle Pause			Space? Used for table and ctrl and arrows to do specific selects w/ keyboard
-			Back 5 seconds			Alt + Left	
-			Forward 5 seconds		Alt + Right		
-			Volume Up				Alt + Up
-			Volume Down				Alt + Down
-			Toggle Shuffle Mode		S			
-			Toggle Repeat Mode		R			
-			Previous				   			
-			Next				
-			Mute / Unmute			M	
-			Show Queue				Ctrl + Q
-			Show History   			Ctrl + H
-			Show Config	
-		
-		Playlists, Albums, Tracks
-			Q 	 					queue item
-			Shift Q 				play next (front of queue)
-			F2						Tag Editor
-			F3						Track List / Info (not for playlists ?)
-			F4						File System Browser
-			Enter					Play Selected Item(s)
-			Shift Enter				Append Item to current list (not current list)
-			Esc						Clear Selection							Do i like this? 
-			
-		Playlists
-			Del						Delete selected Playlists
 	
-		Track
-			L						Show Lyrics
-			
-		Current List
-			J 						Show Jump Window				Maybe put this for everywhere
-			Ctrl + S				Save Current List as Playlist
-			Ctrl + O 				Open files 
-			Del						Delete selected Tracks
-			Shift + Del				Crop to selected Tracks
-			
+General:	
+	Volume Slider 
+		doesn't feel right. Do some math formula instead of linear
 		
-		All Tables
-			Normal table hotkeys	
+	Maybe allow escape to close more windows. Need to be careful not to override the function it serves for editable tables. 
 	
-	https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
-
-
-General:
 	Show in tag edit window when a file doesn't support a particular tag type
 	
 	Resize Policy	
@@ -284,6 +298,8 @@ OS Specific
 		
 		Gnome3 
 			Right click -> Open with -- loads the files to current list, but doesn't start playing. 
+			
+		https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
 	
 	OSX
 		Does our package work? 

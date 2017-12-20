@@ -2,6 +2,7 @@ package net.joshuad.hypnos.fxui;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -9,6 +10,8 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -95,6 +98,17 @@ public class LyricsWindow extends Stage {
 		
 		root.getChildren().add( lyricsPane );
 		setScene( scene );
+		
+		scene.addEventFilter( KeyEvent.KEY_PRESSED, new EventHandler <KeyEvent>() {
+			@Override
+			public void handle ( KeyEvent e ) {
+				if ( e.getCode() == KeyCode.ESCAPE
+				&& !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() && !e.isAltDown() ) {
+					hide();
+					e.consume();
+				}
+			}
+		});
 		
 	}
 	
