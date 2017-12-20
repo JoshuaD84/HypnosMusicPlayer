@@ -221,8 +221,8 @@ public class FXUI implements PlayerListener {
 	Button togglePlayButton, previousButton, nextButton, stopButton;
 	Button showSettingsButton;
 	Button toggleRepeatButton, toggleShuffleButton;
-	Button showQueueButton, showHistoryButton;
-	MenuItem currentListSave, currentListExport, currentListLoad;
+	Button showQueueButton;
+	MenuItem currentListSave, currentListExport, currentListLoad, historyMenuItem;
 
 	ResizableImageView albumImage;
 	ResizableImageView artistImage;
@@ -2033,10 +2033,8 @@ public class FXUI implements PlayerListener {
 		toggleRepeatButton = new Button( );
 		toggleShuffleButton = new Button( );
 		showQueueButton = new Button ( );
-		showHistoryButton = new Button ( );
 		
 		showQueueButton.setGraphic( queueImage );
-		showHistoryButton.setGraphic( historyImage );
 		updateRepeatButtonImages();
 		updateShuffleButtonImages();
 		
@@ -2046,17 +2044,14 @@ public class FXUI implements PlayerListener {
 		toggleRepeatButton.setMinSize( width, height );
 		toggleShuffleButton.setMinSize( width, height );
 		showQueueButton.setMinSize( width, height );
-		showHistoryButton.setMinSize( width, height );
 		
 		toggleRepeatButton.setPrefSize( width, height );
 		toggleShuffleButton.setPrefSize( width, height );
 		showQueueButton.setPrefSize( width, height );
-		showHistoryButton.setPrefSize( width, height );
 		
 		toggleRepeatButton.setTooltip( new Tooltip( "Toggle Repeat Type" ) );
 		toggleShuffleButton.setTooltip( new Tooltip( "Toggle Shuffle" ) );
 		showQueueButton.setTooltip( new Tooltip( "Show Queue" ) );
-		showHistoryButton.setTooltip( new Tooltip( "Show Play History" ) );
 		
 		showQueueButton.setOnAction ( new EventHandler <ActionEvent>() {
 			public void handle ( ActionEvent e ) {
@@ -2073,12 +2068,6 @@ public class FXUI implements PlayerListener {
 					showQueueButton.getStyleClass().add ( "queueActive" );
 				}
 			} 
-		});
-		
-		showHistoryButton.setOnAction ( new EventHandler <ActionEvent>() {
-			public void handle ( ActionEvent e ) {
-				historyWindow.show();
-			}
 		});
 
 		toggleRepeatButton.setOnAction( new EventHandler <ActionEvent>() {
@@ -2199,6 +2188,7 @@ public class FXUI implements PlayerListener {
 		currentListSave = new MenuItem ( "Save" );
 		currentListExport = new MenuItem ( "Export" );
 		currentListLoad = new MenuItem ( "Load Files" );
+		historyMenuItem = new MenuItem ( "History" );
 		MenuItem currentListShuffle = new MenuItem ( "Shuffle" );
 		MenuItem jumpMenuItem = new MenuItem ( "Jump to Track" );
 		
@@ -2206,6 +2196,12 @@ public class FXUI implements PlayerListener {
 			@Override
 			public void handle ( ActionEvent e ) {
 				player.getCurrentList().clearList();
+			}
+		});
+
+		historyMenuItem.setOnAction ( new EventHandler <ActionEvent>() {
+			public void handle ( ActionEvent e ) {
+				historyWindow.show();
 			}
 		});
 		
@@ -2301,13 +2297,14 @@ public class FXUI implements PlayerListener {
 			jumpWindow.show();
 		});
 		
-		currentListMenu.getItems().addAll ( currentListClear, currentListShuffle, jumpMenuItem, currentListExport, currentListSave, currentListLoad );
+		currentListMenu.getItems().addAll ( currentListClear, currentListShuffle, jumpMenuItem, 
+			currentListExport, currentListSave, currentListLoad, historyMenuItem );
 		
 		
 		//playlistControls.getChildren().addAll( toggleShuffleButton, toggleRepeatButton, showQueueButton, showHistoryButton,
 		//currentPlayingListInfo, currentListLength, loadTracksButton, exportPlaylistButton, savePlaylistButton, clearCurrentListButton );
 		
-		playlistControls.getChildren().addAll( toggleShuffleButton, toggleRepeatButton, showQueueButton, showHistoryButton,
+		playlistControls.getChildren().addAll( toggleShuffleButton, toggleRepeatButton, showQueueButton,
 				currentPlayingListInfo, currentListLength, currentListMenu );
 	}
 

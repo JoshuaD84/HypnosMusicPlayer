@@ -3,14 +3,6 @@ Before Beta 2:
 		Type stuff
 		close window
 		reopen window, table is broken
-		
-	Maybe move History button to current list menu
-	
-	All Tables
-		Esc - album, track, and playlist problem -- it currently closes window regardless. 
-		
-	Popup Windows
-		Esc - tagWindow & settings Window - this is a little difficult because esc also stops editing a cell
 	
 	tracks with missing files are removed from the current list if you close and reopen hypnos. They should stay
 		Only when it's an album.
@@ -32,10 +24,14 @@ Before Beta 2:
 		   Actually I think it's the library loader. I turned that down and it went away
 		
 		Delaying loading settings until after display is ugly. Stuff just sits there all wrong.
-		
-	
 	
 General:	
+	All Tables
+		Esc - album, track, and playlist problem -- it currently closes window regardless. 
+		
+	Popup Windows
+		Esc - tagWindow & settings Window - this is a little difficult because esc also stops editing a cell
+		
 	Update current list length section with selection's length, set to entire list when no selection
 	
 	Volume Slider 
