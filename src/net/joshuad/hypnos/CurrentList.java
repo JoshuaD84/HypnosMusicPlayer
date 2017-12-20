@@ -327,10 +327,14 @@ public class CurrentList {
 	public void setTrack ( Track track ) {
 		setTracksPathList ( Arrays.asList( track.getPath() ) );
 	}
-	
+
 	public void setTracks ( List <? extends Track> tracks ) {
+		setTracks ( tracks, true );
+	}
+		
+	public void setTracks ( List <? extends Track> tracks, boolean clearQueue ) {
 		clearList();
-		queue.clear();
+		if ( clearQueue ) queue.clear();
 		appendTracks ( tracks );
 	}
 		
@@ -523,11 +527,19 @@ public class CurrentList {
 		doThreadAware ( runMe );
 	}
 	
+	public void setAlbum ( Album album, boolean clearQueue ) {
+		setAlbums ( Arrays.asList( album ), clearQueue );
+	}
+	
 	public void setAlbum ( Album album ) {
 		setAlbums ( Arrays.asList( album ) );
 	}
 	
 	public void setAlbums ( List<Album> albums ) {
+		setAlbums ( albums, true );
+	}
+
+	public void setAlbums ( List<Album> albums, boolean clearQueue ) {
 		List <Track> addMe = new ArrayList <Track> ();
 		
 		int albumsAdded = 0;
@@ -547,7 +559,7 @@ public class CurrentList {
 			}
 		}
 		
-		setTracks ( addMe );
+		setTracks ( addMe, clearQueue );
 		albumsSet ( albums );
 		
 		if ( missing.size() > 0 ) {

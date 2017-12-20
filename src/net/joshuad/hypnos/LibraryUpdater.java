@@ -150,13 +150,15 @@ public class LibraryUpdater {
 										List <Album> currentListAlbums = player.getCurrentList().getState().getAlbums();
 										
 										//TODO: handle this when we have multiple discs loaded
-										if ( currentListAlbums.size() == 1 && updateMe.equals( currentListAlbums.get( 0 ) ) ) {
+										if ( currentListAlbums.size() == 1 && updateMe.equals( currentListAlbums.get( 0 ) )
+										&& player.getCurrentList().getState().getMode() == CurrentList.Mode.ALBUM
+										){
 											
 											Track currentArtImages = ui.getCurrentImagesTrack();
 											List <CurrentListTrack> selectedItems = new ArrayList<> ( ui.getSelectedTracks() );
 											Track currentTrack = player.getCurrentTrack();
 											
-											player.getCurrentList().setAlbum( updateMe );
+											player.getCurrentList().setAlbum( updateMe, false );
 											library.albumsToUpdate.remove( updateMe ); //prevent an infinite loop
 											
 											ui.setImages( currentArtImages );

@@ -1,13 +1,4 @@
-Before Beta 2:	
-	tracks with missing files are removed from the current list if you close and reopen hypnos. They should stay
-		Only when it's an album.
-		Line 153 of LibraryUpdater.updateLibrary().  Not sure how I want to handle this yet. 
-		
-		Similarly, if you have an album loaded, then add a track to switch to playlist mode, then close-reopen, 
-			it deletes the track and switches back to album mode
-		
-		I think related -- the queue is cleared on restart
-	
+Before Beta 2:		
 	Fixed width column not staying fixed width after resize then window reshape
 			
 	Windows Specific
@@ -22,6 +13,8 @@ Before Beta 2:
 		Delaying loading settings until after display is ugly. Stuff just sits there all wrong.
 	
 General:	
+	Missing tracks are deleted from currentlist after restart if CurrentList.mode == ALBUM instead of remaining and being highlighted in red
+	
 	Jump to Track Window - Using Hypnos Resize Policy causes some infinite loop
 	
 	All Tables
