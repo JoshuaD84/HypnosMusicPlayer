@@ -60,6 +60,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -88,7 +89,7 @@ public class SettingsWindow extends Stage {
 	private AudioSystem player;
 	
 	private TabPane tabPane;
-	private Tab hotkeysTab;
+	private Tab globalHotkeysTab;
 	
 	private EnumMap <Hotkey, TextField> hotkeyFields = new EnumMap <Hotkey, TextField> ( Hotkey.class );
 	
@@ -123,12 +124,13 @@ public class SettingsWindow extends Stage {
 		
 		
 		Tab settingsTab = setupSettingsTab( root, ui );
-		hotkeysTab = setupHotkeysTab ( root );
+		globalHotkeysTab = setupGlobalHotkeysTab ( root );
+		Tab hotkeysTab = setupHotkeysTab ( root );
 		Tab logTab = setupLogTab( root );
 		Tab tagTab = setupTagTab ( root );
 		Tab aboutTab = setupAboutTab( root ); 
 		
-		tabPane.getTabs().addAll( settingsTab, hotkeysTab, logTab, tagTab, aboutTab );
+		tabPane.getTabs().addAll( settingsTab, hotkeysTab, globalHotkeysTab, logTab, tagTab, aboutTab );
 		
 		tabPane.prefWidthProperty().bind( root.widthProperty() );
 		tabPane.prefHeightProperty().bind( root.heightProperty() );
@@ -145,8 +147,36 @@ public class SettingsWindow extends Stage {
 			Hypnos.getPersister().saveSettings();
 		});
 	}	
-	
 	private Tab setupHotkeysTab ( Pane root ) {
+		Tab hotkeyTab = new Tab ( "Hotkeys" );
+		hotkeyTab.setClosable( false );
+		VBox hotkeyPane = new VBox();
+		hotkeyTab.setContent( hotkeyPane );
+		hotkeyPane.setAlignment( Pos.CENTER );
+		hotkeyPane.setPadding( new Insets ( 10 ) );
+		
+		Label headerLabel = new Label ( "Hot Keys" );
+		headerLabel.setPadding( new Insets ( 0, 0, 10, 0 ) );
+		headerLabel.setWrapText( true );
+		headerLabel.setTextAlignment( TextAlignment.CENTER );
+		headerLabel.setStyle( "-fx-font-size: 20px; -fx-font-weight: bold" );
+		hotkeyPane.getChildren().add( headerLabel );
+		
+		TextArea hotkeyView = new TextArea();
+		hotkeyView.setEditable( false );
+		hotkeyView.prefHeightProperty().bind( root.heightProperty() );
+		hotkeyView.setWrapText( false );
+		hotkeyView.setFont( Font.font( "Monospaced", hotkeyView.getFont().getSize() ) );
+		
+		hotkeyView.setText( hotkeyText );
+		
+		hotkeyPane.getChildren().addAll( hotkeyView );
+		
+		return hotkeyTab;
+	}
+		
+	
+	private Tab setupGlobalHotkeysTab ( Pane root ) {
 		
 		GridPane globalContent = new GridPane();
 		globalContent.setAlignment( Pos.TOP_CENTER );
@@ -1039,14 +1069,62 @@ public class SettingsWindow extends Stage {
 
 	public boolean hotkeysDisabledForConfig () {
 		if ( tabPane == null ) return false;
-		if ( hotkeysTab == null ) return false;
+		if ( globalHotkeysTab == null ) return false;
 		if ( !this.isShowing() ) return false;
 		
-		if ( tabPane.getSelectionModel().getSelectedItem().equals( this.hotkeysTab ) )  {
+		if ( tabPane.getSelectionModel().getSelectedItem().equals( this.globalHotkeysTab ) )  {
 			return true;
 		}
 		
 		return false;
 	}
+	
+	
+	private String hotkeyText = 
+		"Main Window\n" +
+		"    Back 5 seconds                       Numpad 1\n" +
+		"    Stop                                 Numpad 2\n" +	
+		"    Forward 5 seconds                    Numpad 3\n" +
+		"    Previous                             Numpad 4\n" +
+		"    Play / Pause                         Numpad 5\n" +			
+		"    Next                                 Numpad 6\n" +
+		"    Volume Down                          Numpad 7\n" +
+		"    Mute / Unmute                        Numpad 8\n" +
+		"    Volume Up                            Numpad 9\n" +
+		"    Toggle Shuffle Mode                  S\n" +	
+		"    Toggle Repeat Mode                   R\n" +
+		"    Show Jump Window                     J\n" +
+		"    Show Queue                           Ctrl + Q\n" +
+		"    Show History                         Ctrl + H\n" +
+		"    Show Config                          Ctrl + P\n" +
+		"    Save Current List as Playlist        Ctrl + S\n" +						
+		"    Open files                           Ctrl + O\n" +						
+		"    Export Current List as Playlist      Ctrl + E\n" +						
+		"\n" +
+		"Playlists, Albums, Tracks\n" +
+		"    Queue Item                           Q\n" + 	 					
+		"    play next (front of queue)           Shift + Q\n" + 				
+		"    Tag Editor / Rename Playlist         F2\n" +						
+		"    Track List / Info                    F3\n" +						
+		"    File System Browser                  F4\n" +						
+		"    Play Selected Item(s)                Enter\n" +					
+		"    Append Item to current list          Ctrl + Enter\n" +				
+		"    Prepend to current List              Shift + Enter\n" +				     			
+		"\n" +	
+		"Playlist Library\n" +
+		"    Delete selected Playlists            Del\n" +						
+		"\n" +
+		"Any Track\n" +
+		"    Show Lyrics                          L\n" +
+		"\n" +
+		"All Tables\n" +
+		"    Deselect                             Esc\n" +
+		"\n" +	
+		"Current List\n" +
+		"    Delete selected Tracks               Del\n" +
+		"    Crop to selected Tracks              Shift + Del\n" +				
+		"\n" +	
+		"Popup Windows\n" +
+		"    Close Window                         Esc";
 
 }

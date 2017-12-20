@@ -8,57 +8,12 @@ Before Beta 2:
 	
 	Art area right click menu is bolded
 
-	Consistent in-program hotkeys & tab in settings window for in-program hotkeys. 
+	All Tables
+		Esc - album, track, and playlist problem -- it currently closes window regardless. 
 		
-		Main Window, Anywhere except text input areas
-			Done		Forward 5 seconds		Numpad 1		
-			Done		Stop					Numpad 2	
-			Done		Back 5 seconds			Numpad 3	
-			Done		Previous				Numpad 4 
-			Done		Play / Pause			Numpad 5			
-			Done		Next					Numpad 6
-			Done		Volume Down				Numpad 7 
-			Done		Mute / Unmute			Numpad 8	
-			Done		Volume Up				Numpad 9
-			Done		Toggle Shuffle Mode		S			
-			Done		Toggle Repeat Mode		R	
-			Done		Show Jump Window		J	
-			Done		Show Queue				Ctrl + Q
-			Done		Show History   			Ctrl + H
-			Done		Show Config				Ctrl + P
-			Done		Ctrl + S				Save Current List as Playlist
-			Done		Ctrl + O 				Open files 
-			Done		Ctrl + E				Export current list as playlist
-		
-		Playlists, Albums, Tracks
-			Done		queue item						Q 	 					
-			Done		play next (front of queue)		Shift Q 				
-			Done		Tag Editor / Rename Playlist	F2						
-			Done		Track List / Info				F3						
-			Done		File System Browser             F4						
-			Done		Play Selected Item(s)           Enter					
-			Done		Append Item to current list     Ctrl Enter				
-			Done		Prepend to current List         Shift Enter				     			
-			
-		Playlists
-			Done		Delete selected Playlists		Del						
+	Popup Windows
+		Esc - tagWindow & settings Window - this is a little difficult because esc also stops editing a cell
 	
-		Track
-			Done		Show Lyrics						L
-		
-		All Tables
-			Done		deselect						Esc
-							album, track, and playlist problem -- it currently closes window regardless. 
-			
-		Current List
-			Done 		Delete selected Tracks			Del
-			Done		Crop to selected Tracks			Shift + Del				
-			
-		Popup Windows
-			Done		Close Window					Esc	
-							tagWindow & settings Window - this is a little difficult because esc also stops editing a cell
-
-		
 	tracks with missing files are removed from the current list if you close and reopen hypnos. They should stay
 		Only when it's an album.
 		Line 153 of LibraryUpdater.updateLibrary().  Not sure how I want to handle this yet. 
@@ -81,7 +36,10 @@ Before Beta 2:
 		Delaying loading settings until after display is ugly. Stuff just sits there all wrong.
 		
 	
+	
 General:	
+	Update current list length section with selection's length, set to entire list when no selection
+	
 	Volume Slider 
 		doesn't feel right. Do some math formula instead of linear
 		
