@@ -1331,6 +1331,10 @@ public class FXUI implements PlayerListener {
 		MenuItem setImage = new MenuItem ( "Set Album Image" );
 		MenuItem exportImage = new MenuItem ( "Export Image" );
 		
+
+		Label dragAndDropLabel = new Label ( "Drop Album Image Here" );
+		dragAndDropLabel.getStyleClass().add( "dragAndDropLabel" );
+		
 		menu.getItems().addAll( setImage, exportImage );
 
 		setImage.setOnAction( ( ActionEvent event ) -> {
@@ -1410,7 +1414,7 @@ public class FXUI implements PlayerListener {
 		
 		albumImagePane.setOnDragEntered ( event -> {
 			albumImagePane.getChildren().clear( );
-			albumImagePane.setCenter( new Label ( "Drop Album Image Here" ) );
+			albumImagePane.setCenter( dragAndDropLabel );
 		});
 		
 		albumImagePane.setOnDragExited( event -> {
@@ -1482,6 +1486,8 @@ public class FXUI implements PlayerListener {
 		artistImagePane = new BorderPane();	
 		
 		artistImagePane.getStyleClass().add( "artpane" );
+		Label dragAndDropLabel = new Label ( "Drop Artist Image Here" );
+		dragAndDropLabel.getStyleClass().add( "dragAndDropLabel" );
 		
 		artistImagePane.setOnContextMenuRequested( ( ContextMenuEvent e ) -> {
 			boolean disableAllMenus = false;
@@ -1610,7 +1616,7 @@ public class FXUI implements PlayerListener {
 		
 		artistImagePane.setOnDragEntered ( event -> {
 			artistImagePane.getChildren().clear( );
-			artistImagePane.setCenter( new Label ( "Drop Artist Image Here" ) );
+			artistImagePane.setCenter( dragAndDropLabel );
 		});
 		
 		artistImagePane.setOnDragExited( event -> {

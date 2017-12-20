@@ -6,8 +6,6 @@ Before Beta 2:
 		
 	Maybe move History button to current list menu
 	
-	Art area right click menu is bolded
-
 	All Tables
 		Esc - album, track, and playlist problem -- it currently closes window regardless. 
 		

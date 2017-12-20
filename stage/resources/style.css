@@ -50,7 +50,7 @@
 	-fx-padding: 0;
 }
 
-.artpane .label {
+.dragAndDropLabel {
 	-fx-font-weight: bold;
 }
 
