@@ -11,6 +11,10 @@ Before Beta 2:
 		Delaying loading settings until after display is ugly. Stuff just sits there all wrong.
 	
 General:	
+	On unpause set artwork to the current track
+	
+	Probably print full exceptions in error log.
+	
 	Missing tracks are deleted from currentlist after restart if CurrentList.mode == ALBUM instead of remaining and being highlighted in red
 	
 	Jump to Track Window - Using Hypnos Resize Policy causes some infinite loop

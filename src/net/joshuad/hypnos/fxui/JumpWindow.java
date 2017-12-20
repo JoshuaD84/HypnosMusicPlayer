@@ -194,10 +194,6 @@ public class JumpWindow extends Stage {
 		yearColumn.setPrefWidth( 60 );
 		albumColumn.setPrefWidth( 100 );
 		titleColumn.setPrefWidth( 100 ); 
-		artistColumn.setMinWidth( 1 );
-		yearColumn.setMinWidth( 1 );
-		albumColumn.setMinWidth( 1 );
-		titleColumn.setMinWidth( 1 ); 
 		
 		trackTable.setPlaceholder( new Label( "No tracks in playlist." ) );
 		trackTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
