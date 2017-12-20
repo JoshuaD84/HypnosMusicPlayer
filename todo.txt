@@ -1,6 +1,4 @@
-Before Beta 2:		
-	Fixed width column not staying fixed width after resize then window reshape
-			
+Before Beta 2:					
 	Windows Specific
 		Changing track position on slider changes volume back to 100%.
 		   Changing album artwork, same thing
