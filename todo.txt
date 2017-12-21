@@ -9,6 +9,8 @@ Before Beta 2:
 		Current Track text isn't big
 	
 General:	
+	Tag window right click menu is missing some stuff
+	
 	On unpause set artwork to the current track
 	
 	Probably print full exceptions in error log.

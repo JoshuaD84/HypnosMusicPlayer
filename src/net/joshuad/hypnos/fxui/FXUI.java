@@ -4163,15 +4163,14 @@ public class FXUI implements PlayerListener {
 	}
 
 	public void setShowAlbumTracks ( final boolean newValue ) {
-		//Platform.runLater( () -> {
-			trackListCheckBox.setSelected( newValue );
-		//});
+		runThreadSafe ( () -> trackListCheckBox.setSelected( newValue ) );
 	}
 	
 	public double getPrimarySplitPercent() {
 		return primarySplitPane.getDividerPositions()[0];
 	}
 	
+	//TODO: probably rename this
 	public void runThreadSafe( Runnable runMe ) {
 		if ( Platform.isFxApplicationThread() ) {
 			runMe.run();
@@ -4180,37 +4179,12 @@ public class FXUI implements PlayerListener {
 		}
 	}
 	
-	public void setPrimarySplitPercent ( double value ) {
-		
-		runThreadSafe ( new Runnable() {
-			public void run() { 
-				primarySplitPane.setDividerPosition( 0, value );
-			}
-		});
-	}
-	
 	public double getCurrentListSplitPercent() {
 		return currentListSplitPane.getDividerPositions()[0];
 	}
 	
-	public void setCurrentListSplitPercent ( double value ) {
-		runThreadSafe ( new Runnable() {
-			public void run() { 
-				currentListSplitPane.setDividerPosition( 0, value );
-			}
-		});
-	}
-	
 	public double getArtSplitPercent() {
 		return artSplitPane.getDividerPositions()[0];
-	}
-	
-	public void setArtSplitPercent ( double value ) {
-		runThreadSafe ( new Runnable() {
-			public void run() { 
-				artSplitPane.setDividerPosition( 0, value );
-			}
-		});
 	}
 	
 	public boolean isMaximized () {
@@ -4536,7 +4510,7 @@ public class FXUI implements PlayerListener {
 						
 						
 					//END NOT BELONG
-							
+					//TODO: Get rid of function calls. Just do the thing directly. 
 					case HIDE_ALBUM_TRACKS:
 						setShowAlbumTracks ( Boolean.valueOf( value ) );
 						break;		
@@ -4560,17 +4534,40 @@ public class FXUI implements PlayerListener {
 					case WINDOW_MAXIMIZED:
 						setMaximized ( Boolean.valueOf( value ) );
 						break;
-						
+
 					case PRIMARY_SPLIT_PERCENT:
-						setPrimarySplitPercent ( Double.valueOf( value ) );
-						break;
+						switch ( Hypnos.getOS() ) {
+							case NIX:
+								Platform.runLater ( () -> primarySplitPane.setDividerPosition( 0, Double.valueOf ( value ) ) );
+								break;
+							default:
+								primarySplitPane.setDividerPosition( 0, Double.valueOf ( value ) );
+								break;
+							
+						}
 						
 					case CURRENT_LIST_SPLIT_PERCENT:
-						setCurrentListSplitPercent ( Double.valueOf( value ) );
+						switch ( Hypnos.getOS() ) {
+							case NIX:
+								Platform.runLater ( () -> currentListSplitPane.setDividerPosition( 0, Double.valueOf ( value ) ) );
+								break;
+							default:
+								currentListSplitPane.setDividerPosition( 0, Double.valueOf ( value ) );
+								break;
+							
+						}
 						break;
 						
 					case ART_SPLIT_PERCENT:
-						setArtSplitPercent ( Double.valueOf( value ) );
+						switch ( Hypnos.getOS() ) {
+							case NIX:
+								Platform.runLater ( () -> artSplitPane.setDividerPosition( 0, Double.valueOf ( value ) ) );
+								break;
+							default:
+								artSplitPane.setDividerPosition( 0, Double.valueOf ( value ) );
+								break;
+							
+						}
 						break;
 						
 					case LIBRARY_TAB:
