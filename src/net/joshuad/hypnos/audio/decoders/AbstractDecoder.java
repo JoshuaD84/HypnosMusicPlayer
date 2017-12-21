@@ -47,6 +47,10 @@ public abstract class AbstractDecoder {
 			return;
 		}
 		
+		
+		System.out.println( "Volume: " +  audioOutput.isControlSupported( FloatControl.Type.VOLUME ) );
+		System.out.println( "Gain: " +  audioOutput.isControlSupported( FloatControl.Type.MASTER_GAIN ) );
+		
 		if ( audioOutput.isControlSupported( FloatControl.Type.VOLUME ) ) {
 			FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.VOLUME );
 			
@@ -59,10 +63,19 @@ public abstract class AbstractDecoder {
 			
 		} else if ( audioOutput.isControlSupported( FloatControl.Type.MASTER_GAIN ) ) {
 			FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.MASTER_GAIN );
-			
+						
 			double min = volume.getMinimum();
 			double max = volume.getMaximum();
 			double value = (max - min) * volumeCurve ( percent ) + min;
+			
+			System.out.println( "Min: " + min + "  Max: " + max + "  value: " + value ) ;
+			
+			System.out.println( "Units: " + volume.getUnits() );
+			System.out.println( "Max Label: " + volume.getMaxLabel() );
+			System.out.println( "Mid Label: " + volume.getMidLabel() );
+			System.out.println( "Min label: " + volume.getMinLabel() );
+			System.out.println( "Precision: " + volume.getPrecision() );
+			System.out.println( "Update Period: " + volume.getUpdatePeriod() );
 			
 			volume.setValue( (float)value );
 			
