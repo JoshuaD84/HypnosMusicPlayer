@@ -54,7 +54,6 @@ public abstract class AbstractDecoder {
 			double min = control.getMinimum();
 			double max = control.getMaximum();	
 			double value = (max - min) * volumeCurve ( percent ) + min;
-			System.out.println ( "setting to: " + value );
 			control.setValue( (float)value );
 		}
 	}
@@ -105,11 +104,7 @@ public abstract class AbstractDecoder {
 			LOGGER.info( "Cannot set volume, audioOutput is null" );
 			return;
 		}
-		
-		
-		System.out.println( "Volume: " +  audioOutput.isControlSupported( FloatControl.Type.VOLUME ) );
-		System.out.println( "Gain: " +  audioOutput.isControlSupported( FloatControl.Type.MASTER_GAIN ) );
-		
+			
 		if ( audioOutput.isControlSupported( FloatControl.Type.VOLUME ) ) {
 			FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.VOLUME );
 			setVolume ( volume, percent );
