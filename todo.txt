@@ -1,7 +1,6 @@
 Before Beta 2:					
 	Windows Specific
-		Changing track position on slider changes volume back to 100%.
-		   Changing album artwork, same thing
+		Changing album artwork changes volume back to 100%.
 		
 		Dub side of the moon causes skipping
 		   Actually I think it's the library loader. I turned that down and it went away

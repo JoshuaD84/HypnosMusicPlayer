@@ -126,12 +126,14 @@ public class AudioPlayer {
 					
 					if ( seekPercentRequested != NO_REQUEST ) {
 						decoder.seekTo ( seekPercentRequested );
+						setDecoderVolume( volumePercent );
 						updateTrackPosition();
 						seekPercentRequested = NO_REQUEST;
 					}
 
 					if ( seekMSRequested != NO_REQUEST ) {
 						decoder.seekTo ( seekMSRequested / (double)( track.getLengthS() * 1000 ) );
+						setDecoderVolume( volumePercent );
 						updateTrackPosition();
 						seekMSRequested = NO_REQUEST;
 					}
