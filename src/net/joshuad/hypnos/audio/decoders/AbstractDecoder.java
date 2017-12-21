@@ -156,13 +156,13 @@ public abstract class AbstractDecoder {
 		boolean volumeSupported = true, masterGainSupported = true;
 		
 		try {
-			FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.VOLUME );
+			audioOutput.getControl( FloatControl.Type.VOLUME );
 		} catch ( Exception e ) {
 			volumeSupported = false;
 		}
 		
 		try {
-			FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.MASTER_GAIN );
+			audioOutput.getControl( FloatControl.Type.MASTER_GAIN );
 		} catch ( Exception e ) {
 			masterGainSupported = false;
 		}
@@ -174,7 +174,6 @@ public abstract class AbstractDecoder {
 		return true;
 	}
 		
-	
 	public long getPositionMS() {
 		if ( audioOutput != null ) {
 			return (long)( audioOutput.getMicrosecondPosition() / 1e3 ) + clipStartTimeMS;

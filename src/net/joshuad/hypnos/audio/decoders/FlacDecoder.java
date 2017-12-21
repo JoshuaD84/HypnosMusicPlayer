@@ -35,7 +35,7 @@ public class FlacDecoder extends AbstractDecoder {
 				Thread.sleep ( 6 ); 
 				//This sleep fixes the close problem.
 				//I tried 20 and 5, both seemed good. Didn't try others. 
-				//Also removed some extranous called to this function across my decoders
+				//Also removed some extraneous called to this function across my decoders
 			} catch ( InterruptedException e ) {
 				LOGGER.info( "Interrupted while trying to sleep before closing Source Data Line." );
 				//IF this fires, it could cause the lock bug, so if you see this error you know what happened. 
