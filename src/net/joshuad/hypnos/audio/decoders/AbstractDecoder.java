@@ -40,6 +40,65 @@ public abstract class AbstractDecoder {
 		return input;
 	}
 	
+	private void setVolume ( FloatControl control, double percent ) {
+		String units = control.getUnits().toLowerCase();
+		
+		//I have not seen "decibel" in the wild, but it seems safe to check for it
+		if ( units.equals( "db" ) || units.equals( "decibel" ) ) { 
+			double min = control.getMinimum();
+			double max = 0;			
+			double value = (max - min) * volumeCurve ( percent ) + min;
+			control.setValue( (float)value );
+			
+		} else {
+			double min = control.getMinimum();
+			double max = control.getMaximum();	
+			double value = (max - min) * volumeCurve ( percent ) + min;
+			System.out.println ( "setting to: " + value );
+			control.setValue( (float)value );
+		}
+	}
+	
+	private double getVolume ( FloatControl control ) {
+		String units = control.getUnits().toLowerCase();
+	
+		//I have not seen "decibel" in the wild, but it seems safe to check for it
+		if ( units.equals( "db" ) || units.equals( "decibel" ) ) { 
+			
+			double min = control.getMinimum();
+			double max = 0;
+			double value = control.getValue();
+			
+			return inverseVolumeCurve ( ( value - min ) / ( max - min ) );
+			
+		} else {
+			double min = control.getMinimum();
+			double max = control.getMaximum();
+			double value = control.getValue();
+			
+			return inverseVolumeCurve ( ( value - min ) / ( max - min ) );
+		}
+	}
+	
+	public double getVolumePercent () {
+		try { 
+			if ( audioOutput.isControlSupported( FloatControl.Type.VOLUME ) ) {
+				FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.VOLUME );
+				return getVolume ( volume );
+				
+			} else if ( audioOutput.isControlSupported( FloatControl.Type.MASTER_GAIN ) ) {
+				FloatControl masterGain = (FloatControl)audioOutput.getControl( FloatControl.Type.MASTER_GAIN );
+				return getVolume ( masterGain );
+				
+			} else {
+				return 1;
+			}
+		} catch ( Exception e ) {
+			LOGGER.info ( "Unable to get volume percent, assuming 100%" );
+			return 1;
+		}
+	}
+	
 	public void setVolumePercent ( double percent ) throws IllegalArgumentException {
 		
 		if ( audioOutput == null ) {
@@ -53,31 +112,11 @@ public abstract class AbstractDecoder {
 		
 		if ( audioOutput.isControlSupported( FloatControl.Type.VOLUME ) ) {
 			FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.VOLUME );
-			
-			double min = volume.getMinimum();
-			double max = volume.getMaximum();
-			double value = (max - min) * volumeCurve ( percent ) + min;
-			
-			volume.setValue( (float)value );
-				
+			setVolume ( volume, percent );
 			
 		} else if ( audioOutput.isControlSupported( FloatControl.Type.MASTER_GAIN ) ) {
-			FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.MASTER_GAIN );
-						
-			double min = volume.getMinimum();
-			double max = volume.getMaximum();
-			double value = (max - min) * volumeCurve ( percent ) + min;
-			
-			System.out.println( "Min: " + min + "  Max: " + max + "  value: " + value ) ;
-			
-			System.out.println( "Units: " + volume.getUnits() );
-			System.out.println( "Max Label: " + volume.getMaxLabel() );
-			System.out.println( "Mid Label: " + volume.getMidLabel() );
-			System.out.println( "Min label: " + volume.getMinLabel() );
-			System.out.println( "Precision: " + volume.getPrecision() );
-			System.out.println( "Update Period: " + volume.getUpdatePeriod() );
-			
-			volume.setValue( (float)value );
+			FloatControl masterGain = (FloatControl)audioOutput.getControl( FloatControl.Type.MASTER_GAIN );
+			setVolume ( masterGain, percent );
 			
 		} else {
 			throw new IllegalArgumentException( "Volume Control not supported by system for this audio format." );
@@ -91,6 +130,7 @@ public abstract class AbstractDecoder {
 		}
 		
 		boolean volumeSupported = true, masterGainSupported = true;
+		
 		try {
 			FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.VOLUME );
 		} catch ( Exception e ) {
@@ -121,33 +161,6 @@ public abstract class AbstractDecoder {
 	
 	public Track getTrack () {
 		return track;
-	}
-	
-	public double getVolumePercent () {
-		try { 
-			if ( audioOutput.isControlSupported( FloatControl.Type.VOLUME ) ) {
-				FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.VOLUME );
-				double min = volume.getMinimum();
-				double max = volume.getMaximum();
-				double value = volume.getValue();
-				
-				return inverseVolumeCurve ( ( value - min ) / ( max - min ) );
-				
-			} else if ( audioOutput.isControlSupported( FloatControl.Type.MASTER_GAIN ) ) {
-				FloatControl volume = (FloatControl)audioOutput.getControl( FloatControl.Type.MASTER_GAIN );
-				double min = volume.getMinimum();
-				double max = volume.getMaximum();
-				double value = volume.getValue();
-				
-				return inverseVolumeCurve ( ( value - min ) / ( max - min ) );
-				
-			} else {
-				return 1;
-			}
-		} catch ( Exception e ) {
-			LOGGER.info ( "Unable to get volume percent, assuming 100%"  );
-			return 1;
-		}
 	}
 
 	public void seekTo ( double seekPercent ) {
