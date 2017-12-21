@@ -685,28 +685,60 @@ public class Hypnos extends Application {
 				
 				persister = new Persister ( ui, library, player, hotkeys );
 				
-				persister.loadDataBeforeShowWindow();
-				ui.showMainWindow();
-				persister.loadDataAfterShowWindow();
-				
-				Thread finishLoadingThread = new Thread ( () -> {
-					player.start();
+				switch ( getOS() ) {
+					case NIX:
+					case OSX: {
+						persister.loadDataBeforeShowWindow();
+						ui.showMainWindow();
+						persister.loadDataAfterShowWindow();
+						
+						Thread finishLoadingThread = new Thread ( () -> {
+							player.start();
+							
+							applyCLICommands( commands );
+							singleInstanceController.startCLICommandListener ( this );
+			
+							libraryUpdater.start();
+							library.startLoader( persister );
+							
+							LOGGER.info( "Hypnos finished loading." );
+							
+							try { Thread.sleep ( 2000 ); } catch ( InterruptedException e ) {}
+							
+							ui.fixTables();
+						} );
+						
+						finishLoadingThread.setDaemon( true );
+						finishLoadingThread.start();
+					} 
+					break;
 					
-					applyCLICommands( commands );
-					singleInstanceController.startCLICommandListener ( this );
-	
-					libraryUpdater.start();
-					library.startLoader( persister );
-					
-					LOGGER.info( "Hypnos finished loading." );
-					
-					try { Thread.sleep ( 2000 ); } catch ( InterruptedException e ) {}
-					
-					ui.fixTables();
-				} );
-				
-				finishLoadingThread.setDaemon( true );
-				finishLoadingThread.start();
+					case UNKNOWN:
+					case WIN_10:
+					case WIN_7:
+					case WIN_8:
+					case WIN_UNKNOWN:
+					case WIN_VISTA:
+					case WIN_XP:
+					default: {
+						persister.loadDataBeforeShowWindow();
+						persister.loadDataAfterShowWindow();
+						
+						player.start();
+						
+						applyCLICommands( commands );
+						singleInstanceController.startCLICommandListener ( this );
+		
+						libraryUpdater.start();
+						library.startLoader( persister );
+						ui.showMainWindow();
+						ui.fixTables();
+						
+						LOGGER.info( "Hypnos finished loading." );
+					} 
+					break;
+				}
+
 								
 			} else {
 				singleInstanceController.sendCommandsThroughSocket( commands );

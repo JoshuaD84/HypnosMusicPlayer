@@ -5,9 +5,7 @@ Before Beta 2:
 		
 		Dub side of the moon causes skipping
 		   Actually I think it's the library loader. I turned that down and it went away
-		
-		Delaying loading settings until after display is ugly. Stuff just sits there all wrong.
-				
+						
 		Current Track text isn't big
 	
 General:	

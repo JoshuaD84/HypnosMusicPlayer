@@ -248,6 +248,10 @@ public class FXUI implements PlayerListener {
 	
 	private boolean isDarkTheme = false;
 	
+	private double primarySplitPaneDefault = .35d;
+	private double currentListSplitPaneDefault = .75d;
+	private double artSplitPaneDeafult = .51d;// For some reason .5 doesn't work...
+	
 	private Double currentListSplitPaneRestoredPosition = null;
 	private Double primarySplitPaneRestoredPosition = null;
 	
@@ -510,6 +514,10 @@ public class FXUI implements PlayerListener {
 				
 			} 
 		});
+		
+		primarySplitPane.setDividerPositions( primarySplitPaneDefault );
+		currentListSplitPane.setDividerPositions( currentListSplitPaneDefault );
+		artSplitPane.setDividerPosition( 0, artSplitPaneDeafult ); 
 		
 		mainStage.widthProperty().addListener( windowSizeListener );
 		mainStage.heightProperty().addListener( windowSizeListener );
@@ -4155,18 +4163,29 @@ public class FXUI implements PlayerListener {
 	}
 
 	public void setShowAlbumTracks ( final boolean newValue ) {
-		Platform.runLater( () -> {
+		//Platform.runLater( () -> {
 			trackListCheckBox.setSelected( newValue );
-		});
+		//});
 	}
 	
 	public double getPrimarySplitPercent() {
 		return primarySplitPane.getDividerPositions()[0];
 	}
 	
+	public void runThreadSafe( Runnable runMe ) {
+		if ( Platform.isFxApplicationThread() ) {
+			runMe.run();
+		} else {
+			Platform.runLater( runMe );
+		}
+	}
+	
 	public void setPrimarySplitPercent ( double value ) {
-		Platform.runLater( () -> {
-			primarySplitPane.setDividerPosition( 0, value );
+		
+		runThreadSafe ( new Runnable() {
+			public void run() { 
+				primarySplitPane.setDividerPosition( 0, value );
+			}
 		});
 	}
 	
@@ -4175,8 +4194,10 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public void setCurrentListSplitPercent ( double value ) {
-		Platform.runLater( () -> {
-			currentListSplitPane.setDividerPosition( 0, value );
+		runThreadSafe ( new Runnable() {
+			public void run() { 
+				currentListSplitPane.setDividerPosition( 0, value );
+			}
 		});
 	}
 	
@@ -4185,8 +4206,10 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public void setArtSplitPercent ( double value ) {
-		Platform.runLater( () -> {
-			artSplitPane.setDividerPosition( 0, value );
+		runThreadSafe ( new Runnable() {
+			public void run() { 
+				artSplitPane.setDividerPosition( 0, value );
+			}
 		});
 	}
 	
@@ -4284,7 +4307,7 @@ public class FXUI implements PlayerListener {
 		
 		mainStage.show();
 		
-		// This stuff has to be done after setScene
+		// This stuff has to be done after show
 		StackPane thumb = (StackPane) trackPositionSlider.lookup( ".thumb" );
 		thumb.setVisible( false );
 		
@@ -4303,18 +4326,8 @@ public class FXUI implements PlayerListener {
 		Node blankCurrentlistHeader = currentListTable.lookup(".column-header-background");
 		blankCurrentlistHeader.setOnContextMenuRequested ( 
 			event -> currentListColumnSelectorMenu.show( blankCurrentlistHeader, event.getScreenX(), event.getScreenY() ) );
-		
-		double primarySplitPaneDefault = .35d;
-		double currentListSplitPaneDefault = .75d;
-		double artSplitPaneDeafult = .51d;// For some reason .5 doesn't work...
 
-		primarySplitPane.setDividerPositions( primarySplitPaneDefault );
-		currentListSplitPane.setDividerPositions( currentListSplitPaneDefault );
-		artSplitPane.setDividerPosition( 0, artSplitPaneDeafult ); 
-		
 		Set<Node> dividers = primarySplitPane.lookupAll(".split-pane-divider");
-		
-		SimpleBooleanProperty mouseDragOnCurrentListDivider = new SimpleBooleanProperty ( false );
 		
 		for ( Node divider : dividers ) {
 			if ( divider.getParent() == currentListSplitPane ) {
