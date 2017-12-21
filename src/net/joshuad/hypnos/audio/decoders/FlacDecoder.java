@@ -121,7 +121,6 @@ public class FlacDecoder extends AbstractDecoder {
 			return false;
 		} 
 		
-		
 		clipStartTimeMS = 0;
 		
 		if ( seekPercent != 0 ) {

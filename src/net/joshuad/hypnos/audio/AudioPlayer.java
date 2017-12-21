@@ -155,7 +155,7 @@ public class AudioPlayer {
 							decoder = null;
 							state = PlayState.STOPPED;
 							controller.playerStopped( StopReason.TRACK_FINISHED );
-						} 				
+						}			
 
 					} else {
 						try {
