@@ -40,6 +40,35 @@ public abstract class AbstractDecoder {
 		return input;
 	}
 	
+	public static double logOfBase ( int base, double num ) {
+		return Math.log ( num ) / Math.log ( base );
+	}
+
+	
+	private static double volumeCurveDB ( double input ) {
+		if ( input <= 0 ) return 0;
+		if ( input >= 1 ) return 1;
+	
+		double value = logOfBase( 200, 199 * input + 1 );
+		
+		if ( value < 0 ) value = 0;
+		if ( value > 1 ) value = 1;
+		
+		return value;
+	}
+	
+	private static double inverseVolumeCurveDB ( double input ) {
+		if ( input <= 0 ) return 0;
+		if ( input >= 1 ) return 1;
+
+		double value = ( Math.pow( 200, input ) - 1 ) / 199;
+		
+		if ( value < 0 ) value = 0;
+		if ( value > 1 ) value = 1;
+		
+		return value;
+	}
+	
 	private void setVolume ( FloatControl control, double percent ) {
 		String units = control.getUnits().toLowerCase();
 		
@@ -47,7 +76,7 @@ public abstract class AbstractDecoder {
 		if ( units.equals( "db" ) || units.equals( "decibel" ) ) { 
 			double min = control.getMinimum();
 			double max = 0;			
-			double value = (max - min) * volumeCurve ( percent ) + min;
+			double value = (max - min) * volumeCurveDB ( percent ) + min;
 			control.setValue( (float)value );
 			
 		} else {
@@ -68,7 +97,7 @@ public abstract class AbstractDecoder {
 			double max = 0;
 			double value = control.getValue();
 			
-			return inverseVolumeCurve ( ( value - min ) / ( max - min ) );
+			return inverseVolumeCurveDB ( ( value - min ) / ( max - min ) );
 			
 		} else {
 			double min = control.getMinimum();
