@@ -50,7 +50,7 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 					
 					return FileVisitResult.SKIP_SIBLINGS;
 				} catch ( Exception e ) {
-					LOGGER.info( e.getClass().getCanonicalName() + ": Unable to load album track. " + file.toAbsolutePath().toString() );
+					LOGGER.info( "Unable to load album track. " + file.toAbsolutePath().toString() );
 					return FileVisitResult.CONTINUE;
 				}
 				

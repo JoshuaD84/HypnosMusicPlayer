@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.URL;
@@ -107,15 +108,23 @@ public class Hypnos extends Application {
 		SimpleDateFormat dateFormat = new SimpleDateFormat ( "MMM d, yyyy HH:mm:ss aaa" );
 		public String format ( LogRecord record ) {
 			
+			String exceptionMessage = "";
+			
+			if ( record.getThrown() != null ) {
+				StringWriter sw = new StringWriter();
+				record.getThrown().printStackTrace( new PrintWriter( sw ) );
+				exceptionMessage = "\n" + sw.toString();
+			}
+			
 			String retMe = dateFormat.format( new Date ( record.getMillis() ) )
 				  + " " + record.getLoggerName()
 				  + " " + record.getSourceMethodName()
 				  + "\n"
 				  + record.getLevel() + ": " + record.getMessage()
+				  + exceptionMessage
 				  + "\n\n";
 			
 			return retMe;
-			
 		}
 	};
 	
@@ -399,7 +408,7 @@ public class Hypnos extends Application {
 			try {
 				Files.move( logFileBackup, logFileBackup2, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 			} catch ( Exception e ) {
-				LOGGER.log ( Level.WARNING, e.getClass().getCanonicalName() + ": Unable to create 2nd backup logfile" );
+				LOGGER.log ( Level.WARNING, "Unable to create 2nd backup logfile" );
 			}
 		}
 		
@@ -407,7 +416,7 @@ public class Hypnos extends Application {
 			try {
 				Files.move( logFile, logFileBackup, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 			} catch ( Exception e ) {
-				LOGGER.log ( Level.WARNING, e.getClass().getCanonicalName() + ": Unable to create 1st backup logfile" );
+				LOGGER.log ( Level.WARNING, "Unable to create 1st backup logfile" );
 			}
 		}
 				

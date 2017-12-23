@@ -1393,7 +1393,7 @@ public class FXUI implements PlayerListener {
 				
 				Utils.saveImageToDisk( targetFile.toPath(), imageBytes );
 			} catch ( IOException ex ) {
-				notifyUserError ( ex.getClass().getCanonicalName() + ": Unable to export image. See log for more information." );
+				notifyUserError ( "Unable to export image. See log for more information." );
 				LOGGER.log( Level.WARNING, "Unable to export album image.", ex );
 			}
 		});

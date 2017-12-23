@@ -1,10 +1,10 @@
 Before Beta 2:		
+	Shuffle and repeat hotkeys are backwards
+	
 	D:\download\1964 - Dust Bowl Ballads
 		No content in tag editor table (on windows, linux too?)
 			
 	Windows Specific		
-		Dub side of the moon causes skipping
-		   Actually I think it's the library loader. I turned that down and it went away
 		   
 		art pane > right click > Set Artist Image is enabled, but doesn't do anything. It should work, there is an artist folder
 		
@@ -13,6 +13,7 @@ Before Beta 2:
 		Some Global Hotkeys aren't consumed - Win + C, Win + X, etc.  
 		
 		During playback every so often the playback stutters and the entire system stutters with it. 
+			Dub side of the moon causes skipping - Actually I think it's the library loader. I turned that down and it went away
 			Playing a flac. 
 			Happens more if you are messing w/ the UI
 			I think it's the persister saving data every so often
@@ -21,6 +22,13 @@ Before Beta 2:
 			Similarly, editing the filter box quickly does it. Esp. the track filterbox.
 			I think it's causing an exception in audio player loop. Line AudioPlayer.line176 was catching stuff
 			it happened on Beta 2 build 129, but I can't duplicate the behavior in the current build (2017/12/21, in eclipse)
+			The skips take a while of playing to kick in memory usage isn't increased, so these are two different problems I think. 
+			
+			Start Hypnos
+			Load a big library ( /d/music)
+			Let it finish loading
+			Close and reopen hypnos
+			1.6GB memory footprint
 		
 		Some Windows don't have icons
 			No: Config, Jump, tag editor, album info, track info, history

@@ -1027,7 +1027,7 @@ public class Track implements Serializable, AlbumInfoSource {
 			}			
 			
 		} catch ( Exception e ) {
-			LOGGER.log( Level.INFO, e.getClass().getCanonicalName() + ": Error when trying to load tag images for file" + getPath(), e );
+			LOGGER.log( Level.INFO, "Error when trying to load tag images for file" + getPath(), e );
 		}
 	
 		return null;

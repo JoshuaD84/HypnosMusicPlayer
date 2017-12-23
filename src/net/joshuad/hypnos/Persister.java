@@ -100,8 +100,7 @@ public class Persister {
 				Files.delete( playlistsDirectory.toPath() );
 				LOGGER.info( "Playlists directory location existed but was not a directory. Removed: " + playlistsDirectory.toString() ); 
 			} catch ( IOException e ) {
-				LOGGER.warning( e.getClass().getCanonicalName() 
-					+ ": Playlists directory exists but is a normal file, and I can't remove it."
+				LOGGER.warning( "Playlists directory exists but is a normal file, and I can't remove it."
 					+ " Playlist data may be lost after program is terminated."
 					+ playlistsDirectory.toString()
 				);
@@ -168,7 +167,7 @@ public class Persister {
 			}
 			
 		} catch ( Exception e ) {
-			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to read library source directory list from disk, continuing." );
+			LOGGER.warning( "Unable to read library source directory list from disk, continuing." );
 		}
 		
 	}
@@ -178,7 +177,7 @@ public class Persister {
 			player.getCurrentList().setState ( (CurrentListState)currentListIn.readObject() );
 		
 		} catch ( Exception e ) {
-			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to read current list from disk, continuing." );
+			LOGGER.warning( "Unable to read current list from disk, continuing." );
 		}
 		
 	}
@@ -189,7 +188,7 @@ public class Persister {
 			player.getQueue().queueAllTracks( (ArrayList <Track>) queueIn.readObject() );
 			
 		} catch ( Exception e ) {
-			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to read queue data from disk, continuing." );
+			LOGGER.warning( "Unable to read queue data from disk, continuing." );
 		}
 	}
 
@@ -199,7 +198,7 @@ public class Persister {
 			player.getHistory().setData( (ArrayList <Track>) historyIn.readObject() );
 		
 		} catch ( Exception e ) {
-			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to read history from disk, continuing." );
+			LOGGER.warning( "Unable to read history from disk, continuing." );
 		}
 	}
 	
@@ -208,7 +207,7 @@ public class Persister {
 		try ( ObjectInputStream hotkeysIn = new ObjectInputStream( new FileInputStream( hotkeysFile ) ); ) {
 			hotkeys.setMap( (EnumMap <Hotkey, KeyState>) hotkeysIn.readObject() );
 		} catch ( Exception e ) {
-			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to read hotkeys from disk, continuing." );
+			LOGGER.warning( "Unable to read hotkeys from disk, continuing." );
 		}
 	}
 
@@ -219,7 +218,7 @@ public class Persister {
 			library.tracks.addAll( (ArrayList <Track>) dataIn.readObject() );
 			
 		} catch ( Exception e ) {
-			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to read library data from disk, continuing." );
+			LOGGER.warning( "Unable to read library data from disk, continuing." );
 		}
 	}
 
@@ -237,7 +236,7 @@ public class Persister {
 			Files.move( tempSourcesFile.toPath(), sourcesFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 			
 		} catch ( Exception e ) {
-			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to save library source directory list to disk, continuing." );
+			LOGGER.warning( "Unable to save library source directory list to disk, continuing." );
 		}
 	}
 
@@ -251,7 +250,7 @@ public class Persister {
 			Files.move( tempCurrentFile.toPath(), currentFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE );
 
 		} catch ( Exception e ) {
-			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to save current list to disk, continuing." );
+			LOGGER.warning( "Unable to save current list to disk, continuing." );
 		}
 	}
 
@@ -266,7 +265,7 @@ public class Persister {
 			Files.move( tempQueueFile.toPath(), queueFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 
 		} catch ( Exception e ) {
-			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to save queue to disk, continuing." );
+			LOGGER.warning( "Unable to save queue to disk, continuing." );
 		}
 	}
 
@@ -283,7 +282,7 @@ public class Persister {
 			Files.move( tempHistoryFile.toPath(), historyFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 
 		} catch ( Exception e ) {
-			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to save history to disk, continuing." );
+			LOGGER.warning( "Unable to save history to disk, continuing." );
 		}
 	}
 	
@@ -299,7 +298,7 @@ public class Persister {
 			Files.move( tempHotkeysFile.toPath(), hotkeysFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 
 		} catch ( Exception e ) {
-			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to save hotkeys to disk, continuing." );
+			LOGGER.warning( "Unable to save hotkeys to disk, continuing." );
 		}
 	}
 
@@ -330,7 +329,7 @@ public class Persister {
 			Files.move( tempDataFile.toPath(), dataFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 
 		} catch ( Exception e ) {
-			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to save library data to disk, continuing." );
+			LOGGER.warning( "Unable to save library data to disk, continuing." );
 		}
 	}
 
@@ -477,7 +476,7 @@ public class Persister {
 			Files.move( tempSettingsFile.toPath(), settingsFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 
 		} catch ( Exception e ) {
-			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to save settings to disk, continuing." );
+			LOGGER.warning( "Unable to save settings to disk, continuing." );
 		}
 	}
 
@@ -552,7 +551,8 @@ public class Persister {
 			}
 
 		} catch ( Exception e ) {
-			LOGGER.warning( e.getClass().getCanonicalName() + ": Unable to read settings from disk, continuing." );
+			LOGGER.warning( "Unable to read settings from disk, continuing." );
+			e.printStackTrace();
 		}
 
 		ui.applySettings( loadMe );
