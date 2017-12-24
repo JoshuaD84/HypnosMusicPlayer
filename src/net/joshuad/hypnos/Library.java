@@ -168,6 +168,7 @@ public class Library {
 			}
 		});
 		
+		loaderThread.setName( "Libary Loader" );
 		loaderThread.setDaemon( true );
 		loaderThread.start();
 	}

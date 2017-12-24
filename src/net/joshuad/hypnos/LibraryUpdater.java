@@ -45,6 +45,7 @@ public class LibraryUpdater {
 			}
 		});
 		
+		libraryUpdaterThread.setName( "Library Updater" );
 		libraryUpdaterThread.setDaemon( true );
 	}
 	

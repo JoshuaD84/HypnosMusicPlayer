@@ -63,6 +63,7 @@ public class SingleInstanceController {
 			}
 		});
 		
+		t.setName( "CLI Listener" );
 		t.setDaemon( true );
 		t.start();
 		return true;

@@ -801,7 +801,7 @@ public class Track implements Serializable, AlbumInfoSource {
 					}
 				}
 			});
-
+			updaterThread.setName ( "Album Image Tag Writer" );
 			updaterThread.setDaemon( true );
 			updaterThread.start();
 		}

@@ -717,6 +717,7 @@ public class Hypnos extends Application {
 							ui.fixTables();
 						} );
 						
+						finishLoadingThread.setName ( "Hypnos Load Finisher for Nix" );
 						finishLoadingThread.setDaemon( true );
 						finishLoadingThread.start();
 					} 

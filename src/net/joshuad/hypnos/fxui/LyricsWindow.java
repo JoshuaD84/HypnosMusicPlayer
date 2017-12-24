@@ -142,7 +142,7 @@ public class LyricsWindow extends Stage {
 		};
 		
 		lyricThread.setDaemon( true );
-		lyricThread.setName( "lyric-fetcher" );
+		lyricThread.setName( "Lyric Fetcher" );
 		lyricThread.start();
 	}
 }

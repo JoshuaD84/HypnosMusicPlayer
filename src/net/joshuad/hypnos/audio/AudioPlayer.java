@@ -44,6 +44,7 @@ public class AudioPlayer {
 			runPlayerThread();
 		});
 		
+		playerThread.setName( "Audio Player Thread" );
 		playerThread.setDaemon( true );
 	}
 	

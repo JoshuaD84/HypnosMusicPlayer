@@ -497,6 +497,7 @@ public class TagWindow extends Stage {
 			ui.refreshImages();
 			
 		});
+		saverThread.setName ( "Tag Window Track Updater" );
 		saverThread.setDaemon( true );
 		saverThread.start();
 	}

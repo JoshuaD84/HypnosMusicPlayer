@@ -686,6 +686,7 @@ public class SettingsWindow extends Stage {
 			}
 		});
 		
+		logReader.setName( "Log UI Text Loader" );
 		logReader.setDaemon( true );
 		logReader.start();
 		

@@ -83,6 +83,7 @@ public class CurrentList {
 	public void doThreadAware( Runnable runMe ) {
 		if ( onBadThread() ) {
 			Thread loaderThread = new Thread ( runMe );
+			loaderThread.setName( "Short Off-FX Thread" );
 			loaderThread.setDaemon( true );
 			loaderThread.start();
 			
@@ -128,6 +129,7 @@ public class CurrentList {
 			}
 		});
 		
+		watcher.setName( "Current List Watcher" );
 		watcher.setDaemon( true );
 		watcher.start();
 	}

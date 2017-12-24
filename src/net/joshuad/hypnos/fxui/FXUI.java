@@ -1603,7 +1603,7 @@ public class FXUI implements PlayerListener {
 	
 					Platform.runLater( () -> setImages ( currentImagesTrack ) );
 				});
-				
+				workerThread.setName ( "Album Artist Image Tag Saver" );
 				workerThread.setDaemon( false );
 				workerThread.start();
 			} catch ( Exception e2 ) {
@@ -1750,7 +1750,8 @@ public class FXUI implements PlayerListener {
 
 						Platform.runLater( () -> setImages ( currentImagesTrack ) );
 					});
-					
+
+					workerThread.setName ( "Artist Image Tag Saver" );
 					workerThread.setDaemon( false );
 					workerThread.start();
 					break;
@@ -1800,6 +1801,7 @@ public class FXUI implements PlayerListener {
 				}
 			};
 			
+			imageLoader.setName ( "Image Panel Loader" );
 			imageLoader.setDaemon( true );
 			imageLoader.start();
 			
@@ -1812,6 +1814,7 @@ public class FXUI implements PlayerListener {
 			setAlbumImage ( null );
 			setArtistImage ( null );
 		}
+		
 	}
 
 	public void setAlbumImage ( Image image ) {
