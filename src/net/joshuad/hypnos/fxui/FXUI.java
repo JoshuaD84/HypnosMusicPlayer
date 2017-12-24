@@ -447,12 +447,12 @@ public class FXUI implements PlayerListener {
 				jumpWindow.show();
 				e.consume();
 				
-			} else if ( e.getCode() == KeyCode.S
+			} else if ( e.getCode() == KeyCode.R
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				toggleRepeatButton.fire();
 				e.consume();
 				
-			} else if ( e.getCode() == KeyCode.R
+			} else if ( e.getCode() == KeyCode.S
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				toggleShuffleButton.fire();
 				e.consume();

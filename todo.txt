@@ -1,6 +1,4 @@
-Before Beta 2:		
-	Shuffle and repeat hotkeys are backwards
-	
+Before Beta 2:			
 	D:\download\1964 - Dust Bowl Ballads
 		No content in tag editor table (on windows, linux too?)
 			
