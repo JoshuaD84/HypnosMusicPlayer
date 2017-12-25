@@ -45,11 +45,6 @@ Before Beta 2:
 				confirmed. Each new song spikes the memory. Just flipping through the songs without playing them causes it
 					Is this related to the skipping issue? - doesn't seem to be with one or two tracks after ramping up the memory
 				Was able to get it to 3 GB just by flipping through tracks. Could probably go higher. 
-				
-			
-		Some Windows don't have icons
-			No: Config, Jump, tag editor, album info, track info, history
-			yes: Playlist prompt
 			
 		Current list label section has some unicode characters. Need to fix them for windows 7 and below. 
 						

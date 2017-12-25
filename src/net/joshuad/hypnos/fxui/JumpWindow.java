@@ -2,6 +2,8 @@ package net.joshuad.hypnos.fxui;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,6 +36,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
@@ -46,6 +49,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import net.joshuad.hypnos.CurrentListTrack;
+import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
@@ -78,6 +82,12 @@ public class JumpWindow extends Stage {
 		setTitle( "Jump to Song" );
 		setWidth( 600 );
 		setHeight( 500 );
+		
+		try {
+			getIcons().add( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) ) );
+		} catch ( FileNotFoundException e ) {
+			LOGGER.warning( "Unable to load program icon: resources/icon.png" );
+		}
 		
 		Pane root = new Pane();
 		Scene scene = new Scene( root );

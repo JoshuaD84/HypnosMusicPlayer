@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -53,6 +55,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.CurrentListTrack;
+import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.MultiFileImageTagPair;
 import net.joshuad.hypnos.MultiFileImageTagPair.ImageFieldKey;
 import net.joshuad.hypnos.MultiFileTextTagPair;
@@ -104,6 +107,12 @@ public class TagWindow extends Stage {
 		this.setHeight ( 500 );
 		Pane root = new Pane();
 		Scene scene = new Scene( root );
+		
+		try {
+			getIcons().add( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) ) );
+		} catch ( FileNotFoundException e ) {
+			LOGGER.warning( "Unable to load program icon: resources/icon.png" );
+		}
 		
 		VBox textTagPane = new VBox();
 		

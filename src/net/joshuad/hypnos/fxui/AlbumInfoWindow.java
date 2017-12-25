@@ -1,6 +1,9 @@
 package net.joshuad.hypnos.fxui;
 
 import java.awt.Desktop;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -27,6 +30,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
@@ -39,6 +43,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.joshuad.hypnos.Album;
+import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
@@ -70,6 +75,12 @@ public class AlbumInfoWindow extends Stage {
 		Pane root = new Pane();
 		Scene scene = new Scene( root );
 		VBox primaryPane = new VBox();
+		
+		try {
+			getIcons().add( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) ) );
+		} catch ( FileNotFoundException e ) {
+			LOGGER.warning( "Unable to load program icon: resources/icon.png" );
+		}
 		
 		setupAlbumTable( primaryPane );
 		

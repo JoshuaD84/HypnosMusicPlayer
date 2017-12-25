@@ -4,6 +4,7 @@ import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -122,7 +123,6 @@ public class SettingsWindow extends Stage {
 		
 		tabPane = new TabPane();
 		
-		
 		Tab settingsTab = setupSettingsTab( root, ui );
 		globalHotkeysTab = setupGlobalHotkeysTab ( root );
 		Tab hotkeysTab = setupHotkeysTab ( root );
@@ -146,7 +146,14 @@ public class SettingsWindow extends Stage {
 			Hypnos.getPersister().saveHotkeys();
 			Hypnos.getPersister().saveSettings();
 		});
+		
+		try {
+			getIcons().add( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) ) );
+		} catch ( FileNotFoundException e ) {
+			LOGGER.warning( "Unable to load program icon: resources/icon.png" );
+		}
 	}	
+	
 	private Tab setupHotkeysTab ( Pane root ) {
 		Tab hotkeyTab = new Tab ( "Hotkeys" );
 		hotkeyTab.setClosable( false );

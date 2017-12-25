@@ -1,22 +1,30 @@
 package net.joshuad.hypnos.fxui;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.logging.Logger;
+
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.lyrics.LyricsFetcher;
 import net.joshuad.hypnos.lyrics.scrapers.MetroScraper;
 
 public class TrackInfoWindow extends Stage {
+	private static final Logger LOGGER = Logger.getLogger( TrackInfoWindow.class.getName() );
 	
 	private FXUI ui;
 	
@@ -35,6 +43,12 @@ public class TrackInfoWindow extends Stage {
 		setTitle( "Track Info" );
 		setWidth( 600 );
 		setHeight( 400 );
+		
+		try {
+			getIcons().add( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) ) );
+		} catch ( FileNotFoundException e ) {
+			LOGGER.warning( "Unable to load program icon: resources/icon.png" );
+		}
 		
 		Pane root = new Pane();
 		Scene scene = new Scene( root );
