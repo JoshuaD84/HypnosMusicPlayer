@@ -338,6 +338,46 @@ public class ImagesPanel extends SplitPane {
 			
 		});
 		
+		setArtistImage.setOnAction( ( ActionEvent e ) -> {
+			Track track = ui.currentImagesTrack;
+			if ( track == null ) return;
+			
+			File imageFile = fileChooser.showOpenDialog( ui.getMainStage() );
+			if ( imageFile == null ) return; 
+			
+			try {
+				byte[] buffer = Files.readAllBytes( imageFile.toPath() );
+				
+				//REFACTOR: put this code in a function, it's duplicated below. 
+				
+				if ( !Utils.isArtistDirectory( ui.currentImagesTrack.getAlbumPath().getParent() ) ) return;
+				
+				Path artistPath = track.getAlbumPath().getParent();
+			
+				Utils.saveImageToDisk( artistPath.resolve( "artist.png" ), buffer );
+				setImages ( ui.currentImagesTrack );
+				Thread workerThread = new Thread ( () -> {
+					try ( DirectoryStream <Path> stream = Files.newDirectoryStream( artistPath ) ) {
+						for ( Path child : stream ) {
+							if ( Utils.isMusicFile( child ) ) {
+								Track.saveArtistImageToTag ( child.toFile(), buffer, ArtistTagImagePriority.GENERAL, false, player );
+							}
+						}
+					} catch ( IOException e3 ) {
+						LOGGER.log( Level.WARNING, "Unable to get directory listing, artist tags not updated for album: " + artistPath, e3 );
+					}
+	
+					Platform.runLater( () -> setImages ( ui.currentImagesTrack ) );
+				});
+				workerThread.setName ( "Album Artist Image Tag Saver" );
+				workerThread.setDaemon( false );
+				workerThread.start();
+			} catch ( Exception e2 ) {
+				LOGGER.log( Level.WARNING, "Unable to load image data from file: " + imageFile, e2 );
+			}
+			
+		});
+		
 		artistImagePane.addEventHandler( MouseEvent.MOUSE_PRESSED, ( MouseEvent e ) -> {
 			menu.hide();
 		});

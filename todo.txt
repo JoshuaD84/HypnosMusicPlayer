@@ -6,9 +6,7 @@ Before Beta 2:
 	D:\download\1964 - Dust Bowl Ballads
 		No content in tag editor table (on windows, linux too?)
 
-	Windows Specific
-		art pane > right click > Set Artist Image is enabled, but doesn't do anything. It should work, there is an artist folder
-		
+	Windows Specific		
 		Volume takes a split second to change. 
 		Process Skipping Issue
 			After some time of playing. Not immediately. 
