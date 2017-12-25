@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -24,8 +23,6 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.concurrent.AbstractExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -38,8 +35,6 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.output.TeeOutputStream;
-import org.jnativehook.GlobalScreen;
-import org.jnativehook.NativeHookException;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -76,6 +71,57 @@ public class Hypnos extends Application {
 		private String displayName;
 		OS ( String displayName ) { this.displayName = displayName; }
 		public String getDisplayName () { return displayName; }
+		
+		public boolean isWindows() {
+			switch ( this ) {
+				case WIN_10:
+				case WIN_7:
+				case WIN_8:
+				case WIN_UNKNOWN:
+				case WIN_VISTA:
+				case WIN_XP:
+					return true;
+				case NIX:
+				case OSX:
+				case UNKNOWN:
+				default:
+					return false;
+			}
+		}
+		
+		public boolean isOSX() {
+			switch ( this ) {
+				case OSX:
+					return true;
+				case WIN_10:
+				case WIN_7:
+				case WIN_8:
+				case WIN_UNKNOWN:
+				case WIN_VISTA:
+				case WIN_XP:
+				case NIX:
+				case UNKNOWN:
+				default:
+					return false;
+			}
+		}
+		
+		public boolean isLinux() {
+			switch ( this ) {
+				case NIX:
+					return true;
+				case WIN_10:
+				case WIN_7:
+				case WIN_8:
+				case WIN_UNKNOWN:
+				case WIN_VISTA:
+				case WIN_XP:
+				case UNKNOWN:
+				case OSX:
+				default:
+					return false;
+			}
+		}
 	}
 	
 	private static OS os = OS.UNKNOWN;
