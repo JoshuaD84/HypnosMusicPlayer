@@ -13,20 +13,25 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 
-/* Goals:
+/* Summary:
  * Min-width, Max-width, and not-resizable are respected absolutely. These take precedence over all other constraints
  * 
  * total width of columns tries to be the width of the table. i.e. columns fill the table, but not past 100%. 
  * 
  * Programmer can register "fixed width" columns so that they tend not to change size when the table is resized but the user can directly resize them
  * 
- * When the table's size is changed, the excess space is shared on a ratio basis between non-fixed-width, resizable columns
+ * When the entire table's size is changed, the excess space is shared on a ratio basis between non-fixed-width, resizable columns
  * 
- * If a column is manually resized, the delta is shared on a ratio basis between non-fixed-width columns to that resized column's right only. 
+ * When the user manually resizes columns, use that new size as the pref width for the columns
+ * 
+ * If a single column is manually resized, the delta is shared on a ratio basis between non-fixed-width columns, but only columns the resized column's right side
  * 
  * If all of the columns are set to fixed-size or no-resize, extra space is given to / taken from all fixed width columns proportionally
  * 
  * If all of the columns are no-resize, then the columns will not fill the table's width exactly (except, of course, at one coincidental size). 
+ *  
+ * Finally, following the guidelines above, extra space is given to columns that aren't at their pref width and need that type of space 
+ * (negative or positive) on a proportional basis first. 
  */
 
 
@@ -84,11 +89,14 @@ public class HypnosResizePolicy implements Callback <TableView.ResizeFeatures, B
 		for ( TableColumn column : columns ) {
 			boolean resizeThisColumn = false;
 			
+			//Choose to resize columns that aren't at their pref width and need the type of space we have (negative or positive) to get there
 			//We do this pref - width > 1 thing instead of pref > width because very small differences don't matter
 			//but they cause a bug where the column widths jump around wildly. 
 			if ( spaceToDistribute > 0 && column.getPrefWidth() - column.getWidth() > 1 ) resizeThisColumn = true;
 			if ( spaceToDistribute < 0 && column.getWidth() - column.getPrefWidth() > 1 ) resizeThisColumn = true;
 
+			//but never resize columns that aren't resizable, are the current manul resizing column
+			//or are to the left of the current manual resize column
 			if ( !column.isResizable() ) resizeThisColumn = false; 
 			if ( singleColumnResizeMode && column == columnToResize ) resizeThisColumn = false; 
 			if ( singleColumnResizeMode && columns.indexOf( column ) < columns.indexOf( columnToResize ) ) resizeThisColumn = false; 
@@ -136,11 +144,10 @@ public class HypnosResizePolicy implements Callback <TableView.ResizeFeatures, B
 				}
 			}
 			
-			
 			if ( columnsToReceiveSpace.size() == 0 ) {
 				if ( singleColumnResizeMode ) {
 					//If there are no eligible columns and we're doing a manual resize, we can break our fixed-width exclusion
-					// and distribute the space to the first eligible column to the right, this time allowing fixedWidth columns to be changed. 
+					// and distribute the space to only the first fixed-width column to the right, this time allowing fixedWidth columns to be changed. 
 					
 					for ( int k = columns.indexOf( columnToResize ) + 1 ; k < columns.size() ; k++ ) {
 						TableColumn candidate = columns.get( k );
@@ -163,7 +170,8 @@ public class HypnosResizePolicy implements Callback <TableView.ResizeFeatures, B
 					}
 				
 				} else {
-					//If all of the columns are set to fixed-size or no-resize, extra space is given to / taken from all fixed width columns proportionally
+					//If we're in full table resize mode and all of the columns are set to fixed-size or no-resize, 
+					//extra space is given to / taken from all fixed width columns proportionally
 					for ( TableColumn column : columns ) {
 						if ( fixedWidthColumns.contains( column ) && column.isResizable() ) {
 							columnsToReceiveSpace.add( column );
@@ -172,17 +180,19 @@ public class HypnosResizePolicy implements Callback <TableView.ResizeFeatures, B
 				}
 			}
 			
-			//Now we distribute the space amongst all eligble columns. It is still possible for there to be no eligible columns, in that case, nothing happens. 
+			//Now we distribute the space amongst all eligible columns. It is still possible for there to be no eligible columns, in that case, nothing happens. 
 			distributeSpaceRatio ( columnsToReceiveSpace, spaceToDistribute );
 		}
 		
 		if ( singleColumnResizeMode ) { 
 			//Now if the user is manually resizing one column, we adjust that column's width to include whatever space we made / destroyed
 			//with the above operations. 
+			//I found it is better to do this at the end when the actual space create/destroyed is known, rather than doing at the top and then
+			//trying to get that much space from the other columns. Sometimes the other columns resist, and this creates a much smoother user experience. 
 			columnToResize.impl_setWidth ( columnToResize.getWidth() + calculateSpaceAvailable ( table ) );
 			
 			//If it's a manual resize, set pref-widths to these user specified widths. 
-			//The user manually set them here, so try to respect them on next resize.
+			//The user manually set them now, so they like this size. Try to respect them on next resize.
 			for ( TableColumn column : columns ) {
 				column.setPrefWidth( column.getWidth() );
 			}
@@ -195,9 +205,6 @@ public class HypnosResizePolicy implements Callback <TableView.ResizeFeatures, B
 		
 		double spaceWanted = 0;
 		for ( TableColumn column : columns ) spaceWanted += column.getPrefWidth() - column.getWidth();
-		
-		double totalWidth = 0;
-		for ( TableColumn column : columns ) totalWidth += column.getWidth();
 		
 		if ( spaceWanted < spaceToDistribute ) {
 			for ( TableColumn column : columns ) {			
@@ -216,28 +223,18 @@ public class HypnosResizePolicy implements Callback <TableView.ResizeFeatures, B
 		}	
 	}
 	
-	private double distributeSpaceRatio ( List<TableColumn> columns, double space ) {
-		
-		double distributed = 0;
+	private void distributeSpaceRatio ( List<TableColumn> columns, double space ) {
 		
 		double totalWidth = 0;
 		for ( TableColumn column : columns ) totalWidth += column.getWidth();
 		
 		for ( TableColumn column : columns ) {
-			double startWidth = column.getWidth(); 
-			
 			double targetWidth = column.getWidth() + space * ( column.getWidth() / totalWidth );
 			if ( targetWidth >= column.getMaxWidth() ) targetWidth = column.getMaxWidth();
 			else if ( targetWidth <= column.getMinWidth() ) targetWidth = column.getMinWidth();
 
 			column.impl_setWidth ( targetWidth );
-			
-			double endWidth = column.getWidth();
-			
-			distributed += endWidth - startWidth;
 		}
-		
-		return distributed;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -247,7 +244,8 @@ public class HypnosResizePolicy implements Callback <TableView.ResizeFeatures, B
 	
 		//TODO: That -4 is annoying. I'm sure there's a way to actually get that value
 		//See thread here: https://stackoverflow.com/questions/47852175/how-to-spread-the-total-width-amongst-all-columns-on-table-construction
-		//Unfortunately, that solution didn't fix the problem.
+		//Which is also implemented below in calculateSpaceAvailableNew
+		//Unfortunately, that solution didn't work on manual resizes. 
 		
 		for ( TableColumn column : columns ) spaceToDistribute -= column.getWidth();
 		return spaceToDistribute;
@@ -269,4 +267,16 @@ public class HypnosResizePolicy implements Callback <TableView.ResizeFeatures, B
 		
 		return scrollBarWidth;
 	}
+	
+	/*private double calculateSpaceAvailableNew ( TableView table ) {
+		Region region = null;
+		Set<Node> nodes = table.lookupAll(".clipped-container");
+		for (Node node : nodes) {
+		    if (node instanceof Region) {
+		        region = (Region) node;
+		    }
+		}
+		
+		return region.getWidth();
+	}*/
 }
