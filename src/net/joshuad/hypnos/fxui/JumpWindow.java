@@ -486,7 +486,7 @@ public class JumpWindow extends Stage {
 		});
 		
 		trackTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
-			ui.setImages ( newSelection );
+			ui.artSplitPane.setImages ( newSelection );
 		});
 		
 		trackTable.setRowFactory( tv -> {

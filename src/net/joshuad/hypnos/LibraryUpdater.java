@@ -162,7 +162,7 @@ public class LibraryUpdater {
 											player.getCurrentList().setAlbum( updateMe, false );
 											library.albumsToUpdate.remove( updateMe ); //prevent an infinite loop
 											
-											ui.setImages( currentArtImages );
+											ui.artSplitPane.setImages( currentArtImages );
 											ui.setSelectedTracks ( selectedItems );
 											
 											if ( currentTrack != null ) {
