@@ -1,13 +1,28 @@
 package net.joshuad.hypnos.hotkeys;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
+import java.util.concurrent.AbstractExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.jnativehook.GlobalScreen;
+import org.jnativehook.NativeHookException;
+import org.jnativehook.NativeInputEvent;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
 import net.joshuad.hypnos.Hypnos;
+import net.joshuad.hypnos.Hypnos.OS;
 
 public class GlobalHotkeys implements NativeKeyListener {
+	private static final Logger LOGGER = Logger.getLogger( GlobalHotkeys.class.getName() );
 
 	public enum Hotkey {
 		PREVIOUS ( "Previous" ), 
@@ -34,11 +49,58 @@ public class GlobalHotkeys implements NativeKeyListener {
 		public String getLabel () { return label; }
 	}
 	
-	private boolean disabled = false;
+	private static boolean disableHotkeys = false;
+	
+	private static boolean disabled = false;
 	
 	private KeyState lastKeyState = null;
 	
 	private EnumMap <Hotkey, KeyState> hotkeyMap = new EnumMap <Hotkey, KeyState> ( Hotkey.class );
+	
+	
+	public static GlobalHotkeys start() {
+		GlobalHotkeys hotkeys;
+		if ( !disableHotkeys ) {
+			PrintStream out = System.out;
+			
+			try {
+				//This suppresses the lgpl banner from the hotkey library. 
+				System.setOut( new PrintStream ( new OutputStream() {
+				    @Override public void write(int b) throws IOException {}
+				}));
+			
+				//LogManager.getLogManager().reset();
+				Logger logger = Logger.getLogger( GlobalScreen.class.getPackage().getName() );
+				logger.setLevel( Level.OFF );
+				GlobalScreen.setEventDispatcher(new VoidDispatchService());
+				GlobalScreen.registerNativeHook();
+				
+			} catch ( NativeHookException ex ) {
+				LOGGER.warning( "There was a problem registering the global hotkey listeners. Global Hotkeys are disabled." );
+				disabled = true;
+			} finally {
+				System.setOut( out );
+			}
+		}
+		
+		hotkeys = new GlobalHotkeys();
+		
+		if ( !disableHotkeys ) {
+			GlobalScreen.addNativeKeyListener( hotkeys );
+		} else {
+			disabled = true;
+		}
+		
+		return hotkeys;
+	}
+	
+	public static void setDisableRequested ( boolean b ) {
+		disableHotkeys = b;
+	}
+	
+	public static boolean getDisableRequested ( ) {
+		return disableHotkeys;
+	}
 	
 	public GlobalHotkeys() {}
 	
@@ -79,17 +141,17 @@ public class GlobalHotkeys implements NativeKeyListener {
 	public void enable() {
 		this.disabled = false;
 	}
-	
-	public void nativeKeyPressed ( NativeKeyEvent e ) {
+			
+	public void nativeKeyPressed ( NativeKeyEvent e ) {	
 		lastKeyState = new KeyState ( e.getKeyCode(), e.getModifiers() );
 		
 		if ( !Hypnos.hotkeysDisabledForConfig() ) {
 			for ( Hotkey hotkey : hotkeyMap.keySet() ) {
 				KeyState registeredHotkey = hotkeyMap.get( hotkey );
 				if ( registeredHotkey != null && registeredHotkey.equals( lastKeyState ) ) {
+					
 					Hypnos.doHotkeyAction ( hotkey );
 					
-					/*
 					try {
 						//This is an attempt to consume the hotkey. Doesn't work in X11
 						Field f = NativeInputEvent.class.getDeclaredField("reserved");
@@ -97,7 +159,7 @@ public class GlobalHotkeys implements NativeKeyListener {
 						f.setShort(e, (short) 0x01);
 					} catch (Exception ex) {
 						ex.printStackTrace();
-					}*/
+					}
 				}
 			}
 		}
@@ -111,9 +173,42 @@ public class GlobalHotkeys implements NativeKeyListener {
 		this.hotkeyMap = map;
 	}
 	
-	public void nativeKeyReleased(NativeKeyEvent e) {}
-	public void nativeKeyTyped(NativeKeyEvent e) {}
-
+	public void nativeKeyReleased( NativeKeyEvent e ) {}
 	
+	public void nativeKeyTyped(NativeKeyEvent e) {}
+	
+}
+
+class VoidDispatchService extends AbstractExecutorService {
+	private boolean running = false;
+
+	public VoidDispatchService() {
+		running = true;
+	}
+
+	public void shutdown() {
+		running = false;
+	}
+
+	public List<Runnable> shutdownNow() {
+		running = false;
+		return new ArrayList<Runnable>(0);
+	}
+
+	public boolean isShutdown() {
+		return !running;
+	}
+
+	public boolean isTerminated() {
+		return !running;
+	}
+
+	public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+		return true;
+	}
+
+	public void execute(Runnable r) {
+		r.run();
+	}
 }
 

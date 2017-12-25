@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.concurrent.AbstractExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -85,7 +87,6 @@ public class Hypnos extends Application {
 	private static Path logFile;
 	private static boolean isStandalone = false;
 	private static boolean isDeveloping = false;
-	private static boolean disableHotkeys = false;
 	private static boolean globalHotkeysDisabled = false;
 	
 	private static Persister persister;
@@ -241,11 +242,11 @@ public class Hypnos extends Application {
 				
 		isStandalone = Boolean.getBoolean( "hypnos.standalone" );
 		isDeveloping = Boolean.getBoolean( "hypnos.developing" );
-		disableHotkeys = Boolean.getBoolean( "hypnos.disableglobalhotkeys" );
+		GlobalHotkeys.setDisableRequested ( Boolean.getBoolean( "hypnos.disableglobalhotkeys" ) );
 		
 		if ( isStandalone ) LOGGER.info ( "Running as standalone - requested by system properties set at program launch" );
 		if ( isDeveloping ) LOGGER.info ( "Running on development port - requested by system properties set at program launch" );
-		if ( disableHotkeys ) LOGGER.info ( "Global hotkeys disabled - requested by system properties set at program launch" );
+		if ( GlobalHotkeys.getDisableRequested() ) LOGGER.info ( "Global hotkeys disabled - requested by system properties set at program launch" );
 	}
 	
 	private void determineOS() {
@@ -463,37 +464,7 @@ public class Hypnos extends Application {
 	}
 	
 	private void startGlobalHotkeyListener() {
-		
-		if ( !disableHotkeys ) {
-			PrintStream out = System.out;
-			
-			try {
-				//This suppresses the lgpl banner from the hotkey library. 
-				System.setOut( new PrintStream ( new OutputStream() {
-				    @Override public void write(int b) throws IOException {}
-				}));
-			
-				//LogManager.getLogManager().reset();
-				Logger logger = Logger.getLogger( GlobalScreen.class.getPackage().getName() );
-				logger.setLevel( Level.OFF );
-	
-				GlobalScreen.registerNativeHook();
-				
-			} catch ( NativeHookException ex ) {
-				LOGGER.warning( "There was a problem registering the global hotkey listeners. Global Hotkeys are disabled." );
-				globalHotkeysDisabled = true;
-			} finally {
-				System.setOut( out );
-			}
-		}
-		
-		hotkeys = new GlobalHotkeys();
-		
-		if ( !disableHotkeys ) {
-			GlobalScreen.addNativeKeyListener( hotkeys );
-		} else {
-			globalHotkeysDisabled = true;
-		}
+		hotkeys = GlobalHotkeys.start();
 	}
 	
 	public static boolean globalHotkeysDisabled() {

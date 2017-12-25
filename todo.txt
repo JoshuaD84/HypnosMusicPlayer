@@ -1,22 +1,21 @@
 Before Beta 2:			
+	Redo global hotkeys, do it on a system-by-system type basis.
+		https://stackoverflow.com/questions/79658/react-on-global-hotkey-in-a-java-program-on-windows-linux-mac
+		Some Global Hotkeys aren't consumed - Win + C, Win + X, etc.  
+	
 	D:\download\1964 - Dust Bowl Ballads
 		No content in tag editor table (on windows, linux too?)
-			
-	Windows Specific		
-		   
+
+	Windows Specific
 		art pane > right click > Set Artist Image is enabled, but doesn't do anything. It should work, there is an artist folder
 		
 		Volume takes a split second to change. 
-		
-		Some Global Hotkeys aren't consumed - Win + C, Win + X, etc.  
-		
-		
 		Process Skipping Issue
 			After some time of playing. Not immediately. 
 			During playback every so often the playback stutters and the entire system stutters with it. 
 			Playing a flac. 
 			Happens more if you are messing w/ the UI
-			I think it's the persister saving data every so often
+			I think it's the persister szzzaving data every so often
 			resizing tables or opening windows causes it. 
 			clicking rapidly on the track library list checkbox causes it to happen real bad
 			Similarly, editing the filter box quickly does it. Esp. the track filterbox.
@@ -29,10 +28,6 @@ Before Beta 2:
 			
 			scrolling up and down the album or track table table does increase memory usage, but "only" by 100-200mb. 
 			
-			
-			
-			
-				
 			Start Hypnos
 			Load a big library ( /d/music)
 			Let it finish loading
@@ -54,15 +49,10 @@ Before Beta 2:
 				Was able to get it to 3 GB just by flipping through tracks. Could probably go higher. 
 				
 			
-			
-		
 		Some Windows don't have icons
 			No: Config, Jump, tag editor, album info, track info, history
 			yes: Playlist prompt
 			
-		Really large memory footprint -- 432MB. Foobar is 57k. Is it like that in linux? 
-			When loading from disk it jumped to 2GB :-o
-		
 		Current list label section has some unicode characters. Need to fix them for windows 7 and below. 
 						
 General:	
