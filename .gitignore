@@ -6,6 +6,7 @@ hypnos.jar
 /bin/
 /distribution
 /packaging/jres/*
+/temp
 *.flac
 *.mp3
 *.wav

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Observable;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
@@ -1602,6 +1603,46 @@ public class FXUI implements PlayerListener {
 				});
 			}
 		});
+		
+		currentListTable.getSelectionModel().getSelectedIndices().addListener ( new ListChangeListener() {
+			@Override
+			public void onChanged ( Change c ) {
+				List<Integer> selected = currentListTable.getSelectionModel().getSelectedIndices();
+				
+				if ( selected.size() == 0 || selected.size() == 1 ) {
+					int lengthS = 0;
+					for ( Track track : player.getCurrentList().getItems() ) {
+						if ( track != null ) {
+							lengthS += track.getLengthS();
+						}
+					}
+					
+					final int lengthArgument = lengthS;
+					
+					Platform.runLater( () -> {
+						currentListLength.setText( Utils.getLengthDisplay( lengthArgument ) );
+					});
+					
+				} else {
+					int lengthS = 0;
+					for ( int index : selected ) {
+						if ( index >= 0 && index < player.getCurrentList().getItems().size() ) {
+							lengthS += player.getCurrentList().getItems().get( index ).getLengthS();
+						}
+					}
+					
+					final int lengthArgument = lengthS;
+					
+					Platform.runLater( () -> {
+						currentListLength.setText( Utils.getLengthDisplay( lengthArgument ) );
+					});
+					
+				}
+					
+				
+			}
+		});
+			
 		
 		final Label currentPlayingListInfo = new Label ( "" );
 		currentPlayingListInfo.setAlignment( Pos.CENTER );
@@ -4194,7 +4235,6 @@ public class FXUI implements PlayerListener {
 		});
 	}
 
-
 	@Override
 	public void playerUnpaused () {
 		Platform.runLater( () -> {
@@ -4204,7 +4244,6 @@ public class FXUI implements PlayerListener {
 		});
 		
 	}
-
 
 	@Override
 	public void playerVolumeChanged ( double newVolumePercent ) {
