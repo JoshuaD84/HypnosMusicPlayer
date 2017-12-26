@@ -4199,6 +4199,7 @@ public class FXUI implements PlayerListener {
 	public void playerUnpaused () {
 		Platform.runLater( () -> {
 			togglePlayButton.setGraphic( pauseImage );
+			artSplitPane.setImages( player.getCurrentTrack() );
 			currentListTable.refresh();//To get the play/pause image to update. 
 		});
 		

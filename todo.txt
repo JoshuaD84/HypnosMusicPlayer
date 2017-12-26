@@ -21,8 +21,6 @@ General:
 	
 	Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
 		
-	On unpause set artwork to the current track
-		
 	Missing tracks are deleted from currentlist after restart if CurrentList.mode == ALBUM instead of remaining and being highlighted in red
 	
 	Esc Hotkey	
