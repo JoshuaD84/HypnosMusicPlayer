@@ -18,10 +18,6 @@ Before Beta 2:
 			if I just disable loader it doens't manifest. 
 			
 			2017/12/25 - I can't make it happen anymore. Maybe we fixed it when dealing w/ the memory stuff? 
-			
-		
-		Current list label section has some unicode characters. Need to fix them for windows 7 and below. 		
-			Do this from linux to avoid writing file with wrong encoding - Line 72 of CurrentListState
 				
 General:	
 	isArtistDirectory -- Keep a cache, so you're not checking every folder every time? Might need to recheck occasionally. 

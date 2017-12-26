@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.joshuad.hypnos.CurrentList.Mode;
+import net.joshuad.hypnos.Hypnos.OS;
 
 public class CurrentListState implements Serializable {
 	
@@ -69,7 +70,11 @@ public class CurrentListState implements Serializable {
 			}
 			
 			if ( mode == Mode.ALBUM_REORDERED ) {
-				retMe += " 🔀";
+				if ( Hypnos.getOS() == OS.WIN_XP || Hypnos.getOS() == OS.WIN_VISTA || Hypnos.getOS() == OS.WIN_7 ) {
+					retMe += " *";
+				} else {
+					retMe += " 🔀";
+				}
 			}
 
 		} else if ( mode == Mode.PLAYLIST || mode == Mode.PLAYLIST_UNSAVED ) {
