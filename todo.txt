@@ -20,9 +20,7 @@ General:
 	isArtistDirectory -- Keep a cache, so you're not checking every folder every time? Might need to recheck occasionally. 
 	
 	Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
-	
-	Tag window right click menu is missing some stuff
-	
+		
 	On unpause set artwork to the current track
 		
 	Missing tracks are deleted from currentlist after restart if CurrentList.mode == ALBUM instead of remaining and being highlighted in red

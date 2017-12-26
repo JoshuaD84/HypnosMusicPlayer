@@ -780,13 +780,16 @@ public class SettingsWindow extends Stage {
 		
 		ContextMenu trackContextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
+		MenuItem playNextMenuItem = new MenuItem( "Play Next" );
 		MenuItem appendMenuItem = new MenuItem( "Append" );
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem infoMenuItem = new MenuItem( "Info" );
+		MenuItem lyricsMenuItem = new MenuItem( "Lyrics" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
-		trackContextMenu.getItems().addAll( playMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, browseMenuItem, addToPlaylistMenuItem );
+		trackContextMenu.getItems().addAll( playMenuItem, playNextMenuItem, appendMenuItem, enqueueMenuItem, 
+			editTagMenuItem, infoMenuItem, lyricsMenuItem, browseMenuItem, addToPlaylistMenuItem );
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
@@ -834,7 +837,6 @@ public class SettingsWindow extends Stage {
 					tracks.add( error.getTrack() );
 				}
 				
-				
 				if ( tracks.size() == 1 ) {
 					player.playItems( tracks );
 					
@@ -845,6 +847,23 @@ public class SettingsWindow extends Stage {
 				}
 			}
 		});
+		
+		playNextMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				List <Track> tracks = new ArrayList <Track> ();
+				
+				for ( TagError error : table.getSelectionModel().getSelectedItems() ) {
+					tracks.add( error.getTrack() );
+				}
+				
+				if ( tracks.size() == 1 ) {
+					player.getQueue().queueAllTracks( tracks, 0 );
+					
+				} 
+			}
+		});
+		
 
 		appendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -894,6 +913,14 @@ public class SettingsWindow extends Stage {
 			public void handle ( ActionEvent event ) {
 				ui.trackInfoWindow.setTrack( table.getSelectionModel().getSelectedItem().getTrack() );
 				ui.trackInfoWindow.show();
+			}
+		});
+		
+		lyricsMenuItem.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				ui.lyricsWindow.setTrack( table.getSelectionModel().getSelectedItem().getTrack() );
+				ui.lyricsWindow.show();
 			}
 		});
 
