@@ -1,7 +1,4 @@
 Before Beta 2:	
-		
-	Set -Xmx600m for windows. Probably linux too, need to check. 
-
 	Windows Specific		
 		Process Skipping Issue
 			After some time of playing. Not immediately. 
@@ -20,6 +17,8 @@ Before Beta 2:
 			2017/12/25 - I can't make it happen anymore. Maybe we fixed it when dealing w/ the memory stuff? 
 				
 General:	
+	Not enough of my build process is in git. Don't include the JREs, but the rest of it should be there, I think. 
+
 	isArtistDirectory -- Keep a cache, so you're not checking every folder every time? Might need to recheck occasionally. 
 	
 	Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
@@ -316,8 +315,7 @@ OS Specific
 		
 	Linux
 		use a compiled launcher rather than a script -- this will make the appimage nicer I think
-		Rename java process to Hypnos
-		
+				
 		Gnome3 
 			Right click -> Open with -- loads the files to current list, but doesn't start playing. 
 			

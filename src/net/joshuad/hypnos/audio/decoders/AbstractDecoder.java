@@ -30,20 +30,33 @@ public abstract class AbstractDecoder {
 		}
 	}
 	
-	private static double volumeCurve ( double input ) {
-		//Stubs for functions if we want to implement this in the future. 
-		return input;
-	}
-	
-	private static double inverseVolumeCurve ( double input ) {
-		//Stubs for functions if we want to implement this in the future. 
-		return input;
-	}
-	
 	public static double logOfBase ( int base, double num ) {
 		return Math.log ( num ) / Math.log ( base );
 	}
 
+	private static double volumeCurvePulse ( double input ) {
+		if ( input <= 0 ) return 0;
+		if ( input >= 1 ) return 1;
+	
+		double value = logOfBase( 5, 4 * input + 1 );
+		
+		if ( value < 0 ) value = 0;
+		if ( value > 1 ) value = 1;
+		
+		return value;
+	}
+	
+	private static double inverseVolumeCurvePulse ( double input ) {
+		if ( input <= 0 ) return 0;
+		if ( input >= 1 ) return 1;
+
+		double value = ( Math.pow( 5, input ) - 1 ) / 4;
+		
+		if ( value < 0 ) value = 0;
+		if ( value > 1 ) value = 1;
+		
+		return value;
+	}
 	
 	private static double volumeCurveDB ( double input ) {
 		if ( input <= 0 ) return 0;
@@ -82,7 +95,7 @@ public abstract class AbstractDecoder {
 		} else {
 			double min = control.getMinimum();
 			double max = control.getMaximum();	
-			double value = (max - min) * volumeCurve ( percent ) + min;
+			double value = (max - min) * volumeCurvePulse ( percent ) + min;
 			control.setValue( (float)value );
 		}
 	}
@@ -104,7 +117,7 @@ public abstract class AbstractDecoder {
 			double max = control.getMaximum();
 			double value = control.getValue();
 			
-			return inverseVolumeCurve ( ( value - min ) / ( max - min ) );
+			return inverseVolumeCurvePulse ( ( value - min ) / ( max - min ) );
 		}
 	}
 	
