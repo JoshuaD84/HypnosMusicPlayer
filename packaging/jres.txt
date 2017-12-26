@@ -1,0 +1,5 @@
+put the jres in:
+
+./jres/win
+./jres/linux-64bit
+./jres/linux-32bit

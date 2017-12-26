@@ -1,0 +1,27 @@
+#!/bin/bash
+
+function abspath() { pushd . > /dev/null; if [ -d "$1" ]; then cd "$1"; dirs -l +0; else cd "`dirname \"$1\"`"; cur_dir=`dirs -l +0`; if [ "$cur_dir" == "/" ]; then echo "$cur_dir`basename \"$1\"`"; else echo "$cur_dir/`basename \"$1\"`"; fi; fi; popd > /dev/null; }
+
+NATIVE_DIR_RELATIVE=`dirname $0`
+NATIVE_DIR=`abspath "$NATIVE_DIR_RELATIVE"`
+
+export JAVA_HOME=$DIR/../hypnos/jre/
+export PATH=$PATH:$DIR/../hypnos/jre/bin
+
+HYPNOS_DIR=`abspath "$NATIVE_DIR/../hypnos"`
+JAVA_USED=`abspath "$NATIVE_DIR/../hypnos/jre/bin/java"`
+
+
+log=$HYPNOS_DIR/logs/osx-output.log
+error=$HYPNOS_DIR/logs/osx-error.log
+
+mkdir -p "$HYPNOS_DIR/logs"
+touch $log
+touch $error
+
+cd $HYPNOS_DIR
+
+$JAVA_USED -Xdock:icon=core/icon-window.png -Dapple.awt.textantialiasing=true -Dapple.laf.useScreenMenuBar=true -Dapple.awt.antialiasing=true -jar hypnos.jar >> $log 2> $error
+
+
+

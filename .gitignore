@@ -5,7 +5,7 @@ hypnos.jar
 /stage/bin/
 /bin/
 /distribution
-/packaging
+/packaging/jres/*
 *.flac
 *.mp3
 *.wav

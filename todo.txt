@@ -17,8 +17,6 @@ Before Beta 2:
 			2017/12/25 - I can't make it happen anymore. Maybe we fixed it when dealing w/ the memory stuff? 
 				
 General:	
-	Not enough of my build process is in git. Don't include the JREs, but the rest of it should be there, I think. 
-
 	isArtistDirectory -- Keep a cache, so you're not checking every folder every time? Might need to recheck occasionally. 
 	
 	Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
@@ -26,30 +24,16 @@ General:
 	Tag window right click menu is missing some stuff
 	
 	On unpause set artwork to the current track
-	
-	Probably print full exceptions in error log.
-	
+		
 	Missing tracks are deleted from currentlist after restart if CurrentList.mode == ALBUM instead of remaining and being highlighted in red
 	
-	Jump to Track Window - Using Hypnos Resize Policy causes some infinite loop
-	
-	All Tables
-		Esc - album, track, and playlist problem -- it currently closes window regardless. 
-		
-	Popup Windows
-		Esc - tagWindow & settings Window - this is a little difficult because esc also stops editing a cell
+	Esc Hotkey	
+		album, track, and playlist problem -- it currently closes window regardless. 
+		tagWindow & settings Window - this is a little difficult because esc also stops editing a cell
 		
 	Update current list length section with selection's length, set to entire list when no selection
-	
-	Volume Slider 
-		doesn't feel right. Do some math formula instead of linear
-		
-	Maybe allow escape to close more windows. Need to be careful not to override the function it serves for editable tables. 
-	
+				
 	Show in tag edit window when a file doesn't support a particular tag type
-	
-	Resize Policy	
-		Do work with preferred widths. 
 
 	Refactor Library
 		Make a source directory a class, not just a path.
@@ -160,8 +144,7 @@ General:
 	Redo global hotkeys, do it on a system-by-system type basis.
 		https://stackoverflow.com/questions/79658/react-on-global-hotkey-in-a-java-program-on-windows-linux-mac
 		Some Global Hotkeys aren't consumed - Win + C, Win + X, etc.  
-		
-		
+			
 		Windows:
 			jkeymaster - windows + x keys not supported
 			
@@ -221,9 +204,10 @@ JavaFX stuff
 		
 	hide/show via hotkeys while maximized toggles every 3 presses instead of every 2 presses. 
 		https://stackoverflow.com/questions/45269173/stage-seticonified-and-stage-isiconified-not-acting-properly
-		I think this is working correctly now? I updated the jvm from _131 to _151 and it seems good? 
+		I think this is working correctly now? I updated the jvm from _131 to _151 and it seems good? 	
+			confirmed on linux
 				
-	Showing any dialog prevents window drag resize. 
+	Showing any dialog prevents window drag resize in ubuntu / other linux?
 		http://bugs.java.com/bugdatabase/view_bug.do?bug_id=8140491
 		https://stackoverflow.com/questions/33134791/javafx-stage-cant-be-resized-after-showing-a-dialog
 	

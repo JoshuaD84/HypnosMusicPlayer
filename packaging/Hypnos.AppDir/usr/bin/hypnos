@@ -1,0 +1,7 @@
+#!/bin/bash
+
+DIR="$(dirname "$(readlink -f "$0")")"
+cd $DIR
+./jre/bin/hypnos -jar -Xmx600m hypnos.jar "$@" &
+disown
+exit 0

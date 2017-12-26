@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Hypnos
+Exec=hypnos %F
+Icon=hypnos
+Type=Application
+Categories=Audio;AudioVideo;
+Comment=Music Player and Library
+MimeType=inode/directory;audio/flac;
+Name[en]=Hypnos
+Terminal=false
+NoDisplay=false
