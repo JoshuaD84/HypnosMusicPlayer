@@ -1,13 +1,8 @@
-Before Beta 2:			
-	Redo global hotkeys, do it on a system-by-system type basis.
-		https://stackoverflow.com/questions/79658/react-on-global-hotkey-in-a-java-program-on-windows-linux-mac
-		Some Global Hotkeys aren't consumed - Win + C, Win + X, etc.  
-	
-	D:\download\1964 - Dust Bowl Ballads
-		No content in tag editor table (on windows, linux too?)
+Before Beta 2:	
+		
+	Set -Xmx600m for windows. Probably linux too, need to check. 
 
 	Windows Specific		
-		Volume takes a split second to change. 
 		Process Skipping Issue
 			After some time of playing. Not immediately. 
 			During playback every so often the playback stutters and the entire system stutters with it. 
@@ -19,36 +14,20 @@ Before Beta 2:
 			Similarly, editing the filter box quickly does it. Esp. the track filterbox.
 			I think it's causing an exception in audio player loop. Line AudioPlayer.line176 was catching stuff
 			
-		Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
+			If I disable loader and libraryupdater it doesn't seem to manifest (about an hour of running hypnos playing music and flipping around)
+			if I just disable loader it doens't manifest. 
+			
+			2017/12/25 - I can't make it happen anymore. Maybe we fixed it when dealing w/ the memory stuff? 
+			
 		
-		Memory Hog issue	
-			loading images definitely makes it real bad. Fixing that will help, but won't solve it. 
-			
-			scrolling up and down the album or track table table does increase memory usage, but "only" by 100-200mb. 
-			
-			Start Hypnos
-			Load a big library ( /d/music)
-			Let it finish loading
-			Close and reopen hypnos
-			1.6GB memory footprint
-			
-			Start Hypnos
-			Load a big library (/d/music)
-			during load -- 1.26GB
-			after load - 721MB
-			after restart hypnos - 1.5GB
-			it seems to stay there. I let it run for about 10 minutes, no drop in memory usage. 
-			
-			stopping the libraryUpdater and libraryLoader seems to cut into the problem tremendously
-			
-			Even after stopping updater and loader, it creeps up. It looks like everytime a new song is played?
-				confirmed. Each new song spikes the memory. Just flipping through the songs without playing them causes it
-					Is this related to the skipping issue? - doesn't seem to be with one or two tracks after ramping up the memory
-				Was able to get it to 3 GB just by flipping through tracks. Could probably go higher. 
-			
-		Current list label section has some unicode characters. Need to fix them for windows 7 and below. 
-						
+		Current list label section has some unicode characters. Need to fix them for windows 7 and below. 		
+			Do this from linux to avoid writing file with wrong encoding - Line 72 of CurrentListState
+				
 General:	
+	isArtistDirectory -- Keep a cache, so you're not checking every folder every time? Might need to recheck occasionally. 
+	
+	Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
+	
 	Tag window right click menu is missing some stuff
 	
 	On unpause set artwork to the current track
@@ -140,6 +119,67 @@ General:
 				
 	If you load albumsAndTracks but not sources Hypnos acts real wierd. Goes back and forth between not responding. On Windows confirmed.  	
 					
+	Memory Hog issue	
+		With an empty library and no current list and nothing loaded uses about 175mb on Windows 7.
+			Clicking around the UI and using every UI feature except for loading library or tracks can climb it to about 300mb
+			loading a folder of 58 albums climbs the usage to ~400mb. Removing seems to push it to 411mb
+			loading a folder of 2460 albums climbs to the usage to 1.7GB
+			closing and reopening 
+			closing and reopening:
+				drives it up to 1.4gb + (i'm sure it would keep going for a while longer)
+				with library loader and library updater disabled puts the memory at 320mb
+				with updater disabled puts the memory at 1.2+ (probably would've kept climbing)
+				with loader disabled it stops at ~367mb. 
+			
+			SO loader is a source of memory consumption definitely. 
+				-Xmx600m fixed this on windows 7. Kept it floating around 450mb. 
+			
+		loading images definitely makes it real bad. Fixing that will help, but won't solve it. 
+		
+		scrolling up and down the album or track table table does increase memory usage, but "only" by 100-200mb. 
+		
+		Start Hypnos
+		Load a big library ( /d/music)
+		Let it finish loading
+		Close and reopen hypnos
+		1.6GB memory footprint
+		
+		Start Hypnos
+		Load a big library (/d/music)
+		during load -- 1.26GB
+		after load - 721MB
+		after restart hypnos - 1.5GB
+		it seems to stay there. I let it run for about 10 minutes, no drop in memory usage. 
+		
+		stopping the libraryUpdater and libraryLoader seems to cut into the problem tremendously
+		
+		Even after stopping updater and loader, it creeps up. It looks like everytime a new song is played?
+			confirmed. Each new song spikes the memory. Just flipping through the songs without playing them causes it
+				Is this related to the skipping issue? - doesn't seem to be with one or two tracks after ramping up the memory
+			Was able to get it to 3 GB just by flipping through tracks. Could probably go higher. 
+		
+		flipping through tracks quickly by hitting next button also causes memory spike. Not terrible. 
+				
+		2017/12/25 - I was able to temper this problem significantly by having only one image loader thread and by setting -Xmx
+		
+	Redo global hotkeys, do it on a system-by-system type basis.
+		https://stackoverflow.com/questions/79658/react-on-global-hotkey-in-a-java-program-on-windows-linux-mac
+		Some Global Hotkeys aren't consumed - Win + C, Win + X, etc.  
+		
+		
+		Windows:
+			jkeymaster - windows + x keys not supported
+			
+			JHotKeys - I can't find a jar, and having trouble building one. 
+		
+			JNativeHook: Hotkey consumption for win keys is bad -- if you press win + v it works, but if you release the win button first, stuff breaks badly 
+				
+		Linux
+			http://sourceforge.net/projects/jxgrabkey/
+			
+			JNativeHook - No consumption of hotkey
+		
+	Windows - Volume takes a split second to change. 	
 		
 JavaFX stuff
 	Double clicking on table-column dividers doesn't call resize:

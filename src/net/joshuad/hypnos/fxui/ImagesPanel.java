@@ -17,8 +17,10 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -56,6 +58,8 @@ public class ImagesPanel extends SplitPane {
 		setupArtistImage();
 
 		getItems().addAll( albumImagePane, artistImagePane );
+		
+		startImageLoaderThread();
 	}
 	
 	public void setupAlbumImage () {
@@ -204,6 +208,47 @@ public class ImagesPanel extends SplitPane {
 				event.consume();
 			}
 		});
+	}
+	
+	private Track requestedTrack;
+	private Album requestedAlbum;
+	
+	private void startImageLoaderThread() {
+		Thread imageLoader = new Thread() {
+			public void run() {
+				while ( true ) {
+					
+					if ( requestedTrack != null ) {
+						Track loadMeTrack = requestedTrack;
+						Album loadMeAlbum = requestedAlbum;
+						requestedTrack = null;
+						requestedAlbum = null;
+						
+						Image albumImage = loadMeTrack.getAlbumCoverImage();
+						Image artistImage = loadMeTrack.getAlbumArtistImage();
+						
+						SimpleBooleanProperty imagesDisplayed = new SimpleBooleanProperty ( false );
+						Platform.runLater( () -> {
+							setAlbumImage( albumImage );
+							setArtistImage( artistImage );
+							ui.currentImagesTrack = loadMeTrack;
+							ui.currentImagesAlbum = loadMeAlbum;
+							imagesDisplayed.setValue( true );
+						});
+						
+						while ( !imagesDisplayed.getValue() ) {
+							try { Thread.sleep ( 10 ); } catch ( InterruptedException e ) {}
+						}
+					}
+
+					try { Thread.sleep ( 100 ); } catch ( InterruptedException e ) {}
+				}
+			}
+		};
+		
+		imageLoader.setName ( "Image Panel Loader" );
+		imageLoader.setDaemon( true );
+		imageLoader.start();
 	}
 	
 	public void setupArtistImage () {
@@ -541,34 +586,11 @@ public class ImagesPanel extends SplitPane {
 		setImages ( album.getTracks().get( 0 ), album );
 	}
 	
-	private Thread imageLoader = null;
 	public void setImages ( Track track, Album album ) {
 		
 		if ( track != null && Files.exists( track.getPath() ) ) {
-			if ( imageLoader != null ) {
-				imageLoader.interrupt();
-			}
-						
-			imageLoader = new Thread ( ) {
-				public void run() {
-					Image albumImage = track.getAlbumCoverImage();
-					Image artistImage = track.getAlbumArtistImage();
-									
-					if ( !this.isInterrupted() ) { 
-						
-						Platform.runLater( () -> {
-							setAlbumImage( albumImage );
-							setArtistImage( artistImage );
-							ui.currentImagesTrack = track;
-							ui.currentImagesAlbum = album;
-						});
-					}
-				}
-			};
-			
-			imageLoader.setName ( "Image Panel Loader" );
-			imageLoader.setDaemon( true );
-			imageLoader.start();
+			requestedTrack = track;
+			requestedAlbum = album;
 			
 		} else if ( track == null && ui.currentImagesTrack != null ) {
 			setImages ( ui.currentImagesTrack );
@@ -579,7 +601,6 @@ public class ImagesPanel extends SplitPane {
 			setAlbumImage ( null );
 			setArtistImage ( null );
 		}
-		
 	}
 
 	public void setAlbumImage ( Image image ) {

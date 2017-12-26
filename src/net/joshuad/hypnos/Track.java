@@ -888,7 +888,9 @@ public class Track implements Serializable, AlbumInfoSource {
 					}
 				}			
 			} catch ( ClosedByInterruptException e ) {
-				//Do nothing
+				System.out.println( "Interrupted" ); //TODO: DD
+				return null;
+				
 			} catch ( Exception e ) {
 				LOGGER.log( Level.INFO, "Unable to load album image from tag for file: " + getFilename(), e );
 			}
@@ -919,6 +921,10 @@ public class Track implements Serializable, AlbumInfoSource {
 					}
 				}
 			}			
+			
+		} catch ( ClosedByInterruptException e ) {
+			System.out.println( "Interrupted" ); //TODO: DD
+			return null;
 			
 		} catch ( Exception e ) {
 			LOGGER.log( Level.INFO, "Unable to load album image from tag for file: " + getFilename(), e );
@@ -1025,6 +1031,10 @@ public class Track implements Serializable, AlbumInfoSource {
 					}
 				}
 			}			
+			
+		} catch ( ClosedByInterruptException e ) {
+			System.out.println( "Interrupted" ); //TODO: DD
+			return null;
 			
 		} catch ( Exception e ) {
 			LOGGER.log( Level.INFO, "Error when trying to load tag images for file" + getPath(), e );
