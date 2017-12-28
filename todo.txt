@@ -1,5 +1,4 @@
 Before Beta 2:		
-	test linux 32 bit and windows, make sure the jre works
 	
 
 General:	
@@ -69,6 +68,8 @@ General:
 		album table -> folder
 	
 	Add default sort column choice, like shuffle and repeat
+	
+	Maybe add hotkey to switch between library tabs. Ctrl + 1, 2, 3? 
 	
 	Hover effects on transparent image buttons
 		Settings Button
