@@ -1,0 +1,109 @@
+<html>
+<head>
+<title>Hypnos Beta 2 Release Notes</title>
+</head>
+<body>
+<h1>Hypnos - Beta 2 Release Notes</h1>
+<h2>New Features</h2>
+<ul>
+	<li>Lyrics Search / Display (Press L)</li>
+	<li>Jump Box (Press J)</li>
+	<li>"Play Next" feature - puts at front of queue (Shift + Q)</li>
+	<li>Hide any columns you dont prefer to see (right click on column header)</li>
+	<li>Additional options when you right click queue button</li>
+	<li>Edit tag-embedded images with tag editor window</li>
+	<li>Album titles have colors for disc, subtitle, and release type</li>
+	<li>Previous and Next buttons for tag editor window</li>
+	<li>Drag and Drop labels for album and artist pane, making it easier to know where to drop</li>
+	<li>Smart alpha numeric sorting (Disc 10 is now after Disc 9 instead of Disc 1)</li>
+	<li>Hide library and art pane option - double click dividers or use hotkeys (Ctrl + L / Ctrl + K)</li>
+	<li>Better column resizing, respect users's preferences and avoid resizing columns that should stay a fixed width</li>
+	<li>Unified hotkeys across program with tab in settings to list</li>
+	<li>Fix volume max on windows. </li>
+	<li>Fix volume slider feel (now logarithmic) for linux and windows. </li>
+</ul>	
+
+<h2>Changes / Improvements</h2>
+<ul>
+	<li>Alert and show main window if you try to launch a second instance</li>
+	<li>Current list menu to reduce button clutter</li>
+	<li>Smaller volume button</li>
+	<li>Art pane can be 0 height</li>
+	<li>Improved split pane resizing when window is resized</li>
+	<li>Alerts are now all skinned</li>
+	<li>Make sure hypnos fits the screen when showing at low resolutions</li>
+	<li>Improve the dark theme in places</li>
+	<li>Only show simple album name in track table.</li>
+	<li>Improved album loading, fix some corner cases where an album was falsely rejected</li>
+	<li>Linux process is now named hypnos instead of java</li>
+	<li>Print exception stack trace to log for better debugging</li>
+	<li>Name threads for better debugging</li>
+	<li>Icons for child windows in Windows. </li>
+	<li>Significantly decrease memory usage</li>
+</ul>
+
+<h2>Bugfixes</h2>
+<ul>
+	<li>Loading m3us at commandline works now</li>
+	<li>Tag window resizes content properly</li>
+	<li>Solve the "playback lock" bug</li>
+	<li>Current List Playing indicator always works nowk, stop always removes it. </li>
+	<li>Fix volume / unmute bug</li>
+	<li>Always hide library tab pane dropdown menu</li>
+	<li>Play used to not start after current list finished until you tried twice. Fixed.</li>
+	<li>Current list play/pause buttons changes theme immediately</li>
+	<li>Global hotkey bring to front toggle now is two steps instead of three (linux 64 bit, windows and 32bit next release)</li>
+</ul>
+	
+<h2>Known Issues</h2>
+<ul>
+	<li><strong>OSX not supported for the time being.</strong>  I don't have an OSX development / testing machine, and seeing all of the small bugs I had to fix in windows made me convinced that it's not responsible to write software for an OS that I can't test on myself.  I'd like to work on an OSX version and I bet it wouldn't be too hard to get hypnos running well there, but I need regular access to the platform to do that.</li>
+	<li>Decoding for non-flac files is still pretty spotty. Going to be rewriting all decoders at some point.</li>
+	<li>Column order, width, and sort preferences are not saved from session to session</li>
+	<li>Memory and CPU usage is still higher than it needs to be. Rewriting the library loader should fix this</li>
+	<li>Global hotkeys on windows are a little finicky. On linux they aren't consumed.</li>
+	<li>Double clicking a columns header divider to shrink wrap column content breaks the 100% width rule, any small resize repairs</li>
+	<li>Linux Only - After a dialog appears, main window cannot be drag-resized. Known javafx bug, still looking for workaround</li>
+   <li>Windows 7 or earlier - Unicode characters don't display correctly.</li>
+	<li>I don't think an album falsely ID'd as an album can be made un-albumed unless you edit the tags and then reload library</li>
+</ul>
+<br />
+<br />
+<br />
+
+<hr />
+
+<h1>Hypnos - Beta 1 Release Notes</h1>
+<h2>New Features</h2>
+<ul>
+	<li>Dark Color Theme</li>
+	<li>Volume Control</li>
+	<li>Settings Window</li>
+	<li>Read images from tags</li>
+	<li>Global Hotkeys</li>
+	<li>Tag Error Window</li>
+	<li>User friendly log</li>
+	<li>M3U Support - import and export</li>
+	<li>UI setting persistence</li>
+	<li>Library Load Speed user controls</li>
+	<li>Improved UI Images</li>
+	<li>Current Track hover info</li>
+</ul>
+
+<h2>Bug Fixes</h2>
+<ul>
+	<li>A million. Too many to list.</li>
+</ul>
+
+<h2>Known Issues / Bugs</h2>
+<ul>
+	<li>Current list play/pause buttons don't change theme colors immediately, need new track to start</li>
+	<li>Bring to front toggle has three steps instead of two - java bug, looking for workaround</li>
+	<li>Bad default window size on small screens (&lt;= 800x600).</li>
+	<li>mp4s don't decode at proper speeds all the time</li>
+	<li>Some codecs not fully supported or not supported</li>
+	<li>Tables scroll a little bit while library is loading</li>
+	<li>Linux Only - After a dialog appears, main window cannot be drag-resized. Known javafx bug, looking for workaround</li>
+</ul>
+</body>
+</html>
