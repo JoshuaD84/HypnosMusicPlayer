@@ -449,6 +449,16 @@ public class FXUI implements PlayerListener {
 				queueWindow.show();
 				e.consume();
 				
+			} else if ( e.getCode() == KeyCode.L && e.isControlDown() 
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				toggleLibraryCollapsed();
+				e.consume();
+						
+			} else if ( e.getCode() == KeyCode.K && e.isControlDown() 
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				toggleArtPaneCollapsed();
+				e.consume();
+				
 			} else if ( ( e.getCode() == KeyCode.NUMPAD1 || e.getCode() == KeyCode.KP_UP ) 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				player.skipMS( -5000 );
@@ -3817,29 +3827,14 @@ public class FXUI implements PlayerListener {
 			if ( divider.getParent() == currentListSplitPane ) {
 				divider.setOnMouseClicked( ( e ) -> {
 					if ( e.getClickCount() == 2 ) {
-						if ( currentListSplitPaneRestoredPosition != null && currentListSplitPane.getDividerPositions()[0] >= .99d  ) {
-							currentListSplitPane.setDividerPosition( 0, currentListSplitPaneRestoredPosition );
-							currentListSplitPaneRestoredPosition = null;
-						} else if ( currentListSplitPane.getDividerPositions()[0] >= .99d ) {
-							currentListSplitPane.setDividerPosition( 0, currentListSplitPaneDefault );
-						} else {
-							currentListSplitPaneRestoredPosition = currentListSplitPane.getDividerPositions()[0];
-							currentListSplitPane.setDividerPosition( 0, 1 );
-						}
+						toggleArtPaneCollapsed();
 					}
+					
 				});
 			} else if ( divider.getParent() == primarySplitPane ) {
 				divider.setOnMouseClicked( ( e ) -> {
 					if ( e.getClickCount() == 2 ) {
-						if ( primarySplitPaneRestoredPosition != null && primarySplitPane.getDividerPositions()[0] <= .01d ) {
-							primarySplitPane.setDividerPosition( 0, primarySplitPaneRestoredPosition );
-							primarySplitPaneRestoredPosition = null;
-						} else if ( primarySplitPane.getDividerPositions()[0] <= .01d ) {
-							primarySplitPane.setDividerPosition( 0, primarySplitPaneDefault );
-						} else {
-							primarySplitPaneRestoredPosition = primarySplitPane.getDividerPositions()[0];
-							primarySplitPane.setDividerPosition( 0, 0 );
-						}
+						toggleLibraryCollapsed();
 					}
 				});
 			}
@@ -3852,6 +3847,30 @@ public class FXUI implements PlayerListener {
 		hackTooltipStartTiming();
 	
 		updateLibraryListPlaceholder();
+	}
+	
+	public void toggleArtPaneCollapsed() {
+		if ( currentListSplitPaneRestoredPosition != null && currentListSplitPane.getDividerPositions()[0] >= .99d  ) {
+			currentListSplitPane.setDividerPosition( 0, currentListSplitPaneRestoredPosition );
+			currentListSplitPaneRestoredPosition = null;
+		} else if ( currentListSplitPane.getDividerPositions()[0] >= .99d ) {
+			currentListSplitPane.setDividerPosition( 0, currentListSplitPaneDefault );
+		} else {
+			currentListSplitPaneRestoredPosition = currentListSplitPane.getDividerPositions()[0];
+			currentListSplitPane.setDividerPosition( 0, 1 );
+		}
+	}
+	
+	public void toggleLibraryCollapsed() {
+		if ( primarySplitPaneRestoredPosition != null && primarySplitPane.getDividerPositions()[0] <= .01d ) {
+			primarySplitPane.setDividerPosition( 0, primarySplitPaneRestoredPosition );
+			primarySplitPaneRestoredPosition = null;
+		} else if ( primarySplitPane.getDividerPositions()[0] <= .01d ) {
+			primarySplitPane.setDividerPosition( 0, primarySplitPaneDefault );
+		} else {
+			primarySplitPaneRestoredPosition = primarySplitPane.getDividerPositions()[0];
+			primarySplitPane.setDividerPosition( 0, 0 );
+		}
 	}
 	
 	public void fixTables() {

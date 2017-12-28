@@ -1129,6 +1129,8 @@ public class SettingsWindow extends Stage {
 		"    Toggle Shuffle Mode                  S\n" +	
 		"    Toggle Repeat Mode                   R\n" +
 		"    Show Jump Window                     J\n" +
+		"    Toggle Library Collapsed             Ctrl + L\n" +
+		"    Toggle Artwork Collapsed             Ctrl + K\n" +
 		"    Show Queue                           Ctrl + Q\n" +
 		"    Show History                         Ctrl + H\n" +
 		"    Show Config                          Ctrl + P\n" +
@@ -1159,6 +1161,10 @@ public class SettingsWindow extends Stage {
 		"    Delete selected Tracks               Del\n" +
 		"    Crop to selected Tracks              Shift + Del\n" +				
 		"\n" +	
+		"Tag Window\n" +
+		"    Save and Previous                    Ctrl + Right\n" +
+		"    Save and Next                        Ctrl + Left\n" +				
+		"\n" +
 		"Popup Windows\n" +
 		"    Close Window                         Esc";
 
