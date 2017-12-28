@@ -37,5 +37,6 @@
     <runtimeBits>64/32</runtimeBits>
     <opt>-Djava.library.path=&quot;lib&quot;</opt>
     <opt>-Xmx600m</opt>
+    <opt>-XX:+UseG1GC</opt>
   </jre>
 </launch4jConfig>

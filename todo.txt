@@ -1,22 +1,10 @@
-Before Beta 2:	
-	Windows Specific		
-		Process Skipping Issue
-			After some time of playing. Not immediately. 
-			During playback every so often the playback stutters and the entire system stutters with it. 
-			Playing a flac. 
-			Happens more if you are messing w/ the UI
-			I think it's the persister szzzaving data every so often
-			resizing tables or opening windows causes it. 
-			clicking rapidly on the track library list checkbox causes it to happen real bad
-			Similarly, editing the filter box quickly does it. Esp. the track filterbox.
-			I think it's causing an exception in audio player loop. Line AudioPlayer.line176 was catching stuff
-			
-			If I disable loader and libraryupdater it doesn't seem to manifest (about an hour of running hypnos playing music and flipping around)
-			if I just disable loader it doens't manifest. 
-			
-			2017/12/25 - I can't make it happen anymore. Maybe we fixed it when dealing w/ the memory stuff? 
-				
+Before Beta 2:		
+	test linux 32 bit and windows, make sure the jre works
+	
+
 General:	
+	After giving volume notification, it's hard to hit play and have the right track play. Maybe start it paused instead of stopping? 
+
 	isArtistDirectory -- Keep a cache, so you're not checking every folder every time? Might need to recheck occasionally. 
 	
 	Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
@@ -290,6 +278,7 @@ OS Specific
 		Installer
 	    Standalone build (32-bit)
 		Rename java process to Hypnos
+			https://sourceforge.net/p/launch4j/discussion/332684/thread/75bbbd93/
 		
 	Linux				
 		Gnome3 
