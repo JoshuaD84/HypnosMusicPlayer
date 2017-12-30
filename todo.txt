@@ -1,6 +1,4 @@
-General:	
-	Allow library pane to be 100% width, i.e. allow current list pane to be 0% width. 
-	
+General:		
 	-XX:+UseStringDeduplication
 
 	isArtistDirectory -- Keep a cache, so you're not checking every folder every time? Might need to recheck occasionally. 

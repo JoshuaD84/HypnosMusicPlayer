@@ -273,6 +273,8 @@ public class FXUI implements PlayerListener {
 		currentListSplitPane = new SplitPane();
 		currentListSplitPane.setOrientation( Orientation.VERTICAL );
 		currentListSplitPane.getItems().addAll( currentPlayingPane, artSplitPane );
+		currentPlayingPane.setMinWidth( 0 );
+		artSplitPane.setMinWidth( 0 );
 
 		BorderPane albumListPane = new BorderPane();
 		albumFilterPane.prefWidthProperty().bind( albumListPane.widthProperty() );
