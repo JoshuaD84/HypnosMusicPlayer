@@ -67,6 +67,12 @@ public class LyricsFetcher {
 					
 					lyrics = parser.getLyrics ( track.getArtist(), simplifiedTrackTitle );
 					if ( !lyrics.hadScrapeError() )  break;
+					
+					lyrics = parser.getLyrics ( track.getAlbumArtist().toLowerCase().replaceFirst( "the ", "" ), simplifiedTrackTitle );
+					if ( !lyrics.hadScrapeError() )  break;
+					
+					lyrics = parser.getLyrics ( track.getArtist().toLowerCase().replaceFirst( "the ", "" ), simplifiedTrackTitle );
+					if ( !lyrics.hadScrapeError() )  break;
 				}
 			}
 		}
@@ -136,7 +142,7 @@ public class LyricsFetcher {
 	}
 	
 	public static void main ( String[] args ) {
-		
+		/*
 		testAll ( "Regina Spektor", "Apres Moi", true );
 		testAll ( "Regina Spektor", "Après Moi", true );
 		testAll ( "Andrew Bird", "Action/Adventure", true );
@@ -153,10 +159,10 @@ public class LyricsFetcher {
 		testAll ( "Radiohead", "2+2=5", true );
 		testAll ( "Florence + the Machine", "Bird Song", true );
 		testAll ( "M. Ward", "Lullaby + Exile", true );
-		
-		
-
 		testAll ( "PJ Harvey", "Is This Desire?", true );
+		*/
+		
+		testAll ( "Decemberists", "The Hazards of Love 2", true );
 		
 	}
 }
