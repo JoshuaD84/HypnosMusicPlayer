@@ -4317,7 +4317,7 @@ public class FXUI implements PlayerListener {
 		Platform.runLater( () -> {
 			Alert alert = new Alert( AlertType.ERROR );
 			double x = mainStage.getX() + mainStage.getWidth() / 2 - 220; //It'd be nice to use alert.getWidth() / 2, but it's NAN now. 
-			double y = mainStage.getY() + mainStage.getHeight() / 2 - 50;
+			double y = mainStage.getY() + mainStage.getHeight() / 2 - 150;
 			
 			setAlertWindowIcon( alert );
 			applyCurrentTheme( alert );
@@ -4329,17 +4329,22 @@ public class FXUI implements PlayerListener {
 			alert.setHeaderText( "Unable to set volume." );
 				
 			Text text = new Text(
-				"System does not support software volume control for this audio format.\n\n" +
+				"Hypnos is unable to change the volume for this audio format.\n\n" +
 				"Please set your physical speakers and system sound " +
-				"to a reasonable level to avoid damaging your ear drums and audio system.\n\n" +
-				"When you have done so, set Hypnos's volume to 100 and start play again.");
+				"to a reasonable level to avoid damaging your ear drums and audio system " +
+				"before unpausing.");
 			
-			text.setWrappingWidth(500);
+			text.setWrappingWidth( 500 );
 			text.getStyleClass().add( "alert-text" );
 			HBox holder = new HBox();
 			holder.getChildren().add( text );
 			holder.setPadding( new Insets ( 10, 10, 10, 10 ) );
 			alert.getDialogPane().setContent( holder );
+			player.setVolumePercent( 1 );
+
+			//volumeSlider.setDisable( false );
+			//volumeMuteButton.setDisable( false );
+			Tooltip.uninstall( volumePane, volumeDisabledTooltip );
 			
 			alert.showAndWait();
 		});

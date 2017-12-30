@@ -101,10 +101,11 @@ public class AudioPlayer {
 				} 
 
 				if ( volumeErrorRequested ) {
-					state = PlayState.STOPPED;
-					decoder.closeAllResources();
-					controller.playerStopped( StopReason.ERROR );
-					decoder = null;					
+					state = PlayState.PAUSED;
+					controller.playerPaused();
+					//decoder.closeAllResources();
+					//controller.playerStopped( StopReason.ERROR );
+					//decoder = null;					
 					volumeErrorRequested = false;
 					Hypnos.warnUserVolumeNotSet();
 				}

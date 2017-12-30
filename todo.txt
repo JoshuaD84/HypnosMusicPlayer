@@ -9,8 +9,6 @@ General:
 	
 	-XX:+UseStringDeduplication
 
-	After giving volume notification, it's hard to hit play and have the right track play. Maybe start it paused instead of stopping? 
-
 	isArtistDirectory -- Keep a cache, so you're not checking every folder every time? Might need to recheck occasionally. 
 	
 	Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
@@ -149,6 +147,8 @@ General:
 		
 	Windows - Volume takes a split second to change. 	
 		
+	If you try to change the volume on a no-volume-change track using hotkeys, you get the notification. i don't think that's necessary, just don't change it. 
+	
 JavaFX stuff
 	Double clicking on table-column dividers doesn't call resize:
 		https://stackoverflow.com/questions/47852239/customresizepolicy-not-triggering-when-a-columns-headers-divider-is-double-cli
