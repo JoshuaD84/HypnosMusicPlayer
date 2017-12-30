@@ -1,7 +1,16 @@
-Before Beta 2:		
-	
-
 General:	
+	Lyrics fail:
+		http://www.metrolyrics.com/the-hazards-of-love-1-lyrics-decemberists.html
+		http://www.metrolyrics.com/the-hazards-of-love-2-lyrics-decemberists.html
+		
+	Use a thread to adjust the filter boxes. Delay afer typing for a second maybe, or delay after each typing for a bit so each letter doesn't generate an event. 
+	
+	Change Ctrl + K to Ctrl + ;
+	
+	Allow library pane to be 100% width, i.e. allow current list pane to be 0% width. 
+	
+	-XX:+UseStringDeduplication
+
 	After giving volume notification, it's hard to hit play and have the right track play. Maybe start it paused instead of stopping? 
 
 	isArtistDirectory -- Keep a cache, so you're not checking every folder every time? Might need to recheck occasionally. 
@@ -275,6 +284,7 @@ OS Specific
 		https://stackoverflow.com/questions/7506329/embed-java-into-a-c-application
 
 	Windows
+		http://nsis.sourceforge.net/FAQ
 		Open-with shell integration
 		Installer
 	    Standalone build (32-bit)

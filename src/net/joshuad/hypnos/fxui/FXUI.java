@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
-import java.util.Observable;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
@@ -447,6 +446,12 @@ public class FXUI implements PlayerListener {
 			} else if ( e.getCode() == KeyCode.Q && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				queueWindow.show();
+				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.L && e.isShiftDown()
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+				lyricsWindow.setTrack( player.getCurrentTrack() );
+				lyricsWindow.show();
 				e.consume();
 				
 			} else if ( e.getCode() == KeyCode.L && e.isControlDown() 

@@ -1129,6 +1129,7 @@ public class SettingsWindow extends Stage {
 		"    Toggle Shuffle Mode                  S\n" +	
 		"    Toggle Repeat Mode                   R\n" +
 		"    Show Jump Window                     J\n" +
+		"    Show Lyrics on Current Track         Shift + L\n" +
 		"    Toggle Library Collapsed             Ctrl + L\n" +
 		"    Toggle Artwork Collapsed             Ctrl + K\n" +
 		"    Show Queue                           Ctrl + Q\n" +
