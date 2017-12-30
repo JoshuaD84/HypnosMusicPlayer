@@ -528,7 +528,7 @@ public class FXUI implements PlayerListener {
 			noRepeatImage.setFitWidth( currentListControlsButtonFitWidth );
 			noRepeatImage.setFitHeight( currentListControlsButtonFitHeight );
 		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/no-repeat.png", e );
+			LOGGER.log( Level.WARNING, "Unable to load no repeat icon: resources/no-repeat.png", e );
 		}
 		
 		try {
@@ -546,7 +546,7 @@ public class FXUI implements PlayerListener {
 			repeatOneImage.setFitWidth( currentListControlsButtonFitWidth );
 			repeatOneImage.setFitHeight( currentListControlsButtonFitHeight );
 		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/repeatOne.png", e );
+			LOGGER.log( Level.WARNING, "Unable to load repeat one icon: resources/repeat-one", e );
 		}
 		
 		try {
@@ -554,7 +554,7 @@ public class FXUI implements PlayerListener {
 			sequentialImage.setFitWidth( currentListControlsButtonFitWidth );
 			sequentialImage.setFitHeight( currentListControlsButtonFitHeight );
 		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/sequential.png", e );
+			LOGGER.log( Level.WARNING, "Unable to load sequential icon: resources/sequential.png", e );
 		}
 		
 		try {
@@ -562,7 +562,7 @@ public class FXUI implements PlayerListener {
 			shuffleImage.setFitWidth( currentListControlsButtonFitWidth );
 			shuffleImage.setFitHeight( currentListControlsButtonFitHeight );
 		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/shuffle.png", e );
+			LOGGER.log( Level.WARNING, "Unable to load shuffle icon: resources/shuffle.png", e );
 		}
 		
 		try {
@@ -570,7 +570,7 @@ public class FXUI implements PlayerListener {
 			queueImage.setFitWidth( currentListControlsButtonFitWidth );
 			queueImage.setFitHeight( currentListControlsButtonFitHeight );
 		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/queue.png", e );
+			LOGGER.log( Level.WARNING, "Unable to load queue icon: resources/queue.png", e );
 		}
 		
 		try {
@@ -578,7 +578,7 @@ public class FXUI implements PlayerListener {
 			historyImage.setFitWidth( currentListControlsButtonFitWidth );
 			historyImage.setFitHeight( currentListControlsButtonFitHeight );
 		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/history.png", e );
+			LOGGER.log( Level.WARNING, "Unable to load history icon: resources/history.png", e );
 		}
 		
 		
@@ -587,7 +587,7 @@ public class FXUI implements PlayerListener {
 			menuImage.setFitWidth( currentListControlsButtonFitWidth );
 			menuImage.setFitHeight( currentListControlsButtonFitHeight );
 		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load w icon: resources/history.png", e );
+			LOGGER.log( Level.WARNING, "Unable to load menu icon: resources/menu.png", e );
 		}
 		
 		try {
@@ -605,7 +605,7 @@ public class FXUI implements PlayerListener {
 			addSourcePlaylistsImage.setFitHeight( currentListControlsButtonFitHeight );
 			
 		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/add.png", e );
+			LOGGER.log( Level.WARNING, "Unable to load add icon: resources/add.png", e );
 		}
 		
 		try {
@@ -629,7 +629,7 @@ public class FXUI implements PlayerListener {
 			playlistFilterClearImage.setFitHeight( 12 );
 			
 		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/clear.png", e );
+			LOGGER.log( Level.WARNING, "Unable to load clear icon: resources/clear.png", e );
 		}	
 	}		
 	
