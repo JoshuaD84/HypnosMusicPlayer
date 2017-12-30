@@ -38,5 +38,6 @@
     <opt>-Djava.library.path=&quot;lib&quot;</opt>
     <opt>-Xmx600m</opt>
     <opt>-XX:+UseG1GC</opt>
+    <opt>-XX:+UseStringDeduplication</opt>
   </jre>
 </launch4jConfig>

@@ -1,9 +1,4 @@
 General:		
-	-XX:+UseStringDeduplication
-
-	isArtistDirectory -- Keep a cache, so you're not checking every folder every time? Might need to recheck occasionally. 
-	
-	Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
 		
 	Missing tracks are deleted from currentlist after restart if CurrentList.mode == ALBUM instead of remaining and being highlighted in red
 	
@@ -14,6 +9,8 @@ General:
 		tagWindow & settings Window - this is a little difficult because esc also stops editing a cell
 						
 	Show in tag edit window when a file doesn't support a particular tag type
+	
+	ctrl + F - move focus to library track filter, whichever tab is showing
 
 	Refactor Library
 		Make a source directory a class, not just a path.
@@ -37,6 +34,12 @@ General:
 		Library load and unload time
 		
 		Loader status % complete thing
+	
+	Use Ctrl + 1, Ctrl +2, Ctrl + 3 to quickly select library tabs
+	
+	Allow library tabs to be hidden
+	
+	Make standalone a commandline switch instead of a java argument
 		
 	Resize Policy
 		Windowed mode, shrink window until a scrollbar appears. Maximize window so scrollbar disappears -- Scrollbar width is still accounted for
@@ -145,6 +148,10 @@ General:
 
 	Playlist browse issues
 		? Add right click > browse and F4 to playlist table -- show playlist folder  
+		
+	isArtistDirectory -- Keep a cache, so you're not checking every folder every time? Might need to recheck occasionally. 
+	
+	Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
 	
 JavaFX stuff
 	Double clicking on table-column dividers doesn't call resize:
