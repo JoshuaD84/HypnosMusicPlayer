@@ -32,7 +32,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.joshuad.hypnos.Album;
-import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
@@ -129,11 +128,12 @@ public class PlaylistInfoWindow extends Stage {
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem infoMenuItem = new MenuItem( "Info" );
 		MenuItem lyricsMenuItem = new MenuItem( "Lyrics" );
+		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		MenuItem removeMenuItem = new MenuItem ( "Remove" );
 		contextMenu.getItems().addAll ( 
 			playMenuItem, appendMenuItem, playNextMenuItem, enqueueMenuItem, editTagMenuItem, 
-			infoMenuItem, lyricsMenuItem, addToPlaylistMenuItem, removeMenuItem 
+			infoMenuItem, lyricsMenuItem, browseMenuItem, addToPlaylistMenuItem, removeMenuItem 
 		);
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
@@ -188,9 +188,7 @@ public class PlaylistInfoWindow extends Stage {
 				
 			} else if ( e.getCode() == KeyCode.F4 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				
-				//TODO: I don't love calling Hypnos directly here
-				ui.openFileBrowser( Hypnos.getPersister().getPlaylistDirectory().toPath() );
+				ui.openFileBrowser( trackTable.getSelectionModel().getSelectedItem().getPath() );
 				
 			} else if ( e.getCode() == KeyCode.L
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
@@ -229,6 +227,10 @@ public class PlaylistInfoWindow extends Stage {
 				ui.lyricsWindow.setTrack( trackTable.getSelectionModel().getSelectedItem() );
 				ui.lyricsWindow.show();
 			}
+		});
+		
+		browseMenuItem.setOnAction( event -> {
+			ui.openFileBrowser( trackTable.getSelectionModel().getSelectedItem().getPath() );
 		});
 		
 		editTagMenuItem.setOnAction( event -> {

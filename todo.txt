@@ -1,9 +1,4 @@
 General:	
-
-	Playlist browse issues
-		Hitting f4 in the playlist info window shows playlsit folder. Show track folder.
-		Add right click > browse to playlist info window table
-		Add rlight click > browse and F4 to playlist table -- show playlist folder. 
 		
 	Volume warning pops up twice. 
 	
@@ -155,7 +150,10 @@ General:
 		
 	Windows - Volume takes a split second to change. 	
 		
-	If you try to change the volume on a no-volume-change track using hotkeys, you get the notification. i don't think that's necessary, just don't change it. 
+	If you try to change the volume on a no-volume-change track using hotkeys, you get the notification. i don't think that's necessary, just don't change it.
+
+	Playlist browse issues
+		? Add right click > browse and F4 to playlist table -- show playlist folder  
 	
 JavaFX stuff
 	Double clicking on table-column dividers doesn't call resize:

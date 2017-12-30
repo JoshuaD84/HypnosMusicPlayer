@@ -1925,6 +1925,7 @@ public class FXUI implements PlayerListener {
 				try {
 					Desktop.getDesktop().open( showMe );
 				} catch ( IOException e ) {
+					//TODO: Notify user
 					LOGGER.log( Level.INFO, "Unable to open native file browser.", e );
 				}
 			}
