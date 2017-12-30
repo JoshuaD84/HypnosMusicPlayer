@@ -1,9 +1,4 @@
 General:	
-		
-	Volume warning pops up twice. 
-			
-	Use a thread to adjust the filter boxes. Delay afer typing for a second maybe, or delay after each typing for a bit so each letter doesn't generate an event. 
-		
 	Allow library pane to be 100% width, i.e. allow current list pane to be 0% width. 
 	
 	-XX:+UseStringDeduplication
@@ -13,6 +8,8 @@ General:
 	Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
 		
 	Missing tracks are deleted from currentlist after restart if CurrentList.mode == ALBUM instead of remaining and being highlighted in red
+	
+	Use a thread to adjust the filter boxes. Delay afer typing for a second maybe, or delay after each typing for a bit so each letter doesn't generate an event. 
 	
 	Esc Hotkey	
 		album, track, and playlist problem -- it currently closes window regardless. 

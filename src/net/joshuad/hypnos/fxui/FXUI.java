@@ -3789,7 +3789,7 @@ public class FXUI implements PlayerListener {
 			alert.setHeaderText( "Unable to set volume." );
 				
 			Text text = new Text(
-				"Hypnos is unable to change the volume for this audio format.\n\n" +
+				"Hypnos is unable to set the volume to less than 100% for this audio format.\n\n" +
 				"Please set your physical speakers and system sound " +
 				"to a reasonable level to avoid damaging your ear drums and audio system " +
 				"before unpausing.");

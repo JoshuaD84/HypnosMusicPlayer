@@ -86,7 +86,7 @@ public class AudioPlayer {
 					if ( decoder != null ) {
 
 						track = currentRequest;
-						setDecoderVolume( volumePercent );
+						volumePercentRequested = volumePercent;
 						controller.playerStarted( currentRequest );
 						updateTrackPosition();
 						state = PlayState.PLAYING;
@@ -355,8 +355,7 @@ public class AudioPlayer {
 			decoder.setVolumePercent( volumePercent );
 			
 		} catch ( IllegalArgumentException e ) {
-			
-			if ( volumePercent < 1 ) {
+			if ( volumePercent < 1 ) {		
 				volumeErrorRequested = true;
 			}
 		}
