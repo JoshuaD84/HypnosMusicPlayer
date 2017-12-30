@@ -459,7 +459,7 @@ public class FXUI implements PlayerListener {
 				toggleLibraryCollapsed();
 				e.consume();
 						
-			} else if ( e.getCode() == KeyCode.K && e.isControlDown() 
+			} else if ( e.getCode() == KeyCode.SEMICOLON && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				toggleArtPaneCollapsed();
 				e.consume();

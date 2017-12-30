@@ -1131,7 +1131,7 @@ public class SettingsWindow extends Stage {
 		"    Show Jump Window                     J\n" +
 		"    Show Lyrics on Current Track         Shift + L\n" +
 		"    Toggle Library Collapsed             Ctrl + L\n" +
-		"    Toggle Artwork Collapsed             Ctrl + K\n" +
+		"    Toggle Artwork Collapsed             Ctrl + ;\n" +
 		"    Show Queue                           Ctrl + Q\n" +
 		"    Show History                         Ctrl + H\n" +
 		"    Show Config                          Ctrl + P\n" +

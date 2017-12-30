@@ -4,9 +4,7 @@ General:
 		http://www.metrolyrics.com/the-hazards-of-love-2-lyrics-decemberists.html
 		
 	Use a thread to adjust the filter boxes. Delay afer typing for a second maybe, or delay after each typing for a bit so each letter doesn't generate an event. 
-	
-	Change Ctrl + K to Ctrl + ;
-	
+		
 	Allow library pane to be 100% width, i.e. allow current list pane to be 0% width. 
 	
 	-XX:+UseStringDeduplication
