@@ -59,7 +59,6 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.Slider;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableCell;
@@ -79,14 +78,11 @@ import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
@@ -118,7 +114,6 @@ import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
 
 @SuppressWarnings({ "rawtypes", "unchecked" }) // REFACTOR: Maybe get rid of this when I understand things better
 public class FXUI implements PlayerListener {
-	
 	private static final Logger LOGGER = Logger.getLogger( FXUI.class.getName() );
 
 	public static final DataFormat DRAGGED_TRACKS = new DataFormat( "application/hypnos-java-track" );
@@ -135,29 +130,18 @@ public class FXUI implements PlayerListener {
 	public ImagesPanel artSplitPane; //TODO: Probably make this private
 	StretchedTabPane libraryPane;
 	
-	ImageView playImage;
-	ImageView pauseImage;
-	ImageView stopImage;
-	ImageView nextImage;
-	ImageView previousImage;
-	
-	ImageView[] volumeImages = new ImageView[ 4 ];
-	
 	ImageView albumFilterClearImage, trackFilterClearImage, playlistFilterClearImage;
-	ImageView settingsImage;
 	ImageView noRepeatImage, repeatImage, repeatOneImage, sequentialImage, shuffleImage;
 	ImageView queueImage, historyImage, menuImage;
 	ImageView addSourceTracksImage, addSourceAlbumsImage, addSourcePlaylistsImage;
 	
 	Image warningAlertImageSource;
+	Image repeatImageSource;
 	
-	Image repeatImageSource, playImageSource, pauseImageSource;
-
 	HBox albumFilterPane;
 	HBox trackFilterPane;
 	HBox playlistFilterPane;
 	HBox playlistControls;
-	HBox volumePane;
 	
 	ContextMenu playlistColumnSelectorMenu, trackColumnSelectorMenu, albumColumnSelectorMenu, currentListColumnSelectorMenu;
 	TableColumn playlistNameColumn, playlistLengthColumn, playlistTracksColumn;
@@ -165,20 +149,7 @@ public class FXUI implements PlayerListener {
 	TableColumn albumArtistColumn, albumYearColumn, albumAlbumColumn;
 	TableColumn clPlayingColumn, clArtistColumn, clYearColumn, clAlbumColumn, clTitleColumn, clNumberColumn, clLengthColumn;
 	
-	Tooltip volumeDisabledTooltip = new Tooltip ( "Volume control not supported for tracks with this encoding." );
-	
-	Slider trackPositionSlider;
-	Slider volumeSlider;
-	Button volumeMuteButton;
-
-	boolean sliderMouseHeld;
-
-	VBox transport;
-
-	Label timeElapsedLabel = new Label( "" );
-	Label timeRemainingLabel = new Label( "" );
-	Button currentTrackButton;
-	Tooltip currentTrackTooltip;
+	Transport transport;
 	
 	Label emptyPlaylistLabel = new Label( 
 		"You haven't created any playlists, make a playlist on the right and click the save button." );
@@ -207,8 +178,6 @@ public class FXUI implements PlayerListener {
 	LyricsWindow lyricsWindow;
 	JumpWindow jumpWindow;
 
-	Button togglePlayButton, previousButton, nextButton, stopButton;
-	Button showSettingsButton;
 	Button toggleRepeatButton, toggleShuffleButton;
 	Button showQueueButton;
 	MenuItem currentListSave, currentListExport, currentListLoad, historyMenuItem;
@@ -238,13 +207,7 @@ public class FXUI implements PlayerListener {
 	
 	private Double currentListSplitPaneRestoredPosition = null;
 	private Double primarySplitPaneRestoredPosition = null;
-	
-	private ColorAdjust darkThemeTransportButtons = new ColorAdjust(); {
-		darkThemeTransportButtons.setSaturation( -1 );
-		darkThemeTransportButtons.setHue( 1 );
-		darkThemeTransportButtons.setBrightness( .55 );
-	}
-	
+
 	private ColorAdjust darkThemeButtons = new ColorAdjust(); {
 		darkThemeButtons.setSaturation( -1 );
 		darkThemeButtons.setHue( 1 );
@@ -256,12 +219,12 @@ public class FXUI implements PlayerListener {
 	boolean doPlaylistSaveWarning = true;
 	
 	
-	public FXUI ( Stage stage, Library library, AudioSystem player, GlobalHotkeys hotkeys ) {
+	public FXUI ( Stage stage, Library library, AudioSystem audioSystem, GlobalHotkeys hotkeys ) {
 		mainStage = stage;
 		this.library = library;
-		this.player = player;
+		this.player = audioSystem;
 		
-		player.getCurrentList().addNoLoadThread( Thread.currentThread() );
+		audioSystem.getCurrentList().addNoLoadThread( Thread.currentThread() );
 		
 		scene = new Scene( new Group(), windowedWidth, windowedHeight );
 		
@@ -285,23 +248,23 @@ public class FXUI implements PlayerListener {
 		setupPlaylistTable();
 		setupCurrentListControlPane();
 		setupTrackTable();
-		setupTransport();
+		transport = new Transport( this, audioSystem );
 		
 		libraryLocationWindow = new LibraryLocationWindow ( mainStage, library );
 		tagWindow = new TagWindow ( this ); 
-		queueWindow = new QueueWindow ( this, library, player, tagWindow );
-		albumInfoWindow = new AlbumInfoWindow ( this, library, player );
-		playlistInfoWindow = new PlaylistInfoWindow ( this, library, player );
-		historyWindow = new HistoryWindow ( this, library, player );
-		settingsWindow = new SettingsWindow ( this, library, hotkeys, player );
+		queueWindow = new QueueWindow ( this, library, audioSystem, tagWindow );
+		albumInfoWindow = new AlbumInfoWindow ( this, library, audioSystem );
+		playlistInfoWindow = new PlaylistInfoWindow ( this, library, audioSystem );
+		historyWindow = new HistoryWindow ( this, library, audioSystem );
+		settingsWindow = new SettingsWindow ( this, library, hotkeys, audioSystem );
 		trackInfoWindow = new TrackInfoWindow ( this );
 		lyricsWindow = new LyricsWindow ( this );
-		jumpWindow = new JumpWindow ( this, library, player );
+		jumpWindow = new JumpWindow ( this, library, audioSystem );
 
 		applyBaseTheme();
 		applyDarkTheme();
 		
-		artSplitPane = new ImagesPanel ( this, player );
+		artSplitPane = new ImagesPanel ( this, audioSystem );
 
 		BorderPane currentPlayingPane = new BorderPane();
 		playlistControls.prefWidthProperty().bind( currentPlayingPane.widthProperty() );
@@ -420,7 +383,7 @@ public class FXUI implements PlayerListener {
 				
 			} else if ( e.getCode() == KeyCode.P && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				showSettingsButton.fire();
+				showSettingsWindow();
 				e.consume();
 			
 			} else if ( e.getCode() == KeyCode.J 
@@ -450,7 +413,7 @@ public class FXUI implements PlayerListener {
 				
 			} else if ( e.getCode() == KeyCode.L && e.isShiftDown()
 			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
-				lyricsWindow.setTrack( player.getCurrentTrack() );
+				lyricsWindow.setTrack( audioSystem.getCurrentTrack() );
 				lyricsWindow.show();
 				e.consume();
 				
@@ -466,47 +429,47 @@ public class FXUI implements PlayerListener {
 				
 			} else if ( ( e.getCode() == KeyCode.NUMPAD1 || e.getCode() == KeyCode.KP_UP ) 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				player.skipMS( -5000 );
+				audioSystem.skipMS( -5000 );
 				e.consume();
 				
 			} else if ( ( e.getCode() == KeyCode.NUMPAD2 || e.getCode() == KeyCode.KP_DOWN ) 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				stopButton.fire();
+				transport.stopButton.fire();
 				e.consume();
 				
 			} else if ( ( e.getCode() == KeyCode.NUMPAD3 || e.getCode() == KeyCode.KP_RIGHT ) 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				player.skipMS( 5000 );
+				audioSystem.skipMS( 5000 );
 				e.consume();
 				
 			} else if ( ( e.getCode() == KeyCode.NUMPAD4 || e.getCode() == KeyCode.KP_LEFT )
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				this.previousButton.fire();
+				transport.previousButton.fire();
 				e.consume();
 				
 			} else if ( ( e.getCode() == KeyCode.NUMPAD5 || e.getCode() == KeyCode.KP_UP ) 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				togglePlayButton.fire();
+				transport.togglePlayButton.fire();
 				e.consume();
 				
 			} else if ( ( e.getCode() == KeyCode.NUMPAD6 || e.getCode() == KeyCode.KP_DOWN ) 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				nextButton.fire();
+				transport.nextButton.fire();
 				e.consume();
 				
 			} else if ( ( e.getCode() == KeyCode.NUMPAD7 || e.getCode() == KeyCode.KP_RIGHT ) 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				player.decrementVolume();
+				audioSystem.decrementVolume();
 				e.consume();
 				
 			} else if ( ( e.getCode() == KeyCode.NUMPAD8 || e.getCode() == KeyCode.KP_LEFT )
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				volumeMuteButton.fire();
+				transport.volumeMuteButton.fire();
 				e.consume();
 				
 			} else if ( ( e.getCode() == KeyCode.NUMPAD9 || e.getCode() == KeyCode.KP_LEFT )
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				player.incrementVolume();
+				audioSystem.incrementVolume();
 				e.consume();
 				
 			} 
@@ -519,11 +482,15 @@ public class FXUI implements PlayerListener {
 		mainStage.widthProperty().addListener( windowSizeListener );
 		mainStage.heightProperty().addListener( windowSizeListener );
 		
-		player.addPlayerListener ( this );
+		audioSystem.addPlayerListener ( this );
+	}
+	
+	public void showSettingsWindow() {
+		settingsWindow.show();
 	}
 	
 	public ColorAdjust getDarkThemeTransportButtonsAdjust () {
-		return darkThemeTransportButtons;
+		return transport.getDarkThemeButtonAdjust();
 	}
 	
 	private void setupFont() {
@@ -552,50 +519,6 @@ public class FXUI implements PlayerListener {
 	}
 	
 	private void loadImages() {
-		//REFACTOR: Move all image loading into here. 
-		double volFitWidth = 55 * .52;
-		double volFitHeight = 45 * .52;
-		
-		try {
-			volumeImages[0] = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/vol-0.png" ).toFile() ) ) );
-			volumeImages[0].setFitWidth( volFitWidth );
-			volumeImages[0].setFitHeight( volFitHeight );
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/vol-0.png", e );
-		}
-		
-		try {
-			volumeImages[1] = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/vol-1.png" ).toFile() ) ) );
-			volumeImages[1].setFitWidth( volFitWidth );
-			volumeImages[1].setFitHeight( volFitHeight );
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/vol-1.png", e );
-		}
-
-		try {
-			volumeImages[2] = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/vol-2.png" ).toFile() ) ) );
-			volumeImages[2].setFitWidth( volFitWidth );
-			volumeImages[2].setFitHeight( volFitHeight );
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/vol-2.png", e );
-		}
-		
-		try {
-			volumeImages[3] = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/vol-3.png" ).toFile() ) ) );
-			volumeImages[3].setFitWidth( volFitWidth );
-			volumeImages[3].setFitHeight( volFitHeight );
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/vol-3.png", e );
-		}
-		
-		try {
-			settingsImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/config.png" ).toFile() ) ) );
-			settingsImage.setFitWidth( 24 );
-			settingsImage.setFitHeight( 24 );
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/config.png", e );
-		}
-		
 		double currentListControlsButtonFitWidth = 15;
 		double currentListControlsButtonFitHeight = 15;
 		
@@ -745,16 +668,8 @@ public class FXUI implements PlayerListener {
 			lyricsWindow.getScene().getStylesheets().add( darkSheet );
 			jumpWindow.getScene().getStylesheets().add( darkSheet );
 			
-			if ( stopImage != null ) stopImage.setEffect( darkThemeTransportButtons );
-			if ( nextImage != null ) nextImage.setEffect( darkThemeTransportButtons );
-			if ( previousImage != null ) previousImage.setEffect( darkThemeTransportButtons );
-			if ( pauseImage != null ) pauseImage.setEffect( darkThemeTransportButtons );
-			if ( playImage != null ) playImage.setEffect( darkThemeTransportButtons );
-			if ( settingsImage != null ) settingsImage.setEffect( darkThemeTransportButtons );
-			
-			for ( int k = 0; k < volumeImages.length; k++ ) {
-				if ( volumeImages[k] != null ) volumeImages[k].setEffect( darkThemeTransportButtons );
-			}
+			transport.applyDarkTheme();
+		
 			if ( albumFilterClearImage != null ) albumFilterClearImage.setEffect( darkThemeButtons );
 			if ( trackFilterClearImage != null ) trackFilterClearImage.setEffect( darkThemeButtons );
 			if ( playlistFilterClearImage != null ) playlistFilterClearImage.setEffect( darkThemeButtons );
@@ -792,16 +707,7 @@ public class FXUI implements PlayerListener {
 		lyricsWindow.getScene().getStylesheets().remove( darkSheet );
 		jumpWindow.getScene().getStylesheets().remove( darkSheet );
 		
-		if ( stopImage != null ) stopImage.setEffect( null );
-		if ( nextImage != null ) nextImage.setEffect( null );
-		if ( previousImage != null ) previousImage.setEffect( null );
-		if ( pauseImage != null ) pauseImage.setEffect( null );
-		if ( playImage != null ) playImage.setEffect( null );
-		if ( settingsImage != null ) settingsImage.setEffect( null );
-		
-		for ( int k = 0; k < volumeImages.length; k++ ) {
-			if ( volumeImages[k] != null ) volumeImages[k].setEffect( null );
-		}
+		transport.removeDarkTheme();
 
 		if ( albumFilterClearImage != null ) albumFilterClearImage.setEffect( null );
 		if ( trackFilterClearImage != null ) trackFilterClearImage.setEffect( null );
@@ -861,29 +767,7 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public void updateTransport ( int timeElapsedS, int timeRemainingS, double percent ) {
-		Platform.runLater( new Runnable() {
-			public void run () {
-
-				if ( player.isPlaying() || player.isPaused() ) {
-					if ( !trackPositionSlider.isValueChanging() && !sliderMouseHeld ) {
-						trackPositionSlider.setValue( (trackPositionSlider.getMax() - trackPositionSlider.getMin()) * percent + trackPositionSlider.getMin() );
-					}
-					timeElapsedLabel.setText( Utils.getLengthDisplay( timeElapsedS ) );
-					timeRemainingLabel.setText( Utils.getLengthDisplay( -timeRemainingS ) );
-				} else if ( player.isStopped() ) {
-					currentListTable.refresh();
-					togglePlayButton.setGraphic( playImage );
-					trackPositionSlider.setValue( 0 );
-					timeElapsedLabel.setText( "" );
-					timeRemainingLabel.setText( "" );
-					currentTrackButton.setText( "" );
-					currentTrackTooltip.setText( "No current track." );
-			
-					StackPane thumb = (StackPane) trackPositionSlider.lookup( ".thumb" );
-					thumb.setVisible( false );
-				}
-			}
-		});
+		transport.update ( timeElapsedS, timeRemainingS, percent );
 	}
 	
 	public void toggleMinimized() {
@@ -909,405 +793,7 @@ public class FXUI implements PlayerListener {
 			items.add( newItem );
 		}
 	}
-	
-	public void setupTransport () {
 
-		playImage = null;
-		pauseImage = null;
-		
-		try {
-			playImageSource = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/play.png" ).toFile() ) );
-			playImage = new ImageView ( playImageSource );
-			playImage.setFitHeight( 18 );
-			playImage.setFitWidth( 18 );
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/play.png", e );
-		}
-		
-		try {
-			pauseImageSource = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/pause.png" ).toFile() ) );
-			pauseImage = new ImageView ( pauseImageSource );
-			pauseImage.setFitHeight( 18 );
-			pauseImage.setFitWidth( 18 );
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load pause icon: resources/pause.png", e );
-		}
-		
-		togglePlayButton = new Button ( "" );
-		togglePlayButton.setGraphic( playImage );
-		togglePlayButton.setPrefSize( 42, 35 );
-		togglePlayButton.setMinSize( 42, 35 );
-		togglePlayButton.setMaxSize( 42, 35 );
-		togglePlayButton.setTooltip( new Tooltip( "Toggle Play/Pause" ) );
-		
-		previousImage = null;
-		try {
-			previousImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/previous.png" ).toFile() ) ) );
-			previousImage.setFitHeight( 18 );
-			previousImage.setFitWidth( 18 );
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load previous icon: resources/previous.png", e );
-		}
-		
-		previousButton = new Button ( "" );
-		previousButton.setGraphic( previousImage );
-		previousButton.setPrefSize( 42, 35 );
-		previousButton.setMinSize( 42, 35 );
-		previousButton.setMaxSize( 42, 35 );
-		previousButton.setTooltip( new Tooltip( "Previous Track" ) );
-		
-		nextImage = null;
-		try {
-			nextImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/next.png" ).toFile() ) ) );
-			nextImage.setFitHeight( 18 );
-			nextImage.setFitWidth( 18 );
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load previous icon: resources/next.png", e );
-		}
-		
-		nextButton = new Button ( "" );
-		nextButton.setGraphic( nextImage );
-		nextButton.setPrefSize( 42, 35 );
-		nextButton.setMinSize( 42, 35 );
-		nextButton.setMaxSize( 42, 35 );
-		nextButton.setTooltip( new Tooltip( "Next Track" ) );
-		
-		stopImage = null;
-		try {
-			stopImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/stop.png" ).toFile() ) ) );
-			stopImage.setFitHeight( 18 );
-			stopImage.setFitWidth( 18 );
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load previous icon: resources/stop.png", e );
-		}
-		
-		stopButton = new Button ( "" );
-		stopButton.setGraphic( stopImage );
-		stopButton.setPrefSize( 42, 35 );
-		stopButton.setMinSize( 42, 35 );
-		stopButton.setMaxSize( 42, 35 );
-		stopButton.setTooltip( new Tooltip( "Stop" ) );
-
-		previousButton.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				previousRequested();
-			}
-		} );
-
-		nextButton.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				player.next();
-			}
-		});
-
-		stopButton.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				player.stop( StopReason.USER_REQUESTED );
-			}
-		} );
-
-		togglePlayButton.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				if ( player.isStopped() ) { 
-					if ( currentListTable.getItems().size() != 0 ) {
-						CurrentListTrack selectedItem = currentListTable.getSelectionModel().getSelectedItem();
-						
-						if ( selectedItem != null ) {
-							player.playTrack( selectedItem );
-						} else {
-							player.next( false );
-						}
-					}
-				} else {
-					player.togglePause();
-				}
-			}
-		} );
-
-		timeElapsedLabel = new Label( "" );
-		timeRemainingLabel = new Label( "" );
-
-		timeElapsedLabel.setMinWidth( 65 );
-		timeElapsedLabel.setContentDisplay( ContentDisplay.RIGHT );
-		timeElapsedLabel.setTextAlignment( TextAlignment.RIGHT );
-		timeElapsedLabel.setAlignment( Pos.CENTER_RIGHT );
-		timeElapsedLabel.setTooltip( new Tooltip ( "Time Elapsed" ) );
-
-		timeRemainingLabel.setMinWidth( 65 );
-		timeRemainingLabel.setTooltip( new Tooltip ( "Time Remaining" ) );
-
-		trackPositionSlider = new Slider();
-		trackPositionSlider.setMin( 0 );
-		trackPositionSlider.setMax( 1000 );
-		trackPositionSlider.setValue( 0 );
-		trackPositionSlider.setMaxWidth( 600 );
-		trackPositionSlider.setMinWidth( 200 );
-		trackPositionSlider.setPrefWidth( 400 );
-		trackPositionSlider.setStyle( "-fx-font-size: 18px" );
-		trackPositionSlider.setTooltip( new Tooltip ( "Change Track Position" ) );
-
-		trackPositionSlider.valueChangingProperty().addListener( new ChangeListener <Boolean>() {
-			public void changed ( ObservableValue <? extends Boolean> obs, Boolean wasChanging, Boolean isNowChanging ) {
-				if ( !isNowChanging ) {
-					player.seekPercent( trackPositionSlider.getValue() / trackPositionSlider.getMax() );
-				}
-			}
-		});
-
-		trackPositionSlider.setOnMousePressed( ( MouseEvent e ) -> {
-			sliderMouseHeld = true;
-		});
-
-		trackPositionSlider.setOnMouseReleased( ( MouseEvent e ) -> {
-			sliderMouseHeld = false;
-			player.seekPercent( trackPositionSlider.getValue() / trackPositionSlider.getMax() );
-		});
-		
-		volumeMuteButton = new Button ( );
-		volumeMuteButton.setGraphic( volumeImages[3] );
-		volumeMuteButton.getStyleClass().add( "volumeLabel" );
-		volumeMuteButton.setPadding( new Insets ( 0, 5, 0, 5 ) );
-		volumeMuteButton.getStyleClass().add( "volumeButton" );
-		volumeMuteButton.setTooltip( new Tooltip ( "Toggle Mute" ) );
-		volumeMuteButton.setOnAction( e -> player.toggleMute() );
-
-		volumeSlider = new Slider();
-		volumeSlider.setMin( 0 );
-		volumeSlider.setMax( 100 );
-		volumeSlider.setValue( 100 );
-		volumeSlider.setPrefWidth( 100 );
-		volumeSlider.setMinWidth( 80 );
-		volumeSlider.setTooltip( new Tooltip ( "Control Volume" ) );
-		volumeSlider.setPadding( new Insets ( 0, 10, 0, 0 ) );
-		
-		EventHandler<MouseEvent> volumeSliderHandler = new EventHandler<MouseEvent> () {
-			@Override
-			public void handle ( MouseEvent event ) {
-				double min = volumeSlider.getMin();
-				double max = volumeSlider.getMax();
-				double percent = (volumeSlider.getValue() - min) / (max - min);
-				player.setVolumePercent( percent ); //Note: this works because min is 0 
-			}
-		};
-		
-		volumeSlider.setOnMouseDragged ( volumeSliderHandler );
-		volumeSlider.setOnMouseClicked ( volumeSliderHandler );
-		
-		volumePane = new HBox();
-		volumePane.getChildren().addAll( volumeMuteButton, volumeSlider );
-		volumePane.setAlignment( Pos.CENTER );
-		volumePane.setSpacing( 5 );
-		
-		HBox positionSliderPane = new HBox();
-		positionSliderPane.getChildren().addAll( timeElapsedLabel, trackPositionSlider, timeRemainingLabel );
-		positionSliderPane.setAlignment( Pos.CENTER );
-		positionSliderPane.setSpacing( 5 );
-
-		HBox trackControls = new HBox();
-		trackControls.getChildren().addAll( previousButton, togglePlayButton, stopButton, nextButton );
-		trackControls.setPadding( new Insets( 5 ) );
-		trackControls.setSpacing( 5 );
-		
-		HBox controls = new HBox();
-		controls.getChildren().addAll( trackControls, positionSliderPane, volumePane );
-		controls.setSpacing( 10 );
-		controls.setAlignment( Pos.CENTER );
-
-		showSettingsButton = new Button ( );
-		showSettingsButton.setGraphic( settingsImage );
-
-		switch ( Hypnos.getOS() ) {
-			case WIN_10: case WIN_7: case WIN_8: case WIN_UNKNOWN: case WIN_VISTA: case WIN_XP:
-				showSettingsButton.setPadding( new Insets ( 5, 5, 0, 5 ) );
-				break;
-				
-			case NIX: case OSX: case UNKNOWN:
-				showSettingsButton.setPadding( new Insets ( 0, 5, 0, 5 ) );
-				break;
-		}
-		
-		showSettingsButton.getStyleClass().add( "settingsButton" );
-		showSettingsButton.setTooltip( new Tooltip( "Configuration and Information" ) );
-		
-		showSettingsButton.setOnAction ( ( ActionEvent event ) -> {
-			settingsWindow.show();
-		});
-		
-		Label settingsWidthPadding = new Label ( "" );
-		settingsWidthPadding.setMinWidth( 36 ); // I couldn't figure out how to make it the exact same width as settings button
-		
-		BorderPane playingTrackInfo = new BorderPane();
-		currentTrackButton = new Button( "" );
-		currentTrackButton.setPadding( new Insets ( 10, 0, 0, 0 ) );
-		currentTrackButton.getStyleClass().add( "trackName" );
-		playingTrackInfo.setCenter( currentTrackButton );
-		playingTrackInfo.setRight( showSettingsButton );
-		playingTrackInfo.setLeft( settingsWidthPadding );
-		
-		currentTrackButton.setOnMouseClicked( ( MouseEvent event ) -> {
-			
-			if ( event.getButton() == MouseButton.PRIMARY ) {
-				selectCurrentTrack();
-			}
-		});
-		
-		currentTrackTooltip = new Tooltip ( "" );
-		currentTrackButton.setTooltip( currentTrackTooltip );
-		
-		MenuItem playMenuItem = new MenuItem( "Play" );
-		MenuItem appendMenuItem = new MenuItem( "Append" );
-		MenuItem playNextMenuItem = new MenuItem( "Play Next" );
-		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
-		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
-		MenuItem infoMenuItem = new MenuItem( "Info" );
-		MenuItem lyricsMenuItem = new MenuItem( "Lyrics" );
-		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
-		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
-		
-		MenuItem newPlaylistButton = new MenuItem( "<New>" );
-
-		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
-
-		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				Track current = player.getCurrentTrack();
-				if ( current != null ) {
-					promptAndSavePlaylist ( Arrays.asList( current ) );
-				}
-			}
-		});
-
-		EventHandler addToPlaylistHandler = new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-
-				Playlist playlist = (Playlist) ((MenuItem) event.getSource()).getUserData();
-				
-				Track currentTrack = player.getCurrentTrack();
-				if ( currentTrack != null && playlist != null ) {
-					addToPlaylist ( Arrays.asList( currentTrack ), playlist );
-				}
-			}
-		};
-		
-		library.getPlaylistSorted().addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
-			updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
-		} );
-
-		updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
-		
-		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				Track currentTrack = player.getCurrentTrack();
-				if ( currentTrack != null ) {
-					player.playTrack( currentTrack );
-				}
-			}
-		});
-
-		appendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				Track currentTrack = player.getCurrentTrack();
-				if ( currentTrack != null ) {
-					player.getCurrentList().appendTrack ( currentTrack );
-				}
-			}
-		});
-		
-		playNextMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				Track currentTrack = player.getCurrentTrack();
-				if ( currentTrack != null ) {
-					player.getQueue().queueTrack( 0, currentTrack );
-				}
-			}
-		});
-		
-		enqueueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				Track currentTrack = player.getCurrentTrack();
-				if ( currentTrack != null ) {
-					player.getQueue().queueTrack( currentTrack );
-				}
-			}
-		});
-		
-		editTagMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-
-				Track currentTrack = player.getCurrentTrack();
-				if ( currentTrack != null ) {
-					tagWindow.setTracks( Arrays.asList( currentTrack ), null );
-					tagWindow.show();
-				}
-			}
-		});
-		
-		
-		infoMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				Track currentTrack = player.getCurrentTrack();
-				if ( currentTrack != null ) {
-					trackInfoWindow.setTrack( currentTrack );
-					trackInfoWindow.show();
-				}
-			}
-		});
-
-		lyricsMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				lyricsWindow.setTrack( player.getCurrentTrack() );
-				lyricsWindow.show();
-			}
-		});
-		
-		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			// PENDING: This is the better way, once openjdk and openjfx supports
-			// it: getHostServices().showDocument(file.toURI().toString());
-			@Override
-			public void handle ( ActionEvent event ) {
-				SwingUtilities.invokeLater( new Runnable() {
-					public void run () {
-						try {
-							Track selectedTrack = player.getCurrentTrack();
-							if ( selectedTrack != null ) {
-								Desktop.getDesktop().open( selectedTrack.getPath().getParent().toFile() );
-							}
-						} catch ( Exception e ) {
-							LOGGER.log( Level.INFO, "Unable to open local file browser.", e );
-						}
-					}
-				} );
-			}
-		});
-		
-		
-		ContextMenu currentTrackButtonMenu = new ContextMenu();
-		currentTrackButtonMenu.getItems().addAll( playMenuItem, appendMenuItem, playNextMenuItem, 
-			enqueueMenuItem, editTagMenuItem, infoMenuItem, lyricsMenuItem, browseMenuItem, addToPlaylistMenuItem );
-		
-		currentTrackButton.setContextMenu( currentTrackButtonMenu );
-		
-		transport = new VBox();
-		transport.getChildren().add( playingTrackInfo );
-		transport.getChildren().add( controls );
-		transport.setPadding( new Insets( 0, 0, 10, 0 ) );
-		transport.setSpacing( 5 );
-		transport.setId( "transport" );
-	}
-	
 	public void selectCurrentTrack () {
 		Track current = player.getCurrentTrack();
 		selectTrackOnCurrentList ( current );
@@ -3108,7 +2594,7 @@ public class FXUI implements PlayerListener {
 		clAlbumColumn.setCellFactory( e -> new FormattedAlbumCell() );
 
 		clPlayingColumn.setCellFactory ( column -> { 
-				return new CurrentListTrackStateCell( this, playImageSource, pauseImageSource ); 
+				return new CurrentListTrackStateCell( this, transport.playImageSource, transport.pauseImageSource ); 
 			} 
 		);
 		
@@ -3807,8 +3293,7 @@ public class FXUI implements PlayerListener {
 		mainStage.show();
 		
 		// This stuff has to be done after show
-		StackPane thumb = (StackPane) trackPositionSlider.lookup( ".thumb" );
-		thumb.setVisible( false );
+		transport.doAfterShowProcessing();
 		
 		Node blankPlaylistHeader = playlistTable.lookup(".column-header-background");
 		blankPlaylistHeader.setOnContextMenuRequested ( 
@@ -4211,8 +3696,8 @@ public class FXUI implements PlayerListener {
 	public void playerStopped ( Track track, StopReason reason ) {
 		Platform.runLater( () -> {
 			updateTransport( 0, 0, 0 ); //values don't matter. 
-			volumeSlider.setDisable( false );
-			volumeMuteButton.setDisable( false );
+			transport.volumeSlider.setDisable( false );
+			transport.volumeMuteButton.setDisable( false );
 		});
 	}
 
@@ -4220,15 +3705,15 @@ public class FXUI implements PlayerListener {
 	@Override
 	public void playerStarted ( Track track ) {
 		Platform.runLater( () -> {
-			togglePlayButton.setGraphic( pauseImage );
+			transport.togglePlayButton.setGraphic( transport.pauseImage );
 			
 			currentListTable.refresh();
 	
-			StackPane thumb = (StackPane) trackPositionSlider.lookup( ".thumb" );
+			StackPane thumb = (StackPane) transport.trackPositionSlider.lookup( ".thumb" );
 			thumb.setVisible( true );
 			
-			currentTrackButton.setText( track.getArtist() + " - " + track.getTitle() );
-			currentTrackTooltip.setText( 
+			transport.currentTrackButton.setText( track.getArtist() + " - " + track.getTitle() );
+			transport.currentTrackTooltip.setText( 
 				"Album: " + track.getAlbumTitle() + "\n" +
 				"Year: " + track.getYear() + "\n" +
 				"Length: " + Utils.getLengthDisplay( track.getLengthS() ) + "\n" + 
@@ -4240,13 +3725,13 @@ public class FXUI implements PlayerListener {
 			boolean disableVolume = !player.volumeChangeSupported();
 			
 			if ( disableVolume ) {
-				volumeSlider.setDisable( true );
-				volumeMuteButton.setDisable( true );
-				Tooltip.install( volumePane, volumeDisabledTooltip );
+				transport.volumeSlider.setDisable( true );
+				transport.volumeMuteButton.setDisable( true );
+				Tooltip.install( transport.volumePane, transport.volumeDisabledTooltip );
 			} else {
-				volumeSlider.setDisable( false );
-				volumeMuteButton.setDisable( false );
-				Tooltip.uninstall( volumePane, volumeDisabledTooltip );
+				transport.volumeSlider.setDisable( false );
+				transport.volumeMuteButton.setDisable( false );
+				Tooltip.uninstall( transport.volumePane, transport.volumeDisabledTooltip );
 			}
 		});
 	}
@@ -4254,7 +3739,7 @@ public class FXUI implements PlayerListener {
 	@Override
 	public void playerPaused () {
 		Platform.runLater( () -> {
-			togglePlayButton.setGraphic( playImage );
+			transport.togglePlayButton.setGraphic( transport.playImage );
 			currentListTable.refresh(); //To get the play/pause image to update. 
 		});
 	}
@@ -4262,7 +3747,7 @@ public class FXUI implements PlayerListener {
 	@Override
 	public void playerUnpaused () {
 		Platform.runLater( () -> {
-			togglePlayButton.setGraphic( pauseImage );
+			transport.togglePlayButton.setGraphic( transport.pauseImage );
 			artSplitPane.setImages( player.getCurrentTrack() );
 			currentListTable.refresh();//To get the play/pause image to update. 
 		});
@@ -4271,22 +3756,7 @@ public class FXUI implements PlayerListener {
 
 	@Override
 	public void playerVolumeChanged ( double newVolumePercent ) {
-		Platform.runLater( () -> {
-			double min = volumeSlider.getMin();
-			double max = volumeSlider.getMax();
-			
-			volumeSlider.setValue( newVolumePercent * ( max - min ) );
-			
-			if ( newVolumePercent == 0 ) {
-				volumeMuteButton.setGraphic( volumeImages[0] );
-			} else if ( newVolumePercent > 0 && newVolumePercent <= .33f ) {
-				volumeMuteButton.setGraphic( volumeImages[1] );
-			} else if ( newVolumePercent > .33f && newVolumePercent <= .66f ) {
-				volumeMuteButton.setGraphic( volumeImages[2] );
-			} else if ( newVolumePercent > .66f ) {
-				volumeMuteButton.setGraphic( volumeImages[3] );
-			}
-		});
+		transport.playerVolumeChanged( newVolumePercent );
 	}
 
 	@Override
@@ -4342,9 +3812,7 @@ public class FXUI implements PlayerListener {
 			alert.getDialogPane().setContent( holder );
 			player.setVolumePercent( 1 );
 
-			//volumeSlider.setDisable( false );
-			//volumeMuteButton.setDisable( false );
-			Tooltip.uninstall( volumePane, volumeDisabledTooltip );
+			Tooltip.uninstall( transport.volumePane, transport.volumeDisabledTooltip );
 			
 			alert.showAndWait();
 		});

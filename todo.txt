@@ -1,4 +1,6 @@
 General:	
+	Volume warning pops up twice. 
+	
 	Lyrics fail:
 		http://www.metrolyrics.com/the-hazards-of-love-1-lyrics-decemberists.html
 		http://www.metrolyrics.com/the-hazards-of-love-2-lyrics-decemberists.html
