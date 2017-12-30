@@ -218,7 +218,6 @@ public class FXUI implements PlayerListener {
 	
 	boolean doPlaylistSaveWarning = true;
 	
-	
 	public FXUI ( Stage stage, Library library, AudioSystem audioSystem, GlobalHotkeys hotkeys ) {
 		mainStage = stage;
 		this.library = library;
@@ -1810,15 +1809,7 @@ public class FXUI implements PlayerListener {
 		});
 
 		browseMenuItem.setOnAction( event -> {
-			SwingUtilities.invokeLater( new Runnable() {
-				public void run () {
-					try {
-						Desktop.getDesktop().open( albumTable.getSelectionModel().getSelectedItem().getPath().toFile() );
-					} catch ( IOException e ) {
-						LOGGER.log( Level.INFO, "Unable to open native file browser.", e );
-					}
-				}
-			});
+			openFileBrowser ( albumTable.getSelectionModel().getSelectedItem().getPath() );
 		});
 		
 		albumTable.setOnDragOver( event -> {
@@ -1918,6 +1909,25 @@ public class FXUI implements PlayerListener {
 			});
 
 			return row;
+		});
+	}
+
+	public void openFileBrowser ( Path path ) {
+
+		// PENDING: This is the better way once openjdk and openjfx supports it:
+		// getHostServices().showDocument(file.toURI().toString());
+		
+		if ( !Files.isDirectory( path ) ) path = path.getParent();
+		final File showMe = path.toFile();
+		
+		SwingUtilities.invokeLater( new Runnable() {
+			public void run () {
+				try {
+					Desktop.getDesktop().open( showMe );
+				} catch ( IOException e ) {
+					LOGGER.log( Level.INFO, "Unable to open native file browser.", e );
+				}
+			}
 		});
 	}
 
@@ -2114,18 +2124,7 @@ public class FXUI implements PlayerListener {
 			// it: getHostServices().showDocument(file.toURI().toString());
 			@Override
 			public void handle ( ActionEvent event ) {
-				SwingUtilities.invokeLater( new Runnable() {
-					public void run () {
-						try {
-							Track selectedTrack = trackTable.getSelectionModel().getSelectedItem();
-							if ( selectedTrack != null ) {
-								Desktop.getDesktop().open( trackTable.getSelectionModel().getSelectedItem().getPath().getParent().toFile() );
-							}
-						} catch ( Exception e ) {
-							LOGGER.log( Level.INFO, "Unable to open native file browser.", e );
-						}
-					}
-				} );
+				openFileBrowser ( trackTable.getSelectionModel().getSelectedItem().getPath() );
 			}
 		});
 		
@@ -2917,19 +2916,9 @@ public class FXUI implements PlayerListener {
 		} );
 
 		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			// PENDING: This is the better way, once openjdk and openjfx supports
-			// it: getHostServices().showDocument(file.toURI().toString());
 			@Override
 			public void handle ( ActionEvent event ) {
-				SwingUtilities.invokeLater( new Runnable() {
-					public void run () {
-						try {
-							Desktop.getDesktop().open( currentListTable.getSelectionModel().getSelectedItem().getPath().getParent().toFile() );
-						} catch ( Exception e ) {
-							LOGGER.log( Level.INFO, "Unable to native file browser.", e );
-						}
-					}
-				} );
+				openFileBrowser ( currentListTable.getSelectionModel().getSelectedItem().getPath() );
 			}
 		});
 		

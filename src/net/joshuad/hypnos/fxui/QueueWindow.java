@@ -1,6 +1,5 @@
 package net.joshuad.hypnos.fxui;
 
-import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,8 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.swing.SwingUtilities;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
@@ -514,25 +511,9 @@ public class QueueWindow extends Stage {
 			}
 		});
 		
-		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			// PENDING: This is the better way, once openjdk and openjfx supports
-			// it: getHostServices().showDocument(file.toURI().toString());
-			@Override
-			public void handle ( ActionEvent event ) {
-				SwingUtilities.invokeLater( new Runnable() {
-					public void run () {
-						try {
-							Track selectedTrack = queueTable.getSelectionModel().getSelectedItem();
-							if ( selectedTrack != null ) {
-								Desktop.getDesktop().open( selectedTrack.getPath().getParent().toFile() );
-							}
-						} catch ( Exception e ) {
-							LOGGER.log( Level.INFO, "Unable to open local file browser.", e );
-						}
-					}
-				} );
-			}
-		} );
+		browseMenuItem.setOnAction( ( ActionEvent event ) -> {
+			ui.openFileBrowser(  queueTable.getSelectionModel().getSelectedItem().getPath() );
+		});
 
 		cropMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override

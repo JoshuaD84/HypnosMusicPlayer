@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.SwingUtilities;
-
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -929,18 +927,7 @@ public class SettingsWindow extends Stage {
 			// it: getHostServices().showDocument(file.toURI().toString());
 			@Override
 			public void handle ( ActionEvent event ) {
-				SwingUtilities.invokeLater( new Runnable() {
-					public void run () {
-						try {
-							TagError selectedTrack = table.getSelectionModel().getSelectedItem();
-							if ( selectedTrack != null ) {
-								Desktop.getDesktop().open( table.getSelectionModel().getSelectedItem().getPath().getParent().toFile() );
-							}
-						} catch ( Exception e ) {
-							LOGGER.log( Level.INFO, "Unable to open native file browser.", e );
-						}
-					}
-				} );
+				ui.openFileBrowser( table.getSelectionModel().getSelectedItem().getPath() );
 			}
 		});
 		

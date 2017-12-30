@@ -1,4 +1,10 @@
 General:	
+
+	Playlist browse issues
+		Hitting f4 in the playlist info window shows playlsit folder. Show track folder.
+		Add right click > browse to playlist info window table
+		Add rlight click > browse and F4 to playlist table -- show playlist folder. 
+		
 	Volume warning pops up twice. 
 	
 	Lyrics fail:

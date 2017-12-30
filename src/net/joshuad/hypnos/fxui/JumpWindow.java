@@ -1,6 +1,5 @@
 package net.joshuad.hypnos.fxui;
 
-import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -10,10 +9,8 @@ import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.SwingUtilities;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -454,15 +451,7 @@ public class JumpWindow extends Stage {
 			// it: getHostServices().showDocument(file.toURI().toString());
 			@Override
 			public void handle ( ActionEvent event ) {
-				SwingUtilities.invokeLater( new Runnable() {
-					public void run () {
-						try {
-							Desktop.getDesktop().open( trackTable.getSelectionModel().getSelectedItem().getPath().getParent().toFile() );
-						} catch ( Exception e ) {
-							LOGGER.log( Level.INFO, "Unable to native file browser.", e );
-						}
-					}
-				} );
+				ui.openFileBrowser( trackTable.getSelectionModel().getSelectedItem().getPath() );
 			}
 		});
 		

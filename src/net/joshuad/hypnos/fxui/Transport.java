@@ -1,12 +1,9 @@
 package net.joshuad.hypnos.fxui;
 
-import java.awt.Desktop;
 import java.io.FileInputStream;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.swing.SwingUtilities;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -397,25 +394,11 @@ public class Transport extends VBox {
 		});
 		
 		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			// PENDING: This is the better way, once openjdk and openjfx supports
-			// it: getHostServices().showDocument(file.toURI().toString());
 			@Override
 			public void handle ( ActionEvent event ) {
-				SwingUtilities.invokeLater( new Runnable() {
-					public void run () {
-						try {
-							Track selectedTrack = player.getCurrentTrack();
-							if ( selectedTrack != null ) {
-								Desktop.getDesktop().open( selectedTrack.getPath().getParent().toFile() );
-							}
-						} catch ( Exception e ) {
-							LOGGER.log( Level.INFO, "Unable to open local file browser.", e );
-						}
-					}
-				} );
+				ui.openFileBrowser(  player.getCurrentTrack().getPath() );
 			}
 		});
-		
 		
 		ContextMenu currentTrackButtonMenu = new ContextMenu();
 		currentTrackButtonMenu.getItems().addAll( playMenuItem, appendMenuItem, playNextMenuItem, 

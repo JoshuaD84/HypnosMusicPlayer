@@ -1,16 +1,12 @@
 package net.joshuad.hypnos.fxui;
 
-import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.swing.SwingUtilities;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -94,26 +90,11 @@ public class AlbumInfoWindow extends Stage {
 		HBox.setHgrow( locationField, Priority.ALWAYS );
 		browseButton = new Button( "Browse" );
 		browseButton.setOnAction( new EventHandler <ActionEvent>() {
-			// PENDING: Future - This is the better way, once openjdk and openjfx supports
-			// it: getHostServices().showDocument(file.toURI().toString());
 			@Override
 			public void handle ( ActionEvent event ) {
-				SwingUtilities.invokeLater( new Runnable() {
-					public void run () {
-						try {
-							if ( album != null ) {
-								Path path = album.getPath();
-								if ( path != null ) {
-									Desktop.getDesktop().open( path.toFile() );
-								}
-							}
-						} catch ( IOException e ) {
-							LOGGER.info( "Unable to open directory in desktop environment." );
-						}
-					}
-				} );
+				ui.openFileBrowser( album.getPath() );
 			}
-		} );
+		});
 		
 		HBox locationBox = new HBox();
 		locationBox.getChildren().addAll( label, locationField, browseButton );

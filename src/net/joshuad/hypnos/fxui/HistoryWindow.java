@@ -1,16 +1,11 @@
 package net.joshuad.hypnos.fxui;
 
-import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.logging.Level;
-
-import javax.swing.SwingUtilities;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
@@ -321,20 +316,9 @@ public class HistoryWindow extends Stage {
 			// it: getHostServices().showDocument(file.toURI().toString());
 			@Override
 			public void handle ( ActionEvent event ) {
-				SwingUtilities.invokeLater( new Runnable() {
-					public void run () {
-						try {
-							Track selectedTrack = historyTable.getSelectionModel().getSelectedItem();
-							if ( selectedTrack != null ) {
-								Desktop.getDesktop().open( selectedTrack.getPath().getParent().toFile() );
-							}
-						} catch ( IOException e ) {
-							LOGGER.log( Level.INFO, "Unable to open native file browser.", e );
-						}
-					}
-				} );
+				ui.openFileBrowser( historyTable.getSelectionModel().getSelectedItem().getPath() );
 			}
-		} );
+		});
 		
 		
 		numberColumn.setCellValueFactory( new Callback <CellDataFeatures <Track, Track>, ObservableValue <Track>>() {

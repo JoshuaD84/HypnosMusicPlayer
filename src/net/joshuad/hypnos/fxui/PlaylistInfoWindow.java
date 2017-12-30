@@ -1,16 +1,12 @@
 package net.joshuad.hypnos.fxui;
 
-import java.awt.Desktop;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.swing.SwingUtilities;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -192,21 +188,9 @@ public class PlaylistInfoWindow extends Stage {
 				
 			} else if ( e.getCode() == KeyCode.F4 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				// PENDING: This is the better way, once openjdk and openjfx supports
-				// it: getHostServices().showDocument(file.toURI().toString());
-				SwingUtilities.invokeLater( new Runnable() {
-					public void run () {
-						try {
-							Track selectedTrack = player.getCurrentTrack();
-							if ( selectedTrack != null ) {
-								//TODO: I don't love calling Hypnos directly here
-								Desktop.getDesktop().open( Hypnos.getPersister().getPlaylistDirectory() );
-							}
-						} catch ( Exception e ) {
-							LOGGER.log( Level.INFO, "Unable to open local file browser.", e );
-						}
-					}
-				} );
+				
+				//TODO: I don't love calling Hypnos directly here
+				ui.openFileBrowser( Hypnos.getPersister().getPlaylistDirectory().toPath() );
 				
 			} else if ( e.getCode() == KeyCode.L
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
