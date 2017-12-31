@@ -2,7 +2,6 @@ package net.joshuad.hypnos.workbench;
 
 import java.util.ArrayList;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;

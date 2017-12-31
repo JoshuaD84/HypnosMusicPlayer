@@ -16,7 +16,6 @@ import net.joshuad.hypnos.fxui.HypnosResizePolicy;
 		
 public class CustomResizeExample extends Application {
 	
-	@SuppressWarnings("unchecked")
 	private Parent getContent () {
 		TableView <Locale> table = new TableView <>( FXCollections.observableArrayList( Locale.getAvailableLocales() ) );
 		TableColumn <Locale, String> countryCode = new TableColumn <>( "CountryCode" );

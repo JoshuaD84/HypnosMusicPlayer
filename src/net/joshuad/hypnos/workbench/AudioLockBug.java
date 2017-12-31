@@ -11,7 +11,6 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.SourceDataLine;
 
-import net.joshuad.hypnos.audio.decoders.AbstractDecoder;
 import net.joshuad.hypnos.audio.decoders.FlacDecoderLogic;
 
 public class AudioLockBug {

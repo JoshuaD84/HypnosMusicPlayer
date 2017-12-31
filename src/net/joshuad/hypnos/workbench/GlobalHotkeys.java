@@ -5,7 +5,6 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -17,9 +16,6 @@ import org.jnativehook.NativeHookException;
 import org.jnativehook.NativeInputEvent;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
-
-import net.joshuad.hypnos.Hypnos;
-import net.joshuad.hypnos.hotkeys.KeyState;
 
 public class GlobalHotkeys implements NativeKeyListener {
 	private static final Logger LOGGER = Logger.getLogger( GlobalHotkeys.class.getName() );

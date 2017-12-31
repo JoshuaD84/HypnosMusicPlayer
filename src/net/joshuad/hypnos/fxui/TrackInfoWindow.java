@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.logging.Logger;
 
-import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
@@ -20,8 +19,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Track;
-import net.joshuad.hypnos.lyrics.LyricsFetcher;
-import net.joshuad.hypnos.lyrics.scrapers.MetroScraper;
 
 public class TrackInfoWindow extends Stage {
 	private static final Logger LOGGER = Logger.getLogger( TrackInfoWindow.class.getName() );

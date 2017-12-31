@@ -19,7 +19,6 @@ import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
 import net.joshuad.hypnos.Hypnos;
-import net.joshuad.hypnos.Hypnos.OS;
 
 public class GlobalHotkeys implements NativeKeyListener {
 	private static final Logger LOGGER = Logger.getLogger( GlobalHotkeys.class.getName() );
@@ -135,11 +134,11 @@ public class GlobalHotkeys implements NativeKeyListener {
 	}
 	
 	public void disable() {
-		this.disabled = true;
+		disabled = true;
 	}
 	
 	public void enable() {
-		this.disabled = false;
+		disabled = false;
 	}
 			
 	public void nativeKeyPressed ( NativeKeyEvent e ) {	
