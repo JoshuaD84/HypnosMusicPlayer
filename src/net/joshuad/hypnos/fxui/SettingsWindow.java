@@ -1,6 +1,5 @@
 package net.joshuad.hypnos.fxui;
 
-import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -1116,16 +1115,19 @@ public class SettingsWindow extends Stage {
 		"    Toggle Shuffle Mode                      S\n" +	
 		"    Toggle Repeat Mode                       R\n" +
 		"    Show Jump Window (Find Track)            F\n" +
-		"    Focus the Filter TextBox  in Library     Ctrl + F\n" +
+		"    Focus the Filter TextBox in Library      Ctrl + F\n" +
 		"    Show Lyrics on Current Track             Shift + L\n" +
 		"    Toggle Library Collapsed                 Ctrl + L\n" +
 		"    Toggle Artwork Collapsed                 Ctrl + ;\n" +
 		"    Show Queue                               Ctrl + Q\n" +
 		"    Show History                             Ctrl + H\n" +
 		"    Show Config                              Ctrl + P\n" +
-		"    Save Current List as Playlist            Ctrl + S\n" +						
-		"    Open files                               Ctrl + O\n" +						
-		"    Export Current List as Playlist          Ctrl + E\n" +						
+		"    Save Current List as Playlist            Ctrl + S\n" +	
+		"    Open files                               Ctrl + O\n" +
+		"    Export Current List as Playlist          Ctrl + E\n" +	
+		"    Select the First Tab in Library          1 or Ctrl + 1\n" +
+		"    Select the Second Tab in Library         2 or Ctrl + 2\n" +
+		"    Select the Third Tab in Library          3 or Ctrl + 3\n" +							
 		"\n" +
 		"Playlists, Albums, Tracks\n" +
 		"    Queue Item                               Q\n" + 	 					
@@ -1145,6 +1147,9 @@ public class SettingsWindow extends Stage {
 		"\n" +
 		"All Tables\n" +
 		"    Deselect                                 Esc\n" +
+		"\n" +	
+		"Filter Text Boxes\n" +
+		"    Clear Filter                             Esc\n" +
 		"\n" +	
 		"Current List\n" +
 		"    Delete selected Tracks                   Del\n" +

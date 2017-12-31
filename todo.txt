@@ -10,8 +10,6 @@ General:
 						
 	Show in tag edit window when a file doesn't support a particular tag type
 	
-	ctrl + F - move focus to library track filter, whichever tab is showing
-
 	Refactor Library
 		Make a source directory a class, not just a path.
 			Library Source Directories - highlight in red if they are missing. 
@@ -34,9 +32,7 @@ General:
 		Library load and unload time
 		
 		Loader status % complete thing
-	
-	Use Ctrl + 1, Ctrl +2, Ctrl + 3 to quickly select library tabs
-	
+			
 	Allow library tabs to be hidden
 	
 	Make standalone a commandline switch instead of a java argument
@@ -70,9 +66,7 @@ General:
 		album table -> folder
 	
 	Add default sort column choice, like shuffle and repeat
-	
-	Maybe add hotkey to switch between library tabs. Ctrl + 1, 2, 3? 
-	
+		
 	Hover effects on transparent image buttons
 		Settings Button
 		Volume button

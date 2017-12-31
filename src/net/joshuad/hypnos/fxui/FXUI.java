@@ -373,119 +373,134 @@ public class FXUI implements PlayerListener {
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				currentListSave.fire();
 				e.consume();
-				
+
 			} else if ( e.getCode() == KeyCode.F && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				Tab currentLibraryTab = libraryPane.getSelectionModel().getSelectedItem();
-				
+
 				if ( libraryAlbumTab == currentLibraryTab ) {
 					albumFilterBox.requestFocus();
-					
+
 				} else if ( libraryTrackTab == currentLibraryTab ) {
 					trackFilterBox.requestFocus();
-					
+
 				} else if ( libraryPlaylistTab == currentLibraryTab ) {
 					playlistFilterBox.requestFocus();
 				}
-				
+
 				e.consume();
-				
+
 			} else if ( e.getCode() == KeyCode.E && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				currentListExport.fire();
 				e.consume();
-				
+
 			} else if ( e.getCode() == KeyCode.O && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				currentListLoad.fire();
 				e.consume();
-				
+
 			} else if ( e.getCode() == KeyCode.P && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				showSettingsWindow();
 				e.consume();
-			
+
+			} else if ( e.getCode() == KeyCode.DIGIT1 /* With or without control */
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				libraryPane.getSelectionModel().select( 0 );
+				e.consume();
+
+			} else if ( e.getCode() == KeyCode.DIGIT2 /* With or without control */
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				libraryPane.getSelectionModel().select( 1 );
+				e.consume();
+	
+			} else if ( e.getCode() == KeyCode.DIGIT3 /* With or without control */
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				libraryPane.getSelectionModel().select( 2 );
+				e.consume();
+
 			} else if ( e.getCode() == KeyCode.F 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				jumpWindow.show();
 				e.consume();
-				
+
 			} else if ( e.getCode() == KeyCode.R
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				toggleRepeatButton.fire();
 				e.consume();
-				
+
 			} else if ( e.getCode() == KeyCode.S
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				toggleShuffleButton.fire();
 				e.consume();
-				
+
 			} else if ( e.getCode() == KeyCode.H
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				historyWindow.show();
 				e.consume();
-				
+
 			} else if ( e.getCode() == KeyCode.Q && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				queueWindow.show();
 				e.consume();
-				
+
 			} else if ( e.getCode() == KeyCode.L && e.isShiftDown()
 			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
 				lyricsWindow.setTrack( audioSystem.getCurrentTrack() );
 				lyricsWindow.show();
 				e.consume();
-				
+
 			} else if ( e.getCode() == KeyCode.L && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				toggleLibraryCollapsed();
 				e.consume();
-						
+
 			} else if ( e.getCode() == KeyCode.SEMICOLON && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				toggleArtPaneCollapsed();
 				e.consume();
-				
+
 			} else if ( ( e.getCode() == KeyCode.NUMPAD1 || e.getCode() == KeyCode.KP_UP ) 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				audioSystem.skipMS( -5000 );
 				e.consume();
-				
+
 			} else if ( ( e.getCode() == KeyCode.NUMPAD2 || e.getCode() == KeyCode.KP_DOWN ) 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				transport.stopButton.fire();
 				e.consume();
-				
+
 			} else if ( ( e.getCode() == KeyCode.NUMPAD3 || e.getCode() == KeyCode.KP_RIGHT ) 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				audioSystem.skipMS( 5000 );
 				e.consume();
-				
+
 			} else if ( ( e.getCode() == KeyCode.NUMPAD4 || e.getCode() == KeyCode.KP_LEFT )
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				transport.previousButton.fire();
 				e.consume();
-				
+
 			} else if ( ( e.getCode() == KeyCode.NUMPAD5 || e.getCode() == KeyCode.KP_UP ) 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				transport.togglePlayButton.fire();
 				e.consume();
-				
+
 			} else if ( ( e.getCode() == KeyCode.NUMPAD6 || e.getCode() == KeyCode.KP_DOWN ) 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				transport.nextButton.fire();
 				e.consume();
-				
+
 			} else if ( ( e.getCode() == KeyCode.NUMPAD7 || e.getCode() == KeyCode.KP_RIGHT ) 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				audioSystem.decrementVolume();
 				e.consume();
-				
+
 			} else if ( ( e.getCode() == KeyCode.NUMPAD8 || e.getCode() == KeyCode.KP_LEFT )
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				transport.volumeMuteButton.fire();
 				e.consume();
-				
+
 			} else if ( ( e.getCode() == KeyCode.NUMPAD9 || e.getCode() == KeyCode.KP_LEFT )
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				audioSystem.incrementVolume();
