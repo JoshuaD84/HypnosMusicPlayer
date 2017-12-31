@@ -605,6 +605,36 @@ public class CurrentList {
 		}
 	}
 	
+	public void insertPlaylists ( int index, List<Playlist> playlists ) {
+		Runnable runMe = new Runnable() {
+			public void run() {
+				int targetIndex = index > items.size() ? items.size() : index;
+				boolean insertedAtEnd = ( targetIndex == items.size() );
+				
+				boolean startedEmpty = false;
+				if ( items.size() == 0 ) startedEmpty = true;
+				
+				Mode startMode = mode;
+				
+				List<Track> addMe = new ArrayList<Track> ();
+				for ( Playlist playlist : playlists ) {
+					if ( playlist != null ) {
+						addMe.addAll( playlist.getTracks() );
+					}
+				}
+		
+				insertTracks ( targetIndex, addMe );
+				
+				if ( startedEmpty ) {
+					playlistsSet ( playlists );
+				} else {
+					tracksAdded();
+				}
+			}
+		};
+		doThreadAware ( runMe );
+	}
+	
 	public void setPlaylist ( Playlist playlist ) {
 		setPlaylists ( Arrays.asList( playlist ) );
 	}
@@ -893,7 +923,4 @@ public class CurrentList {
 		//Hypnos.getLibrary().albumsToUpdate.addAll( playlists );  //TODO: update the playlist from disc?
 		
 	}
-
-	
-	
 }

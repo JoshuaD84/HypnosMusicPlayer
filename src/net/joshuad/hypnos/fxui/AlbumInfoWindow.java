@@ -300,6 +300,10 @@ public class AlbumInfoWindow extends Stage {
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				playMenuItem.fire();
 				
+			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown()
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+				player.getCurrentList().insertTracks( 0, trackTable.getSelectionModel().getSelectedItems() );
+				
 			} else if ( e.getCode() == KeyCode.ENTER && e.isControlDown()
 			&& !e.isAltDown() && !e.isShiftDown()  && !e.isMetaDown() ) {
 				appendMenuItem.fire();

@@ -1570,11 +1570,25 @@ public class FXUI implements PlayerListener {
 	
 					ArrayList <String> matchableText = new ArrayList <String>();
 	
-					matchableText.add( Normalizer.normalize( album.getAlbumArtist(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+					matchableText.add( 
+						Normalizer.normalize( album.getAlbumArtist(), Normalizer.Form.NFD )
+						.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() 
+					);
+					
 					matchableText.add( album.getAlbumArtist().toLowerCase() );
-					matchableText.add( Normalizer.normalize( album.getFullAlbumTitle(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+					
+					matchableText.add( 
+						Normalizer.normalize( album.getFullAlbumTitle(), Normalizer.Form.NFD )
+						.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() 
+					);
+					
 					matchableText.add( album.getFullAlbumTitle().toLowerCase() );
-					matchableText.add( Normalizer.normalize( album.getYear(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+					
+					matchableText.add( 
+						Normalizer.normalize( album.getYear(), Normalizer.Form.NFD )
+						.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase()
+					);
+					
 					matchableText.add( album.getYear().toLowerCase() );
 	
 					for ( String token : lowerCaseFilterTokens ) {
@@ -1645,7 +1659,7 @@ public class FXUI implements PlayerListener {
 		trackListCheckBox = new CheckBox( "" );
 		trackListCheckBox.selectedProperty().addListener( new ChangeListener <Boolean> () {
 			@Override
-			public void changed ( ObservableValue <? extends Boolean> observable, Boolean oldValue, Boolean newValue ) {
+			public void changed( ObservableValue <? extends Boolean> observable, Boolean oldValue, Boolean newValue ) {
 				library.getTracksFiltered().setPredicate( track -> {
 					return acceptTrackFilterChange ( track, oldValue, newValue );
 				});
@@ -1752,6 +1766,10 @@ public class FXUI implements PlayerListener {
 			} else if ( e.getCode() == KeyCode.ENTER
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				playMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown()
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+				player.getCurrentList().insertAlbums( 0,  albumTable.getSelectionModel().getSelectedItems() );
 				
 			} else if ( e.getCode() == KeyCode.ENTER && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
@@ -1880,7 +1898,8 @@ public class FXUI implements PlayerListener {
 		    	artSplitPane.setImages ( player.getCurrentTrack() );
 		    	
 		    } else {
-		    	//Do nothing, leave the old artwork there. We can set to null if we like that better, I don't think so though
+		    	//Do nothing, leave the old artwork there. We can set to null if we like that better
+		    	//I don't think so though
 		    }
 		});
 
@@ -2012,7 +2031,9 @@ public class FXUI implements PlayerListener {
 		numberMenuItem.setSelected( true );
 		titleMenuItem.setSelected( true );
 		lengthMenuItem.setSelected( true );
-		trackColumnSelectorMenu.getItems().addAll( artistMenuItem, albumMenuItem, numberMenuItem, titleMenuItem, lengthMenuItem );
+		trackColumnSelectorMenu.getItems().addAll( 
+			artistMenuItem, albumMenuItem, numberMenuItem, titleMenuItem, lengthMenuItem );
+		
 		trackArtistColumn.setContextMenu( trackColumnSelectorMenu );
 		trackAlbumColumn.setContextMenu( trackColumnSelectorMenu );
 		trackTitleColumn.setContextMenu( trackColumnSelectorMenu );
@@ -2025,7 +2046,9 @@ public class FXUI implements PlayerListener {
 		lengthMenuItem.selectedProperty().bindBidirectional( trackLengthColumn.visibleProperty() );
 		
 		trackTable = new TableView();
-		trackTable.getColumns().addAll( trackArtistColumn, trackAlbumColumn, trackNumberColumn, trackTitleColumn, trackLengthColumn );
+		trackTable.getColumns().addAll( 
+			trackArtistColumn, trackAlbumColumn, trackNumberColumn, trackTitleColumn, trackLengthColumn );
+		
 		trackTable.setEditable( false );
 		trackTable.setItems( library.getTracksSorted() );
 
@@ -2094,7 +2117,7 @@ public class FXUI implements PlayerListener {
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				List <Track> selectedItems = new ArrayList <Track> ( trackTable.getSelectionModel().getSelectedItems() );
+				List <Track> selectedItems = new ArrayList <> ( trackTable.getSelectionModel().getSelectedItems() );
 				
 				if ( selectedItems.size() == 1 ) {
 					player.playItems( selectedItems );
@@ -2198,10 +2221,17 @@ public class FXUI implements PlayerListener {
 			} else if ( e.getCode() == KeyCode.ENTER
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				playMenuItem.fire();
+				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown()
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+				player.getCurrentList().insertTracks( 0, trackTable.getSelectionModel().getSelectedItems() );
+				e.consume();
 				
 			} else if ( e.getCode() == KeyCode.ENTER && e.isControlDown() 
 			&& !e.isShiftDown() && !e.isAltDown() && !e.isMetaDown() ) {
 				appendMenuItem.fire();
+				e.consume();
 			}
 		});
 		
@@ -2214,7 +2244,8 @@ public class FXUI implements PlayerListener {
 		    	artSplitPane.setImages ( player.getCurrentTrack() );
 		    	
 		    } else {
-		    	//Do nothing, leave the old artwork there. We can set to null if we like that better, I don't think so though
+		    	//Do nothing, leave the old artwork there. We can set to null if we like that better, 
+		    	//I don't think so though
 		    }
 		});
 		
@@ -2470,6 +2501,10 @@ public class FXUI implements PlayerListener {
 			}  else if ( e.getCode() == KeyCode.ENTER
 			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
 				playMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown()
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+				player.getCurrentList().insertPlaylists ( 0, playlistTable.getSelectionModel().getSelectedItems() );
 				
 			} else if ( e.getCode() == KeyCode.ENTER && e.isControlDown()
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {

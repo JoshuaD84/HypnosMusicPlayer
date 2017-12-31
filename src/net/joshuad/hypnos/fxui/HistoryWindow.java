@@ -173,6 +173,10 @@ public class HistoryWindow extends Stage {
 				playMenuItem.fire();
 				e.consume();
 				
+			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown()
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+				player.getCurrentList().insertTracks( 0, historyTable.getSelectionModel().getSelectedItems() );
+				
 			} else if ( e.getCode() == KeyCode.ENTER && e.isControlDown()
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				appendMenuItem.fire();

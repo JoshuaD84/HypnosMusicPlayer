@@ -38,6 +38,8 @@ General:
 			
 	Allow library tabs to be hidden
 	
+	Hotkeys on tag error window table
+	
 	Make standalone a commandline switch instead of a java argument
 		
 	Resize Policy
@@ -147,6 +149,8 @@ General:
 	isArtistDirectory -- Keep a cache, so you're not checking every folder every time? Might need to recheck occasionally. 
 	
 	Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
+	
+	Look at jump windows hotkeys re queue
 	
 JavaFX stuff
 	Double clicking on table-column dividers doesn't call resize:

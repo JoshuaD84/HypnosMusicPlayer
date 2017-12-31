@@ -860,7 +860,6 @@ public class SettingsWindow extends Stage {
 				} 
 			}
 		});
-		
 
 		appendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
