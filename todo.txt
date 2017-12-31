@@ -1,4 +1,9 @@
 General:		
+	
+	Update available notification. 
+		Show something in the UI, can be turned off
+		Prompt after hypnos is closed, can be turned off.
+		Always show something in settings. Also put it in log because why not. 
 		
 	Missing tracks are deleted from currentlist after restart if CurrentList.mode == ALBUM instead of remaining and being highlighted in red
 	
@@ -16,9 +21,7 @@ General:
 
 		An album will form from tracks if you edit them and they aren't currently an album. But an album won't split if you edit tags and make it not be an album.
 			Is this desired behavior? I feel like probably no -- it can create different states based on the same disk contents, which doesn't make sense
-			
-		Albums aren't updating on the album list when you edit tags. Probably because they're behind in the update queue or I broke album.update
-		
+					
 		Sometimes there are duplicated tracks in the track list
 		
 		When removing all sources, it takes a long time to remove everything (5+ seconds)
@@ -51,9 +54,7 @@ General:
 	persist column info
 		sort options
 		ordering
-	
-	I don't like the way the library line wraps in the manifest. Can we make this nicer in ant? 
-	
+		
 	Bug report dialog
 	
 	Export playlist as a folder
@@ -189,12 +190,7 @@ JavaFX stuff
 		What systems do support? 
 		What other systems don't support? How to handle? 
 		https://stackoverflow.com/questions/29995727/java-systemtray-icon-does-not-always-work
-		
-	hide/show via hotkeys while maximized toggles every 3 presses instead of every 2 presses. 
-		https://stackoverflow.com/questions/45269173/stage-seticonified-and-stage-isiconified-not-acting-properly
-		I think this is working correctly now? I updated the jvm from _131 to _151 and it seems good? 	
-			confirmed on linux
-				
+
 	Showing any dialog prevents window drag resize in ubuntu / other linux?
 		http://bugs.java.com/bugdatabase/view_bug.do?bug_id=8140491
 		https://stackoverflow.com/questions/33134791/javafx-stage-cant-be-resized-after-showing-a-dialog

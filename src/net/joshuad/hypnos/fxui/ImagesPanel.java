@@ -20,7 +20,6 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
-import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -128,6 +127,7 @@ public class ImagesPanel extends SplitPane {
 		});
 				
 		albumImagePane = new BorderPane();
+		albumImagePane.setMinWidth( 0 );
 
 		albumImagePane.getStyleClass().add( "artpane" );
 		
@@ -263,6 +263,7 @@ public class ImagesPanel extends SplitPane {
 		menu.getItems().addAll( setArtistImage, setAlbumArtistImage, setTrackArtistImage, exportImage );
 		
 		artistImagePane = new BorderPane();	
+		artistImagePane.setMinWidth( 0 );
 		
 		artistImagePane.getStyleClass().add( "artpane" );
 		Label dragAndDropLabel = new Label ( "Drop Artist Image Here" );
