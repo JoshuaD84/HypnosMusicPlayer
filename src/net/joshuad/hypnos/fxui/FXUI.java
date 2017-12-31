@@ -3340,16 +3340,22 @@ public class FXUI implements PlayerListener {
 		
 		for ( Node divider : dividers ) {
 			if ( divider.getParent() == currentListSplitPane ) {
-				divider.setOnMouseClicked( ( e ) -> {
+				divider.setOnMouseClicked ( ( e ) -> {
 					if ( e.getClickCount() == 2 ) {
 						toggleArtPaneCollapsed();
 					}
 					
 				});
 			} else if ( divider.getParent() == primarySplitPane ) {
-				divider.setOnMouseClicked( ( e ) -> {
+				divider.setOnMouseClicked ( ( e ) -> {
 					if ( e.getClickCount() == 2 ) {
 						toggleLibraryCollapsed();
+					}
+				});
+			} else if ( divider.getParent() == artSplitPane ) {
+				divider.setOnMouseClicked ( ( e ) -> {
+					if ( e.getClickCount() == 2 ) {
+						artSplitPane.setDividerPosition( 0, .5f );
 					}
 				});
 			}
