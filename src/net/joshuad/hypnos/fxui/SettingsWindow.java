@@ -1104,56 +1104,57 @@ public class SettingsWindow extends Stage {
 	
 	private String hotkeyText = 
 		"Main Window\n" +
-		"    Back 5 seconds                       Numpad 1\n" +
-		"    Stop                                 Numpad 2\n" +	
-		"    Forward 5 seconds                    Numpad 3\n" +
-		"    Previous                             Numpad 4\n" +
-		"    Play / Pause                         Numpad 5\n" +			
-		"    Next                                 Numpad 6\n" +
-		"    Volume Down                          Numpad 7\n" +
-		"    Mute / Unmute                        Numpad 8\n" +
-		"    Volume Up                            Numpad 9\n" +
-		"    Toggle Shuffle Mode                  S\n" +	
-		"    Toggle Repeat Mode                   R\n" +
-		"    Show Jump Window                     J\n" +
-		"    Show Lyrics on Current Track         Shift + L\n" +
-		"    Toggle Library Collapsed             Ctrl + L\n" +
-		"    Toggle Artwork Collapsed             Ctrl + ;\n" +
-		"    Show Queue                           Ctrl + Q\n" +
-		"    Show History                         Ctrl + H\n" +
-		"    Show Config                          Ctrl + P\n" +
-		"    Save Current List as Playlist        Ctrl + S\n" +						
-		"    Open files                           Ctrl + O\n" +						
-		"    Export Current List as Playlist      Ctrl + E\n" +						
+		"    Back 5 seconds                           Numpad 1\n" +
+		"    Stop                                     Numpad 2\n" +	
+		"    Forward 5 seconds                        Numpad 3\n" +
+		"    Previous                                 Numpad 4\n" +
+		"    Play / Pause                             Numpad 5\n" +			
+		"    Next                                     Numpad 6\n" +
+		"    Volume Down                              Numpad 7\n" +
+		"    Mute / Unmute                            Numpad 8\n" +
+		"    Volume Up                                Numpad 9\n" +
+		"    Toggle Shuffle Mode                      S\n" +	
+		"    Toggle Repeat Mode                       R\n" +
+		"    Show Jump Window (Find Track)            F\n" +
+		"    Focus the Filter TextBox  in Library     Ctrl + F\n" +
+		"    Show Lyrics on Current Track             Shift + L\n" +
+		"    Toggle Library Collapsed                 Ctrl + L\n" +
+		"    Toggle Artwork Collapsed                 Ctrl + ;\n" +
+		"    Show Queue                               Ctrl + Q\n" +
+		"    Show History                             Ctrl + H\n" +
+		"    Show Config                              Ctrl + P\n" +
+		"    Save Current List as Playlist            Ctrl + S\n" +						
+		"    Open files                               Ctrl + O\n" +						
+		"    Export Current List as Playlist          Ctrl + E\n" +						
 		"\n" +
 		"Playlists, Albums, Tracks\n" +
-		"    Queue Item                           Q\n" + 	 					
-		"    play next (front of queue)           Shift + Q\n" + 				
-		"    Tag Editor / Rename Playlist         F2\n" +						
-		"    Track List / Info                    F3\n" +						
-		"    File System Browser                  F4\n" +						
-		"    Play Selected Item(s)                Enter\n" +					
-		"    Append Item to current list          Ctrl + Enter\n" +				
-		"    Prepend to current List              Shift + Enter\n" +				     			
+		"    Queue Item                               Q\n" + 	 					
+		"    play next (front of queue)               Shift + Q\n" + 				
+		"    Tag Editor / Rename Playlist             F2\n" +						
+		"    Track List / Info                        F3\n" +						
+		"    File System Browser                      F4\n" +						
+		"    Play Selected Item(s)                    Enter\n" +					
+		"    Append Item to current list              Ctrl + Enter\n" +				
+		"    Prepend to current List                  Shift + Enter\n" +				     			
 		"\n" +	
 		"Playlist Library\n" +
-		"    Delete selected Playlists            Del\n" +						
+		"    Delete selected Playlists                Del\n" +						
 		"\n" +
 		"Any Track\n" +
-		"    Show Lyrics                          L\n" +
+		"    Show Lyrics                              L\n" +
 		"\n" +
 		"All Tables\n" +
-		"    Deselect                             Esc\n" +
+		"    Deselect                                 Esc\n" +
 		"\n" +	
 		"Current List\n" +
-		"    Delete selected Tracks               Del\n" +
-		"    Crop to selected Tracks              Shift + Del\n" +				
+		"    Delete selected Tracks                   Del\n" +
+		"    Crop to selected Tracks                  Shift + Del\n" +				
 		"\n" +	
 		"Tag Window\n" +
-		"    Save and Previous                    Ctrl + Right\n" +
-		"    Save and Next                        Ctrl + Left\n" +				
+		"    Save and Previous                        Ctrl + Right\n" +
+		"    Save and Next                            Ctrl + Left\n" +				
 		"\n" +
 		"Popup Windows\n" +
-		"    Close Window                         Esc";
+		"    Close Window                             Esc";
 
 }

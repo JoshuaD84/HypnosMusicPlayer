@@ -150,6 +150,8 @@ public class FXUI implements PlayerListener {
 	TableColumn clPlayingColumn, clArtistColumn, clYearColumn, clAlbumColumn, clTitleColumn, clNumberColumn, clLengthColumn;
 	
 	Transport transport;
+
+	Tab libraryTrackTab, libraryAlbumTab, libraryPlaylistTab;
 	
 	Label emptyPlaylistLabel = new Label( 
 		"You haven't created any playlists, make a playlist on the right and click the save button." );
@@ -183,7 +185,7 @@ public class FXUI implements PlayerListener {
 	MenuItem currentListSave, currentListExport, currentListLoad, historyMenuItem;
 	
 	CheckBox trackListCheckBox;
-	TextField trackFilterBox;
+	TextField trackFilterBox, albumFilterBox, playlistFilterBox;
 	
 	final AudioSystem player;
 	final Library library;
@@ -292,12 +294,12 @@ public class FXUI implements PlayerListener {
 		playlistPane.setCenter( playlistTable );
 
 		libraryPane = new StretchedTabPane();
-
-		Tab albumListTab = new Tab( "Albums" );
-		albumListTab.setContent( albumListPane );
-		albumListTab.setClosable( false );
+		
+		libraryAlbumTab = new Tab( "Albums" );
+		libraryAlbumTab.setContent( albumListPane );
+		libraryAlbumTab.setClosable( false );
 		Tooltip albumTabTooltip = new Tooltip ( "Album Count: " + library.getAlbums().size() );
-		albumListTab.setTooltip( albumTabTooltip );
+		libraryAlbumTab.setTooltip( albumTabTooltip );
 		
 		library.getAlbums().addListener( new ListChangeListener<Album> () {
 			public void onChanged ( Change <? extends Album> changed ) {
@@ -305,11 +307,11 @@ public class FXUI implements PlayerListener {
 			}
 		});
 
-		Tab playlistTab = new Tab( "Playlists" );
-		playlistTab.setContent( playlistPane );
-		playlistTab.setClosable( false );
+		libraryPlaylistTab = new Tab( "Playlists" );
+		libraryPlaylistTab.setContent( playlistPane );
+		libraryPlaylistTab.setClosable( false );
 		Tooltip playlistTabTooltip = new Tooltip ( "Playlist Count: " + library.getPlaylists().size() );
-		playlistTab.setTooltip( playlistTabTooltip );
+		libraryPlaylistTab.setTooltip( playlistTabTooltip );
 		
 		library.getPlaylists().addListener( new ListChangeListener<Playlist> () {
 			public void onChanged ( Change <? extends Playlist> changed ) {
@@ -317,11 +319,11 @@ public class FXUI implements PlayerListener {
 			}
 		});
 
-		Tab songListTab = new Tab( "Tracks" );
-		songListTab.setContent( trackListPane );
-		songListTab.setClosable( false );
+		libraryTrackTab = new Tab( "Tracks" );
+		libraryTrackTab.setContent( trackListPane );
+		libraryTrackTab.setClosable( false );
 		Tooltip trackTabTooltip = new Tooltip ( "Track Count: " + library.getTracks().size() );
-		songListTab.setTooltip( trackTabTooltip );
+		libraryTrackTab.setTooltip( trackTabTooltip );
 		
 		library.getTracks().addListener( new ListChangeListener<Track> () {
 			public void onChanged ( Change <? extends Track> changed ) {
@@ -329,7 +331,7 @@ public class FXUI implements PlayerListener {
 			}
 		});
 
-		libraryPane.getTabs().addAll( albumListTab, songListTab, playlistTab );
+		libraryPane.getTabs().addAll( libraryAlbumTab, libraryTrackTab, libraryPlaylistTab );
 		libraryPane.setSide( Side.BOTTOM );
 
 		primarySplitPane = new SplitPane();
@@ -372,6 +374,22 @@ public class FXUI implements PlayerListener {
 				currentListSave.fire();
 				e.consume();
 				
+			} else if ( e.getCode() == KeyCode.F && e.isControlDown() 
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				Tab currentLibraryTab = libraryPane.getSelectionModel().getSelectedItem();
+				
+				if ( libraryAlbumTab == currentLibraryTab ) {
+					albumFilterBox.requestFocus();
+					
+				} else if ( libraryTrackTab == currentLibraryTab ) {
+					trackFilterBox.requestFocus();
+					
+				} else if ( libraryPlaylistTab == currentLibraryTab ) {
+					playlistFilterBox.requestFocus();
+				}
+				
+				e.consume();
+				
 			} else if ( e.getCode() == KeyCode.E && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				currentListExport.fire();
@@ -387,7 +405,7 @@ public class FXUI implements PlayerListener {
 				showSettingsWindow();
 				e.consume();
 			
-			} else if ( e.getCode() == KeyCode.J 
+			} else if ( e.getCode() == KeyCode.F 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				jumpWindow.show();
 				e.consume();
@@ -1330,10 +1348,10 @@ public class FXUI implements PlayerListener {
 
 	public void setupPlaylistFilterPane () {
 		playlistFilterPane = new HBox();
-		TextField filterBox = new TextField();
-		filterBox.setPrefWidth( 500000 );
+		playlistFilterBox = new TextField();
+		playlistFilterBox.setPrefWidth( 500000 );
 		
-		filterBox.textProperty().addListener( ( observable, oldValue, newValue ) -> {
+		playlistFilterBox.textProperty().addListener( ( observable, oldValue, newValue ) -> {
 			Platform.runLater( () -> {
 				library.getPlaylistsFiltered().setPredicate( playlist -> {
 					if ( newValue == null || newValue.isEmpty() ) {
@@ -1365,16 +1383,16 @@ public class FXUI implements PlayerListener {
 			});
 		});
 		
-		filterBox.setOnKeyPressed( ( KeyEvent event ) -> {
+		playlistFilterBox.setOnKeyPressed( ( KeyEvent event ) -> {
 			if ( event.getCode() == KeyCode.ESCAPE ) {
-				filterBox.clear();
+				playlistFilterBox.clear();
 			}
 		});
 		
 		double width = 33;
 		double height = 26;
 		
-		filterBox.setPrefHeight( height );
+		playlistFilterBox.setPrefHeight( height );
 		
 		Button libraryButton = new Button( );
 		libraryButton.setGraphic ( addSourcePlaylistsImage );
@@ -1398,16 +1416,16 @@ public class FXUI implements PlayerListener {
 		clearButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				filterBox.setText( "" );
+				playlistFilterBox.setText( "" );
 			}
 		});
 		
 
 		libraryButton.setTooltip( new Tooltip( "Add or Remove Music Folders" ) );
-		filterBox.setTooltip ( new Tooltip ( "Filter/Search playlists" ) );
+		playlistFilterBox.setTooltip ( new Tooltip ( "Filter/Search playlists" ) );
 		clearButton.setTooltip( new Tooltip( "Clear the filter text" ) );
 
-		playlistFilterPane.getChildren().addAll( libraryButton, filterBox, clearButton );
+		playlistFilterPane.getChildren().addAll( libraryButton, playlistFilterBox, clearButton );
 	}
 
 	public void setupTrackFilterPane () {
@@ -1524,9 +1542,9 @@ public class FXUI implements PlayerListener {
 
 	public void setupAlbumFilterPane () {
 		albumFilterPane = new HBox();
-		TextField filterBox = new TextField();
-		filterBox.setPrefWidth( 500000 );
-		filterBox.textProperty().addListener( ( observable, oldValue, newValue ) -> {
+		albumFilterBox = new TextField();
+		albumFilterBox.setPrefWidth( 500000 );
+		albumFilterBox.textProperty().addListener( ( observable, oldValue, newValue ) -> {
 			Platform.runLater( () -> {
 				library.getAlbumsFiltered().setPredicate( album -> {
 					if ( newValue == null || newValue.isEmpty() ) {
@@ -1562,9 +1580,9 @@ public class FXUI implements PlayerListener {
 			});
 		});
 		
-		filterBox.setOnKeyPressed( ( KeyEvent event ) -> {
+		albumFilterBox.setOnKeyPressed( ( KeyEvent event ) -> {
 			if ( event.getCode() == KeyCode.ESCAPE ) {
-				filterBox.clear();
+				albumFilterBox.clear();
 			}
 		});
 		
@@ -1572,7 +1590,7 @@ public class FXUI implements PlayerListener {
 		float width = 33;
 		float height = 26;
 
-		filterBox.setPrefHeight( height );
+		albumFilterBox.setPrefHeight( height );
 		
 		Button libraryButton = new Button( );
 		libraryButton.setGraphic( addSourceAlbumsImage );
@@ -1596,16 +1614,16 @@ public class FXUI implements PlayerListener {
 		clearButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				filterBox.setText( "" );
+				albumFilterBox.setText( "" );
 			}
 		});
 		
 
 		libraryButton.setTooltip( new Tooltip( "Add or Remove Music Folders" ) );
-		filterBox.setTooltip ( new Tooltip ( "Filter/Search albums" ) );
+		albumFilterBox.setTooltip ( new Tooltip ( "Filter/Search albums" ) );
 		clearButton.setTooltip( new Tooltip( "Clear the filter text" ) );
 
-		albumFilterPane.getChildren().addAll( libraryButton, filterBox, clearButton );
+		albumFilterPane.getChildren().addAll( libraryButton, albumFilterBox, clearButton );
 	}
 
 	public void setupTrackListCheckBox() {
