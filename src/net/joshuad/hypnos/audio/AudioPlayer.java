@@ -332,6 +332,12 @@ public class AudioPlayer {
 				decoder = new MP4Decoder ( track );
 				break;
 				
+			//	Currently Disabled because the sample rates reported in the files as I read them aren't accurate
+			/*case M4B:
+				decoder = new MP4Decoder ( track );
+				break;
+			*/
+				
 			case OGG:
 				decoder = new OggDecoder ( track );
 				break;

@@ -17,6 +17,7 @@ import net.sourceforge.jaad.mp4.MP4Container;
 import net.sourceforge.jaad.mp4.api.AudioTrack;
 import net.sourceforge.jaad.mp4.api.Frame;
 import net.sourceforge.jaad.mp4.api.Movie;
+import net.sourceforge.jaad.mp4.api.Type;
 
 public class MP4Decoder extends AbstractDecoder {
 	
@@ -72,14 +73,13 @@ public class MP4Decoder extends AbstractDecoder {
 			
 			final MP4Container cont = new MP4Container( input );
 			final Movie movie = cont.getMovie();
-			final List <net.sourceforge.jaad.mp4.api.Track> tracks = movie.getTracks( AudioTrack.AudioCodec.AAC );
+			final List <net.sourceforge.jaad.mp4.api.Track> tracks = movie.getTracks( Type.AUDIO );
 			
 			if ( tracks.isEmpty() ) {
-				//TODO: This happens in Test Cases/last-minstrel.m4a
+				throw new IOException ( "No Audio Tracks Found" );
 			}
 			
 			audioTrack = (AudioTrack) tracks.get( 0 );
-			
 			
 			int sampleRate = audioTrack.getSampleRate();
 			int sampleSize = audioTrack.getSampleSize();

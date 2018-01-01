@@ -1,4 +1,9 @@
 General:
+	Select Multiple Files in File Browser, Right click, open with Hypnos - Not all the tracks appear on the current list, and it doesn't start playing the first one
+
+	Current list - make one file missing rest good
+		Select all, edit tags. No content in table. 
+
 	Typing an uppercase L (shift + L) in the filter box brings up the lyrics window
 		
 	If you press down while editing a filter box, move focus to the correpsonding table
@@ -161,7 +166,8 @@ General:
 	
 	Maybe add sorting of roman numerals? 
 	
-JavaFX stuff
+:::: JavaFX stuff ::::
+
 	Resize Policy
 		Windowed mode, shrink window until a scrollbar appears. Maximize window so scrollbar disappears -- Scrollbar width is still accounted for
 		
@@ -173,37 +179,6 @@ JavaFX stuff
 			
 	Double clicking on table-column dividers doesn't call resize:
 		https://stackoverflow.com/questions/47852239/customresizepolicy-not-triggering-when-a-columns-headers-divider-is-double-cli
-	
-	DND Error that doesn't do any harm
-		Exception in thread "JavaFX Application Thread" java.lang.RuntimeException: dndGesture.dragboard is null in dragDropEnd
-			at javafx.scene.Scene$DragSourceListener.dragDropEnd(Scene.java:3310)
-			at com.sun.javafx.tk.quantum.GlassScene$1.lambda$actionPerformed$0(GlassScene.java:254)
-			at java.security.AccessController.doPrivileged(Native Method)
-			at com.sun.javafx.tk.quantum.GlassScene$1.actionPerformed(GlassScene.java:251)
-			at com.sun.glass.ui.Clipboard.actionPerformed(Clipboard.java:173)
-			at com.sun.glass.ui.gtk.GtkDnDClipboard.pushToSystem(GtkDnDClipboard.java:41)
-			at com.sun.glass.ui.SystemClipboard.flush(SystemClipboard.java:51)
-			at com.sun.glass.ui.ClipboardAssistance.flush(ClipboardAssistance.java:59)
-			at com.sun.javafx.tk.quantum.QuantumClipboard.flush(QuantumClipboard.java:274)
-			at com.sun.javafx.tk.quantum.QuantumToolkit.startDrag(QuantumToolkit.java:1224)
-			at javafx.scene.Scene$DnDGesture.dragDetectedProcessed(Scene.java:2953)
-			at javafx.scene.Scene$DnDGesture.process(Scene.java:3022)
-			at javafx.scene.Scene$DnDGesture.access$8200(Scene.java:2909)
-			at javafx.scene.Scene$MouseHandler.process(Scene.java:3773)
-			at javafx.scene.Scene$MouseHandler.access$1500(Scene.java:3485)
-			at javafx.scene.Scene.impl_processMouseEvent(Scene.java:1762)
-			at javafx.scene.Scene$ScenePeerListener.mouseEvent(Scene.java:2494)
-			at com.sun.javafx.tk.quantum.GlassViewEventHandler$MouseEventNotification.run(GlassViewEventHandler.java:381)
-			at com.sun.javafx.tk.quantum.GlassViewEventHandler$MouseEventNotification.run(GlassViewEventHandler.java:295)
-			at java.security.AccessController.doPrivileged(Native Method)
-			at com.sun.javafx.tk.quantum.GlassViewEventHandler.lambda$handleMouseEvent$2(GlassViewEventHandler.java:417)
-			at com.sun.javafx.tk.quantum.QuantumToolkit.runWithoutRenderLock(QuantumToolkit.java:389)
-			at com.sun.javafx.tk.quantum.GlassViewEventHandler.handleMouseEvent(GlassViewEventHandler.java:416)
-			at com.sun.glass.ui.View.handleMouseEvent(View.java:555)
-			at com.sun.glass.ui.View.notifyMouse(View.java:937)
-			at com.sun.glass.ui.gtk.GtkApplication._runLoop(Native Method)
-			at com.sun.glass.ui.gtk.GtkApplication.lambda$null$5(GtkApplication.java:139)
-			at java.lang.Thread.run(Thread.java:748)
 			
 	Tray Icon
 		I have a few demos that are all terrible. It looks like we need to wait for JavaFX to get this going for us. 
@@ -222,7 +197,9 @@ JavaFX stuff
 	
 	Tiny drop shadow on transport buttons when in dark theme. It's the line HBox, VBox, #transport { ... -fx-background-color: #222222 ... }
 	
-Refactor / organize my code. 
+	
+:::: Refactor / organize my code ::::
+
  	Make LibraryUpdater part of Library. Is there a way to abstract out the Platform -> RunLater part? I feel like we're just stuck w/ that, which kind of ties to us JavaFX. 
  		Maybe ui.runMe ( Runnable ), and then the UI can decide whether to launch a new thread, have a thread idling, do it on this thread, or use something like Platform.runLater()	
 
@@ -238,85 +215,63 @@ Refactor / organize my code.
 	
 	Make a single function for setting up right click menus, or at least combine a bunch. We have so many big chunks of the same code. 
 
-Decoders
-	Ogg - no known problems
-	Wav - no known problems
-	m4a - no known problems
-	flac - no known problems, but 24bit files give me the volume issue on at least linux
-	mp3
-		music-files-broken/mpthreetest.mp3
-	
-			
 
+:::: Decoders ::::
+
+	Playback Problems
+		Ogg
+			seeking is done using read() instead of skip(), so it's a little slow.
+			
+			Seek doesn't seem to be working on many ogg files (all the living and the dead from test cases does work)
+				normal.ogg
+				sweet.ogg (and full anthologies albums from the beatles)
+				zombie.ogg (and full white zombie album)
+			
+			three-silver.ogg takes a long time to load and stop. Not sure about seek.
+			
+		Wav
+			organfinale.wav - 	java.lang.IllegalArgumentException: No line matching interface SourceDataLine 
+								supporting format PCM_FLOAT 44100.0 Hz, 32 bit, stereo, 8 bytes/frame,  is supported.
+								I can look at downsampling: http://www.jsresources.org/examples/SampleRateConverter.html
+								
+		m4a - no known problems
+			alac.m4a doesn't work - Apple Lossless Codec? 
+			
+		flac - no known problems, but 24bit files give me the volume issue on at least linux
+			I can look at downsampling: http://www.jsresources.org/examples/SampleRateConverter.html
+			I'm also fine w/ how things are I think. 
+			Guessing this problem is isolated to my system and my strange sound card. 
+			
+		mp3
+			music-files-broken/mpthreetest.mp3
+			
+		m4b	- Currently disabled in AudioPlayer.java -> getDecoder 
+			https://stackoverflow.com/questions/44750751/why-are-m4bs-playing-at-faster-speeds
+			I need to set the sample rate to one of these: 96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350 
+			The files seem te report the wrong sample rate. JAAD acutally reads them. 
+		
+			acts: 11025 - > reports 44100
+			artofwar: 11025 -> reports 22050
+			cardtrick: 22050 -> reports 44100
+			whitefang: 16000 -> reports 44100
+			
+	
 	Play mounted audio cd
 		http://www.jsresources.org/examples/CddaPlayer.java.html
 
-	Trying to play back https://archive.org/download/testmp3testfile/mpthreetest.mp3 using 
-	http://hypnosplayer.org/download/beta1/Hypnos-nix-64bit-beta1.AppImage on Xubuntu 16.04 gives a very high-pitch voice, not how it should sound.
-	
-	Mp4
-		buffered input stream on the random access File stream
-		
-	Ogg
-		Works, seeking is done using read() instead of skip(), so it's a little slow.
-		
-	m4b - Fast play for some reason
-		https://stackoverflow.com/questions/44750751/why-are-m4bs-playing-at-faster-speeds
-		I need to set the sample rate to one of these: 96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350 
-		The files seem te report the wrong sample rate. JAAD acutally reads them. 
-		
-	Flac
-		Can we get flacplayer.java to play things that we need jflac for:
-			Adrian Orange
-			A Perfect Circle - Mer de noms
-			Pink Floyd - Pulse (disc 1)
-			
-		buffered input stream on the random access File stream
-		
-	Test Cases
-		organfinale.wav
-			No line matching interface SourceDataLine supporting format PCM_FLOAT 44100.0 Hz, 32 bit, stereo, 8 bytes/frame,  is supported.
-			at javax.sound.sampled.AudioSystem.getLine(AudioSystem.java:479)
-			at net.joshuad.musicplayer.players.WavPlayer.openStreamsAtRequestedOffset(WavPlayer.java:133)
-		
-		Leonard Cohen - You want it Darker
-			No volume control
 
-		three-silver.ogg
-			Long files take a long time to seek
-			Long load time
-			
-		normal.wav
-			Slow seek
-			
-		c304-2.wav
-			Slow load, slow seek
+
+:::: OS Specific ::::
+
 		
-		long.m4a
-			No load
-
-		normal.ogg
-			Trouble seeking
-		
-	Wav
-		BufferedInputStream
-
-OS Specific		
-	All:
-		https://stackoverflow.com/questions/7506329/embed-java-into-a-c-application
-
 	Windows
 		http://nsis.sourceforge.net/FAQ
 		Open-with shell integration
-		Installer
-	    Standalone build (32-bit)
 		Rename java process to Hypnos
 			https://sourceforge.net/p/launch4j/discussion/332684/thread/75bbbd93/
+			https://stackoverflow.com/questions/7506329/embed-java-into-a-c-application
 		
-	Linux				
-		Gnome3 
-			Right click -> Open with -- loads the files to current list, but doesn't start playing. 
-			
+	Linux					
 		https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
 	
 	OSX
@@ -324,6 +279,6 @@ OS Specific
 		Open-with shell integration
 		.DMG installer
 		Rename java process to Hypnos ?
-		
 		Test global hotkeys
+		Test Everything
 	
