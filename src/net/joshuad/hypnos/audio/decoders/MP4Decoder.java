@@ -85,7 +85,7 @@ public class MP4Decoder extends AbstractDecoder {
 			int sampleSize = audioTrack.getSampleSize();
 			int channelCount = audioTrack.getChannelCount();
 			
-			final AudioFormat outputFormat = new AudioFormat( sampleRate / 2, sampleSize, channelCount, true, true );
+			final AudioFormat outputFormat = new AudioFormat( sampleRate, sampleSize, channelCount, true, true );
 			
 			audioOutput = AudioSystem.getSourceDataLine( outputFormat );
 			audioOutput.open();

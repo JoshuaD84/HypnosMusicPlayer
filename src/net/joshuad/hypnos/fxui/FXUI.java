@@ -104,7 +104,7 @@ public class FXUI implements PlayerListener {
 	
 	Transport transport;
 
-	Scene scene; //TODO: Does this need to be class global? 
+	Scene scene;
 	Stage mainStage;
 	
 	QueueWindow queueWindow;

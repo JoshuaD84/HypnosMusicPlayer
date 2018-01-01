@@ -1,4 +1,12 @@
-General:		
+General:
+	Typing an uppercase L (shift + L) in the filter box brings up the lyrics window
+		
+	If you press down while editing a filter box, move focus to the correpsonding table
+	
+	Try to replace the album info bar with another filter box type situation
+		I like the way it looks, but i'd like it to become a filter box when clicked on or when F is pressed, then go back to being what it is when 
+		focus is lost
+	
 	If you drag a playlist with links to non-existent files, put something on the list with its name or whatever. Show the item and that the file is missing. 
 	
 	If something gets dropped into config/playlists, update the UI to include it? 
@@ -40,6 +48,8 @@ General:
 		Loader status % complete thing
 			
 	Allow library tabs to be hidden
+	
+	Drop album cover and we lose current track status on the current list
 	
 	Hotkeys on tag error window table
 	
@@ -229,6 +239,14 @@ Refactor / organize my code.
 	Make a single function for setting up right click menus, or at least combine a bunch. We have so many big chunks of the same code. 
 
 Decoders
+	Ogg - no known problems
+	Wav - no known problems
+	m4a - no known problems
+	flac - no known problems, but 24bit files give me the volume issue on at least linux
+	mp3
+		music-files-broken/mpthreetest.mp3
+	
+			
 
 	Play mounted audio cd
 		http://www.jsresources.org/examples/CddaPlayer.java.html
