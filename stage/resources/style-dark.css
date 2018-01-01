@@ -56,7 +56,7 @@ HBox, VBox, #transport {
     -fx-fill: rgb( 175, 175, 175 );
 }
 
-#playlist-controls {
+#currentListControls {
 	-fx-background-color: #303030;
 }
 

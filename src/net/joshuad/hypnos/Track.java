@@ -888,7 +888,6 @@ public class Track implements Serializable, AlbumInfoSource {
 					}
 				}			
 			} catch ( ClosedByInterruptException e ) {
-				System.out.println( "Interrupted" ); //TODO: DD
 				return null;
 				
 			} catch ( Exception e ) {
@@ -923,7 +922,6 @@ public class Track implements Serializable, AlbumInfoSource {
 			}			
 			
 		} catch ( ClosedByInterruptException e ) {
-			System.out.println( "Interrupted" ); //TODO: DD
 			return null;
 			
 		} catch ( Exception e ) {
@@ -1033,7 +1031,6 @@ public class Track implements Serializable, AlbumInfoSource {
 			}			
 			
 		} catch ( ClosedByInterruptException e ) {
-			System.out.println( "Interrupted" ); //TODO: DD
 			return null;
 			
 		} catch ( Exception e ) {

@@ -63,5 +63,5 @@ public class StretchedTabPane extends TabPane {
                 }
             }
         });
-   }
+    }
 }

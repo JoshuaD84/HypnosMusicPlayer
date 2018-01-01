@@ -82,7 +82,7 @@ public class LibraryUpdater {
 						}
 						
 						library.playlistsToRemove.clear();
-						ui.updateLibraryListPlaceholder();
+						ui.libraryPane.updateLibraryListPlaceholder();
 					}
 				
 					synchronized ( library.playlistsToAdd ) {
@@ -98,7 +98,7 @@ public class LibraryUpdater {
 					
 					library.playlistsToUpdate.clear(); //PENDING: update playlists. 
 
-					ui.updateLibraryListPlaceholder();
+					ui.libraryPane.updateLibraryListPlaceholder();
 					
 					synchronized ( library.albumsToRemove ) {
 						if ( !library.albumsToRemove.isEmpty() ) {
@@ -107,7 +107,7 @@ public class LibraryUpdater {
 								changeCount++;
 							}
 							
-							ui.updateLibraryListPlaceholder();
+							ui.libraryPane.updateLibraryListPlaceholder();
 
 							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshAlbumTable(); //TODO: this may not be necessary. 
@@ -123,7 +123,7 @@ public class LibraryUpdater {
 								changeCount++;
 							}
 							
-							ui.updateLibraryListPlaceholder();
+							ui.libraryPane.updateLibraryListPlaceholder();
 
 							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshAlbumTable();  //TODO: this may not be necessary. 
@@ -206,7 +206,7 @@ public class LibraryUpdater {
 								}
 							}
 
-							ui.updateLibraryListPlaceholder();
+							ui.libraryPane.updateLibraryListPlaceholder();
 							
 							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshTrackTable(); //TODO: this may not be necessary. 
@@ -227,7 +227,7 @@ public class LibraryUpdater {
 							}
 
 
-							ui.updateLibraryListPlaceholder();
+							ui.libraryPane.updateLibraryListPlaceholder();
 							
 							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshTrackTable(); //TODO: this may not be necessary. 
@@ -262,7 +262,7 @@ public class LibraryUpdater {
 							}
 
 
-							ui.updateLibraryListPlaceholder();
+							ui.libraryPane.updateLibraryListPlaceholder();
 							
 							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshTrackTable(); //TODO: this may not be necessary. 

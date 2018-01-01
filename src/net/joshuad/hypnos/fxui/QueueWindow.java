@@ -167,7 +167,6 @@ public class QueueWindow extends Stage {
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				if ( queueTable.getSelectionModel().getSelectedItems().size() > 0 ) {
 					queueTable.getSelectionModel().clearSelection();
-					System.out.println (" Consuming here" );
 					e.consume();
 				} else {
 					this.hide();

@@ -12,7 +12,6 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -24,8 +23,6 @@ import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
-import org.jaudiotagger.tag.FieldKey;
-
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -33,68 +30,47 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
-import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.CheckMenuItem;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DialogPane;
-import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
-import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import net.joshuad.hypnos.Album;
-import net.joshuad.hypnos.AlphanumComparator;
 import net.joshuad.hypnos.CurrentList;
 import net.joshuad.hypnos.CurrentListState;
 import net.joshuad.hypnos.CurrentListTrack;
-import net.joshuad.hypnos.CurrentListTrackState;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.LibraryUpdater.LoaderSpeed;
@@ -102,14 +78,12 @@ import net.joshuad.hypnos.Persister;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
-import net.joshuad.hypnos.AlphanumComparator.CaseHandling;
 import net.joshuad.hypnos.Persister.Setting;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.PlayerListener;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
 import net.joshuad.hypnos.audio.AudioSystem.StopReason;
-import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
 
 @SuppressWarnings({ "rawtypes", "unchecked" }) // REFACTOR: Maybe get rid of this when I understand things better
@@ -120,53 +94,17 @@ public class FXUI implements PlayerListener {
 
 	public final String PROGRAM_NAME = "Hypnos";
 
-	TableView <Album> albumTable;
-	TableView <Playlist> playlistTable;
-	TableView <Track> trackTable;
-	TableView <CurrentListTrack> currentListTable;
-
 	SplitPane primarySplitPane;
 	SplitPane currentListSplitPane;
 	public ImagesPanel artSplitPane; //TODO: Probably make this private
-	StretchedTabPane libraryPane;
-	
-	ImageView albumFilterClearImage, trackFilterClearImage, playlistFilterClearImage;
-	ImageView noRepeatImage, repeatImage, repeatOneImage, sequentialImage, shuffleImage;
-	ImageView queueImage, historyImage, menuImage;
-	ImageView addSourceTracksImage, addSourceAlbumsImage, addSourcePlaylistsImage;
+	public LibraryTabPane libraryPane; //TODO: make private
+	CurrentListPane currentListPane;
 	
 	Image warningAlertImageSource;
-	Image repeatImageSource;
-	
-	HBox albumFilterPane;
-	HBox trackFilterPane;
-	HBox playlistFilterPane;
-	HBox playlistControls;
-	
-	ContextMenu playlistColumnSelectorMenu, trackColumnSelectorMenu, albumColumnSelectorMenu, currentListColumnSelectorMenu;
-	TableColumn playlistNameColumn, playlistLengthColumn, playlistTracksColumn;
-	TableColumn trackArtistColumn, trackLengthColumn, trackNumberColumn, trackAlbumColumn, trackTitleColumn;
-	TableColumn albumArtistColumn, albumYearColumn, albumAlbumColumn;
-	TableColumn clPlayingColumn, clArtistColumn, clYearColumn, clAlbumColumn, clTitleColumn, clNumberColumn, clLengthColumn;
 	
 	Transport transport;
 
-	Tab libraryTrackTab, libraryAlbumTab, libraryPlaylistTab;
-	
-	Label emptyPlaylistLabel = new Label( 
-		"You haven't created any playlists, make a playlist on the right and click the save button." );
-
-	Label emptyTrackListLabel = new Label( 
-		"No tracks loaded. To add to your library, click on the + button or drop folders here." );
-	
-	Label emptyAlbumListLabel = new Label(
-		"No albums loaded. To add to your library, click on the + button or drop folders here." );
-	
-	Label filteredAlbumListLabel = new Label( "No albums match." );
-	Label filteredTrackListLabel = new Label( "No tracks match." );
-	Label filteredPlaylistLabel = new Label( "No playlists match." );
-
-	Scene scene;
+	Scene scene; //TODO: Does this need to be class global? 
 	Stage mainStage;
 	
 	QueueWindow queueWindow;
@@ -179,13 +117,6 @@ public class FXUI implements PlayerListener {
 	TrackInfoWindow trackInfoWindow;
 	LyricsWindow lyricsWindow;
 	JumpWindow jumpWindow;
-
-	Button toggleRepeatButton, toggleShuffleButton;
-	Button showQueueButton;
-	MenuItem currentListSave, currentListExport, currentListLoad, historyMenuItem;
-	
-	CheckBox trackListCheckBox;
-	TextField trackFilterBox, albumFilterBox, playlistFilterBox;
 	
 	final AudioSystem player;
 	final Library library;
@@ -240,16 +171,11 @@ public class FXUI implements PlayerListener {
 		
 		setupFont();
 		loadImages();
-		setupAlbumTable();
-		setupTrackListCheckBox();
-		setupAlbumFilterPane();
-		setupTrackFilterPane();
-		setupPlaylistFilterPane();
-		setupCurrentListTable();
-		setupPlaylistTable();
-		setupCurrentListControlPane();
-		setupTrackTable();
+
+		libraryPane = new LibraryTabPane( this, audioSystem, library );
 		transport = new Transport( this, audioSystem );
+		artSplitPane = new ImagesPanel ( this, audioSystem );
+		currentListPane = new CurrentListPane( this, audioSystem, library );
 		
 		libraryLocationWindow = new LibraryLocationWindow ( mainStage, library );
 		tagWindow = new TagWindow ( this ); 
@@ -265,75 +191,11 @@ public class FXUI implements PlayerListener {
 		applyBaseTheme();
 		applyDarkTheme();
 		
-		artSplitPane = new ImagesPanel ( this, audioSystem );
-
-		BorderPane currentPlayingPane = new BorderPane();
-		playlistControls.prefWidthProperty().bind( currentPlayingPane.widthProperty() );
-		currentPlayingPane.setTop( playlistControls );
-		currentPlayingPane.setCenter( currentListTable );
-
 		currentListSplitPane = new SplitPane();
 		currentListSplitPane.setOrientation( Orientation.VERTICAL );
-		currentListSplitPane.getItems().addAll( currentPlayingPane, artSplitPane );
-		currentPlayingPane.setMinWidth( 0 );
+		currentListSplitPane.getItems().addAll( currentListPane, artSplitPane );
 		artSplitPane.setMinWidth( 0 );
-
-		BorderPane albumListPane = new BorderPane();
-		albumFilterPane.prefWidthProperty().bind( albumListPane.widthProperty() );
-		albumListPane.setTop( albumFilterPane );
-		albumListPane.setCenter( albumTable );
 		
-		BorderPane trackListPane = new BorderPane();
-		trackFilterPane.prefWidthProperty().bind( trackListPane.widthProperty() );
-		trackListPane.setTop( trackFilterPane );
-		trackListPane.setCenter( trackTable );
-
-		BorderPane playlistPane = new BorderPane();
-		playlistFilterPane.prefWidthProperty().bind( playlistPane.widthProperty() );
-		playlistPane.setTop( playlistFilterPane );
-		playlistPane.setCenter( playlistTable );
-
-		libraryPane = new StretchedTabPane();
-		
-		libraryAlbumTab = new Tab( "Albums" );
-		libraryAlbumTab.setContent( albumListPane );
-		libraryAlbumTab.setClosable( false );
-		Tooltip albumTabTooltip = new Tooltip ( "Album Count: " + library.getAlbums().size() );
-		libraryAlbumTab.setTooltip( albumTabTooltip );
-		
-		library.getAlbums().addListener( new ListChangeListener<Album> () {
-			public void onChanged ( Change <? extends Album> changed ) {
-				albumTabTooltip.setText( "Album Count: " + library.getAlbums().size() );
-			}
-		});
-
-		libraryPlaylistTab = new Tab( "Playlists" );
-		libraryPlaylistTab.setContent( playlistPane );
-		libraryPlaylistTab.setClosable( false );
-		Tooltip playlistTabTooltip = new Tooltip ( "Playlist Count: " + library.getPlaylists().size() );
-		libraryPlaylistTab.setTooltip( playlistTabTooltip );
-		
-		library.getPlaylists().addListener( new ListChangeListener<Playlist> () {
-			public void onChanged ( Change <? extends Playlist> changed ) {
-				playlistTabTooltip.setText( "Playlist Count: " + library.getPlaylists().size() );
-			}
-		});
-
-		libraryTrackTab = new Tab( "Tracks" );
-		libraryTrackTab.setContent( trackListPane );
-		libraryTrackTab.setClosable( false );
-		Tooltip trackTabTooltip = new Tooltip ( "Track Count: " + library.getTracks().size() );
-		libraryTrackTab.setTooltip( trackTabTooltip );
-		
-		library.getTracks().addListener( new ListChangeListener<Track> () {
-			public void onChanged ( Change <? extends Track> changed ) {
-				trackTabTooltip.setText( "Track Count: " + library.getTracks().size() );
-			}
-		});
-
-		libraryPane.getTabs().addAll( libraryAlbumTab, libraryTrackTab, libraryPlaylistTab );
-		libraryPane.setSide( Side.BOTTOM );
-
 		primarySplitPane = new SplitPane();
 		primarySplitPane.getItems().addAll( libraryPane, currentListSplitPane );
 
@@ -349,7 +211,7 @@ public class FXUI implements PlayerListener {
 		SplitPane.setResizableWithParent( artSplitPane, Boolean.FALSE );
 		SplitPane.setResizableWithParent( currentListSplitPane, Boolean.FALSE );
 		SplitPane.setResizableWithParent( primarySplitPane, Boolean.FALSE );
-		SplitPane.setResizableWithParent( currentPlayingPane, Boolean.FALSE );
+		SplitPane.setResizableWithParent( currentListPane, Boolean.FALSE );
 		
 		mainStage.setTitle( ( Hypnos.isDeveloping() ? "Dev - " : "" ) + PROGRAM_NAME );
 
@@ -371,33 +233,33 @@ public class FXUI implements PlayerListener {
 		primaryContainer.setOnKeyPressed( ( KeyEvent e ) -> { 
 			if ( e.getCode() == KeyCode.S && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				currentListSave.fire();
+				currentListPane.currentListSave.fire();
 				e.consume();
 
 			} else if ( e.getCode() == KeyCode.F && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				Tab currentLibraryTab = libraryPane.getSelectionModel().getSelectedItem();
 
-				if ( libraryAlbumTab == currentLibraryTab ) {
-					albumFilterBox.requestFocus();
+				if ( libraryPane.libraryAlbumTab == currentLibraryTab ) {
+					libraryPane.albumFilterBox.requestFocus();
 
-				} else if ( libraryTrackTab == currentLibraryTab ) {
-					trackFilterBox.requestFocus();
+				} else if ( libraryPane.libraryTrackTab == currentLibraryTab ) {
+					libraryPane.trackFilterBox.requestFocus();
 
-				} else if ( libraryPlaylistTab == currentLibraryTab ) {
-					playlistFilterBox.requestFocus();
+				} else if ( libraryPane.libraryPlaylistTab == currentLibraryTab ) {
+					libraryPane.playlistFilterBox.requestFocus();
 				}
 
 				e.consume();
 
 			} else if ( e.getCode() == KeyCode.E && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				currentListExport.fire();
+				currentListPane.currentListExport.fire();
 				e.consume();
 
 			} else if ( e.getCode() == KeyCode.O && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				currentListLoad.fire();
+				currentListPane.currentListLoad.fire();
 				e.consume();
 
 			} else if ( e.getCode() == KeyCode.P && e.isControlDown() 
@@ -427,12 +289,12 @@ public class FXUI implements PlayerListener {
 
 			} else if ( e.getCode() == KeyCode.R
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				toggleRepeatButton.fire();
+				currentListPane.toggleRepeatButton.fire();
 				e.consume();
 
 			} else if ( e.getCode() == KeyCode.S
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				toggleShuffleButton.fire();
+				currentListPane.toggleShuffleButton.fire();
 				e.consume();
 
 			} else if ( e.getCode() == KeyCode.H
@@ -553,118 +415,11 @@ public class FXUI implements PlayerListener {
 	}
 	
 	private void loadImages() {
-		double currentListControlsButtonFitWidth = 15;
-		double currentListControlsButtonFitHeight = 15;
-		
-		//TODO: Fix warning messages
-		try {
-			noRepeatImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/no-repeat.png" ).toFile() ) ) );
-			noRepeatImage.setFitWidth( currentListControlsButtonFitWidth );
-			noRepeatImage.setFitHeight( currentListControlsButtonFitHeight );
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load no repeat icon: resources/no-repeat.png", e );
-		}
-		
-		try {
-			repeatImageSource = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/repeat.png" ).toFile() ) );
-			repeatImage = new ImageView ( repeatImageSource );
-			repeatImage.setFitWidth( currentListControlsButtonFitWidth );
-			repeatImage.setFitHeight( currentListControlsButtonFitHeight );
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load repeat icon: resources/repeat.png", e );
-		}
-		
-		
-		try {
-			repeatOneImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/repeat-one.png" ).toFile() ) ) );
-			repeatOneImage.setFitWidth( currentListControlsButtonFitWidth );
-			repeatOneImage.setFitHeight( currentListControlsButtonFitHeight );
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load repeat one icon: resources/repeat-one", e );
-		}
-		
-		try {
-			sequentialImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/sequential.png" ).toFile() ) ) );
-			sequentialImage.setFitWidth( currentListControlsButtonFitWidth );
-			sequentialImage.setFitHeight( currentListControlsButtonFitHeight );
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load sequential icon: resources/sequential.png", e );
-		}
-		
-		try {
-			shuffleImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/shuffle.png" ).toFile() ) ) );
-			shuffleImage.setFitWidth( currentListControlsButtonFitWidth );
-			shuffleImage.setFitHeight( currentListControlsButtonFitHeight );
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load shuffle icon: resources/shuffle.png", e );
-		}
-		
-		try {
-			queueImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/queue.png" ).toFile() ) ) );
-			queueImage.setFitWidth( currentListControlsButtonFitWidth );
-			queueImage.setFitHeight( currentListControlsButtonFitHeight );
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load queue icon: resources/queue.png", e );
-		}
-		
-		try {
-			historyImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/history.png" ).toFile() ) ) );
-			historyImage.setFitWidth( currentListControlsButtonFitWidth );
-			historyImage.setFitHeight( currentListControlsButtonFitHeight );
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load history icon: resources/history.png", e );
-		}
-		
-		
-		try {
-			menuImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/menu.png" ).toFile() ) ) );
-			menuImage.setFitWidth( currentListControlsButtonFitWidth );
-			menuImage.setFitHeight( currentListControlsButtonFitHeight );
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load menu icon: resources/menu.png", e );
-		}
-		
-		try {
-			Image image = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/add.png" ).toFile() ) );
-
-			addSourceTracksImage = new ImageView ( image );
-			addSourceAlbumsImage = new ImageView ( image );
-			addSourcePlaylistsImage = new ImageView ( image );
-			
-			addSourceTracksImage.setFitWidth( currentListControlsButtonFitWidth );
-			addSourceTracksImage.setFitHeight( currentListControlsButtonFitHeight );
-			addSourceAlbumsImage.setFitWidth( currentListControlsButtonFitWidth );
-			addSourceAlbumsImage.setFitHeight( currentListControlsButtonFitHeight );
-			addSourcePlaylistsImage.setFitWidth( currentListControlsButtonFitWidth );
-			addSourcePlaylistsImage.setFitHeight( currentListControlsButtonFitHeight );
-			
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load add icon: resources/add.png", e );
-		}
-		
 		try {
 			warningAlertImageSource = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/alert-warning.png" ).toFile() ) );
 		} catch ( Exception e ) {
 			LOGGER.log( Level.WARNING, "Unable to load warning alert icon: resources/alert-warning.png", e );
 		}
-			
-		try {
-			Image clearImage = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/clear.png" ).toFile() ) );
-			
-			albumFilterClearImage = new ImageView ( clearImage );
-			trackFilterClearImage = new ImageView ( clearImage );
-			playlistFilterClearImage = new ImageView ( clearImage );
-
-			albumFilterClearImage.setFitWidth( 12 );
-			albumFilterClearImage.setFitHeight( 12 );
-			trackFilterClearImage.setFitWidth( 12 );
-			trackFilterClearImage.setFitHeight( 12 );
-			playlistFilterClearImage.setFitWidth( 12 );
-			playlistFilterClearImage.setFitHeight( 12 );
-			
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load clear icon: resources/clear.png", e );
-		}	
 	}		
 	
 	public void applyBaseTheme() {
@@ -703,24 +458,8 @@ public class FXUI implements PlayerListener {
 			jumpWindow.getScene().getStylesheets().add( darkSheet );
 			
 			transport.applyDarkTheme();
-		
-			if ( albumFilterClearImage != null ) albumFilterClearImage.setEffect( darkThemeButtons );
-			if ( trackFilterClearImage != null ) trackFilterClearImage.setEffect( darkThemeButtons );
-			if ( playlistFilterClearImage != null ) playlistFilterClearImage.setEffect( darkThemeButtons );
-			
-			if ( noRepeatImage != null ) noRepeatImage.setEffect( darkThemeButtons );
-			if ( repeatImage != null ) repeatImage.setEffect( darkThemeButtons );
-			if ( repeatOneImage != null ) repeatOneImage.setEffect( darkThemeButtons );
-			if ( sequentialImage != null ) sequentialImage.setEffect( darkThemeButtons );
-			if ( shuffleImage != null ) shuffleImage.setEffect( darkThemeButtons );
-			if ( menuImage != null ) menuImage.setEffect( darkThemeButtons );
-			if ( queueImage != null ) queueImage.setEffect( darkThemeButtons );
-			if ( historyImage != null ) historyImage.setEffect( darkThemeButtons );
-			if ( addSourceTracksImage != null ) addSourceTracksImage.setEffect( darkThemeButtons );
-			if ( addSourceAlbumsImage != null ) addSourceAlbumsImage.setEffect( darkThemeButtons );
-			if ( addSourcePlaylistsImage != null ) addSourcePlaylistsImage.setEffect( darkThemeButtons );
-			
-			currentListTable.refresh();
+			libraryPane.applyDarkTheme( darkThemeButtons );
+			currentListPane.applyDarkTheme ( darkThemeButtons );
 		}
 	}
 	
@@ -742,24 +481,8 @@ public class FXUI implements PlayerListener {
 		jumpWindow.getScene().getStylesheets().remove( darkSheet );
 		
 		transport.removeDarkTheme();
-
-		if ( albumFilterClearImage != null ) albumFilterClearImage.setEffect( null );
-		if ( trackFilterClearImage != null ) trackFilterClearImage.setEffect( null );
-		if ( playlistFilterClearImage != null ) playlistFilterClearImage.setEffect( null );
-		
-		if ( noRepeatImage != null ) noRepeatImage.setEffect( null );
-		if ( repeatImage != null ) repeatImage.setEffect( null );
-		if ( repeatOneImage != null ) repeatOneImage.setEffect( null );
-		if ( sequentialImage != null ) sequentialImage.setEffect( null );
-		if ( shuffleImage != null ) shuffleImage.setEffect( null );
-		if ( menuImage != null ) menuImage.setEffect( null );
-		if ( queueImage != null ) queueImage.setEffect( null );
-		if ( historyImage != null ) historyImage.setEffect( null );
-		if ( addSourceTracksImage != null ) addSourceTracksImage.setEffect( null );
-		if ( addSourceAlbumsImage != null ) addSourceAlbumsImage.setEffect( null );
-		if ( addSourcePlaylistsImage != null ) addSourcePlaylistsImage.setEffect( null );
-		
-		currentListTable.refresh();
+		libraryPane.removeDarkTheme();
+		currentListPane.removeDarkTheme();
 	}
 	
 	public boolean isDarkTheme() {
@@ -776,26 +499,27 @@ public class FXUI implements PlayerListener {
 	
 	public void previousRequested() {
 		if ( player.isStopped() ) {
-			currentListTable.getSelectionModel().clearAndSelect( currentListTable.getSelectionModel().getSelectedIndex() - 1 );
+			currentListPane.currentListTable.getSelectionModel().clearAndSelect( 
+					currentListPane.currentListTable.getSelectionModel().getSelectedIndex() - 1 );
 		} else {
 			player.previous();
 		}
 	}
 	
 	public Track getSelectedTrack () {
-		return currentListTable.getSelectionModel().getSelectedItem();
+		return currentListPane.currentListTable.getSelectionModel().getSelectedItem();
 	}
 	
 	public ObservableList <CurrentListTrack> getSelectedTracks () {
-		return currentListTable.getSelectionModel().getSelectedItems();
+		return currentListPane.currentListTable.getSelectionModel().getSelectedItems();
 	}
 	
 	public void setSelectedTracks ( List <CurrentListTrack> selectMe ) {
-		currentListTable.getSelectionModel().clearSelection();
+		currentListPane.currentListTable.getSelectionModel().clearSelection();
 		
 		if ( selectMe != null ) {
 			for ( CurrentListTrack track : selectMe ) {
-				currentListTable.getSelectionModel().select( track );
+				currentListPane.currentListTable.getSelectionModel().select( track );
 			}
 		}
 	}
@@ -835,14 +559,14 @@ public class FXUI implements PlayerListener {
 	
 	public void selectTrackOnCurrentList ( Track selectMe ) {
 		if ( selectMe != null ) {
-			synchronized ( currentListTable.getItems() ) {
-				int itemIndex = currentListTable.getItems().indexOf( selectMe );
+			synchronized ( currentListPane.currentListTable.getItems() ) {
+				int itemIndex = currentListPane.currentListTable.getItems().indexOf( selectMe );
 				
-				if ( itemIndex != -1 && itemIndex < currentListTable.getItems().size() ) {
-					currentListTable.requestFocus();
-					currentListTable.getSelectionModel().clearAndSelect( itemIndex );
-					currentListTable.getFocusModel().focus( itemIndex );
-					currentListTable.scrollTo( itemIndex );
+				if ( itemIndex != -1 && itemIndex < currentListPane.currentListTable.getItems().size() ) {
+					currentListPane.currentListTable.requestFocus();
+					currentListPane.currentListTable.getSelectionModel().clearAndSelect( itemIndex );
+					currentListPane.currentListTable.getFocusModel().focus( itemIndex );
+					currentListPane.currentListTable.scrollTo( itemIndex );
 				}
 			}
 			artSplitPane.setImages( selectMe );
@@ -852,7 +576,7 @@ public class FXUI implements PlayerListener {
 	//REFACTOR: This function probably belongs in Library
 	public void addToPlaylist ( List <Track> tracks, Playlist playlist ) {
 		playlist.getTracks().addAll( tracks );
-		playlistTable.refresh(); 
+		libraryPane.playlistTable.refresh(); 
 		
 		//TODO: playlist.equals ( playlist ) instead of name .equals ( name ) ?
 		if ( player.getCurrentPlaylist() != null && player.getCurrentPlaylist().getName().equals( playlist.getName() ) ) {
@@ -1007,965 +731,11 @@ public class FXUI implements PlayerListener {
 		library.removePlaylist( playlist );
 		playlist.setName ( rawName );
 		library.addPlaylist( playlist );
-		playlistTable.refresh();
+		libraryPane.playlistTable.refresh();
 		Hypnos.getPersister().saveLibraryPlaylists();
 		Hypnos.getPersister().deletePlaylistFile( oldFileBasename );
 	}
 	
-	private void updateShuffleButtonImages() {
-		switch ( player.getShuffleMode() ) {
-			
-			case SHUFFLE:
-				toggleShuffleButton.setGraphic( shuffleImage );
-				break;
-				
-			case SEQUENTIAL: //Fall through
-			default:
-				toggleShuffleButton.setGraphic( sequentialImage );
-				
-				break;
-			
-		}
-	}
-	
-	private void updateRepeatButtonImages() {
-		switch ( player.getRepeatMode() ) {
-			
-			case REPEAT:
-				toggleRepeatButton.setGraphic( repeatImage );
-				break;
-			case REPEAT_ONE_TRACK:
-				toggleRepeatButton.setGraphic( repeatOneImage );
-				break;
-				
-			default: //Fall through
-			case PLAY_ONCE:
-				toggleRepeatButton.setGraphic( noRepeatImage );
-				break;
-		}
-	}
-
-	public void setupCurrentListControlPane () {
-
-		toggleRepeatButton = new Button( );
-		toggleShuffleButton = new Button( );
-		showQueueButton = new Button ( );
-		
-		showQueueButton.setGraphic( queueImage );
-		updateRepeatButtonImages();
-		updateShuffleButtonImages();
-		
-		float width = 33;
-		float height = 26;
-		
-		toggleRepeatButton.setMinSize( width, height );
-		toggleShuffleButton.setMinSize( width, height );
-		showQueueButton.setMinSize( width, height );
-		
-		toggleRepeatButton.setPrefSize( width, height );
-		toggleShuffleButton.setPrefSize( width, height );
-		showQueueButton.setPrefSize( width, height );
-		
-		toggleRepeatButton.setTooltip( new Tooltip( "Toggle Repeat Type" ) );
-		toggleShuffleButton.setTooltip( new Tooltip( "Toggle Shuffle" ) );
-		showQueueButton.setTooltip( new Tooltip( "Show Queue" ) );
-		
-		showQueueButton.setOnAction ( new EventHandler <ActionEvent>() {
-			public void handle ( ActionEvent e ) {
-				queueWindow.show();
-			}
-		});
-		
-		player.getQueue().getData().addListener( new ListChangeListener () {
-			@Override
-			public void onChanged ( Change arg0 ) {
-				if ( player.getQueue().isEmpty() ) {
-					showQueueButton.getStyleClass().removeAll ( "queueActive" );
-				} else {
-					showQueueButton.getStyleClass().add ( "queueActive" );
-				}
-			} 
-		});
-
-		toggleRepeatButton.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				player.toggleRepeatMode();
-				updateRepeatButtonImages();
-			}
-		});
-
-		toggleShuffleButton.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				player.toggleShuffleMode();
-				updateShuffleButtonImages();
-			}
-		});
-
-		EventHandler savePlaylistHandler = new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				String playlistName = ((Playlist) ((MenuItem) event.getSource()).getUserData()).getName();
-				Playlist playlist = new Playlist( playlistName, new ArrayList <Track>( player.getCurrentList().getItems() ) );
-				library.addPlaylist( playlist );
-			}
-		};
-
-		playlistControls = new HBox();
-		playlistControls.setAlignment( Pos.CENTER_RIGHT );
-		playlistControls.setId( "playlist-controls" );
-		
-		final Label currentListLength = new Label ( "" );
-		currentListLength.setMinWidth( Region.USE_PREF_SIZE );
-		currentListLength.setPadding( new Insets ( 0, 10, 0, 0 ) );
-		
-		player.getCurrentList().getItems().addListener( new ListChangeListener () {
-			@Override
-			public void onChanged ( Change changes ) {
-				int lengthS = 0;
-				
-				for ( Track track : player.getCurrentList().getItems() ) {
-					if ( track != null ) {
-						lengthS += track.getLengthS();
-					}
-				}
-				
-				final int lengthArgument = lengthS;
-				
-				Platform.runLater( () -> {
-					currentListLength.setText( Utils.getLengthDisplay( lengthArgument ) );
-				});
-			}
-		});
-		
-		currentListTable.getSelectionModel().getSelectedIndices().addListener ( new ListChangeListener() {
-			@Override
-			public void onChanged ( Change c ) {
-				List<Integer> selected = currentListTable.getSelectionModel().getSelectedIndices();
-				
-				if ( selected.size() == 0 || selected.size() == 1 ) {
-					int lengthS = 0;
-					for ( Track track : player.getCurrentList().getItems() ) {
-						if ( track != null ) {
-							lengthS += track.getLengthS();
-						}
-					}
-					
-					final int lengthArgument = lengthS;
-					
-					Platform.runLater( () -> {
-						currentListLength.setText( Utils.getLengthDisplay( lengthArgument ) );
-					});
-					
-				} else {
-					int lengthS = 0;
-					for ( int index : selected ) {
-						if ( index >= 0 && index < player.getCurrentList().getItems().size() ) {
-							lengthS += player.getCurrentList().getItems().get( index ).getLengthS();
-						}
-					}
-					
-					final int lengthArgument = lengthS;
-					
-					Platform.runLater( () -> {
-						currentListLength.setText( Utils.getLengthDisplay( lengthArgument ) );
-					});
-					
-				}
-					
-				
-			}
-		});
-			
-		
-		final Label currentPlayingListInfo = new Label ( "" );
-		currentPlayingListInfo.setAlignment( Pos.CENTER );
-		currentPlayingListInfo.prefWidthProperty().bind( playlistControls.widthProperty() );
-		
-		player.getCurrentList().addListener( ( CurrentListState currentState ) -> {  
-			Platform.runLater( () -> {
-				currentPlayingListInfo.setText( currentState.getDisplayString() );
-			});
-		});
-		
-		final ContextMenu queueButtonMenu = new ContextMenu();
-		MenuItem clearQueue = new MenuItem ( "Clear Queue" );
-		MenuItem replaceWithQueue = new MenuItem ( "Replace list with queue" );
-		MenuItem dumpQueueBefore = new MenuItem ( "Prepend to list" );
-		MenuItem dumpQueueAfter = new MenuItem ( "Append to list" );
-		queueButtonMenu.getItems().addAll( clearQueue, replaceWithQueue, dumpQueueBefore, dumpQueueAfter );
-		showQueueButton.setContextMenu( queueButtonMenu );
-		
-		clearQueue.setOnAction(  ( ActionEvent e ) -> { player.getQueue().clear(); });
-		
-		replaceWithQueue.setOnAction( ( ActionEvent e ) -> { 
-			player.getCurrentList().clearList();
-			player.getCurrentList().appendTracks ( player.getQueue().getData() );
-			player.getQueue().clear(); 
-		});
-		
-		dumpQueueAfter.setOnAction( ( ActionEvent e ) -> { 
-			player.getCurrentList().appendTracks ( player.getQueue().getData() );
-			player.getQueue().clear(); 
-		});
-		
-		dumpQueueBefore.setOnAction( ( ActionEvent e ) -> { 
-			player.getCurrentList().insertTracks( 0, player.getQueue().getData() );
-			player.getQueue().clear(); 
-		});
-		
-		final ContextMenu shuffleButtonMenu = new ContextMenu();
-		toggleShuffleButton.setContextMenu( shuffleButtonMenu );
-		
-		MenuItem sequential = new MenuItem ( "Sequential" );
-		MenuItem shuffle = new MenuItem ( "Shuffle" );
-		MenuItem shuffleList = new MenuItem ( "Randomize List Order" );
-		shuffleButtonMenu.getItems().addAll( sequential, shuffle, shuffleList );
-		
-		sequential.setOnAction( ( actionEvent ) -> { player.setShuffleMode( ShuffleMode.SEQUENTIAL ); });
-		shuffle.setOnAction( ( actionEvent ) -> { player.setShuffleMode( ShuffleMode.SHUFFLE ); });
-		shuffleList.setOnAction( ( actionEvent ) -> { player.shuffleList(); });
-		
-		final ContextMenu repeatButtonMenu = new ContextMenu();
-		toggleRepeatButton.setContextMenu( repeatButtonMenu );
-		MenuItem noRepeat = new MenuItem ( "No Repeat" );
-		MenuItem repeatAll = new MenuItem ( "Repeat All" );
-		MenuItem repeatOne = new MenuItem ( "Repeat One Track" );
-		repeatButtonMenu.getItems().addAll( noRepeat, repeatAll, repeatOne );
-		
-		noRepeat.setOnAction( ( actionEvent ) -> { player.setRepeatMode( RepeatMode.PLAY_ONCE ); });
-		repeatAll.setOnAction( ( actionEvent ) -> { player.setRepeatMode( RepeatMode.REPEAT ); });
-		repeatOne.setOnAction( ( actionEvent ) -> { player.setRepeatMode( RepeatMode.REPEAT_ONE_TRACK ); });
-		
-		MenuButton currentListMenu = new MenuButton ( "" );
-		currentListMenu.setTooltip ( new Tooltip ( "Current List Controls" ) );
-		currentListMenu.setGraphic ( menuImage );
-		MenuItem currentListClear = new MenuItem ( "Clear" );
-		currentListSave = new MenuItem ( "Save" );
-		currentListExport = new MenuItem ( "Export" );
-		currentListLoad = new MenuItem ( "Load Files" );
-		historyMenuItem = new MenuItem ( "History" );
-		MenuItem currentListShuffle = new MenuItem ( "Shuffle" );
-		MenuItem jumpMenuItem = new MenuItem ( "Jump to Track" );
-		
-		currentListClear.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				player.getCurrentList().clearList();
-			}
-		});
-
-		historyMenuItem.setOnAction ( new EventHandler <ActionEvent>() {
-			public void handle ( ActionEvent e ) {
-				historyWindow.show();
-			}
-		});
-		
-		currentListSave.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				promptAndSavePlaylist( new ArrayList <Track>( player.getCurrentList().getItems() ) );
-			}
-		});
-		
-		currentListShuffle.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				List<Integer> selectedIndices = currentListTable.getSelectionModel().getSelectedIndices();
-				
-				if ( selectedIndices.size() < 2 ) {
-					player.shuffleList();
-					
-				} else {
-					player.getCurrentList().shuffleItems( selectedIndices );
-				}
-			}
-		});
-		
-		currentListLoad.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				FileChooser fileChooser = new FileChooser();
-				
-				ArrayList <String> filters = new ArrayList <String> ();
-				
-				for ( String ending : Utils.musicExtensions ) {
-					filters.add( "*." + ending );
-				}
-				
-				FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter( "Audio Files", filters );
-				fileChooser.getExtensionFilters().add( fileExtensions );
-				List <File> selectedFiles = fileChooser.showOpenMultipleDialog( mainStage );
-				
-				if ( selectedFiles == null ) {
-					return;
-				}
-				
-				ArrayList <Path> paths = new ArrayList <Path> ();
-				for ( File file : selectedFiles ) {
-					paths.add( file.toPath() );
-				}
-				
-				player.getCurrentList().setTracksPathList( paths );
-					
-			}
-		});
-		
-		currentListExport.setOnAction( ( ActionEvent e ) -> {
-			File targetFile = promptUserForPlaylistFile();
-			if ( targetFile == null ) {
-				return;
-			}
-			
-			CurrentListState state = player.getCurrentList().getState();
-			
-			Playlist saveMe = null; 
-		
-			switch ( state.getMode() ) {
-				case ALBUM:
-				case ALBUM_REORDERED: {
-					saveMe = new Playlist( targetFile.getName(), Utils.convertCurrentTrackList( state.getItems() ) );
-			
-				} break;
-				
-				case PLAYLIST:
-				case PLAYLIST_UNSAVED: {
-					saveMe = state.getPlaylist();
-					if ( saveMe == null ) saveMe = new Playlist( targetFile.getName() );
-					saveMe.setTracks( Utils.convertCurrentTrackList( state.getItems() ) );
-		
-				} break;
-				
-				case EMPTY:
-					break;
-				
-			}
-			
-			try {
-				saveMe.saveAs( targetFile );
-				
-			} catch ( IOException e1 ) {
-				alertUser ( AlertType.ERROR, "Warning", "Unable to save playlist.", "Unable to save the playlist to the specified location", 400 );
-			}
-		});
-		
-		jumpMenuItem.setOnAction( ( ActionEvent e ) -> {
-			jumpWindow.show();
-		});
-		
-		currentListMenu.getItems().addAll ( currentListClear, currentListShuffle, jumpMenuItem, 
-			currentListExport, currentListSave, currentListLoad, historyMenuItem );
-		
-		playlistControls.getChildren().addAll( toggleShuffleButton, toggleRepeatButton, showQueueButton,
-				currentPlayingListInfo, currentListLength, currentListMenu );
-	}
-
-	public void setupPlaylistFilterPane () {
-		playlistFilterPane = new HBox();
-		playlistFilterBox = new TextField();
-		playlistFilterBox.setPrefWidth( 500000 );
-		
-		playlistFilterBox.textProperty().addListener( ( observable, oldValue, newValue ) -> {
-			Platform.runLater( () -> {
-				library.getPlaylistsFiltered().setPredicate( playlist -> {
-					if ( newValue == null || newValue.isEmpty() ) {
-						return true;
-					}
-	
-					String[] lowerCaseFilterTokens = newValue.toLowerCase().split( "\\s+" );
-	
-					ArrayList <String> matchableText = new ArrayList <String>();
-	
-					matchableText.add( Normalizer.normalize( playlist.getName(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-					matchableText.add( playlist.getName().toLowerCase() );
-	
-					for ( String token : lowerCaseFilterTokens ) {
-						boolean tokenMatches = false;
-						for ( String test : matchableText ) {
-							if ( test.contains( token ) ) {
-								tokenMatches = true;
-							}
-						}
-	
-						if ( !tokenMatches ) {
-							return false;
-						}
-					}
-	
-					return true;
-				});
-			});
-		});
-		
-		playlistFilterBox.setOnKeyPressed( ( KeyEvent event ) -> {
-			if ( event.getCode() == KeyCode.ESCAPE ) {
-				playlistFilterBox.clear();
-			}
-		});
-		
-		double width = 33;
-		double height = 26;
-		
-		playlistFilterBox.setPrefHeight( height );
-		
-		Button libraryButton = new Button( );
-		libraryButton.setGraphic ( addSourcePlaylistsImage );
-		libraryButton.setMinSize( width, height );
-		libraryButton.setPrefSize( width, height );
-		libraryButton.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				if ( libraryLocationWindow.isShowing() ) {
-					libraryLocationWindow.hide();
-				} else {
-					libraryLocationWindow.show();
-				}
-			}
-		});
-		
-		Button clearButton = new Button ( );
-		clearButton.setGraphic( playlistFilterClearImage );
-		clearButton.setMinSize( width, height );
-		clearButton.setPrefSize( width, height );
-		clearButton.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				playlistFilterBox.setText( "" );
-			}
-		});
-		
-
-		libraryButton.setTooltip( new Tooltip( "Add or Remove Music Folders" ) );
-		playlistFilterBox.setTooltip ( new Tooltip ( "Filter/Search playlists" ) );
-		clearButton.setTooltip( new Tooltip( "Clear the filter text" ) );
-
-		playlistFilterPane.getChildren().addAll( libraryButton, playlistFilterBox, clearButton );
-	}
-
-	public void setupTrackFilterPane () {
-		trackFilterPane = new HBox();
-		trackFilterBox = new TextField();
-		trackFilterBox.setPrefWidth( 500000 );
-		
-		trackFilterBox.textProperty().addListener( new ChangeListener <String> () {
-
-			@Override
-			public void changed ( ObservableValue <? extends String> observable, String oldValue, String newValue ) {
-				Platform.runLater( () -> {
-					library.getTracksFiltered().setPredicate( track -> {
-						return acceptTrackFilterChange ( track, oldValue, newValue ); 
-					});
-				});
-			}
-		});
-		
-		trackFilterBox.setOnKeyPressed( ( KeyEvent event ) -> {
-			if ( event.getCode() == KeyCode.ESCAPE ) {
-				trackFilterBox.clear();
-			}
-		});
-		
-		double width = 33;
-		double height = 26;
-
-		trackFilterBox.setPrefHeight( height );
-		
-		Button libraryButton = new Button( );
-		libraryButton.setGraphic( addSourceTracksImage );
-		libraryButton.setMinSize( width, height );
-		libraryButton.setPrefSize( width, height );
-		libraryButton.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				if ( libraryLocationWindow.isShowing() ) {
-					libraryLocationWindow.hide();
-				} else {
-					libraryLocationWindow.show();
-				}
-			}
-		} );
-		
-		Button clearButton = new Button ( );
-		clearButton.setGraphic( trackFilterClearImage );
-		clearButton.setMinSize( width, height );
-		clearButton.setPrefSize( width, height );
-		clearButton.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				trackFilterBox.setText( "" );
-			}
-		});
-
-		libraryButton.setTooltip( new Tooltip( "Add or Remove Music Folders" ) );
-		trackFilterBox.setTooltip ( new Tooltip ( "Filter/Search tracks" ) );
-		clearButton.setTooltip( new Tooltip( "Clear the filter text" ) );
-		
-		HBox checkBoxMargins = new HBox();
-		checkBoxMargins.setPadding( new Insets ( 4, 0, 0, 6 ) );
-		checkBoxMargins.getChildren().add( trackListCheckBox );
-		
-		trackFilterPane.getChildren().addAll( libraryButton, trackFilterBox, clearButton, checkBoxMargins );
-	}
-	
-	public boolean acceptTrackFilterChange ( Track track, Object oldValue, Object newValueIn ) {
-				
-		String newValue = trackFilterBox.getText();
-		if ( newValueIn instanceof String ) {
-			newValue = (String)newValueIn;
-		}
-		
-		Boolean boxSelected = trackListCheckBox.isSelected();
-		if ( newValueIn instanceof Boolean ) {
-			boxSelected = (Boolean)newValueIn;
-		}
-			
-		if ( track.hasAlbumDirectory() && boxSelected ) {
-			return false;
-		} 
-	
-		if ( newValue == null || newValue.isEmpty() ) {
-			return true;
-		}
-		
-		String[] lowerCaseFilterTokens = newValue.toLowerCase().split( "\\s+" );
-
-		ArrayList <String> matchableText = new ArrayList <String>();
-
-		matchableText.add( Normalizer.normalize( track.getArtist(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-		matchableText.add( track.getArtist().toLowerCase() );
-		matchableText.add( Normalizer.normalize( track.getTitle(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-		matchableText.add( track.getTitle().toLowerCase() );
-		matchableText.add( Normalizer.normalize( track.getFullAlbumTitle(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-		matchableText.add( track.getFullAlbumTitle().toLowerCase() );
-
-		for ( String token : lowerCaseFilterTokens ) {
-			boolean tokenMatches = false;
-			for ( String test : matchableText ) {
-				if ( test.contains( token ) ) {
-					tokenMatches = true;
-				}
-			}
-
-			if ( !tokenMatches ) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	public void setupAlbumFilterPane () {
-		albumFilterPane = new HBox();
-		albumFilterBox = new TextField();
-		albumFilterBox.setPrefWidth( 500000 );
-		albumFilterBox.textProperty().addListener( ( observable, oldValue, newValue ) -> {
-			Platform.runLater( () -> {
-				library.getAlbumsFiltered().setPredicate( album -> {
-					if ( newValue == null || newValue.isEmpty() ) {
-						return true;
-					}
-	
-					String[] lowerCaseFilterTokens = newValue.toLowerCase().split( "\\s+" );
-	
-					ArrayList <String> matchableText = new ArrayList <String>();
-	
-					matchableText.add( 
-						Normalizer.normalize( album.getAlbumArtist(), Normalizer.Form.NFD )
-						.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() 
-					);
-					
-					matchableText.add( album.getAlbumArtist().toLowerCase() );
-					
-					matchableText.add( 
-						Normalizer.normalize( album.getFullAlbumTitle(), Normalizer.Form.NFD )
-						.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() 
-					);
-					
-					matchableText.add( album.getFullAlbumTitle().toLowerCase() );
-					
-					matchableText.add( 
-						Normalizer.normalize( album.getYear(), Normalizer.Form.NFD )
-						.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase()
-					);
-					
-					matchableText.add( album.getYear().toLowerCase() );
-	
-					for ( String token : lowerCaseFilterTokens ) {
-						boolean tokenMatches = false;
-						for ( String test : matchableText ) {
-							if ( test.contains( token ) ) {
-								tokenMatches = true;
-							}
-						}
-	
-						if ( !tokenMatches ) {
-							return false;
-						}
-					}
-	
-					return true;
-				});
-			});
-		});
-		
-		albumFilterBox.setOnKeyPressed( ( KeyEvent event ) -> {
-			if ( event.getCode() == KeyCode.ESCAPE ) {
-				albumFilterBox.clear();
-			}
-		});
-		
-		
-		float width = 33;
-		float height = 26;
-
-		albumFilterBox.setPrefHeight( height );
-		
-		Button libraryButton = new Button( );
-		libraryButton.setGraphic( addSourceAlbumsImage );
-		libraryButton.setMinSize( width, height );
-		libraryButton.setPrefSize( width, height );
-		libraryButton.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				if ( libraryLocationWindow.isShowing() ) {
-					libraryLocationWindow.hide();
-				} else {
-					libraryLocationWindow.show();
-				}
-			}
-		} );
-
-		Button clearButton = new Button( );
-		clearButton.setGraphic( albumFilterClearImage );
-		clearButton.setMinSize( width, height );
-		clearButton.setPrefSize( width, height );
-		clearButton.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				albumFilterBox.setText( "" );
-			}
-		});
-		
-
-		libraryButton.setTooltip( new Tooltip( "Add or Remove Music Folders" ) );
-		albumFilterBox.setTooltip ( new Tooltip ( "Filter/Search albums" ) );
-		clearButton.setTooltip( new Tooltip( "Clear the filter text" ) );
-
-		albumFilterPane.getChildren().addAll( libraryButton, albumFilterBox, clearButton );
-	}
-
-	public void setupTrackListCheckBox() {
-		trackListCheckBox = new CheckBox( "" );
-		trackListCheckBox.selectedProperty().addListener( new ChangeListener <Boolean> () {
-			@Override
-			public void changed( ObservableValue <? extends Boolean> observable, Boolean oldValue, Boolean newValue ) {
-				library.getTracksFiltered().setPredicate( track -> {
-					return acceptTrackFilterChange ( track, oldValue, newValue );
-				});
-			}
-		});
-		
-		trackListCheckBox.setTooltip( new Tooltip( "Only show tracks not in albums" ) );
-	}
-
-	public void setupAlbumTable () {
-		albumArtistColumn = new TableColumn( "Artist" );
-		albumYearColumn = new TableColumn( "Year" );
-		albumAlbumColumn = new TableColumn( "Album" );
-
-		albumArtistColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
-		albumAlbumColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
-
-		albumArtistColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "albumArtist" ) );
-		albumYearColumn.setCellValueFactory( new PropertyValueFactory <Album, Integer>( "year" ) );
-		
-		albumAlbumColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "FullAlbumTitle" ) );
-		albumAlbumColumn.setCellFactory( e -> new FormattedAlbumCell() );
-		
-		albumColumnSelectorMenu = new ContextMenu ();
-		CheckMenuItem artistMenuItem = new CheckMenuItem ( "Show Artist Column" );
-		CheckMenuItem yearMenuItem = new CheckMenuItem ( "Show Year Column" );
-		CheckMenuItem albumMenuItem = new CheckMenuItem ( "Show Album Column" );
-		artistMenuItem.setSelected( true );
-		yearMenuItem.setSelected( true );
-		albumMenuItem.setSelected( true );
-		albumColumnSelectorMenu.getItems().addAll( artistMenuItem, yearMenuItem, albumMenuItem );
-		albumArtistColumn.setContextMenu( albumColumnSelectorMenu );
-		albumYearColumn.setContextMenu( albumColumnSelectorMenu );
-		albumAlbumColumn.setContextMenu( albumColumnSelectorMenu );
-		artistMenuItem.selectedProperty().bindBidirectional( albumArtistColumn.visibleProperty() );
-		yearMenuItem.selectedProperty().bindBidirectional( albumYearColumn.visibleProperty() );
-		albumMenuItem.selectedProperty().bindBidirectional( albumAlbumColumn.visibleProperty() );
-
-		albumTable = new TableView();
-		albumTable.getColumns().addAll( albumArtistColumn, albumYearColumn, albumAlbumColumn );
-		albumTable.setEditable( false );
-		albumTable.setItems( library.getAlbumsSorted() );
-		albumTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
-
-		library.getAlbumsSorted().comparatorProperty().bind( albumTable.comparatorProperty() );
-		
-		albumTable.getSortOrder().add( albumArtistColumn );
-		albumTable.getSortOrder().add( albumYearColumn );
-		albumTable.getSortOrder().add( albumAlbumColumn );
-		
-		HypnosResizePolicy resizePolicy = new HypnosResizePolicy();
-		albumTable.setColumnResizePolicy( resizePolicy );
-		albumArtistColumn.setPrefWidth( 100 );
-		albumYearColumn.setPrefWidth( 60 );
-		albumAlbumColumn.setPrefWidth( 100 );
-		resizePolicy.registerFixedWidthColumns( albumYearColumn );
-		
-		emptyAlbumListLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
-		emptyAlbumListLabel.setWrapText( true );
-		emptyAlbumListLabel.setTextAlignment( TextAlignment.CENTER );
-		
-		filteredAlbumListLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
-		filteredAlbumListLabel.setWrapText( true );
-		filteredAlbumListLabel.setTextAlignment( TextAlignment.CENTER );
-		
-		albumTable.setPlaceholder( emptyAlbumListLabel );
-
-		ContextMenu contextMenu = new ContextMenu();
-		MenuItem playMenuItem = new MenuItem( "Play" );
-		MenuItem appendMenuItem = new MenuItem( "Append" );
-		MenuItem playNextMenuItem = new MenuItem( "Play Next" );
-		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
-		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
-		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
-		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
-		MenuItem infoMenuItem = new MenuItem( "Track List" );
-		
-		albumTable.setOnKeyPressed( ( KeyEvent e ) -> {
-			if ( e.getCode() == KeyCode.ESCAPE 
-			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				albumTable.getSelectionModel().clearSelection();
-				
-			} else if ( e.getCode() == KeyCode.Q 
-			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				enqueueMenuItem.fire();
-				
-			} else if ( e.getCode() == KeyCode.Q && e.isShiftDown() 
-			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
-				playNextMenuItem.fire();
-				
-			} else if ( e.getCode() == KeyCode.F2 
-			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				editTagMenuItem.fire();
-				
-			} else if ( e.getCode() == KeyCode.F3
-			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				infoMenuItem.fire();
-				
-			} else if ( e.getCode() == KeyCode.F4
-			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				browseMenuItem.fire();
-				e.consume();
-				
-			} else if ( e.getCode() == KeyCode.ENTER
-			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				playMenuItem.fire();
-				
-			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown()
-			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
-				player.getCurrentList().insertAlbums( 0,  albumTable.getSelectionModel().getSelectedItems() );
-				
-			} else if ( e.getCode() == KeyCode.ENTER && e.isControlDown() 
-			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				appendMenuItem.fire();
-				
-			}
-		});
-		
-		contextMenu.getItems().addAll( 
-			playMenuItem, appendMenuItem, playNextMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, 
-			browseMenuItem, addToPlaylistMenuItem
-		);
-		
-		MenuItem newPlaylistButton = new MenuItem( "<New>" );
-
-		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
-
-		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
-			
-			@Override
-			public void handle ( ActionEvent e ) {
-				ObservableList <Album> selectedAlbums = albumTable.getSelectionModel().getSelectedItems();
-				ArrayList <Track> tracks = new ArrayList <Track> ();
-				
-				for ( Album album : selectedAlbums ) {
-					tracks.addAll( album.getTracks() );
-				}
-				promptAndSavePlaylist ( tracks );
-			}
-		});
-
-		EventHandler addToPlaylistHandler = new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				
-				Playlist playlist = (Playlist) ((MenuItem) event.getSource()).getUserData();
-				
-				ArrayList <Album> albums = new ArrayList <Album> ( albumTable.getSelectionModel().getSelectedItems() );
-				ArrayList <Track> tracksToAdd = new ArrayList <Track> ();
-				
-				for ( Album album : albums ) {
-					tracksToAdd.addAll( album.getTracks() );
-				}
-				
-				addToPlaylist ( tracksToAdd, playlist );
-			}
-		};
-
-		library.getPlaylistSorted().addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
-			updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
-		} );
-
-		updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
-		
-		playMenuItem.setOnAction( event -> {
-			if ( okToReplaceCurrentList() ) {
-				player.getCurrentList().setAndPlayAlbums( albumTable.getSelectionModel().getSelectedItems() );
-			}
-		});
-
-		appendMenuItem.setOnAction( event -> {
-			player.getCurrentList().appendAlbums( albumTable.getSelectionModel().getSelectedItems() );
-		});
-
-		playNextMenuItem.setOnAction( event -> {
-			player.getQueue().queueAllAlbums( albumTable.getSelectionModel().getSelectedItems(), 0 );
-		});
-		
-		enqueueMenuItem.setOnAction( event -> {
-			player.getQueue().queueAllAlbums( albumTable.getSelectionModel().getSelectedItems() );
-		});
-		
-		editTagMenuItem.setOnAction( event -> {
-			List<Album> albums = albumTable.getSelectionModel().getSelectedItems();
-			ArrayList<Track> editMe = new ArrayList<Track>();
-			
-			for ( Album album : albums ) {
-				if ( album != null ) {
-					editMe.addAll( album.getTracks() );
-				}
-			}
-			
-			tagWindow.setTracks( editMe, albums, FieldKey.TRACK, FieldKey.TITLE );
-			tagWindow.show();
-		});
-		
-		infoMenuItem.setOnAction( event -> {
-			albumInfoWindow.setAlbum( albumTable.getSelectionModel().getSelectedItem() );
-			albumInfoWindow.show();
-		});
-
-		browseMenuItem.setOnAction( event -> {
-			openFileBrowser ( albumTable.getSelectionModel().getSelectedItem().getPath() );
-		});
-		
-		albumTable.setOnDragOver( event -> {
-			Dragboard db = event.getDragboard();
-			if ( db.hasFiles() ) {
-				event.acceptTransferModes( TransferMode.COPY );
-				event.consume();
-
-			}
-		});
-		
-		albumTable.setOnDragDropped( event -> {
-			Dragboard db = event.getDragboard();
-			if ( db.hasFiles() ) {
-				List <File> files = db.getFiles();
-				
-				for ( File file : files ) {
-					library.requestAddSource( file.toPath() );
-				}
-
-				event.setDropCompleted( true );
-				event.consume();
-			}
-		});
-		
-		albumTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
-			
-		    if ( newSelection != null ) {
-		    	artSplitPane.setImages ( newSelection );
-		    	albumInfoWindow.setAlbum( newSelection );
-		    	
-		    } else if ( player.getCurrentTrack() != null ) {
-		    	artSplitPane.setImages ( player.getCurrentTrack() );
-		    	
-		    } else {
-		    	//Do nothing, leave the old artwork there. We can set to null if we like that better
-		    	//I don't think so though
-		    }
-		});
-
-		albumTable.setRowFactory( tv -> {
-			TableRow <Album> row = new TableRow <>();
-			
-			row.setContextMenu( contextMenu );
-
-			row.setOnMouseClicked( event -> {
-				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					if ( okToReplaceCurrentList() ) {
-						player.getCurrentList().setAndPlayAlbum( row.getItem() );
-					}
-				}
-			} );
-
-			row.setOnDragOver( event -> {
-				Dragboard db = event.getDragboard();
-				if ( db.hasFiles() ) {
-					event.acceptTransferModes( TransferMode.COPY );
-					event.consume();
-
-				}
-			});
-			
-			row.setOnDragDropped( event -> {
-				Dragboard db = event.getDragboard();
-				if ( db.hasFiles() ) {
-					List <File> files = db.getFiles();
-					
-					for ( File file : files ) {
-						library.requestAddSource( file.toPath() );
-					}
-
-					event.setDropCompleted( true );
-					event.consume();
-				}
-			});
-
-			row.setOnDragDetected( event -> {
-				if ( !row.isEmpty() ) {
-					
-					ArrayList <Integer> indices = new ArrayList <Integer>( albumTable.getSelectionModel().getSelectedIndices() );
-					ArrayList <Album> albums = new ArrayList <Album>( albumTable.getSelectionModel().getSelectedItems() );
-					ArrayList <Track> tracks = new ArrayList <Track> ();
-					
-					for ( Album album : albums ) {
-						if ( album != null ) {
-							tracks.addAll( album.getTracks() );
-						}
-					}
-					
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( null, tracks, albums, null, DragSource.ALBUM_LIST );
-					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
-					db.setDragView( row.snapshot( null, null ) );
-					ClipboardContent cc = new ClipboardContent();
-					cc.put( DRAGGED_TRACKS, dragObject );
-					db.setContent( cc );
-					event.consume();
-				}
-			});
-
-			return row;
-		});
-	}
-
 	public void openFileBrowser ( Path path ) {
 
 		// PENDING: This is the better way once openjdk and openjfx supports it:
@@ -1983,1197 +753,6 @@ public class FXUI implements PlayerListener {
 					LOGGER.log( Level.INFO, "Unable to open native file browser.", e );
 				}
 			}
-		});
-	}
-
-	public void setupTrackTable () {
-		trackArtistColumn = new TableColumn( "Artist" );
-		trackLengthColumn = new TableColumn( "Length" );
-		trackNumberColumn = new TableColumn( "#" );
-		trackAlbumColumn = new TableColumn( "Album" );
-		trackTitleColumn = new TableColumn( "Title" );
-		
-		trackArtistColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
-		trackTitleColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
-		trackLengthColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
-
-		trackArtistColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Artist" ) );
-		trackTitleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
-		trackLengthColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "LengthDisplay" ) );
-		trackNumberColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "TrackNumber" ) );
-		trackAlbumColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "albumTitle" ) );
-		
-		trackArtistColumn.setSortType( TableColumn.SortType.ASCENDING );
-
-		trackNumberColumn.setCellFactory( column -> {
-			return new TableCell <Track, Integer>() {
-				@Override
-				protected void updateItem ( Integer value, boolean empty ) {
-					super.updateItem( value, empty );
-
-					if ( value == null || value.equals( Track.NO_TRACK_NUMBER ) || empty ) {
-						setText( null );
-					} else {
-						setText( value.toString() );
-					}
-				}
-			};
-		} );
-		
-		trackColumnSelectorMenu = new ContextMenu ();
-		CheckMenuItem artistMenuItem = new CheckMenuItem ( "Show Artist Column" );
-		CheckMenuItem albumMenuItem = new CheckMenuItem ( "Show Album Column" );
-		CheckMenuItem numberMenuItem = new CheckMenuItem ( "Show Track # Column" );
-		CheckMenuItem titleMenuItem = new CheckMenuItem ( "Show Title Column" );
-		CheckMenuItem lengthMenuItem = new CheckMenuItem ( "Show Length Column" );
-		artistMenuItem.setSelected( true );
-		albumMenuItem.setSelected( true );
-		numberMenuItem.setSelected( true );
-		titleMenuItem.setSelected( true );
-		lengthMenuItem.setSelected( true );
-		trackColumnSelectorMenu.getItems().addAll( 
-			artistMenuItem, albumMenuItem, numberMenuItem, titleMenuItem, lengthMenuItem );
-		
-		trackArtistColumn.setContextMenu( trackColumnSelectorMenu );
-		trackAlbumColumn.setContextMenu( trackColumnSelectorMenu );
-		trackTitleColumn.setContextMenu( trackColumnSelectorMenu );
-		trackNumberColumn.setContextMenu( trackColumnSelectorMenu );
-		trackLengthColumn.setContextMenu( trackColumnSelectorMenu );
-		artistMenuItem.selectedProperty().bindBidirectional( trackArtistColumn.visibleProperty() );
-		albumMenuItem.selectedProperty().bindBidirectional( trackAlbumColumn.visibleProperty() );
-		numberMenuItem.selectedProperty().bindBidirectional( trackNumberColumn.visibleProperty() );
-		titleMenuItem.selectedProperty().bindBidirectional( trackTitleColumn.visibleProperty() );
-		lengthMenuItem.selectedProperty().bindBidirectional( trackLengthColumn.visibleProperty() );
-		
-		trackTable = new TableView();
-		trackTable.getColumns().addAll( 
-			trackArtistColumn, trackAlbumColumn, trackNumberColumn, trackTitleColumn, trackLengthColumn );
-		
-		trackTable.setEditable( false );
-		trackTable.setItems( library.getTracksSorted() );
-
-		library.getTracksSorted().comparatorProperty().bind( trackTable.comparatorProperty() );
-		
-		trackTable.getSelectionModel().clearSelection();
-		trackTable.getSortOrder().add( trackArtistColumn );
-		trackTable.getSortOrder().add( trackAlbumColumn );
-		trackTable.getSortOrder().add( trackNumberColumn );
-		
-		HypnosResizePolicy resizePolicy = new HypnosResizePolicy();
-		trackTable.setColumnResizePolicy( resizePolicy );
-		trackArtistColumn.setPrefWidth( 100 );
-		trackNumberColumn.setPrefWidth( 40 );
-		trackAlbumColumn.setPrefWidth( 100 );
-		trackTitleColumn.setPrefWidth( 100 );
-		trackLengthColumn.setPrefWidth( 60 );
-		resizePolicy.registerFixedWidthColumns( trackNumberColumn, trackLengthColumn );
-		
-		emptyTrackListLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
-		emptyTrackListLabel.setWrapText( true );
-		emptyTrackListLabel.setTextAlignment( TextAlignment.CENTER );
-		trackTable.setPlaceholder( emptyTrackListLabel );
-		
-		trackTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
-
-		ContextMenu trackContextMenu = new ContextMenu();
-		MenuItem playMenuItem = new MenuItem( "Play" );
-		MenuItem playNextMenuItem = new MenuItem( "Play Next" );
-		MenuItem appendMenuItem = new MenuItem( "Append" );
-		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
-		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
-		MenuItem infoMenuItem = new MenuItem( "Info" );
-		MenuItem lyricsMenuItem = new MenuItem( "Lyrics" );
-		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
-		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
-		trackContextMenu.getItems().addAll ( 
-			playMenuItem, playNextMenuItem, appendMenuItem, enqueueMenuItem, 
-			editTagMenuItem, infoMenuItem, lyricsMenuItem, browseMenuItem, addToPlaylistMenuItem );
-		
-		MenuItem newPlaylistButton = new MenuItem( "<New>" );
-
-		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
-
-		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				promptAndSavePlaylist ( trackTable.getSelectionModel().getSelectedItems() );
-			}
-		});
-
-		EventHandler addToPlaylistHandler = new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				Playlist playlist = (Playlist) ((MenuItem) event.getSource()).getUserData();
-				addToPlaylist ( trackTable.getSelectionModel().getSelectedItems(), playlist );
-			}
-		};
-
-		library.getPlaylistSorted().addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
-			updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
-		} );
-
-		updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
-		
-		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				List <Track> selectedItems = new ArrayList <> ( trackTable.getSelectionModel().getSelectedItems() );
-				
-				if ( selectedItems.size() == 1 ) {
-					player.playItems( selectedItems );
-					
-				} else if ( selectedItems.size() > 1 ) {
-					if ( okToReplaceCurrentList() ) {
-						player.playItems( selectedItems );
-					}
-				}
-			}
-		});
-
-		appendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				player.getCurrentList().appendTracks ( trackTable.getSelectionModel().getSelectedItems() );
-			}
-		});
-		
-		playNextMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				player.getQueue().queueAllTracks( trackTable.getSelectionModel().getSelectedItems(), 0 );
-			}
-		});
-		
-		enqueueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				player.getQueue().queueAllTracks( trackTable.getSelectionModel().getSelectedItems() );
-			}
-		});
-		
-		editTagMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				List<Track> tracks = trackTable.getSelectionModel().getSelectedItems();
-				
-				tagWindow.setTracks( tracks, null );
-				tagWindow.show();
-			}
-		});
-		
-		
-		infoMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				trackInfoWindow.setTrack( trackTable.getSelectionModel().getSelectedItem() );
-				trackInfoWindow.show();
-			}
-		});
-		
-		lyricsMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				lyricsWindow.setTrack( trackTable.getSelectionModel().getSelectedItem() );
-				lyricsWindow.show();
-			}
-		});
-
-		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			// PENDING: This is the better way, once openjdk and openjfx supports
-			// it: getHostServices().showDocument(file.toURI().toString());
-			@Override
-			public void handle ( ActionEvent event ) {
-				openFileBrowser ( trackTable.getSelectionModel().getSelectedItem().getPath() );
-			}
-		});
-		
-		trackTable.setOnKeyPressed( ( KeyEvent e ) -> {
-			if ( e.getCode() == KeyCode.ESCAPE 
-			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				trackTable.getSelectionModel().clearSelection();
-				
-			} else if ( e.getCode() == KeyCode.L
-			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				lyricsMenuItem.fire();
-				
-			} else if ( e.getCode() == KeyCode.Q 
-			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				enqueueMenuItem.fire();
-				
-			} else if ( e.getCode() == KeyCode.Q && e.isShiftDown()
-			&& !e.isAltDown() && !e.isControlDown()  && !e.isMetaDown() ) {
-				playNextMenuItem.fire();
-							
-			} else if ( e.getCode() == KeyCode.F2 
-			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				editTagMenuItem.fire();
-				
-			} else if ( e.getCode() == KeyCode.F3
-			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				infoMenuItem.fire();
-				e.consume();
-				
-			} else if ( e.getCode() == KeyCode.F4
-			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				browseMenuItem.fire();
-				e.consume();
-				
-			} else if ( e.getCode() == KeyCode.ENTER
-			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				playMenuItem.fire();
-				e.consume();
-				
-			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown()
-			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
-				player.getCurrentList().insertTracks( 0, trackTable.getSelectionModel().getSelectedItems() );
-				e.consume();
-				
-			} else if ( e.getCode() == KeyCode.ENTER && e.isControlDown() 
-			&& !e.isShiftDown() && !e.isAltDown() && !e.isMetaDown() ) {
-				appendMenuItem.fire();
-				e.consume();
-			}
-		});
-		
-		trackTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
-		    if (newSelection != null) {
-		    	artSplitPane.setImages ( newSelection );
-		    	trackInfoWindow.setTrack( newSelection );
-		    	
-		    } else if ( player.getCurrentTrack() != null ) {
-		    	artSplitPane.setImages ( player.getCurrentTrack() );
-		    	
-		    } else {
-		    	//Do nothing, leave the old artwork there. We can set to null if we like that better, 
-		    	//I don't think so though
-		    }
-		});
-		
-		trackTable.setOnDragOver( event -> {
-			Dragboard db = event.getDragboard();
-			if ( db.hasFiles() ) {
-				event.acceptTransferModes( TransferMode.COPY );
-				event.consume();
-
-			}
-		});
-		
-		trackTable.setOnDragDropped( event -> {
-			Dragboard db = event.getDragboard();
-			if ( db.hasFiles() ) {
-				List <File> files = db.getFiles();
-				
-				for ( File file : files ) {
-					library.requestAddSource( file.toPath() );
-				}
-
-				event.setDropCompleted( true );
-				event.consume();
-			}
-		});
-
-		trackTable.setRowFactory( tv -> {
-			TableRow <Track> row = new TableRow <>();
-			
-			row.setContextMenu( trackContextMenu );
-			
-			row.setOnMouseClicked( event -> {
-				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					player.playTrack( row.getItem(), false );
-				}
-			});
-			
-			row.setOnDragOver( event -> {
-				Dragboard db = event.getDragboard();
-				if ( db.hasFiles() ) {
-					event.acceptTransferModes( TransferMode.COPY );
-					event.consume();
-				}
-			});
-			
-			row.setOnDragDropped( event -> {
-				Dragboard db = event.getDragboard();
-				if ( db.hasFiles() ) {
-					List <File> files = db.getFiles();
-					
-					for ( File file : files ) {
-						library.requestAddSource( file.toPath() );
-					}
-
-					event.setDropCompleted( true );
-					event.consume();
-				}
-			});
-
-			row.setOnDragDetected( event -> {
-				if ( !row.isEmpty() ) {
-					ArrayList <Integer> indices = new ArrayList <Integer>( trackTable.getSelectionModel().getSelectedIndices() );
-					ArrayList <Track> tracks = new ArrayList <Track>( trackTable.getSelectionModel().getSelectedItems() );
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, null, DragSource.TRACK_LIST );
-					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
-					db.setDragView( row.snapshot( null, null ) );
-					ClipboardContent cc = new ClipboardContent();
-					cc.put( DRAGGED_TRACKS, dragObject );
-					db.setContent( cc );
-					event.consume();
-				}
-			});
-
-			return row;
-		} );
-	}
-
-	public void setupPlaylistTable () {
-		playlistNameColumn = new TableColumn( "Playlist" );
-		playlistLengthColumn = new TableColumn( "Length" );
-		playlistTracksColumn = new TableColumn( "Tracks" );
-
-		playlistLengthColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
-		
-		//TODO: Are these the right types? Integer/String look wrong. 
-		playlistNameColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "Name" ) );
-		playlistLengthColumn.setCellValueFactory( new PropertyValueFactory <Album, Integer>( "LengthDisplay" ) );
-		playlistTracksColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "SongCount" ) );
-
-		playlistNameColumn.setSortType( TableColumn.SortType.ASCENDING );
-		
-		playlistColumnSelectorMenu = new ContextMenu ();
-		CheckMenuItem nameMenuItem = new CheckMenuItem ( "Show Name Column" );
-		CheckMenuItem tracksMenuItem = new CheckMenuItem ( "Show Tracks Column" );
-		CheckMenuItem lengthMenuItem = new CheckMenuItem ( "Show Length Column" );
-		nameMenuItem.setSelected( true );
-		tracksMenuItem.setSelected( true );
-		lengthMenuItem.setSelected( true );
-		playlistColumnSelectorMenu.getItems().addAll( nameMenuItem, tracksMenuItem, lengthMenuItem );
-		playlistNameColumn.setContextMenu( playlistColumnSelectorMenu );
-		playlistTracksColumn.setContextMenu( playlistColumnSelectorMenu );
-		playlistLengthColumn.setContextMenu( playlistColumnSelectorMenu );
-		nameMenuItem.selectedProperty().bindBidirectional( playlistNameColumn.visibleProperty() );
-		tracksMenuItem.selectedProperty().bindBidirectional( playlistTracksColumn.visibleProperty() );
-		lengthMenuItem.selectedProperty().bindBidirectional( playlistLengthColumn.visibleProperty() );
-
-		playlistTable = new TableView<Playlist>();
-		playlistTable.getColumns().addAll( playlistNameColumn, playlistTracksColumn, playlistLengthColumn );
-		playlistTable.setEditable( false );
-		playlistTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
-		playlistTable.setItems( library.getPlaylistSorted() );
-
-		library.getPlaylistSorted().comparatorProperty().bind( playlistTable.comparatorProperty() );
-
-		playlistTable.getSortOrder().add( playlistNameColumn );
-		
-		HypnosResizePolicy resizePolicy = new HypnosResizePolicy();
-		playlistTable.setColumnResizePolicy( resizePolicy );
-		playlistNameColumn.setPrefWidth( 100 );
-		playlistTracksColumn.setPrefWidth( 90 );
-		playlistLengthColumn.setPrefWidth( 90 );
-		resizePolicy.registerFixedWidthColumns( playlistTracksColumn, playlistLengthColumn );
-		
-		emptyPlaylistLabel.setWrapText( true );
-		emptyPlaylistLabel.setTextAlignment( TextAlignment.CENTER );
-		emptyPlaylistLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
-		playlistTable.setPlaceholder( emptyPlaylistLabel );
-
-		ContextMenu contextMenu = new ContextMenu();
-		MenuItem playMenuItem = new MenuItem( "Play" );
-		MenuItem appendMenuItem = new MenuItem( "Append" );		
-		MenuItem playNextMenuItem = new MenuItem( "Play Next" );
-		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
-		MenuItem renameMenuItem = new MenuItem( "Rename" );
-		MenuItem infoMenuItem = new MenuItem( "Track List" );
-		MenuItem exportMenuItem = new MenuItem( "Export" );
-		MenuItem removeMenuItem = new MenuItem( "Remove" );
-		contextMenu.getItems().addAll( playMenuItem, appendMenuItem, playNextMenuItem, enqueueMenuItem, 
-				renameMenuItem, infoMenuItem, exportMenuItem, removeMenuItem );
-
-		playMenuItem.setOnAction( ( ActionEvent event ) -> {
-			if ( okToReplaceCurrentList() ) {
-				player.getCurrentList().setAndPlayPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
-			}
-		});
-
-		appendMenuItem.setOnAction( ( ActionEvent event ) -> {
-			player.getCurrentList().appendPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
-		});
-		
-		playNextMenuItem.setOnAction( ( ActionEvent event ) -> {
-			player.getQueue().queueAllPlaylists( playlistTable.getSelectionModel().getSelectedItems(), 0 );
-		});
-		
-		enqueueMenuItem.setOnAction( ( ActionEvent event ) -> {
-			player.getQueue().queueAllPlaylists( playlistTable.getSelectionModel().getSelectedItems() );
-		});
-		
-		renameMenuItem.setOnAction( ( ActionEvent event ) -> {
-			promptAndRenamePlaylist ( playlistTable.getSelectionModel().getSelectedItem() );
-		});
-		
-		infoMenuItem.setOnAction( ( ActionEvent event ) -> {
-			playlistInfoWindow.setPlaylist ( playlistTable.getSelectionModel().getSelectedItem() );
-			playlistInfoWindow.show();
-		});
-		
-		exportMenuItem.setOnAction( ( ActionEvent event ) -> {
-			File targetFile = promptUserForPlaylistFile();
-			
-			if ( targetFile == null ) {
-				return;
-			}
-			
-			Playlist saveMe = playlistTable.getSelectionModel().getSelectedItem(); 
-			
-			if ( saveMe == null ) {
-				return;
-			}
-			
-			try {
-				saveMe.saveAs( targetFile );
-				
-			} catch ( IOException e1 ) {
-				alertUser ( AlertType.ERROR, "Warning", "Unable to save playlist.", "Unable to save the playlist to the specified location", 400 );
-			}
-			
-		});
-
-		removeMenuItem.setOnAction( ( ActionEvent event ) -> {
-			
-			List <Playlist> deleteMe = playlistTable.getSelectionModel().getSelectedItems();
-			if ( deleteMe.size() == 0 ) return;
-			
-			Alert alert = new Alert( AlertType.CONFIRMATION );
-			applyCurrentTheme( alert );
-			setAlertWindowIcon( alert );
-			double x = mainStage.getX() + mainStage.getWidth() / 2 - 220; //It'd be nice to use alert.getWidth() / 2, but it's NAN now. 
-			double y = mainStage.getY() + mainStage.getHeight() / 2 - 50;
-			
-			alert.setX( x );
-			alert.setY( y );
-			
-			alert.setTitle( "Confirm" );
-			alert.setHeaderText( "Delete Playlist Requested" );
-			String text = "Are you sure you want to delete theses playlists?\n";
-			int count = 0;
-			for ( Playlist playlist : deleteMe ) { 
-				text += "\n  " + playlist.getName(); 
-				count++;
-				if ( count > 6 ) { 
-					text += "\n  <... and more>";
-					break;
-				}
-			};
-			
-			alert.setContentText( text );
-
-			Optional <ButtonType> result = alert.showAndWait();
-			
-			if ( result.get() == ButtonType.OK ) {
-				library.removePlaylists( playlistTable.getSelectionModel().getSelectedItems() );
-				playlistTable.getSelectionModel().clearSelection();
-			}
-		});
-		
-		playlistTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
-		    if (newSelection != null) {
-		    	playlistInfoWindow.setPlaylist( newSelection );
-		    }
-		});
-
-		playlistTable.setOnKeyPressed( ( KeyEvent e ) -> {
-			if ( e.getCode() == KeyCode.ESCAPE ) {
-				playlistTable.getSelectionModel().clearSelection();
-				
-			} else if ( e.getCode() == KeyCode.F2         
-			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
-				renameMenuItem.fire();
-				
-			} else if ( e.getCode() == KeyCode.F3         
-			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
-				infoMenuItem.fire();
-				
-			} else if ( e.getCode() == KeyCode.Q
-			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
-				enqueueMenuItem.fire();
-				
-			} else if ( e.getCode() == KeyCode.Q && e.isShiftDown()
-			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
-				playNextMenuItem.fire();
-
-			}  else if ( e.getCode() == KeyCode.ENTER
-			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
-				playMenuItem.fire();
-				
-			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown()
-			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
-				player.getCurrentList().insertPlaylists ( 0, playlistTable.getSelectionModel().getSelectedItems() );
-				
-			} else if ( e.getCode() == KeyCode.ENTER && e.isControlDown()
-			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				appendMenuItem.fire();
-				
-			} else if ( e.getCode() == KeyCode.DELETE
-			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
-				removeMenuItem.fire();
-				
-			} 
-		});
-		
-		playlistTable.setOnDragOver( event -> {
-			Dragboard db = event.getDragboard();
-			if ( db.hasFiles() ) {
-				//REFACTOR: I can check for file extensions...
-				event.acceptTransferModes( TransferMode.COPY );
-				event.consume();
-			}
-		});
-		
-		playlistTable.setOnDragDropped( event -> {
-			Dragboard db = event.getDragboard();
-			if ( db.hasFiles() ) {
-				ArrayList <Playlist> playlistsToAdd = new ArrayList <Playlist> ();
-				
-				for ( File file : db.getFiles() ) {
-					Path droppedPath = Paths.get( file.getAbsolutePath() );
-					if ( Utils.isPlaylistFile ( droppedPath ) ) {
-						Playlist playlist = Playlist.loadPlaylist( droppedPath );
-						if ( playlist != null ) {
-							playlistsToAdd.add( playlist );
-						}
-					}
-				}
-				
-				if ( !playlistsToAdd.isEmpty() ) {
-					library.addPlaylists( playlistsToAdd );
-				}
-
-				event.setDropCompleted( true );
-				event.consume();
-			}
-			
-		});
-		
-		playlistTable.setRowFactory( tv -> {
-			TableRow <Playlist> row = new TableRow <>();
-			
-			row.setContextMenu ( contextMenu );
-
-			row.setOnMouseClicked( event -> {
-				if ( event.getClickCount() == 2 && !row.isEmpty() ) {
-					boolean doOverwrite = okToReplaceCurrentList();
-					if ( doOverwrite ) {
-						player.getCurrentList().setAndPlayPlaylist( row.getItem() );
-					}
-				}
-			});
-
-			row.setOnDragDetected( event -> {
-				if ( !row.isEmpty() ) {
-					List <Playlist> selectedPlaylists = playlistTable.getSelectionModel().getSelectedItems();
-					List <Track> tracks = new ArrayList <Track> ();
-					
-					List <Playlist> serializableList = new ArrayList ( selectedPlaylists );
-					
-					for ( Playlist playlist : selectedPlaylists ) {
-						tracks.addAll ( playlist.getTracks() );
-					}
-					
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( null, tracks, null, serializableList, DragSource.PLAYLIST_LIST );
-					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
-					db.setDragView( row.snapshot( null, null ) );
-					ClipboardContent cc = new ClipboardContent();
-					cc.put( DRAGGED_TRACKS, dragObject );
-					db.setContent( cc );
-					event.consume();
-				
-				}
-			});
-
-			row.setOnDragOver( event -> {
-
-				Dragboard db = event.getDragboard();
-				if ( db.hasContent( DRAGGED_TRACKS ) ) {
-					if ( !row.isEmpty() ) {
-						event.acceptTransferModes( TransferMode.COPY );
-						event.consume();
-					}
-				} else if ( db.hasFiles() ) {
-					//REFACTOR: I can check for file extensions...
-					event.acceptTransferModes( TransferMode.COPY );
-					event.consume();
-				}
-			});
-
-			row.setOnDragDropped( event -> {
-				Dragboard db = event.getDragboard();
-				if ( db.hasContent( DRAGGED_TRACKS ) ) {
-					if ( !row.isEmpty() ) {
-						DraggedTrackContainer container = (DraggedTrackContainer) db.getContent( DRAGGED_TRACKS );
-						Playlist playlist = row.getItem();
-						addToPlaylist( container.getTracks(), playlist );
-						playlistTable.refresh();
-						event.setDropCompleted( true );
-						event.consume();
-					}
-				} else if ( db.hasFiles() ) {
-					ArrayList <Playlist> playlistsToAdd = new ArrayList <Playlist> ();
-					
-					for ( File file : db.getFiles() ) {
-						Path droppedPath = Paths.get( file.getAbsolutePath() );
-						if ( Utils.isPlaylistFile ( droppedPath ) ) {
-							Playlist playlist = Playlist.loadPlaylist( droppedPath );
-							if ( playlist != null ) {
-								playlistsToAdd.add( playlist );
-							}
-						}
-					}
-					
-					if ( !playlistsToAdd.isEmpty() ) {
-						int dropIndex = row.isEmpty() ? dropIndex = library.getPlaylists().size() : row.getIndex();
-						library.addPlaylists( playlistsToAdd );
-					}
-
-					event.setDropCompleted( true );
-					event.consume();
-				}
-			});
-
-			return row;
-		});
-	}
-	
-	public void setupCurrentListTable () {
-		clPlayingColumn = new TableColumn( "" );
-		clArtistColumn = new TableColumn( "Artist" );
-		clYearColumn = new TableColumn( "Year" );
-		clAlbumColumn = new TableColumn( "Album" );
-		clTitleColumn = new TableColumn( "Title" );
-		clNumberColumn = new TableColumn( "#" );
-		clLengthColumn = new TableColumn( "Length" );
-		
-		clAlbumColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
-		clArtistColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
-		clTitleColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
-		
-		clPlayingColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, CurrentListTrackState>( "displayState" ) );
-		clArtistColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "artist" ) );
-		clYearColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, Integer>( "year" ) );
-		clAlbumColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "fullAlbumTitle" ) );
-		clTitleColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "title" ) );
-		clNumberColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, Integer>( "trackNumber" ) );
-		clLengthColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "lengthDisplay" ) );
-		
-		clAlbumColumn.setCellFactory( e -> new FormattedAlbumCell() );
-
-		clPlayingColumn.setCellFactory ( column -> { 
-				return new CurrentListTrackStateCell( this, transport.playImageSource, transport.pauseImageSource ); 
-			} 
-		);
-		
-		clNumberColumn.setCellFactory( column -> {
-			return new TableCell <CurrentListTrack, Integer>() {
-				@Override
-				protected void updateItem ( Integer value, boolean empty ) {
-					super.updateItem( value, empty );
-
-					if ( value == null || value.equals( Track.NO_TRACK_NUMBER ) || empty ) {
-						setText( null );
-					} else {
-						setText( value.toString() );
-					}
-				}
-			};
-		});
-		
-		currentListColumnSelectorMenu = new ContextMenu ();
-		CheckMenuItem playingMenuItem = new CheckMenuItem ( "Show Playing Column" );
-		CheckMenuItem artistMenuItem = new CheckMenuItem ( "Show Artist Column" );
-		CheckMenuItem yearMenuItem = new CheckMenuItem ( "Show Year Column" );
-		CheckMenuItem albumMenuItem = new CheckMenuItem ( "Show Album Column" );
-		CheckMenuItem numberMenuItem = new CheckMenuItem ( "Show Track # Column" );
-		CheckMenuItem titleMenuItem = new CheckMenuItem ( "Show Title Column" );
-		CheckMenuItem lengthMenuItem = new CheckMenuItem ( "Show Length Column" );
-		playingMenuItem.setSelected( true );
-		artistMenuItem.setSelected( true );
-		yearMenuItem.setSelected( true );
-		albumMenuItem.setSelected( true );
-		numberMenuItem.setSelected( true );
-		titleMenuItem.setSelected( true );
-		lengthMenuItem.setSelected( true );
-		currentListColumnSelectorMenu.getItems().addAll( playingMenuItem, numberMenuItem,artistMenuItem, 
-			yearMenuItem, albumMenuItem,  titleMenuItem, lengthMenuItem );
-		clPlayingColumn.setContextMenu( currentListColumnSelectorMenu );
-		clArtistColumn.setContextMenu( currentListColumnSelectorMenu );
-		clYearColumn.setContextMenu( currentListColumnSelectorMenu );
-		clAlbumColumn.setContextMenu( currentListColumnSelectorMenu );
-		clTitleColumn.setContextMenu( currentListColumnSelectorMenu );
-		clNumberColumn.setContextMenu( currentListColumnSelectorMenu );
-		clLengthColumn.setContextMenu( currentListColumnSelectorMenu );
-		playingMenuItem.selectedProperty().bindBidirectional( clPlayingColumn.visibleProperty() );
-		artistMenuItem.selectedProperty().bindBidirectional( clArtistColumn.visibleProperty() );
-		yearMenuItem.selectedProperty().bindBidirectional( clYearColumn.visibleProperty() );
-		albumMenuItem.selectedProperty().bindBidirectional( clAlbumColumn.visibleProperty() );
-		numberMenuItem.selectedProperty().bindBidirectional( clNumberColumn.visibleProperty() );
-		titleMenuItem.selectedProperty().bindBidirectional( clTitleColumn.visibleProperty() );
-		lengthMenuItem.selectedProperty().bindBidirectional( clLengthColumn.visibleProperty() );
-		
-		currentListTable = new TableView();
-		currentListTable.getColumns().addAll( clPlayingColumn, clNumberColumn, clArtistColumn, clYearColumn, clAlbumColumn, clTitleColumn, clLengthColumn );
-		currentListTable.getSortOrder().add( clNumberColumn ); 
-		currentListTable.setEditable( false );
-		currentListTable.setItems( player.getCurrentList().getItems() );
-		
-		HypnosResizePolicy resizePolicy = new HypnosResizePolicy();
-		currentListTable.setColumnResizePolicy( resizePolicy );
-		
-		currentListTable.setPlaceholder( new Label( "No tracks in playlist." ) );
-		currentListTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
-		
-		clPlayingColumn.setMaxWidth( 38 );
-		clPlayingColumn.setMinWidth( 38 );
-		clPlayingColumn.setResizable( false );
-
-		clArtistColumn.setPrefWidth( 100 );
-		clNumberColumn.setPrefWidth( 40 );
-		clYearColumn.setPrefWidth( 60 );
-		clAlbumColumn.setPrefWidth( 100 );
-		clTitleColumn.setPrefWidth( 100 );
-		clLengthColumn.setPrefWidth( 70 );
-		
-		resizePolicy.registerFixedWidthColumns( clYearColumn, clNumberColumn, clLengthColumn );
-		
-		currentListTable.setOnDragOver( event -> {
-			
-			Dragboard db = event.getDragboard();
-			
-			if ( db.hasContent( DRAGGED_TRACKS ) || db.hasFiles() ) {
-				event.acceptTransferModes( TransferMode.COPY );
-				event.consume();
-			}
-		});
-
-		currentListTable.setOnDragDropped( event -> {
-			Dragboard db = event.getDragboard();
-
-			if ( db.hasContent( DRAGGED_TRACKS ) ) {
-				//REFACTOR: This code is duplicated below. Put it in a function. 
-
-				DraggedTrackContainer container = (DraggedTrackContainer) db.getContent( DRAGGED_TRACKS );
-				
-				switch ( container.getSource() ) {
-					case TRACK_LIST:
-					case ALBUM_INFO:
-					case PLAYLIST_INFO:
-					case TAG_ERROR_LIST:
-					case HISTORY: {
-						player.getCurrentList().appendTracks ( container.getTracks() );
-					
-					} break;
-
-					case PLAYLIST_LIST: {
-						player.getCurrentList().appendPlaylists ( container.getPlaylists() );
-						
-					} break;
-					
-					case ALBUM_LIST: {
-						player.getCurrentList().appendAlbums ( container.getAlbums() );
-					} break;
-					
-					case CURRENT_LIST: {
-						//There is no meaning in dragging from an empty list to an empty list. 
-					} break;
-					
-					case QUEUE: {
-						synchronized ( player.getQueue().getData() ) {
-							List <Integer> draggedIndices = container.getIndices();
-							
-							ArrayList <Track> tracksToCopy = new ArrayList <Track> ( draggedIndices.size() );
-							for ( int index : draggedIndices ) {
-								if ( index >= 0 && index < player.getQueue().getData().size() ) {
-									Track addMe = player.getQueue().getData().get( index );
-									if ( addMe instanceof CurrentListTrack ) {
-										tracksToCopy.add( (CurrentListTrack)addMe );
-									} else {
-										CurrentListTrack newAddMe = new CurrentListTrack ( addMe );
-										player.getQueue().getData().remove ( index );
-										player.getQueue().getData().add( index, newAddMe );
-										tracksToCopy.add( newAddMe );
-									}
-								}
-							}
-							player.getCurrentList().appendTracks( tracksToCopy );
-						}
-						
-					} break;
-				}
-
-				player.getQueue().updateQueueIndexes();
-				event.setDropCompleted( true );
-				event.consume();
-
-
-		
-			} else if ( db.hasFiles() ) {
-				ArrayList <Path> tracksToAdd = new ArrayList<Path> ();
-				
-				for ( File file : db.getFiles() ) {
-					Path droppedPath = Paths.get( file.getAbsolutePath() );
-					if ( Utils.isMusicFile( droppedPath ) ) {
-						tracksToAdd.add ( droppedPath );
-						
-					} else if ( Files.isDirectory( droppedPath ) ) {
-						tracksToAdd.addAll ( Utils.getAllTracksInDirectory( droppedPath ) );
-						
-					} else if ( Utils.isPlaylistFile ( droppedPath ) ) {
-						List<Path> paths = Playlist.getTrackPaths( droppedPath );
-						tracksToAdd.addAll( paths );
-					}
-				}
-				
-				if ( !tracksToAdd.isEmpty() ) {
-					player.getCurrentList().insertTrackPathList ( 0, tracksToAdd );
-				}
-
-				event.setDropCompleted( true );
-				event.consume();
-			} 
-
-		});
-
-		ContextMenu contextMenu = new ContextMenu();
-		MenuItem playMenuItem = new MenuItem( "Play" );
-		MenuItem playNextMenuItem = new MenuItem( "Play Next" );
-		MenuItem queueMenuItem = new MenuItem( "Enqueue" );
-		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
-		MenuItem infoMenuItem = new MenuItem( "Info" );
-		MenuItem lyricsMenuItem = new MenuItem( "Lyrics" );
-		MenuItem cropMenuItem = new MenuItem( "Crop" );
-		MenuItem removeMenuItem = new MenuItem( "Remove" );
-		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
-		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
-
-		currentListTable.setOnKeyPressed( ( KeyEvent e ) -> {
-			
-			if ( e.getCode() == KeyCode.ESCAPE
-			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				currentListTable.getSelectionModel().clearSelection();
-				e.consume();
-				
-			} else if ( e.getCode() == KeyCode.DELETE      
-			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				removeMenuItem.fire();
-				e.consume();
-				
-			} else if ( e.getCode() == KeyCode.DELETE && e.isShiftDown()
-			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
-				cropMenuItem.fire();
-				e.consume();
-				
-			} else if ( e.getCode() == KeyCode.Q
-			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				queueMenuItem.fire();
-				e.consume();	
-				
-			} else if ( e.getCode() == KeyCode.Q && e.isShiftDown()
-			&& !e.isControlDown() && !e.isAltDown() && !e.isMetaDown() ) {
-				playNextMenuItem.fire();
-				e.consume();
-				
-			} else if ( e.getCode() == KeyCode.J
-			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				jumpWindow.show();
-				e.consume();
-				
-			} else if ( e.getCode() == KeyCode.L
-			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				lyricsMenuItem.fire();
-				e.consume();
-				
-			} else if ( e.getCode() == KeyCode.F2
-			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				editTagMenuItem.fire();
-				e.consume();
-				
-			} else if ( e.getCode() == KeyCode.F3
-			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				infoMenuItem.fire();
-				e.consume();
-				
-			} else if ( e.getCode() == KeyCode.F4
-			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				browseMenuItem.fire();
-				e.consume();
-				
-			} else if ( e.getCode() == KeyCode.ENTER
-			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				playMenuItem.fire();
-				e.consume();
-				
-			}
-		});
-		
-		MenuItem newPlaylistButton = new MenuItem( "<New>" );
-
-		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
-		contextMenu.getItems().addAll( 
-			playMenuItem, playNextMenuItem, queueMenuItem, editTagMenuItem, infoMenuItem, lyricsMenuItem,
-			browseMenuItem, addToPlaylistMenuItem, cropMenuItem, removeMenuItem 
-		);
-		
-		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent e ) {
-				promptAndSavePlaylist ( new ArrayList <Track> ( currentListTable.getSelectionModel().getSelectedItems() ) );
-			}
-		});
-
-		EventHandler addToPlaylistHandler = new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				Playlist playlist = (Playlist) ((MenuItem) event.getSource()).getUserData();
-				addToPlaylist ( Utils.convertCurrentTrackList ( currentListTable.getSelectionModel().getSelectedItems() ), playlist );
-			}
-		};
-
-		library.getPlaylistSorted().addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
-			updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
-		} );
-
-		updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
-
-		
-		playNextMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				player.getQueue().queueAllTracks( currentListTable.getSelectionModel().getSelectedItems(), 0 );
-			}
-		});
-		
-		queueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				player.getQueue().queueAllTracks( currentListTable.getSelectionModel().getSelectedItems() );
-			}
-		});
-		
-		editTagMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				
-				tagWindow.setTracks( (List<Track>)(List<?>)currentListTable.getSelectionModel().getSelectedItems(), null );
-				tagWindow.show();
-			}
-		});
-		
-		infoMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				trackInfoWindow.setTrack( currentListTable.getSelectionModel().getSelectedItem() );
-				trackInfoWindow.show();
-			}
-		});
-		
-		lyricsMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				lyricsWindow.setTrack( currentListTable.getSelectionModel().getSelectedItem() );
-				lyricsWindow.show();
-			}
-		});
-
-		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				player.playTrack( currentListTable.getSelectionModel().getSelectedItem() );
-			}
-		} );
-
-		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				openFileBrowser ( currentListTable.getSelectionModel().getSelectedItem().getPath() );
-			}
-		});
-		
-		removeMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				ObservableList <Integer> selectedIndexes = currentListTable.getSelectionModel().getSelectedIndices();
-				List <Integer> removeMe = new ArrayList<> ( selectedIndexes );
-				int selectAfterDelete = selectedIndexes.get( 0 ) - 1;
-				currentListTable.getSelectionModel().clearSelection();
-				removeFromCurrentList ( removeMe );
-			}
-		});
-				
-		cropMenuItem.setOnAction( new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-
-				ObservableList <Integer> selectedIndexes = currentListTable.getSelectionModel().getSelectedIndices();
-				
-				List <Integer> removeMe = new ArrayList<Integer> ( selectedIndexes );
-				for ( int k = 0; k < currentListTable.getItems().size(); k++ ) {
-					if ( !selectedIndexes.contains( k ) ) {
-						removeMe.add ( k );
-					}
-				}
-				
-				removeFromCurrentList ( removeMe );
-				currentListTable.getSelectionModel().clearSelection();
-			}
-		});
-		
-		currentListTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
-			artSplitPane.setImages ( newSelection );
-		});
-		
-		currentListTable.setRowFactory( tv -> {
-			TableRow <CurrentListTrack> row = new TableRow <>();
-			
-
-			row.setContextMenu( contextMenu );
-			
-			row.setOnMouseClicked( event -> {
-				if ( event.getClickCount() == 2 && !row.isEmpty() ) {
-					player.playTrack( row.getItem() );
-				}
-			});
-			
-			row.itemProperty().addListener( (obs, oldValue, newValue ) -> {
-				if ( newValue != null && row != null ) {
-			        if ( newValue.isMissingFile() ) {
-			            row.getStyleClass().add( "file-missing" );
-			        } else {
-			            row.getStyleClass().remove( "file-missing" );
-			        }
-				}
-		    });
-			
-			row.itemProperty().addListener( ( obs, oldValue, newTrackValue ) -> {
-				if ( newTrackValue != null  && row != null ) {
-					newTrackValue.fileIsMissingProperty().addListener( ( o, old, newValue ) -> {
-						if ( newValue ) {
-							row.getStyleClass().add( "file-missing" );
-						} else {
-							row.getStyleClass().remove( "file-missing" );
-						}
-					});
-				}
-			});
-
-			row.setOnDragDetected( event -> {
-				if ( !row.isEmpty() ) {
-					ArrayList <Integer> indices = new ArrayList <Integer>( currentListTable.getSelectionModel().getSelectedIndices() );
-					ArrayList <Track> tracks = new ArrayList <Track>( currentListTable.getSelectionModel().getSelectedItems() );
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, null, DragSource.CURRENT_LIST );
-					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
-					db.setDragView( row.snapshot( null, null ) );
-					ClipboardContent cc = new ClipboardContent();
-					cc.put( DRAGGED_TRACKS, dragObject );
-					db.setContent( cc );
-					event.consume();
-				}
-			});
-
-			row.setOnDragOver( event -> {
-				Dragboard db = event.getDragboard();
-				if ( db.hasContent( DRAGGED_TRACKS ) || db.hasFiles() ) {
-					event.acceptTransferModes( TransferMode.COPY );
-					event.consume();
-				}
-			});
-
-			row.setOnDragDropped( event -> {
-				Dragboard db = event.getDragboard();
-				if ( db.hasContent( DRAGGED_TRACKS ) ) {
-
-					DraggedTrackContainer container = (DraggedTrackContainer) db.getContent( DRAGGED_TRACKS );
-					int dropIndex = row.getIndex();
-					
-					switch ( container.getSource() ) {
-						case ALBUM_LIST: {
-							player.getCurrentList().insertAlbums( dropIndex, container.getAlbums() );
-						} break;
-						
-						case PLAYLIST_LIST:
-						case TRACK_LIST:
-						case ALBUM_INFO:
-						case PLAYLIST_INFO:
-						case TAG_ERROR_LIST:
-						case HISTORY: {
-							player.getCurrentList().insertTracks( dropIndex, Utils.convertTrackList( container.getTracks() ) );
-						} break;
-						
-						case CURRENT_LIST: {
-							List<Integer> draggedIndices = container.getIndices();
-							
-							player.getCurrentList().moveTracks ( draggedIndices, dropIndex );
-							
-							currentListTable.getSelectionModel().clearSelection();
-							for ( int k = 0; k < draggedIndices.size(); k++ ) {
-								int selectIndex = dropIndex + k;
-								if ( selectIndex < currentListTable.getItems().size() ) {
-									currentListTable.getSelectionModel().select( dropIndex + k );
-								}
-							}
-						} break;
-						
-						case QUEUE: {
-							synchronized ( player.getQueue().getData() ) {
-								List <Integer> draggedIndices = container.getIndices();
-								
-								ArrayList <CurrentListTrack> tracksToCopy = new ArrayList <CurrentListTrack> ( draggedIndices.size() );
-								for ( int index : draggedIndices ) {
-									if ( index >= 0 && index < player.getQueue().getData().size() ) {
-										Track addMe = player.getQueue().getData().get( index );
-										if ( addMe instanceof CurrentListTrack ) {
-											tracksToCopy.add( (CurrentListTrack)addMe );
-										} else {
-											CurrentListTrack newAddMe = new CurrentListTrack ( addMe );
-											player.getQueue().getData().remove ( index );
-											player.getQueue().getData().add( index, newAddMe );
-											tracksToCopy.add( newAddMe );
-										}
-									}
-								}
-								player.getCurrentList().insertTracks ( dropIndex, tracksToCopy );
-							}
-							
-						} break;
-					}
-
-					player.getQueue().updateQueueIndexes( );
-					event.setDropCompleted( true );
-					event.consume();
-
-				} else if ( db.hasFiles() ) {
-					//REFACTOR: this code is in a bunch of places. We should probably make it a function
-					ArrayList <Path> tracksToAdd = new ArrayList<Path> ();
-					
-					for ( File file : db.getFiles() ) {
-						Path droppedPath = Paths.get( file.getAbsolutePath() );
-						if ( Utils.isMusicFile( droppedPath ) ) {
-							tracksToAdd.add( droppedPath );
-						
-						} else if ( Files.isDirectory( droppedPath ) ) {
-							tracksToAdd.addAll( Utils.getAllTracksInDirectory( droppedPath ) );
-						
-						} else if ( Utils.isPlaylistFile ( droppedPath ) ) {
-							List<Path> paths = Playlist.getTrackPaths( droppedPath );
-							tracksToAdd.addAll( paths );
-						}
-					}
-					
-					if ( !tracksToAdd.isEmpty() ) {
-						int dropIndex = row.isEmpty() ? dropIndex = currentListTable.getItems().size() : row.getIndex();
-						player.getCurrentList().insertTrackPathList ( dropIndex, tracksToAdd );
-					}
-
-					event.setDropCompleted( true );
-					event.consume();
-				}
-			});
-
-			return row;
 		});
 	}
 
@@ -3200,41 +779,8 @@ public class FXUI implements PlayerListener {
 		this.libraryLocationWindow.setLoaderSpeedDisplay ( speed );
 	}
 
-	public void updateLibraryListPlaceholder() {
-
-		if ( library.getAlbums().isEmpty() ) {
-			if ( albumTable.getPlaceholder() != emptyAlbumListLabel ) {
-				albumTable.setPlaceholder( emptyAlbumListLabel );
-			}
-		} else {
-			if ( !albumTable.getPlaceholder().equals( filteredAlbumListLabel ) ) {
-				albumTable.setPlaceholder( filteredAlbumListLabel );
-			}
-		}
-		
-		if ( library.getTracks().isEmpty() ) {
-			if ( trackTable.getPlaceholder() != emptyTrackListLabel ) {
-				trackTable.setPlaceholder( emptyTrackListLabel );
-			}
-		} else {
-			if ( !trackTable.getPlaceholder().equals( filteredTrackListLabel ) ) {
-				trackTable.setPlaceholder( filteredTrackListLabel );
-			}
-		}
-		
-		if ( library.getPlaylists().isEmpty() ) {
-			if ( !playlistTable.getPlaceholder().equals( emptyPlaylistLabel ) ) {
-				playlistTable.setPlaceholder( emptyPlaylistLabel );
-			}
-		} else {
-			if ( !playlistTable.getPlaceholder().equals( filteredPlaylistLabel ) ) {
-				playlistTable.setPlaceholder( filteredPlaylistLabel );
-			}
-		}
-	}
-
 	public void setShowAlbumTracks ( final boolean newValue ) {
-		runThreadSafe ( () -> trackListCheckBox.setSelected( newValue ) );
+		runThreadSafe ( () -> libraryPane.trackListCheckBox.setSelected( newValue ) );
 	}
 	
 	public double getPrimarySplitPercent() {
@@ -3354,22 +900,11 @@ public class FXUI implements PlayerListener {
 		
 		// This stuff has to be done after show
 		transport.doAfterShowProcessing();
+		libraryPane.doAfterShowProcessing();
 		
-		Node blankPlaylistHeader = playlistTable.lookup(".column-header-background");
-		blankPlaylistHeader.setOnContextMenuRequested ( 
-			event -> playlistColumnSelectorMenu.show( blankPlaylistHeader, event.getScreenX(), event.getScreenY() ) );
-		
-		Node blankTrackHeader = trackTable.lookup(".column-header-background");
-		blankTrackHeader.setOnContextMenuRequested ( 
-			event -> trackColumnSelectorMenu.show( blankTrackHeader, event.getScreenX(), event.getScreenY() ) );
-		
-		Node blankAlbumHeader = albumTable.lookup(".column-header-background");
-		blankAlbumHeader.setOnContextMenuRequested ( 
-			event -> albumColumnSelectorMenu.show( blankAlbumHeader, event.getScreenX(), event.getScreenY() ) );
-		
-		Node blankCurrentlistHeader = currentListTable.lookup(".column-header-background");
+		Node blankCurrentlistHeader = currentListPane.currentListTable.lookup(".column-header-background");
 		blankCurrentlistHeader.setOnContextMenuRequested ( 
-			event -> currentListColumnSelectorMenu.show( blankCurrentlistHeader, event.getScreenX(), event.getScreenY() ) );
+			event -> currentListPane.currentListColumnSelectorMenu.show( blankCurrentlistHeader, event.getScreenX(), event.getScreenY() ) );
 
 		Set<Node> dividers = primarySplitPane.lookupAll(".split-pane-divider");
 		
@@ -3402,7 +937,7 @@ public class FXUI implements PlayerListener {
 			
 		hackTooltipStartTiming();
 	
-		updateLibraryListPlaceholder();
+		libraryPane.updateLibraryListPlaceholder();
 	}
 	
 	public void toggleArtPaneCollapsed() {
@@ -3431,18 +966,17 @@ public class FXUI implements PlayerListener {
 	
 	public void fixTables() {
 		Platform.runLater( () -> {
-			albumTable.refresh();
-			playlistTable.refresh();
-			trackTable.refresh();
+			libraryPane.albumTable.refresh();
+			libraryPane.playlistTable.refresh();
+			libraryPane.trackTable.refresh();
 		});
 	}
-
 
 	public EnumMap <Persister.Setting, ? extends Object> getSettings () {
 		
 		EnumMap <Persister.Setting, Object> retMe = new EnumMap <Persister.Setting, Object> ( Persister.Setting.class );
 		
-		retMe.put ( Setting.HIDE_ALBUM_TRACKS, trackListCheckBox.isSelected() );
+		retMe.put ( Setting.HIDE_ALBUM_TRACKS, libraryPane.trackListCheckBox.isSelected() );
 		
 		boolean isMaximized = isMaximized();
 		retMe.put ( Setting.WINDOW_MAXIMIZED, isMaximized );
@@ -3469,24 +1003,24 @@ public class FXUI implements PlayerListener {
 		retMe.put ( Setting.PROMPT_BEFORE_OVERWRITE, promptBeforeOverwrite.getValue() );
 		retMe.put ( Setting.THEME, theme );
 		
-		retMe.put ( Setting.AL_TABLE_SHOW_ARTIST_COLUMN, albumArtistColumn.isVisible() );
-		retMe.put ( Setting.AL_TABLE_SHOW_YEAR_COLUMN, albumYearColumn.isVisible() );
-		retMe.put ( Setting.AL_TABLE_SHOW_ALBUM_COLUMN, albumAlbumColumn.isVisible() );
-		retMe.put ( Setting.TR_TABLE_SHOW_ARTIST_COLUMN, trackArtistColumn.isVisible() );
-		retMe.put ( Setting.TR_TABLE_SHOW_NUMBER_COLUMN, trackNumberColumn.isVisible() );
-		retMe.put ( Setting.TR_TABLE_SHOW_TITLE_COLUMN, trackTitleColumn.isVisible() );
-		retMe.put ( Setting.TR_TABLE_SHOW_ALBUM_COLUMN, trackAlbumColumn.isVisible() );
-		retMe.put ( Setting.TR_TABLE_SHOW_LENGTH_COLUMN, trackLengthColumn.isVisible() );
-		retMe.put ( Setting.PL_TABLE_SHOW_PLAYLIST_COLUMN, playlistNameColumn.isVisible() );
-		retMe.put ( Setting.PL_TABLE_SHOW_TRACKS_COLUMN, playlistTracksColumn.isVisible() );
-		retMe.put ( Setting.PL_TABLE_SHOW_LENGTH_COLUMN, playlistLengthColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_SHOW_PLAYING_COLUMN, clPlayingColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_SHOW_NUMBER_COLUMN, clNumberColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_SHOW_ARTIST_COLUMN, clArtistColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_SHOW_YEAR_COLUMN, clYearColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_SHOW_ALBUM_COLUMN, clAlbumColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_SHOW_TITLE_COLUMN, clTitleColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_SHOW_LENGTH_COLUMN, clLengthColumn.isVisible() );
+		retMe.put ( Setting.AL_TABLE_SHOW_ARTIST_COLUMN, libraryPane.albumArtistColumn.isVisible() );
+		retMe.put ( Setting.AL_TABLE_SHOW_YEAR_COLUMN, libraryPane.albumYearColumn.isVisible() );
+		retMe.put ( Setting.AL_TABLE_SHOW_ALBUM_COLUMN, libraryPane.albumAlbumColumn.isVisible() );
+		retMe.put ( Setting.TR_TABLE_SHOW_ARTIST_COLUMN, libraryPane.trackArtistColumn.isVisible() );
+		retMe.put ( Setting.TR_TABLE_SHOW_NUMBER_COLUMN, libraryPane.trackNumberColumn.isVisible() );
+		retMe.put ( Setting.TR_TABLE_SHOW_TITLE_COLUMN, libraryPane.trackTitleColumn.isVisible() );
+		retMe.put ( Setting.TR_TABLE_SHOW_ALBUM_COLUMN, libraryPane.trackAlbumColumn.isVisible() );
+		retMe.put ( Setting.TR_TABLE_SHOW_LENGTH_COLUMN, libraryPane.trackLengthColumn.isVisible() );
+		retMe.put ( Setting.PL_TABLE_SHOW_PLAYLIST_COLUMN, libraryPane.playlistNameColumn.isVisible() );
+		retMe.put ( Setting.PL_TABLE_SHOW_TRACKS_COLUMN, libraryPane.playlistTracksColumn.isVisible() );
+		retMe.put ( Setting.PL_TABLE_SHOW_LENGTH_COLUMN, libraryPane.playlistLengthColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_SHOW_PLAYING_COLUMN, currentListPane.clPlayingColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_SHOW_NUMBER_COLUMN, currentListPane.clNumberColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_SHOW_ARTIST_COLUMN, currentListPane.clArtistColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_SHOW_YEAR_COLUMN, currentListPane.clYearColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_SHOW_ALBUM_COLUMN, currentListPane.clAlbumColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_SHOW_TITLE_COLUMN, currentListPane.clTitleColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_SHOW_LENGTH_COLUMN, currentListPane.clLengthColumn.isVisible() );
 
 		return retMe;
 	}
@@ -3504,23 +1038,22 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public void refreshCurrentList () {
-		for ( CurrentListTrack track : currentListTable.getItems() ) {
+		for ( CurrentListTrack track : currentListPane.currentListTable.getItems() ) {
 			try {
 				track.refreshTagData();
 			} catch ( Exception e ) {
 				track.setIsMissingFile( true ); //TODO: Do we want to make another flag or rename isMissingFile?
 			}
 		}
-		currentListTable.refresh();
+		currentListPane.currentListTable.refresh();
 	}
 	
 	public void refreshAlbumTable () {
-		albumTable.refresh();
+		libraryPane.albumTable.refresh();
 	}
 
-
 	public void refreshTrackTable () {
-		trackTable.refresh();
+		libraryPane.trackTable.refresh();
 	}
 
 	public void applySettings( EnumMap<Persister.Setting, String> settings ) {
@@ -3676,58 +1209,58 @@ public class FXUI implements PlayerListener {
 						break;
 						
 					case AL_TABLE_SHOW_ARTIST_COLUMN:
-						albumArtistColumn.setVisible( Boolean.valueOf ( value ) );
+						libraryPane.albumArtistColumn.setVisible( Boolean.valueOf ( value ) );
 						break;
 					case AL_TABLE_SHOW_YEAR_COLUMN:
-						albumYearColumn.setVisible( Boolean.valueOf ( value ) );
+						libraryPane.albumYearColumn.setVisible( Boolean.valueOf ( value ) );
 						break;
 					case AL_TABLE_SHOW_ALBUM_COLUMN:
-						albumAlbumColumn.setVisible( Boolean.valueOf ( value ) );
+						libraryPane.albumAlbumColumn.setVisible( Boolean.valueOf ( value ) );
 						break;
 					case TR_TABLE_SHOW_ARTIST_COLUMN:
-						trackArtistColumn.setVisible( Boolean.valueOf ( value ) );
+						libraryPane.trackArtistColumn.setVisible( Boolean.valueOf ( value ) );
 						break;
 					case TR_TABLE_SHOW_NUMBER_COLUMN:
-						trackNumberColumn.setVisible( Boolean.valueOf ( value ) );
+						libraryPane.trackNumberColumn.setVisible( Boolean.valueOf ( value ) );
 						break;
 					case TR_TABLE_SHOW_TITLE_COLUMN:
-						trackTitleColumn.setVisible( Boolean.valueOf ( value ) );
+						libraryPane.trackTitleColumn.setVisible( Boolean.valueOf ( value ) );
 						break;
 					case TR_TABLE_SHOW_ALBUM_COLUMN:
-						trackAlbumColumn.setVisible( Boolean.valueOf ( value ) );
+						libraryPane.trackAlbumColumn.setVisible( Boolean.valueOf ( value ) );
 						break;
 					case TR_TABLE_SHOW_LENGTH_COLUMN:
-						trackLengthColumn.setVisible( Boolean.valueOf ( value ) );
+						libraryPane.trackLengthColumn.setVisible( Boolean.valueOf ( value ) );
 						break;
 					case PL_TABLE_SHOW_PLAYLIST_COLUMN:
-						playlistNameColumn.setVisible( Boolean.valueOf ( value ) );
+						libraryPane.playlistNameColumn.setVisible( Boolean.valueOf ( value ) );
 						break;
 					case PL_TABLE_SHOW_TRACKS_COLUMN: 
-						playlistTracksColumn.setVisible( Boolean.valueOf ( value ) );
+						libraryPane.playlistTracksColumn.setVisible( Boolean.valueOf ( value ) );
 						break;
 					case PL_TABLE_SHOW_LENGTH_COLUMN:
-						playlistLengthColumn.setVisible( Boolean.valueOf ( value ) );
+						libraryPane.playlistLengthColumn.setVisible( Boolean.valueOf ( value ) );
 						break;
 					case CL_TABLE_SHOW_PLAYING_COLUMN:
-						clPlayingColumn.setVisible( Boolean.valueOf ( value ) );
+						currentListPane.clPlayingColumn.setVisible( Boolean.valueOf ( value ) );
 						break;
 					case CL_TABLE_SHOW_NUMBER_COLUMN:
-						clNumberColumn.setVisible( Boolean.valueOf ( value ) );
+						currentListPane.clNumberColumn.setVisible( Boolean.valueOf ( value ) );
 						break;
 					case CL_TABLE_SHOW_ARTIST_COLUMN:
-						clArtistColumn.setVisible( Boolean.valueOf ( value ) );
+						currentListPane.clArtistColumn.setVisible( Boolean.valueOf ( value ) );
 						break;
 					case CL_TABLE_SHOW_YEAR_COLUMN:
-						clYearColumn.setVisible( Boolean.valueOf ( value ) );
+						currentListPane.clYearColumn.setVisible( Boolean.valueOf ( value ) );
 						break;
 					case CL_TABLE_SHOW_ALBUM_COLUMN:
-						clAlbumColumn.setVisible( Boolean.valueOf ( value ) );
+						currentListPane.clAlbumColumn.setVisible( Boolean.valueOf ( value ) );
 						break;
 					case CL_TABLE_SHOW_TITLE_COLUMN:
-						clTitleColumn.setVisible( Boolean.valueOf ( value ) );
+						currentListPane.clTitleColumn.setVisible( Boolean.valueOf ( value ) );
 						break;
 					case CL_TABLE_SHOW_LENGTH_COLUMN:
-						clLengthColumn.setVisible( Boolean.valueOf ( value ) );
+						currentListPane.clLengthColumn.setVisible( Boolean.valueOf ( value ) );
 						break;
 					default:
 						//Do nothing
@@ -3773,7 +1306,7 @@ public class FXUI implements PlayerListener {
 		Platform.runLater( () -> {
 			transport.togglePlayButton.setGraphic( transport.pauseImage );
 			
-			currentListTable.refresh();
+			currentListPane.currentListTable.refresh();
 	
 			StackPane thumb = (StackPane) transport.trackPositionSlider.lookup( ".thumb" );
 			thumb.setVisible( true );
@@ -3806,7 +1339,7 @@ public class FXUI implements PlayerListener {
 	public void playerPaused () {
 		Platform.runLater( () -> {
 			transport.togglePlayButton.setGraphic( transport.playImage );
-			currentListTable.refresh(); //To get the play/pause image to update. 
+			currentListPane.currentListTable.refresh(); //To get the play/pause image to update. 
 		});
 	}
 
@@ -3815,9 +1348,8 @@ public class FXUI implements PlayerListener {
 		Platform.runLater( () -> {
 			transport.togglePlayButton.setGraphic( transport.pauseImage );
 			artSplitPane.setImages( player.getCurrentTrack() );
-			currentListTable.refresh();//To get the play/pause image to update. 
+			currentListPane.currentListTable.refresh();//To get the play/pause image to update. 
 		});
-		
 	}
 
 	@Override
@@ -3828,17 +1360,15 @@ public class FXUI implements PlayerListener {
 	@Override
 	public void playerShuffleModeChanged ( ShuffleMode newMode ) {
 		Platform.runLater( () -> {
-			updateShuffleButtonImages();
+			currentListPane.updateShuffleButtonImages();
 		});
-		
 	}
 
 	@Override
 	public void playerRepeatModeChanged ( RepeatMode newMode ) {
 		Platform.runLater( () -> {
-			updateRepeatButtonImages();
+			currentListPane.updateRepeatButtonImages();
 		});
-		
 	}
 
 	public boolean hotkeysDisabledForConfig () {
@@ -4066,81 +1596,6 @@ class LineNumbersCellFactory<T, E> implements Callback<TableColumn<T, E>, TableC
             }
         };
     }
-}
-
-class CurrentListTrackStateCell extends TableCell <CurrentListTrack, CurrentListTrackState> {
-	
-	private ImageView pauseImage, playImage;
-	private FXUI ui;
-	private boolean isDarkTheme = false;
-	
-	public CurrentListTrackStateCell ( FXUI ui, Image playImageSource, Image pauseImageSource ) {
-		this.ui = ui;
-		
-		playImage = new ImageView ( playImageSource );
-		playImage.setFitHeight( 13 );
-		playImage.setFitWidth( 13 );
-		
-		pauseImage = new ImageView ( pauseImageSource );
-		pauseImage.setFitHeight( 13 );
-		pauseImage.setFitWidth( 13 );
-
-		setContentDisplay ( ContentDisplay.LEFT );
-		setGraphicTextGap ( 2 );
-		this.setAlignment( Pos.BOTTOM_LEFT );
-	}
-	
-	protected void updateImageThemes ( ) {
-		if ( ui.isDarkTheme() && !isDarkTheme ) {
-			playImage.setEffect( ui.getDarkThemeTransportButtonsAdjust() );
-			pauseImage.setEffect( ui.getDarkThemeTransportButtonsAdjust() );
-			isDarkTheme = true;
-			
-		} else if ( !ui.isDarkTheme() && isDarkTheme ) {
-			playImage.setEffect( null );
-			pauseImage.setEffect( null );	
-			isDarkTheme = false;
-		}
-	}
-	
-	@Override
-	protected void updateItem ( CurrentListTrackState state, boolean empty ) {
-		super.updateItem( state, empty );
-		
-		updateImageThemes();
-
-		if ( state != null ) {
-			if ( state.getIsCurrentTrack() ) {
-				
-				ImageView playPauseImage = ui.player.isPaused() ? pauseImage : playImage;
-				
-				if ( state.getQueueIndices().size() > 0 ) {
-					setGraphic ( playPauseImage );
-					setText ( "+" );
-					
-				} else {
-					setGraphic ( playPauseImage );
-					setText ( null );
-				}
-
-			} else if ( state.getQueueIndices().size() == 1 ) {
-				setText ( state.getQueueIndices().get( 0 ).toString() );
-				setGraphic ( null );
-				
-			} else if ( state.getQueueIndices().size() >= 1 ) {
-				setText ( state.getQueueIndices().get( 0 ).toString() + "+" );
-				setGraphic ( null );
-				
-			} else {
-				setText ( "" );
-				setGraphic ( null );
-				
-			}
-		} else {
-			setText( null );
-			setGraphic( null );
-		}
-	}
 }
 
 class FixedOrderButtonDialog extends DialogPane {

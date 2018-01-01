@@ -1,4 +1,7 @@
 General:		
+	If you drag a playlist with links to non-existent files, put something on the list with its name or whatever. Show the item and that the file is missing. 
+	
+	If something gets dropped into config/playlists, update the UI to include it? 
 	
 	Update available notification. 
 		Show something in the UI, can be turned off
@@ -40,16 +43,10 @@ General:
 	
 	Hotkeys on tag error window table
 	
+	If the current list is big it takes forever to write to disk. Need to use zip on that too probably. 
+		2600 hours makes 10mb takes about 20s or so
+	
 	Make standalone a commandline switch instead of a java argument
-		
-	Resize Policy
-		Windowed mode, shrink window until a scrollbar appears. Maximize window so scrollbar disappears -- Scrollbar width is still accounted for
-		
-		Scrollbar width is calculated wrong by 4 pixels. I have it hardcoded, but I posted a SE question
-			https://stackoverflow.com/questions/47852175/get-full-width-of-scrollbar-for-a-tableview
-		
-		CustomResizePolicy is not called when double clicking on table header dividers to shrink wrap	
-			https://stackoverflow.com/questions/47852239/customresizepolicy-not-triggering-when-a-columns-headers-divider-is-double-cli
 
 	Tag auto fix button
 				
@@ -152,7 +149,18 @@ General:
 	
 	Look at jump windows hotkeys re queue
 	
+	Maybe add sorting of roman numerals? 
+	
 JavaFX stuff
+	Resize Policy
+		Windowed mode, shrink window until a scrollbar appears. Maximize window so scrollbar disappears -- Scrollbar width is still accounted for
+		
+		Scrollbar width is calculated wrong by 4 pixels. I have it hardcoded, but I posted a SE question
+			https://stackoverflow.com/questions/47852175/get-full-width-of-scrollbar-for-a-tableview
+		
+		CustomResizePolicy is not called when double clicking on table header dividers to shrink wrap	
+			https://stackoverflow.com/questions/47852239/customresizepolicy-not-triggering-when-a-columns-headers-divider-is-double-cli
+			
 	Double clicking on table-column dividers doesn't call resize:
 		https://stackoverflow.com/questions/47852239/customresizepolicy-not-triggering-when-a-columns-headers-divider-is-double-cli
 	

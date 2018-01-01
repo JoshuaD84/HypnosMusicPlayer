@@ -51,8 +51,6 @@ public class SingleInstanceController {
 					
 					Object dataIn = in.readObject();
 					
-					System.out.println ( dataIn.getClass().getCanonicalName() );
-					
 					if ( dataIn instanceof List ) {
 						hypnos.applyCLICommands ( (List <SocketCommand>) dataIn );
 					}
