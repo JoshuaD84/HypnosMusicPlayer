@@ -309,9 +309,12 @@ public class FXUI implements PlayerListener {
 
 			} else if ( e.getCode() == KeyCode.L && e.isShiftDown()
 			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
-				lyricsWindow.setTrack( audioSystem.getCurrentTrack() );
-				lyricsWindow.show();
-				e.consume();
+				if ( !libraryPane.trackFilterBox.isFocused() && !libraryPane.albumFilterBox.isFocused()
+				&& !libraryPane.playlistFilterBox.isFocused() ) {
+					lyricsWindow.setTrack( audioSystem.getCurrentTrack() );
+					lyricsWindow.show();
+					e.consume();
+				}
 
 			} else if ( e.getCode() == KeyCode.L && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
