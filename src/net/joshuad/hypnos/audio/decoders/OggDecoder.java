@@ -1,4 +1,4 @@
-package net.joshuad.hypnos.audio.decoders;
+ package net.joshuad.hypnos.audio.decoders;
 
 import java.io.FileNotFoundException;
 import java.util.logging.Level;

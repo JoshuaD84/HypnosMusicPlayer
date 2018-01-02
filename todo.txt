@@ -224,14 +224,8 @@ General:
 :::: Decoders ::::
 
 	Playback Problems
-		Ogg
-			seeking is done using read() instead of skip(), so it's a little slow.
-			
-			Seek doesn't seem to be working on many ogg files (all the living and the dead from test cases does work)
-				normal.ogg
-				sweet.ogg (and full anthologies albums from the beatles)
-				zombie.ogg (and full white zombie album)
-			
+		Ogg - In general OGG playback is garbage. 
+			seeking is done using read() instead of skip(), so it's slow.
 			three-silver.ogg takes a long time to load and stop. Not sure about seek.
 			
 		Wav
@@ -240,16 +234,15 @@ General:
 								I can look at downsampling: http://www.jsresources.org/examples/SampleRateConverter.html
 								
 		m4a - no known problems
-			alac.m4a doesn't work - Apple Lossless Codec? 
+			
+		Apple lossless codec (m4a) - no support
 			
 		flac - no known problems, but 24bit files give me the volume issue on at least linux
 			I can look at downsampling: http://www.jsresources.org/examples/SampleRateConverter.html
 			I'm also fine w/ how things are I think. 
 			Guessing this problem is isolated to my system and my strange sound card. 
 			
-		mp3
-			normal.mp3 and normal.wav have slightly different pitches
-			piano2.wav and piano2*.mp3 are at different pitches
+		mp3 - No known issues
 			
 		m4b	- Currently disabled in AudioPlayer.java -> getDecoder 
 			https://stackoverflow.com/questions/44750751/why-are-m4bs-playing-at-faster-speeds

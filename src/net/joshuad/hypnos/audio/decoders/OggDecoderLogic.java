@@ -251,10 +251,16 @@ public class OggDecoderLogic {
 	
 	void skipToPercent ( double percent ) {
 		try {
-			
 			long bytesToSkip = (long)(totalBytesInStream * percent);
+			System.out.println ( "Asked to skip to percent: " + percent ); //TODO: DD
+			System.out.println( "Asked to skip N bytes: " + bytesToSkip ); //TODO: DD
 			
-			encodedInput.skip( bytesToSkip );
+			int iteration = 0;
+			while ( bytesToSkip > 0 && iteration < 100 ) {
+				long bytesSkipped = encodedInput.skip( bytesToSkip );
+				bytesToSkip -= bytesSkipped;
+				iteration++;
+			}
 			
 		} catch ( Exception e ) {
 			LOGGER.log( Level.WARNING, "Unable to seek to " + percent + "% in ogg file:" + file, e );
