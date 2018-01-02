@@ -1080,7 +1080,6 @@ public class Track implements Serializable, AlbumInfoSource {
 			refreshTagData();
 	
 		} catch ( Exception e ) {
-			e.printStackTrace();
 			LOGGER.log( Level.WARNING, "Unable to save updated tag.", e );
 		}
 	}

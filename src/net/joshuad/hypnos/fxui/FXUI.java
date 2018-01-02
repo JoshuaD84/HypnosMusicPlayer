@@ -871,17 +871,16 @@ public class FXUI implements PlayerListener {
 		}
 	}
 		
-	public static void notifyUserError ( String message ) { 
-		//TODO: Make this not static so we can set the theme on it the right way and because it being static is bad. 
-		
-		Alert alert = new Alert ( AlertType.ERROR );
-		setAlertWindowIcon( alert );
-		
-		
-		alert.setTitle( "Error" );
-		alert.setContentText( message );
-		alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-		alert.showAndWait();
+	public void notifyUserError ( String message ) { 
+		Platform.runLater( () -> {
+			Alert alert = new Alert ( AlertType.ERROR );
+			setAlertWindowIcon( alert );
+			applyCurrentTheme( alert );
+			alert.setTitle( "Error" );
+			alert.setContentText( message );
+			alert.getDialogPane().setMinHeight( Region.USE_PREF_SIZE );
+			alert.showAndWait();
+		});
 	}
 
 	public void showMainWindow() {

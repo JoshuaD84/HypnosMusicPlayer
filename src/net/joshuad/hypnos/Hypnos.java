@@ -432,17 +432,17 @@ public class Hypnos extends Application {
 			} catch ( Exception e ) {
 				String message = "Unable to create config directory, data will not be saved.\n" + Hypnos.getConfigDirectory();
 				LOGGER.info( message );
-				FXUI.notifyUserError( message );
+				///TODO: Some version of a deferred ui.notifyUserError( message );
 			}
 		} else if ( !configDirectory.isDirectory() ) {
 			String message = "There is a file where the config directory should be, data will not be saved.\n" + Hypnos.getConfigDirectory();
 			LOGGER.info( message );
-			FXUI.notifyUserError( message );
+			///TODO: Some version of a deferred ui.notifyUserError( message );
 			
 		} else if ( !configDirectory.canWrite() ) {
 			String message = "Cannot write to config directory, data will not be saved.\n" + Hypnos.getConfigDirectory();
 			LOGGER.info( message );
-			FXUI.notifyUserError( message );
+			///TODO: Some version of a deferred ui.notifyUserError( message );
 		}
 	}
 	

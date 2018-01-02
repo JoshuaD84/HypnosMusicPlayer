@@ -121,7 +121,7 @@ public class ImagesPanel extends SplitPane {
 				
 				Utils.saveImageToDisk( targetFile.toPath(), imageBytes );
 			} catch ( IOException ex ) {
-				FXUI.notifyUserError ( "Unable to export image. See log for more information." );
+				ui.notifyUserError ( "Unable to export image. See log for more information." );
 				LOGGER.log( Level.WARNING, "Unable to export album image.", ex );
 			}
 		});
@@ -321,7 +321,7 @@ public class ImagesPanel extends SplitPane {
 				
 				Utils.saveImageToDisk( targetFile.toPath(), imageBytes );
 			} catch ( IOException ex ) {
-				FXUI.notifyUserError ( ex.getClass().getCanonicalName() + ": Unable to export image. See log for more information." );
+				ui.notifyUserError ( ex.getClass().getCanonicalName() + ": Unable to export image. See log for more information." );
 				LOGGER.log( Level.WARNING, "Unable to export artist image.", ex );
 			}
 		});

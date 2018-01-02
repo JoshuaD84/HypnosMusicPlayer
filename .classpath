@@ -19,5 +19,7 @@
 	<classpathentry kind="lib" path="stage/lib/commons-text-1.1.jar"/>
 	<classpathentry kind="lib" path="stage/lib/commons-lang3-3.7.jar"/>
 	<classpathentry kind="lib" path="stage/lib/jnativehook-2.0.2.jar"/>
+	<classpathentry kind="lib" path="stage/lib/mp3spi1.9.5.jar"/>
+	<classpathentry kind="lib" path="stage/lib/tritonus_share.jar"/>
 	<classpathentry kind="output" path="stage/bin"/>
 </classpath>

@@ -10,8 +10,8 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
+import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Track;
-import net.joshuad.hypnos.fxui.FXUI;
 
 public class FlacDecoder extends AbstractDecoder {
 
@@ -94,7 +94,7 @@ public class FlacDecoder extends AbstractDecoder {
 		} catch ( IOException e ) {
 			String message = "Unable to decode flac file:" + track.getPath().toString();
 			LOGGER.log( Level.WARNING, message );
-			FXUI.notifyUserError( message );
+			Hypnos.getUI().notifyUserError( message ); //TODO: inject instead of ask
 			return false;
 		}
 		
@@ -107,17 +107,17 @@ public class FlacDecoder extends AbstractDecoder {
 		} catch ( LineUnavailableException exception ) {
 			String message = "The audio output line could not be opened due to resource restrictions.";
 			LOGGER.log( Level.WARNING, message, exception );
-			FXUI.notifyUserError( message );
+			Hypnos.getUI().notifyUserError( message ); //TODO: inject instead of ask
 			return false;
 		} catch ( IllegalStateException exception ) {
 			String message = "The audio output line is already open.";
 			LOGGER.log( Level.WARNING, message, exception );
-			FXUI.notifyUserError( message );
+			Hypnos.getUI().notifyUserError( message ); //TODO: inject instead of ask
 			return false;
 		} catch ( SecurityException exception ) {
 			String message = "The audio output line could not be opened due to security restrictions.";
 			LOGGER.log( Level.WARNING, message, exception );
-			FXUI.notifyUserError( message );
+			Hypnos.getUI().notifyUserError( message ); //TODO: inject instead of ask
 			return false;
 		} 
 		
@@ -136,7 +136,7 @@ public class FlacDecoder extends AbstractDecoder {
 			} catch ( IOException e ) {
 				String message = "Unable to seek.";
 				LOGGER.log( Level.WARNING, message, e );
-				FXUI.notifyUserError( message );
+				Hypnos.getUI().notifyUserError( message ); //TODO: inject instead of ask
 			}
 			
 			clipStartTimeMS = (long)( ( track.getLengthS() * 1000 ) * seekPercent );

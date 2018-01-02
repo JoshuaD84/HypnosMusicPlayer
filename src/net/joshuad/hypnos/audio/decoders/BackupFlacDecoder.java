@@ -17,6 +17,7 @@ import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.AudioHeader;
 import org.jaudiotagger.audio.flac.FlacAudioHeader;
+import org.kc7bfi.jflac.sound.spi.FlacAudioFileReader;
 
 import net.joshuad.hypnos.Track;
 
@@ -66,7 +67,8 @@ public class BackupFlacDecoder extends AbstractDecoder {
 	@Override
 	public boolean openStreamsAt ( double seekPercent ) {
 		try {
-			encodedInput = AudioSystem.getAudioInputStream( track.getPath().toFile() );
+			FlacAudioFileReader reader = new FlacAudioFileReader();
+			encodedInput = reader.getAudioInputStream( track.getPath().toFile() );
 		} catch ( FileNotFoundException e ) {
 			LOGGER.warning( "File not found: " + track.getPath().toString() );
 			return false;

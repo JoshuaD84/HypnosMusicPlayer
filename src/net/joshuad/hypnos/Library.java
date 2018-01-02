@@ -27,7 +27,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
-import net.joshuad.hypnos.fxui.FXUI;
 
 public class Library {
 
@@ -93,7 +92,7 @@ public class Library {
 			} catch ( IOException e ) {
 				String message = "Unable to initialize file watcher, changes to file system while running won't be detected";
 				LOGGER.log( Level.WARNING, message );
-				FXUI.notifyUserError( message );
+				Hypnos.getUI().notifyUserError( message );
 			}
 		}
 	}

@@ -6,6 +6,7 @@ hypnos.jar
 /bin/
 /distribution
 /packaging/jres/*
+/music-files-broken
 build.num
 /temp
 *.flac

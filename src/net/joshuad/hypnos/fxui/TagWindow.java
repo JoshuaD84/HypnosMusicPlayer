@@ -274,7 +274,7 @@ public class TagWindow extends Stage {
 										
 										Utils.saveImageToDisk( targetFile.toPath(), imageBytes );
 									} catch ( IOException ex ) {
-										FXUI.notifyUserError ( ex.getClass().getCanonicalName() + ": Unable to export image. See log for more information." );
+										ui.notifyUserError ( ex.getClass().getCanonicalName() + ": Unable to export image. See log for more information." );
 										LOGGER.log( Level.WARNING, "Unable to export image.", ex );
 									}
 								}
