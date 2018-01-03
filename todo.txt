@@ -1,5 +1,4 @@
 General:	
-	Select Multiple Files in File Browser, Right click, open with Hypnos - Not all the tracks appear on the current list, and it doesn't start playing the first one
 
 	Current list - make one file missing rest good
 		Select all, edit tags. No content in table. 
@@ -55,9 +54,7 @@ General:
 		Maybe allow a filter for file type and lossy vs not lossy
 			Maybe just a special search text "type:mp3", "type:lossy"
 			I dunno making search box script is alot. 	
-			
-	Allow library tabs to be hidden
-	
+				
 	Drop album cover and we lose current track status on the current list
 	
 	Hotkeys on tag error window table
@@ -73,7 +70,8 @@ General:
 		sort options
 		ordering
 		
-	Bug report dialog
+	
+	Select Multiple Files in File Browser, Right click, open with Hypnos - Not all the tracks appear on the current list, and it doesn't start playing the first one
 	
 	Export playlist as a folder
 		Copy all of the music files into that folder. Prepend them with index number? 
@@ -298,3 +296,7 @@ General:
 		Test global hotkeys
 		Test Everything
 	
+
+:::: Dream List, not now ::::
+
+Bug report dialog

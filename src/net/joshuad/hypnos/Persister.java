@@ -51,7 +51,9 @@ public class Persister {
 		PL_TABLE_SHOW_PLAYLIST_COLUMN, PL_TABLE_SHOW_TRACKS_COLUMN, PL_TABLE_SHOW_LENGTH_COLUMN,
 		CL_TABLE_SHOW_PLAYING_COLUMN, CL_TABLE_SHOW_NUMBER_COLUMN, CL_TABLE_SHOW_ARTIST_COLUMN, 
 		CL_TABLE_SHOW_YEAR_COLUMN, CL_TABLE_SHOW_ALBUM_COLUMN, CL_TABLE_SHOW_TITLE_COLUMN, 
-		CL_TABLE_SHOW_LENGTH_COLUMN
+		CL_TABLE_SHOW_LENGTH_COLUMN,
+		
+		LIBRARY_TAB_ALBUMS_VISIBLE, LIBRARY_TAB_TRACKS_VISIBLE, LIBRARY_TAB_PLAYLISTS_VISIBLE
 		;
 	}
 
@@ -117,12 +119,14 @@ public class Persister {
 		}
 	}
 
-	public void loadDataBeforeShowWindow () {
+	public EnumMap <Setting, String> loadDataBeforeShowWindow () {
 		loadCurrentList();
-		loadPreWindowSettings();
+		EnumMap <Setting, String> loadMeLater = loadPreWindowSettings();
+		return loadMeLater;
 	}
 
-	public void loadDataAfterShowWindow () {
+	public void loadDataAfterShowWindow ( EnumMap <Setting, String> loadMe ) {
+		loadPostWindowSettings( loadMe );
 		loadAlbumsAndTracks();
 		loadSources();
 		loadQueue();
@@ -479,9 +483,18 @@ public class Persister {
 			LOGGER.warning( "Unable to save settings to disk, continuing." );
 		}
 	}
+	
+	public void loadPostWindowSettings ( EnumMap <Setting, String> loadMe ) {
+		ui.applySettings( loadMe );
+	}
 
-	public void loadPreWindowSettings () {
-		EnumMap <Setting, String> loadMe = new EnumMap <Setting, String>( Setting.class );
+	//TODO: There is a much better way to do this. Reorganize this code
+	// 1 -- read settings into two enum maps, return them
+	// 2 -- call loadPre
+	// 3 -- later call loadPost
+	public EnumMap <Setting, String> loadPreWindowSettings () {
+		EnumMap <Setting, String> loadMeNow = new EnumMap <Setting, String>( Setting.class );
+		EnumMap <Setting, String> loadMeLater = new EnumMap <Setting, String>( Setting.class );
 
 		try ( FileReader fileReader = new FileReader( settingsFile ); ) {
 
@@ -541,10 +554,18 @@ public class Persister {
 					case CL_TABLE_SHOW_ALBUM_COLUMN:
 					case CL_TABLE_SHOW_TITLE_COLUMN:
 					case CL_TABLE_SHOW_LENGTH_COLUMN:
-						loadMe.put( setting, value );
+					
+						loadMeNow.put( setting, value );
 						break;
 					case LOADER_SPEED:
 						Hypnos.setLoaderSpeed( LoaderSpeed.valueOf( value ) );
+						
+					case LIBRARY_TAB_ALBUMS_VISIBLE:
+					case LIBRARY_TAB_TRACKS_VISIBLE:
+					case LIBRARY_TAB_PLAYLISTS_VISIBLE:
+						loadMeLater.put( setting, value );
+						break;
+						
 					default:
 						break;
 				}
@@ -555,6 +576,8 @@ public class Persister {
 			e.printStackTrace();
 		}
 
-		ui.applySettings( loadMe );
+		ui.applySettings( loadMeNow );
+		
+		return loadMeLater;
 	}
 }

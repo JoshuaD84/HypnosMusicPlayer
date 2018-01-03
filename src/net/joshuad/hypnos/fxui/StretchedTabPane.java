@@ -22,6 +22,21 @@ public class StretchedTabPane extends TabPane {
         super(tabs);
         setUpChangeListeners();
     }
+    
+    public void fixTabs () {
+		Side side = getSide();
+		int numTabs = getTabs().size();
+		if (numTabs != 0) {
+		    if (side == Side.LEFT|| side == Side.RIGHT) {
+		        setTabMinWidth(heightProperty().intValue() / numTabs - (20));
+		        setTabMaxWidth(heightProperty().intValue() / numTabs - (20));
+		    }
+		    if (side == Side.BOTTOM || side == Side.TOP) {
+		        setTabMinWidth(widthProperty().intValue() / numTabs - (20));
+		        setTabMaxWidth(widthProperty().intValue() / numTabs - (20));
+		    }
+		}
+    }
 
     private void setUpChangeListeners() {
 
@@ -46,7 +61,7 @@ public class StretchedTabPane extends TabPane {
                }
            }
         });
-
+        
         getTabs().addListener(new ListChangeListener<Tab>() {
             public void onChanged(ListChangeListener.Change<? extends Tab> change){
                 Side side = getSide();

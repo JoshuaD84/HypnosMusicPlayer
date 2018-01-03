@@ -971,6 +971,7 @@ public class FXUI implements PlayerListener {
 			libraryPane.albumTable.refresh();
 			libraryPane.playlistTable.refresh();
 			libraryPane.trackTable.refresh();
+			libraryPane.fixTabs();
 		});
 	}
 
@@ -1023,7 +1024,10 @@ public class FXUI implements PlayerListener {
 		retMe.put ( Setting.CL_TABLE_SHOW_ALBUM_COLUMN, currentListPane.clAlbumColumn.isVisible() );
 		retMe.put ( Setting.CL_TABLE_SHOW_TITLE_COLUMN, currentListPane.clTitleColumn.isVisible() );
 		retMe.put ( Setting.CL_TABLE_SHOW_LENGTH_COLUMN, currentListPane.clLengthColumn.isVisible() );
-
+		retMe.put ( Setting.LIBRARY_TAB_ALBUMS_VISIBLE, libraryPane.getTabs().contains( libraryPane.libraryAlbumTab ) );
+		retMe.put ( Setting.LIBRARY_TAB_TRACKS_VISIBLE, libraryPane.getTabs().contains( libraryPane.libraryTrackTab ) );
+		retMe.put ( Setting.LIBRARY_TAB_PLAYLISTS_VISIBLE, libraryPane.getTabs().contains( libraryPane.libraryPlaylistTab ) );
+		
 		return retMe;
 	}
 
@@ -1263,6 +1267,18 @@ public class FXUI implements PlayerListener {
 						break;
 					case CL_TABLE_SHOW_LENGTH_COLUMN:
 						currentListPane.clLengthColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+						
+					case LIBRARY_TAB_ALBUMS_VISIBLE:
+						libraryPane.setAlbumsVisible( Boolean.valueOf ( value ) );
+						break;
+						
+					case LIBRARY_TAB_TRACKS_VISIBLE:
+						libraryPane.setTracksVisible( Boolean.valueOf ( value ) );
+						break;
+						
+					case LIBRARY_TAB_PLAYLISTS_VISIBLE:
+						libraryPane.setPlaylistsVisible( Boolean.valueOf ( value ) );
 						break;
 					default:
 						//Do nothing

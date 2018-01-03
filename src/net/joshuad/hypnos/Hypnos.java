@@ -714,11 +714,12 @@ public class Hypnos extends Application {
 				switch ( getOS() ) {
 					case NIX:
 					case OSX: {
-						persister.loadDataBeforeShowWindow();
+						EnumMap <Setting, String> loadMeLater = persister.loadDataBeforeShowWindow();
 						ui.showMainWindow();
-						persister.loadDataAfterShowWindow();
 						
 						Thread finishLoadingThread = new Thread ( () -> {
+
+							Platform.runLater( () -> persister.loadDataAfterShowWindow( loadMeLater ) );
 							player.start();
 							
 							applyCLICommands( commands );
@@ -748,8 +749,8 @@ public class Hypnos extends Application {
 					case WIN_VISTA:
 					case WIN_XP:
 					default: {
-						persister.loadDataBeforeShowWindow();
-						persister.loadDataAfterShowWindow();
+						EnumMap <Setting, String> loadMeLater = persister.loadDataBeforeShowWindow();
+						persister.loadDataAfterShowWindow( loadMeLater );
 						
 						player.start();
 						

@@ -86,9 +86,14 @@ public class LibraryTabPane extends StretchedTabPane {
 	HBox playlistFilterPane;
 	
 	ContextMenu playlistColumnSelectorMenu, trackColumnSelectorMenu, albumColumnSelectorMenu;
+	ContextMenu tabMenu;
 	TableColumn playlistNameColumn, playlistLengthColumn, playlistTracksColumn;
 	TableColumn trackArtistColumn, trackLengthColumn, trackNumberColumn, trackAlbumColumn, trackTitleColumn;
 	TableColumn albumArtistColumn, albumYearColumn, albumAlbumColumn;
+	
+	CheckMenuItem showAlbums; 
+	CheckMenuItem showTracks;
+	CheckMenuItem showPlaylists;
 	
 	Label emptyPlaylistLabel = new Label( 
 		"You haven't created any playlists, make a playlist on the right and click the save button." );
@@ -171,9 +176,112 @@ public class LibraryTabPane extends StretchedTabPane {
 				trackTabTooltip.setText( "Track Count: " + library.getTracks().size() );
 			}
 		});
+		
+		tabMenu = new ContextMenu();
+		showAlbums = new CheckMenuItem ( "Albums" );
+		showTracks = new CheckMenuItem ( "Tracks" );
+		showPlaylists = new CheckMenuItem ( "Playlists" );
+		tabMenu.getItems().addAll( showAlbums, showTracks, showPlaylists );
+
+		showAlbums.setSelected( true );
+		showTracks.setSelected( true );
+		showPlaylists.setSelected( true );
+		
+		showAlbums.selectedProperty().addListener( ( observable, oldValue, newValue ) -> {
+			setAlbumsVisible ( newValue );
+		});
+		
+		showTracks.selectedProperty().addListener( ( observable, oldValue, newValue ) -> {
+			setTracksVisible ( newValue );
+		});
+		
+		showPlaylists.selectedProperty().addListener( ( observable, oldValue, newValue ) -> {
+			setPlaylistsVisible ( newValue );
+		});
+		
+		libraryAlbumTab.setContextMenu( tabMenu );
+		libraryTrackTab.setContextMenu( tabMenu );
+		libraryPlaylistTab.setContextMenu( tabMenu );
 
 		getTabs().addAll( libraryAlbumTab, libraryTrackTab, libraryPlaylistTab );
 		setSide( Side.BOTTOM );
+		setStyle("-fx-open-tab-animation: NONE; -fx-close-tab-animation: NONE;");
+		
+	}
+	
+	private void fixTabOrder() {
+		List<Tab> tabs = this.getTabs();
+		List<Tab> reorderedTabs = new ArrayList<> ( tabs.size() );
+		
+		int index = 0;
+		if ( tabs.contains( libraryAlbumTab ) ) {
+			reorderedTabs.add( index++, libraryAlbumTab );
+		}
+
+		if ( tabs.contains( libraryTrackTab ) ) {
+			reorderedTabs.add( index++, libraryTrackTab );
+		}
+		
+		if ( tabs.contains( libraryPlaylistTab ) ) {
+			reorderedTabs.add( index++, libraryPlaylistTab );
+		}
+		
+		this.getTabs().clear();
+		getTabs().addAll( reorderedTabs );
+	}
+	
+	public void setAlbumsVisible ( boolean visible ) {
+		if ( visible ) {
+			if ( !getTabs().contains( libraryAlbumTab ) ) {
+				getTabs().add( libraryAlbumTab );
+				showAlbums.setSelected( true );
+				fixTabOrder();
+			}
+		} else {
+			if ( this.getTabs().size() >= 2 ) {
+				getTabs().remove( libraryAlbumTab );
+				fixTabOrder();
+				showAlbums.setSelected( false );
+			} else {
+				showAlbums.setSelected( true );
+			}
+		}
+	}
+	
+	public void setTracksVisible ( boolean visible ) {
+		if ( visible ) {
+			if ( !getTabs().contains( libraryTrackTab ) ) {
+				getTabs().add( libraryTrackTab );
+				showTracks.setSelected( true );
+				fixTabOrder();
+			}
+		} else {
+			if ( this.getTabs().size() >= 2 ) {
+				getTabs().remove( libraryTrackTab );
+				showTracks.setSelected( false );
+				fixTabOrder();
+			} else {
+				showTracks.setSelected( true );
+			}
+		}
+	}
+	
+	public void setPlaylistsVisible ( boolean visible ) {
+		if ( visible ) {
+			if ( !getTabs().contains( libraryPlaylistTab ) ) {
+				getTabs().add( libraryPlaylistTab );
+				showPlaylists.setSelected( true );
+				fixTabOrder();
+			}
+		} else {
+			if ( this.getTabs().size() >= 2 ) {
+				getTabs().remove( libraryPlaylistTab );
+				showPlaylists.setSelected( false );
+				fixTabOrder();
+			} else {
+				showPlaylists.setSelected( true );
+			}
+		}
 	}
 	
 	private void loadImages() {
@@ -1520,7 +1628,6 @@ public class LibraryTabPane extends StretchedTabPane {
 		Node blankAlbumHeader = albumTable.lookup(".column-header-background");
 		blankAlbumHeader.setOnContextMenuRequested ( 
 			event -> albumColumnSelectorMenu.show( blankAlbumHeader, event.getScreenX(), event.getScreenY() ) );
-		
 	}
 
 	public void applyDarkTheme ( ColorAdjust buttonColor ) {
