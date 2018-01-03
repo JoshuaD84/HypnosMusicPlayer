@@ -140,6 +140,8 @@ public abstract class AbstractDecoder {
 		}
 	}
 	
+	private boolean notifiedUserVolumeError = false;
+	
 	public void setVolumePercent ( double percent ) throws IllegalArgumentException {
 		
 		if ( audioOutput == null ) {
@@ -156,7 +158,12 @@ public abstract class AbstractDecoder {
 			setVolume ( masterGain, percent );
 			
 		} else {
-			throw new IllegalArgumentException( "Volume Control not supported by system for this audio format." );
+			if ( !notifiedUserVolumeError ) {
+				notifiedUserVolumeError = true;
+				throw new IllegalArgumentException( "Volume Control not supported by system for this audio format." );
+			} else {
+				LOGGER.info( "Cannot set volume, volume control is not supported by system for this audio format." );
+			}
 		}
 	}
 	

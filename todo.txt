@@ -1,4 +1,4 @@
-General:
+General:	
 	Select Multiple Files in File Browser, Right click, open with Hypnos - Not all the tracks appear on the current list, and it doesn't start playing the first one
 
 	Current list - make one file missing rest good
@@ -157,7 +157,6 @@ General:
 		
 	Windows - Volume takes a split second to change. 	
 		
-	If you try to change the volume on a no-volume-change track using hotkeys, you get the notification. i don't think that's necessary, just don't change it.
 
 	Playlist browse issues
 		? Add right click > browse and F4 to playlist table -- show playlist folder  
@@ -169,6 +168,23 @@ General:
 	Look at jump windows hotkeys re queue
 	
 	Maybe add sorting of roman numerals? 
+	
+	Using Java 9 to launch hypnos
+		WARNING: An illegal reflective access operation has occurred
+		WARNING: Illegal reflective access by net.joshuad.hypnos.Hypnos (file:/home/joshua/workbench/hypnos-9-test/hypnos.jar) to field java.lang.ClassLoader.sys_paths
+		WARNING: Please consider reporting this to the maintainers of net.joshuad.hypnos.Hypnos
+		WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+		WARNING: All illegal access operations will be denied in a future release
+		
+:::: Lyric Failures ::::
+	
+	Jenny Lewis with the Watson Twins - Handle with Care
+		Empty result from Musix
+		
+	Vangelis - Memory of Antarctica
+		False positive Genius Lyrics
+	
+	
 	
 :::: JavaFX stuff ::::
 
@@ -198,10 +214,12 @@ General:
 	
 	While loading the library, the table view scrolls a little bit. 
 		https://stackoverflow.com/questions/47950917/stop-tableview-small-scroll-when-adding-content-to-bottom-of-table
+		1/2/18 - Bug submitted to bugs.java.com
 	
 	Tiny drop shadow on transport buttons when in dark theme. It's the line HBox, VBox, #transport { ... -fx-background-color: #222222 ... }
 		
 	Inconsistent eyEvent consumption - https://stackoverflow.com/questions/48054928/inconsistent-keyevent-consumption-by-textfield
+		Resolved in java 9 apparently
 	
 :::: Refactor / organize my code ::::
 

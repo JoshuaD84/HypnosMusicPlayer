@@ -898,7 +898,7 @@ public class FXUI implements PlayerListener {
 			mainStage.setHeight( screenSize.getHeight() * .8f );
 		}
 		
-		mainStage.show();
+		mainStage.show(); //PENDING: This is where I get a crash with oracle's java 9, no info and can't catch it. 
 		
 		// This stuff has to be done after show
 		transport.doAfterShowProcessing();
