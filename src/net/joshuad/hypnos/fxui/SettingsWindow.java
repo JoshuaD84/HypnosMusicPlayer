@@ -67,13 +67,13 @@ import javafx.stage.WindowEvent;
 import net.joshuad.hypnos.CurrentList.DefaultRepeatMode;
 import net.joshuad.hypnos.CurrentList.DefaultShuffleMode;
 import net.joshuad.hypnos.Hypnos;
-import net.joshuad.hypnos.Hypnos.OS;
 import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.Playlist;
-import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
-import net.joshuad.hypnos.hotkeys.GlobalHotkeys.Hotkey;
 import net.joshuad.hypnos.TagError;
 import net.joshuad.hypnos.Track;
+import net.joshuad.hypnos.Hypnos.OS;
+import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
+import net.joshuad.hypnos.hotkeys.GlobalHotkeys.Hotkey;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 

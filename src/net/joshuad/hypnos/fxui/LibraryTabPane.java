@@ -57,12 +57,12 @@ import javafx.scene.text.TextAlignment;
 import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.AlphanumComparator;
 import net.joshuad.hypnos.Hypnos;
+import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.AlphanumComparator.CaseHandling;
-import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 
 public class LibraryTabPane extends StretchedTabPane {

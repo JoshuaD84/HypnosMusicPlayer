@@ -57,10 +57,10 @@ import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.MultiFileImageTagPair;
-import net.joshuad.hypnos.MultiFileImageTagPair.ImageFieldKey;
 import net.joshuad.hypnos.MultiFileTextTagPair;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
+import net.joshuad.hypnos.MultiFileImageTagPair.ImageFieldKey;
 
 
 @SuppressWarnings("rawtypes")

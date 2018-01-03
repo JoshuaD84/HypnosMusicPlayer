@@ -35,8 +35,8 @@ import javafx.stage.FileChooser;
 import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
-import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.Track.ArtistTagImagePriority;
+import net.joshuad.hypnos.audio.AudioSystem;
 
 public class ImagesPanel extends SplitPane {
 	private static final Logger LOGGER = Logger.getLogger( ImagesPanel.class.getName() );

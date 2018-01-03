@@ -47,11 +47,11 @@ public class Library {
 	final ObservableList <Album> albums = FXCollections.observableArrayList( new ArrayList <Album>() );
 	final FilteredList <Album> albumsFiltered = new FilteredList <Album>( albums, p -> true );
 	final SortedList <Album> albumsSorted = new SortedList <Album>( albumsFiltered );
-
+    
 	final ObservableList <Track> tracks = FXCollections.observableArrayList( new ArrayList <Track>() );
 	final FilteredList <Track> tracksFiltered = new FilteredList <Track>( tracks, p -> true );
 	final SortedList <Track> tracksSorted = new SortedList <Track>( tracksFiltered );
-
+    
 	final ObservableList <Playlist> playlists = FXCollections.observableArrayList( new ArrayList <Playlist>() );
 	final FilteredList <Playlist> playlistsFiltered = new FilteredList <Playlist>( playlists, p -> true );
 	final SortedList <Playlist> playlistsSorted = new SortedList <Playlist>( playlistsFiltered );
@@ -65,11 +65,11 @@ public class Library {
 	Vector <Album> albumsToAdd = new Vector <Album>();
 	Vector <Album> albumsToRemove = new Vector <Album>();
 	Vector <Album> albumsToUpdate = new Vector <Album>();
-
+    
 	Vector <Track> tracksToAdd = new Vector <Track>();
 	Vector <Track> tracksToRemove = new Vector <Track>();
 	Vector <Track> tracksToUpdate = new Vector <Track>();
-
+    
 	Vector <Playlist> playlistsToAdd = new Vector <Playlist>();
 	Vector <Playlist> playlistsToRemove = new Vector <Playlist>();
 	Vector <Playlist> playlistsToUpdate = new Vector <Playlist>();
@@ -252,7 +252,7 @@ public class Library {
 		}
 	}
 	
-	void addAlbum ( Album album ) {
+	public void addAlbum ( Album album ) {
 		if ( containsAlbum( album ) ) {
 			albumsToUpdate.add ( album ); 
 		} else {
@@ -283,7 +283,7 @@ public class Library {
 		else return false;
 	}
 	
-	void addTracks ( ArrayList<Track> tracks ) {
+	public void addTracks ( ArrayList<Track> tracks ) {
 		for ( Track track : tracks ) {
 			addTrack ( track );
 		}

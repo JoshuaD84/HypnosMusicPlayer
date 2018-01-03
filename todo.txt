@@ -17,8 +17,6 @@ General:
 	Esc Hotkey	
 		album, track, and playlist problem -- it currently closes window regardless. 
 		tagWindow & settings Window - this is a little difficult because esc also stops editing a cell
-						
-	Show in tag edit window when a file doesn't support a particular tag type
 	
 	Refactor Library
 		Make a source directory a class, not just a path.
@@ -46,7 +44,7 @@ General:
 		Maybe allow a filter for file type and lossy vs not lossy
 			Maybe just a special search text "type:mp3", "type:lossy"
 			I dunno making search box script is alot. 	
-						
+			
 	If the current list is big it takes forever to write to disk. Need to use zip on that too probably. 
 		2600 hours makes 10mb takes about 20s or so
 	
@@ -69,8 +67,6 @@ General:
 		playlist table -> m3u
 		track table, history, queue, info windows, current table -> single tracks
 		album table -> folder
-	
-	Add default sort column choice, like shuffle and repeat
 		
 	Hover effects on transparent image buttons
 		Settings Button
@@ -140,26 +136,16 @@ General:
 			http://sourceforge.net/projects/jxgrabkey/
 			
 			JNativeHook - No consumption of hotkey
+			
+			KDE Neon - Test file browser feature (dolphin browser). User said it opened the track instead of opening folder. 
 		
 	Windows - Volume takes a split second to change. 	
-		
-
-	Playlist browse issues
-		? Add right click > browse and F4 to playlist table -- show playlist folder  
 			
 	Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
 	
 	Look at jump windows hotkeys re queue
 	
-	Maybe add sorting of roman numerals? 
-	
-	Using Java 9 to launch hypnos
-		WARNING: An illegal reflective access operation has occurred
-		WARNING: Illegal reflective access by net.joshuad.hypnos.Hypnos (file:/home/joshua/workbench/hypnos-9-test/hypnos.jar) to field java.lang.ClassLoader.sys_paths
-		WARNING: Please consider reporting this to the maintainers of net.joshuad.hypnos.Hypnos
-		WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
-		WARNING: All illegal access operations will be denied in a future release
-		
+
 :::: Lyric Failures ::::
 	
 	Jenny Lewis with the Watson Twins - Handle with Care
@@ -167,8 +153,6 @@ General:
 		
 	Vangelis - Memory of Antarctica
 		False positive Genius Lyrics
-	
-	
 	
 :::: JavaFX stuff ::::
 
@@ -283,6 +267,26 @@ General:
 		Test Everything
 	
 
-:::: Dream List, not now ::::
+:::: not now ::::
 
 Bug report dialog
+
+Playlist browse issues
+	? Add right click > browse and F4 to playlist table -- show playlist folder  
+	
+Java 9
+		
+	Using Java 9 to launch hypnos
+		WARNING: An illegal reflective access operation has occurred
+		WARNING: Illegal reflective access by net.joshuad.hypnos.Hypnos (file:/home/joshua/workbench/hypnos-9-test/hypnos.jar) to field java.lang.ClassLoader.sys_paths
+		WARNING: Please consider reporting this to the maintainers of net.joshuad.hypnos.Hypnos
+		WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+		WARNING: All illegal access operations will be denied in a future release
+		
+	Using java 9 to launch hypnos crashes. I can't get either OpenSDK or OracleSDK to run, for different reasons
+	
+Maybe add sorting of roman numerals? 
+
+Add default sort column choice, like shuffle and repeat
+
+Show in tag edit window when a file doesn't support a particular tag type
