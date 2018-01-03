@@ -512,6 +512,11 @@ public class TagWindow extends Stage {
 	}
 	
 	public void setTracks ( List <Track> tracks, List <Album> albumsToRefresh, FieldKey ... hiddenTags ) { 
+		
+		List <Track> nonMissing = new ArrayList <Track> ();
+		for ( Track track : tracks ) if ( Utils.isMusicFile( track.getPath() ) ) nonMissing.add( track );
+		tracks = nonMissing;
+		
 		textTagPairs.clear();
 		imageTagPairs.clear();
 		this.hiddenTextTagsList = Arrays.asList( hiddenTags );
@@ -538,6 +543,7 @@ public class TagWindow extends Stage {
 			previousButton.setVisible( false );
 			nextButton.setVisible( false );
 		}
+		
 		
 		try {
 			

@@ -1,8 +1,4 @@
 General:	
-
-	Current list - make one file missing rest good
-		Select all, edit tags. No content in table. 
-		
 	If you press down while editing a filter box, move focus to the correpsonding table
 	
 	Try to replace the album info bar with another filter box type situation
@@ -158,9 +154,7 @@ General:
 
 	Playlist browse issues
 		? Add right click > browse and F4 to playlist table -- show playlist folder  
-		
-	isArtistDirectory -- Keep a cache, so you're not checking every folder every time? Might need to recheck occasionally. 
-	
+			
 	Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
 	
 	Look at jump windows hotkeys re queue
@@ -205,7 +199,9 @@ General:
 		What systems do support? 
 		What other systems don't support? How to handle? 
 		https://stackoverflow.com/questions/29995727/java-systemtray-icon-does-not-always-work
-
+	
+	Tiny drop shadow on transport buttons when in dark theme. It's the line HBox, VBox, #transport { ... -fx-background-color: #222222 ... }
+	
 	Showing any dialog prevents window drag resize in ubuntu / other linux?
 		http://bugs.java.com/bugdatabase/view_bug.do?bug_id=8140491
 		https://stackoverflow.com/questions/33134791/javafx-stage-cant-be-resized-after-showing-a-dialog
@@ -213,8 +209,6 @@ General:
 	While loading the library, the table view scrolls a little bit. 
 		https://stackoverflow.com/questions/47950917/stop-tableview-small-scroll-when-adding-content-to-bottom-of-table
 		1/2/18 - Bug submitted to bugs.java.com
-	
-	Tiny drop shadow on transport buttons when in dark theme. It's the line HBox, VBox, #transport { ... -fx-background-color: #222222 ... }
 		
 	Inconsistent eyEvent consumption - https://stackoverflow.com/questions/48054928/inconsistent-keyevent-consumption-by-textfield
 		Resolved in java 9 apparently
