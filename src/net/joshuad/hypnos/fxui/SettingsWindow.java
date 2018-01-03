@@ -928,11 +928,57 @@ public class SettingsWindow extends Stage {
 				ui.openFileBrowser( table.getSelectionModel().getSelectedItem().getPath() );
 			}
 		});
-		
+
 		table.setOnKeyPressed( ( KeyEvent e ) -> {
 			if ( e.getCode() == KeyCode.ESCAPE 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				table.getSelectionModel().clearSelection();
+				
+			} else if ( e.getCode() == KeyCode.L
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				lyricsMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.Q 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				enqueueMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.Q && e.isShiftDown()
+			&& !e.isAltDown() && !e.isControlDown()  && !e.isMetaDown() ) {
+				playNextMenuItem.fire();
+							
+			} else if ( e.getCode() == KeyCode.F2 
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				editTagMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.F3
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				infoMenuItem.fire();
+				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.F4
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				browseMenuItem.fire();
+				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.ENTER
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				playMenuItem.fire();
+				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown()
+			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
+				List <TagError> errors = table.getSelectionModel().getSelectedItems();
+				List <Track> tracks = new ArrayList<> ();
+				
+				for ( TagError error : errors ) tracks.add ( error.getTrack() );
+				
+				ui.player.getCurrentList().insertTracks( 0, tracks );
+				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.ENTER && e.isControlDown() 
+			&& !e.isShiftDown() && !e.isAltDown() && !e.isMetaDown() ) {
+				appendMenuItem.fire();
+				e.consume();
 			}
 		});
 		

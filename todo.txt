@@ -2,9 +2,7 @@ General:
 	Try to replace the album info bar with another filter box type situation
 		I like the way it looks, but i'd like it to become a filter box when clicked on or when F is pressed, then go back to being what it is when 
 		focus is lost
-	
-	If you drag a playlist with links to non-existent files, put something on the list with its name or whatever. Show the item and that the file is missing. 
-	
+		
 	If something gets dropped into config/playlists, update the UI to include it? 
 	
 	Update available notification. 
@@ -48,11 +46,7 @@ General:
 		Maybe allow a filter for file type and lossy vs not lossy
 			Maybe just a special search text "type:mp3", "type:lossy"
 			I dunno making search box script is alot. 	
-				
-	Drop album cover and we lose current track status on the current list
-	
-	Hotkeys on tag error window table
-	
+						
 	If the current list is big it takes forever to write to disk. Need to use zip on that too probably. 
 		2600 hours makes 10mb takes about 20s or so
 	
