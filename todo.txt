@@ -1,6 +1,4 @@
-General:	
-	If you press down while editing a filter box, move focus to the correpsonding table
-	
+General:		
 	Try to replace the album info bar with another filter box type situation
 		I like the way it looks, but i'd like it to become a filter box when clicked on or when F is pressed, then go back to being what it is when 
 		focus is lost

@@ -364,6 +364,9 @@ public class LibraryTabPane extends StretchedTabPane {
 		playlistFilterBox.setOnKeyPressed( ( KeyEvent event ) -> {
 			if ( event.getCode() == KeyCode.ESCAPE ) {
 				playlistFilterBox.clear();
+			} else if ( event.getCode() == KeyCode.DOWN ) {
+				playlistTable.requestFocus();
+				playlistTable.getSelectionModel().select( playlistTable.getSelectionModel().getFocusedIndex() );
 			}
 		});
 		
@@ -426,6 +429,9 @@ public class LibraryTabPane extends StretchedTabPane {
 		trackFilterBox.setOnKeyPressed( ( KeyEvent event ) -> {
 			if ( event.getCode() == KeyCode.ESCAPE ) {
 				trackFilterBox.clear();
+			} else if ( event.getCode() == KeyCode.DOWN ) {
+				trackTable.requestFocus();
+				trackTable.getSelectionModel().select( trackTable.getSelectionModel().getFocusedIndex() );
 			}
 		});
 		
@@ -575,6 +581,9 @@ public class LibraryTabPane extends StretchedTabPane {
 		albumFilterBox.setOnKeyPressed( ( KeyEvent event ) -> {
 			if ( event.getCode() == KeyCode.ESCAPE ) {
 				albumFilterBox.clear();
+			} else if ( event.getCode() == KeyCode.DOWN ) {
+				albumTable.requestFocus();
+				albumTable.getSelectionModel().select( albumTable.getSelectionModel().getFocusedIndex() );
 			}
 		});
 		
