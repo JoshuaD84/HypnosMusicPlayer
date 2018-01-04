@@ -50,6 +50,7 @@
 													lib/jaudiotagger-2.2.6-SNAPSHOT.jar lib/jflac-1.2.jar
 													lib/jl1.0.1.jar lib/jnativehook-2.0.2.jar 
 													lib/jogg-0.0.7.jar lib/jorbis-0.0.15.jar lib/jsoup-1.11.2.jar
+													lib/mp3spi1.9.5.jar lib/tritonus_share.jar
 													" />
 				<attribute name="Implementation-Version" value="${version}" />
 				<attribute name="Build-Date" value="${TODAY}" />
