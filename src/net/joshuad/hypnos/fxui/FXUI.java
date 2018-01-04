@@ -239,13 +239,13 @@ public class FXUI implements PlayerListener {
 				e.consume();
 				Tab currentLibraryTab = libraryPane.getSelectionModel().getSelectedItem();
 
-				if ( libraryPane.libraryAlbumTab == currentLibraryTab ) {
+				if ( libraryPane.albumTab == currentLibraryTab ) {
 					libraryPane.albumFilterBox.requestFocus();
 
-				} else if ( libraryPane.libraryTrackTab == currentLibraryTab ) {
+				} else if ( libraryPane.trackTab == currentLibraryTab ) {
 					libraryPane.trackFilterBox.requestFocus();
 
-				} else if ( libraryPane.libraryPlaylistTab == currentLibraryTab ) {
+				} else if ( libraryPane.playlistTab == currentLibraryTab ) {
 					libraryPane.playlistFilterBox.requestFocus();
 				}
 
@@ -267,18 +267,21 @@ public class FXUI implements PlayerListener {
 
 			} else if ( e.getCode() == KeyCode.DIGIT1 /* With or without control */
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				libraryPane.getSelectionModel().select( 0 );
 				e.consume();
+				libraryPane.getSelectionModel().select( 0 );
+				Platform.runLater( () -> libraryPane.focusTopOfCurrentTable() );
 
 			} else if ( e.getCode() == KeyCode.DIGIT2 /* With or without control */
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
 				libraryPane.getSelectionModel().select( 1 );
+				Platform.runLater( () -> libraryPane.focusTopOfCurrentTable() );
 	
 			} else if ( e.getCode() == KeyCode.DIGIT3 /* With or without control */
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
 				libraryPane.getSelectionModel().select( 2 );
+				Platform.runLater( () -> libraryPane.focusTopOfCurrentTable() );
 				
 			} else if ( e.getCode() == KeyCode.F
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
@@ -1019,9 +1022,9 @@ public class FXUI implements PlayerListener {
 		retMe.put ( Setting.CL_TABLE_SHOW_ALBUM_COLUMN, currentListPane.clAlbumColumn.isVisible() );
 		retMe.put ( Setting.CL_TABLE_SHOW_TITLE_COLUMN, currentListPane.clTitleColumn.isVisible() );
 		retMe.put ( Setting.CL_TABLE_SHOW_LENGTH_COLUMN, currentListPane.clLengthColumn.isVisible() );
-		retMe.put ( Setting.LIBRARY_TAB_ALBUMS_VISIBLE, libraryPane.getTabs().contains( libraryPane.libraryAlbumTab ) );
-		retMe.put ( Setting.LIBRARY_TAB_TRACKS_VISIBLE, libraryPane.getTabs().contains( libraryPane.libraryTrackTab ) );
-		retMe.put ( Setting.LIBRARY_TAB_PLAYLISTS_VISIBLE, libraryPane.getTabs().contains( libraryPane.libraryPlaylistTab ) );
+		retMe.put ( Setting.LIBRARY_TAB_ALBUMS_VISIBLE, libraryPane.getTabs().contains( libraryPane.albumTab ) );
+		retMe.put ( Setting.LIBRARY_TAB_TRACKS_VISIBLE, libraryPane.getTabs().contains( libraryPane.trackTab ) );
+		retMe.put ( Setting.LIBRARY_TAB_PLAYLISTS_VISIBLE, libraryPane.getTabs().contains( libraryPane.playlistTab ) );
 		
 		return retMe;
 	}

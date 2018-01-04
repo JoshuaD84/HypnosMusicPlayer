@@ -72,7 +72,7 @@ public class LibraryTabPane extends StretchedTabPane {
 	AudioSystem audioSystem;
 	Library library;
 
-	Tab libraryTrackTab, libraryAlbumTab, libraryPlaylistTab;
+	Tab trackTab, albumTab, playlistTab;
 	
 	ImageView albumFilterClearImage, trackFilterClearImage, playlistFilterClearImage;
 	ImageView addSourceTracksImage, addSourceAlbumsImage, addSourcePlaylistsImage;
@@ -141,11 +141,11 @@ public class LibraryTabPane extends StretchedTabPane {
 		playlistPane.setTop( playlistFilterPane );
 		playlistPane.setCenter( playlistTable );
 		
-		libraryAlbumTab = new Tab( "Albums" );
-		libraryAlbumTab.setContent( albumListPane );
-		libraryAlbumTab.setClosable( false );
+		albumTab = new Tab( "Albums" );
+		albumTab.setContent( albumListPane );
+		albumTab.setClosable( false );
 		Tooltip albumTabTooltip = new Tooltip ( "Album Count: " + library.getAlbums().size() );
-		libraryAlbumTab.setTooltip( albumTabTooltip );
+		albumTab.setTooltip( albumTabTooltip );
 		
 		library.getAlbums().addListener( new ListChangeListener<Album> () {
 			public void onChanged ( Change <? extends Album> changed ) {
@@ -153,11 +153,11 @@ public class LibraryTabPane extends StretchedTabPane {
 			}
 		});
 
-		libraryPlaylistTab = new Tab( "Playlists" );
-		libraryPlaylistTab.setContent( playlistPane );
-		libraryPlaylistTab.setClosable( false );
+		playlistTab = new Tab( "Playlists" );
+		playlistTab.setContent( playlistPane );
+		playlistTab.setClosable( false );
 		Tooltip playlistTabTooltip = new Tooltip ( "Playlist Count: " + library.getPlaylists().size() );
-		libraryPlaylistTab.setTooltip( playlistTabTooltip );
+		playlistTab.setTooltip( playlistTabTooltip );
 		
 		library.getPlaylists().addListener( new ListChangeListener<Playlist> () {
 			public void onChanged ( Change <? extends Playlist> changed ) {
@@ -165,11 +165,11 @@ public class LibraryTabPane extends StretchedTabPane {
 			}
 		});
 
-		libraryTrackTab = new Tab( "Tracks" );
-		libraryTrackTab.setContent( trackListPane );
-		libraryTrackTab.setClosable( false );
+		trackTab = new Tab( "Tracks" );
+		trackTab.setContent( trackListPane );
+		trackTab.setClosable( false );
 		Tooltip trackTabTooltip = new Tooltip ( "Track Count: " + library.getTracks().size() );
-		libraryTrackTab.setTooltip( trackTabTooltip );
+		trackTab.setTooltip( trackTabTooltip );
 		
 		library.getTracks().addListener( new ListChangeListener<Track> () {
 			public void onChanged ( Change <? extends Track> changed ) {
@@ -199,11 +199,11 @@ public class LibraryTabPane extends StretchedTabPane {
 			setPlaylistsVisible ( newValue );
 		});
 		
-		libraryAlbumTab.setContextMenu( tabMenu );
-		libraryTrackTab.setContextMenu( tabMenu );
-		libraryPlaylistTab.setContextMenu( tabMenu );
+		albumTab.setContextMenu( tabMenu );
+		trackTab.setContextMenu( tabMenu );
+		playlistTab.setContextMenu( tabMenu );
 
-		getTabs().addAll( libraryAlbumTab, libraryTrackTab, libraryPlaylistTab );
+		getTabs().addAll( albumTab, trackTab, playlistTab );
 		setSide( Side.BOTTOM );
 		setStyle("-fx-open-tab-animation: NONE; -fx-close-tab-animation: NONE;");
 		
@@ -214,16 +214,16 @@ public class LibraryTabPane extends StretchedTabPane {
 		List<Tab> reorderedTabs = new ArrayList<> ( tabs.size() );
 		
 		int index = 0;
-		if ( tabs.contains( libraryAlbumTab ) ) {
-			reorderedTabs.add( index++, libraryAlbumTab );
+		if ( tabs.contains( albumTab ) ) {
+			reorderedTabs.add( index++, albumTab );
 		}
 
-		if ( tabs.contains( libraryTrackTab ) ) {
-			reorderedTabs.add( index++, libraryTrackTab );
+		if ( tabs.contains( trackTab ) ) {
+			reorderedTabs.add( index++, trackTab );
 		}
 		
-		if ( tabs.contains( libraryPlaylistTab ) ) {
-			reorderedTabs.add( index++, libraryPlaylistTab );
+		if ( tabs.contains( playlistTab ) ) {
+			reorderedTabs.add( index++, playlistTab );
 		}
 		
 		this.getTabs().clear();
@@ -232,14 +232,14 @@ public class LibraryTabPane extends StretchedTabPane {
 	
 	public void setAlbumsVisible ( boolean visible ) {
 		if ( visible ) {
-			if ( !getTabs().contains( libraryAlbumTab ) ) {
-				getTabs().add( libraryAlbumTab );
+			if ( !getTabs().contains( albumTab ) ) {
+				getTabs().add( albumTab );
 				showAlbums.setSelected( true );
 				fixTabOrder();
 			}
 		} else {
 			if ( this.getTabs().size() >= 2 ) {
-				getTabs().remove( libraryAlbumTab );
+				getTabs().remove( albumTab );
 				fixTabOrder();
 				showAlbums.setSelected( false );
 			} else {
@@ -250,14 +250,14 @@ public class LibraryTabPane extends StretchedTabPane {
 	
 	public void setTracksVisible ( boolean visible ) {
 		if ( visible ) {
-			if ( !getTabs().contains( libraryTrackTab ) ) {
-				getTabs().add( libraryTrackTab );
+			if ( !getTabs().contains( trackTab ) ) {
+				getTabs().add( trackTab );
 				showTracks.setSelected( true );
 				fixTabOrder();
 			}
 		} else {
 			if ( this.getTabs().size() >= 2 ) {
-				getTabs().remove( libraryTrackTab );
+				getTabs().remove( trackTab );
 				showTracks.setSelected( false );
 				fixTabOrder();
 			} else {
@@ -268,14 +268,14 @@ public class LibraryTabPane extends StretchedTabPane {
 	
 	public void setPlaylistsVisible ( boolean visible ) {
 		if ( visible ) {
-			if ( !getTabs().contains( libraryPlaylistTab ) ) {
-				getTabs().add( libraryPlaylistTab );
+			if ( !getTabs().contains( playlistTab ) ) {
+				getTabs().add( playlistTab );
 				showPlaylists.setSelected( true );
 				fixTabOrder();
 			}
 		} else {
 			if ( this.getTabs().size() >= 2 ) {
-				getTabs().remove( libraryPlaylistTab );
+				getTabs().remove( playlistTab );
 				showPlaylists.setSelected( false );
 				fixTabOrder();
 			} else {
@@ -1683,5 +1683,20 @@ public class LibraryTabPane extends StretchedTabPane {
 		if ( addSourceTracksImage != null ) addSourceTracksImage.setEffect( null );
 		if ( addSourceAlbumsImage != null ) addSourceAlbumsImage.setEffect( null );
 		if ( addSourcePlaylistsImage != null ) addSourcePlaylistsImage.setEffect( null );
+	}
+
+	public void focusTopOfCurrentTable () {
+		if( getSelectionModel().getSelectedItem() == albumTab ) {
+			albumTable.requestFocus();
+			albumTable.getSelectionModel().select( albumTable.getSelectionModel().getFocusedIndex() );
+			
+		} else if( getSelectionModel().getSelectedItem() == trackTab ) {
+			trackTable.requestFocus();
+			trackTable.getSelectionModel().select( trackTable.getSelectionModel().getFocusedIndex() );
+			
+		} else if( getSelectionModel().getSelectedItem() == playlistTab ) {
+			playlistTable.requestFocus();
+			playlistTable.getSelectionModel().select( playlistTable.getSelectionModel().getFocusedIndex() );
+		}
 	}
 }
