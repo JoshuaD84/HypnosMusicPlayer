@@ -712,7 +712,12 @@ public class LibraryTabPane extends StretchedTabPane {
 		albumTable.setOnKeyPressed( ( KeyEvent e ) -> {
 			if ( e.getCode() == KeyCode.ESCAPE 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				albumTable.getSelectionModel().clearSelection();
+				if ( albumFilterBox.getText().length() > 0 ) {
+					albumFilterBox.clear();
+					Platform.runLater( ()-> albumTable.scrollTo( albumTable.getSelectionModel().getSelectedItem() ) );
+				} else {
+					albumTable.getSelectionModel().clearSelection();
+				}
 				
 			} else if ( e.getCode() == KeyCode.Q 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
@@ -747,6 +752,10 @@ public class LibraryTabPane extends StretchedTabPane {
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				appendMenuItem.fire();
 				
+			} else if ( e.getCode() == KeyCode.UP ) {
+				if ( albumTable.getSelectionModel().getSelectedIndex() == 0 ) {
+					albumFilterBox.requestFocus();
+				}
 			}
 		});
 		
@@ -1142,8 +1151,12 @@ public class LibraryTabPane extends StretchedTabPane {
 		trackTable.setOnKeyPressed( ( KeyEvent e ) -> {
 			if ( e.getCode() == KeyCode.ESCAPE 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				trackTable.getSelectionModel().clearSelection();
-				
+				if ( trackFilterBox.getText().length() > 0 ) {
+					trackFilterBox.clear();
+					Platform.runLater( ()-> trackTable.scrollTo( trackTable.getSelectionModel().getSelectedItem() ) );
+				} else {
+					trackTable.getSelectionModel().clearSelection();
+				}
 			} else if ( e.getCode() == KeyCode.L
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				lyricsMenuItem.fire();
@@ -1184,6 +1197,11 @@ public class LibraryTabPane extends StretchedTabPane {
 			&& !e.isShiftDown() && !e.isAltDown() && !e.isMetaDown() ) {
 				appendMenuItem.fire();
 				e.consume();
+				
+			} else if ( e.getCode() == KeyCode.UP ) {
+				if ( trackTable.getSelectionModel().getSelectedIndex() == 0 ) {
+					trackFilterBox.requestFocus();
+				}
 			}
 		});
 		
@@ -1432,7 +1450,12 @@ public class LibraryTabPane extends StretchedTabPane {
 
 		playlistTable.setOnKeyPressed( ( KeyEvent e ) -> {
 			if ( e.getCode() == KeyCode.ESCAPE ) {
-				playlistTable.getSelectionModel().clearSelection();
+				if ( playlistFilterBox.getText().length() > 0 ) {
+					playlistFilterBox.clear();
+					Platform.runLater( ()-> playlistTable.scrollTo( playlistTable.getSelectionModel().getSelectedItem() ) );
+				} else {
+					playlistTable.getSelectionModel().clearSelection();
+				}
 				
 			} else if ( e.getCode() == KeyCode.F2         
 			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
@@ -1466,7 +1489,11 @@ public class LibraryTabPane extends StretchedTabPane {
 			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() && !e.isShiftDown() ) {
 				removeMenuItem.fire();
 				
-			} 
+			} else if ( e.getCode() == KeyCode.UP ) {
+				if ( playlistTable.getSelectionModel().getSelectedIndex() == 0 ) {
+					playlistFilterBox.requestFocus();
+				}
+			}
 		});
 		
 		playlistTable.setOnDragOver( event -> {

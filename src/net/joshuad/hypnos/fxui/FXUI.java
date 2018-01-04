@@ -116,7 +116,6 @@ public class FXUI implements PlayerListener {
 	SettingsWindow settingsWindow;
 	TrackInfoWindow trackInfoWindow;
 	LyricsWindow lyricsWindow;
-	JumpWindow jumpWindow;
 	
 	final AudioSystem player;
 	final Library library;
@@ -186,7 +185,6 @@ public class FXUI implements PlayerListener {
 		settingsWindow = new SettingsWindow ( this, library, hotkeys, audioSystem );
 		trackInfoWindow = new TrackInfoWindow ( this );
 		lyricsWindow = new LyricsWindow ( this );
-		jumpWindow = new JumpWindow ( this, library, audioSystem );
 
 		applyBaseTheme();
 		applyDarkTheme();
@@ -233,11 +231,12 @@ public class FXUI implements PlayerListener {
 		primaryContainer.setOnKeyPressed( ( KeyEvent e ) -> { 
 			if ( e.getCode() == KeyCode.S && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				currentListPane.currentListSave.fire();
 				e.consume();
+				currentListPane.currentListSave.fire();
 
 			} else if ( e.getCode() == KeyCode.F && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				e.consume();
 				Tab currentLibraryTab = libraryPane.getSelectionModel().getSelectedItem();
 
 				if ( libraryPane.libraryAlbumTab == currentLibraryTab ) {
@@ -250,22 +249,21 @@ public class FXUI implements PlayerListener {
 					libraryPane.playlistFilterBox.requestFocus();
 				}
 
-				e.consume();
 
 			} else if ( e.getCode() == KeyCode.E && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				currentListPane.currentListExport.fire();
 				e.consume();
+				currentListPane.currentListExport.fire();
 
 			} else if ( e.getCode() == KeyCode.O && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				currentListPane.currentListLoad.fire();
 				e.consume();
+				currentListPane.currentListLoad.fire();
 
 			} else if ( e.getCode() == KeyCode.P && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				showSettingsWindow();
 				e.consume();
+				showSettingsWindow();
 
 			} else if ( e.getCode() == KeyCode.DIGIT1 /* With or without control */
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
@@ -274,103 +272,103 @@ public class FXUI implements PlayerListener {
 
 			} else if ( e.getCode() == KeyCode.DIGIT2 /* With or without control */
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				libraryPane.getSelectionModel().select( 1 );
 				e.consume();
+				libraryPane.getSelectionModel().select( 1 );
 	
 			} else if ( e.getCode() == KeyCode.DIGIT3 /* With or without control */
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				e.consume();
 				libraryPane.getSelectionModel().select( 2 );
-				e.consume();
-
-			} else if ( e.getCode() == KeyCode.F 
+				
+			} else if ( e.getCode() == KeyCode.F
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				jumpWindow.show();
 				e.consume();
+				//We put it in runlater to keep the key from being passed down to the filter box
+				Platform.runLater( () -> currentListPane.infoLabelAndFilter.beginEditing() );
 
 			} else if ( e.getCode() == KeyCode.R
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				currentListPane.toggleRepeatButton.fire();
 				e.consume();
+				currentListPane.toggleRepeatButton.fire();
 
 			} else if ( e.getCode() == KeyCode.S
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				currentListPane.toggleShuffleButton.fire();
 				e.consume();
+				currentListPane.toggleShuffleButton.fire();
 
 			} else if ( e.getCode() == KeyCode.H
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				historyWindow.show();
 				e.consume();
+				historyWindow.show();
 
 			} else if ( e.getCode() == KeyCode.Q && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				queueWindow.show();
 				e.consume();
+				queueWindow.show();
 
 			} else if ( e.getCode() == KeyCode.L && e.isShiftDown()
 			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
 				if ( !libraryPane.trackFilterBox.isFocused() && !libraryPane.albumFilterBox.isFocused()
 				&& !libraryPane.playlistFilterBox.isFocused() ) {
+					e.consume();
 					lyricsWindow.setTrack( audioSystem.getCurrentTrack() );
 					lyricsWindow.show();
-					e.consume();
 				}
 
 			} else if ( e.getCode() == KeyCode.L && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				toggleLibraryCollapsed();
 				e.consume();
+				toggleLibraryCollapsed();
 
 			} else if ( e.getCode() == KeyCode.SEMICOLON && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				toggleArtPaneCollapsed();
 				e.consume();
+				toggleArtPaneCollapsed();
 
 			} else if ( ( e.getCode() == KeyCode.NUMPAD1 || e.getCode() == KeyCode.KP_UP ) 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				audioSystem.skipMS( -5000 );
 				e.consume();
+				audioSystem.skipMS( -5000 );
 
 			} else if ( ( e.getCode() == KeyCode.NUMPAD2 || e.getCode() == KeyCode.KP_DOWN ) 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				transport.stopButton.fire();
 				e.consume();
+				transport.stopButton.fire();
 
 			} else if ( ( e.getCode() == KeyCode.NUMPAD3 || e.getCode() == KeyCode.KP_RIGHT ) 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				audioSystem.skipMS( 5000 );
 				e.consume();
+				audioSystem.skipMS( 5000 );
 
 			} else if ( ( e.getCode() == KeyCode.NUMPAD4 || e.getCode() == KeyCode.KP_LEFT )
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				transport.previousButton.fire();
 				e.consume();
+				transport.previousButton.fire();
 
 			} else if ( ( e.getCode() == KeyCode.NUMPAD5 || e.getCode() == KeyCode.KP_UP ) 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				transport.togglePlayButton.fire();
 				e.consume();
+				transport.togglePlayButton.fire();
 
 			} else if ( ( e.getCode() == KeyCode.NUMPAD6 || e.getCode() == KeyCode.KP_DOWN ) 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				transport.nextButton.fire();
 				e.consume();
+				transport.nextButton.fire();
 
 			} else if ( ( e.getCode() == KeyCode.NUMPAD7 || e.getCode() == KeyCode.KP_RIGHT ) 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				audioSystem.decrementVolume();
 				e.consume();
+				audioSystem.decrementVolume();
 
 			} else if ( ( e.getCode() == KeyCode.NUMPAD8 || e.getCode() == KeyCode.KP_LEFT )
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				transport.volumeMuteButton.fire();
 				e.consume();
+				transport.volumeMuteButton.fire();
 
 			} else if ( ( e.getCode() == KeyCode.NUMPAD9 || e.getCode() == KeyCode.KP_LEFT )
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				audioSystem.incrementVolume();
 				e.consume();
-				
+				audioSystem.incrementVolume();
 			} 
 		});
 		
@@ -439,7 +437,6 @@ public class FXUI implements PlayerListener {
 		settingsWindow.getScene().getStylesheets().add( baseSheet );
 		trackInfoWindow.getScene().getStylesheets().add( baseSheet );
 		lyricsWindow.getScene().getStylesheets().add( baseSheet );
-		jumpWindow.getScene().getStylesheets().add( baseSheet );
 	}
 	
 	public void applyDarkTheme() {
@@ -458,7 +455,6 @@ public class FXUI implements PlayerListener {
 			settingsWindow.getScene().getStylesheets().add( darkSheet );
 			trackInfoWindow.getScene().getStylesheets().add( darkSheet );
 			lyricsWindow.getScene().getStylesheets().add( darkSheet );
-			jumpWindow.getScene().getStylesheets().add( darkSheet );
 			
 			transport.applyDarkTheme();
 			libraryPane.applyDarkTheme( darkThemeButtons );
@@ -481,7 +477,6 @@ public class FXUI implements PlayerListener {
 		settingsWindow.getScene().getStylesheets().remove( darkSheet );
 		trackInfoWindow.getScene().getStylesheets().remove( darkSheet );
 		lyricsWindow.getScene().getStylesheets().remove( darkSheet );
-		jumpWindow.getScene().getStylesheets().remove( darkSheet );
 		
 		transport.removeDarkTheme();
 		libraryPane.removeDarkTheme();

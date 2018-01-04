@@ -1159,8 +1159,8 @@ public class SettingsWindow extends Stage {
 		"    Volume Up                                Numpad 9\n" +
 		"    Toggle Shuffle Mode                      S\n" +	
 		"    Toggle Repeat Mode                       R\n" +
-		"    Show Jump Window (Find Track)            F\n" +
-		"    Focus the Filter TextBox in Library      Ctrl + F\n" +
+		"    Search the Current List                  F\n" +
+		"    Search the Library                       Ctrl + F\n" +
 		"    Show Lyrics on Current Track             Shift + L\n" +
 		"    Toggle Library Collapsed                 Ctrl + L\n" +
 		"    Toggle Artwork Collapsed                 Ctrl + ;\n" +

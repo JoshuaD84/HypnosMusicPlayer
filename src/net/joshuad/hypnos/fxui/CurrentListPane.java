@@ -6,14 +6,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -46,6 +50,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.stage.FileChooser;
+import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.AlphanumComparator;
 import net.joshuad.hypnos.CurrentListState;
 import net.joshuad.hypnos.CurrentListTrack;
@@ -73,20 +78,27 @@ public class CurrentListPane extends BorderPane {
 	Button toggleRepeatButton, toggleShuffleButton;
 	Button showQueueButton;
 	MenuItem currentListSave, currentListExport, currentListLoad, historyMenuItem;
+	MenuItem playMenuItem, playNextMenuItem, queueMenuItem, editTagMenuItem, infoMenuItem;
+	MenuItem lyricsMenuItem, cropMenuItem, removeMenuItem, browseMenuItem, addToPlaylistMenuItem;
 	
 	ImageView noRepeatImage, repeatImage, repeatOneImage, sequentialImage, shuffleImage;
 	ImageView queueImage, historyImage, menuImage;
 
 	Image repeatImageSource;
 
+	InfoFilterHybrid infoLabelAndFilter;
+	
 	FXUI ui;
 	AudioSystem audioSystem;
 	Library library;
+	
+	final FilteredList <CurrentListTrack> currentListFiltered;
 	
 	public CurrentListPane( FXUI ui, AudioSystem audioSystem, Library library ) {
 		this.ui = ui;
 		this.audioSystem = audioSystem;
 		this.library = library;
+		currentListFiltered = new FilteredList <CurrentListTrack> ( audioSystem.getCurrentList().getItems(), p -> true );
 		
 		loadImages();
 		setupTable();
@@ -95,7 +107,6 @@ public class CurrentListPane extends BorderPane {
 		this.setTop( currentListControls );
 		this.setCenter( currentListTable );
 		this.setMinWidth( 0 );
-		
 	}
 	
 	private void loadImages() {
@@ -244,7 +255,7 @@ public class CurrentListPane extends BorderPane {
 		
 		final Label currentListLength = new Label ( "" );
 		currentListLength.setMinWidth( Region.USE_PREF_SIZE );
-		currentListLength.setPadding( new Insets ( 0, 10, 0, 0 ) );
+		currentListLength.setPadding( new Insets ( 0, 10, 0, 10 ) );
 		
 		audioSystem.getCurrentList().getItems().addListener( new ListChangeListener () {
 			@Override
@@ -303,15 +314,56 @@ public class CurrentListPane extends BorderPane {
 				
 			}
 		});
-			
 		
-		final Label currentPlayingListInfo = new Label ( "" );
-		currentPlayingListInfo.setAlignment( Pos.CENTER );
-		currentPlayingListInfo.prefWidthProperty().bind( currentListControls.widthProperty() );
+		infoLabelAndFilter = new InfoFilterHybrid ( "" );
+		infoLabelAndFilter.prefWidthProperty().bind( currentListControls.widthProperty() );
+		infoLabelAndFilter.setFilteredTable( currentListTable );
+		
+		infoLabelAndFilter.getFilter().setOnKeyPressed( ( KeyEvent e ) -> {
+			if ( e.getCode() == KeyCode.ENTER
+			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				e.consume();
+				audioSystem.playTrack( currentListTable.getSelectionModel().getSelectedItem() );
+				
+			} else if ( e.getCode() == KeyCode.F2
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				e.consume();
+				editTagMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.F3
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				e.consume();
+				infoMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.F4
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				e.consume();
+				browseMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.DOWN
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				e.consume();
+				currentListTable.requestFocus();
+				currentListTable.getSelectionModel().select( currentListTable.getSelectionModel().getFocusedIndex() );
+			}
+		});
+		
+		infoLabelAndFilter.textProperty().addListener( new ChangeListener <String> () {
+			@Override
+			public void changed ( ObservableValue <? extends String> observable, String oldValue, String newValue ) {
+				Platform.runLater( () -> {
+					currentListFiltered.setPredicate( track -> {
+						return acceptTrackFilterChange ( track, oldValue, newValue ); 
+					});
+					currentListTable.getSelectionModel().clearSelection();
+					currentListTable.getSelectionModel().selectFirst();
+				});
+			}
+		});
 		
 		audioSystem.getCurrentList().addListener( ( CurrentListState currentState ) -> {  
 			Platform.runLater( () -> {
-				currentPlayingListInfo.setText( currentState.getDisplayString() );
+				infoLabelAndFilter.setInfoText( currentState.getDisplayString() );
 			});
 		});
 		
@@ -373,7 +425,7 @@ public class CurrentListPane extends BorderPane {
 		currentListLoad = new MenuItem ( "Load Files" );
 		historyMenuItem = new MenuItem ( "History" );
 		MenuItem currentListShuffle = new MenuItem ( "Shuffle" );
-		MenuItem jumpMenuItem = new MenuItem ( "Jump to Track" );
+		MenuItem searchMenuItem = new MenuItem ( "Search" );
 		
 		currentListClear.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -476,15 +528,15 @@ public class CurrentListPane extends BorderPane {
 			}
 		});
 		
-		jumpMenuItem.setOnAction( ( ActionEvent e ) -> {
-			ui.jumpWindow.show();
+		searchMenuItem.setOnAction( ( ActionEvent e ) -> {
+			infoLabelAndFilter.beginEditing();
 		});
 		
-		currentListMenu.getItems().addAll ( currentListClear, currentListShuffle, jumpMenuItem, 
+		currentListMenu.getItems().addAll ( currentListClear, currentListShuffle, searchMenuItem, 
 			currentListExport, currentListSave, currentListLoad, historyMenuItem );
 		
 		currentListControls.getChildren().addAll( toggleShuffleButton, toggleRepeatButton, showQueueButton,
-				currentPlayingListInfo, currentListLength, currentListMenu );
+				infoLabelAndFilter, currentListLength, currentListMenu );
 
 		currentListControls.prefWidthProperty().bind( this.widthProperty() );
 	}
@@ -568,7 +620,7 @@ public class CurrentListPane extends BorderPane {
 		currentListTable.getColumns().addAll( clPlayingColumn, clNumberColumn, clArtistColumn, clYearColumn, clAlbumColumn, clTitleColumn, clLengthColumn );
 		currentListTable.getSortOrder().add( clNumberColumn ); 
 		currentListTable.setEditable( false );
-		currentListTable.setItems( audioSystem.getCurrentList().getItems() );
+		currentListTable.setItems( currentListFiltered );
 		
 		HypnosResizePolicy resizePolicy = new HypnosResizePolicy();
 		currentListTable.setColumnResizePolicy( resizePolicy );
@@ -685,19 +737,18 @@ public class CurrentListPane extends BorderPane {
 		});
 
 		ContextMenu contextMenu = new ContextMenu();
-		MenuItem playMenuItem = new MenuItem( "Play" );
-		MenuItem playNextMenuItem = new MenuItem( "Play Next" );
-		MenuItem queueMenuItem = new MenuItem( "Enqueue" );
-		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
-		MenuItem infoMenuItem = new MenuItem( "Info" );
-		MenuItem lyricsMenuItem = new MenuItem( "Lyrics" );
-		MenuItem cropMenuItem = new MenuItem( "Crop" );
-		MenuItem removeMenuItem = new MenuItem( "Remove" );
-		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
+		playMenuItem = new MenuItem( "Play" );
+		playNextMenuItem = new MenuItem( "Play Next" );
+		queueMenuItem = new MenuItem( "Enqueue" );
+		editTagMenuItem = new MenuItem( "Edit Tag(s)" );
+		infoMenuItem = new MenuItem( "Info" );
+		lyricsMenuItem = new MenuItem( "Lyrics" );
+		cropMenuItem = new MenuItem( "Crop" );
+		removeMenuItem = new MenuItem( "Remove" );
+		browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 
 		currentListTable.setOnKeyPressed( ( KeyEvent e ) -> {
-			
 			if ( e.getCode() == KeyCode.ESCAPE
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				currentListTable.getSelectionModel().clearSelection();
@@ -721,11 +772,6 @@ public class CurrentListPane extends BorderPane {
 			} else if ( e.getCode() == KeyCode.Q && e.isShiftDown()
 			&& !e.isControlDown() && !e.isAltDown() && !e.isMetaDown() ) {
 				playNextMenuItem.fire();
-				e.consume();
-				
-			} else if ( e.getCode() == KeyCode.J
-			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				ui.jumpWindow.show();
 				e.consume();
 				
 			} else if ( e.getCode() == KeyCode.L
@@ -752,7 +798,13 @@ public class CurrentListPane extends BorderPane {
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				playMenuItem.fire();
 				e.consume();
-				
+			} else if ( e.getCode() == KeyCode.UP
+			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				if ( currentListTable.getSelectionModel().getSelectedIndex() == 0 
+				&& infoLabelAndFilter.isFilterMode() ) {
+					infoLabelAndFilter.beginEditing();
+					e.consume();
+				}
 			}
 		});
 		
@@ -771,7 +823,7 @@ public class CurrentListPane extends BorderPane {
 			}
 		});
 
-		EventHandler addToPlaylistHandler = new EventHandler <ActionEvent>() {
+		EventHandler<ActionEvent> addToPlaylistHandler = new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
 				Playlist playlist = (Playlist) ((MenuItem) event.getSource()).getUserData();
@@ -1079,6 +1131,44 @@ public class CurrentListPane extends BorderPane {
 		if ( historyImage != null ) historyImage.setEffect( null );
 		
 		currentListTable.refresh();
+	}
+	
+	public boolean acceptTrackFilterChange ( Track track, String oldValue, String newValueIn ) {
+		
+		String newValue = newValueIn;
+		if ( newValueIn instanceof String ) {
+			newValue = (String)newValueIn;
+		}
+	
+		if ( newValue == null || newValue.isEmpty() ) {
+			return true;
+		}
+		
+		String[] lowerCaseFilterTokens = newValue.toLowerCase().split( "\\s+" );
+
+		ArrayList <String> matchableText = new ArrayList <String>();
+
+		matchableText.add( Normalizer.normalize( track.getArtist(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+		matchableText.add( track.getArtist().toLowerCase() );
+		matchableText.add( Normalizer.normalize( track.getTitle(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+		matchableText.add( track.getTitle().toLowerCase() );
+		matchableText.add( Normalizer.normalize( track.getFullAlbumTitle(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+		matchableText.add( track.getFullAlbumTitle().toLowerCase() );
+
+		for ( String token : lowerCaseFilterTokens ) {
+			boolean tokenMatches = false;
+			for ( String test : matchableText ) {
+				if ( test.contains( token ) ) {
+					tokenMatches = true;
+				}
+			}
+
+			if ( !tokenMatches ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }
 
