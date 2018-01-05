@@ -34,9 +34,6 @@ General:
 			Maybe just a special search text "type:mp3", "type:lossy"
 			I dunno making search box script is alot. 	
 			
-	If the current list is big it takes forever to write to disk. Need to use zip on that too probably. 
-		2600 hours makes 10mb takes about 20s or so
-	
 	Make standalone a commandline switch instead of a java argument
 
 	Tag auto fix button
@@ -141,6 +138,8 @@ General:
 		False positive Genius Lyrics
 	
 :::: JavaFX stuff ::::
+
+	Add a ton of albums to the current list. (close and reopen hypnos?) Ctrl + A, delete. Exception. UI is broken
 
 	Resize Policy
 		Windowed mode, shrink window until a scrollbar appears. Maximize window so scrollbar disappears -- Scrollbar width is still accounted for

@@ -176,14 +176,13 @@ public class Persister {
 		
 	}
 
-	public void loadCurrentList () {
-		try ( ObjectInputStream currentListIn = new ObjectInputStream( new FileInputStream( currentFile ) ); ) {
-			player.getCurrentList().setState ( (CurrentListState)currentListIn.readObject() );
-		
+	public void loadCurrentList() {
+		try ( ObjectInputStream dataIn = new ObjectInputStream( new GZIPInputStream( new FileInputStream( currentFile ) ) ) ) {
+			player.getCurrentList().setState ( (CurrentListState)dataIn.readObject() );
+			
 		} catch ( Exception e ) {
-			LOGGER.warning( "Unable to read current list from disk, continuing." );
+			LOGGER.warning( "Unable to read library data from disk, continuing." );
 		}
-		
 	}
 
 	@SuppressWarnings("unchecked")
@@ -243,18 +242,25 @@ public class Persister {
 			LOGGER.warning( "Unable to save library source directory list to disk, continuing." );
 		}
 	}
-
+	
 	public void saveCurrentList () {
 		File tempCurrentFile = new File ( currentFile.toString() + ".temp" );
-		try ( ObjectOutputStream currentListOut = new ObjectOutputStream( new FileOutputStream( tempCurrentFile ) ) ) {
-			currentListOut.writeObject( player.getCurrentList().getState() );
+		
+		try ( GZIPOutputStream currentListOut = new GZIPOutputStream( new BufferedOutputStream( new FileOutputStream( tempCurrentFile ) ) ); ) {
+
+			ByteArrayOutputStream byteWriter = new ByteArrayOutputStream();
+			ObjectOutputStream bytesOut = new ObjectOutputStream( byteWriter );
+
+			bytesOut.writeObject( player.getCurrentList().getState() );
+
+			currentListOut.write( byteWriter.toByteArray() );
 			currentListOut.flush();
 			currentListOut.close();
-
-			Files.move( tempCurrentFile.toPath(), currentFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE );
+			
+			Files.move( tempCurrentFile.toPath(), currentFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 
 		} catch ( Exception e ) {
-			LOGGER.warning( "Unable to save current list to disk, continuing." );
+			LOGGER.warning( "Unable to save library data to disk, continuing." );
 		}
 	}
 
