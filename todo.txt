@@ -1,4 +1,16 @@
 General:		
+	Select Multiple Files in File Browser, Right click, open with Hypnos - Not all the tracks appear on the current list, and it doesn't start playing the first one
+	
+	Windows - Running from C:\Program Files (x86)\Hypnos causes problems with loading stylesheets
+	
+	Windows - When you launch show busy mouse cursor
+	
+	Add IRC link / info to about tab
+	
+	persist column info
+		sort options
+		ordering
+	
 	Missing tracks are deleted from currentlist after restart if CurrentList.mode == ALBUM instead of remaining and being highlighted in red
 	
 	Use a thread to adjust the filter boxes. Delay afer typing for a second maybe, or delay after each typing for a bit so each letter doesn't generate an event. 
@@ -33,17 +45,7 @@ General:
 		Maybe allow a filter for file type and lossy vs not lossy
 			Maybe just a special search text "type:mp3", "type:lossy"
 			I dunno making search box script is alot. 	
-			
-	Make standalone a commandline switch instead of a java argument
 
-	Tag auto fix button
-				
-	persist column info
-		sort options
-		ordering
-		
-	Select Multiple Files in File Browser, Right click, open with Hypnos - Not all the tracks appear on the current list, and it doesn't start playing the first one
-	
 	Export playlist as a folder
 		Copy all of the music files into that folder. Prepend them with index number? 
 		Warn if the total copy is larger than X MB or more than X tracks
@@ -62,49 +64,6 @@ General:
 		This is kind of a pain. We need to hard code the values, convert from hsv to color adjust, and also probably have white button images instead of black. 
 				
 	If you load albumsAndTracks but not sources Hypnos acts real wierd. Goes back and forth between not responding. On Windows confirmed.  	
-					
-	Memory Hog issue	
-		With an empty library and no current list and nothing loaded uses about 175mb on Windows 7.
-			Clicking around the UI and using every UI feature except for loading library or tracks can climb it to about 300mb
-			loading a folder of 58 albums climbs the usage to ~400mb. Removing seems to push it to 411mb
-			loading a folder of 2460 albums climbs to the usage to 1.7GB
-			closing and reopening 
-			closing and reopening:
-				drives it up to 1.4gb + (i'm sure it would keep going for a while longer)
-				with library loader and library updater disabled puts the memory at 320mb
-				with updater disabled puts the memory at 1.2+ (probably would've kept climbing)
-				with loader disabled it stops at ~367mb. 
-			
-			SO loader is a source of memory consumption definitely. 
-				-Xmx600m fixed this on windows 7. Kept it floating around 450mb. 
-			
-		loading images definitely makes it real bad. Fixing that will help, but won't solve it. 
-		
-		scrolling up and down the album or track table table does increase memory usage, but "only" by 100-200mb. 
-		
-		Start Hypnos
-		Load a big library ( /d/music)
-		Let it finish loading
-		Close and reopen hypnos
-		1.6GB memory footprint
-		
-		Start Hypnos
-		Load a big library (/d/music)
-		during load -- 1.26GB
-		after load - 721MB
-		after restart hypnos - 1.5GB
-		it seems to stay there. I let it run for about 10 minutes, no drop in memory usage. 
-		
-		stopping the libraryUpdater and libraryLoader seems to cut into the problem tremendously
-		
-		Even after stopping updater and loader, it creeps up. It looks like everytime a new song is played?
-			confirmed. Each new song spikes the memory. Just flipping through the songs without playing them causes it
-				Is this related to the skipping issue? - doesn't seem to be with one or two tracks after ramping up the memory
-			Was able to get it to 3 GB just by flipping through tracks. Could probably go higher. 
-		
-		flipping through tracks quickly by hitting next button also causes memory spike. Not terrible. 
-				
-		2017/12/25 - I was able to temper this problem significantly by having only one image loader thread and by setting -Xmx
 		
 	Redo global hotkeys, do it on a system-by-system type basis.
 		https://stackoverflow.com/questions/79658/react-on-global-hotkey-in-a-java-program-on-windows-linux-mac
@@ -121,21 +80,18 @@ General:
 			http://sourceforge.net/projects/jxgrabkey/
 			
 			JNativeHook - No consumption of hotkey
-			
-			KDE Neon - Test file browser feature (dolphin browser). User said it opened the track instead of opening folder. 
+	
+	Linux - KDE Neon - Test file browser feature (dolphin browser). User said it opened the track instead of opening folder. 
 		
 	Windows - Volume takes a split second to change. 	
 			
 	Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
+	
+	Interface with Last.fm scrobbler
 		
 
 :::: Lyric Failures ::::
-	
-	Jenny Lewis with the Watson Twins - Handle with Care
-		Empty result from Musix
-		
-	Vangelis - Memory of Antarctica
-		False positive Genius Lyrics
+
 	
 :::: JavaFX stuff ::::
 
@@ -186,9 +142,7 @@ General:
 	a better structure for persister
 	
 	a better structure for hotkey commands (maybe combine with commandline commands?)
-	
-	Move all the file browser calls into a single function
-	
+		
 	Make a single function for setting up right click menus, or at least combine a bunch. We have so many big chunks of the same code. 
 
 
@@ -203,17 +157,9 @@ General:
 			organfinale.wav - 	java.lang.IllegalArgumentException: No line matching interface SourceDataLine 
 								supporting format PCM_FLOAT 44100.0 Hz, 32 bit, stereo, 8 bytes/frame,  is supported.
 								I can look at downsampling: http://www.jsresources.org/examples/SampleRateConverter.html
-								
-		m4a - no known problems
 			
-		Apple lossless codec (m4a) - no support
-			
-		flac - no known problems, but 24bit files give me the volume issue on at least linux
-			I can look at downsampling: http://www.jsresources.org/examples/SampleRateConverter.html
-			I'm also fine w/ how things are I think. 
-			Guessing this problem is isolated to my system and my strange sound card. 
-			
-		mp3 - No known issues
+		Apple lossless codec (m4a) - no support					
+			https://github.com/soiaf/Java-Apple-Lossless-decoder
 			
 		m4b	- Currently disabled in AudioPlayer.java -> getDecoder 
 			https://stackoverflow.com/questions/44750751/why-are-m4bs-playing-at-faster-speeds
@@ -225,18 +171,26 @@ General:
 			cardtrick: 22050 -> reports 44100
 			whitefang: 16000 -> reports 44100
 			
+		m4a - no known problems
+			
+		flac - no known problems, but 24bit files give me the volume issue on at least linux
+			I can look at downsampling: http://www.jsresources.org/examples/SampleRateConverter.html
+			I'm also fine w/ how things are I think. 
+			Guessing this problem is isolated to my system and my strange sound card. 
+			
+		mp3 - No known issues
+			
+			
 	Play mounted audio cd
 		http://www.jsresources.org/examples/CddaPlayer.java.html
 
 
 
 :::: OS Specific ::::
-
-		
+	
 	Windows
 		http://nsis.sourceforge.net/FAQ
 		Open-with shell integration
-		Rename java process to Hypnos
 			https://sourceforge.net/p/launch4j/discussion/332684/thread/75bbbd93/
 			https://stackoverflow.com/questions/7506329/embed-java-into-a-c-application
 		
@@ -253,6 +207,8 @@ General:
 	
 
 :::: not now ::::
+
+	Tag auto fix button
 
 	Bug report dialog
 	
@@ -278,3 +234,45 @@ General:
 	
 	If something gets dropped into config/playlists, update the UI to include it? 
 	
+	Memory Hog issue	
+		With an empty library and no current list and nothing loaded uses about 175mb on Windows 7.
+			Clicking around the UI and using every UI feature except for loading library or tracks can climb it to about 300mb
+			loading a folder of 58 albums climbs the usage to ~400mb. Removing seems to push it to 411mb
+			loading a folder of 2460 albums climbs to the usage to 1.7GB
+			closing and reopening 
+			closing and reopening:
+				drives it up to 1.4gb + (i'm sure it would keep going for a while longer)
+				with library loader and library updater disabled puts the memory at 320mb
+				with updater disabled puts the memory at 1.2+ (probably would've kept climbing)
+				with loader disabled it stops at ~367mb. 
+			
+			SO loader is a source of memory consumption definitely. 
+				-Xmx600m fixed this on windows 7. Kept it floating around 450mb. 
+			
+		loading images definitely makes it real bad. Fixing that will help, but won't solve it. 
+		
+		scrolling up and down the album or track table table does increase memory usage, but "only" by 100-200mb. 
+		
+		Start Hypnos
+		Load a big library ( /d/music)
+		Let it finish loading
+		Close and reopen hypnos
+		1.6GB memory footprint
+		
+		Start Hypnos
+		Load a big library (/d/music)
+		during load -- 1.26GB
+		after load - 721MB
+		after restart hypnos - 1.5GB
+		it seems to stay there. I let it run for about 10 minutes, no drop in memory usage. 
+		
+		stopping the libraryUpdater and libraryLoader seems to cut into the problem tremendously
+		
+		Even after stopping updater and loader, it creeps up. It looks like everytime a new song is played?
+			confirmed. Each new song spikes the memory. Just flipping through the songs without playing them causes it
+				Is this related to the skipping issue? - doesn't seem to be with one or two tracks after ramping up the memory
+			Was able to get it to 3 GB just by flipping through tracks. Could probably go higher. 
+		
+		flipping through tracks quickly by hitting next button also causes memory spike. Not terrible. 
+				
+		2017/12/25 - I was able to temper this problem significantly by having only one image loader thread and by setting -Xmx

@@ -38,7 +38,11 @@ public class MusixScraper extends AbstractScraper {
 			return new Lyrics ( "", LyricsFetcher.LyricSite.MUSIX, url, Lyrics.ScrapeError.NOT_FOUND );
 		}
 		
-		if ( lyrics != null && lyrics.matches( "^Restricted Lyrics.*" ) ) {
+		if ( lyrics == null || lyrics.equals( "" ) ) {
+			return new Lyrics ( "", LyricsFetcher.LyricSite.MUSIX, url, Lyrics.ScrapeError.NOT_FOUND );
+		}
+		
+		if ( lyrics.matches( "^Restricted Lyrics.*" ) ) {
 			lyrics = null;
 			return new Lyrics ( "", LyricsFetcher.LyricSite.MUSIX, url, Lyrics.ScrapeError.RESTRICTED );
 		}
@@ -58,7 +62,7 @@ public class MusixScraper extends AbstractScraper {
 	
 	public static void main ( String [] args ) {
 		MusixScraper parser = new MusixScraper();
-		Lyrics result = parser.getLyrics( "Sufjan Stevens", "Impossible Soul" );
+		Lyrics result = parser.getLyrics( "Jenny Lewis with the Watson Twins", "Handle with Care" );
 		
 		if ( result.hadScrapeError() ) {
 			System.out.println ( "Error: " + result.getError() );

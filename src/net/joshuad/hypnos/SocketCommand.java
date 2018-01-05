@@ -25,7 +25,6 @@ public class SocketCommand implements Serializable {
 	public static final int SEEK_BACK = 10;
 	public static final int SHOW = 11;
 	
-	
 	private CommandType type;
 	private Object object;
 	

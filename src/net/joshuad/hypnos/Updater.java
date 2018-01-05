@@ -22,7 +22,7 @@ public class Updater {
 	
 	public boolean updateAvailable () {
 		
-		if ( !Updater.class.getResource( "Updater.class").toString().startsWith( "jar" ) ) {
+		if ( !Updater.class.getResource( "Updater.class" ).toString().startsWith( "jar" ) ) {
 			if ( Hypnos.isDeveloping() ) {
 				//This is what happens when I am working on the project and I don't want to see extraneous prints. 
 				return false;

@@ -161,9 +161,9 @@
 			</mappedresources>
 		</copy>
 		
-		<zip destfile="${dist}/hypnos-win-${version-simple}_${TODAY}_b${build.number}.zip">
-			<fileset dir="${temp}" />
-		</zip>
+		<exec executable="makensis">
+			<arg value="${packaging}/nsis/hypnos.nsh" />
+		</exec>
 		
 		<delete dir="${temp}" />
 		
