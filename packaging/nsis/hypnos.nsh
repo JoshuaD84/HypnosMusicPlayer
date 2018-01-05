@@ -77,6 +77,10 @@ section "install"
 	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "NoRepair" 1
 	# Set the INSTALLSIZE constant (!defined at the top of this script) so Add/Remove Programs can accurately report the size
 	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "EstimatedSize" ${INSTALLSIZE}
+
+   #Registry Info for context menus
+   #WriteRegStr HKCR ".flac\shell\Hypnos\command" "" "$INSTDIR\Hypnos.exe $\"%1$\""
+
 sectionEnd
  
 # Uninstaller

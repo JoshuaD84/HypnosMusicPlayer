@@ -522,11 +522,18 @@ public class ImagesPanel extends SplitPane {
 			
 			ArtistImageSaveDialog prompt = new ArtistImageSaveDialog ( ui.getMainStage(), choices );
 			
-			String darkSheet = "file:///" + ui.darkStylesheet.getAbsolutePath().replace( "\\", "/" );
-			if ( ui.isDarkTheme() ) {
-				prompt.getScene().getStylesheets().add( darkSheet );
+			//TODO: Make this part of ArtistImageSaveDialog
+			String darkSheet = ui.fileToStylesheetString( ui.darkStylesheet );
+			if ( darkSheet == null ) {
+				LOGGER.log( Level.INFO, "Unable to load dark style sheet, alert will not look right." + 
+						ui.darkStylesheet.toString()
+				);
 			} else {
-				prompt.getScene().getStylesheets().remove( darkSheet );
+				if ( ui.isDarkTheme() ) {
+					prompt.getScene().getStylesheets().add( darkSheet );
+				} else {
+					prompt.getScene().getStylesheets().remove( darkSheet );
+				}
 			}
 			
 			prompt.showAndWait();

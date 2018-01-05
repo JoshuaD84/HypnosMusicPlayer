@@ -1107,7 +1107,6 @@ public class SettingsWindow extends Stage {
 		sourceLink.setOnAction( ( ActionEvent e ) -> {
 			ui.openWebBrowser( githubURL );
 		});
-		
 
 		sourceBox.getChildren().addAll( sourceLabel, sourceLink );
 		

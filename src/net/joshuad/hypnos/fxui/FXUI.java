@@ -418,7 +418,15 @@ public class FXUI implements PlayerListener {
 				break;
 		}
 		
-		scene.getStylesheets().add( "file:///" + stylesheet.toFile().getAbsolutePath().replace( "\\", "/" ) );
+		String fontSheet = fileToStylesheetString( stylesheet.toFile() );
+		if ( fontSheet == null ) {
+			LOGGER.log( Level.WARNING, "Unable to load font style sheet, hypnos will not look right." + 
+				stylesheet.toString()
+			);
+			return;
+		}
+		
+		scene.getStylesheets().add( fontSheet );
 	}
 	
 	private void loadImages() {
@@ -429,8 +437,23 @@ public class FXUI implements PlayerListener {
 		}
 	}		
 	
+	public String fileToStylesheetString ( File stylesheetFile ) {
+		try {
+			return stylesheetFile.toURI().toURL().toString();
+		} catch ( Exception e ) {
+			return null;
+		}
+	}
+	
 	public void applyBaseTheme() {
-		String baseSheet = "file:///" + baseStylesheet.getAbsolutePath().replace( "\\", "/" );
+		String baseSheet = fileToStylesheetString( baseStylesheet );
+		if ( baseSheet == null ) {
+			LOGGER.log( Level.WARNING, "Unable to load base style sheet hypnos will not look right." + 
+				baseStylesheet.toString()
+			);
+			return;
+		}
+			
 		scene.getStylesheets().add( baseSheet ); 
 		libraryLocationWindow.getScene().getStylesheets().add( baseSheet );
 		settingsWindow.getScene().getStylesheets().add( baseSheet );
@@ -447,7 +470,14 @@ public class FXUI implements PlayerListener {
 	
 	public void applyDarkTheme() {
 		if ( !isDarkTheme ) {
-			String darkSheet = "file:///" + darkStylesheet.getAbsolutePath().replace( "\\", "/" );
+			String darkSheet = fileToStylesheetString( darkStylesheet );
+			if ( darkSheet == null ) {
+				LOGGER.log( Level.WARNING, "Unable to load dark style sheet hypnos will not look right." + 
+						darkStylesheet.toString()
+				);
+				return;
+			}
+			
 			isDarkTheme = true;
 			scene.getStylesheets().add( darkSheet ); 
 			libraryLocationWindow.getScene().getStylesheets().add( darkSheet );
@@ -470,7 +500,15 @@ public class FXUI implements PlayerListener {
 	
 	public void removeDarkTheme() {	
 		isDarkTheme = false;
-		String darkSheet = "file:///" + darkStylesheet.getAbsolutePath().replace( "\\", "/" );
+		
+		String darkSheet = fileToStylesheetString( darkStylesheet );
+		if ( darkSheet == null ) {
+			LOGGER.log( Level.WARNING, "Unable to load dark style sheet, hypnos will not look right." + 
+					darkStylesheet.toString()
+			);
+			return;
+		}
+		
 		scene.getStylesheets().remove( darkSheet ); 
 		libraryLocationWindow.getScene().getStylesheets().remove( darkSheet );
 		settingsWindow.getScene().getStylesheets().remove( darkSheet );
@@ -860,7 +898,15 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public void applyCurrentTheme ( Alert alert ) {
-		String darkSheet = "file:///" + darkStylesheet.getAbsolutePath().replace( "\\", "/" );
+		String darkSheet = fileToStylesheetString( darkStylesheet );
+		
+		if ( darkSheet == null ) {
+			LOGGER.log( Level.INFO, "Unable to load dark style sheet, alert will not look right." + 
+					darkStylesheet.toString()
+			);
+			return;
+		}
+		
 		if ( isDarkTheme() ) {
 			((Stage) alert.getDialogPane().getScene().getWindow()).getScene().getStylesheets().add( darkSheet );
 		} else {
@@ -869,7 +915,13 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public void applyCurrentTheme ( TextInputDialog dialog ) {
-		String darkSheet = "file:///" + darkStylesheet.getAbsolutePath().replace( "\\", "/" );
+		String darkSheet = fileToStylesheetString( darkStylesheet );
+		if ( darkSheet == null ) {
+			LOGGER.log( Level.INFO, "Unable to load dark style sheet, input dialog will not look right." + 
+					darkStylesheet.toString()
+			);
+			return;
+		}
 		if ( isDarkTheme() ) {
 			((Stage) dialog.getDialogPane().getScene().getWindow()).getScene().getStylesheets().add( darkSheet );
 		

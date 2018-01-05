@@ -1,12 +1,11 @@
-General:		
-	Select Multiple Files in File Browser, Right click, open with Hypnos - Not all the tracks appear on the current list, and it doesn't start playing the first one
-	
-	Windows - Running from C:\Program Files (x86)\Hypnos causes problems with loading stylesheets
-	
-	Windows - When you launch show busy mouse cursor
-	
-	Add IRC link / info to about tab
-	
+General:
+
+	Current List - Can't sort by clicking on column headers unless the list is empty
+			
+	Select Multiple Files in File Browser, Right click, open with Hypnos -
+		Not all the tracks appear on the current list, and it doesn't start playing the first one
+		Also the pause button kinda bugs out
+		
 	persist column info
 		sort options
 		ordering
@@ -16,7 +15,6 @@ General:
 	Use a thread to adjust the filter boxes. Delay afer typing for a second maybe, or delay after each typing for a bit so each letter doesn't generate an event. 
 	
 	Esc Hotkey	
-		album, track, and playlist problem -- it currently closes window regardless. 
 		tagWindow & settings Window - this is a little difficult because esc also stops editing a cell
 	
 	Refactor Library
@@ -189,10 +187,20 @@ General:
 :::: OS Specific ::::
 	
 	Windows
-		http://nsis.sourceforge.net/FAQ
-		Open-with shell integration
-			https://sourceforge.net/p/launch4j/discussion/332684/thread/75bbbd93/
-			https://stackoverflow.com/questions/7506329/embed-java-into-a-c-application
+		NSIS
+			Version number dynamically assigned
+			
+			Open-with shell integration
+				http://nsis.sourceforge.net/Add_your_app_in_each_EXE_in_the_context_menu
+				
+				This is pretty close. It makes an entry but it doesn't work. Could be a lot of different problems.
+				WriteRegStr HKCR ".flac\shell\Hypnos\command" "" "$INSTDIR\Hypnos.exe $\"%1$\""
+				
+				
+		When you launch show busy mouse cursor
+
+		https://sourceforge.net/p/launch4j/discussion/332684/thread/75bbbd93/
+		https://stackoverflow.com/questions/7506329/embed-java-into-a-c-application
 		
 	Linux					
 		https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
@@ -207,6 +215,9 @@ General:
 	
 
 :::: not now ::::
+
+	Get java to release memory back sometimes. We use a lot on load
+		https://stackoverflow.com/questions/30458195/does-gc-release-back-memory-to-os
 
 	Tag auto fix button
 
