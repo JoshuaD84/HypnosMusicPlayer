@@ -730,6 +730,11 @@ public class Hypnos extends Application {
 							
 							LOGGER.info( "Hypnos finished loading." );
 							
+							Updater updater = new Updater();
+							boolean updateAvailable = updater.updateAvailable();
+							if ( updateAvailable ) LOGGER.info( "Updates available" );
+							ui.setUpdateAvailable ( updateAvailable );
+							
 							try { Thread.sleep ( 2000 ); } catch ( InterruptedException e ) {}
 							
 							ui.fixTables();
@@ -763,11 +768,14 @@ public class Hypnos extends Application {
 						ui.fixTables();
 						
 						LOGGER.info( "Hypnos finished loading." );
+
+						Updater updater = new Updater();
+						boolean updateAvailable = updater.updateAvailable();
+						if ( updateAvailable ) LOGGER.info( "Updates available" );
 					} 
 					break;
 				}
 
-								
 			} else {
 				singleInstanceController.sendCommandsThroughSocket( commands );
 				if ( commands.size() > 0 ) {

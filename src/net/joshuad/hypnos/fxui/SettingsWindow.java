@@ -98,9 +98,10 @@ public class SettingsWindow extends Stage {
 	private ChoiceBox <String> playlistShuffleChoices;
 	private ChoiceBox <String> playlistRepeatChoices;
 	
-	
 	private ToggleButton lightTheme, darkTheme;
 	private ToggleGroup themeToggleGroup;
+	
+	private Hyperlink updateLink;
 	
 	SettingsWindow( FXUI ui, Library library, GlobalHotkeys hotkeys, AudioSystem player ) {
 		super();
@@ -423,10 +424,8 @@ public class SettingsWindow extends Stage {
 		Insets labelInsets = new Insets ( 10, 10, 10, 10 );
 		Insets checkBoxInsets = new Insets ( 10, 10, 10, 10 );
 		
-		
 		Label themeLabel = new Label ( "Theme: " );
 		themeLabel.setPadding( labelInsets );
-		
 		
 		lightTheme = new ToggleButton ( "Light" );
 		darkTheme = new ToggleButton ( "Dark" );
@@ -457,22 +456,27 @@ public class SettingsWindow extends Stage {
 		themeBox.setAlignment( Pos.TOP_CENTER );	
 		themeBox.getChildren().addAll( themeLabel, lightTheme, darkTheme );
 		
-		
 		Label warnLabel = new Label ( "Warn before erasing unsaved playlists" );
 		warnLabel.setPadding( labelInsets );
 		
 		CheckBox warnCheckBox = new CheckBox ();
 		warnCheckBox.setPadding( checkBoxInsets );
-		
 		warnCheckBox.selectedProperty().bindBidirectional( ui.promptBeforeOverwriteProperty() );
-		
-		warnCheckBox.selectedProperty().addListener( (obs, wasSelected, isNowSelected) -> {
-	    	ui.setPromptBeforeOverwrite( isNowSelected );
-		});
 				
 		HBox warnBox = new HBox();
 		warnBox.setAlignment( Pos.TOP_CENTER );
 		warnBox.getChildren().addAll( warnCheckBox, warnLabel );
+		
+		Label updateInUILabel = new Label ( "Show update available notification in main window" );
+		updateInUILabel.setPadding( labelInsets );
+		
+		CheckBox updateInUICheckBox = new CheckBox ();
+		updateInUICheckBox.setPadding( checkBoxInsets );
+		updateInUICheckBox.selectedProperty().bindBidirectional( ui.showUpdateAvailableInUIProperty() );
+				
+		HBox updateInUIBox = new HBox();
+		updateInUIBox.setAlignment( Pos.TOP_CENTER );
+		updateInUIBox.getChildren().addAll( updateInUICheckBox, updateInUILabel );
 						
 		GridPane shuffleGrid = new GridPane();
 		shuffleGrid.setPadding( new Insets ( 0, 0, 0, 0 ) );
@@ -643,7 +647,7 @@ public class SettingsWindow extends Stage {
 
 		shuffleGrid.setAlignment( Pos.TOP_CENTER );	
 		
-		settingsPane.getChildren().addAll( shuffleGrid, themeBox, warnBox );
+		settingsPane.getChildren().addAll( shuffleGrid, themeBox, warnBox, updateInUIBox );
 		
 		return settingsTab;
 	}
@@ -1042,9 +1046,7 @@ public class SettingsWindow extends Stage {
 		String url = "http://www.hypnosplayer.org";
 		Hyperlink website = new Hyperlink ( url );
 		website.setTooltip( new Tooltip ( url ) );
-		website.setOnAction( ( ActionEvent e ) -> {
-			ui.openWebBrowser( url );
-		});
+		website.setOnAction( event -> ui.openWebBrowser( url ) );
 		website.setStyle( "-fx-font-size: 20px; -fx-text-fill: #0A95C8" );
 		aboutPane.getStyleClass().add( "aboutPaneURL" );
 
@@ -1127,8 +1129,17 @@ public class SettingsWindow extends Stage {
 		
 		licenseBox.getChildren().addAll( licenseLabel, licenseLink );
 		
-
-		aboutPane.getChildren().addAll ( name, website, versionNumber, logo, authorBox, sourceBox, licenseBox);
+		String updateURL = "http://hypnosplayer.org";
+		updateLink = new Hyperlink ( "Update Available!" );
+		updateLink.setStyle( "-fx-font-size: 20px; -fx-text-fill: #0A95C8" );
+		updateLink.getStyleClass().add( "aboutPaneURL" );
+		updateLink.setPadding( new Insets ( 15, 0, 0, 0 ) );
+		updateLink.setVisible ( false );
+		updateLink.setOnAction( e -> ui.openWebBrowser( updateURL ) );
+		updateLink.setTooltip ( new Tooltip ( updateURL ) );
+		updateLink.visibleProperty().bind( ui.updateAvailableProperty() );
+		
+		aboutPane.getChildren().addAll ( name, website, versionNumber, logo, authorBox, sourceBox, licenseBox, updateLink );
 		
 		return aboutTab;
 	}
@@ -1144,7 +1155,6 @@ public class SettingsWindow extends Stage {
 		
 		return false;
 	}
-	
 	
 	private String hotkeyText = 
 		"Main Window\n" +
@@ -1206,5 +1216,4 @@ public class SettingsWindow extends Stage {
 		"\n" +
 		"Popup Windows\n" +
 		"    Close Window                             Esc";
-
 }

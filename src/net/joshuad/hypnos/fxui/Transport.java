@@ -16,6 +16,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -49,6 +50,7 @@ public class Transport extends VBox {
 	
 	Button togglePlayButton, previousButton, nextButton, stopButton;
 	Button showSettingsButton;
+	Hyperlink updateAvailableButton;
 	
 	Label timeElapsedLabel = new Label( "" );
 	Label timeRemainingLabel = new Label( "" );
@@ -239,33 +241,43 @@ public class Transport extends VBox {
 
 		showSettingsButton = new Button ( );
 		showSettingsButton.setGraphic( settingsImage );
-
+		showSettingsButton.getStyleClass().add( "settingsButton" );
+		showSettingsButton.setTooltip( new Tooltip( "Configuration and Information" ) );
+		showSettingsButton.setOnAction ( event -> ui.showSettingsWindow() );
+		
+		updateAvailableButton = new Hyperlink ( "!" );
+		updateAvailableButton.getStyleClass().add( "updateButton" );
+		updateAvailableButton.setTooltip( new Tooltip( "An Update is Available!" ) );
+		updateAvailableButton.setOnAction ( event -> ui.openWebBrowser( "http://hypnosplayer.org" ) );
+		
 		switch ( Hypnos.getOS() ) {
 			case WIN_10: case WIN_7: case WIN_8: case WIN_UNKNOWN: case WIN_VISTA: case WIN_XP:
 				showSettingsButton.setPadding( new Insets ( 5, 5, 0, 5 ) );
+				updateAvailableButton.setPadding( new Insets ( 5, 5, 5, 0 ) );
 				break;
 				
 			case NIX: case OSX: case UNKNOWN:
 				showSettingsButton.setPadding( new Insets ( 0, 5, 0, 5 ) );
+				updateAvailableButton.setPadding( new Insets ( 5, 5, 5, 0 ) );
 				break;
 		}
 		
-		showSettingsButton.getStyleClass().add( "settingsButton" );
-		showSettingsButton.setTooltip( new Tooltip( "Configuration and Information" ) );
+		//Make it not take up space when it is not visible.
+		updateAvailableButton.managedProperty().bind( updateAvailableButton.visibleProperty() );
+		updateAvailableButton.visibleProperty().bind( ui.updateAvailableProperty().and( ui.showUpdateAvailableInUIProperty() ) );
 		
-		showSettingsButton.setOnAction ( ( ActionEvent event ) -> {
-			ui.showSettingsWindow();
-		});
+		HBox settingsBox = new HBox();
+		settingsBox.getChildren().addAll( showSettingsButton, updateAvailableButton );
 		
 		Label settingsWidthPadding = new Label ( "" );
-		settingsWidthPadding.setMinWidth( 36 ); // I couldn't figure out how to make it the exact same width as settings button
+		//settingsWidthPadding.prefWidthProperty().bind( settingsBox.widthProperty() );
 		
 		BorderPane playingTrackInfo = new BorderPane();
 		currentTrackButton = new Button( "" );
 		currentTrackButton.setPadding( new Insets ( 10, 0, 0, 0 ) );
 		currentTrackButton.getStyleClass().add( "trackName" );
 		playingTrackInfo.setCenter( currentTrackButton );
-		playingTrackInfo.setRight( showSettingsButton );
+		playingTrackInfo.setRight( settingsBox );
 		playingTrackInfo.setLeft( settingsWidthPadding );
 		
 		currentTrackButton.setOnMouseClicked( ( MouseEvent event ) -> {

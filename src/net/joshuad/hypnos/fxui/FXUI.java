@@ -148,6 +148,9 @@ public class FXUI implements PlayerListener {
 
 	private SimpleBooleanProperty promptBeforeOverwrite = new SimpleBooleanProperty ( true );
 	
+	private SimpleBooleanProperty showUpdateAvailableInUI = new SimpleBooleanProperty ( true ); 
+	private SimpleBooleanProperty updateAvailable = new SimpleBooleanProperty ( false );
+	
 	boolean doPlaylistSaveWarning = true;
 	
 	public FXUI ( Stage stage, Library library, AudioSystem audioSystem, GlobalHotkeys hotkeys ) {
@@ -584,13 +587,16 @@ public class FXUI implements PlayerListener {
 			player.getCurrentList().appendTracks( tracks );
 		}
 	}
-
-	public void setPromptBeforeOverwrite ( boolean prompt ) {
-		promptBeforeOverwrite.set( prompt );
-	}
 	
 	public BooleanProperty promptBeforeOverwriteProperty ( ) {
 		return promptBeforeOverwrite;
+	}
+	
+	public BooleanProperty showUpdateAvailableInUIProperty ( ) {
+		return showUpdateAvailableInUI;
+	}
+	public BooleanProperty updateAvailableProperty ( ) {
+		return updateAvailable;
 	}
 	
 	public boolean okToReplaceCurrentList () {
@@ -1001,7 +1007,8 @@ public class FXUI implements PlayerListener {
 		retMe.put ( Setting.CURRENT_LIST_SPLIT_PERCENT, getCurrentListSplitPercent() );
 		retMe.put ( Setting.ART_SPLIT_PERCENT, getArtSplitPercent() );
 		retMe.put ( Setting.LIBRARY_TAB, libraryPane.getSelectionModel().getSelectedIndex() );
-		retMe.put ( Setting.PROMPT_BEFORE_OVERWRITE, promptBeforeOverwrite.getValue() );
+		retMe.put ( Setting.PROMPT_BEFORE_OVERWRITE, showUpdateAvailableInUI.getValue() );
+		retMe.put ( Setting.SHOW_UPDATE_AVAILABLE_IN_MAIN_WINDOW, promptBeforeOverwrite.getValue() );
 		retMe.put ( Setting.THEME, theme );
 		
 		retMe.put ( Setting.AL_TABLE_SHOW_ARTIST_COLUMN, libraryPane.albumArtistColumn.isVisible() );
@@ -1198,6 +1205,10 @@ public class FXUI implements PlayerListener {
 					
 					case PROMPT_BEFORE_OVERWRITE:
 						promptBeforeOverwrite.setValue( Boolean.valueOf( value ) );
+						break;
+						
+					case SHOW_UPDATE_AVAILABLE_IN_MAIN_WINDOW:
+						showUpdateAvailableInUI.setValue( Boolean.valueOf( value ) );
 						break;
 					
 					case THEME:
@@ -1592,6 +1603,10 @@ public class FXUI implements PlayerListener {
 				break;
 			}
 		}
+	}
+
+	public void setUpdateAvailable ( boolean updateAvailable ) {
+		this.updateAvailable.setValue( updateAvailable );
 	}
 }
 

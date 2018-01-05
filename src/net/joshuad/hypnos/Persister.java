@@ -41,7 +41,7 @@ public class Persister {
 		SHUFFLE, REPEAT, HIDE_ALBUM_TRACKS, WINDOW_MAXIMIZED, PRIMARY_SPLIT_PERCENT, 
 		CURRENT_LIST_SPLIT_PERCENT, ART_SPLIT_PERCENT, WINDOW_X_POSITION, WINDOW_Y_POSITION, 
 		WINDOW_WIDTH, WINDOW_HEIGHT, TRACK, TRACK_POSITION, TRACK_NUMBER, VOLUME, LIBRARY_TAB,
-		PROMPT_BEFORE_OVERWRITE, THEME, LOADER_SPEED,
+		PROMPT_BEFORE_OVERWRITE, SHOW_UPDATE_AVAILABLE_IN_MAIN_WINDOW, THEME, LOADER_SPEED,
 		DEFAULT_SHUFFLE_TRACKS, DEFAULT_SHUFFLE_ALBUMS, DEFAULT_SHUFFLE_PLAYLISTS,
 		DEFAULT_REPEAT_TRACKS, DEFAULT_REPEAT_ALBUMS, DEFAULT_REPEAT_PLAYLISTS,
 
@@ -529,6 +529,7 @@ public class Persister {
 					case TRACK_NUMBER:
 					case ART_SPLIT_PERCENT:
 					case PROMPT_BEFORE_OVERWRITE:
+					case SHOW_UPDATE_AVAILABLE_IN_MAIN_WINDOW:
 					case DEFAULT_REPEAT_ALBUMS:
 					case DEFAULT_REPEAT_PLAYLISTS:
 					case DEFAULT_REPEAT_TRACKS:
@@ -554,7 +555,6 @@ public class Persister {
 					case CL_TABLE_SHOW_ALBUM_COLUMN:
 					case CL_TABLE_SHOW_TITLE_COLUMN:
 					case CL_TABLE_SHOW_LENGTH_COLUMN:
-					
 						loadMeNow.put( setting, value );
 						break;
 					case LOADER_SPEED:
@@ -572,8 +572,7 @@ public class Persister {
 			}
 
 		} catch ( Exception e ) {
-			LOGGER.warning( "Unable to read settings from disk, continuing." );
-			e.printStackTrace();
+			LOGGER.log( Level.WARNING, "Unable to read settings from disk, continuing.", e );
 		}
 
 		ui.applySettings( loadMeNow );

@@ -1,11 +1,4 @@
 General:		
-	If something gets dropped into config/playlists, update the UI to include it? 
-	
-	Update available notification. 
-		Show something in the UI, can be turned off
-		Prompt after hypnos is closed, can be turned off.
-		Always show something in settings. Also put it in log because why not. 
-		
 	Missing tracks are deleted from currentlist after restart if CurrentList.mode == ALBUM instead of remaining and being highlighted in red
 	
 	Use a thread to adjust the filter boxes. Delay afer typing for a second maybe, or delay after each typing for a bit so each letter doesn't generate an event. 
@@ -52,7 +45,6 @@ General:
 		sort options
 		ordering
 		
-	
 	Select Multiple Files in File Browser, Right click, open with Hypnos - Not all the tracks appear on the current list, and it doesn't start playing the first one
 	
 	Export playlist as a folder
@@ -138,9 +130,7 @@ General:
 	Windows - Volume takes a split second to change. 	
 			
 	Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
-	
-	Look at jump windows hotkeys re queue
-	
+		
 
 :::: Lyric Failures ::::
 	
@@ -265,24 +255,27 @@ General:
 
 :::: not now ::::
 
-Bug report dialog
-
-Playlist browse issues
-	? Add right click > browse and F4 to playlist table -- show playlist folder  
+	Bug report dialog
 	
-Java 9
+	Playlist browse issues
+		? Add right click > browse and F4 to playlist table -- show playlist folder  
 		
-	Using Java 9 to launch hypnos
-		WARNING: An illegal reflective access operation has occurred
-		WARNING: Illegal reflective access by net.joshuad.hypnos.Hypnos (file:/home/joshua/workbench/hypnos-9-test/hypnos.jar) to field java.lang.ClassLoader.sys_paths
-		WARNING: Please consider reporting this to the maintainers of net.joshuad.hypnos.Hypnos
-		WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
-		WARNING: All illegal access operations will be denied in a future release
+	Java 9
+			
+		Using Java 9 to launch hypnos
+			WARNING: An illegal reflective access operation has occurred
+			WARNING: Illegal reflective access by net.joshuad.hypnos.Hypnos (file:/home/joshua/workbench/hypnos-9-test/hypnos.jar) to field java.lang.ClassLoader.sys_paths
+			WARNING: Please consider reporting this to the maintainers of net.joshuad.hypnos.Hypnos
+			WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+			WARNING: All illegal access operations will be denied in a future release
+			
+		Using java 9 to launch hypnos crashes. I can't get either OpenSDK or OracleSDK to run, for different reasons
 		
-	Using java 9 to launch hypnos crashes. I can't get either OpenSDK or OracleSDK to run, for different reasons
+	Maybe add sorting of roman numerals? 
 	
-Maybe add sorting of roman numerals? 
-
-Add default sort column choice, like shuffle and repeat
-
-Show in tag edit window when a file doesn't support a particular tag type
+	Add default sort column choice, like shuffle and repeat
+	
+	Show in tag edit window when a file doesn't support a particular tag type
+	
+	If something gets dropped into config/playlists, update the UI to include it? 
+	

@@ -13,11 +13,11 @@
 }
 
 .trackName:hover {
-   -fx-text-fill: cornflowerblue;
+	-fx-text-fill: cornflowerblue;
 }
 
 .trackName:pressed {
-   -fx-text-fill: grey;
+	-fx-text-fill: grey;
 }
 
 .file-missing, .file-missing .tableAlbumName, .file-missing .tableAlbumDisc, .file-missing .tableAlbumType {
@@ -26,12 +26,19 @@
 }
 
 .settingsButton {
-   -fx-background-color: transparent;
-   -fx-font-size: 32px;
+	-fx-background-color: transparent;
+	-fx-font-size: 32px;
+}
+
+.updateButton {
+	-fx-background-color: transparent;
+	-fx-font-size: 16px;
+	-fx-underline: false;
+	-fx-border-color: transparent;
 }
 
 .volumeButton {
-   -fx-background-color: transparent;
+	-fx-background-color: transparent;
 }
 
 .lyricsTextArea .scroll-pane .content .text {
