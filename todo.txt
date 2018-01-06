@@ -1,7 +1,4 @@
 General:
-
-	Current List - Can't sort by clicking on column headers unless the list is empty
-			
 	Select Multiple Files in File Browser, Right click, open with Hypnos -
 		Not all the tracks appear on the current list, and it doesn't start playing the first one
 		Also the pause button kinda bugs out
@@ -13,9 +10,6 @@ General:
 	Missing tracks are deleted from currentlist after restart if CurrentList.mode == ALBUM instead of remaining and being highlighted in red
 	
 	Use a thread to adjust the filter boxes. Delay afer typing for a second maybe, or delay after each typing for a bit so each letter doesn't generate an event. 
-	
-	Esc Hotkey	
-		tagWindow & settings Window - this is a little difficult because esc also stops editing a cell
 	
 	Refactor Library
 		Make a source directory a class, not just a path.

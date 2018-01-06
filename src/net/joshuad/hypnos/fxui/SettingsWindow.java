@@ -103,6 +103,10 @@ public class SettingsWindow extends Stage {
 	
 	private Hyperlink updateLink;
 	
+	private TableView <TagError> tagTable;
+	
+	private List <TextField> globalHotkeyFields = new ArrayList<> ();
+	
 	SettingsWindow( FXUI ui, Library library, GlobalHotkeys hotkeys, AudioSystem player ) {
 		super();
 		
@@ -150,6 +154,26 @@ public class SettingsWindow extends Stage {
 		} catch ( FileNotFoundException e ) {
 			LOGGER.warning( "Unable to load program icon: resources/icon.png" );
 		}
+		
+		scene.addEventFilter( KeyEvent.KEY_PRESSED, new EventHandler <KeyEvent>() {
+			@Override
+			public void handle ( KeyEvent e ) {
+				if ( e.getCode() == KeyCode.ESCAPE ) {
+
+					boolean editingGlobalHotkey = false;
+					for ( TextField field : globalHotkeyFields ) {
+						if ( field.isFocused() ) {
+							editingGlobalHotkey = true;
+						}
+					}
+					
+					if ( !editingGlobalHotkey ) {
+						close();
+						e.consume();
+					}
+				}
+			}
+		});
 	}	
 	
 	private Tab setupHotkeysTab ( Pane root ) {
@@ -219,6 +243,7 @@ public class SettingsWindow extends Stage {
 			TextField field = new TextField ();
 			field.setStyle( "-fx-alignment: center" );
 			field.setPrefWidth( 200 );
+			globalHotkeyFields.add ( field );
 			
 			field.setOnKeyPressed( ( KeyEvent e ) -> { 
 				
@@ -765,19 +790,19 @@ public class SettingsWindow extends Stage {
 		messageColumn.setMaxWidth( 30000 );
 
 
-		TableView <TagError> table = new TableView <TagError> ();
-		table.getColumns().addAll( pathColumn, filenameColumn, messageColumn );
-		table.getSortOrder().addAll( pathColumn, messageColumn, filenameColumn );
-		table.setPlaceholder( new Label( "There are no tag errors." ) );
+		tagTable = new TableView <TagError> ();
+		tagTable.getColumns().addAll( pathColumn, filenameColumn, messageColumn );
+		tagTable.getSortOrder().addAll( pathColumn, messageColumn, filenameColumn );
+		tagTable.setPlaceholder( new Label( "There are no tag errors." ) );
 
-		library.getTagErrorsSorted().comparatorProperty().bind( table.comparatorProperty() );
+		library.getTagErrorsSorted().comparatorProperty().bind( tagTable.comparatorProperty() );
 		
-		table.setEditable( false );
-		table.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
-		table.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
-		table.setItems( library.getTagErrorsSorted() );
-		table.prefWidthProperty().bind( pane.widthProperty() );
-		table.prefHeightProperty().bind( pane.heightProperty() );
+		tagTable.setEditable( false );
+		tagTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
+		tagTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
+		tagTable.setItems( library.getTagErrorsSorted() );
+		tagTable.prefWidthProperty().bind( pane.widthProperty() );
+		tagTable.prefHeightProperty().bind( pane.heightProperty() );
 		
 		ContextMenu trackContextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
@@ -801,7 +826,7 @@ public class SettingsWindow extends Stage {
 			public void handle ( ActionEvent e ) {
 				List <Track> tracks = new ArrayList <Track> ();
 				
-				for ( TagError error : table.getSelectionModel().getSelectedItems() ) {
+				for ( TagError error : tagTable.getSelectionModel().getSelectedItems() ) {
 					tracks.add( error.getTrack() );
 				}
 				
@@ -814,7 +839,7 @@ public class SettingsWindow extends Stage {
 			public void handle ( ActionEvent event ) {
 				List <Track> tracks = new ArrayList <Track> ();
 				
-				for ( TagError error : table.getSelectionModel().getSelectedItems() ) {
+				for ( TagError error : tagTable.getSelectionModel().getSelectedItems() ) {
 					tracks.add( error.getTrack() );
 				}
 				
@@ -834,7 +859,7 @@ public class SettingsWindow extends Stage {
 			public void handle ( ActionEvent event ) {
 				List <Track> tracks = new ArrayList <Track> ();
 				
-				for ( TagError error : table.getSelectionModel().getSelectedItems() ) {
+				for ( TagError error : tagTable.getSelectionModel().getSelectedItems() ) {
 					tracks.add( error.getTrack() );
 				}
 				
@@ -854,7 +879,7 @@ public class SettingsWindow extends Stage {
 			public void handle ( ActionEvent event ) {
 				List <Track> tracks = new ArrayList <Track> ();
 				
-				for ( TagError error : table.getSelectionModel().getSelectedItems() ) {
+				for ( TagError error : tagTable.getSelectionModel().getSelectedItems() ) {
 					tracks.add( error.getTrack() );
 				}
 				
@@ -870,7 +895,7 @@ public class SettingsWindow extends Stage {
 			public void handle ( ActionEvent event ) {
 				List <Track> tracks = new ArrayList <Track> ();
 				
-				for ( TagError error : table.getSelectionModel().getSelectedItems() ) {
+				for ( TagError error : tagTable.getSelectionModel().getSelectedItems() ) {
 					tracks.add( error.getTrack() );
 				}
 				
@@ -883,7 +908,7 @@ public class SettingsWindow extends Stage {
 			public void handle ( ActionEvent event ) {
 				List <Track> tracks = new ArrayList <Track> ();
 				
-				for ( TagError error : table.getSelectionModel().getSelectedItems() ) {
+				for ( TagError error : tagTable.getSelectionModel().getSelectedItems() ) {
 					tracks.add( error.getTrack() );
 				}
 				
@@ -896,7 +921,7 @@ public class SettingsWindow extends Stage {
 			public void handle ( ActionEvent event ) {
 				List <Track> tracks = new ArrayList <Track> ();
 				
-				for ( TagError error : table.getSelectionModel().getSelectedItems() ) {
+				for ( TagError error : tagTable.getSelectionModel().getSelectedItems() ) {
 					if ( error != null ) {
 						tracks.add( error.getTrack() );
 					}
@@ -911,7 +936,7 @@ public class SettingsWindow extends Stage {
 		infoMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				ui.trackInfoWindow.setTrack( table.getSelectionModel().getSelectedItem().getTrack() );
+				ui.trackInfoWindow.setTrack( tagTable.getSelectionModel().getSelectedItem().getTrack() );
 				ui.trackInfoWindow.show();
 			}
 		});
@@ -919,7 +944,7 @@ public class SettingsWindow extends Stage {
 		lyricsMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				ui.lyricsWindow.setTrack( table.getSelectionModel().getSelectedItem().getTrack() );
+				ui.lyricsWindow.setTrack( tagTable.getSelectionModel().getSelectedItem().getTrack() );
 				ui.lyricsWindow.show();
 			}
 		});
@@ -929,14 +954,14 @@ public class SettingsWindow extends Stage {
 			// it: getHostServices().showDocument(file.toURI().toString());
 			@Override
 			public void handle ( ActionEvent event ) {
-				ui.openFileBrowser( table.getSelectionModel().getSelectedItem().getPath() );
+				ui.openFileBrowser( tagTable.getSelectionModel().getSelectedItem().getPath() );
 			}
 		});
 
-		table.setOnKeyPressed( ( KeyEvent e ) -> {
+		tagTable.setOnKeyPressed( ( KeyEvent e ) -> {
 			if ( e.getCode() == KeyCode.ESCAPE 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				table.getSelectionModel().clearSelection();
+				tagTable.getSelectionModel().clearSelection();
 				
 			} else if ( e.getCode() == KeyCode.L
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
@@ -971,7 +996,7 @@ public class SettingsWindow extends Stage {
 				
 			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown()
 			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
-				List <TagError> errors = table.getSelectionModel().getSelectedItems();
+				List <TagError> errors = tagTable.getSelectionModel().getSelectedItems();
 				List <Track> tracks = new ArrayList<> ();
 				
 				for ( TagError error : errors ) tracks.add ( error.getTrack() );
@@ -986,7 +1011,7 @@ public class SettingsWindow extends Stage {
 			}
 		});
 		
-		table.setRowFactory( tv -> {
+		tagTable.setRowFactory( tv -> {
 			TableRow <TagError> row = new TableRow <>();
 
 			row.setContextMenu( trackContextMenu );
@@ -1000,10 +1025,10 @@ public class SettingsWindow extends Stage {
 			
 			row.setOnDragDetected( event -> {
 				if ( !row.isEmpty() ) {
-					ArrayList <Integer> indices = new ArrayList <Integer>( table.getSelectionModel().getSelectedIndices() );
+					ArrayList <Integer> indices = new ArrayList <Integer>( tagTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( );
 					for ( Integer index : indices ) {
-						TagError error = table.getItems().get( index );
+						TagError error = tagTable.getItems().get( index );
 						if ( error != null ) {
 							tracks.add( error.getTrack() );
 						}
@@ -1025,7 +1050,7 @@ public class SettingsWindow extends Stage {
 		
 		
 		
-		pane.getChildren().addAll( table );
+		pane.getChildren().addAll( tagTable );
 		
 		return tab;
 	}

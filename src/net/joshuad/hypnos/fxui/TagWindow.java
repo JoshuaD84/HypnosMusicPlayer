@@ -338,11 +338,8 @@ public class TagWindow extends Stage {
 		imageTagTable.prefHeightProperty().bind( imageTagPane.heightProperty() );
 		imageTagTable.prefWidthProperty().bind( imageTagPane.widthProperty() );
 		
-		
-		
 		setupControlPanel();
 
-		
 		TabPane tabPane = new TabPane();
 		Tab textTab = new Tab( "Tags" );
 		Tab imagesTab = new Tab( "Images" );
@@ -381,7 +378,12 @@ public class TagWindow extends Stage {
 					previousButton.fire();
 					e.consume();
 					
-				} 
+				} else if ( e.getCode() == KeyCode.ESCAPE ) {
+					if ( imageTagTable.getEditingCell() == null && textTagTable.getEditingCell() == null ) {
+						close();
+						e.consume();
+					}
+				}
 			}
 		});
 
