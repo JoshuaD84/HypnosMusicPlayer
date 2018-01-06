@@ -18,6 +18,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -93,12 +94,15 @@ public class CurrentListPane extends BorderPane {
 	Library library;
 	
 	final FilteredList <CurrentListTrack> currentListFiltered;
+	final SortedList <CurrentListTrack> currentListSorted;
 	
 	public CurrentListPane( FXUI ui, AudioSystem audioSystem, Library library ) {
 		this.ui = ui;
 		this.audioSystem = audioSystem;
 		this.library = library;
 		currentListFiltered = new FilteredList <CurrentListTrack> ( audioSystem.getCurrentList().getItems(), p -> true );
+		currentListSorted = new SortedList <CurrentListTrack>( currentListFiltered );
+		
 		
 		loadImages();
 		setupTable();
@@ -617,10 +621,12 @@ public class CurrentListPane extends BorderPane {
 		lengthMenuItem.selectedProperty().bindBidirectional( clLengthColumn.visibleProperty() );
 		
 		currentListTable = new TableView();
-		currentListTable.getColumns().addAll( clPlayingColumn, clNumberColumn, clArtistColumn, clYearColumn, clAlbumColumn, clTitleColumn, clLengthColumn );
+		currentListTable.getColumns().addAll( clPlayingColumn, clNumberColumn, clArtistColumn,
+			clYearColumn, clAlbumColumn, clTitleColumn, clLengthColumn );
 		currentListTable.getSortOrder().add( clNumberColumn ); 
 		currentListTable.setEditable( false );
-		currentListTable.setItems( currentListFiltered );
+		currentListTable.setItems( currentListSorted );
+		currentListSorted.comparatorProperty().bind( currentListTable.comparatorProperty() );
 		
 		HypnosResizePolicy resizePolicy = new HypnosResizePolicy();
 		currentListTable.setColumnResizePolicy( resizePolicy );
