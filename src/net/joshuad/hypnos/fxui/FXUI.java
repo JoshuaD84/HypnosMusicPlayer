@@ -792,7 +792,7 @@ public class FXUI implements PlayerListener {
 		SwingUtilities.invokeLater( new Runnable() {
 			public void run () {
 				try {
-					Desktop.getDesktop().open( showMe );
+					Desktop.getDesktop().browse( showMe.toURI() );
 				} catch ( IOException e ) {
 					//TODO: Notify user
 					LOGGER.log( Level.INFO, "Unable to open native file browser.", e );

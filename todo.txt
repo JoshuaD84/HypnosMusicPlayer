@@ -1,16 +1,37 @@
-General:
+Now:
+	If you load albumsAndTracks but not sources Hypnos acts real wierd. Goes back and forth between not responding. On Windows confirmed. 
+		Does not happen on linux, but still, this is a wierd state -- library without sources. 	
+
 	Select Multiple Files in File Browser, Right click, open with Hypnos -
 		Not all the tracks appear on the current list, and it doesn't start playing the first one
 		Also the pause button kinda bugs out
-		
+	
 	persist column info
 		sort options
 		ordering
 	
-	Missing tracks are deleted from currentlist after restart if CurrentList.mode == ALBUM instead of remaining and being highlighted in red
+	Windows - Volume takes a split second to change.
 	
-	Use a thread to adjust the filter boxes. Delay afer typing for a second maybe, or delay after each typing for a bit so each letter doesn't generate an event. 
+	Use a thread to adjust the filter boxes. Delay afer typing for a second maybe, or delay after each typing for a bit so each letter doesn't generate an event.  
 	
+	Add default sort column choice, like shuffle and repeat	
+		Just pick 5 reasonable options and use them. It doens't need to be comprehensive
+		
+	New Hypnos layout settings. The art pane is shrunk very small vertically and not divided evenly horizontally	
+		Confirmed on KDE Neon. 
+	
+	KDE Neon
+		Can't drag and drop an mp3 into hypnos
+		
+		User said it opened the track instead of opening folder.
+			On KDE Neon image on my computer, it opened gwenview 
+			https://stackoverflow.com/questions/48131760/desktop-getdesktop-open-folder-in-kde-opens-up-gwenview-instead-of-dolphin
+
+
+Key Testing before next release:
+	Make sure browse button still works in various systems. I changed FXUI.openFileBrowser -- Desktop.getDesktop().open() to .browse()
+	
+General
 	Refactor Library
 		Make a source directory a class, not just a path.
 			Library Source Directories - highlight in red if they are missing. 
@@ -54,9 +75,16 @@ General:
 		settingsButton.setOnMouseEntered( e -> settingsImage.setEffect( this.darkThemeButtonsHover ) );
 		settingsButton.setOnMouseExited( e -> settingsImage.setEffect( isDarkTheme()? darkThemeButtons : null ) );
 		This is kind of a pain. We need to hard code the values, convert from hsv to color adjust, and also probably have white button images instead of black. 
-				
-	If you load albumsAndTracks but not sources Hypnos acts real wierd. Goes back and forth between not responding. On Windows confirmed.  	
 		
+	Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
+	
+	Interface with Last.fm scrobbler
+		https://github.com/jkovacs/lastfm-java
+		https://github.com/thomwiggers/lastfm-java
+		https://stackoverflow.com/questions/22766572/last-fm-java-api-get-recenttracks-of-a-user-within-a-data-range
+
+	Missing tracks are deleted from currentlist after restart if CurrentList.mode == ALBUM instead of remaining and being highlighted in red
+
 	Redo global hotkeys, do it on a system-by-system type basis.
 		https://stackoverflow.com/questions/79658/react-on-global-hotkey-in-a-java-program-on-windows-linux-mac
 		Some Global Hotkeys aren't consumed - Win + C, Win + X, etc.  
@@ -72,15 +100,78 @@ General:
 			http://sourceforge.net/projects/jxgrabkey/
 			
 			JNativeHook - No consumption of hotkey
+
+	Get java to release memory back sometimes. We use a lot on load
+		https://stackoverflow.com/questions/30458195/does-gc-release-back-memory-to-os
+
+	Tag auto fix button
+
+	Bug report dialog
 	
-	Linux - KDE Neon - Test file browser feature (dolphin browser). User said it opened the track instead of opening folder. 
+	Playlist browse issues
+		? Add right click > browse and F4 to playlist table -- show playlist folder  
 		
-	Windows - Volume takes a split second to change. 	
+	Java 9
 			
-	Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
-	
-	Interface with Last.fm scrobbler
+		Using Java 9 to launch hypnos
+			WARNING: An illegal reflective access operation has occurred
+			WARNING: Illegal reflective access by net.joshuad.hypnos.Hypnos (file:/home/joshua/workbench/hypnos-9-test/hypnos.jar) to field java.lang.ClassLoader.sys_paths
+			WARNING: Please consider reporting this to the maintainers of net.joshuad.hypnos.Hypnos
+			WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+			WARNING: All illegal access operations will be denied in a future release
+			
+		Using java 9 to launch hypnos crashes. I can't get either OpenSDK or OracleSDK to run, for different reasons
 		
+	Maybe add sorting of roman numerals? 
+	
+	Show in tag edit window when a file doesn't support a particular tag type
+	
+	If something gets dropped into config/playlists, update the UI to include it? 
+	
+	Memory Hog issue	
+		With an empty library and no current list and nothing loaded uses about 175mb on Windows 7.
+			Clicking around the UI and using every UI feature except for loading library or tracks can climb it to about 300mb
+			loading a folder of 58 albums climbs the usage to ~400mb. Removing seems to push it to 411mb
+			loading a folder of 2460 albums climbs to the usage to 1.7GB
+			closing and reopening 
+			closing and reopening:
+				drives it up to 1.4gb + (i'm sure it would keep going for a while longer)
+				with library loader and library updater disabled puts the memory at 320mb
+				with updater disabled puts the memory at 1.2+ (probably would've kept climbing)
+				with loader disabled it stops at ~367mb. 
+			
+			SO loader is a source of memory consumption definitely. 
+				-Xmx600m fixed this on windows 7. Kept it floating around 450mb. 
+			
+		loading images definitely makes it real bad. Fixing that will help, but won't solve it. 
+		
+		scrolling up and down the album or track table table does increase memory usage, but "only" by 100-200mb. 
+		
+		Start Hypnos
+		Load a big library ( /d/music)
+		Let it finish loading
+		Close and reopen hypnos
+		1.6GB memory footprint
+		
+		Start Hypnos
+		Load a big library (/d/music)
+		during load -- 1.26GB
+		after load - 721MB
+		after restart hypnos - 1.5GB
+		it seems to stay there. I let it run for about 10 minutes, no drop in memory usage. 
+		
+		stopping the libraryUpdater and libraryLoader seems to cut into the problem tremendously
+		
+		Even after stopping updater and loader, it creeps up. It looks like everytime a new song is played?
+			confirmed. Each new song spikes the memory. Just flipping through the songs without playing them causes it
+				Is this related to the skipping issue? - doesn't seem to be with one or two tracks after ramping up the memory
+			Was able to get it to 3 GB just by flipping through tracks. Could probably go higher. 
+		
+		flipping through tracks quickly by hitting next button also causes memory spike. Not terrible. 
+				
+		2017/12/25 - I was able to temper this problem significantly by having only one image loader thread and by setting -Xmx
+
+
 
 :::: Lyric Failures ::::
 
@@ -94,10 +185,7 @@ General:
 		
 		Scrollbar width is calculated wrong by 4 pixels. I have it hardcoded, but I posted a SE question
 			https://stackoverflow.com/questions/47852175/get-full-width-of-scrollbar-for-a-tableview
-		
-		CustomResizePolicy is not called when double clicking on table header dividers to shrink wrap	
-			https://stackoverflow.com/questions/47852239/customresizepolicy-not-triggering-when-a-columns-headers-divider-is-double-cli
-			
+					
 	Double clicking on table-column dividers doesn't call resize:
 		https://stackoverflow.com/questions/47852239/customresizepolicy-not-triggering-when-a-columns-headers-divider-is-double-cli
 			
@@ -126,18 +214,11 @@ General:
 
  	Make LibraryUpdater part of Library. Is there a way to abstract out the Platform -> RunLater part? I feel like we're just stuck w/ that, which kind of ties to us JavaFX. 
  		Maybe ui.runMe ( Runnable ), and then the UI can decide whether to launch a new thread, have a thread idling, do it on this thread, or use something like Platform.runLater()	
-
- 	Make MainWindow its own class, and have FXUI be more of a simple manager? 
- 	
-	use observable values for all of the track and album stuff, so we don't have to do refreshes
 	
 	a better structure for persister
 	
 	a better structure for hotkey commands (maybe combine with commandline commands?)
 		
-	Make a single function for setting up right click menus, or at least combine a bunch. We have so many big chunks of the same code. 
-
-
 :::: Decoders ::::
 
 	Playback Problems
@@ -190,94 +271,9 @@ General:
 				This is pretty close. It makes an entry but it doesn't work. Could be a lot of different problems.
 				WriteRegStr HKCR ".flac\shell\Hypnos\command" "" "$INSTDIR\Hypnos.exe $\"%1$\""
 				
-				
 		When you launch show busy mouse cursor
 
 		https://sourceforge.net/p/launch4j/discussion/332684/thread/75bbbd93/
 		https://stackoverflow.com/questions/7506329/embed-java-into-a-c-application
 		
-	Linux					
-		https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
-	
-	OSX
-		Does our package work? 
-		Open-with shell integration
-		.DMG installer
-		Rename java process to Hypnos ?
-		Test global hotkeys
-		Test Everything
-	
 
-:::: not now ::::
-
-	Get java to release memory back sometimes. We use a lot on load
-		https://stackoverflow.com/questions/30458195/does-gc-release-back-memory-to-os
-
-	Tag auto fix button
-
-	Bug report dialog
-	
-	Playlist browse issues
-		? Add right click > browse and F4 to playlist table -- show playlist folder  
-		
-	Java 9
-			
-		Using Java 9 to launch hypnos
-			WARNING: An illegal reflective access operation has occurred
-			WARNING: Illegal reflective access by net.joshuad.hypnos.Hypnos (file:/home/joshua/workbench/hypnos-9-test/hypnos.jar) to field java.lang.ClassLoader.sys_paths
-			WARNING: Please consider reporting this to the maintainers of net.joshuad.hypnos.Hypnos
-			WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
-			WARNING: All illegal access operations will be denied in a future release
-			
-		Using java 9 to launch hypnos crashes. I can't get either OpenSDK or OracleSDK to run, for different reasons
-		
-	Maybe add sorting of roman numerals? 
-	
-	Add default sort column choice, like shuffle and repeat
-	
-	Show in tag edit window when a file doesn't support a particular tag type
-	
-	If something gets dropped into config/playlists, update the UI to include it? 
-	
-	Memory Hog issue	
-		With an empty library and no current list and nothing loaded uses about 175mb on Windows 7.
-			Clicking around the UI and using every UI feature except for loading library or tracks can climb it to about 300mb
-			loading a folder of 58 albums climbs the usage to ~400mb. Removing seems to push it to 411mb
-			loading a folder of 2460 albums climbs to the usage to 1.7GB
-			closing and reopening 
-			closing and reopening:
-				drives it up to 1.4gb + (i'm sure it would keep going for a while longer)
-				with library loader and library updater disabled puts the memory at 320mb
-				with updater disabled puts the memory at 1.2+ (probably would've kept climbing)
-				with loader disabled it stops at ~367mb. 
-			
-			SO loader is a source of memory consumption definitely. 
-				-Xmx600m fixed this on windows 7. Kept it floating around 450mb. 
-			
-		loading images definitely makes it real bad. Fixing that will help, but won't solve it. 
-		
-		scrolling up and down the album or track table table does increase memory usage, but "only" by 100-200mb. 
-		
-		Start Hypnos
-		Load a big library ( /d/music)
-		Let it finish loading
-		Close and reopen hypnos
-		1.6GB memory footprint
-		
-		Start Hypnos
-		Load a big library (/d/music)
-		during load -- 1.26GB
-		after load - 721MB
-		after restart hypnos - 1.5GB
-		it seems to stay there. I let it run for about 10 minutes, no drop in memory usage. 
-		
-		stopping the libraryUpdater and libraryLoader seems to cut into the problem tremendously
-		
-		Even after stopping updater and loader, it creeps up. It looks like everytime a new song is played?
-			confirmed. Each new song spikes the memory. Just flipping through the songs without playing them causes it
-				Is this related to the skipping issue? - doesn't seem to be with one or two tracks after ramping up the memory
-			Was able to get it to 3 GB just by flipping through tracks. Could probably go higher. 
-		
-		flipping through tracks quickly by hitting next button also causes memory spike. Not terrible. 
-				
-		2017/12/25 - I was able to temper this problem significantly by having only one image loader thread and by setting -Xmx

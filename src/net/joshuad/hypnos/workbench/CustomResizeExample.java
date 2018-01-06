@@ -47,10 +47,6 @@ public class CustomResizeExample extends Application {
 		table.getColumns().add( local );
 		table.getColumns().add( language2 );
 		
-		for ( TableColumn column : table.getColumns() ) {
-			System.out.println ( "Width: " + column.getWidth() + ", Pref: " + column.getPrefWidth() + ", Min: " + column.getMinWidth() + ", Max: " + column.getMaxWidth() ) ;
-		}
-
 		BorderPane pane = new BorderPane( table );
 		return pane;
 	}
