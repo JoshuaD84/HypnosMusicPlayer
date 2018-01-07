@@ -53,7 +53,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.stage.FileChooser;
-import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.AlphanumComparator;
 import net.joshuad.hypnos.CurrentListState;
 import net.joshuad.hypnos.CurrentListTrack;
@@ -65,6 +64,7 @@ import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.AlphanumComparator.CaseHandling;
+import net.joshuad.hypnos.CurrentList.DefaultSortMode;
 import net.joshuad.hypnos.Persister.Setting;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
@@ -77,7 +77,7 @@ public class CurrentListPane extends BorderPane {
 	HBox currentListControls; 
 
 	TableView <CurrentListTrack> currentListTable;
-	TableColumn clPlayingColumn, clArtistColumn, clYearColumn, clAlbumColumn, clTitleColumn, clNumberColumn, clLengthColumn;
+	TableColumn playingColumn, artistColumn, yearColumn, albumColumn, titleColumn, numberColumn, lengthColumn;
 	ContextMenu currentListColumnSelectorMenu;
 	
 	Button toggleRepeatButton, toggleShuffleButton;
@@ -550,34 +550,34 @@ public class CurrentListPane extends BorderPane {
 	}
 	
 	private void setupTable () {
-		clPlayingColumn = new TableColumn( "" );
-		clArtistColumn = new TableColumn( "Artist" );
-		clYearColumn = new TableColumn( "Year" );
-		clAlbumColumn = new TableColumn( "Album" );
-		clTitleColumn = new TableColumn( "Title" );
-		clNumberColumn = new TableColumn( "#" );
-		clLengthColumn = new TableColumn( "Length" );
+		playingColumn = new TableColumn( "" );
+		artistColumn = new TableColumn( "Artist" );
+		yearColumn = new TableColumn( "Year" );
+		albumColumn = new TableColumn( "Album" );
+		titleColumn = new TableColumn( "Title" );
+		numberColumn = new TableColumn( "#" );
+		lengthColumn = new TableColumn( "Length" );
 		
-		clAlbumColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
-		clArtistColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
-		clTitleColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
+		albumColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
+		artistColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
+		titleColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
 		
-		clPlayingColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, CurrentListTrackState>( "displayState" ) );
-		clArtistColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "artist" ) );
-		clYearColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, Integer>( "year" ) );
-		clAlbumColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "fullAlbumTitle" ) );
-		clTitleColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "title" ) );
-		clNumberColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, Integer>( "trackNumber" ) );
-		clLengthColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "lengthDisplay" ) );
+		playingColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, CurrentListTrackState>( "displayState" ) );
+		artistColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "artist" ) );
+		yearColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, Integer>( "year" ) );
+		albumColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "fullAlbumTitle" ) );
+		titleColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "title" ) );
+		numberColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, Integer>( "trackNumber" ) );
+		lengthColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "lengthDisplay" ) );
 		
-		clAlbumColumn.setCellFactory( e -> new FormattedAlbumCell() );
+		albumColumn.setCellFactory( e -> new FormattedAlbumCell() );
 
-		clPlayingColumn.setCellFactory ( column -> { 
+		playingColumn.setCellFactory ( column -> { 
 				return new CurrentListTrackStateCell( ui, ui.transport.playImageSource, ui.transport.pauseImageSource ); 
 			} 
 		);
 		
-		clNumberColumn.setCellFactory( column -> {
+		numberColumn.setCellFactory( column -> {
 			return new TableCell <CurrentListTrack, Integer>() {
 				@Override
 				protected void updateItem ( Integer value, boolean empty ) {
@@ -609,25 +609,25 @@ public class CurrentListPane extends BorderPane {
 		lengthMenuItem.setSelected( true );
 		currentListColumnSelectorMenu.getItems().addAll( playingMenuItem, numberMenuItem,artistMenuItem, 
 			yearMenuItem, albumMenuItem,  titleMenuItem, lengthMenuItem );
-		clPlayingColumn.setContextMenu( currentListColumnSelectorMenu );
-		clArtistColumn.setContextMenu( currentListColumnSelectorMenu );
-		clYearColumn.setContextMenu( currentListColumnSelectorMenu );
-		clAlbumColumn.setContextMenu( currentListColumnSelectorMenu );
-		clTitleColumn.setContextMenu( currentListColumnSelectorMenu );
-		clNumberColumn.setContextMenu( currentListColumnSelectorMenu );
-		clLengthColumn.setContextMenu( currentListColumnSelectorMenu );
-		playingMenuItem.selectedProperty().bindBidirectional( clPlayingColumn.visibleProperty() );
-		artistMenuItem.selectedProperty().bindBidirectional( clArtistColumn.visibleProperty() );
-		yearMenuItem.selectedProperty().bindBidirectional( clYearColumn.visibleProperty() );
-		albumMenuItem.selectedProperty().bindBidirectional( clAlbumColumn.visibleProperty() );
-		numberMenuItem.selectedProperty().bindBidirectional( clNumberColumn.visibleProperty() );
-		titleMenuItem.selectedProperty().bindBidirectional( clTitleColumn.visibleProperty() );
-		lengthMenuItem.selectedProperty().bindBidirectional( clLengthColumn.visibleProperty() );
+		playingColumn.setContextMenu( currentListColumnSelectorMenu );
+		artistColumn.setContextMenu( currentListColumnSelectorMenu );
+		yearColumn.setContextMenu( currentListColumnSelectorMenu );
+		albumColumn.setContextMenu( currentListColumnSelectorMenu );
+		titleColumn.setContextMenu( currentListColumnSelectorMenu );
+		numberColumn.setContextMenu( currentListColumnSelectorMenu );
+		lengthColumn.setContextMenu( currentListColumnSelectorMenu );
+		playingMenuItem.selectedProperty().bindBidirectional( playingColumn.visibleProperty() );
+		artistMenuItem.selectedProperty().bindBidirectional( artistColumn.visibleProperty() );
+		yearMenuItem.selectedProperty().bindBidirectional( yearColumn.visibleProperty() );
+		albumMenuItem.selectedProperty().bindBidirectional( albumColumn.visibleProperty() );
+		numberMenuItem.selectedProperty().bindBidirectional( numberColumn.visibleProperty() );
+		titleMenuItem.selectedProperty().bindBidirectional( titleColumn.visibleProperty() );
+		lengthMenuItem.selectedProperty().bindBidirectional( lengthColumn.visibleProperty() );
 		
 		currentListTable = new TableView();
-		currentListTable.getColumns().addAll( clPlayingColumn, clNumberColumn, clArtistColumn,
-			clYearColumn, clAlbumColumn, clTitleColumn, clLengthColumn );
-		currentListTable.getSortOrder().add( clNumberColumn ); 
+		currentListTable.getColumns().addAll( playingColumn, numberColumn, artistColumn,
+			yearColumn, albumColumn, titleColumn, lengthColumn );
+		currentListTable.getSortOrder().add( numberColumn ); 
 		currentListTable.setEditable( false );
 		currentListTable.setItems( currentListSorted );
 		currentListSorted.comparatorProperty().bind( currentListTable.comparatorProperty() );
@@ -638,18 +638,18 @@ public class CurrentListPane extends BorderPane {
 		currentListTable.setPlaceholder( new Label( "No tracks in playlist." ) );
 		currentListTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 		
-		clPlayingColumn.setMaxWidth( 38 );
-		clPlayingColumn.setMinWidth( 38 );
-		clPlayingColumn.setResizable( false );
+		playingColumn.setMaxWidth( 38 );
+		playingColumn.setMinWidth( 38 );
+		playingColumn.setResizable( false );
 
-		clArtistColumn.setPrefWidth( 100 );
-		clNumberColumn.setPrefWidth( 40 );
-		clYearColumn.setPrefWidth( 60 );
-		clAlbumColumn.setPrefWidth( 100 );
-		clTitleColumn.setPrefWidth( 100 );
-		clLengthColumn.setPrefWidth( 70 );
+		artistColumn.setPrefWidth( 100 );
+		numberColumn.setPrefWidth( 40 );
+		yearColumn.setPrefWidth( 60 );
+		albumColumn.setPrefWidth( 100 );
+		titleColumn.setPrefWidth( 100 );
+		lengthColumn.setPrefWidth( 70 );
 		
-		resizePolicy.registerFixedWidthColumns( clYearColumn, clNumberColumn, clLengthColumn );
+		resizePolicy.registerFixedWidthColumns( yearColumn, numberColumn, lengthColumn );
 		
 		currentListTable.setOnDragOver( event -> {
 			
@@ -1187,31 +1187,31 @@ public class CurrentListPane extends BorderPane {
 			try {
 				switch ( setting ) {
 					case CL_TABLE_PLAYING_COLUMN_SHOW:
-						clPlayingColumn.setVisible( Boolean.valueOf ( value ) );
+						playingColumn.setVisible( Boolean.valueOf ( value ) );
 						settings.remove ( setting );
 						break;
 					case CL_TABLE_NUMBER_COLUMN_SHOW:
-						clNumberColumn.setVisible( Boolean.valueOf ( value ) );
+						numberColumn.setVisible( Boolean.valueOf ( value ) );
 						settings.remove ( setting );
 						break;
 					case CL_TABLE_ARTIST_COLUMN_SHOW:
-						clArtistColumn.setVisible( Boolean.valueOf ( value ) );
+						artistColumn.setVisible( Boolean.valueOf ( value ) );
 						settings.remove ( setting );
 						break;
 					case CL_TABLE_YEAR_COLUMN_SHOW:
-						clYearColumn.setVisible( Boolean.valueOf ( value ) );
+						yearColumn.setVisible( Boolean.valueOf ( value ) );
 						settings.remove ( setting );
 						break;
 					case CL_TABLE_ALBUM_COLUMN_SHOW:
-						clAlbumColumn.setVisible( Boolean.valueOf ( value ) );
+						albumColumn.setVisible( Boolean.valueOf ( value ) );
 						settings.remove ( setting );
 						break;
 					case CL_TABLE_TITLE_COLUMN_SHOW:
-						clTitleColumn.setVisible( Boolean.valueOf ( value ) );
+						titleColumn.setVisible( Boolean.valueOf ( value ) );
 						settings.remove ( setting );
 						break;
 					case CL_TABLE_LENGTH_COLUMN_SHOW:
-						clLengthColumn.setVisible( Boolean.valueOf ( value ) );
+						lengthColumn.setVisible( Boolean.valueOf ( value ) );
 						settings.remove ( setting );
 						break;	
 					case CL_SORT_ORDER:
@@ -1225,26 +1225,26 @@ public class CurrentListPane extends BorderPane {
 									SortType sortType = SortType.valueOf( fullValue.split( "-" )[1] );
 									
 									if ( columnName.equals( "playing" ) ) {
-										currentListTable.getSortOrder().add( clPlayingColumn );
-										clPlayingColumn.setSortType( sortType );
+										currentListTable.getSortOrder().add( playingColumn );
+										playingColumn.setSortType( sortType );
 									} else if ( columnName.equals( "artist" ) ) {
-										currentListTable.getSortOrder().add( clArtistColumn );
-										clArtistColumn.setSortType( sortType );
+										currentListTable.getSortOrder().add( artistColumn );
+										artistColumn.setSortType( sortType );
 									} else if ( columnName.equals( "year" ) ) {
-										currentListTable.getSortOrder().add( clYearColumn );
-										clYearColumn.setSortType( sortType );
+										currentListTable.getSortOrder().add( yearColumn );
+										yearColumn.setSortType( sortType );
 									} else if ( columnName.equals( "album" ) ) {
-										currentListTable.getSortOrder().add( clAlbumColumn );
-										clAlbumColumn.setSortType( sortType );
+										currentListTable.getSortOrder().add( albumColumn );
+										albumColumn.setSortType( sortType );
 									} else if ( columnName.equals( "title" ) ) {
-										currentListTable.getSortOrder().add( clTitleColumn );
-										clTitleColumn.setSortType( sortType );
+										currentListTable.getSortOrder().add( titleColumn );
+										titleColumn.setSortType( sortType );
 									} else if ( columnName.equals( "number" ) ) {
-										currentListTable.getSortOrder().add( clNumberColumn );
-										clNumberColumn.setSortType( sortType );
+										currentListTable.getSortOrder().add( numberColumn );
+										numberColumn.setSortType( sortType );
 									} else if ( columnName.equals( "length" ) ) {
-										currentListTable.getSortOrder().add( clLengthColumn );
-										clLengthColumn.setSortType( sortType );
+										currentListTable.getSortOrder().add( lengthColumn );
+										lengthColumn.setSortType( sortType );
 									} 
 									
 								} catch ( Exception e ) {
@@ -1261,26 +1261,26 @@ public class CurrentListPane extends BorderPane {
 						for ( String columnName : order ) {
 							try {
 								if ( columnName.equals( "playing" ) ) {
-									currentListTable.getColumns().remove( clPlayingColumn );
-									currentListTable.getColumns().add( newIndex, clPlayingColumn );
+									currentListTable.getColumns().remove( playingColumn );
+									currentListTable.getColumns().add( newIndex, playingColumn );
 								} else if ( columnName.equals( "artist" ) ) {
-									currentListTable.getColumns().remove( clArtistColumn );
-									currentListTable.getColumns().add( newIndex, clArtistColumn );
+									currentListTable.getColumns().remove( artistColumn );
+									currentListTable.getColumns().add( newIndex, artistColumn );
 								} else if ( columnName.equals( "year" ) ) {
-									currentListTable.getColumns().remove( clYearColumn );
-									currentListTable.getColumns().add( newIndex, clYearColumn );
+									currentListTable.getColumns().remove( yearColumn );
+									currentListTable.getColumns().add( newIndex, yearColumn );
 								} else if ( columnName.equals( "album" ) ) {
-									currentListTable.getColumns().remove( clAlbumColumn );
-									currentListTable.getColumns().add( newIndex, clAlbumColumn );
+									currentListTable.getColumns().remove( albumColumn );
+									currentListTable.getColumns().add( newIndex, albumColumn );
 								} else if ( columnName.equals( "title" ) ) {
-									currentListTable.getColumns().remove( clTitleColumn );
-									currentListTable.getColumns().add( newIndex, clTitleColumn );
+									currentListTable.getColumns().remove( titleColumn );
+									currentListTable.getColumns().add( newIndex, titleColumn );
 								} else if ( columnName.equals( "number" ) ) {
-									currentListTable.getColumns().remove( clNumberColumn );
-									currentListTable.getColumns().add( newIndex, clNumberColumn );
+									currentListTable.getColumns().remove( numberColumn );
+									currentListTable.getColumns().add( newIndex, numberColumn );
 								} else if ( columnName.equals( "length" ) ) {
-									currentListTable.getColumns().remove( clLengthColumn );
-									currentListTable.getColumns().add( newIndex, clLengthColumn );
+									currentListTable.getColumns().remove( lengthColumn );
+									currentListTable.getColumns().add( newIndex, lengthColumn );
 								} 
 								newIndex++;
 							} catch ( Exception e ) {
@@ -1309,53 +1309,123 @@ public class CurrentListPane extends BorderPane {
 		String sortOrderValue = "";
 		
 		for ( TableColumn<CurrentListTrack, ?> column : currentListTable.getSortOrder() ) {
-			if ( column == clPlayingColumn ) {
-				sortOrderValue += "playing-" + clPlayingColumn.getSortType() + " ";
-			} else if ( column == clArtistColumn ) {
-				sortOrderValue += "artist-" + clArtistColumn.getSortType() + " ";
-			} else if ( column == clYearColumn ) {
-				sortOrderValue += "year-" + clYearColumn.getSortType() + " ";
-			} else if ( column == clAlbumColumn ) {
-				sortOrderValue += "album-" + clAlbumColumn.getSortType() + " ";
-			} else if ( column == clTitleColumn ) {
-				sortOrderValue += "title-" + clTitleColumn.getSortType() + " ";
-			} else if ( column == clNumberColumn ) {
-				sortOrderValue += "number-" + clNumberColumn.getSortType() + " ";
-			} else if ( column == clLengthColumn ) {
-				sortOrderValue += "length-" + clLengthColumn.getSortType() + " ";
+			if ( column == playingColumn ) {
+				sortOrderValue += "playing-" + playingColumn.getSortType() + " ";
+			} else if ( column == artistColumn ) {
+				sortOrderValue += "artist-" + artistColumn.getSortType() + " ";
+			} else if ( column == yearColumn ) {
+				sortOrderValue += "year-" + yearColumn.getSortType() + " ";
+			} else if ( column == albumColumn ) {
+				sortOrderValue += "album-" + albumColumn.getSortType() + " ";
+			} else if ( column == titleColumn ) {
+				sortOrderValue += "title-" + titleColumn.getSortType() + " ";
+			} else if ( column == numberColumn ) {
+				sortOrderValue += "number-" + numberColumn.getSortType() + " ";
+			} else if ( column == lengthColumn ) {
+				sortOrderValue += "length-" + lengthColumn.getSortType() + " ";
 			} 
 		}
 		retMe.put ( Setting.CL_SORT_ORDER, sortOrderValue );
 		
 		String columnOrderValue = "";
 		for ( TableColumn<CurrentListTrack, ?> column : currentListTable.getColumns() ) {
-			if ( column == clPlayingColumn ) {
+			if ( column == playingColumn ) {
 				columnOrderValue += "playing ";
-			} else if ( column == clArtistColumn ) {
+			} else if ( column == artistColumn ) {
 				columnOrderValue += "artist ";
-			} else if ( column == clYearColumn ) {
+			} else if ( column == yearColumn ) {
 				columnOrderValue += "year ";
-			} else if ( column == clAlbumColumn ) {
+			} else if ( column == albumColumn ) {
 				columnOrderValue += "album ";
-			} else if ( column == clTitleColumn ) {
+			} else if ( column == titleColumn ) {
 				columnOrderValue += "title ";
-			} else if ( column == clNumberColumn ) {
+			} else if ( column == numberColumn ) {
 				columnOrderValue += "number ";
-			} else if ( column == clLengthColumn ) {
+			} else if ( column == lengthColumn ) {
 				columnOrderValue += "length ";
 			}
 		}
 		retMe.put ( Setting.CL_COLUMN_ORDER, columnOrderValue );
 		
-		retMe.put ( Setting.CL_TABLE_PLAYING_COLUMN_SHOW, clPlayingColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_NUMBER_COLUMN_SHOW, clNumberColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_ARTIST_COLUMN_SHOW, clArtistColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_YEAR_COLUMN_SHOW, clYearColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_ALBUM_COLUMN_SHOW, clAlbumColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_TITLE_COLUMN_SHOW, clTitleColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_LENGTH_COLUMN_SHOW, clLengthColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_PLAYING_COLUMN_SHOW, playingColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_NUMBER_COLUMN_SHOW, numberColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_ARTIST_COLUMN_SHOW, artistColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_YEAR_COLUMN_SHOW, yearColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_ALBUM_COLUMN_SHOW, albumColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_TITLE_COLUMN_SHOW, titleColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_LENGTH_COLUMN_SHOW, lengthColumn.isVisible() );
 		
 		return retMe;
+	}
+
+	@SuppressWarnings("unchecked")
+	public void setSortMode ( DefaultSortMode sortMode ) {
+		switch ( sortMode ) {
+			case ARTIST:
+				currentListTable.getSortOrder().clear();
+				currentListTable.getSortOrder().add( artistColumn );
+				artistColumn.setSortType( SortType.ASCENDING );
+				break;
+			case ARTIST_ALBUM_NUMBER:
+				currentListTable.getSortOrder().clear();
+				currentListTable.getSortOrder().add( artistColumn );
+				currentListTable.getSortOrder().add( albumColumn );
+				currentListTable.getSortOrder().add( numberColumn );
+				artistColumn.setSortType( SortType.ASCENDING );
+				albumColumn.setSortType( SortType.ASCENDING );
+				numberColumn.setSortType( SortType.ASCENDING );
+				break;
+			case ARTIST_NUMBER:
+				currentListTable.getSortOrder().clear();
+				currentListTable.getSortOrder().add( artistColumn );
+				currentListTable.getSortOrder().add( numberColumn );
+				artistColumn.setSortType( SortType.ASCENDING );
+				numberColumn.setSortType( SortType.ASCENDING );
+				break;
+			case ARTIST_TITLE:
+				currentListTable.getSortOrder().clear();
+				currentListTable.getSortOrder().add( artistColumn );
+				currentListTable.getSortOrder().add( titleColumn );
+				artistColumn.setSortType( SortType.ASCENDING );
+				titleColumn.setSortType( SortType.ASCENDING );
+				break;
+			case ARTIST_YEAR_ALBUM_NUMBER:
+				currentListTable.getSortOrder().clear();
+				currentListTable.getSortOrder().add( artistColumn );
+				currentListTable.getSortOrder().add( yearColumn );
+				currentListTable.getSortOrder().add( albumColumn );
+				currentListTable.getSortOrder().add( numberColumn );
+				artistColumn.setSortType( SortType.ASCENDING );
+				yearColumn.setSortType( SortType.ASCENDING );
+				albumColumn.setSortType( SortType.ASCENDING );
+				numberColumn.setSortType( SortType.ASCENDING );
+				break;
+			case NUMBER:
+				currentListTable.getSortOrder().clear();
+				currentListTable.getSortOrder().add( numberColumn );
+				numberColumn.setSortType( SortType.ASCENDING );
+				break;
+			case NO_CHANGE:
+				//Do nothing
+				break;
+			case YEAR_ALBUM_NUMBER:
+				currentListTable.getSortOrder().clear();
+				currentListTable.getSortOrder().add( yearColumn );
+				currentListTable.getSortOrder().add( albumColumn );
+				currentListTable.getSortOrder().add( numberColumn );
+				yearColumn.setSortType( SortType.ASCENDING );
+				albumColumn.setSortType( SortType.ASCENDING );
+				numberColumn.setSortType( SortType.ASCENDING );
+				break;
+			case ALBUM_NUMBER:
+				currentListTable.getSortOrder().clear();
+				currentListTable.getSortOrder().add( albumColumn );
+				currentListTable.getSortOrder().add( numberColumn );
+				albumColumn.setSortType( SortType.ASCENDING );
+				numberColumn.setSortType( SortType.ASCENDING );
+			default:
+				break;
+		}
 	}
 }
 

@@ -9,9 +9,12 @@ Now:
 	Windows - Volume takes a split second to change.
 	
 	Use a thread to adjust the filter boxes. Delay afer typing for a second maybe, or delay after each typing for a bit so each letter doesn't generate an event.  
-	
-	Add default sort column choice, like shuffle and repeat	
-		Just pick 5 reasonable options and use them. It doens't need to be comprehensive
+
+	Right click on table header -> Reset to Default View
+		Playlists
+		Albums
+		Tracks
+		CurrentList
 		
 	New Hypnos layout settings. The art pane is shrunk very small vertically and not divided evenly horizontally	
 		Confirmed on KDE Neon. 
@@ -21,9 +24,13 @@ Key Testing before next release:
 	Make sure browse button still works in various systems. I changed FXUI.openFileBrowser -- Desktop.getDesktop().open() to .browse()
 	
 General
-	If you delete a list of tracks down so that it matches an album, set title bar to that album
+	Rename player to audioSystem in Persister, FXUI, and wherever else
 	
-	Right click on table header -> Reset to Default View
+	Set an option to sort by album artist instead of artist on artist column in current list
+	
+	Don't try to initialize a decoder if track.isMissingFile();
+	
+	If you delete a list of tracks down so that it matches an album, set title bar to that album
 	
 	Persister loadPreWindow and PostWindowSettings  -- check the EnumMap after applying the setting for any items. 
 		if there is stuff log it as "not applied settings" 

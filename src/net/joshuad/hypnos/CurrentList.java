@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -14,6 +15,8 @@ import java.util.logging.Logger;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.TableColumn;
+import net.joshuad.hypnos.Persister.Setting;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
@@ -37,6 +40,18 @@ public class CurrentList {
 	public enum DefaultRepeatMode {
 		PLAY_ONCE, REPEAT, NO_CHANGE
 	}
+	
+	public enum DefaultSortMode {
+		NUMBER,
+		ARTIST,
+		ARTIST_TITLE,
+		ARTIST_NUMBER,
+		ARTIST_ALBUM_NUMBER,
+		ARTIST_YEAR_ALBUM_NUMBER,
+		ALBUM_NUMBER,
+		YEAR_ALBUM_NUMBER,
+		NO_CHANGE
+	}
 		
 	Mode mode = Mode.EMPTY;
 	final List <Album> currentAlbums = new ArrayList <Album> ();
@@ -56,6 +71,10 @@ public class CurrentList {
 	private DefaultRepeatMode albumRepeatMode = DefaultRepeatMode.PLAY_ONCE;
 	private DefaultRepeatMode trackRepeatMode = DefaultRepeatMode.NO_CHANGE;
 	private DefaultRepeatMode playlistRepeatMode = DefaultRepeatMode.REPEAT;
+	
+	private DefaultSortMode albumSortMode = DefaultSortMode.YEAR_ALBUM_NUMBER;
+	private DefaultSortMode trackSortMode = DefaultSortMode.YEAR_ALBUM_NUMBER;
+	private DefaultSortMode playlistSortMode = DefaultSortMode.ARTIST_TITLE;
 	
 	List <Thread> noLoadThreads = new ArrayList <Thread> ();
 	
@@ -184,6 +203,18 @@ public class CurrentList {
 		this.playlistRepeatMode = mode;
 	}
 	
+	public void setDefaultAlbumSortMode  ( DefaultSortMode mode ) {
+		this.albumSortMode = mode;
+	}
+	
+	public void setDefaultTrackSortMode  ( DefaultSortMode mode ) {
+		this.trackSortMode = mode;
+	}
+	
+	public void setDefaultPlaylistSortMode  ( DefaultSortMode mode ) {
+		this.playlistSortMode = mode;
+	}
+	
 	public DefaultShuffleMode getDefaultTrackShuffleMode () {
 		return trackShuffleMode;
 	}
@@ -206,6 +237,18 @@ public class CurrentList {
 	
 	public DefaultRepeatMode getDefaultPlaylistRepeatMode () {
 		return playlistRepeatMode;
+	}
+	
+	public DefaultSortMode getDefaultTrackSortMode () {
+		return trackSortMode;
+	}
+	
+	public DefaultSortMode getDefaultAlbumSortMode () {
+		return albumSortMode;
+	}
+	
+	public DefaultSortMode getDefaultPlaylistSortMode () {
+		return playlistSortMode;
 	}
 	
 	public void setState( CurrentListState state ) {
@@ -694,7 +737,7 @@ public class CurrentList {
 		
 		} else if ( albums.size() == 1 ) {
 			mode = Mode.ALBUM;
-			updateShuffleAndRepeatMode();
+			updateDefaultModes();
 			currentAlbums.clear();
 			currentAlbums.addAll( albums );
 			notifyListenersStateChanged();
@@ -733,7 +776,7 @@ public class CurrentList {
 				
 			} else if ( differentBaseAlbums ) {
 				mode = Mode.PLAYLIST_UNSAVED;
-				updateShuffleAndRepeatMode();
+				updateDefaultModes();
 				currentAlbums.clear();
 				currentPlaylist = null;
 				notifyListenersStateChanged();
@@ -741,7 +784,7 @@ public class CurrentList {
 				
 			} else {
 				mode = Mode.ALBUM;
-				updateShuffleAndRepeatMode();
+				updateDefaultModes();
 				currentAlbums.clear();
 				currentAlbums.addAll( albums );
 				notifyListenersStateChanged();
@@ -750,21 +793,24 @@ public class CurrentList {
 		}
 	}
 	
-	private void updateShuffleAndRepeatMode() {
+	private void updateDefaultModes() {
 		
 		DefaultShuffleMode shuffleTarget;
 		DefaultRepeatMode repeatTarget;
+		DefaultSortMode sortTarget;
 		
 		switch ( mode ) {
 			case ALBUM:
 			case ALBUM_REORDERED:
 				shuffleTarget = albumShuffleMode;
 				repeatTarget = albumRepeatMode;
+				sortTarget = albumSortMode;
 				break;
 				
 			case PLAYLIST:
 				shuffleTarget = playlistShuffleMode;
 				repeatTarget = playlistRepeatMode;
+				sortTarget = playlistSortMode;
 				break;
 				
 			case PLAYLIST_UNSAVED:
@@ -772,6 +818,7 @@ public class CurrentList {
 			default:
 				shuffleTarget = trackShuffleMode;
 				repeatTarget = trackRepeatMode;
+				sortTarget = trackSortMode;
 				break;
 			
 		}
@@ -800,6 +847,14 @@ public class CurrentList {
 				player.setRepeatMode( RepeatMode.REPEAT );
 				break;
 		}
+		
+		switch ( sortTarget ) {
+			case NO_CHANGE:
+				break;
+			default:
+				Hypnos.getUI().setCurrentListSortMode ( sortTarget ); //TODO: inject ui instead of asking for it
+				break;
+		}
 	}
 	
 	public void playlistsSet ( List <Playlist> playlists ) {
@@ -824,7 +879,7 @@ public class CurrentList {
 		
 		} else if ( playlists.size() == 1 ) {
 			mode = Mode.PLAYLIST;
-			updateShuffleAndRepeatMode();
+			updateDefaultModes();
 			currentAlbums.clear();
 			currentPlaylist = playlists.get( 0 );
 			notifyListenersStateChanged();
@@ -832,7 +887,7 @@ public class CurrentList {
 
 		} else {
 			mode = Mode.PLAYLIST;
-			updateShuffleAndRepeatMode();
+			updateDefaultModes();
 			currentAlbums.clear();
 			currentPlaylist = null;
 			notifyListenersStateChanged();
@@ -842,7 +897,7 @@ public class CurrentList {
 	
 	public void tracksSet () {
 		mode = Mode.PLAYLIST_UNSAVED;
-		updateShuffleAndRepeatMode();
+		updateDefaultModes();
 		currentAlbums.clear();
 		currentPlaylist = null;
 		notifyListenersStateChanged();

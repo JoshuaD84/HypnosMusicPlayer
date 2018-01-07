@@ -66,6 +66,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import net.joshuad.hypnos.CurrentList.DefaultRepeatMode;
 import net.joshuad.hypnos.CurrentList.DefaultShuffleMode;
+import net.joshuad.hypnos.CurrentList.DefaultSortMode;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.Playlist;
@@ -93,10 +94,13 @@ public class SettingsWindow extends Stage {
 	
 	private ChoiceBox <String> albumShuffleChoices;
 	private ChoiceBox <String> albumRepeatChoices;
+	private ChoiceBox <String> albumSortChoices;
 	private ChoiceBox <String> trackShuffleChoices;
 	private ChoiceBox <String> trackRepeatChoices;
+	private ChoiceBox <String> trackSortChoices;
 	private ChoiceBox <String> playlistShuffleChoices;
 	private ChoiceBox <String> playlistRepeatChoices;
+	private ChoiceBox <String> playlistSortChoices;
 	
 	private ToggleButton lightTheme, darkTheme;
 	private ToggleGroup themeToggleGroup;
@@ -106,6 +110,18 @@ public class SettingsWindow extends Stage {
 	private TableView <TagError> tagTable;
 	
 	private List <TextField> globalHotkeyFields = new ArrayList<> ();
+	
+	final ObservableList<String> sortOptions = FXCollections.observableArrayList( 
+			"No Change", "#", "Artist", "Artist - Title", 
+			"Album - #", "Artist - #", "Artist - Album - #", 
+			"Year - Album - #", "Artist - Year - Album - #"
+		);
+		//TODO: This sortOptionModes is the right way. Do it for shuffle and repeat too
+	final List<DefaultSortMode> sortOptionModes = Arrays.asList( 
+		DefaultSortMode.NO_CHANGE, DefaultSortMode.NUMBER, DefaultSortMode.ARTIST, DefaultSortMode.ARTIST_TITLE,
+		DefaultSortMode.ALBUM_NUMBER, DefaultSortMode.ARTIST_NUMBER, DefaultSortMode.ARTIST_ALBUM_NUMBER, 
+		DefaultSortMode.YEAR_ALBUM_NUMBER, DefaultSortMode.ARTIST_YEAR_ALBUM_NUMBER
+	);
 	
 	SettingsWindow( FXUI ui, Library library, GlobalHotkeys hotkeys, AudioSystem player ) {
 		super();
@@ -414,6 +430,13 @@ public class SettingsWindow extends Stage {
 			
 		}
 		
+		albumSortChoices.getSelectionModel().select ( 
+			sortOptionModes.indexOf( player.getCurrentList().getDefaultAlbumSortMode() ) );
+		trackSortChoices.getSelectionModel().select (
+			sortOptionModes.indexOf( player.getCurrentList().getDefaultTrackSortMode() ) );
+		playlistSortChoices.getSelectionModel().select (
+			sortOptionModes.indexOf( player.getCurrentList().getDefaultPlaylistSortMode() ) );
+		
 		if ( ui.isDarkTheme() ) {
 			themeToggleGroup.selectToggle( darkTheme );
 		} else {
@@ -517,6 +540,11 @@ public class SettingsWindow extends Stage {
 		Label repeatLabel = new Label ( "Repeat" );
 		GridPane.setHalignment( repeatLabel, HPos.CENTER );
 		shuffleGrid.add( repeatLabel, 2, row );
+		
+		Label sortLabel = new Label ( "Sort Order" );
+		GridPane.setHalignment( sortLabel, HPos.CENTER );
+		shuffleGrid.add( sortLabel, 3, row );
+		
 		row++;
 		
 		final ObservableList<String> shuffleOptions = FXCollections.observableArrayList( "No Change", "Sequential", "Shuffle" );
@@ -569,6 +597,16 @@ public class SettingsWindow extends Stage {
 				}
 			}
 		});
+		
+		albumSortChoices = new ChoiceBox <String>( sortOptions );
+		shuffleGrid.add ( albumSortChoices, 3, row );
+		albumSortChoices.getSelectionModel().select( 6 );
+		albumSortChoices.getSelectionModel().selectedIndexProperty().addListener( new ChangeListener<Number>() {
+			@Override
+			public void changed ( ObservableValue <? extends Number> observableValue, Number oldValue, Number newValue ) {
+				player.getCurrentList().setDefaultAlbumSortMode ( sortOptionModes.get( newValue.intValue() ) );
+			}
+		});
 		row++;
 		
 		Label trackLabel = new Label ( "Default setting for tracks:" );
@@ -616,6 +654,16 @@ public class SettingsWindow extends Stage {
 						player.getCurrentList().setDefaultTrackRepeatMode ( DefaultRepeatMode.REPEAT );
 						break;
 				}
+			}
+		});
+		
+		trackSortChoices = new ChoiceBox <String>( sortOptions );
+		shuffleGrid.add ( trackSortChoices, 3, row );
+		trackSortChoices.getSelectionModel().select( 6 );
+		trackSortChoices.getSelectionModel().selectedIndexProperty().addListener( new ChangeListener<Number>() {
+			@Override
+			public void changed ( ObservableValue <? extends Number> observableValue, Number oldValue, Number newValue ) {
+				player.getCurrentList().setDefaultTrackSortMode ( sortOptionModes.get( newValue.intValue() ) );
 			}
 		});
 		row++;
@@ -667,6 +715,17 @@ public class SettingsWindow extends Stage {
 				}
 			}
 		});
+		
+		playlistSortChoices = new ChoiceBox <String>( sortOptions );
+		shuffleGrid.add ( playlistSortChoices, 3, row );
+		playlistSortChoices.getSelectionModel().select( 3 );
+		playlistSortChoices.getSelectionModel().selectedIndexProperty().addListener( new ChangeListener<Number>() {
+			@Override
+			public void changed ( ObservableValue <? extends Number> observableValue, Number oldValue, Number newValue ) {
+				player.getCurrentList().setDefaultPlaylistSortMode ( sortOptionModes.get( newValue.intValue() ) );
+			}
+		});
+		
 		row++;
 		
 

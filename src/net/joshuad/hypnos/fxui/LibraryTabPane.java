@@ -1333,13 +1333,6 @@ public class LibraryTabPane extends StretchedTabPane {
 		playlistTable.setEditable( false );
 		playlistTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 		playlistTable.setItems( library.getPlaylistSorted() );
-		
-		playlistTable.getSortOrder().addListener( new ListChangeListener <TableColumn <Playlist,?>>() {
-			@Override
-			public void onChanged ( javafx.collections.ListChangeListener.Change <? extends TableColumn <Playlist, ?>> arg0 ) {
-				(new Exception()).printStackTrace();
-			}
-		}); 
 
 		library.getPlaylistSorted().comparatorProperty().bind( playlistTable.comparatorProperty() );
 
@@ -1977,7 +1970,6 @@ public class LibraryTabPane extends StretchedTabPane {
 					}
 					
 					case PLAYLIST_SORT_ORDER: {
-						System.out.println ( "here" ); //TODO: DD
 						playlistTable.getSortOrder().clear();
 						
 						if ( !value.equals( "" ) ) {
@@ -1988,15 +1980,12 @@ public class LibraryTabPane extends StretchedTabPane {
 									SortType sortType = SortType.valueOf( fullValue.split( "-" )[1] );
 
 									if ( columnName.equals( "name" ) ) {
-										System.out.println ( "setting name to " + sortType ); //TODO: DD
 										playlistTable.getSortOrder().add( playlistNameColumn );
 										playlistNameColumn.setSortType( sortType );
 									} else if ( columnName.equals( "tracks" ) ) {
-										System.out.println ( "setting tracks" ); //TODO: DD
 										playlistTable.getSortOrder().add( playlistTracksColumn );
 										playlistTracksColumn.setSortType( sortType );
 									} else if ( columnName.equals( "length" ) ) {
-										System.out.println ( "setting length" ); //TODO: DD
 										playlistTable.getSortOrder().add( playlistLengthColumn );
 										playlistLengthColumn.setSortType( sortType );
 									} 
@@ -2015,7 +2004,6 @@ public class LibraryTabPane extends StretchedTabPane {
 			}
 		});
 	}
-	
 	
 	public EnumMap<Persister.Setting, ? extends Object> getSettings () {
 

@@ -69,6 +69,7 @@ import javafx.util.Callback;
 import javafx.util.Duration;
 import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.CurrentList;
+import net.joshuad.hypnos.CurrentList.DefaultSortMode;
 import net.joshuad.hypnos.CurrentListState;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.Hypnos;
@@ -145,7 +146,8 @@ public class FXUI implements PlayerListener {
 		darkThemeButtons.setHue( 1 );
 		darkThemeButtons.setBrightness( .75 );
 	}
-
+	
+	//TODO: this doesn't really belong in the UI, but we don't have a better place atm. 
 	private SimpleBooleanProperty promptBeforeOverwrite = new SimpleBooleanProperty ( true );
 	
 	private SimpleBooleanProperty showUpdateAvailableInUI = new SimpleBooleanProperty ( true ); 
@@ -1101,87 +1103,6 @@ public class FXUI implements PlayerListener {
 		settings.forEach( ( setting, value )-> {
 			try {
 				switch ( setting ) {
-				
-				//REFACTOR: These don't belong here. 
-					case TRACK:
-						Path trackPath = Paths.get( value );
-						Path albumPath = null;
-						if ( Utils.isAlbumDirectory( trackPath.toAbsolutePath().getParent() ) ) {
-							albumPath = trackPath.toAbsolutePath().getParent();
-						}
-						Track track = new Track ( trackPath, albumPath );
-						artSplitPane.setImages( track );
-						player.playTrack( track, true );
-						settings.remove ( setting );
-						break;
-						
-					case TRACK_POSITION:
-						player.seekMS( Long.parseLong( value ) );
-						settings.remove ( setting );
-						break;
-						
-					case SHUFFLE:
-						player.setShuffleMode ( AudioSystem.ShuffleMode.valueOf( value ) );
-						settings.remove ( setting );
-						break;
-						
-					case REPEAT:
-						player.setRepeatMode ( AudioSystem.RepeatMode.valueOf( value ) );
-						settings.remove ( setting );
-						break;
-						
-					case VOLUME:
-						player.setVolumePercent( Double.valueOf ( value ) );
-						playerVolumeChanged ( Double.valueOf ( value ) ); //This is kind of a hack. 
-						settings.remove ( setting );
-						break;
-						
-					case TRACK_NUMBER:
-						try {
-							int tracklistNumber = Integer.parseInt( value );
-							if ( tracklistNumber != -1 ) {
-								player.getCurrentList().getItems().get( tracklistNumber ).setIsCurrentTrack( true );
-							}
-						} catch ( Exception e ) {
-							LOGGER.info( "Error loading current list track number: " + e.getMessage() );
-						}
-
-						settings.remove ( setting );
-						break;
-						
-					case DEFAULT_REPEAT_ALBUMS:
-						player.getCurrentList().setDefaultAlbumRepeatMode( CurrentList.DefaultRepeatMode.valueOf( value ) );
-						settings.remove ( setting );
-						break;
-						
-					case DEFAULT_REPEAT_PLAYLISTS:
-						player.getCurrentList().setDefaultPlaylistRepeatMode( CurrentList.DefaultRepeatMode.valueOf( value ) );
-						settings.remove ( setting );
-						break;
-						
-					case DEFAULT_REPEAT_TRACKS:
-						player.getCurrentList().setDefaultTrackRepeatMode( CurrentList.DefaultRepeatMode.valueOf( value ) );
-						settings.remove ( setting );
-						break;
-						
-					case DEFAULT_SHUFFLE_ALBUMS:
-						player.getCurrentList().setDefaultAlbumShuffleMode( CurrentList.DefaultShuffleMode.valueOf( value ) );
-						settings.remove ( setting );
-						break;
-						
-					case DEFAULT_SHUFFLE_PLAYLISTS:
-						player.getCurrentList().setDefaultPlaylistShuffleMode( CurrentList.DefaultShuffleMode.valueOf( value ) );
-						settings.remove ( setting );
-						break;
-						
-					case DEFAULT_SHUFFLE_TRACKS:
-						player.getCurrentList().setDefaultTrackShuffleMode( CurrentList.DefaultShuffleMode.valueOf( value )  );
-						settings.remove ( setting );
-						break;
-						
-				//END NOT BELONG
-						
-						
 					case WINDOW_X_POSITION:
 						mainStage.setX( Double.valueOf( value ) );
 						settings.remove ( setting );
@@ -1581,6 +1502,10 @@ public class FXUI implements PlayerListener {
 
 	public void setUpdateAvailable ( boolean updateAvailable ) {
 		this.updateAvailable.setValue( updateAvailable );
+	}
+
+	public void setCurrentListSortMode ( DefaultSortMode sortMode ) {
+		currentListPane.setSortMode ( sortMode );
 	}
 }
 

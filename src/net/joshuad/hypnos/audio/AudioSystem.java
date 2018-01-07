@@ -1,21 +1,26 @@
 package net.joshuad.hypnos.audio;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.joshuad.hypnos.CurrentList;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.History;
+import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Persister;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.PreviousStack;
 import net.joshuad.hypnos.Queue;
 import net.joshuad.hypnos.Track;
+import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.Persister.Setting;
 
 public class AudioSystem {
@@ -402,32 +407,137 @@ public class AudioSystem {
 	}
 	
 	
-	public EnumMap <Persister.Setting, ? extends Object> getSettings () {
-		EnumMap <Persister.Setting, Object> retMe = new EnumMap <Persister.Setting, Object> ( Persister.Setting.class );
+	public EnumMap <Persister.Setting, String> getSettings () {
+		EnumMap <Persister.Setting, String> retMe = new EnumMap <Persister.Setting, String> ( Persister.Setting.class );
 		
 		if ( !player.isStopped() ) {
 			if ( player.getTrack() != null ) {
 				retMe.put ( Setting.TRACK, player.getTrack().getPath().toString() );
 			}
-			retMe.put ( Setting.TRACK_POSITION, player.getPositionMS() );
-			retMe.put ( Setting.TRACK_NUMBER, getCurrentTrackIndex() );
+			retMe.put ( Setting.TRACK_POSITION, Long.toString( player.getPositionMS() ) );
+			retMe.put ( Setting.TRACK_NUMBER, Integer.toString ( getCurrentTrackIndex() ) );
 		}
 
 		retMe.put ( Setting.SHUFFLE, getShuffleMode().toString() );
-		retMe.put ( Setting.REPEAT, getRepeatMode() );
-		retMe.put ( Setting.VOLUME, player.getVolumePercent() );
+		retMe.put ( Setting.REPEAT, getRepeatMode().toString() );
+		retMe.put ( Setting.VOLUME, Double.toString( player.getVolumePercent() ) );
 		
-		retMe.put ( Setting.DEFAULT_SHUFFLE_TRACKS, currentList.getDefaultTrackShuffleMode() );
-		retMe.put ( Setting.DEFAULT_SHUFFLE_ALBUMS, currentList.getDefaultAlbumShuffleMode() );
-		retMe.put ( Setting.DEFAULT_SHUFFLE_PLAYLISTS, currentList.getDefaultPlaylistShuffleMode() );
+		retMe.put ( Setting.DEFAULT_SHUFFLE_TRACKS, currentList.getDefaultTrackShuffleMode().toString() );
+		retMe.put ( Setting.DEFAULT_SHUFFLE_ALBUMS, currentList.getDefaultAlbumShuffleMode().toString() );
+		retMe.put ( Setting.DEFAULT_SHUFFLE_PLAYLISTS, currentList.getDefaultPlaylistShuffleMode().toString() );
 
-		retMe.put ( Setting.DEFAULT_REPEAT_TRACKS, currentList.getDefaultTrackRepeatMode() );
-		retMe.put ( Setting.DEFAULT_REPEAT_ALBUMS, currentList.getDefaultAlbumRepeatMode() );
-		retMe.put ( Setting.DEFAULT_REPEAT_PLAYLISTS, currentList.getDefaultPlaylistRepeatMode() );
+		retMe.put ( Setting.DEFAULT_REPEAT_TRACKS, currentList.getDefaultTrackRepeatMode().toString() );
+		retMe.put ( Setting.DEFAULT_REPEAT_ALBUMS, currentList.getDefaultAlbumRepeatMode().toString() );
+		retMe.put ( Setting.DEFAULT_REPEAT_PLAYLISTS, currentList.getDefaultPlaylistRepeatMode().toString() );
+		
+		retMe.put ( Setting.DEFAULT_SORT_TRACKS, currentList.getDefaultTrackSortMode().toString() );
+		retMe.put ( Setting.DEFAULT_SORT_ALBUMS, currentList.getDefaultAlbumSortMode().toString() );
+		retMe.put ( Setting.DEFAULT_SORT_PLAYLISTS, currentList.getDefaultPlaylistSortMode().toString() );
 		
 		return retMe;
 	}
 	
+	@SuppressWarnings("incomplete-switch")
+	public void applySettings ( EnumMap <Persister.Setting, String> settings ) {
+		settings.forEach( ( setting, value )-> {
+			try {
+				switch ( setting ) {
+				case TRACK:
+					Path trackPath = Paths.get( value );
+					Path albumPath = null;
+					if ( Utils.isAlbumDirectory( trackPath.toAbsolutePath().getParent() ) ) {
+						albumPath = trackPath.toAbsolutePath().getParent();
+					}
+					Track track = new Track ( trackPath, albumPath );
+					Hypnos.getUI().artSplitPane.setImages( track ); //TODO: 
+					playTrack( track, true );
+					settings.remove ( setting );
+					break;
+					
+				case TRACK_POSITION:
+					seekMS( Long.parseLong( value ) );
+					settings.remove ( setting );
+					break;
+					
+				case SHUFFLE:
+					setShuffleMode ( AudioSystem.ShuffleMode.valueOf( value ) );
+					settings.remove ( setting );
+					break;
+					
+				case REPEAT:
+					setRepeatMode ( AudioSystem.RepeatMode.valueOf( value ) );
+					settings.remove ( setting );
+					break;
+					
+				case VOLUME:
+					setVolumePercent( Double.valueOf ( value ) );
+					Hypnos.getUI().playerVolumeChanged ( Double.valueOf ( value ) ); //TODO: this is kind of a hack. 
+					settings.remove ( setting );
+					break;
+					
+				case TRACK_NUMBER:
+					try {
+						int tracklistNumber = Integer.parseInt( value );
+						if ( tracklistNumber != -1 ) {
+							getCurrentList().getItems().get( tracklistNumber ).setIsCurrentTrack( true );
+						}
+					} catch ( Exception e ) {
+						LOGGER.info( "Error loading current list track number: " + e.getMessage() );
+					}
+		
+					settings.remove ( setting );
+					break;
+					
+				case DEFAULT_REPEAT_ALBUMS:
+					getCurrentList().setDefaultAlbumRepeatMode( CurrentList.DefaultRepeatMode.valueOf( value ) );
+					settings.remove ( setting );
+					break;
+					
+				case DEFAULT_REPEAT_PLAYLISTS:
+					getCurrentList().setDefaultPlaylistRepeatMode( CurrentList.DefaultRepeatMode.valueOf( value ) );
+					settings.remove ( setting );
+					break;
+					
+				case DEFAULT_REPEAT_TRACKS:
+					getCurrentList().setDefaultTrackRepeatMode( CurrentList.DefaultRepeatMode.valueOf( value ) );
+					settings.remove ( setting );
+					break;
+					
+				case DEFAULT_SHUFFLE_ALBUMS:
+					getCurrentList().setDefaultAlbumShuffleMode( CurrentList.DefaultShuffleMode.valueOf( value ) );
+					settings.remove ( setting );
+					break;
+					
+				case DEFAULT_SHUFFLE_PLAYLISTS:
+					getCurrentList().setDefaultPlaylistShuffleMode( CurrentList.DefaultShuffleMode.valueOf( value ) );
+					settings.remove ( setting );
+					break;
+					
+				case DEFAULT_SHUFFLE_TRACKS:
+					getCurrentList().setDefaultTrackShuffleMode( CurrentList.DefaultShuffleMode.valueOf( value )  );
+					settings.remove ( setting );
+					break;
+					
+				case DEFAULT_SORT_ALBUMS:
+					getCurrentList().setDefaultAlbumSortMode( CurrentList.DefaultSortMode.valueOf( value ) );
+					settings.remove ( setting );
+					break;
+					
+				case DEFAULT_SORT_PLAYLISTS:
+					getCurrentList().setDefaultPlaylistSortMode( CurrentList.DefaultSortMode.valueOf( value ) );
+					settings.remove ( setting );
+					break;
+					
+				case DEFAULT_SORT_TRACKS:
+					getCurrentList().setDefaultTrackSortMode( CurrentList.DefaultSortMode.valueOf( value )  );
+					settings.remove ( setting );
+					break;
+				}
+			} catch ( Exception e ) {
+				LOGGER.log( Level.INFO, "Unable to apply setting: " + setting + " to UI.", e );
+			}
+		});
+	}
 	
 	
 //Manage Listeners
