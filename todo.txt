@@ -6,9 +6,6 @@ Now:
 		Not all the tracks appear on the current list, and it doesn't start playing the first one
 		Also the pause button kinda bugs out
 		
-	Library Pane
-		Track and Playlist sort order and column order
-	
 	Windows - Volume takes a split second to change.
 	
 	Use a thread to adjust the filter boxes. Delay afer typing for a second maybe, or delay after each typing for a bit so each letter doesn't generate an event.  

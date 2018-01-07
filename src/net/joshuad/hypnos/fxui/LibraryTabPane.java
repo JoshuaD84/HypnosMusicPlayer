@@ -1333,10 +1333,17 @@ public class LibraryTabPane extends StretchedTabPane {
 		playlistTable.setEditable( false );
 		playlistTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 		playlistTable.setItems( library.getPlaylistSorted() );
+		
+		playlistTable.getSortOrder().addListener( new ListChangeListener <TableColumn <Playlist,?>>() {
+			@Override
+			public void onChanged ( javafx.collections.ListChangeListener.Change <? extends TableColumn <Playlist, ?>> arg0 ) {
+				(new Exception()).printStackTrace();
+			}
+		}); 
 
 		library.getPlaylistSorted().comparatorProperty().bind( playlistTable.comparatorProperty() );
 
-		playlistTable.getSortOrder().add( playlistNameColumn );
+		//playlistTable.getSortOrder().add( playlistNameColumn );
 		
 		HypnosResizePolicy resizePolicy = new HypnosResizePolicy();
 		playlistTable.setColumnResizePolicy( resizePolicy );
@@ -1820,6 +1827,90 @@ public class LibraryTabPane extends StretchedTabPane {
 						setPlaylistsVisible( Boolean.valueOf ( value ) );
 						settings.remove ( setting );
 						break;
+					case ALBUM_COLUMN_ORDER: {
+						String[] order = value.split( " " );
+						int newIndex = 0;
+						
+						for ( String columnName : order ) {
+							try {
+								if ( columnName.equals( "artist" ) ) {
+									albumTable.getColumns().remove( albumArtistColumn );
+									albumTable.getColumns().add( newIndex, albumArtistColumn );
+								} else if ( columnName.equals( "year" ) ) {
+									albumTable.getColumns().remove( albumYearColumn );
+									albumTable.getColumns().add( newIndex, albumYearColumn );
+								} else if ( columnName.equals( "album" ) ) {
+									albumTable.getColumns().remove( albumAlbumColumn );
+									albumTable.getColumns().add( newIndex, albumAlbumColumn );
+								}
+								newIndex++;
+							} catch ( Exception e ) {
+								LOGGER.log( Level.INFO, "Unable to set album table column order: '" + value + "'", e );
+							}
+							
+						}
+						settings.remove ( setting );
+						break;
+					}
+					
+					case TRACK_COLUMN_ORDER: {
+						String[] order = value.split( " " );
+						int newIndex = 0;
+
+						for ( String columnName : order ) {
+							try {
+								if ( columnName.equals( "artist" ) ) {
+									trackTable.getColumns().remove( trackArtistColumn );
+									trackTable.getColumns().add( newIndex, trackArtistColumn );
+								} else if ( columnName.equals( "length" ) ) {
+									trackTable.getColumns().remove( trackLengthColumn );
+									trackTable.getColumns().add( newIndex, trackLengthColumn );
+								} else if ( columnName.equals( "number" ) ) {
+									trackTable.getColumns().remove( trackNumberColumn );
+									trackTable.getColumns().add( newIndex, trackNumberColumn );
+								} else if ( columnName.equals( "album" ) ) {
+									trackTable.getColumns().remove( trackAlbumColumn );
+									trackTable.getColumns().add( newIndex, trackAlbumColumn );
+								} else if ( columnName.equals( "title" ) ) {
+									trackTable.getColumns().remove( trackTitleColumn );
+									trackTable.getColumns().add( newIndex, trackTitleColumn );
+								} 
+								newIndex++;
+							} catch ( Exception e ) {
+								LOGGER.log( Level.INFO, "Unable to set album table column order: '" + value + "'", e );
+							}
+							
+						}
+						settings.remove ( setting );
+						break;
+					}
+					
+					case PLAYLIST_COLUMN_ORDER: {
+						String[] order = value.split( " " );
+						int newIndex = 0;
+
+						for ( String columnName : order ) {
+							try {
+								if ( columnName.equals( "name" ) ) {
+									playlistTable.getColumns().remove( playlistNameColumn );
+									playlistTable.getColumns().add( newIndex, playlistNameColumn );
+								} else if ( columnName.equals( "tracks" ) ) {
+									playlistTable.getColumns().remove( playlistTracksColumn );
+									playlistTable.getColumns().add( newIndex, playlistTracksColumn );
+								} else if ( columnName.equals( "length" ) ) {
+									playlistTable.getColumns().remove( playlistLengthColumn );
+									playlistTable.getColumns().add( newIndex, playlistLengthColumn );
+								} 
+								newIndex++;
+							} catch ( Exception e ) {
+								LOGGER.log( Level.INFO, "Unable to set album table column order: '" + value + "'", e );
+							}
+							
+						}
+						settings.remove ( setting );
+						break;
+					}
+
 					case ALBUM_SORT_ORDER: {
 						albumTable.getSortOrder().clear();
 						
@@ -1848,27 +1939,72 @@ public class LibraryTabPane extends StretchedTabPane {
 						settings.remove ( setting );
 						break;
 					}
-					case ALBUM_COLUMN_ORDER: {
-						String[] order = value.split( " " );
-						int newIndex = 0;
+					
+					case TRACK_SORT_ORDER: {
+						trackTable.getSortOrder().clear();
 						
-						for ( String columnName : order ) {
-							try {
-								if ( columnName.equals( "artist" ) ) {
-									albumTable.getColumns().remove( albumArtistColumn );
-									albumTable.getColumns().add( newIndex, albumArtistColumn );
-								} else if ( columnName.equals( "year" ) ) {
-									albumTable.getColumns().remove( albumYearColumn );
-									albumTable.getColumns().add( newIndex, albumYearColumn );
-								} else if ( columnName.equals( "album" ) ) {
-									albumTable.getColumns().remove( albumAlbumColumn );
-									albumTable.getColumns().add( newIndex, albumAlbumColumn );
+						if ( !value.equals( "" ) ) {
+							String[] order = value.split( " " );
+							for ( String fullValue : order ) {
+								try {
+									String columnName = fullValue.split( "-" )[0];
+									SortType sortType = SortType.valueOf( fullValue.split( "-" )[1] );
+
+									if ( columnName.equals( "artist" ) ) {
+										trackTable.getSortOrder().add( trackArtistColumn );
+										trackArtistColumn.setSortType( sortType );
+									} else if ( columnName.equals( "length" ) ) {
+										trackTable.getSortOrder().add( trackLengthColumn );
+										trackLengthColumn.setSortType( sortType );
+									} else if ( columnName.equals( "number" ) ) {
+										trackTable.getSortOrder().add( trackNumberColumn );
+										trackNumberColumn.setSortType( sortType );
+									} else if ( columnName.equals( "album" ) ) {
+										trackTable.getSortOrder().add( trackAlbumColumn );
+										trackAlbumColumn.setSortType( sortType );
+									} else if ( columnName.equals( "title" ) ) {
+										trackTable.getSortOrder().add( trackTitleColumn );
+										trackTitleColumn.setSortType( sortType );
+									}
+									
+								} catch ( Exception e ) {
+									LOGGER.log( Level.INFO, "Unable to set album table sort order: '" + value + "'", e );
 								}
-								newIndex++;
-							} catch ( Exception e ) {
-								LOGGER.log( Level.INFO, "Unable to set album table column order: '" + value + "'", e );
 							}
-							
+						}
+						settings.remove ( setting );
+						break;
+					}
+					
+					case PLAYLIST_SORT_ORDER: {
+						System.out.println ( "here" ); //TODO: DD
+						playlistTable.getSortOrder().clear();
+						
+						if ( !value.equals( "" ) ) {
+							String[] order = value.split( " " );
+							for ( String fullValue : order ) {
+								try {
+									String columnName = fullValue.split( "-" )[0];
+									SortType sortType = SortType.valueOf( fullValue.split( "-" )[1] );
+
+									if ( columnName.equals( "name" ) ) {
+										System.out.println ( "setting name to " + sortType ); //TODO: DD
+										playlistTable.getSortOrder().add( playlistNameColumn );
+										playlistNameColumn.setSortType( sortType );
+									} else if ( columnName.equals( "tracks" ) ) {
+										System.out.println ( "setting tracks" ); //TODO: DD
+										playlistTable.getSortOrder().add( playlistTracksColumn );
+										playlistTracksColumn.setSortType( sortType );
+									} else if ( columnName.equals( "length" ) ) {
+										System.out.println ( "setting length" ); //TODO: DD
+										playlistTable.getSortOrder().add( playlistLengthColumn );
+										playlistLengthColumn.setSortType( sortType );
+									} 
+									
+								} catch ( Exception e ) {
+									LOGGER.log( Level.INFO, "Unable to set album table sort order: '" + value + "'", e );
+								}
+							}
 						}
 						settings.remove ( setting );
 						break;
@@ -1885,31 +2021,85 @@ public class LibraryTabPane extends StretchedTabPane {
 
 		EnumMap <Persister.Setting, Object> retMe = new EnumMap <Persister.Setting, Object> ( Persister.Setting.class );
 		
-		List <String> albumSortOrder = new ArrayList<> ();
+		String albumColumnOrderValue = "";
+		for ( TableColumn<Album, ?> column : albumTable.getColumns() ) {
+			if ( column == albumArtistColumn ) {
+				albumColumnOrderValue += "artist ";
+			} else if ( column == albumYearColumn ) {
+				albumColumnOrderValue += "year ";
+			} else if ( column == albumAlbumColumn ) {
+				albumColumnOrderValue += "album ";
+			}
+		}
+		retMe.put ( Setting.ALBUM_COLUMN_ORDER, albumColumnOrderValue );
 		
 		String albumSortValue = "";
 		for ( TableColumn<Album, ?> column : albumTable.getSortOrder() ) {
-			if ( column == this.albumArtistColumn ) {
+			if ( column == albumArtistColumn ) {
 				albumSortValue += "artist-" + albumArtistColumn.getSortType() + " ";
-			} else if ( column == this.albumYearColumn ) {
+			} else if ( column == albumYearColumn ) {
 				albumSortValue += "year-" + albumYearColumn.getSortType() + " ";
-			} else if ( column == this.albumAlbumColumn ) {
+			} else if ( column == albumAlbumColumn ) {
 				albumSortValue += "album-" + albumAlbumColumn.getSortType() + " ";
 			}
 		}
 		retMe.put ( Setting.ALBUM_SORT_ORDER, albumSortValue );
 		
-		String albumColumnOrderValue = "";
-		for ( TableColumn<Album, ?> column : albumTable.getColumns() ) {
-			if ( column == this.albumArtistColumn ) {
-				albumColumnOrderValue += "artist ";
-			} else if ( column == this.albumYearColumn ) {
-				albumColumnOrderValue += "year ";
-			} else if ( column == this.albumAlbumColumn ) {
-				albumColumnOrderValue += "album ";
+		String trackColumnOrderValue = "";
+		for ( TableColumn<Track, ?> column : trackTable.getColumns() ) {
+			if ( column == trackArtistColumn ) {
+				trackColumnOrderValue += "artist ";
+			} else if ( column == trackLengthColumn ) {
+				trackColumnOrderValue += "length ";
+			} else if ( column == trackNumberColumn ) {
+				trackColumnOrderValue += "number ";
+			} else if ( column == trackAlbumColumn ) {
+				trackColumnOrderValue += "album ";
+			} else if ( column == trackTitleColumn ) {
+				trackColumnOrderValue += "title ";
+			} 
+		}
+		retMe.put ( Setting.TRACK_COLUMN_ORDER, trackColumnOrderValue );
+		
+		String trackSortValue = "";
+		for ( TableColumn<Track, ?> column : trackTable.getSortOrder() ) {
+			if ( column == trackArtistColumn ) {
+				trackSortValue += "artist-" + trackArtistColumn.getSortType() + " ";
+			} else if ( column == trackLengthColumn ) {
+				trackSortValue += "length-" + trackLengthColumn.getSortType() + " ";
+			} else if ( column == trackNumberColumn ) {
+				trackSortValue += "number-" + trackNumberColumn.getSortType() + " ";
+			} else if ( column == trackAlbumColumn ) {
+				trackSortValue += "album-" + trackAlbumColumn.getSortType() + " ";
+			} else if ( column == trackTitleColumn ) {
+				trackSortValue += "title-" + trackTitleColumn.getSortType() + " ";
+			} 
+		}
+		retMe.put ( Setting.TRACK_SORT_ORDER, trackSortValue );
+		
+		String playlistColumnOrderValue = "";
+		for ( TableColumn<Playlist, ?> column : playlistTable.getColumns() ) {
+			if ( column == this.playlistNameColumn ) {
+				playlistColumnOrderValue += "name ";
+			} else if ( column == this.playlistTracksColumn ) {
+				playlistColumnOrderValue += "tracks ";
+			} else if ( column == this.playlistLengthColumn ) {
+				playlistColumnOrderValue += "length ";
 			}
 		}
-		retMe.put ( Setting.ALBUM_COLUMN_ORDER, albumColumnOrderValue );
+		retMe.put ( Setting.PLAYLIST_COLUMN_ORDER, playlistColumnOrderValue );
+		
+		String playlistSortValue = "";
+		for ( TableColumn<Playlist, ?> column : playlistTable.getSortOrder() ) {
+			if ( column == this.playlistNameColumn ) {
+				playlistSortValue += "name-" + playlistNameColumn.getSortType() + " ";
+			} else if ( column == this.playlistTracksColumn ) {
+				playlistSortValue += "tracks-" + playlistTracksColumn.getSortType() + " ";
+			} else if ( column == this.playlistLengthColumn ) {
+				playlistSortValue += "length-" + playlistLengthColumn.getSortType() + " ";
+			}
+		}
+		retMe.put ( Setting.PLAYLIST_SORT_ORDER, playlistSortValue );
 		
 		retMe.put ( Setting.LIBRARY_TAB, getSelectionModel().getSelectedIndex() );
 		retMe.put ( Setting.AL_TABLE_ARTIST_COLUMN_SHOW, albumArtistColumn.isVisible() );

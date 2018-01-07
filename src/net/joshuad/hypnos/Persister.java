@@ -63,7 +63,12 @@ public class Persister {
 		
 		LIBRARY_TAB_ALBUMS_VISIBLE, LIBRARY_TAB_TRACKS_VISIBLE, LIBRARY_TAB_PLAYLISTS_VISIBLE,
 		
-		ALBUM_SORT_ORDER, ALBUM_COLUMN_ORDER,
+		//This is dumb, but column order has to come before sort order in this list
+		//so column order is applied first, so it doesn't mess up sort order. 
+		//TODO: Get rid of this dependency. 
+		ALBUM_COLUMN_ORDER, ALBUM_SORT_ORDER, 
+		TRACK_COLUMN_ORDER, TRACK_SORT_ORDER, 
+		PLAYLIST_COLUMN_ORDER, PLAYLIST_SORT_ORDER, 
 		CL_SORT_ORDER, CL_COLUMN_ORDER,
 		;
 	}
