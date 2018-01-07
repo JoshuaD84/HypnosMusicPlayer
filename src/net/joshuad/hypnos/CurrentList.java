@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
+import net.joshuad.hypnos.CurrentList.DefaultSortMode;
 import net.joshuad.hypnos.Persister.Setting;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
@@ -797,7 +798,7 @@ public class CurrentList {
 		
 		DefaultShuffleMode shuffleTarget;
 		DefaultRepeatMode repeatTarget;
-		DefaultSortMode sortTarget;
+		DefaultSortMode sortTarget = getCurrentDefaultSortMode();
 		
 		switch ( mode ) {
 			case ALBUM:
@@ -856,6 +857,24 @@ public class CurrentList {
 				break;
 		}
 	}
+	
+	public DefaultSortMode getCurrentDefaultSortMode() {
+		switch ( mode ) {
+			case ALBUM:
+			case ALBUM_REORDERED:
+				return albumSortMode;
+				
+			case PLAYLIST:
+				return playlistSortMode;
+
+			case PLAYLIST_UNSAVED:
+			case EMPTY:
+			default:
+				return trackSortMode;
+			
+		}
+	}
+	
 	
 	public void playlistsSet ( List <Playlist> playlists ) {
 		

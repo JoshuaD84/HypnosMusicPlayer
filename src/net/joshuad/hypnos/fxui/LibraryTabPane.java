@@ -39,6 +39,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.SortType;
+import javafx.scene.control.TableView.ResizeFeatures;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -131,6 +132,9 @@ public class LibraryTabPane extends StretchedTabPane {
 		setupAlbumTable();
 		setupTrackTable();
 		setupPlaylistTable();
+		resetAlbumTableSettingsToDefault();
+		resetTrackTableSettingsToDefault();
+		resetPlaylistTableSettingsToDefault();
 
 		BorderPane albumListPane = new BorderPane();
 		albumFilterPane.prefWidthProperty().bind( albumListPane.widthProperty() );
@@ -647,6 +651,30 @@ public class LibraryTabPane extends StretchedTabPane {
 		trackListCheckBox.setTooltip( new Tooltip( "Only show tracks not in albums" ) );
 	}
 	
+	@SuppressWarnings("unchecked")
+	public void resetAlbumTableSettingsToDefault() {
+		albumArtistColumn.setVisible( true );
+		albumYearColumn.setVisible( true );
+		albumAlbumColumn.setVisible( true );
+		
+		albumTable.getColumns().remove( albumArtistColumn );
+		albumTable.getColumns().add( albumArtistColumn );
+		albumTable.getColumns().remove( albumYearColumn );
+		albumTable.getColumns().add( albumYearColumn );
+		albumTable.getColumns().remove( albumAlbumColumn );
+		albumTable.getColumns().add( albumAlbumColumn );
+
+		albumTable.getSortOrder().add( albumArtistColumn );
+		albumTable.getSortOrder().add( albumYearColumn );
+		albumTable.getSortOrder().add( albumAlbumColumn );
+		
+		albumArtistColumn.setPrefWidth( 100 );
+		albumYearColumn.setPrefWidth( 60 );
+		albumAlbumColumn.setPrefWidth( 100 );
+		
+		albumTable.getColumnResizePolicy().call(new ResizeFeatures (  albumTable, null, 0d ) );
+	}
+	
 	public void setupAlbumTable () {
 		albumArtistColumn = new TableColumn( "Artist" );
 		albumYearColumn = new TableColumn( "Year" );
@@ -665,16 +693,19 @@ public class LibraryTabPane extends StretchedTabPane {
 		CheckMenuItem artistMenuItem = new CheckMenuItem ( "Show Artist Column" );
 		CheckMenuItem yearMenuItem = new CheckMenuItem ( "Show Year Column" );
 		CheckMenuItem albumMenuItem = new CheckMenuItem ( "Show Album Column" );
+		MenuItem defaultMenuItem = new MenuItem ( "Reset to Default View" );
+		
 		artistMenuItem.setSelected( true );
 		yearMenuItem.setSelected( true );
 		albumMenuItem.setSelected( true );
-		albumColumnSelectorMenu.getItems().addAll( artistMenuItem, yearMenuItem, albumMenuItem );
+		albumColumnSelectorMenu.getItems().addAll( artistMenuItem, yearMenuItem, albumMenuItem, defaultMenuItem );
 		albumArtistColumn.setContextMenu( albumColumnSelectorMenu );
 		albumYearColumn.setContextMenu( albumColumnSelectorMenu );
 		albumAlbumColumn.setContextMenu( albumColumnSelectorMenu );
 		artistMenuItem.selectedProperty().bindBidirectional( albumArtistColumn.visibleProperty() );
 		yearMenuItem.selectedProperty().bindBidirectional( albumYearColumn.visibleProperty() );
 		albumMenuItem.selectedProperty().bindBidirectional( albumAlbumColumn.visibleProperty() );
+		defaultMenuItem.setOnAction( ( e ) -> this.resetAlbumTableSettingsToDefault() );
 
 		albumTable = new TableView();
 		albumTable.getColumns().addAll( albumArtistColumn, albumYearColumn, albumAlbumColumn );
@@ -684,15 +715,8 @@ public class LibraryTabPane extends StretchedTabPane {
 
 		library.getAlbumsSorted().comparatorProperty().bind( albumTable.comparatorProperty() );
 		
-		albumTable.getSortOrder().add( albumArtistColumn );
-		albumTable.getSortOrder().add( albumYearColumn );
-		albumTable.getSortOrder().add( albumAlbumColumn );
-		
 		HypnosResizePolicy resizePolicy = new HypnosResizePolicy();
 		albumTable.setColumnResizePolicy( resizePolicy );
-		albumArtistColumn.setPrefWidth( 100 );
-		albumYearColumn.setPrefWidth( 60 );
-		albumAlbumColumn.setPrefWidth( 100 );
 		resizePolicy.registerFixedWidthColumns( albumYearColumn );
 		
 		emptyAlbumListLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
@@ -953,6 +977,41 @@ public class LibraryTabPane extends StretchedTabPane {
 		});
 	}
 	
+	@SuppressWarnings("unchecked")
+	public void resetTrackTableSettingsToDefault() {
+		trackArtistColumn.setVisible( true );
+		trackLengthColumn.setVisible( true );
+		trackNumberColumn.setVisible( true );
+		trackAlbumColumn.setVisible( true );
+		trackTitleColumn.setVisible( true );
+		
+		trackTable.getColumns().remove( trackArtistColumn );
+		trackTable.getColumns().add( trackArtistColumn );
+		trackTable.getColumns().remove( trackLengthColumn );
+		trackTable.getColumns().add( trackLengthColumn );
+		trackTable.getColumns().remove( trackNumberColumn );
+		trackTable.getColumns().add( trackNumberColumn );
+		trackTable.getColumns().remove( trackAlbumColumn );
+		trackTable.getColumns().add( trackAlbumColumn );
+		trackTable.getColumns().remove( trackTitleColumn );
+		trackTable.getColumns().add( trackTitleColumn );
+
+		trackTable.getSortOrder().clear();
+		trackTable.getSortOrder().add( trackArtistColumn );
+		trackTable.getSortOrder().add( trackAlbumColumn );
+		trackTable.getSortOrder().add( trackNumberColumn );
+		trackArtistColumn.setSortType( SortType.ASCENDING );
+		trackAlbumColumn.setSortType( SortType.ASCENDING );
+		trackNumberColumn.setSortType( SortType.ASCENDING );
+		
+		trackArtistColumn.setPrefWidth( 100 );
+		trackNumberColumn.setPrefWidth( 40 );
+		trackAlbumColumn.setPrefWidth( 100 );
+		trackTitleColumn.setPrefWidth( 100 );
+		trackLengthColumn.setPrefWidth( 60 );
+		trackTable.getColumnResizePolicy().call(new ResizeFeatures ( trackTable, null, 0d ) );
+	}
+	
 	public void setupTrackTable () {
 		trackArtistColumn = new TableColumn( "Artist" );
 		trackLengthColumn = new TableColumn( "Length" );
@@ -993,13 +1052,14 @@ public class LibraryTabPane extends StretchedTabPane {
 		CheckMenuItem numberMenuItem = new CheckMenuItem ( "Show Track # Column" );
 		CheckMenuItem titleMenuItem = new CheckMenuItem ( "Show Title Column" );
 		CheckMenuItem lengthMenuItem = new CheckMenuItem ( "Show Length Column" );
+		MenuItem defaultMenuItem = new MenuItem ( "Reset to Default View" );
 		artistMenuItem.setSelected( true );
 		albumMenuItem.setSelected( true );
 		numberMenuItem.setSelected( true );
 		titleMenuItem.setSelected( true );
 		lengthMenuItem.setSelected( true );
 		trackColumnSelectorMenu.getItems().addAll( 
-			artistMenuItem, albumMenuItem, numberMenuItem, titleMenuItem, lengthMenuItem );
+			artistMenuItem, albumMenuItem, numberMenuItem, titleMenuItem, lengthMenuItem, defaultMenuItem );
 		
 		trackArtistColumn.setContextMenu( trackColumnSelectorMenu );
 		trackAlbumColumn.setContextMenu( trackColumnSelectorMenu );
@@ -1011,6 +1071,7 @@ public class LibraryTabPane extends StretchedTabPane {
 		numberMenuItem.selectedProperty().bindBidirectional( trackNumberColumn.visibleProperty() );
 		titleMenuItem.selectedProperty().bindBidirectional( trackTitleColumn.visibleProperty() );
 		lengthMenuItem.selectedProperty().bindBidirectional( trackLengthColumn.visibleProperty() );
+		defaultMenuItem.setOnAction( ( e ) -> this.resetTrackTableSettingsToDefault() );
 		
 		trackTable = new TableView();
 		trackTable.getColumns().addAll( 
@@ -1022,17 +1083,9 @@ public class LibraryTabPane extends StretchedTabPane {
 		library.getTracksSorted().comparatorProperty().bind( trackTable.comparatorProperty() );
 		
 		trackTable.getSelectionModel().clearSelection();
-		trackTable.getSortOrder().add( trackArtistColumn );
-		trackTable.getSortOrder().add( trackAlbumColumn );
-		trackTable.getSortOrder().add( trackNumberColumn );
 		
 		HypnosResizePolicy resizePolicy = new HypnosResizePolicy();
 		trackTable.setColumnResizePolicy( resizePolicy );
-		trackArtistColumn.setPrefWidth( 100 );
-		trackNumberColumn.setPrefWidth( 40 );
-		trackAlbumColumn.setPrefWidth( 100 );
-		trackTitleColumn.setPrefWidth( 100 );
-		trackLengthColumn.setPrefWidth( 60 );
 		resizePolicy.registerFixedWidthColumns( trackNumberColumn, trackLengthColumn );
 		
 		emptyTrackListLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
@@ -1298,6 +1351,27 @@ public class LibraryTabPane extends StretchedTabPane {
 			return row;
 		} );
 	}
+	
+	@SuppressWarnings("unchecked")
+	public void resetPlaylistTableSettingsToDefault() {
+		playlistNameColumn.setVisible( true );
+		playlistLengthColumn.setVisible( true );
+		playlistTracksColumn.setVisible( true );
+		
+		playlistTable.getColumns().remove( playlistNameColumn );
+		playlistTable.getColumns().add( playlistNameColumn );
+		playlistTable.getColumns().remove( playlistLengthColumn );
+		playlistTable.getColumns().add( playlistLengthColumn );
+		playlistTable.getColumns().remove( playlistTracksColumn );
+		playlistTable.getColumns().add( playlistTracksColumn );
+
+		playlistTable.getSortOrder().clear();
+		
+		playlistNameColumn.setPrefWidth( 100 );
+		playlistTracksColumn.setPrefWidth( 90 );
+		playlistLengthColumn.setPrefWidth( 90 );
+		playlistTable.getColumnResizePolicy().call(new ResizeFeatures ( playlistTable, null, 0d ) );
+	}
 
 	public void setupPlaylistTable () {
 		playlistNameColumn = new TableColumn( "Playlist" );
@@ -1311,22 +1385,22 @@ public class LibraryTabPane extends StretchedTabPane {
 		playlistLengthColumn.setCellValueFactory( new PropertyValueFactory <Album, Integer>( "LengthDisplay" ) );
 		playlistTracksColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "SongCount" ) );
 
-		playlistNameColumn.setSortType( TableColumn.SortType.ASCENDING );
-		
 		playlistColumnSelectorMenu = new ContextMenu ();
 		CheckMenuItem nameMenuItem = new CheckMenuItem ( "Show Name Column" );
 		CheckMenuItem tracksMenuItem = new CheckMenuItem ( "Show Tracks Column" );
 		CheckMenuItem lengthMenuItem = new CheckMenuItem ( "Show Length Column" );
+		MenuItem defaultMenuItem = new MenuItem ( "Reset to Default View" );
 		nameMenuItem.setSelected( true );
 		tracksMenuItem.setSelected( true );
 		lengthMenuItem.setSelected( true );
-		playlistColumnSelectorMenu.getItems().addAll( nameMenuItem, tracksMenuItem, lengthMenuItem );
+		playlistColumnSelectorMenu.getItems().addAll( nameMenuItem, tracksMenuItem, lengthMenuItem, defaultMenuItem );
 		playlistNameColumn.setContextMenu( playlistColumnSelectorMenu );
 		playlistTracksColumn.setContextMenu( playlistColumnSelectorMenu );
 		playlistLengthColumn.setContextMenu( playlistColumnSelectorMenu );
 		nameMenuItem.selectedProperty().bindBidirectional( playlistNameColumn.visibleProperty() );
 		tracksMenuItem.selectedProperty().bindBidirectional( playlistTracksColumn.visibleProperty() );
 		lengthMenuItem.selectedProperty().bindBidirectional( playlistLengthColumn.visibleProperty() );
+		defaultMenuItem.setOnAction( ( e ) -> this.resetPlaylistTableSettingsToDefault() );
 
 		playlistTable = new TableView<Playlist>();
 		playlistTable.getColumns().addAll( playlistNameColumn, playlistTracksColumn, playlistLengthColumn );
@@ -1335,14 +1409,9 @@ public class LibraryTabPane extends StretchedTabPane {
 		playlistTable.setItems( library.getPlaylistSorted() );
 
 		library.getPlaylistSorted().comparatorProperty().bind( playlistTable.comparatorProperty() );
-
-		//playlistTable.getSortOrder().add( playlistNameColumn );
 		
 		HypnosResizePolicy resizePolicy = new HypnosResizePolicy();
 		playlistTable.setColumnResizePolicy( resizePolicy );
-		playlistNameColumn.setPrefWidth( 100 );
-		playlistTracksColumn.setPrefWidth( 90 );
-		playlistLengthColumn.setPrefWidth( 90 );
 		resizePolicy.registerFixedWidthColumns( playlistTracksColumn, playlistLengthColumn );
 		
 		emptyPlaylistLabel.setWrapText( true );

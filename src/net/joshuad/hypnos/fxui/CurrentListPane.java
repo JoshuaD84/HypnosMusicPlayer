@@ -37,6 +37,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TableView.ResizeFeatures;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TableColumn.SortType;
@@ -107,9 +108,9 @@ public class CurrentListPane extends BorderPane {
 		currentListFiltered = new FilteredList <CurrentListTrack> ( audioSystem.getCurrentList().getItems(), p -> true );
 		currentListSorted = new SortedList <CurrentListTrack>( currentListFiltered );
 		
-		
 		loadImages();
 		setupTable();
+		resetTableSettingsToDefault();
 		setupControlPane();
 		
 		this.setTop( currentListControls );
@@ -188,6 +189,45 @@ public class CurrentListPane extends BorderPane {
 		} catch ( Exception e ) {
 			LOGGER.log( Level.WARNING, "Unable to load menu icon: resources/menu.png", e );
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void resetTableSettingsToDefault() {
+		playingColumn.setVisible( true );
+		artistColumn.setVisible( true );
+		yearColumn.setVisible( true );
+		albumColumn.setVisible( true );
+		titleColumn.setVisible( true );
+		numberColumn.setVisible( true );
+		lengthColumn.setVisible( true );
+		
+		currentListTable.getColumns().remove( playingColumn );
+		currentListTable.getColumns().add( playingColumn );
+		currentListTable.getColumns().remove( numberColumn );
+		currentListTable.getColumns().add( numberColumn );
+		currentListTable.getColumns().remove( artistColumn );
+		currentListTable.getColumns().add( artistColumn );
+		currentListTable.getColumns().remove( yearColumn );
+		currentListTable.getColumns().add( yearColumn );
+		currentListTable.getColumns().remove( albumColumn );
+		currentListTable.getColumns().add( albumColumn );
+		currentListTable.getColumns().remove( titleColumn );
+		currentListTable.getColumns().add( titleColumn );
+		currentListTable.getColumns().remove( lengthColumn );
+		currentListTable.getColumns().add( lengthColumn );
+
+		setSortMode( audioSystem.getCurrentList().getCurrentDefaultSortMode() );
+
+		artistColumn.setPrefWidth( 100 );
+		numberColumn.setPrefWidth( 40 );
+		yearColumn.setPrefWidth( 60 );
+		albumColumn.setPrefWidth( 100 );
+		titleColumn.setPrefWidth( 100 );
+		lengthColumn.setPrefWidth( 70 );
+		
+		((HypnosResizePolicy)currentListTable.getColumnResizePolicy()).call(
+			new ResizeFeatures (  currentListTable, null, (double)0 ) 
+		);
 	}
 	
 	private void setupControlPane () {
@@ -600,6 +640,7 @@ public class CurrentListPane extends BorderPane {
 		CheckMenuItem numberMenuItem = new CheckMenuItem ( "Show Track # Column" );
 		CheckMenuItem titleMenuItem = new CheckMenuItem ( "Show Title Column" );
 		CheckMenuItem lengthMenuItem = new CheckMenuItem ( "Show Length Column" );
+		MenuItem resetMenuItem = new MenuItem ( "Reset To Default View" );
 		playingMenuItem.setSelected( true );
 		artistMenuItem.setSelected( true );
 		yearMenuItem.setSelected( true );
@@ -608,7 +649,7 @@ public class CurrentListPane extends BorderPane {
 		titleMenuItem.setSelected( true );
 		lengthMenuItem.setSelected( true );
 		currentListColumnSelectorMenu.getItems().addAll( playingMenuItem, numberMenuItem,artistMenuItem, 
-			yearMenuItem, albumMenuItem,  titleMenuItem, lengthMenuItem );
+			yearMenuItem, albumMenuItem,  titleMenuItem, lengthMenuItem, resetMenuItem );
 		playingColumn.setContextMenu( currentListColumnSelectorMenu );
 		artistColumn.setContextMenu( currentListColumnSelectorMenu );
 		yearColumn.setContextMenu( currentListColumnSelectorMenu );
@@ -627,7 +668,6 @@ public class CurrentListPane extends BorderPane {
 		currentListTable = new TableView();
 		currentListTable.getColumns().addAll( playingColumn, numberColumn, artistColumn,
 			yearColumn, albumColumn, titleColumn, lengthColumn );
-		currentListTable.getSortOrder().add( numberColumn ); 
 		currentListTable.setEditable( false );
 		currentListTable.setItems( currentListSorted );
 		currentListSorted.comparatorProperty().bind( currentListTable.comparatorProperty() );
@@ -641,13 +681,6 @@ public class CurrentListPane extends BorderPane {
 		playingColumn.setMaxWidth( 38 );
 		playingColumn.setMinWidth( 38 );
 		playingColumn.setResizable( false );
-
-		artistColumn.setPrefWidth( 100 );
-		numberColumn.setPrefWidth( 40 );
-		yearColumn.setPrefWidth( 60 );
-		albumColumn.setPrefWidth( 100 );
-		titleColumn.setPrefWidth( 100 );
-		lengthColumn.setPrefWidth( 70 );
 		
 		resizePolicy.registerFixedWidthColumns( yearColumn, numberColumn, lengthColumn );
 		
@@ -832,6 +865,8 @@ public class CurrentListPane extends BorderPane {
 				ui.promptAndSavePlaylist ( new ArrayList <Track> ( currentListTable.getSelectionModel().getSelectedItems() ) );
 			}
 		});
+		
+		resetMenuItem.setOnAction ( ( e ) -> this.resetTableSettingsToDefault() );
 
 		EventHandler<ActionEvent> addToPlaylistHandler = new EventHandler <ActionEvent>() {
 			@Override

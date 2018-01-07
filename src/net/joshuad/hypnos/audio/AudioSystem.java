@@ -311,8 +311,6 @@ public class AudioSystem {
 		notifyListenersShuffleModeChanged ( shuffleMode );
 	}
 	
-	
-	
 	public void setRepeatMode ( RepeatMode newMode ) {
 		this.repeatMode = newMode;
 		notifyListenersRepeatModeChanged ( newMode );

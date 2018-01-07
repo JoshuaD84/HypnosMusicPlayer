@@ -9,12 +9,6 @@ Now:
 	Windows - Volume takes a split second to change.
 	
 	Use a thread to adjust the filter boxes. Delay afer typing for a second maybe, or delay after each typing for a bit so each letter doesn't generate an event.  
-
-	Right click on table header -> Reset to Default View
-		Playlists
-		Albums
-		Tracks
-		CurrentList
 		
 	New Hypnos layout settings. The art pane is shrunk very small vertically and not divided evenly horizontally	
 		Confirmed on KDE Neon. 
