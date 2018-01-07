@@ -5,9 +5,9 @@ Now:
 	Select Multiple Files in File Browser, Right click, open with Hypnos -
 		Not all the tracks appear on the current list, and it doesn't start playing the first one
 		Also the pause button kinda bugs out
-
-	CurrentListTable
-		Persist column information (sort order, width, order)
+		
+	Library Pane
+		Track and Playlist sort order and column order
 	
 	Windows - Volume takes a split second to change.
 	
@@ -24,6 +24,15 @@ Key Testing before next release:
 	Make sure browse button still works in various systems. I changed FXUI.openFileBrowser -- Desktop.getDesktop().open() to .browse()
 	
 General
+	If you delete a list of tracks down so that it matches an album, set title bar to that album
+	
+	Right click on table header -> Reset to Default View
+	
+	Persister loadPreWindow and PostWindowSettings  -- check the EnumMap after applying the setting for any items. 
+		if there is stuff log it as "not applied settings" 
+		
+	Select an album in the library. Drag and album cover to the art pane. It is set, but the display doesn't update
+	
 	Current List - On loading a new album or playlist or list of tracks, try to distribute excess space such that everything can be seen
 		if not possible, do nothing
 	

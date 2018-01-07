@@ -849,10 +849,6 @@ public class FXUI implements PlayerListener {
 		return mainStage.isMaximized();
 	}
 	
-	public void setMaximized( boolean value ) {
-		mainStage.setMaximized( value );
-	}
-	
 	public static void notifyUserHypnosRunning() {
 		Alert alert = new Alert ( AlertType.INFORMATION );
 		setAlertWindowIcon ( alert );
@@ -1031,8 +1027,6 @@ public class FXUI implements PlayerListener {
 		
 		EnumMap <Persister.Setting, Object> retMe = new EnumMap <Persister.Setting, Object> ( Persister.Setting.class );
 		
-		retMe.put ( Setting.HIDE_ALBUM_TRACKS, libraryPane.trackListCheckBox.isSelected() );
-		
 		boolean isMaximized = isMaximized();
 		retMe.put ( Setting.WINDOW_MAXIMIZED, isMaximized );
 		
@@ -1052,23 +1046,20 @@ public class FXUI implements PlayerListener {
 		}
 		
 		retMe.put ( Setting.PRIMARY_SPLIT_PERCENT, getPrimarySplitPercent() );
-		retMe.put ( Setting.CURRENT_LIST_SPLIT_PERCENT, getCurrentListSplitPercent() );
+		retMe.put ( Setting.ART_CURRENT_SPLIT_PERCENT, getCurrentListSplitPercent() );
 		retMe.put ( Setting.ART_SPLIT_PERCENT, getArtSplitPercent() );
 		retMe.put ( Setting.PROMPT_BEFORE_OVERWRITE, showUpdateAvailableInUI.getValue() );
 		retMe.put ( Setting.SHOW_UPDATE_AVAILABLE_IN_MAIN_WINDOW, promptBeforeOverwrite.getValue() );
 		retMe.put ( Setting.THEME, theme );
 		
-		retMe.put ( Setting.CL_TABLE_PLAYING_COLUMN_SHOW, currentListPane.clPlayingColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_NUMBER_COLUMN_SHOW, currentListPane.clNumberColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_ARTIST_COLUMN_SHOW, currentListPane.clArtistColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_YEAR_COLUMN_SHOW, currentListPane.clYearColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_ALBUM_COLUMN_SHOW, currentListPane.clAlbumColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_TITLE_COLUMN_SHOW, currentListPane.clTitleColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_LENGTH_COLUMN_SHOW, currentListPane.clLengthColumn.isVisible() );
-		
 		EnumMap <Persister.Setting, ? extends Object> librarySettings = libraryPane.getSettings();
 		for ( Persister.Setting setting : librarySettings.keySet() ) {
 			retMe.put( setting, librarySettings.get( setting ) );
+		}
+		
+		EnumMap <Persister.Setting, ? extends Object> currentListSettings = currentListPane.getSettings();
+		for ( Persister.Setting setting : currentListSettings.keySet() ) {
+			retMe.put( setting, currentListSettings.get( setting ) );
 		}
 		
 		return retMe;
@@ -1105,11 +1096,13 @@ public class FXUI implements PlayerListener {
 		libraryPane.trackTable.refresh();
 	}
 
+	@SuppressWarnings("incomplete-switch")
 	public void applySettings( EnumMap<Persister.Setting, String> settings ) {
 		settings.forEach( ( setting, value )-> {
 			try {
 				switch ( setting ) {
-					//REFACTOR: These don't belong here. 
+				
+				//REFACTOR: These don't belong here. 
 					case TRACK:
 						Path trackPath = Paths.get( value );
 						Path albumPath = null;
@@ -1119,23 +1112,28 @@ public class FXUI implements PlayerListener {
 						Track track = new Track ( trackPath, albumPath );
 						artSplitPane.setImages( track );
 						player.playTrack( track, true );
+						settings.remove ( setting );
 						break;
 						
 					case TRACK_POSITION:
 						player.seekMS( Long.parseLong( value ) );
+						settings.remove ( setting );
 						break;
 						
 					case SHUFFLE:
 						player.setShuffleMode ( AudioSystem.ShuffleMode.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 						
 					case REPEAT:
 						player.setRepeatMode ( AudioSystem.RepeatMode.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 						
 					case VOLUME:
 						player.setVolumePercent( Double.valueOf ( value ) );
 						playerVolumeChanged ( Double.valueOf ( value ) ); //This is kind of a hack. 
+						settings.remove ( setting );
 						break;
 						
 					case TRACK_NUMBER:
@@ -1147,75 +1145,66 @@ public class FXUI implements PlayerListener {
 						} catch ( Exception e ) {
 							LOGGER.info( "Error loading current list track number: " + e.getMessage() );
 						}
-						
+
+						settings.remove ( setting );
 						break;
 						
 					case DEFAULT_REPEAT_ALBUMS:
 						player.getCurrentList().setDefaultAlbumRepeatMode( CurrentList.DefaultRepeatMode.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 						
 					case DEFAULT_REPEAT_PLAYLISTS:
 						player.getCurrentList().setDefaultPlaylistRepeatMode( CurrentList.DefaultRepeatMode.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 						
 					case DEFAULT_REPEAT_TRACKS:
 						player.getCurrentList().setDefaultTrackRepeatMode( CurrentList.DefaultRepeatMode.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 						
 					case DEFAULT_SHUFFLE_ALBUMS:
 						player.getCurrentList().setDefaultAlbumShuffleMode( CurrentList.DefaultShuffleMode.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 						
 					case DEFAULT_SHUFFLE_PLAYLISTS:
 						player.getCurrentList().setDefaultPlaylistShuffleMode( CurrentList.DefaultShuffleMode.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 						
 					case DEFAULT_SHUFFLE_TRACKS:
 						player.getCurrentList().setDefaultTrackShuffleMode( CurrentList.DefaultShuffleMode.valueOf( value )  );
+						settings.remove ( setting );
 						break;
 						
-					case CL_TABLE_PLAYING_COLUMN_SHOW:
-						currentListPane.clPlayingColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-					case CL_TABLE_NUMBER_COLUMN_SHOW:
-						currentListPane.clNumberColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-					case CL_TABLE_ARTIST_COLUMN_SHOW:
-						currentListPane.clArtistColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-					case CL_TABLE_YEAR_COLUMN_SHOW:
-						currentListPane.clYearColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-					case CL_TABLE_ALBUM_COLUMN_SHOW:
-						currentListPane.clAlbumColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-					case CL_TABLE_TITLE_COLUMN_SHOW:
-						currentListPane.clTitleColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-					case CL_TABLE_LENGTH_COLUMN_SHOW:
-						currentListPane.clLengthColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
+				//END NOT BELONG
 						
-					//END NOT BELONG
-					//TODO: Get rid of function calls. Just do the thing directly. 
+						
 					case WINDOW_X_POSITION:
 						mainStage.setX( Double.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 						
 					case WINDOW_Y_POSITION:
 						mainStage.setY( Double.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 						
 					case WINDOW_WIDTH:
 						mainStage.setWidth( Double.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 						
 					case WINDOW_HEIGHT:
 						mainStage.setHeight( Double.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 						
 					case WINDOW_MAXIMIZED:
-						setMaximized ( Boolean.valueOf( value ) );
+						mainStage.setMaximized( Boolean.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 
 					case PRIMARY_SPLIT_PERCENT:
@@ -1226,10 +1215,13 @@ public class FXUI implements PlayerListener {
 							default:
 								primarySplitPane.setDividerPosition( 0, Double.valueOf ( value ) );
 								break;
+								
 							
 						}
+						settings.remove ( setting );
+						break;
 						
-					case CURRENT_LIST_SPLIT_PERCENT:
+					case ART_CURRENT_SPLIT_PERCENT:
 						switch ( Hypnos.getOS() ) {
 							case NIX:
 								Platform.runLater ( () -> currentListSplitPane.setDividerPosition( 0, Double.valueOf ( value ) ) );
@@ -1239,6 +1231,7 @@ public class FXUI implements PlayerListener {
 								break;
 							
 						}
+						settings.remove ( setting );
 						break;
 						
 					case ART_SPLIT_PERCENT:
@@ -1251,14 +1244,17 @@ public class FXUI implements PlayerListener {
 								break;
 							
 						}
+						settings.remove ( setting );
 						break;
 						
 					case PROMPT_BEFORE_OVERWRITE:
 						promptBeforeOverwrite.setValue( Boolean.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 						
 					case SHOW_UPDATE_AVAILABLE_IN_MAIN_WINDOW:
 						showUpdateAvailableInUI.setValue( Boolean.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 					
 					case THEME:
@@ -1267,14 +1263,7 @@ public class FXUI implements PlayerListener {
 						} else {
 							removeDarkTheme();
 						}
-						break;
-						
-					case LOADER_SPEED:
-						//Do nothing
-						break;
-
-					default:
-						//Do nothing
+						settings.remove ( setting );
 						break;
 				}
 			} catch ( Exception e ) {
@@ -1283,6 +1272,7 @@ public class FXUI implements PlayerListener {
 		});
 		
 		libraryPane.applySettings( settings );
+		currentListPane.applySettings( settings );
 		settingsWindow.updateSettings();
 	}
 

@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,6 +39,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.TableColumn.SortType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
@@ -58,10 +60,12 @@ import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.CurrentListTrackState;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Library;
+import net.joshuad.hypnos.Persister;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.AlphanumComparator.CaseHandling;
+import net.joshuad.hypnos.Persister.Setting;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
@@ -1175,6 +1179,183 @@ public class CurrentListPane extends BorderPane {
 		}
 
 		return true;
+	}
+	
+	@SuppressWarnings("incomplete-switch")
+	public void applySettings( EnumMap<Persister.Setting, String> settings ) {
+		settings.forEach( ( setting, value )-> {
+			try {
+				switch ( setting ) {
+					case CL_TABLE_PLAYING_COLUMN_SHOW:
+						clPlayingColumn.setVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
+						break;
+					case CL_TABLE_NUMBER_COLUMN_SHOW:
+						clNumberColumn.setVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
+						break;
+					case CL_TABLE_ARTIST_COLUMN_SHOW:
+						clArtistColumn.setVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
+						break;
+					case CL_TABLE_YEAR_COLUMN_SHOW:
+						clYearColumn.setVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
+						break;
+					case CL_TABLE_ALBUM_COLUMN_SHOW:
+						clAlbumColumn.setVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
+						break;
+					case CL_TABLE_TITLE_COLUMN_SHOW:
+						clTitleColumn.setVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
+						break;
+					case CL_TABLE_LENGTH_COLUMN_SHOW:
+						clLengthColumn.setVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
+						break;	
+					case CL_SORT_ORDER:
+						currentListTable.getSortOrder().clear();
+						
+						if ( !value.equals( "" ) ) {
+							String[] order = value.split( " " );
+							for ( String fullValue : order ) {
+								try {
+									String columnName = fullValue.split( "-" )[0];
+									SortType sortType = SortType.valueOf( fullValue.split( "-" )[1] );
+									
+									if ( columnName.equals( "playing" ) ) {
+										currentListTable.getSortOrder().add( clPlayingColumn );
+										clPlayingColumn.setSortType( sortType );
+									} else if ( columnName.equals( "artist" ) ) {
+										currentListTable.getSortOrder().add( clArtistColumn );
+										clArtistColumn.setSortType( sortType );
+									} else if ( columnName.equals( "year" ) ) {
+										currentListTable.getSortOrder().add( clYearColumn );
+										clYearColumn.setSortType( sortType );
+									} else if ( columnName.equals( "album" ) ) {
+										currentListTable.getSortOrder().add( clAlbumColumn );
+										clAlbumColumn.setSortType( sortType );
+									} else if ( columnName.equals( "title" ) ) {
+										currentListTable.getSortOrder().add( clTitleColumn );
+										clTitleColumn.setSortType( sortType );
+									} else if ( columnName.equals( "number" ) ) {
+										currentListTable.getSortOrder().add( clNumberColumn );
+										clNumberColumn.setSortType( sortType );
+									} else if ( columnName.equals( "length" ) ) {
+										currentListTable.getSortOrder().add( clLengthColumn );
+										clLengthColumn.setSortType( sortType );
+									} 
+									
+								} catch ( Exception e ) {
+									LOGGER.log( Level.INFO, "Unable to set album table sort order: '" + value + "'", e );
+								}
+							}
+						}
+						settings.remove ( setting );
+						break;
+					case CL_COLUMN_ORDER: {
+						String[] order = value.split( " " );
+						int newIndex = 0;
+						
+						for ( String columnName : order ) {
+							try {
+								if ( columnName.equals( "playing" ) ) {
+									currentListTable.getColumns().remove( clPlayingColumn );
+									currentListTable.getColumns().add( newIndex, clPlayingColumn );
+								} else if ( columnName.equals( "artist" ) ) {
+									currentListTable.getColumns().remove( clArtistColumn );
+									currentListTable.getColumns().add( newIndex, clArtistColumn );
+								} else if ( columnName.equals( "year" ) ) {
+									currentListTable.getColumns().remove( clYearColumn );
+									currentListTable.getColumns().add( newIndex, clYearColumn );
+								} else if ( columnName.equals( "album" ) ) {
+									currentListTable.getColumns().remove( clAlbumColumn );
+									currentListTable.getColumns().add( newIndex, clAlbumColumn );
+								} else if ( columnName.equals( "title" ) ) {
+									currentListTable.getColumns().remove( clTitleColumn );
+									currentListTable.getColumns().add( newIndex, clTitleColumn );
+								} else if ( columnName.equals( "number" ) ) {
+									currentListTable.getColumns().remove( clNumberColumn );
+									currentListTable.getColumns().add( newIndex, clNumberColumn );
+								} else if ( columnName.equals( "length" ) ) {
+									currentListTable.getColumns().remove( clLengthColumn );
+									currentListTable.getColumns().add( newIndex, clLengthColumn );
+								} 
+								newIndex++;
+							} catch ( Exception e ) {
+								LOGGER.log( Level.INFO, "Unable to set album table column order: '" + value + "'", e );
+							}
+							
+						}
+						settings.remove ( setting );
+						break;
+					}
+				}
+				
+				
+			} catch ( Exception e ) {
+				LOGGER.log( Level.INFO, "Unable to apply setting: " + setting + " to current list.", e );
+			}
+		});
+	}
+	
+	public EnumMap<Persister.Setting, ? extends Object> getSettings () {
+
+		EnumMap <Persister.Setting, Object> retMe = new EnumMap <Persister.Setting, Object> ( Persister.Setting.class );
+		
+		List <String> albumSortOrder = new ArrayList<> ();
+		
+		String sortOrderValue = "";
+		
+		for ( TableColumn<CurrentListTrack, ?> column : currentListTable.getSortOrder() ) {
+			if ( column == clPlayingColumn ) {
+				sortOrderValue += "playing-" + clPlayingColumn.getSortType() + " ";
+			} else if ( column == clArtistColumn ) {
+				sortOrderValue += "artist-" + clArtistColumn.getSortType() + " ";
+			} else if ( column == clYearColumn ) {
+				sortOrderValue += "year-" + clYearColumn.getSortType() + " ";
+			} else if ( column == clAlbumColumn ) {
+				sortOrderValue += "album-" + clAlbumColumn.getSortType() + " ";
+			} else if ( column == clTitleColumn ) {
+				sortOrderValue += "title-" + clTitleColumn.getSortType() + " ";
+			} else if ( column == clNumberColumn ) {
+				sortOrderValue += "number-" + clNumberColumn.getSortType() + " ";
+			} else if ( column == clLengthColumn ) {
+				sortOrderValue += "length-" + clLengthColumn.getSortType() + " ";
+			} 
+		}
+		retMe.put ( Setting.CL_SORT_ORDER, sortOrderValue );
+		
+		String columnOrderValue = "";
+		for ( TableColumn<CurrentListTrack, ?> column : currentListTable.getColumns() ) {
+			if ( column == clPlayingColumn ) {
+				columnOrderValue += "playing ";
+			} else if ( column == clArtistColumn ) {
+				columnOrderValue += "artist ";
+			} else if ( column == clYearColumn ) {
+				columnOrderValue += "year ";
+			} else if ( column == clAlbumColumn ) {
+				columnOrderValue += "album ";
+			} else if ( column == clTitleColumn ) {
+				columnOrderValue += "title ";
+			} else if ( column == clNumberColumn ) {
+				columnOrderValue += "number ";
+			} else if ( column == clLengthColumn ) {
+				columnOrderValue += "length ";
+			}
+		}
+		retMe.put ( Setting.CL_COLUMN_ORDER, columnOrderValue );
+		
+		retMe.put ( Setting.CL_TABLE_PLAYING_COLUMN_SHOW, clPlayingColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_NUMBER_COLUMN_SHOW, clNumberColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_ARTIST_COLUMN_SHOW, clArtistColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_YEAR_COLUMN_SHOW, clYearColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_ALBUM_COLUMN_SHOW, clAlbumColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_TITLE_COLUMN_SHOW, clTitleColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_LENGTH_COLUMN_SHOW, clLengthColumn.isVisible() );
+		
+		return retMe;
 	}
 }
 

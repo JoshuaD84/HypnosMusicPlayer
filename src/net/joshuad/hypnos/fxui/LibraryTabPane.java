@@ -1706,91 +1706,119 @@ public class LibraryTabPane extends StretchedTabPane {
 		}
 	}
 
+	@SuppressWarnings("incomplete-switch")
 	public void applySettings ( EnumMap<Persister.Setting, String> settings ) {
 		settings.forEach( ( setting, value )-> {
 			try {
 				switch ( setting ) {
 					case HIDE_ALBUM_TRACKS:
 						ui.runThreadSafe ( () -> trackListCheckBox.setSelected( Boolean.valueOf ( value ) ) );
+						settings.remove ( setting );
 						break;		
 					case LIBRARY_TAB:
 						getSelectionModel().select( Integer.valueOf ( value ) );
+						settings.remove ( setting );
 						break;
 					case AL_TABLE_ARTIST_COLUMN_SHOW:
 						albumArtistColumn.setVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
 						break;
 					case AL_TABLE_YEAR_COLUMN_SHOW:
 						albumYearColumn.setVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
 						break;
 					case AL_TABLE_ALBUM_COLUMN_SHOW:
 						albumAlbumColumn.setVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
 						break;
 					case TR_TABLE_ARTIST_COLUMN_SHOW:
 						trackArtistColumn.setVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
 						break;
 					case TR_TABLE_NUMBER_COLUMN_SHOW:
 						trackNumberColumn.setVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
 						break;
 					case TR_TABLE_TITLE_COLUMN_SHOW:
 						trackTitleColumn.setVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
 						break;
 					case TR_TABLE_ALBUM_COLUMN_SHOW:
 						trackAlbumColumn.setVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
 						break;
 					case TR_TABLE_LENGTH_COLUMN_SHOW:
 						trackLengthColumn.setVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
 						break;
 					case PL_TABLE_PLAYLIST_COLUMN_SHOW:
 						playlistNameColumn.setVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
 						break;
 					case PL_TABLE_TRACKS_COLUMN_SHOW: 
 						playlistTracksColumn.setVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
 						break;
 					case PL_TABLE_LENGTH_COLUMN_SHOW:
 						playlistLengthColumn.setVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
 						break;
 						
 					case AL_TABLE_ARTIST_COLUMN_WIDTH: 
 						albumArtistColumn.setPrefWidth( Double.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 					case AL_TABLE_YEAR_COLUMN_WIDTH: 
 						albumYearColumn.setPrefWidth( Double.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 					case AL_TABLE_ALBUM_COLUMN_WIDTH: 
 						albumAlbumColumn.setPrefWidth( Double.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 					case TR_TABLE_ARTIST_COLUMN_WIDTH: 
 						trackArtistColumn.setPrefWidth( Double.valueOf( value ) );
+						settings.remove ( setting );
 					break;
 					case TR_TABLE_NUMBER_COLUMN_WIDTH: 
 						trackNumberColumn.setPrefWidth( Double.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 					case TR_TABLE_TITLE_COLUMN_WIDTH:
 						trackTitleColumn.setPrefWidth( Double.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 					case TR_TABLE_ALBUM_COLUMN_WIDTH:
 						trackAlbumColumn.setPrefWidth( Double.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 					case TR_TABLE_LENGTH_COLUMN_WIDTH:
 						trackLengthColumn.setPrefWidth( Double.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 					case PL_TABLE_PLAYLIST_COLUMN_WIDTH: 
 						playlistNameColumn.setPrefWidth( Double.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 					case PL_TABLE_TRACKS_COLUMN_WIDTH:
 						playlistTracksColumn.setPrefWidth( Double.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 					case PL_TABLE_LENGTH_COLUMN_WIDTH:
 						playlistLengthColumn.setPrefWidth( Double.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 					case LIBRARY_TAB_ALBUMS_VISIBLE:
 						setAlbumsVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
 						break;
 					case LIBRARY_TAB_TRACKS_VISIBLE:
 						setTracksVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
 						break;
 					case LIBRARY_TAB_PLAYLISTS_VISIBLE:
 						setPlaylistsVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
 						break;
 					case ALBUM_SORT_ORDER: {
 						albumTable.getSortOrder().clear();
@@ -1817,6 +1845,7 @@ public class LibraryTabPane extends StretchedTabPane {
 								}
 							}
 						}
+						settings.remove ( setting );
 						break;
 					}
 					case ALBUM_COLUMN_ORDER: {
@@ -1841,11 +1870,9 @@ public class LibraryTabPane extends StretchedTabPane {
 							}
 							
 						}
+						settings.remove ( setting );
 						break;
 					}
-					default:
-						//Do nothing
-						break;
 				}
 			} catch ( Exception e ) {
 				LOGGER.log( Level.INFO, "Unable to apply setting: " + setting + " to UI.", e );
@@ -1912,6 +1939,8 @@ public class LibraryTabPane extends StretchedTabPane {
 		retMe.put ( Setting.LIBRARY_TAB_ALBUMS_VISIBLE, getTabs().contains( albumTab ) );
 		retMe.put ( Setting.LIBRARY_TAB_TRACKS_VISIBLE, getTabs().contains( trackTab ) );
 		retMe.put ( Setting.LIBRARY_TAB_PLAYLISTS_VISIBLE, getTabs().contains( playlistTab ) );
+		
+		retMe.put ( Setting.HIDE_ALBUM_TRACKS, trackListCheckBox.isSelected() );
 		
 		return retMe;
 	}
