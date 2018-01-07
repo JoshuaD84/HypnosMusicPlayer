@@ -76,9 +76,9 @@ public class Transport extends VBox {
 	FXUI ui;
 	AudioSystem audioSystem;
 	
-	public Transport( FXUI ui, AudioSystem player ) {
+	public Transport( FXUI ui, AudioSystem audioSystem ) {
 		this.ui = ui;
-		this.audioSystem = player;
+		this.audioSystem = audioSystem;
 		
 		loadImages();
 		
@@ -120,32 +120,32 @@ public class Transport extends VBox {
 		nextButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				player.next();
+				audioSystem.next();
 			}
 		});
 
 		stopButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				player.stop( StopReason.USER_REQUESTED );
+				audioSystem.stop( StopReason.USER_REQUESTED );
 			}
 		} );
 
 		togglePlayButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				if ( player.isStopped() ) { 
+				if ( audioSystem.isStopped() ) { 
 					if ( ui.currentListPane.currentListTable.getItems().size() != 0 ) {
 						CurrentListTrack selectedItem = ui.currentListPane.currentListTable.getSelectionModel().getSelectedItem();
 						
 						if ( selectedItem != null ) {
-							player.playTrack( selectedItem );
+							audioSystem.playTrack( selectedItem );
 						} else {
-							player.next( false );
+							audioSystem.next( false );
 						}
 					}
 				} else {
-					player.togglePause();
+					audioSystem.togglePause();
 				}
 			}
 		} );
@@ -175,7 +175,7 @@ public class Transport extends VBox {
 		trackPositionSlider.valueChangingProperty().addListener( new ChangeListener <Boolean>() {
 			public void changed ( ObservableValue <? extends Boolean> obs, Boolean wasChanging, Boolean isNowChanging ) {
 				if ( !isNowChanging ) {
-					player.seekPercent( trackPositionSlider.getValue() / trackPositionSlider.getMax() );
+					audioSystem.seekPercent( trackPositionSlider.getValue() / trackPositionSlider.getMax() );
 				}
 			}
 		});
@@ -186,7 +186,7 @@ public class Transport extends VBox {
 
 		trackPositionSlider.setOnMouseReleased( ( MouseEvent e ) -> {
 			sliderMouseHeld = false;
-			player.seekPercent( trackPositionSlider.getValue() / trackPositionSlider.getMax() );
+			audioSystem.seekPercent( trackPositionSlider.getValue() / trackPositionSlider.getMax() );
 		});
 		
 		volumeMuteButton = new Button ( );
@@ -195,7 +195,7 @@ public class Transport extends VBox {
 		volumeMuteButton.setPadding( new Insets ( 0, 5, 0, 5 ) );
 		volumeMuteButton.getStyleClass().add( "volumeButton" );
 		volumeMuteButton.setTooltip( new Tooltip ( "Toggle Mute" ) );
-		volumeMuteButton.setOnAction( e -> player.toggleMute() );
+		volumeMuteButton.setOnAction( e -> audioSystem.toggleMute() );
 
 		volumeSlider = new Slider();
 		volumeSlider.setMin( 0 );
@@ -212,7 +212,7 @@ public class Transport extends VBox {
 				double min = volumeSlider.getMin();
 				double max = volumeSlider.getMax();
 				double percent = (volumeSlider.getValue() - min) / (max - min);
-				player.setVolumePercent( percent ); //Note: this works because min is 0 
+				audioSystem.setVolumePercent( percent ); //Note: this works because min is 0 
 			}
 		};
 		
@@ -307,7 +307,7 @@ public class Transport extends VBox {
 		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				Track current = player.getCurrentTrack();
+				Track current = audioSystem.getCurrentTrack();
 				if ( current != null ) {
 					ui.promptAndSavePlaylist ( Arrays.asList( current ) );
 				}
@@ -320,7 +320,7 @@ public class Transport extends VBox {
 
 				Playlist playlist = (Playlist) ((MenuItem) event.getSource()).getUserData();
 				
-				Track currentTrack = player.getCurrentTrack();
+				Track currentTrack = audioSystem.getCurrentTrack();
 				if ( currentTrack != null && playlist != null ) {
 					ui.addToPlaylist ( Arrays.asList( currentTrack ), playlist );
 				}
@@ -336,9 +336,9 @@ public class Transport extends VBox {
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				Track currentTrack = player.getCurrentTrack();
+				Track currentTrack = audioSystem.getCurrentTrack();
 				if ( currentTrack != null ) {
-					player.playTrack( currentTrack );
+					audioSystem.playTrack( currentTrack );
 				}
 			}
 		});
@@ -346,9 +346,9 @@ public class Transport extends VBox {
 		appendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				Track currentTrack = player.getCurrentTrack();
+				Track currentTrack = audioSystem.getCurrentTrack();
 				if ( currentTrack != null ) {
-					player.getCurrentList().appendTrack ( currentTrack );
+					audioSystem.getCurrentList().appendTrack ( currentTrack );
 				}
 			}
 		});
@@ -356,9 +356,9 @@ public class Transport extends VBox {
 		playNextMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				Track currentTrack = player.getCurrentTrack();
+				Track currentTrack = audioSystem.getCurrentTrack();
 				if ( currentTrack != null ) {
-					player.getQueue().queueTrack( 0, currentTrack );
+					audioSystem.getQueue().queueTrack( 0, currentTrack );
 				}
 			}
 		});
@@ -366,9 +366,9 @@ public class Transport extends VBox {
 		enqueueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				Track currentTrack = player.getCurrentTrack();
+				Track currentTrack = audioSystem.getCurrentTrack();
 				if ( currentTrack != null ) {
-					player.getQueue().queueTrack( currentTrack );
+					audioSystem.getQueue().queueTrack( currentTrack );
 				}
 			}
 		});
@@ -377,7 +377,7 @@ public class Transport extends VBox {
 			@Override
 			public void handle ( ActionEvent event ) {
 
-				Track currentTrack = player.getCurrentTrack();
+				Track currentTrack = audioSystem.getCurrentTrack();
 				if ( currentTrack != null ) {
 					ui.tagWindow.setTracks( Arrays.asList( currentTrack ), null );
 					ui.tagWindow.show();
@@ -389,7 +389,7 @@ public class Transport extends VBox {
 		infoMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				Track currentTrack = player.getCurrentTrack();
+				Track currentTrack = audioSystem.getCurrentTrack();
 				if ( currentTrack != null ) {
 					ui.trackInfoWindow.setTrack( currentTrack );
 					ui.trackInfoWindow.show();
@@ -400,7 +400,7 @@ public class Transport extends VBox {
 		lyricsMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				ui.lyricsWindow.setTrack( player.getCurrentTrack() );
+				ui.lyricsWindow.setTrack( audioSystem.getCurrentTrack() );
 				ui.lyricsWindow.show();
 			}
 		});
@@ -408,7 +408,7 @@ public class Transport extends VBox {
 		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				ui.openFileBrowser(  player.getCurrentTrack().getPath() );
+				ui.openFileBrowser(  audioSystem.getCurrentTrack().getPath() );
 			}
 		});
 		

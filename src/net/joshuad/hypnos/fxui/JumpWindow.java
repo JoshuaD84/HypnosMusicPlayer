@@ -59,7 +59,7 @@ public class JumpWindow extends Stage {
 	
 	private FXUI ui;
 	private Library library;
-	final AudioSystem player;
+	final AudioSystem audioSystem;
 	
 	private TextField trackFilterBox;
 	
@@ -67,12 +67,12 @@ public class JumpWindow extends Stage {
 
 	final FilteredList <CurrentListTrack> currentListFiltered;
 	
-	public JumpWindow ( FXUI ui, Library library, AudioSystem player ) {
+	public JumpWindow ( FXUI ui, Library library, AudioSystem audioSystem ) {
 		super();
 		
 		this.ui = ui;
 		this.library = library;
-		this.player = player;
+		this.audioSystem = audioSystem;
 		
 		initModality( Modality.NONE );
 		initOwner( ui.getMainStage() );
@@ -91,7 +91,7 @@ public class JumpWindow extends Stage {
 		VBox primaryPane = new VBox();
 		primaryPane.setAlignment( Pos.CENTER );
 		
-		currentListFiltered = new FilteredList <CurrentListTrack> ( player.getCurrentList().getItems(), p -> true );
+		currentListFiltered = new FilteredList <CurrentListTrack> ( audioSystem.getCurrentList().getItems(), p -> true );
 		
 		HBox trackFilterPane = new HBox();
 		trackFilterBox = new TextField();
@@ -128,12 +128,12 @@ public class JumpWindow extends Stage {
 				if ( playMe != null ) {
 					
 					if ( event.isControlDown() ) {
-						player.getQueue().queueTrack ( playMe );
+						audioSystem.getQueue().queueTrack ( playMe );
 						
 					} else if ( event.isShiftDown() ) {
-						player.getQueue().queueTrack ( 0, playMe );
+						audioSystem.getQueue().queueTrack ( 0, playMe );
 					} else {
-						player.playTrack ( playMe );
+						audioSystem.playTrack ( playMe );
 					}
 				}
 				
@@ -229,17 +229,17 @@ public class JumpWindow extends Stage {
 					case PLAYLIST_INFO:
 					case TAG_ERROR_LIST:
 					case HISTORY: {
-						player.getCurrentList().appendTracks ( container.getTracks() );
+						audioSystem.getCurrentList().appendTracks ( container.getTracks() );
 					
 					} break;
 
 					case PLAYLIST_LIST: {
-						player.getCurrentList().appendPlaylists ( container.getPlaylists() );
+						audioSystem.getCurrentList().appendPlaylists ( container.getPlaylists() );
 						
 					} break;
 					
 					case ALBUM_LIST: {
-						player.getCurrentList().appendAlbums ( container.getAlbums() );
+						audioSystem.getCurrentList().appendAlbums ( container.getAlbums() );
 					} break;
 					
 					case CURRENT_LIST: {
@@ -247,30 +247,30 @@ public class JumpWindow extends Stage {
 					} break;
 					
 					case QUEUE: {
-						synchronized ( player.getQueue().getData() ) {
+						synchronized ( audioSystem.getQueue().getData() ) {
 							List <Integer> draggedIndices = container.getIndices();
 							
 							ArrayList <Track> tracksToCopy = new ArrayList <Track> ( draggedIndices.size() );
 							for ( int index : draggedIndices ) {
-								if ( index >= 0 && index < player.getQueue().getData().size() ) {
-									Track addMe = player.getQueue().getData().get( index );
+								if ( index >= 0 && index < audioSystem.getQueue().getData().size() ) {
+									Track addMe = audioSystem.getQueue().getData().get( index );
 									if ( addMe instanceof CurrentListTrack ) {
 										tracksToCopy.add( (CurrentListTrack)addMe );
 									} else {
 										CurrentListTrack newAddMe = new CurrentListTrack ( addMe );
-										player.getQueue().getData().remove ( index );
-										player.getQueue().getData().add( index, newAddMe );
+										audioSystem.getQueue().getData().remove ( index );
+										audioSystem.getQueue().getData().add( index, newAddMe );
 										tracksToCopy.add( newAddMe );
 									}
 								}
 							}
-							player.getCurrentList().appendTracks( tracksToCopy );
+							audioSystem.getCurrentList().appendTracks( tracksToCopy );
 						}
 						
 					} break;
 				}
 
-				player.getQueue().updateQueueIndexes();
+				audioSystem.getQueue().updateQueueIndexes();
 				event.setDropCompleted( true );
 				event.consume();
 
@@ -281,14 +281,14 @@ public class JumpWindow extends Stage {
 				for ( File file : db.getFiles() ) {
 					Path droppedPath = Paths.get( file.getAbsolutePath() );
 					if ( Utils.isMusicFile( droppedPath ) ) {
-						player.getCurrentList().appendTrack ( droppedPath );
+						audioSystem.getCurrentList().appendTrack ( droppedPath );
 						
 					} else if ( Files.isDirectory( droppedPath ) ) {
-						player.getCurrentList().appendTracksPathList ( Utils.getAllTracksInDirectory( droppedPath ) );
+						audioSystem.getCurrentList().appendTracksPathList ( Utils.getAllTracksInDirectory( droppedPath ) );
 					} else if ( Utils.isPlaylistFile ( droppedPath ) ) {
 						Playlist playlist = Playlist.loadPlaylist( droppedPath );
 						if ( playlist != null ) {
-							player.getCurrentList().appendPlaylist ( playlist );
+							audioSystem.getCurrentList().appendPlaylist ( playlist );
 						}
 					}
 				}
@@ -389,14 +389,14 @@ public class JumpWindow extends Stage {
 		playNextMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.getQueue().queueAllTracks( trackTable.getSelectionModel().getSelectedItems(), 0 );
+				audioSystem.getQueue().queueAllTracks( trackTable.getSelectionModel().getSelectedItems(), 0 );
 			}
 		});
 		
 		queueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.getQueue().queueAllTracks( trackTable.getSelectionModel().getSelectedItems() );
+				audioSystem.getQueue().queueAllTracks( trackTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 		
@@ -406,10 +406,10 @@ public class JumpWindow extends Stage {
 				List<Integer> selectedIndices = trackTable.getSelectionModel().getSelectedIndices();
 				
 				if ( selectedIndices.size() < 2 ) {
-					player.shuffleList();
+					audioSystem.shuffleList();
 					
 				} else {
-					player.getCurrentList().shuffleItems( selectedIndices );
+					audioSystem.getCurrentList().shuffleItems( selectedIndices );
 				}
 			}
 		});
@@ -442,7 +442,7 @@ public class JumpWindow extends Stage {
 		playMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.playTrack( trackTable.getSelectionModel().getSelectedItem() );
+				audioSystem.playTrack( trackTable.getSelectionModel().getSelectedItem() );
 			}
 		} );
 
@@ -496,7 +496,7 @@ public class JumpWindow extends Stage {
 			
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && !row.isEmpty() ) {
-					player.playTrack( row.getItem() );
+					audioSystem.playTrack( row.getItem() );
 				}
 			});
 			
@@ -553,7 +553,7 @@ public class JumpWindow extends Stage {
 					
 					switch ( container.getSource() ) {
 						case ALBUM_LIST: {
-							player.getCurrentList().insertAlbums( dropIndex, container.getAlbums() );
+							audioSystem.getCurrentList().insertAlbums( dropIndex, container.getAlbums() );
 						} break;
 						
 						case PLAYLIST_LIST:
@@ -562,13 +562,13 @@ public class JumpWindow extends Stage {
 						case PLAYLIST_INFO:
 						case TAG_ERROR_LIST:
 						case HISTORY: {
-							player.getCurrentList().insertTracks( dropIndex, Utils.convertTrackList( container.getTracks() ) );
+							audioSystem.getCurrentList().insertTracks( dropIndex, Utils.convertTrackList( container.getTracks() ) );
 						} break;
 						
 						case CURRENT_LIST: {
 							List<Integer> draggedIndices = container.getIndices();
 							
-							player.getCurrentList().moveTracks ( draggedIndices, dropIndex );
+							audioSystem.getCurrentList().moveTracks ( draggedIndices, dropIndex );
 							
 							trackTable.getSelectionModel().clearSelection();
 							for ( int k = 0; k < draggedIndices.size(); k++ ) {
@@ -580,30 +580,30 @@ public class JumpWindow extends Stage {
 						} break;
 						
 						case QUEUE: {
-							synchronized ( player.getQueue().getData() ) {
+							synchronized ( audioSystem.getQueue().getData() ) {
 								List <Integer> draggedIndices = container.getIndices();
 								
 								ArrayList <CurrentListTrack> tracksToCopy = new ArrayList <CurrentListTrack> ( draggedIndices.size() );
 								for ( int index : draggedIndices ) {
-									if ( index >= 0 && index < player.getQueue().getData().size() ) {
-										Track addMe = player.getQueue().getData().get( index );
+									if ( index >= 0 && index < audioSystem.getQueue().getData().size() ) {
+										Track addMe = audioSystem.getQueue().getData().get( index );
 										if ( addMe instanceof CurrentListTrack ) {
 											tracksToCopy.add( (CurrentListTrack)addMe );
 										} else {
 											CurrentListTrack newAddMe = new CurrentListTrack ( addMe );
-											player.getQueue().getData().remove ( index );
-											player.getQueue().getData().add( index, newAddMe );
+											audioSystem.getQueue().getData().remove ( index );
+											audioSystem.getQueue().getData().add( index, newAddMe );
 											tracksToCopy.add( newAddMe );
 										}
 									}
 								}
-								player.getCurrentList().insertTracks ( dropIndex, tracksToCopy );
+								audioSystem.getCurrentList().insertTracks ( dropIndex, tracksToCopy );
 							}
 							
 						} break;
 					}
 
-					player.getQueue().updateQueueIndexes( );
+					audioSystem.getQueue().updateQueueIndexes( );
 					event.setDropCompleted( true );
 					event.consume();
 
@@ -627,7 +627,7 @@ public class JumpWindow extends Stage {
 					
 					if ( !tracksToAdd.isEmpty() ) {
 						int dropIndex = row.isEmpty() ? dropIndex = trackTable.getItems().size() : row.getIndex();
-						player.getCurrentList().insertTrackPathList ( dropIndex, tracksToAdd );
+						audioSystem.getCurrentList().insertTrackPathList ( dropIndex, tracksToAdd );
 					}
 
 					event.setDropCompleted( true );

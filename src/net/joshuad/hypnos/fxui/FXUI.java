@@ -118,7 +118,7 @@ public class FXUI implements PlayerListener {
 	TrackInfoWindow trackInfoWindow;
 	LyricsWindow lyricsWindow;
 	
-	final AudioSystem player;
+	final AudioSystem audioSystem;
 	final Library library;
 	
 	private double windowedWidth = 1024;
@@ -158,7 +158,7 @@ public class FXUI implements PlayerListener {
 	public FXUI ( Stage stage, Library library, AudioSystem audioSystem, GlobalHotkeys hotkeys ) {
 		mainStage = stage;
 		this.library = library;
-		this.player = audioSystem;
+		this.audioSystem = audioSystem;
 		
 		audioSystem.getCurrentList().addNoLoadThread( Thread.currentThread() );
 		
@@ -541,16 +541,16 @@ public class FXUI implements PlayerListener {
 	void removeFromCurrentList ( List<Integer> removeMe ) {
 		
 		if ( !removeMe.isEmpty() ) {
-			player.getCurrentList().removeTracksAtIndices ( removeMe );
+			audioSystem.getCurrentList().removeTracksAtIndices ( removeMe );
 		}
 	}
 	
 	public void previousRequested() {
-		if ( player.isStopped() ) {
+		if ( audioSystem.isStopped() ) {
 			currentListPane.currentListTable.getSelectionModel().clearAndSelect( 
 					currentListPane.currentListTable.getSelectionModel().getSelectedIndex() - 1 );
 		} else {
-			player.previous();
+			audioSystem.previous();
 		}
 	}
 	
@@ -601,7 +601,7 @@ public class FXUI implements PlayerListener {
 	}
 
 	public void selectCurrentTrack () {
-		Track current = player.getCurrentTrack();
+		Track current = audioSystem.getCurrentTrack();
 		selectTrackOnCurrentList ( current );
 	}
 	
@@ -627,8 +627,8 @@ public class FXUI implements PlayerListener {
 		libraryPane.playlistTable.refresh(); 
 		
 		//TODO: playlist.equals ( playlist ) instead of name .equals ( name ) ?
-		if ( player.getCurrentPlaylist() != null && player.getCurrentPlaylist().getName().equals( playlist.getName() ) ) {
-			player.getCurrentList().appendTracks( tracks );
+		if ( audioSystem.getCurrentPlaylist() != null && audioSystem.getCurrentPlaylist().getName().equals( playlist.getName() ) ) {
+			audioSystem.getCurrentList().appendTracks( tracks );
 		}
 	}
 	
@@ -644,7 +644,7 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public boolean okToReplaceCurrentList () {
-		if ( player.getCurrentList().getState().getMode() != CurrentList.Mode.PLAYLIST_UNSAVED ) {
+		if ( audioSystem.getCurrentList().getState().getMode() != CurrentList.Mode.PLAYLIST_UNSAVED ) {
 			return true;
 		}
 		
@@ -713,7 +713,7 @@ public class FXUI implements PlayerListener {
 				return true;
 				
 			} else if (result.get() == ButtonType.YES ) {
-				return promptAndSavePlaylist ( Utils.convertCurrentTrackList( player.getCurrentList().getItems() ) );
+				return promptAndSavePlaylist ( Utils.convertCurrentTrackList( audioSystem.getCurrentList().getItems() ) );
 			
 			} else {
 				return false;
@@ -725,8 +725,8 @@ public class FXUI implements PlayerListener {
 	public boolean promptAndSavePlaylist ( List <Track> tracks ) { 
 	//REFACTOR: This should probably be refactored into promptForPlaylistName and <something>.savePlaylist( name, items )
 		String defaultName = "";
-		if ( player.getCurrentPlaylist() != null ) {
-			defaultName = player.getCurrentPlaylist().getName();
+		if ( audioSystem.getCurrentPlaylist() != null ) {
+			defaultName = audioSystem.getCurrentPlaylist().getName();
 		}
 		TextInputDialog dialog = new TextInputDialog( defaultName );
 		applyCurrentTheme ( dialog );
@@ -750,11 +750,11 @@ public class FXUI implements PlayerListener {
 			Playlist newPlaylist = new Playlist( enteredName, new ArrayList <Track> ( tracks ) );
 			library.addPlaylist ( newPlaylist );
 			
-			CurrentListState state = player.getCurrentList().getState();
+			CurrentListState state = audioSystem.getCurrentList().getState();
 			
 			CurrentListState newState = new CurrentListState ( state.getItems(), state.getAlbums(), newPlaylist, CurrentList.Mode.PLAYLIST );
 			
-			player.getCurrentList().setState( newState );
+			audioSystem.getCurrentList().setState( newState );
 			return true;
 		}
 		return false;
@@ -1252,7 +1252,7 @@ public class FXUI implements PlayerListener {
 			
 			artSplitPane.setImages( track );
 			
-			boolean disableVolume = !player.volumeChangeSupported();
+			boolean disableVolume = !audioSystem.volumeChangeSupported();
 			
 			if ( disableVolume ) {
 				transport.volumeSlider.setDisable( true );
@@ -1278,7 +1278,7 @@ public class FXUI implements PlayerListener {
 	public void playerUnpaused () {
 		Platform.runLater( () -> {
 			transport.togglePlayButton.setGraphic( transport.pauseImage );
-			artSplitPane.setImages( player.getCurrentTrack() );
+			artSplitPane.setImages( audioSystem.getCurrentTrack() );
 			currentListPane.currentListTable.refresh();//To get the play/pause image to update. 
 		});
 	}
@@ -1337,7 +1337,7 @@ public class FXUI implements PlayerListener {
 			holder.getChildren().add( text );
 			holder.setPadding( new Insets ( 10, 10, 10, 10 ) );
 			alert.getDialogPane().setContent( holder );
-			player.setVolumePercent( 1 );
+			audioSystem.setVolumePercent( 1 );
 
 			Tooltip.uninstall( transport.volumePane, transport.volumeDisabledTooltip );
 			

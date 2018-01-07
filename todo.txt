@@ -14,7 +14,7 @@ Key Testing before next release:
 	Make sure browse button still works in various systems. I changed FXUI.openFileBrowser -- Desktop.getDesktop().open() to .browse()
 	
 General
-	Rename player to audioSystem in Persister, FXUI, and wherever else
+	Rename player to audioSystem in Persister, and wherever else
 	
 	Set an option to sort by album artist instead of artist on artist column in current list
 	

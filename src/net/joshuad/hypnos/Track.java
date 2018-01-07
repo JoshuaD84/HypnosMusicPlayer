@@ -602,25 +602,25 @@ public class Track implements Serializable, AlbumInfoSource {
 		return ( compareTo.getPath().toAbsolutePath().equals( getPath().toAbsolutePath() ) );
 	}
 
-	public static void saveArtistImageToTag ( File file, Path imagePath, ArtistTagImagePriority priority, boolean overwriteAll, AudioSystem player ) {
+	public static void saveArtistImageToTag ( File file, Path imagePath, ArtistTagImagePriority priority, boolean overwriteAll, AudioSystem audioSystem ) {
 		try {
 			byte[] imageBuffer = Files.readAllBytes( imagePath );
-			saveImageToID3 ( file, imageBuffer, 8, priority, overwriteAll, player );
+			saveImageToID3 ( file, imageBuffer, 8, priority, overwriteAll, audioSystem );
 		} catch ( Exception e ) {
 			LOGGER.log( Level.WARNING, "Unable to read image data from file" + imagePath, e );
 		}
 	}
 	
-	public static void saveArtistImageToTag ( File file, byte[] buffer, ArtistTagImagePriority priority, boolean overwriteAll, AudioSystem player ) {
-		saveImageToID3 ( file, buffer, 8, priority, overwriteAll, player );
+	public static void saveArtistImageToTag ( File file, byte[] buffer, ArtistTagImagePriority priority, boolean overwriteAll, AudioSystem audioSystem ) {
+		saveImageToID3 ( file, buffer, 8, priority, overwriteAll, audioSystem );
 	}
 	
 
-	public static void saveAlbumImageToTag ( File file, byte[] buffer, AudioSystem player ) {
-		saveImageToID3 ( file, buffer, 3, null, true, player );
+	public static void saveAlbumImageToTag ( File file, byte[] buffer, AudioSystem audioSystem ) {
+		saveImageToID3 ( file, buffer, 3, null, true, audioSystem );
 	}
 		
-	private static void deleteImageFromID3 ( File file, int type, AudioSystem player ) { 
+	private static void deleteImageFromID3 ( File file, int type, AudioSystem audioSystem ) { 
 		try {
 			AudioFile audioFile = AudioFileIO.read( file );
 			Tag tag = audioFile.getTag();
@@ -645,11 +645,11 @@ public class Track implements Serializable, AlbumInfoSource {
 			long currentPositionMS = 0;
 			Track currentTrack = null;
 			
-			if ( player.getCurrentTrack() != null && player.getCurrentTrack().getPath().equals( file.toPath() ) && player.isPlaying() ) {
+			if ( audioSystem.getCurrentTrack() != null && audioSystem.getCurrentTrack().getPath().equals( file.toPath() ) && audioSystem.isPlaying() ) {
 
-				currentPositionMS = player.getPositionMS();
-				currentTrack = player.getCurrentTrack();
-				player.stop( StopReason.WRITING_TO_TAG );
+				currentPositionMS = audioSystem.getPositionMS();
+				currentTrack = audioSystem.getCurrentTrack();
+				audioSystem.stop( StopReason.WRITING_TO_TAG );
 				pausedPlayer = true;
 			}
 				
@@ -657,9 +657,9 @@ public class Track implements Serializable, AlbumInfoSource {
 			AudioFileIO.write( audioFile );
 			
 			if ( pausedPlayer ) {
-				player.playTrack( currentTrack, true );
-				player.seekMS( currentPositionMS );
-				player.unpause();
+				audioSystem.playTrack( currentTrack, true );
+				audioSystem.seekMS( currentPositionMS );
+				audioSystem.unpause();
 			}
 			
 		} catch ( Exception e ) {
@@ -668,7 +668,7 @@ public class Track implements Serializable, AlbumInfoSource {
 		
 	}
 	
-	private static void saveImageToID3 ( File file, byte[] buffer, int type, ArtistTagImagePriority priority, boolean overwriteAll, AudioSystem player ) {
+	private static void saveImageToID3 ( File file, byte[] buffer, int type, ArtistTagImagePriority priority, boolean overwriteAll, AudioSystem audioSystem ) {
 
 		try {
 			AudioFile audioFile = AudioFileIO.read( file );
@@ -720,11 +720,11 @@ public class Track implements Serializable, AlbumInfoSource {
 			long currentPositionMS = 0;
 			Track currentTrack = null;
 			
-			if ( player.getCurrentTrack() != null && player.getCurrentTrack().getPath().equals( file.toPath() ) && player.isPlaying() ) {
+			if ( audioSystem.getCurrentTrack() != null && audioSystem.getCurrentTrack().getPath().equals( file.toPath() ) && audioSystem.isPlaying() ) {
 
-				currentPositionMS = player.getPositionMS();
-				currentTrack = player.getCurrentTrack();
-				player.stop( StopReason.WRITING_TO_TAG );
+				currentPositionMS = audioSystem.getPositionMS();
+				currentTrack = audioSystem.getCurrentTrack();
+				audioSystem.stop( StopReason.WRITING_TO_TAG );
 				pausedPlayer = true;
 			}
 				
@@ -732,9 +732,9 @@ public class Track implements Serializable, AlbumInfoSource {
 			AudioFileIO.write( audioFile );
 			
 			if ( pausedPlayer ) {
-				player.playTrack( currentTrack, true );
-				player.seekMS( currentPositionMS );
-				player.unpause();
+				audioSystem.playTrack( currentTrack, true );
+				audioSystem.seekMS( currentPositionMS );
+				audioSystem.unpause();
 			}
 			
 		} catch ( Exception e ) {
@@ -742,20 +742,20 @@ public class Track implements Serializable, AlbumInfoSource {
 		}
 	}
 	
-	public void setAndSaveAlbumImage ( Path imagePath, AudioSystem player ) {
+	public void setAndSaveAlbumImage ( Path imagePath, AudioSystem audioSystem ) {
 		try {
 			byte[] imageBuffer = Files.readAllBytes( imagePath );
-			setAndSaveAlbumImage ( imageBuffer, player );
+			setAndSaveAlbumImage ( imageBuffer, audioSystem );
 		} catch ( IOException e ) {
 			LOGGER.log( Level.WARNING, "Unable to read image data from image file (" + imagePath + ") can't set album image for track: " + getPath(), e );
 		}
 	}
 	
-	public void setAndSaveAlbumImage ( byte[] buffer, AudioSystem player ) {
+	public void setAndSaveAlbumImage ( byte[] buffer, AudioSystem audioSystem ) {
 		
 		if ( buffer.length < 8 ) return; //png signature is length 8, so might as well use that as an absolute minimum
 
-		saveAlbumImageToTag ( getPath().toFile(), buffer, player );
+		saveAlbumImageToTag ( getPath().toFile(), buffer, audioSystem );
 		
 		if ( hasAlbumDirectory() ) {
 			
@@ -797,7 +797,7 @@ public class Track implements Serializable, AlbumInfoSource {
 				List <Path> tracks = Utils.getAllTracksInDirectory ( this.getAlbumPath() );
 				for ( Path track : tracks ) {
 					if ( !track.toAbsolutePath().equals( getPath().toAbsolutePath() ) ) {
-						saveAlbumImageToTag ( track.toFile(), buffer, player );
+						saveAlbumImageToTag ( track.toFile(), buffer, audioSystem );
 					}
 				}
 			});
@@ -1040,7 +1040,7 @@ public class Track implements Serializable, AlbumInfoSource {
 		return null;
 	}
 	
-	public void updateTagsAndSave ( List<MultiFileTextTagPair> textTagPairs, List<MultiFileImageTagPair> imageTagPairs, AudioSystem player ) {
+	public void updateTagsAndSave ( List<MultiFileTextTagPair> textTagPairs, List<MultiFileImageTagPair> imageTagPairs, AudioSystem audioSystem ) {
 		try {
 			AudioFile audioFile = AudioFileIO.read( getPath().toFile() );
 			Tag tag = audioFile.getTag();
@@ -1069,10 +1069,10 @@ public class Track implements Serializable, AlbumInfoSource {
 				if ( !tagPair.isMultiValue() && tagPair.imageDataChanged() ) {
 					
 					if ( tagPair.getImageData() == null ) {
-						deleteImageFromID3 ( getPath().toFile(), ImageFieldKey.getIndexFromKey( tagPair.getKey() ), player );
+						deleteImageFromID3 ( getPath().toFile(), ImageFieldKey.getIndexFromKey( tagPair.getKey() ), audioSystem );
 					} else {
 						saveImageToID3 ( getPath().toFile(), tagPair.getImageData(), ImageFieldKey.getIndexFromKey( tagPair.getKey() ), 
-							ArtistTagImagePriority.TRACK, true, player );
+							ArtistTagImagePriority.TRACK, true, audioSystem );
 					}
 				}
 			}

@@ -23,13 +23,13 @@ public class LibraryUpdater {
 	
 	private FXUI ui;
 	private Library library;
-	private AudioSystem player;
+	private AudioSystem audioSystem;
 	private Thread libraryUpdaterThread;
 	
-	public LibraryUpdater( Library library, AudioSystem player, FXUI ui ) {
+	public LibraryUpdater( Library library, AudioSystem audioSystem, FXUI ui ) {
 		this.ui = ui;
 		this.library = library;
-		this.player = player;
+		this.audioSystem = audioSystem;
 		
 		libraryUpdaterThread = new Thread( () -> {
 			while ( true ) {
@@ -148,25 +148,25 @@ public class LibraryUpdater {
 											} catch ( Exception e2 ) {}
 										}
 										
-										List <Album> currentListAlbums = player.getCurrentList().getState().getAlbums();
+										List <Album> currentListAlbums = audioSystem.getCurrentList().getState().getAlbums();
 										
 										//TODO: handle this when we have multiple discs loaded
 										if ( currentListAlbums.size() == 1 && updateMe.equals( currentListAlbums.get( 0 ) )
-										&& player.getCurrentList().getState().getMode() == CurrentList.Mode.ALBUM
+										&& audioSystem.getCurrentList().getState().getMode() == CurrentList.Mode.ALBUM
 										){
 											
 											Track currentArtImages = ui.getCurrentImagesTrack();
 											List <CurrentListTrack> selectedItems = new ArrayList<> ( ui.getSelectedTracks() );
-											Track currentTrack = player.getCurrentTrack();
+											Track currentTrack = audioSystem.getCurrentTrack();
 											
-											player.getCurrentList().setAlbum( updateMe, false );
+											audioSystem.getCurrentList().setAlbum( updateMe, false );
 											library.albumsToUpdate.remove( updateMe ); //prevent an infinite loop
 											
 											ui.artSplitPane.setImages( currentArtImages );
 											ui.setSelectedTracks ( selectedItems );
 											
 											if ( currentTrack != null ) {
-												for ( CurrentListTrack currentListTrack : player.getCurrentList().getItems() ) {
+												for ( CurrentListTrack currentListTrack : audioSystem.getCurrentList().getItems() ) {
 													if ( currentListTrack.equals( currentTrack ) ) {
 														currentListTrack.setIsCurrentTrack( true );
 														currentListTrack.setIsLastCurrentListTrack( true );

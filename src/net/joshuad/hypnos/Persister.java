@@ -84,14 +84,14 @@ public class Persister {
 	private File hotkeysFile;
 
 	private FXUI ui;
-	private AudioSystem player;
+	private AudioSystem audioSystem;
 	private Library library;
 	private GlobalHotkeys hotkeys;
 	
-	public Persister ( FXUI ui, Library library, AudioSystem player, GlobalHotkeys hotkeys ) {
+	public Persister ( FXUI ui, Library library, AudioSystem audioSystem, GlobalHotkeys hotkeys ) {
 
 		this.ui = ui;
-		this.player = player;
+		this.audioSystem = audioSystem;
 		this.library = library;
 		this.hotkeys = hotkeys;
 
@@ -147,7 +147,7 @@ public class Persister {
 		loadAlbumsAndTracks();
 		loadSources();
 		loadQueue();
-		player.linkQueueToCurrentList();
+		audioSystem.linkQueueToCurrentList();
 		loadHistory();
 		loadPlaylists();
 		loadHotkeys();
@@ -155,7 +155,7 @@ public class Persister {
 	}
 	
 	//REFACTOR: I don't think this way of doing things is very great, two almost identical functions. W/e it works for now. 
-	public void saveAllData( EnumMap <Setting, ? extends Object> fromPlayer, EnumMap <Setting, ? extends Object> fromUI ) {
+	public void saveAllData( EnumMap <Setting, ? extends Object> fromAudioSystem, EnumMap <Setting, ? extends Object> fromUI ) {
 		createNecessaryFolders();
 		saveAlbumsAndTracks();
 		saveSources();
@@ -163,7 +163,7 @@ public class Persister {
 		saveQueue();
 		saveHistory();
 		saveLibraryPlaylists();
-		saveSettings( fromPlayer, fromUI );
+		saveSettings( fromAudioSystem, fromUI );
 		saveHotkeys();	
 	}
 
@@ -195,7 +195,7 @@ public class Persister {
 
 	public void loadCurrentList() {
 		try ( ObjectInputStream dataIn = new ObjectInputStream( new GZIPInputStream( new FileInputStream( currentFile ) ) ) ) {
-			player.getCurrentList().setState ( (CurrentListState)dataIn.readObject() );
+			audioSystem.getCurrentList().setState ( (CurrentListState)dataIn.readObject() );
 			
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to read library data from disk, continuing." );
@@ -205,7 +205,7 @@ public class Persister {
 	@SuppressWarnings("unchecked")
 	public void loadQueue () {
 		try ( ObjectInputStream queueIn = new ObjectInputStream( new FileInputStream( queueFile ) ); ) {
-			player.getQueue().queueAllTracks( (ArrayList <Track>) queueIn.readObject() );
+			audioSystem.getQueue().queueAllTracks( (ArrayList <Track>) queueIn.readObject() );
 			
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to read queue data from disk, continuing." );
@@ -215,7 +215,7 @@ public class Persister {
 	@SuppressWarnings("unchecked")
 	public void loadHistory () {
 		try ( ObjectInputStream historyIn = new ObjectInputStream( new FileInputStream( historyFile ) ); ) {
-			player.getHistory().setData( (ArrayList <Track>) historyIn.readObject() );
+			audioSystem.getHistory().setData( (ArrayList <Track>) historyIn.readObject() );
 		
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to read history from disk, continuing." );
@@ -268,7 +268,7 @@ public class Persister {
 			ByteArrayOutputStream byteWriter = new ByteArrayOutputStream();
 			ObjectOutputStream bytesOut = new ObjectOutputStream( byteWriter );
 
-			bytesOut.writeObject( player.getCurrentList().getState() );
+			bytesOut.writeObject( audioSystem.getCurrentList().getState() );
 
 			currentListOut.write( byteWriter.toByteArray() );
 			currentListOut.flush();
@@ -285,7 +285,7 @@ public class Persister {
 
 		File tempQueueFile = new File ( queueFile.toString() + ".temp" );
 		try ( ObjectOutputStream queueListOut = new ObjectOutputStream( new FileOutputStream( tempQueueFile ) ) ) {
-			queueListOut.writeObject( new ArrayList <Track>( player.getQueue().getData() ) );
+			queueListOut.writeObject( new ArrayList <Track>( audioSystem.getQueue().getData() ) );
 			queueListOut.flush();
 			queueListOut.close();
 			
@@ -302,7 +302,7 @@ public class Persister {
 		
 		try ( ObjectOutputStream historyListOut = new ObjectOutputStream( new FileOutputStream( tempHistoryFile ) ) ) {
 			
-			historyListOut.writeObject( new ArrayList <Track>( player.getHistory().getItems() ) );
+			historyListOut.writeObject( new ArrayList <Track>( audioSystem.getHistory().getItems() ) );
 			historyListOut.flush();
 			historyListOut.close();
 			
@@ -473,19 +473,19 @@ public class Persister {
 	}
 	
 	public void saveSettings() {
-		EnumMap <Setting, ? extends Object> fromPlayer = player.getSettings();
+		EnumMap <Setting, ? extends Object> fromAudioSystem = audioSystem.getSettings();
 		EnumMap <Setting, ? extends Object> fromUI = ui.getSettings();
-		saveSettings ( fromPlayer, fromUI );
+		saveSettings ( fromAudioSystem, fromUI );
 	}
 
-	public void saveSettings ( EnumMap <Setting, ? extends Object> fromPlayer, EnumMap <Setting, ? extends Object> fromUI ) {
+	public void saveSettings ( EnumMap <Setting, ? extends Object> fromAudioSystem, EnumMap <Setting, ? extends Object> fromUI ) {
 		
 		File tempSettingsFile = new File ( settingsFile.toString() + ".temp" );
 
 		try ( FileWriter fileWriter = new FileWriter( tempSettingsFile ); ) {
 			PrintWriter settingsOut = new PrintWriter( new BufferedWriter( fileWriter ) );
 
-			fromPlayer.forEach( ( key, value ) -> {
+			fromAudioSystem.forEach( ( key, value ) -> {
 				String valueOut = value == null ? "null" : value.toString();
 				settingsOut.printf( "%s: %s\n", key, valueOut );
 			} );
@@ -561,7 +561,7 @@ public class Persister {
 		}
 
 		ui.applySettings( loadMeNow );
-		player.applySettings ( loadMeNow );
+		audioSystem.applySettings ( loadMeNow );
 		
 		return loadMeLater;
 	}

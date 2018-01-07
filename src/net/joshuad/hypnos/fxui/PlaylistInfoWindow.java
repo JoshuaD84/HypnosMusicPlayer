@@ -48,13 +48,13 @@ public class PlaylistInfoWindow extends Stage {
 	TextField locationField;
 	FXUI ui;
 	Library library;
-	AudioSystem player;
+	AudioSystem audioSystem;
 	
-	public PlaylistInfoWindow( FXUI ui, Library library, AudioSystem player ) {
+	public PlaylistInfoWindow( FXUI ui, Library library, AudioSystem audioSystem ) {
 		super();
 		this.ui = ui;
 		this.library = library;
-		this.player = player;
+		this.audioSystem = audioSystem;
 		this.initModality( Modality.NONE );
 		this.initOwner( ui.getMainStage() );
 		this.setTitle( "Album Info" );
@@ -200,7 +200,7 @@ public class PlaylistInfoWindow extends Stage {
 				
 			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown()
 			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
-				player.getCurrentList().insertTracks( 0, trackTable.getSelectionModel().getSelectedItems() );
+				audioSystem.getCurrentList().insertTracks( 0, trackTable.getSelectionModel().getSelectedItems() );
 				
 			} else if ( e.getCode() == KeyCode.ENTER && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
@@ -213,11 +213,11 @@ public class PlaylistInfoWindow extends Stage {
 		});
 		
 		playNextMenuItem.setOnAction( event -> {
-			player.getQueue().queueAllTracks( trackTable.getSelectionModel().getSelectedItems(), 0 );
+			audioSystem.getQueue().queueAllTracks( trackTable.getSelectionModel().getSelectedItems(), 0 );
 		});
 		
 		enqueueMenuItem.setOnAction( event -> {
-			player.getQueue().queueAllTracks( trackTable.getSelectionModel().getSelectedItems() );
+			audioSystem.getQueue().queueAllTracks( trackTable.getSelectionModel().getSelectedItems() );
 		});
 		
 		infoMenuItem.setOnAction( event -> {
@@ -267,11 +267,11 @@ public class PlaylistInfoWindow extends Stage {
 			List <Track> selectedItems =  new ArrayList<Track> ( trackTable.getSelectionModel().getSelectedItems() );
 			
 			if ( selectedItems.size() == 1 ) {
-				player.playItems( selectedItems );
+				audioSystem.playItems( selectedItems );
 				
 			} else if ( selectedItems.size() > 1 ) {
 				if ( ui.okToReplaceCurrentList() ) {
-					player.playItems( selectedItems );
+					audioSystem.playItems( selectedItems );
 				}
 			}
 		});
@@ -283,7 +283,7 @@ public class PlaylistInfoWindow extends Stage {
 
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					player.playTrack( row.getItem() );
+					audioSystem.playTrack( row.getItem() );
 				}
 			} );
 			

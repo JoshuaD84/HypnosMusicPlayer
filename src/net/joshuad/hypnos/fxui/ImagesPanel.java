@@ -48,11 +48,11 @@ public class ImagesPanel extends SplitPane {
 	BorderPane artistImagePane;
 	
 	FXUI ui;
-	AudioSystem player;
+	AudioSystem audioSystem;
 	
-	public ImagesPanel( FXUI ui, AudioSystem player ) {
+	public ImagesPanel( FXUI ui, AudioSystem audioSystem ) {
 		this.ui = ui;
-		this.player = player;
+		this.audioSystem = audioSystem;
 		setupAlbumImage();
 		setupArtistImage();
 
@@ -88,7 +88,7 @@ public class ImagesPanel extends SplitPane {
 			
 			if ( targetFile == null ) return; 
 			
-			track.setAndSaveAlbumImage ( targetFile.toPath(), player );
+			track.setAndSaveAlbumImage ( targetFile.toPath(), audioSystem );
 
 			setImages ( ui.currentImagesTrack );
 		});
@@ -181,7 +181,7 @@ public class ImagesPanel extends SplitPane {
 				for ( File file : files ) {
 					if ( Utils.isImageFile( file ) ) {
 						try {
-							track.setAndSaveAlbumImage ( file.toPath(), player );
+							track.setAndSaveAlbumImage ( file.toPath(), audioSystem );
 							break;
 						} catch ( Exception e ) {
 							LOGGER.log( Level.WARNING, "Unable to set album image from file: " + file.toString(), e );
@@ -197,7 +197,7 @@ public class ImagesPanel extends SplitPane {
 					try {
 						if ( contentType == DataFormat.lookupMimeType("application/octet-stream" ) ) {
 							ByteBuffer buffer = (ByteBuffer)db.getContent( contentType );
-							track.setAndSaveAlbumImage( buffer.array(), player );
+							track.setAndSaveAlbumImage( buffer.array(), audioSystem );
 						}
 					} catch ( Exception e ) {
 						LOGGER.log( Level.WARNING, "Unable to set album image from drop source.", e );
@@ -340,7 +340,7 @@ public class ImagesPanel extends SplitPane {
 			File imageFile = fileChooser.showOpenDialog( ui.getMainStage() );
 			if ( imageFile == null ) return; 
 			
-			Track.saveArtistImageToTag ( track.getPath().toFile(), imageFile.toPath(), ArtistTagImagePriority.TRACK, false, player );
+			Track.saveArtistImageToTag ( track.getPath().toFile(), imageFile.toPath(), ArtistTagImagePriority.TRACK, false, audioSystem );
 			setImages ( ui.currentImagesTrack );
 		});
 		
@@ -366,7 +366,7 @@ public class ImagesPanel extends SplitPane {
 					try ( DirectoryStream <Path> stream = Files.newDirectoryStream( albumPath ) ) {
 						for ( Path child : stream ) {
 							if ( Utils.isMusicFile( child ) ) {
-								Track.saveArtistImageToTag ( child.toFile(), buffer, ArtistTagImagePriority.ALBUM, false, player );
+								Track.saveArtistImageToTag ( child.toFile(), buffer, ArtistTagImagePriority.ALBUM, false, audioSystem );
 							}
 						}
 					} catch ( IOException e3 ) {
@@ -406,7 +406,7 @@ public class ImagesPanel extends SplitPane {
 					try ( DirectoryStream <Path> stream = Files.newDirectoryStream( artistPath ) ) {
 						for ( Path child : stream ) {
 							if ( Utils.isMusicFile( child ) ) {
-								Track.saveArtistImageToTag ( child.toFile(), buffer, ArtistTagImagePriority.GENERAL, false, player );
+								Track.saveArtistImageToTag ( child.toFile(), buffer, ArtistTagImagePriority.GENERAL, false, audioSystem );
 							}
 						}
 					} catch ( IOException e3 ) {
@@ -561,7 +561,7 @@ public class ImagesPanel extends SplitPane {
 						try ( DirectoryStream <Path> stream = Files.newDirectoryStream( albumPath ) ) {
 							for ( Path child : stream ) {
 								if ( Utils.isMusicFile( child ) ) {
-									Track.saveArtistImageToTag ( child.toFile(), buffer, ArtistTagImagePriority.ALBUM, overwriteAll, player );
+									Track.saveArtistImageToTag ( child.toFile(), buffer, ArtistTagImagePriority.ALBUM, overwriteAll, audioSystem );
 								}
 							}
 						} catch ( IOException e ) {
@@ -577,7 +577,7 @@ public class ImagesPanel extends SplitPane {
 					break;
 					
 				case TRACK:
-					Track.saveArtistImageToTag ( targetTrack.getPath().toFile(), buffer, ArtistTagImagePriority.TRACK, overwriteAll, player );
+					Track.saveArtistImageToTag ( targetTrack.getPath().toFile(), buffer, ArtistTagImagePriority.TRACK, overwriteAll, audioSystem );
 					setImages ( ui.currentImagesTrack );
 					break;
 					

@@ -85,7 +85,7 @@ public class SettingsWindow extends Stage {
 	private FXUI ui;
 	private Library library;
 	private GlobalHotkeys hotkeys;
-	private AudioSystem player;
+	private AudioSystem audioSystem;
 	
 	private TabPane tabPane;
 	private Tab globalHotkeysTab;
@@ -123,13 +123,13 @@ public class SettingsWindow extends Stage {
 		DefaultSortMode.YEAR_ALBUM_NUMBER, DefaultSortMode.ARTIST_YEAR_ALBUM_NUMBER
 	);
 	
-	SettingsWindow( FXUI ui, Library library, GlobalHotkeys hotkeys, AudioSystem player ) {
+	SettingsWindow( FXUI ui, Library library, GlobalHotkeys hotkeys, AudioSystem audioSystem ) {
 		super();
 		
 		this.ui = ui;
 		this.library = library;
 		this.hotkeys = hotkeys;
-		this.player = player;
+		this.audioSystem = audioSystem;
 
 		initModality( Modality.NONE );
 		initOwner( ui.getMainStage() );		
@@ -352,7 +352,7 @@ public class SettingsWindow extends Stage {
 	
 	public void updateSettings() {
 		
-		switch ( player.getCurrentList().getDefaultTrackRepeatMode() ) {
+		switch ( audioSystem.getCurrentList().getDefaultTrackRepeatMode() ) {
 			case NO_CHANGE:
 				trackRepeatChoices.getSelectionModel().select( 0 );
 				break;
@@ -365,7 +365,7 @@ public class SettingsWindow extends Stage {
 			
 		}
 		
-		switch ( player.getCurrentList().getDefaultAlbumRepeatMode() ) {
+		switch ( audioSystem.getCurrentList().getDefaultAlbumRepeatMode() ) {
 			case NO_CHANGE:
 				albumRepeatChoices.getSelectionModel().select( 0 );
 				break;
@@ -378,7 +378,7 @@ public class SettingsWindow extends Stage {
 			
 		}
 		
-		switch ( player.getCurrentList().getDefaultPlaylistRepeatMode() ) {
+		switch ( audioSystem.getCurrentList().getDefaultPlaylistRepeatMode() ) {
 			case NO_CHANGE:
 				playlistRepeatChoices.getSelectionModel().select( 0 );
 				break;
@@ -391,7 +391,7 @@ public class SettingsWindow extends Stage {
 			
 		}
 		
-		switch ( player.getCurrentList().getDefaultTrackShuffleMode() ) {
+		switch ( audioSystem.getCurrentList().getDefaultTrackShuffleMode() ) {
 			case NO_CHANGE:
 				trackShuffleChoices.getSelectionModel().select( 0 );
 				break;
@@ -404,7 +404,7 @@ public class SettingsWindow extends Stage {
 			
 		}
 		
-		switch ( player.getCurrentList().getDefaultAlbumShuffleMode() ) {
+		switch ( audioSystem.getCurrentList().getDefaultAlbumShuffleMode() ) {
 			case NO_CHANGE:
 				albumShuffleChoices.getSelectionModel().select( 0 );
 				break;
@@ -417,7 +417,7 @@ public class SettingsWindow extends Stage {
 			
 		}
 	
-		switch ( player.getCurrentList().getDefaultPlaylistShuffleMode() ) {
+		switch ( audioSystem.getCurrentList().getDefaultPlaylistShuffleMode() ) {
 			case NO_CHANGE:
 				playlistShuffleChoices.getSelectionModel().select( 0 );
 				break;
@@ -431,11 +431,11 @@ public class SettingsWindow extends Stage {
 		}
 		
 		albumSortChoices.getSelectionModel().select ( 
-			sortOptionModes.indexOf( player.getCurrentList().getDefaultAlbumSortMode() ) );
+			sortOptionModes.indexOf( audioSystem.getCurrentList().getDefaultAlbumSortMode() ) );
 		trackSortChoices.getSelectionModel().select (
-			sortOptionModes.indexOf( player.getCurrentList().getDefaultTrackSortMode() ) );
+			sortOptionModes.indexOf( audioSystem.getCurrentList().getDefaultTrackSortMode() ) );
 		playlistSortChoices.getSelectionModel().select (
-			sortOptionModes.indexOf( player.getCurrentList().getDefaultPlaylistSortMode() ) );
+			sortOptionModes.indexOf( audioSystem.getCurrentList().getDefaultPlaylistSortMode() ) );
 		
 		if ( ui.isDarkTheme() ) {
 			themeToggleGroup.selectToggle( darkTheme );
@@ -562,15 +562,15 @@ public class SettingsWindow extends Stage {
 			public void changed ( ObservableValue <? extends Number> observableValue, Number oldValue, Number newValue ) {
 				switch ( newValue.intValue() ) {
 					case 0: 
-						player.getCurrentList().setDefaultAlbumShuffleMode ( DefaultShuffleMode.NO_CHANGE );
+						audioSystem.getCurrentList().setDefaultAlbumShuffleMode ( DefaultShuffleMode.NO_CHANGE );
 						break;
 						
 					case 1:
-						player.getCurrentList().setDefaultAlbumShuffleMode ( DefaultShuffleMode.SEQUENTIAL );
+						audioSystem.getCurrentList().setDefaultAlbumShuffleMode ( DefaultShuffleMode.SEQUENTIAL );
 						break;
 					
 					case 2:
-						player.getCurrentList().setDefaultAlbumShuffleMode ( DefaultShuffleMode.SHUFFLE );
+						audioSystem.getCurrentList().setDefaultAlbumShuffleMode ( DefaultShuffleMode.SHUFFLE );
 						break;
 				}
 			}
@@ -584,15 +584,15 @@ public class SettingsWindow extends Stage {
 			public void changed ( ObservableValue <? extends Number> observableValue, Number oldValue, Number newValue ) {
 				switch ( newValue.intValue() ) {
 					case 0: 
-						player.getCurrentList().setDefaultAlbumRepeatMode( DefaultRepeatMode.NO_CHANGE );
+						audioSystem.getCurrentList().setDefaultAlbumRepeatMode( DefaultRepeatMode.NO_CHANGE );
 						break;
 						
 					case 1:
-						player.getCurrentList().setDefaultAlbumRepeatMode ( DefaultRepeatMode.PLAY_ONCE );
+						audioSystem.getCurrentList().setDefaultAlbumRepeatMode ( DefaultRepeatMode.PLAY_ONCE );
 						break;
 					
 					case 2:
-						player.getCurrentList().setDefaultAlbumRepeatMode ( DefaultRepeatMode.REPEAT );
+						audioSystem.getCurrentList().setDefaultAlbumRepeatMode ( DefaultRepeatMode.REPEAT );
 						break;
 				}
 			}
@@ -604,7 +604,7 @@ public class SettingsWindow extends Stage {
 		albumSortChoices.getSelectionModel().selectedIndexProperty().addListener( new ChangeListener<Number>() {
 			@Override
 			public void changed ( ObservableValue <? extends Number> observableValue, Number oldValue, Number newValue ) {
-				player.getCurrentList().setDefaultAlbumSortMode ( sortOptionModes.get( newValue.intValue() ) );
+				audioSystem.getCurrentList().setDefaultAlbumSortMode ( sortOptionModes.get( newValue.intValue() ) );
 			}
 		});
 		row++;
@@ -621,15 +621,15 @@ public class SettingsWindow extends Stage {
 			public void changed ( ObservableValue <? extends Number> observableValue, Number oldValue, Number newValue ) {
 				switch ( newValue.intValue() ) {
 					case 0: 
-						player.getCurrentList().setDefaultTrackShuffleMode( DefaultShuffleMode.NO_CHANGE );
+						audioSystem.getCurrentList().setDefaultTrackShuffleMode( DefaultShuffleMode.NO_CHANGE );
 						break;
 						
 					case 1:
-						player.getCurrentList().setDefaultTrackShuffleMode ( DefaultShuffleMode.SEQUENTIAL );
+						audioSystem.getCurrentList().setDefaultTrackShuffleMode ( DefaultShuffleMode.SEQUENTIAL );
 						break;
 					
 					case 2:
-						player.getCurrentList().setDefaultTrackShuffleMode ( DefaultShuffleMode.SHUFFLE );
+						audioSystem.getCurrentList().setDefaultTrackShuffleMode ( DefaultShuffleMode.SHUFFLE );
 						break;
 				}
 			}
@@ -643,15 +643,15 @@ public class SettingsWindow extends Stage {
 			public void changed ( ObservableValue <? extends Number> observableValue, Number oldValue, Number newValue ) {
 				switch ( newValue.intValue() ) {
 					case 0: 
-						player.getCurrentList().setDefaultTrackRepeatMode( DefaultRepeatMode.NO_CHANGE );
+						audioSystem.getCurrentList().setDefaultTrackRepeatMode( DefaultRepeatMode.NO_CHANGE );
 						break;
 						
 					case 1:
-						player.getCurrentList().setDefaultTrackRepeatMode ( DefaultRepeatMode.PLAY_ONCE );
+						audioSystem.getCurrentList().setDefaultTrackRepeatMode ( DefaultRepeatMode.PLAY_ONCE );
 						break;
 					
 					case 2:
-						player.getCurrentList().setDefaultTrackRepeatMode ( DefaultRepeatMode.REPEAT );
+						audioSystem.getCurrentList().setDefaultTrackRepeatMode ( DefaultRepeatMode.REPEAT );
 						break;
 				}
 			}
@@ -663,7 +663,7 @@ public class SettingsWindow extends Stage {
 		trackSortChoices.getSelectionModel().selectedIndexProperty().addListener( new ChangeListener<Number>() {
 			@Override
 			public void changed ( ObservableValue <? extends Number> observableValue, Number oldValue, Number newValue ) {
-				player.getCurrentList().setDefaultTrackSortMode ( sortOptionModes.get( newValue.intValue() ) );
+				audioSystem.getCurrentList().setDefaultTrackSortMode ( sortOptionModes.get( newValue.intValue() ) );
 			}
 		});
 		row++;
@@ -680,15 +680,15 @@ public class SettingsWindow extends Stage {
 			public void changed ( ObservableValue <? extends Number> observableValue, Number oldValue, Number newValue ) {
 				switch ( newValue.intValue() ) {
 					case 0: 
-						player.getCurrentList().setDefaultPlaylistShuffleMode( DefaultShuffleMode.NO_CHANGE );
+						audioSystem.getCurrentList().setDefaultPlaylistShuffleMode( DefaultShuffleMode.NO_CHANGE );
 						break;
 						
 					case 1:
-						player.getCurrentList().setDefaultPlaylistShuffleMode ( DefaultShuffleMode.SEQUENTIAL );
+						audioSystem.getCurrentList().setDefaultPlaylistShuffleMode ( DefaultShuffleMode.SEQUENTIAL );
 						break;
 					
 					case 2:
-						player.getCurrentList().setDefaultPlaylistShuffleMode ( DefaultShuffleMode.SHUFFLE );
+						audioSystem.getCurrentList().setDefaultPlaylistShuffleMode ( DefaultShuffleMode.SHUFFLE );
 						break;
 				}
 			}
@@ -702,15 +702,15 @@ public class SettingsWindow extends Stage {
 			public void changed ( ObservableValue <? extends Number> observableValue, Number oldValue, Number newValue ) {
 				switch ( newValue.intValue() ) {
 					case 0: 
-						player.getCurrentList().setDefaultPlaylistRepeatMode( DefaultRepeatMode.NO_CHANGE );
+						audioSystem.getCurrentList().setDefaultPlaylistRepeatMode( DefaultRepeatMode.NO_CHANGE );
 						break;
 						
 					case 1:
-						player.getCurrentList().setDefaultPlaylistRepeatMode ( DefaultRepeatMode.PLAY_ONCE );
+						audioSystem.getCurrentList().setDefaultPlaylistRepeatMode ( DefaultRepeatMode.PLAY_ONCE );
 						break;
 					
 					case 2:
-						player.getCurrentList().setDefaultPlaylistRepeatMode ( DefaultRepeatMode.REPEAT );
+						audioSystem.getCurrentList().setDefaultPlaylistRepeatMode ( DefaultRepeatMode.REPEAT );
 						break;
 				}
 			}
@@ -722,7 +722,7 @@ public class SettingsWindow extends Stage {
 		playlistSortChoices.getSelectionModel().selectedIndexProperty().addListener( new ChangeListener<Number>() {
 			@Override
 			public void changed ( ObservableValue <? extends Number> observableValue, Number oldValue, Number newValue ) {
-				player.getCurrentList().setDefaultPlaylistSortMode ( sortOptionModes.get( newValue.intValue() ) );
+				audioSystem.getCurrentList().setDefaultPlaylistSortMode ( sortOptionModes.get( newValue.intValue() ) );
 			}
 		});
 		
@@ -923,11 +923,11 @@ public class SettingsWindow extends Stage {
 				}
 				
 				if ( tracks.size() == 1 ) {
-					player.playItems( tracks );
+					audioSystem.playItems( tracks );
 					
 				} else if ( tracks.size() > 1 ) {
 					if ( ui.okToReplaceCurrentList() ) {
-						player.playItems( tracks );
+						audioSystem.playItems( tracks );
 					}
 				}
 			}
@@ -943,7 +943,7 @@ public class SettingsWindow extends Stage {
 				}
 				
 				if ( tracks.size() == 1 ) {
-					player.getQueue().queueAllTracks( tracks, 0 );
+					audioSystem.getQueue().queueAllTracks( tracks, 0 );
 					
 				} 
 			}
@@ -958,7 +958,7 @@ public class SettingsWindow extends Stage {
 					tracks.add( error.getTrack() );
 				}
 				
-				player.getCurrentList().appendTracks ( tracks );
+				audioSystem.getCurrentList().appendTracks ( tracks );
 			}
 		});
 		
@@ -971,7 +971,7 @@ public class SettingsWindow extends Stage {
 					tracks.add( error.getTrack() );
 				}
 				
-				player.getQueue().queueAllTracks( tracks );
+				audioSystem.getQueue().queueAllTracks( tracks );
 			}
 		});
 		
@@ -1060,7 +1060,7 @@ public class SettingsWindow extends Stage {
 				
 				for ( TagError error : errors ) tracks.add ( error.getTrack() );
 				
-				ui.player.getCurrentList().insertTracks( 0, tracks );
+				ui.audioSystem.getCurrentList().insertTracks( 0, tracks );
 				e.consume();
 				
 			} else if ( e.getCode() == KeyCode.ENTER && e.isControlDown() 

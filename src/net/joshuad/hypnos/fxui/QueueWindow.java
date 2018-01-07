@@ -56,14 +56,14 @@ public class QueueWindow extends Stage {
 	
 	TableView <Track> queueTable;
 	FXUI ui;
-	AudioSystem player;
+	AudioSystem audioSystem;
 	Library library;
 	
 	@SuppressWarnings("unchecked")
-	public QueueWindow ( FXUI ui, Library library, AudioSystem player, TagWindow tagWindow ) {
+	public QueueWindow ( FXUI ui, Library library, AudioSystem audioSystem, TagWindow tagWindow ) {
 		super();
 		this.ui = ui;
-		this.player = player;
+		this.audioSystem = audioSystem;
 		this.library = library;
 		initModality( Modality.NONE );
 		initOwner( ui.getMainStage() );
@@ -87,7 +87,7 @@ public class QueueWindow extends Stage {
 
 		queueTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
 		queueTable.setPlaceholder( emptyLabel );
-		queueTable.setItems( player.getQueue().getData() );
+		queueTable.setItems( audioSystem.getQueue().getData() );
 		
 		queueTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 
@@ -199,7 +199,7 @@ public class QueueWindow extends Stage {
 				
 			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown()
 			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
-				player.getCurrentList().insertTracks( 0, queueTable.getSelectionModel().getSelectedItems() );
+				audioSystem.getCurrentList().insertTracks( 0, queueTable.getSelectionModel().getSelectedItems() );
 				
 			} else if ( e.getCode() == KeyCode.ENTER && e.isControlDown()
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
@@ -224,7 +224,7 @@ public class QueueWindow extends Stage {
 			
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					player.playTrack( row.getItem(), false );
+					audioSystem.playTrack( row.getItem(), false );
 				}
 			} );
 			
@@ -257,7 +257,7 @@ public class QueueWindow extends Stage {
 					
 					DraggedTrackContainer container = (DraggedTrackContainer) db.getContent( FXUI.DRAGGED_TRACKS );
 					List <Integer> draggedIndices = container.getIndices();
-					int dropIndex = row.isEmpty() ? dropIndex = player.getQueue().size() : row.getIndex();
+					int dropIndex = row.isEmpty() ? dropIndex = audioSystem.getQueue().size() : row.getIndex();
 					
 					switch ( container.getSource() ) {
 						case ALBUM_LIST:
@@ -268,53 +268,53 @@ public class QueueWindow extends Stage {
 						case PLAYLIST_INFO:
 						case TRACK_LIST: {
 							List <Track> tracksToCopy = container.getTracks();
-							player.getQueue().queueAllTracks( tracksToCopy, dropIndex );
+							audioSystem.getQueue().queueAllTracks( tracksToCopy, dropIndex );
 							
 						} break;
 						
 						case CURRENT_LIST: {
 							//PENDING: Should I refactor this? 
-							synchronized ( player.getCurrentList() ) {
+							synchronized ( audioSystem.getCurrentList() ) {
 								ArrayList <CurrentListTrack> tracksToCopy = new ArrayList <CurrentListTrack> (  );
 								for ( int index : draggedIndices ) {
-									if ( index >= 0 && index < player.getCurrentList().getItems().size() ) {
-										tracksToCopy.add( player.getCurrentList().getItems().get( index ) );
+									if ( index >= 0 && index < audioSystem.getCurrentList().getItems().size() ) {
+										tracksToCopy.add( audioSystem.getCurrentList().getItems().get( index ) );
 									}
 								}
-								player.getQueue().queueAllTracks( tracksToCopy, dropIndex );
+								audioSystem.getQueue().queueAllTracks( tracksToCopy, dropIndex );
 							}
 						} break;
 
 						case QUEUE: {
 							ArrayList <Track> tracksToMove = new ArrayList <Track> ( draggedIndices.size() );
 							for ( int index : draggedIndices ) {
-								if ( index >= 0 && index < player.getQueue().size() ) {
-									tracksToMove.add( player.getQueue().get( index ) );
+								if ( index >= 0 && index < audioSystem.getQueue().size() ) {
+									tracksToMove.add( audioSystem.getQueue().get( index ) );
 								}
 							}
 							
 							for ( int k = draggedIndices.size() - 1; k >= 0; k-- ) {
 								int index = draggedIndices.get( k ).intValue();
-								if ( index >= 0 && index < player.getQueue().size() ) {
-									player.getQueue().remove ( index );
+								if ( index >= 0 && index < audioSystem.getQueue().size() ) {
+									audioSystem.getQueue().remove ( index );
 								}
 							}
 							
-							dropIndex = Math.min( player.getQueue().size(), row.getIndex() );
+							dropIndex = Math.min( audioSystem.getQueue().size(), row.getIndex() );
 							
-							player.getQueue().queueAllTracks( tracksToMove, dropIndex );
+							audioSystem.getQueue().queueAllTracks( tracksToMove, dropIndex );
 							
 							queueTable.getSelectionModel().clearSelection();
 							for ( int k = 0; k < draggedIndices.size(); k++ ) {
 								queueTable.getSelectionModel().select( dropIndex + k );
 							}
 							
-							player.getQueue().updateQueueIndexes();
+							audioSystem.getQueue().updateQueueIndexes();
 							
 						} break;
 					}
 
-					player.getQueue().updateQueueIndexes( );
+					audioSystem.getQueue().updateQueueIndexes( );
 					event.setDropCompleted( true );
 					event.consume();
 
@@ -345,8 +345,8 @@ public class QueueWindow extends Stage {
 					}
 										
 					if ( !tracksToAdd.isEmpty() ) {
-						int dropIndex = row.isEmpty() ? dropIndex = player.getQueue().size() : row.getIndex();
-						player.getQueue().queueAllTracks( tracksToAdd, Math.min( dropIndex, player.getQueue().size() ) );
+						int dropIndex = row.isEmpty() ? dropIndex = audioSystem.getQueue().size() : row.getIndex();
+						audioSystem.getQueue().queueAllTracks( tracksToAdd, Math.min( dropIndex, audioSystem.getQueue().size() ) );
 					}
 
 					event.setDropCompleted( true );
@@ -385,19 +385,19 @@ public class QueueWindow extends Stage {
 					case TAG_ERROR_LIST:
 					case TRACK_LIST: {
 						List <Track> tracksToCopy = container.getTracks();
-						player.getQueue().queueAllTracks( tracksToCopy );
+						audioSystem.getQueue().queueAllTracks( tracksToCopy );
 					} break;
 					
 					case CURRENT_LIST: {
 						//PENDING: should I refactor this
-						synchronized ( player.getCurrentList() ) {
+						synchronized ( audioSystem.getCurrentList() ) {
 							ArrayList <CurrentListTrack> tracksToCopy = new ArrayList <CurrentListTrack> (  );
 							for ( int index : draggedIndices ) {
-								if ( index >= 0 && index < player.getCurrentList().getItems().size() ) {
-									tracksToCopy.add( player.getCurrentList().getItems().get( index ) );
+								if ( index >= 0 && index < audioSystem.getCurrentList().getItems().size() ) {
+									tracksToCopy.add( audioSystem.getCurrentList().getItems().get( index ) );
 								}
 							}
-							player.getQueue().queueAllTracks( tracksToCopy );
+							audioSystem.getQueue().queueAllTracks( tracksToCopy );
 						}
 					} break;
 					
@@ -407,7 +407,7 @@ public class QueueWindow extends Stage {
 					} break;
 				}
 
-				player.getQueue().updateQueueIndexes();
+				audioSystem.getQueue().updateQueueIndexes();
 				event.setDropCompleted( true );
 				event.consume();
 
@@ -435,7 +435,7 @@ public class QueueWindow extends Stage {
 				}
 				
 				if ( !tracksToAdd.isEmpty() ) {
-					player.getQueue().queueAllTracks( tracksToAdd );
+					audioSystem.getQueue().queueAllTracks( tracksToAdd );
 				}
 
 				event.setDropCompleted( true );
@@ -473,11 +473,11 @@ public class QueueWindow extends Stage {
 				List <Track> selectedItems =  new ArrayList<Track> ( queueTable.getSelectionModel().getSelectedItems() );
 				
 				if ( selectedItems.size() == 1 ) {
-					player.playItems( selectedItems );
+					audioSystem.playItems( selectedItems );
 					
 				} else if ( selectedItems.size() > 1 ) {
 					if ( ui.okToReplaceCurrentList() ) {
-						player.playItems( selectedItems );
+						audioSystem.playItems( selectedItems );
 					}
 				}
 			}
@@ -486,7 +486,7 @@ public class QueueWindow extends Stage {
 		appendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.getCurrentList().appendTracks ( queueTable.getSelectionModel().getSelectedItems() );
+				audioSystem.getCurrentList().appendTracks ( queueTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 		
@@ -534,7 +534,7 @@ public class QueueWindow extends Stage {
 				if ( !removeMe.isEmpty() ) {
 
 					for ( int k = removeMe.size() - 1; k >= 0; k-- ) {
-						player.getQueue().remove ( removeMe.get( k ).intValue() );
+						audioSystem.getQueue().remove ( removeMe.get( k ).intValue() );
 					}
 
 					queueTable.getSelectionModel().clearSelection();
@@ -551,7 +551,7 @@ public class QueueWindow extends Stage {
 					ArrayList<Integer> removeMeIndices = new ArrayList<Integer> ( selectedIndices );
 					
 					for ( int k = removeMeIndices.size() - 1; k >= 0 ; k-- ) {
-						player.getQueue().remove( removeMeIndices.get( k ).intValue() );
+						audioSystem.getQueue().remove( removeMeIndices.get( k ).intValue() );
 					}
 				}
 			}

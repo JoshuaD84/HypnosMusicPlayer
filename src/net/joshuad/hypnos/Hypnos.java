@@ -136,7 +136,7 @@ public class Hypnos extends Application {
 	private static boolean globalHotkeysDisabled = false;
 	
 	private static Persister persister;
-	private static AudioSystem player;
+	private static AudioSystem audioSystem;
 	private static FXUI ui;
 	private static LibraryUpdater libraryUpdater;
 	private static Library library;
@@ -525,45 +525,45 @@ public class Hypnos extends Application {
 		Platform.runLater( () -> {
 			switch ( hotkey ) {
 				case NEXT:
-					player.next();
+					audioSystem.next();
 					break;
 				case PLAY:
-					player.play();
+					audioSystem.play();
 					break;
 				case PREVIOUS:
-					player.previous();
+					audioSystem.previous();
 					break;
 				case SHOW_HIDE_UI:
 					ui.toggleMinimized();
 					break;
 				case SKIP_BACK:
-					long target = player.getPositionMS() - 5000 ;
+					long target = audioSystem.getPositionMS() - 5000 ;
 					if ( target < 0 ) target = 0;
-					player.seekMS( target ); 
+					audioSystem.seekMS( target ); 
 					break;
 				case SKIP_FORWARD:
-					player.seekMS( player.getPositionMS() + 5000 ); 
+					audioSystem.seekMS( audioSystem.getPositionMS() + 5000 ); 
 					break;
 				case STOP:
-					player.stop( StopReason.USER_REQUESTED );
+					audioSystem.stop( StopReason.USER_REQUESTED );
 					break;
 				case TOGGLE_MUTE:
-					player.toggleMute();
+					audioSystem.toggleMute();
 					break;
 				case TOGGLE_PAUSE:
-					player.togglePause();
+					audioSystem.togglePause();
 					break;
 				case TOGGLE_REPEAT:
-					player.toggleRepeatMode();
+					audioSystem.toggleRepeatMode();
 					break;
 				case TOGGLE_SHUFFLE:
-					player.toggleShuffleMode();
+					audioSystem.toggleShuffleMode();
 					break;
 				case VOLUME_DOWN:
-					player.decrementVolume();
+					audioSystem.decrementVolume();
 					break;
 				case VOLUME_UP:
-					player.incrementVolume();
+					audioSystem.incrementVolume();
 					break;
 				default:
 					break;
@@ -612,7 +612,7 @@ public class Hypnos extends Application {
 				
 				if ( newList.size() > 0 ) {
 					Platform.runLater( () -> {
-						player.getCurrentList().setTracksPathList( newList );
+						audioSystem.getCurrentList().setTracksPathList( newList );
 					});
 				}
 			}
@@ -624,39 +624,39 @@ public class Hypnos extends Application {
 				Platform.runLater( () -> {
 					switch ( action ) {
 						case SocketCommand.NEXT: 
-							player.next();
+							audioSystem.next();
 							break;
 						case SocketCommand.PREVIOUS:
-							player.previous();
+							audioSystem.previous();
 							break;
 						case SocketCommand.PAUSE:
-							player.pause();
+							audioSystem.pause();
 							break;
 						case SocketCommand.PLAY:
-							player.unpause();
+							audioSystem.unpause();
 							break;
 						case SocketCommand.TOGGLE_PAUSE:
-							player.togglePause();
+							audioSystem.togglePause();
 							break;
 						case SocketCommand.STOP:
-							player.stop( StopReason.USER_REQUESTED );
+							audioSystem.stop( StopReason.USER_REQUESTED );
 							break;
 						case SocketCommand.TOGGLE_MINIMIZED:
 							ui.toggleMinimized();
 							break;
 						case SocketCommand.VOLUME_DOWN:
-							player.decrementVolume();
+							audioSystem.decrementVolume();
 							break;
 						case SocketCommand.VOLUME_UP:
-							player.incrementVolume();
+							audioSystem.incrementVolume();
 							break;
 						case SocketCommand.SEEK_BACK:
-							long target = player.getPositionMS() - 5000 ;
+							long target = audioSystem.getPositionMS() - 5000 ;
 							if ( target < 0 ) target = 0;
-							player.seekMS( target ); 
+							audioSystem.seekMS( target ); 
 							break;
 						case SocketCommand.SEEK_FORWARD:
-							player.seekMS( player.getPositionMS() + 5000 ); 
+							audioSystem.seekMS( audioSystem.getPositionMS() + 5000 ); 
 							break;
 						case SocketCommand.SHOW:
 							ui.restoreWindow();
@@ -668,10 +668,10 @@ public class Hypnos extends Application {
 	}
 
 	public static void exit ( ExitCode exitCode ) {
-		EnumMap <Setting, ? extends Object> fromPlayer = player.getSettings();
+		EnumMap <Setting, ? extends Object> fromAudioSystem = audioSystem.getSettings();
 		EnumMap <Setting, ? extends Object> fromUI = ui.getSettings();
-		player.stop ( StopReason.USER_REQUESTED );
-		persister.saveAllData( fromPlayer, fromUI );
+		audioSystem.stop ( StopReason.USER_REQUESTED );
+		persister.saveAllData( fromAudioSystem, fromUI );
 		System.exit ( exitCode.ordinal() );
 	}
 	
@@ -703,13 +703,13 @@ public class Hypnos extends Application {
 			if ( singleInstanceController.isFirstInstance() ) {
 				setupLogFile();
 				library = new Library();
-				player = new AudioSystem();
+				audioSystem = new AudioSystem();
 				startGlobalHotkeyListener();
 				
-				ui = new FXUI ( stage, library, player, hotkeys );
-				libraryUpdater = new LibraryUpdater ( library, player, ui );
+				ui = new FXUI ( stage, library, audioSystem, hotkeys );
+				libraryUpdater = new LibraryUpdater ( library, audioSystem, ui );
 				
-				persister = new Persister ( ui, library, player, hotkeys );
+				persister = new Persister ( ui, library, audioSystem, hotkeys );
 				
 				switch ( getOS() ) {
 					case NIX:
@@ -720,7 +720,7 @@ public class Hypnos extends Application {
 						Thread finishLoadingThread = new Thread ( () -> {
 
 							Platform.runLater( () -> persister.loadDataAfterShowWindow( loadMeLater ) );
-							player.start();
+							audioSystem.start();
 							
 							applyCLICommands( commands );
 							singleInstanceController.startCLICommandListener ( this );
@@ -757,7 +757,7 @@ public class Hypnos extends Application {
 						EnumMap <Setting, String> loadMeLater = persister.loadDataBeforeShowWindow();
 						persister.loadDataAfterShowWindow( loadMeLater );
 						
-						player.start();
+						audioSystem.start();
 						
 						applyCLICommands( commands );
 						singleInstanceController.startCLICommandListener ( this );

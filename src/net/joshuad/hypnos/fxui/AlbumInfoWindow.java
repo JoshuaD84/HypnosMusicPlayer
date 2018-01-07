@@ -54,15 +54,15 @@ public class AlbumInfoWindow extends Stage {
 	TableView <Track> trackTable;
 	TextField locationField;
 	FXUI ui;
-	AudioSystem player;
+	AudioSystem audioSystem;
 	Library library;
 	Button browseButton;
 	
-	public AlbumInfoWindow( FXUI ui, Library library, AudioSystem player ) {
+	public AlbumInfoWindow( FXUI ui, Library library, AudioSystem audioSystem ) {
 		super();
 		this.ui = ui;
 		this.library = library;
-		this.player = player;
+		this.audioSystem = audioSystem;
 		
 		this.initModality( Modality.NONE );
 		this.initOwner( ui.getMainStage() );
@@ -222,11 +222,11 @@ public class AlbumInfoWindow extends Stage {
 		ui.updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		
 		playNextMenuItem.setOnAction( event -> {
-			player.getQueue().queueAllTracks( trackTable.getSelectionModel().getSelectedItems(), 0 );
+			audioSystem.getQueue().queueAllTracks( trackTable.getSelectionModel().getSelectedItems(), 0 );
 		});
 		
 		enqueueMenuItem.setOnAction( event -> {
-			player.getQueue().queueAllTracks( trackTable.getSelectionModel().getSelectedItems() );
+			audioSystem.getQueue().queueAllTracks( trackTable.getSelectionModel().getSelectedItems() );
 		});
 			
 		editTagMenuItem.setOnAction( event -> {
@@ -235,7 +235,7 @@ public class AlbumInfoWindow extends Stage {
 		});
 		
 		appendMenuItem.setOnAction( event -> {
-			player.getCurrentList().appendTracks ( trackTable.getSelectionModel().getSelectedItems() );
+			audioSystem.getCurrentList().appendTracks ( trackTable.getSelectionModel().getSelectedItems() );
 		});
 		
 		infoMenuItem.setOnAction( event -> {
@@ -255,11 +255,11 @@ public class AlbumInfoWindow extends Stage {
 			List <Track> selectedItems =  new ArrayList<Track> ( trackTable.getSelectionModel().getSelectedItems() );
 			
 			if ( selectedItems.size() == 1 ) {
-				player.playItems( selectedItems );
+				audioSystem.playItems( selectedItems );
 				
 			} else if ( selectedItems.size() > 1 ) {
 				if ( ui.okToReplaceCurrentList() ) {
-					player.playItems( selectedItems );
+					audioSystem.playItems( selectedItems );
 				}
 			}
 		});
@@ -302,7 +302,7 @@ public class AlbumInfoWindow extends Stage {
 				
 			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown()
 			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
-				player.getCurrentList().insertTracks( 0, trackTable.getSelectionModel().getSelectedItems() );
+				audioSystem.getCurrentList().insertTracks( 0, trackTable.getSelectionModel().getSelectedItems() );
 				
 			} else if ( e.getCode() == KeyCode.ENTER && e.isControlDown()
 			&& !e.isAltDown() && !e.isShiftDown()  && !e.isMetaDown() ) {
@@ -319,7 +319,7 @@ public class AlbumInfoWindow extends Stage {
 
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					player.playTrack( row.getItem() );
+					audioSystem.playTrack( row.getItem() );
 				}
 			} );
 

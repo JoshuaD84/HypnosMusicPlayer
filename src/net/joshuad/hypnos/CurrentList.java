@@ -62,7 +62,7 @@ public class CurrentList {
 	
 	private final List <CurrentListListener> listeners = new ArrayList<CurrentListListener> ();
 	
-	private AudioSystem player;
+	private AudioSystem audioSystem;
 	private Queue queue;
 
 	private DefaultShuffleMode albumShuffleMode = DefaultShuffleMode.SEQUENTIAL;
@@ -79,9 +79,9 @@ public class CurrentList {
 	
 	List <Thread> noLoadThreads = new ArrayList <Thread> ();
 	
-	public CurrentList ( AudioSystem player, Queue queue ) {
+	public CurrentList ( AudioSystem audioSystem, Queue queue ) {
 		this.queue = queue;
-		this.player = player;
+		this.audioSystem = audioSystem;
 		
 		startListWatcher();
 		
@@ -829,10 +829,10 @@ public class CurrentList {
 				//Do nothing
 				break;
 			case SEQUENTIAL:
-				player.setShuffleMode( ShuffleMode.SEQUENTIAL );
+				audioSystem.setShuffleMode( ShuffleMode.SEQUENTIAL );
 				break;
 			case SHUFFLE:
-				player.setShuffleMode( ShuffleMode.SHUFFLE );
+				audioSystem.setShuffleMode( ShuffleMode.SHUFFLE );
 				break;
 			
 		}
@@ -842,10 +842,10 @@ public class CurrentList {
 				//Do nothing
 				break;
 			case PLAY_ONCE:
-				player.setRepeatMode( RepeatMode.PLAY_ONCE );
+				audioSystem.setRepeatMode( RepeatMode.PLAY_ONCE );
 				break;
 			case REPEAT:
-				player.setRepeatMode( RepeatMode.REPEAT );
+				audioSystem.setRepeatMode( RepeatMode.REPEAT );
 				break;
 		}
 		
@@ -983,7 +983,7 @@ public class CurrentList {
 	
 	public void setAndPlayAlbums ( List <Album> albums ) {
 		setAlbums( albums );
-		player.next( false );
+		audioSystem.next( false );
 		Hypnos.getLibrary().albumsToUpdate.addAll( albums );  //TODO: pass library in don't call Hypnos.get()
 	}
 	
@@ -993,7 +993,7 @@ public class CurrentList {
 
 	public void setAndPlayPlaylists ( List <Playlist> playlists ) {
 		setPlaylists( playlists );
-		player.next( false );
+		audioSystem.next( false );
 		//Hypnos.getLibrary().albumsToUpdate.addAll( playlists );  //TODO: update the playlist from disc?
 		
 	}

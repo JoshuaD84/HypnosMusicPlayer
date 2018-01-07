@@ -465,7 +465,7 @@ public class TagWindow extends Stage {
 			if ( nextAlbum != null ) setTracks ( nextAlbum.getTracks(), Arrays.asList( nextAlbum ), hidden ); 
 			
 		} else if ( tracks != null && tracks.get( 0 ) instanceof CurrentListTrack ) { 
-			List <CurrentListTrack> currentList = ui.player.getCurrentList().getItems();
+			List <CurrentListTrack> currentList = ui.audioSystem.getCurrentList().getItems();
 			if ( currentList == null || currentList.size() == 0 ) return;
 			int thisIndex = currentList.indexOf( tracks.get ( 0 ) );
 			int targetIndex = 0;
@@ -494,7 +494,7 @@ public class TagWindow extends Stage {
 		Thread saverThread = new Thread( () -> {
 			if ( saveMe != null ) {
 				for ( Track track : saveMe ) {
-					track.updateTagsAndSave( saveMeTextPairs, saveMeImagePairs, ui.player );
+					track.updateTagsAndSave( saveMeTextPairs, saveMeImagePairs, ui.audioSystem );
 					ui.library.addTrack( track ); //TODO: This just causes the track to be updated, probably should rename the function
 				}
 			}

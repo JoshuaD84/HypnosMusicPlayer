@@ -50,15 +50,15 @@ public class HistoryWindow extends Stage {
 	private static final Logger LOGGER = Logger.getLogger( HistoryWindow.class.getName() );
 	
 	private FXUI ui;
-	private AudioSystem player;
+	private AudioSystem audioSystem;
 	private Library library;
 
 	private TableView <Track> historyTable;
 	
-	public HistoryWindow ( FXUI ui, Library library, AudioSystem player ) {
+	public HistoryWindow ( FXUI ui, Library library, AudioSystem audioSystem ) {
 		super();
 		this.ui = ui;
-		this.player = player;
+		this.audioSystem = audioSystem;
 		this.library = library;
 		
 		initModality( Modality.NONE );
@@ -85,7 +85,7 @@ public class HistoryWindow extends Stage {
 
 		historyTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
 		historyTable.setPlaceholder( emptyLabel );
-		historyTable.setItems( player.getHistory().getItems() );
+		historyTable.setItems( audioSystem.getHistory().getItems() );
 		historyTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 
 		historyTable.setOnKeyPressed( new EventHandler <KeyEvent>() {
@@ -94,7 +94,7 @@ public class HistoryWindow extends Stage {
 				if ( keyEvent.getCode().equals( KeyCode.DELETE ) ) {
 					ObservableList <Integer> indexes = historyTable.getSelectionModel().getSelectedIndices();
 					for ( int index : indexes ) { 
-						player.getQueue().remove( index );
+						audioSystem.getQueue().remove( index );
 					}
 				}
 			}
@@ -175,7 +175,7 @@ public class HistoryWindow extends Stage {
 				
 			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown()
 			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
-				player.getCurrentList().insertTracks( 0, historyTable.getSelectionModel().getSelectedItems() );
+				audioSystem.getCurrentList().insertTracks( 0, historyTable.getSelectionModel().getSelectedItems() );
 				
 			} else if ( e.getCode() == KeyCode.ENTER && e.isControlDown()
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
@@ -195,7 +195,7 @@ public class HistoryWindow extends Stage {
 			
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					player.playTrack( row.getItem(), false );
+					audioSystem.playTrack( row.getItem(), false );
 				}
 			});
 			
@@ -246,11 +246,11 @@ public class HistoryWindow extends Stage {
 				List <Track> selectedItems =  new ArrayList<Track> ( historyTable.getSelectionModel().getSelectedItems() );
 				
 				if ( selectedItems.size() == 1 ) {
-					player.playItems( selectedItems );
+					audioSystem.playItems( selectedItems );
 					
 				} else if ( selectedItems.size() > 1 ) {
 					if ( ui.okToReplaceCurrentList() ) {
-						player.playItems( selectedItems );
+						audioSystem.playItems( selectedItems );
 					}
 				}
 			}
@@ -259,14 +259,14 @@ public class HistoryWindow extends Stage {
 		playNextMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.getQueue().queueAllTracks( historyTable.getSelectionModel().getSelectedItems(), 0 );
+				audioSystem.getQueue().queueAllTracks( historyTable.getSelectionModel().getSelectedItems(), 0 );
 			}
 		});
 		
 		enqueueMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.getQueue().queueAllTracks( historyTable.getSelectionModel().getSelectedItems() );
+				audioSystem.getQueue().queueAllTracks( historyTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 		
@@ -285,7 +285,7 @@ public class HistoryWindow extends Stage {
 		appendMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
-				player.getCurrentList().appendTracks ( historyTable.getSelectionModel().getSelectedItems() );
+				audioSystem.getCurrentList().appendTracks ( historyTable.getSelectionModel().getSelectedItems() );
 			}
 		});
 		

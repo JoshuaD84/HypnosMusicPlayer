@@ -1508,7 +1508,7 @@ class CurrentListTrackStateCell extends TableCell <CurrentListTrack, CurrentList
 		if ( state != null ) {
 			if ( state.getIsCurrentTrack() ) {
 				
-				ImageView playPauseImage = ui.player.isPaused() ? pauseImage : playImage;
+				ImageView playPauseImage = ui.audioSystem.isPaused() ? pauseImage : playImage;
 				
 				if ( state.getQueueIndices().size() > 0 ) {
 					setGraphic ( playPauseImage );
