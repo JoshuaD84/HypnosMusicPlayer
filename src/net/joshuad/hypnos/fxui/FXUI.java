@@ -823,10 +823,6 @@ public class FXUI implements PlayerListener {
 	public void setLoaderSpeedDisplay ( LoaderSpeed speed ) {
 		this.libraryLocationWindow.setLoaderSpeedDisplay ( speed );
 	}
-
-	public void setShowAlbumTracks ( final boolean newValue ) {
-		runThreadSafe ( () -> libraryPane.trackListCheckBox.setSelected( newValue ) );
-	}
 	
 	public double getPrimarySplitPercent() {
 		return primarySplitPane.getDividerPositions()[0];
@@ -1058,32 +1054,22 @@ public class FXUI implements PlayerListener {
 		retMe.put ( Setting.PRIMARY_SPLIT_PERCENT, getPrimarySplitPercent() );
 		retMe.put ( Setting.CURRENT_LIST_SPLIT_PERCENT, getCurrentListSplitPercent() );
 		retMe.put ( Setting.ART_SPLIT_PERCENT, getArtSplitPercent() );
-		retMe.put ( Setting.LIBRARY_TAB, libraryPane.getSelectionModel().getSelectedIndex() );
 		retMe.put ( Setting.PROMPT_BEFORE_OVERWRITE, showUpdateAvailableInUI.getValue() );
 		retMe.put ( Setting.SHOW_UPDATE_AVAILABLE_IN_MAIN_WINDOW, promptBeforeOverwrite.getValue() );
 		retMe.put ( Setting.THEME, theme );
 		
-		retMe.put ( Setting.AL_TABLE_SHOW_ARTIST_COLUMN, libraryPane.albumArtistColumn.isVisible() );
-		retMe.put ( Setting.AL_TABLE_SHOW_YEAR_COLUMN, libraryPane.albumYearColumn.isVisible() );
-		retMe.put ( Setting.AL_TABLE_SHOW_ALBUM_COLUMN, libraryPane.albumAlbumColumn.isVisible() );
-		retMe.put ( Setting.TR_TABLE_SHOW_ARTIST_COLUMN, libraryPane.trackArtistColumn.isVisible() );
-		retMe.put ( Setting.TR_TABLE_SHOW_NUMBER_COLUMN, libraryPane.trackNumberColumn.isVisible() );
-		retMe.put ( Setting.TR_TABLE_SHOW_TITLE_COLUMN, libraryPane.trackTitleColumn.isVisible() );
-		retMe.put ( Setting.TR_TABLE_SHOW_ALBUM_COLUMN, libraryPane.trackAlbumColumn.isVisible() );
-		retMe.put ( Setting.TR_TABLE_SHOW_LENGTH_COLUMN, libraryPane.trackLengthColumn.isVisible() );
-		retMe.put ( Setting.PL_TABLE_SHOW_PLAYLIST_COLUMN, libraryPane.playlistNameColumn.isVisible() );
-		retMe.put ( Setting.PL_TABLE_SHOW_TRACKS_COLUMN, libraryPane.playlistTracksColumn.isVisible() );
-		retMe.put ( Setting.PL_TABLE_SHOW_LENGTH_COLUMN, libraryPane.playlistLengthColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_SHOW_PLAYING_COLUMN, currentListPane.clPlayingColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_SHOW_NUMBER_COLUMN, currentListPane.clNumberColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_SHOW_ARTIST_COLUMN, currentListPane.clArtistColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_SHOW_YEAR_COLUMN, currentListPane.clYearColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_SHOW_ALBUM_COLUMN, currentListPane.clAlbumColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_SHOW_TITLE_COLUMN, currentListPane.clTitleColumn.isVisible() );
-		retMe.put ( Setting.CL_TABLE_SHOW_LENGTH_COLUMN, currentListPane.clLengthColumn.isVisible() );
-		retMe.put ( Setting.LIBRARY_TAB_ALBUMS_VISIBLE, libraryPane.getTabs().contains( libraryPane.albumTab ) );
-		retMe.put ( Setting.LIBRARY_TAB_TRACKS_VISIBLE, libraryPane.getTabs().contains( libraryPane.trackTab ) );
-		retMe.put ( Setting.LIBRARY_TAB_PLAYLISTS_VISIBLE, libraryPane.getTabs().contains( libraryPane.playlistTab ) );
+		retMe.put ( Setting.CL_TABLE_PLAYING_COLUMN_SHOW, currentListPane.clPlayingColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_NUMBER_COLUMN_SHOW, currentListPane.clNumberColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_ARTIST_COLUMN_SHOW, currentListPane.clArtistColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_YEAR_COLUMN_SHOW, currentListPane.clYearColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_ALBUM_COLUMN_SHOW, currentListPane.clAlbumColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_TITLE_COLUMN_SHOW, currentListPane.clTitleColumn.isVisible() );
+		retMe.put ( Setting.CL_TABLE_LENGTH_COLUMN_SHOW, currentListPane.clLengthColumn.isVisible() );
+		
+		EnumMap <Persister.Setting, ? extends Object> librarySettings = libraryPane.getSettings();
+		for ( Persister.Setting setting : librarySettings.keySet() ) {
+			retMe.put( setting, librarySettings.get( setting ) );
+		}
 		
 		return retMe;
 	}
@@ -1170,7 +1156,6 @@ public class FXUI implements PlayerListener {
 						
 					case DEFAULT_REPEAT_PLAYLISTS:
 						player.getCurrentList().setDefaultPlaylistRepeatMode( CurrentList.DefaultRepeatMode.valueOf( value ) );
-						
 						break;
 						
 					case DEFAULT_REPEAT_TRACKS:
@@ -1189,13 +1174,30 @@ public class FXUI implements PlayerListener {
 						player.getCurrentList().setDefaultTrackShuffleMode( CurrentList.DefaultShuffleMode.valueOf( value )  );
 						break;
 						
+					case CL_TABLE_PLAYING_COLUMN_SHOW:
+						currentListPane.clPlayingColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case CL_TABLE_NUMBER_COLUMN_SHOW:
+						currentListPane.clNumberColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case CL_TABLE_ARTIST_COLUMN_SHOW:
+						currentListPane.clArtistColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case CL_TABLE_YEAR_COLUMN_SHOW:
+						currentListPane.clYearColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case CL_TABLE_ALBUM_COLUMN_SHOW:
+						currentListPane.clAlbumColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case CL_TABLE_TITLE_COLUMN_SHOW:
+						currentListPane.clTitleColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case CL_TABLE_LENGTH_COLUMN_SHOW:
+						currentListPane.clLengthColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
 						
 					//END NOT BELONG
 					//TODO: Get rid of function calls. Just do the thing directly. 
-					case HIDE_ALBUM_TRACKS:
-						setShowAlbumTracks ( Boolean.valueOf( value ) );
-						break;		
-						
 					case WINDOW_X_POSITION:
 						mainStage.setX( Double.valueOf( value ) );
 						break;
@@ -1251,10 +1253,6 @@ public class FXUI implements PlayerListener {
 						}
 						break;
 						
-					case LIBRARY_TAB:
-						libraryPane.getSelectionModel().select( Integer.valueOf ( value ) );
-						break;
-					
 					case PROMPT_BEFORE_OVERWRITE:
 						promptBeforeOverwrite.setValue( Boolean.valueOf( value ) );
 						break;
@@ -1274,73 +1272,7 @@ public class FXUI implements PlayerListener {
 					case LOADER_SPEED:
 						//Do nothing
 						break;
-						
-					case AL_TABLE_SHOW_ARTIST_COLUMN:
-						libraryPane.albumArtistColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-					case AL_TABLE_SHOW_YEAR_COLUMN:
-						libraryPane.albumYearColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-					case AL_TABLE_SHOW_ALBUM_COLUMN:
-						libraryPane.albumAlbumColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-					case TR_TABLE_SHOW_ARTIST_COLUMN:
-						libraryPane.trackArtistColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-					case TR_TABLE_SHOW_NUMBER_COLUMN:
-						libraryPane.trackNumberColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-					case TR_TABLE_SHOW_TITLE_COLUMN:
-						libraryPane.trackTitleColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-					case TR_TABLE_SHOW_ALBUM_COLUMN:
-						libraryPane.trackAlbumColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-					case TR_TABLE_SHOW_LENGTH_COLUMN:
-						libraryPane.trackLengthColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-					case PL_TABLE_SHOW_PLAYLIST_COLUMN:
-						libraryPane.playlistNameColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-					case PL_TABLE_SHOW_TRACKS_COLUMN: 
-						libraryPane.playlistTracksColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-					case PL_TABLE_SHOW_LENGTH_COLUMN:
-						libraryPane.playlistLengthColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-					case CL_TABLE_SHOW_PLAYING_COLUMN:
-						currentListPane.clPlayingColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-					case CL_TABLE_SHOW_NUMBER_COLUMN:
-						currentListPane.clNumberColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-					case CL_TABLE_SHOW_ARTIST_COLUMN:
-						currentListPane.clArtistColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-					case CL_TABLE_SHOW_YEAR_COLUMN:
-						currentListPane.clYearColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-					case CL_TABLE_SHOW_ALBUM_COLUMN:
-						currentListPane.clAlbumColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-					case CL_TABLE_SHOW_TITLE_COLUMN:
-						currentListPane.clTitleColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-					case CL_TABLE_SHOW_LENGTH_COLUMN:
-						currentListPane.clLengthColumn.setVisible( Boolean.valueOf ( value ) );
-						break;
-						
-					case LIBRARY_TAB_ALBUMS_VISIBLE:
-						libraryPane.setAlbumsVisible( Boolean.valueOf ( value ) );
-						break;
-						
-					case LIBRARY_TAB_TRACKS_VISIBLE:
-						libraryPane.setTracksVisible( Boolean.valueOf ( value ) );
-						break;
-						
-					case LIBRARY_TAB_PLAYLISTS_VISIBLE:
-						libraryPane.setPlaylistsVisible( Boolean.valueOf ( value ) );
-						break;
+
 					default:
 						//Do nothing
 						break;
@@ -1350,7 +1282,7 @@ public class FXUI implements PlayerListener {
 			}
 		});
 		
-
+		libraryPane.applySettings( settings );
 		settingsWindow.updateSettings();
 	}
 

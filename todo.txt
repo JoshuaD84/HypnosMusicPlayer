@@ -5,10 +5,9 @@ Now:
 	Select Multiple Files in File Browser, Right click, open with Hypnos -
 		Not all the tracks appear on the current list, and it doesn't start playing the first one
 		Also the pause button kinda bugs out
-	
-	persist column info
-		sort options
-		ordering
+
+	CurrentListTable
+		Persist column information (sort order, width, order)
 	
 	Windows - Volume takes a split second to change.
 	
@@ -19,19 +18,22 @@ Now:
 		
 	New Hypnos layout settings. The art pane is shrunk very small vertically and not divided evenly horizontally	
 		Confirmed on KDE Neon. 
+		Confirmed on Xubuntu
 	
-	KDE Neon
-		Can't drag and drop an mp3 into hypnos
-		
-		User said it opened the track instead of opening folder.
-			On KDE Neon image on my computer, it opened gwenview 
-			https://stackoverflow.com/questions/48131760/desktop-getdesktop-open-folder-in-kde-opens-up-gwenview-instead-of-dolphin
-
-
 Key Testing before next release:
 	Make sure browse button still works in various systems. I changed FXUI.openFileBrowser -- Desktop.getDesktop().open() to .browse()
 	
 General
+	Current List - On loading a new album or playlist or list of tracks, try to distribute excess space such that everything can be seen
+		if not possible, do nothing
+	
+	KDE Neon
+		Can't drag and drop an mp3 into hypnos
+			onDragOver doesn't seem to hear the drag event. 
+		
+		User said it opened the track instead of opening folder. Confirmed on KDE Neon image on my computer, it opened gwenview 
+			https://stackoverflow.com/questions/48131760/desktop-getdesktop-open-folder-in-kde-opens-up-gwenview-instead-of-dolphin
+		
 	Refactor Library
 		Make a source directory a class, not just a path.
 			Library Source Directories - highlight in red if they are missing. 

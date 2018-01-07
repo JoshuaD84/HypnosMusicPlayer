@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -37,6 +38,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.SortType;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -51,18 +53,22 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.input.DataFormat;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.TextAlignment;
 import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.AlphanumComparator;
+import net.joshuad.hypnos.CurrentList;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Library;
+import net.joshuad.hypnos.Persister;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.AlphanumComparator.CaseHandling;
+import net.joshuad.hypnos.Persister.Setting;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 
 public class LibraryTabPane extends StretchedTabPane {
@@ -848,11 +854,11 @@ public class LibraryTabPane extends StretchedTabPane {
 		
 		albumTable.setOnDragOver( event -> {
 			Dragboard db = event.getDragboard();
+			
 			if ( db.hasFiles() ) {
 				event.acceptTransferModes( TransferMode.COPY );
 				event.consume();
-
-			}
+			} 
 		});
 		
 		albumTable.setOnDragDropped( event -> {
@@ -1698,5 +1704,215 @@ public class LibraryTabPane extends StretchedTabPane {
 			playlistTable.requestFocus();
 			playlistTable.getSelectionModel().select( playlistTable.getSelectionModel().getFocusedIndex() );
 		}
+	}
+
+	public void applySettings ( EnumMap<Persister.Setting, String> settings ) {
+		settings.forEach( ( setting, value )-> {
+			try {
+				switch ( setting ) {
+					case HIDE_ALBUM_TRACKS:
+						ui.runThreadSafe ( () -> trackListCheckBox.setSelected( Boolean.valueOf ( value ) ) );
+						break;		
+					case LIBRARY_TAB:
+						getSelectionModel().select( Integer.valueOf ( value ) );
+						break;
+					case AL_TABLE_ARTIST_COLUMN_SHOW:
+						albumArtistColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case AL_TABLE_YEAR_COLUMN_SHOW:
+						albumYearColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case AL_TABLE_ALBUM_COLUMN_SHOW:
+						albumAlbumColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case TR_TABLE_ARTIST_COLUMN_SHOW:
+						trackArtistColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case TR_TABLE_NUMBER_COLUMN_SHOW:
+						trackNumberColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case TR_TABLE_TITLE_COLUMN_SHOW:
+						trackTitleColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case TR_TABLE_ALBUM_COLUMN_SHOW:
+						trackAlbumColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case TR_TABLE_LENGTH_COLUMN_SHOW:
+						trackLengthColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case PL_TABLE_PLAYLIST_COLUMN_SHOW:
+						playlistNameColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case PL_TABLE_TRACKS_COLUMN_SHOW: 
+						playlistTracksColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+					case PL_TABLE_LENGTH_COLUMN_SHOW:
+						playlistLengthColumn.setVisible( Boolean.valueOf ( value ) );
+						break;
+						
+					case AL_TABLE_ARTIST_COLUMN_WIDTH: 
+						albumArtistColumn.setPrefWidth( Double.valueOf( value ) );
+						break;
+					case AL_TABLE_YEAR_COLUMN_WIDTH: 
+						albumYearColumn.setPrefWidth( Double.valueOf( value ) );
+						break;
+					case AL_TABLE_ALBUM_COLUMN_WIDTH: 
+						albumAlbumColumn.setPrefWidth( Double.valueOf( value ) );
+						break;
+					case TR_TABLE_ARTIST_COLUMN_WIDTH: 
+						trackArtistColumn.setPrefWidth( Double.valueOf( value ) );
+					break;
+					case TR_TABLE_NUMBER_COLUMN_WIDTH: 
+						trackNumberColumn.setPrefWidth( Double.valueOf( value ) );
+						break;
+					case TR_TABLE_TITLE_COLUMN_WIDTH:
+						trackTitleColumn.setPrefWidth( Double.valueOf( value ) );
+						break;
+					case TR_TABLE_ALBUM_COLUMN_WIDTH:
+						trackAlbumColumn.setPrefWidth( Double.valueOf( value ) );
+						break;
+					case TR_TABLE_LENGTH_COLUMN_WIDTH:
+						trackLengthColumn.setPrefWidth( Double.valueOf( value ) );
+						break;
+					case PL_TABLE_PLAYLIST_COLUMN_WIDTH: 
+						playlistNameColumn.setPrefWidth( Double.valueOf( value ) );
+						break;
+					case PL_TABLE_TRACKS_COLUMN_WIDTH:
+						playlistTracksColumn.setPrefWidth( Double.valueOf( value ) );
+						break;
+					case PL_TABLE_LENGTH_COLUMN_WIDTH:
+						playlistLengthColumn.setPrefWidth( Double.valueOf( value ) );
+						break;
+					case LIBRARY_TAB_ALBUMS_VISIBLE:
+						setAlbumsVisible( Boolean.valueOf ( value ) );
+						break;
+					case LIBRARY_TAB_TRACKS_VISIBLE:
+						setTracksVisible( Boolean.valueOf ( value ) );
+						break;
+					case LIBRARY_TAB_PLAYLISTS_VISIBLE:
+						setPlaylistsVisible( Boolean.valueOf ( value ) );
+						break;
+					case ALBUM_SORT_ORDER: {
+						albumTable.getSortOrder().clear();
+						
+						if ( !value.equals( "" ) ) {
+							String[] order = value.split( " " );
+							for ( String fullValue : order ) {
+								try {
+									String columnName = fullValue.split( "-" )[0];
+									SortType sortType = SortType.valueOf( fullValue.split( "-" )[1] );
+									
+									if ( columnName.equals( "artist" ) ) {
+										albumTable.getSortOrder().add( albumArtistColumn );
+										albumArtistColumn.setSortType( sortType );
+									} else if ( columnName.equals( "year" ) ) {
+										albumTable.getSortOrder().add( albumYearColumn );
+										albumYearColumn.setSortType( sortType );
+									} else if ( columnName.equals( "album" ) ) {
+										albumTable.getSortOrder().add( albumAlbumColumn );
+										albumAlbumColumn.setSortType( sortType );
+									}
+								} catch ( Exception e ) {
+									LOGGER.log( Level.INFO, "Unable to set album table sort order: '" + value + "'", e );
+								}
+							}
+						}
+						break;
+					}
+					case ALBUM_COLUMN_ORDER: {
+						String[] order = value.split( " " );
+						int newIndex = 0;
+						
+						for ( String columnName : order ) {
+							try {
+								if ( columnName.equals( "artist" ) ) {
+									albumTable.getColumns().remove( albumArtistColumn );
+									albumTable.getColumns().add( newIndex, albumArtistColumn );
+								} else if ( columnName.equals( "year" ) ) {
+									albumTable.getColumns().remove( albumYearColumn );
+									albumTable.getColumns().add( newIndex, albumYearColumn );
+								} else if ( columnName.equals( "album" ) ) {
+									albumTable.getColumns().remove( albumAlbumColumn );
+									albumTable.getColumns().add( newIndex, albumAlbumColumn );
+								}
+								newIndex++;
+							} catch ( Exception e ) {
+								LOGGER.log( Level.INFO, "Unable to set album table column order: '" + value + "'", e );
+							}
+							
+						}
+						break;
+					}
+					default:
+						//Do nothing
+						break;
+				}
+			} catch ( Exception e ) {
+				LOGGER.log( Level.INFO, "Unable to apply setting: " + setting + " to UI.", e );
+			}
+		});
+	}
+	
+	
+	public EnumMap<Persister.Setting, ? extends Object> getSettings () {
+
+		EnumMap <Persister.Setting, Object> retMe = new EnumMap <Persister.Setting, Object> ( Persister.Setting.class );
+		
+		List <String> albumSortOrder = new ArrayList<> ();
+		
+		String albumSortValue = "";
+		for ( TableColumn<Album, ?> column : albumTable.getSortOrder() ) {
+			if ( column == this.albumArtistColumn ) {
+				albumSortValue += "artist-" + albumArtistColumn.getSortType() + " ";
+			} else if ( column == this.albumYearColumn ) {
+				albumSortValue += "year-" + albumYearColumn.getSortType() + " ";
+			} else if ( column == this.albumAlbumColumn ) {
+				albumSortValue += "album-" + albumAlbumColumn.getSortType() + " ";
+			}
+		}
+		retMe.put ( Setting.ALBUM_SORT_ORDER, albumSortValue );
+		
+		String albumColumnOrderValue = "";
+		for ( TableColumn<Album, ?> column : albumTable.getColumns() ) {
+			if ( column == this.albumArtistColumn ) {
+				albumColumnOrderValue += "artist ";
+			} else if ( column == this.albumYearColumn ) {
+				albumColumnOrderValue += "year ";
+			} else if ( column == this.albumAlbumColumn ) {
+				albumColumnOrderValue += "album ";
+			}
+		}
+		retMe.put ( Setting.ALBUM_COLUMN_ORDER, albumColumnOrderValue );
+		
+		retMe.put ( Setting.LIBRARY_TAB, getSelectionModel().getSelectedIndex() );
+		retMe.put ( Setting.AL_TABLE_ARTIST_COLUMN_SHOW, albumArtistColumn.isVisible() );
+		retMe.put ( Setting.AL_TABLE_YEAR_COLUMN_SHOW, albumYearColumn.isVisible() );
+		retMe.put ( Setting.AL_TABLE_ALBUM_COLUMN_SHOW, albumAlbumColumn.isVisible() );
+		retMe.put ( Setting.TR_TABLE_ARTIST_COLUMN_SHOW, trackArtistColumn.isVisible() );
+		retMe.put ( Setting.TR_TABLE_NUMBER_COLUMN_SHOW, trackNumberColumn.isVisible() );
+		retMe.put ( Setting.TR_TABLE_TITLE_COLUMN_SHOW, trackTitleColumn.isVisible() );
+		retMe.put ( Setting.TR_TABLE_ALBUM_COLUMN_SHOW, trackAlbumColumn.isVisible() );
+		retMe.put ( Setting.TR_TABLE_LENGTH_COLUMN_SHOW, trackLengthColumn.isVisible() );
+		retMe.put ( Setting.PL_TABLE_PLAYLIST_COLUMN_SHOW, playlistNameColumn.isVisible() );
+		retMe.put ( Setting.PL_TABLE_TRACKS_COLUMN_SHOW, playlistTracksColumn.isVisible() );
+		retMe.put ( Setting.PL_TABLE_LENGTH_COLUMN_SHOW, playlistLengthColumn.isVisible() );
+		
+		retMe.put ( Setting.AL_TABLE_ARTIST_COLUMN_WIDTH, albumArtistColumn.getPrefWidth() );
+		retMe.put ( Setting.AL_TABLE_YEAR_COLUMN_WIDTH, albumYearColumn.getPrefWidth() );
+		retMe.put ( Setting.AL_TABLE_ALBUM_COLUMN_WIDTH, albumAlbumColumn.getPrefWidth() );
+		retMe.put ( Setting.TR_TABLE_ARTIST_COLUMN_WIDTH, trackArtistColumn.getPrefWidth() );
+		retMe.put ( Setting.TR_TABLE_NUMBER_COLUMN_WIDTH, trackNumberColumn.getPrefWidth() );
+		retMe.put ( Setting.TR_TABLE_TITLE_COLUMN_WIDTH, trackTitleColumn.getPrefWidth() );
+		retMe.put ( Setting.TR_TABLE_ALBUM_COLUMN_WIDTH, trackAlbumColumn.getPrefWidth() );
+		retMe.put ( Setting.TR_TABLE_LENGTH_COLUMN_WIDTH, trackLengthColumn.getPrefWidth() );
+		retMe.put ( Setting.PL_TABLE_PLAYLIST_COLUMN_WIDTH, playlistNameColumn.getPrefWidth() );
+		retMe.put ( Setting.PL_TABLE_TRACKS_COLUMN_WIDTH, playlistTracksColumn.getPrefWidth() );
+		retMe.put ( Setting.PL_TABLE_LENGTH_COLUMN_WIDTH, playlistLengthColumn.getPrefWidth() );
+		
+		retMe.put ( Setting.LIBRARY_TAB_ALBUMS_VISIBLE, getTabs().contains( albumTab ) );
+		retMe.put ( Setting.LIBRARY_TAB_TRACKS_VISIBLE, getTabs().contains( trackTab ) );
+		retMe.put ( Setting.LIBRARY_TAB_PLAYLISTS_VISIBLE, getTabs().contains( playlistTab ) );
+		
+		return retMe;
 	}
 }
