@@ -9,10 +9,6 @@ Now:
 	Windows - Volume takes a split second to change.
 	
 	Use a thread to adjust the filter boxes. Delay afer typing for a second maybe, or delay after each typing for a bit so each letter doesn't generate an event.  
-		
-	New Hypnos layout settings. The art pane is shrunk very small vertically and not divided evenly horizontally	
-		Confirmed on KDE Neon. 
-		Confirmed on Xubuntu
 	
 Key Testing before next release:
 	Make sure browse button still works in various systems. I changed FXUI.openFileBrowser -- Desktop.getDesktop().open() to .browse()

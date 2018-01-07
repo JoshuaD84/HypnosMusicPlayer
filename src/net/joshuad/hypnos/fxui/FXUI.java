@@ -136,7 +136,7 @@ public class FXUI implements PlayerListener {
 	
 	private double primarySplitPaneDefault = .35d;
 	private double currentListSplitPaneDefault = .75d;
-	private double artSplitPaneDeafult = .51d;// For some reason .5 doesn't work...
+	private double artSplitPaneDefault = .5001d;// For some reason .5 puts it at like .3. 
 	
 	private Double currentListSplitPaneRestoredPosition = null;
 	private Double primarySplitPaneRestoredPosition = null;
@@ -268,7 +268,7 @@ public class FXUI implements PlayerListener {
 			} else if ( e.getCode() == KeyCode.P && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
-				showSettingsWindow();
+				settingsWindow.show();
 
 			} else if ( e.getCode() == KeyCode.DIGIT1 /* With or without control */
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
@@ -380,18 +380,22 @@ public class FXUI implements PlayerListener {
 			} 
 		});
 		
-		primarySplitPane.setDividerPositions( primarySplitPaneDefault );
-		currentListSplitPane.setDividerPositions( currentListSplitPaneDefault );
-		artSplitPane.setDividerPosition( 0, artSplitPaneDeafult ); 
+		Runnable setDefaultDividerPositions = () -> {
+			primarySplitPane.setDividerPositions( primarySplitPaneDefault );
+			currentListSplitPane.setDividerPositions( currentListSplitPaneDefault );
+			artSplitPane.setDividerPositions( artSplitPaneDefault ); 
+		};
+		
+		if ( Hypnos.getOS().isLinux() ) {
+			Platform.runLater( setDefaultDividerPositions );
+		} else {
+			setDefaultDividerPositions.run();
+		}
 		
 		mainStage.widthProperty().addListener( windowSizeListener );
 		mainStage.heightProperty().addListener( windowSizeListener );
 		
 		audioSystem.addPlayerListener ( this );
-	}
-	
-	public void showSettingsWindow() {
-		settingsWindow.show();
 	}
 	
 	public ColorAdjust getDarkThemeTransportButtonsAdjust () {
@@ -990,6 +994,15 @@ public class FXUI implements PlayerListener {
 		hackTooltipStartTiming();
 	
 		libraryPane.updateLibraryListPlaceholder();
+		
+		Platform.runLater( () -> {
+			try {
+				Thread.sleep ( 100 );
+			} catch ( InterruptedException e ) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
 	}
 	
 	public void toggleArtPaneCollapsed() {
@@ -1136,8 +1149,6 @@ public class FXUI implements PlayerListener {
 							default:
 								primarySplitPane.setDividerPosition( 0, Double.valueOf ( value ) );
 								break;
-								
-							
 						}
 						settings.remove ( setting );
 						break;
@@ -1150,7 +1161,6 @@ public class FXUI implements PlayerListener {
 							default:
 								currentListSplitPane.setDividerPosition( 0, Double.valueOf ( value ) );
 								break;
-							
 						}
 						settings.remove ( setting );
 						break;
@@ -1163,7 +1173,6 @@ public class FXUI implements PlayerListener {
 							default:
 								artSplitPane.setDividerPosition( 0, Double.valueOf ( value ) );
 								break;
-							
 						}
 						settings.remove ( setting );
 						break;

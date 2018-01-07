@@ -243,7 +243,7 @@ public class Transport extends VBox {
 		showSettingsButton.setGraphic( settingsImage );
 		showSettingsButton.getStyleClass().add( "settingsButton" );
 		showSettingsButton.setTooltip( new Tooltip( "Configuration and Information" ) );
-		showSettingsButton.setOnAction ( event -> ui.showSettingsWindow() );
+		showSettingsButton.setOnAction ( e -> ui.settingsWindow.show() );
 		
 		updateAvailableButton = new Hyperlink ( "!" );
 		updateAvailableButton.getStyleClass().add( "updateButton" );
