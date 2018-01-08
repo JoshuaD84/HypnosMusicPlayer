@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -32,8 +31,8 @@ public class PredicateSpeed extends Application {
 	private String mostRecentFilter = "";
 	private String requestedFilter = "";
 	private boolean interruptPredicate = false;
-
 	Thread filterThread;
+	
 	TextField filterBox;
 
 	@Override

@@ -11,7 +11,6 @@ import java.lang.reflect.Field;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -246,12 +245,15 @@ public class FXUI implements PlayerListener {
 
 				if ( libraryPane.albumTab == currentLibraryTab ) {
 					libraryPane.albumFilterBox.requestFocus();
+					libraryPane.albumTable.getSelectionModel().clearSelection();
 
 				} else if ( libraryPane.trackTab == currentLibraryTab ) {
 					libraryPane.trackFilterBox.requestFocus();
+					libraryPane.trackTable.getSelectionModel().clearSelection();
 
 				} else if ( libraryPane.playlistTab == currentLibraryTab ) {
 					libraryPane.playlistFilterBox.requestFocus();
+					libraryPane.playlistTable.getSelectionModel().clearSelection();
 				}
 
 
@@ -292,7 +294,10 @@ public class FXUI implements PlayerListener {
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
 				//We put it in runlater to keep the key from being passed down to the filter box
-				Platform.runLater( () -> currentListPane.infoLabelAndFilter.beginEditing() );
+				Platform.runLater( () -> {
+					currentListPane.infoLabelAndFilter.beginEditing();
+					currentListPane.currentListTable.getSelectionModel().clearSelection();
+				});
 
 			} else if ( e.getCode() == KeyCode.R
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {

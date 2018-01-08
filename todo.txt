@@ -7,14 +7,26 @@ Now:
 		Also the pause button kinda bugs out
 		
 	Windows - Volume takes a split second to change.
-	
-	Use a thread to adjust the filter boxes. Delay afer typing for a second maybe, or delay after each typing for a bit so each letter doesn't generate an event.  
-	
+
+   Drag Have one on me (all three discs) to empty current list -- it registers as only disc 1 in the info section
+
+   Review and include this answer
+      https://stackoverflow.com/questions/48144750/how-can-i-debug-a-nullpointerexception-where-the-stacktrace-doesnt-reference-my/48145928#48145928
+   
 Key Testing before next release:
 	Make sure browse button still works in various systems. I changed FXUI.openFileBrowser -- Desktop.getDesktop().open() to .browse()
 	
+	Try deleting settings and seeing if the UI lays out properly
+	
+	Try resetting tables to defaults manually
+	
+	Try out the throttled table filters on different sytems, see if stuff breaks
+	
 General
-	Rename player to audioSystem in Persister, and wherever else
+	Select two unrelated albums -> Right click play -> no change to shuffle, i expected it to set it to sequential
+		Maybe add a "Multiple Albums" type
+	
+	Zwan - Number of the beast - Artist image is not showing (embedded and folder sources)
 	
 	Set an option to sort by album artist instead of artist on artist column in current list
 	
@@ -176,13 +188,20 @@ General
 				
 		2017/12/25 - I was able to temper this problem significantly by having only one image loader thread and by setting -Xmx
 
-
+	Playlist throttled filter, but man, who's going to have over 1000 playlists? 
 
 :::: Lyric Failures ::::
 
 	
 :::: JavaFX stuff ::::
 
+	Try to fit all data in current list table by adjusting columsn that aren't no-resize on setCurrentList
+		I did some work on this. It conflicts with our FormattedAlbumCell because there, to keep it from wrapping
+		we setminwidth to double.max, causing the fit function to fail. 
+		I used the reflection stuff from this thread, and I think it would've worked if not for this issue:
+			https://stackoverflow.com/questions/23284437/javafx-tablecolumn-resize-to-fit-cell-content
+		Of course, I would have to then check table width, fail gracefully and revert, or distribute excess space. 
+		
 	Add a ton of albums to the current list. (close and reopen hypnos?) Ctrl + A, delete. Exception. UI is broken
 
 	Resize Policy

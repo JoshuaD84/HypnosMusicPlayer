@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import org.jaudiotagger.tag.FieldKey;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
@@ -54,13 +55,11 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
-import javafx.scene.input.DataFormat;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.TextAlignment;
 import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.AlphanumComparator;
-import net.joshuad.hypnos.CurrentList;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.Persister;
@@ -91,6 +90,9 @@ public class LibraryTabPane extends StretchedTabPane {
 	HBox albumFilterPane;
 	HBox trackFilterPane;
 	HBox playlistFilterPane;
+	
+	ThrottledTrackFilter trackTableFilter;
+	ThrottledAlbumFilter albumTableFilter;
 	
 	ContextMenu playlistColumnSelectorMenu, trackColumnSelectorMenu, albumColumnSelectorMenu;
 	ContextMenu tabMenu;
@@ -420,19 +422,16 @@ public class LibraryTabPane extends StretchedTabPane {
 	}
 
 	public void setupTrackFilterPane () {
+		trackTableFilter = new ThrottledTrackFilter ( library.getTracksFiltered() );
+		
 		trackFilterPane = new HBox();
 		trackFilterBox = new TextField();
 		trackFilterBox.setPrefWidth( 500000 );
 		
 		trackFilterBox.textProperty().addListener( new ChangeListener <String> () {
-
 			@Override
 			public void changed ( ObservableValue <? extends String> observable, String oldValue, String newValue ) {
-				Platform.runLater( () -> {
-					library.getTracksFiltered().setPredicate( track -> {
-						return acceptTrackFilterChange ( track, oldValue, newValue ); 
-					});
-				});
+				trackTableFilter.setFilter( newValue, trackListCheckBox.isSelected() );
 			}
 		});
 		
@@ -487,105 +486,18 @@ public class LibraryTabPane extends StretchedTabPane {
 		trackFilterPane.getChildren().addAll( libraryButton, trackFilterBox, clearButton, checkBoxMargins );
 	}
 	
-	public boolean acceptTrackFilterChange ( Track track, Object oldValue, Object newValueIn ) {
-				
-		String newValue = trackFilterBox.getText();
-		if ( newValueIn instanceof String ) {
-			newValue = (String)newValueIn;
-		}
-		
-		Boolean boxSelected = trackListCheckBox.isSelected();
-		if ( newValueIn instanceof Boolean ) {
-			boxSelected = (Boolean)newValueIn;
-		}
-			
-		if ( track.hasAlbumDirectory() && boxSelected ) {
-			return false;
-		} 
-	
-		if ( newValue == null || newValue.isEmpty() ) {
-			return true;
-		}
-		
-		String[] lowerCaseFilterTokens = newValue.toLowerCase().split( "\\s+" );
-
-		ArrayList <String> matchableText = new ArrayList <String>();
-
-		matchableText.add( Normalizer.normalize( track.getArtist(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-		matchableText.add( track.getArtist().toLowerCase() );
-		matchableText.add( Normalizer.normalize( track.getTitle(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-		matchableText.add( track.getTitle().toLowerCase() );
-		matchableText.add( Normalizer.normalize( track.getFullAlbumTitle(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-		matchableText.add( track.getFullAlbumTitle().toLowerCase() );
-
-		for ( String token : lowerCaseFilterTokens ) {
-			boolean tokenMatches = false;
-			for ( String test : matchableText ) {
-				if ( test.contains( token ) ) {
-					tokenMatches = true;
-				}
-			}
-
-			if ( !tokenMatches ) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
 	public void setupAlbumFilterPane () {
+		albumTableFilter = new ThrottledAlbumFilter ( library.getAlbumsFiltered() );
+		
 		albumFilterPane = new HBox();
 		albumFilterBox = new TextField();
 		albumFilterBox.setPrefWidth( 500000 );
-		albumFilterBox.textProperty().addListener( ( observable, oldValue, newValue ) -> {
-			Platform.runLater( () -> {
-				library.getAlbumsFiltered().setPredicate( album -> {
-					if ( newValue == null || newValue.isEmpty() ) {
-						return true;
-					}
-	
-					String[] lowerCaseFilterTokens = newValue.toLowerCase().split( "\\s+" );
-	
-					ArrayList <String> matchableText = new ArrayList <String>();
-	
-					matchableText.add( 
-						Normalizer.normalize( album.getAlbumArtist(), Normalizer.Form.NFD )
-						.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() 
-					);
-					
-					matchableText.add( album.getAlbumArtist().toLowerCase() );
-					
-					matchableText.add( 
-						Normalizer.normalize( album.getFullAlbumTitle(), Normalizer.Form.NFD )
-						.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() 
-					);
-					
-					matchableText.add( album.getFullAlbumTitle().toLowerCase() );
-					
-					matchableText.add( 
-						Normalizer.normalize( album.getYear(), Normalizer.Form.NFD )
-						.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase()
-					);
-					
-					matchableText.add( album.getYear().toLowerCase() );
-	
-					for ( String token : lowerCaseFilterTokens ) {
-						boolean tokenMatches = false;
-						for ( String test : matchableText ) {
-							if ( test.contains( token ) ) {
-								tokenMatches = true;
-							}
-						}
-	
-						if ( !tokenMatches ) {
-							return false;
-						}
-					}
-	
-					return true;
-				});
-			});
+		
+		albumFilterBox.textProperty().addListener( new ChangeListener <String> () {
+			@Override
+			public void changed ( ObservableValue <? extends String> observable, String oldValue, String newValue ) {
+				albumTableFilter.setFilter( newValue );
+			}
 		});
 		
 		albumFilterBox.setOnKeyPressed( ( KeyEvent event ) -> {
@@ -642,9 +554,7 @@ public class LibraryTabPane extends StretchedTabPane {
 		trackListCheckBox.selectedProperty().addListener( new ChangeListener <Boolean> () {
 			@Override
 			public void changed( ObservableValue <? extends Boolean> observable, Boolean oldValue, Boolean newValue ) {
-				library.getTracksFiltered().setPredicate( track -> {
-					return acceptTrackFilterChange ( track, oldValue, newValue );
-				});
+				trackTableFilter.setFilter( trackFilterBox.getText(), newValue );
 			}
 		});
 		

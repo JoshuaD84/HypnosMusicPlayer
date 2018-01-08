@@ -92,6 +92,8 @@ public class CurrentListPane extends BorderPane {
 
 	Image repeatImageSource;
 
+	ThrottledTrackFilter currentListTableFilter;
+	
 	InfoFilterHybrid infoLabelAndFilter;
 	
 	FXUI ui;
@@ -396,15 +398,13 @@ public class CurrentListPane extends BorderPane {
 			}
 		});
 		
+		currentListTableFilter = new ThrottledTrackFilter ( currentListFiltered );
+		
 		infoLabelAndFilter.textProperty().addListener( new ChangeListener <String> () {
 			@Override
 			public void changed ( ObservableValue <? extends String> observable, String oldValue, String newValue ) {
 				Platform.runLater( () -> {
-					currentListFiltered.setPredicate( track -> {
-						return acceptTrackFilterChange ( track, oldValue, newValue ); 
-					});
-					currentListTable.getSelectionModel().clearSelection();
-					currentListTable.getSelectionModel().selectFirst();
+					currentListTableFilter.setFilter( newValue, false );
 				});
 			}
 		});
@@ -1176,44 +1176,6 @@ public class CurrentListPane extends BorderPane {
 		if ( historyImage != null ) historyImage.setEffect( null );
 		
 		currentListTable.refresh();
-	}
-	
-	public boolean acceptTrackFilterChange ( Track track, String oldValue, String newValueIn ) {
-		
-		String newValue = newValueIn;
-		if ( newValueIn instanceof String ) {
-			newValue = (String)newValueIn;
-		}
-	
-		if ( newValue == null || newValue.isEmpty() ) {
-			return true;
-		}
-		
-		String[] lowerCaseFilterTokens = newValue.toLowerCase().split( "\\s+" );
-
-		ArrayList <String> matchableText = new ArrayList <String>();
-
-		matchableText.add( Normalizer.normalize( track.getArtist(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-		matchableText.add( track.getArtist().toLowerCase() );
-		matchableText.add( Normalizer.normalize( track.getTitle(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-		matchableText.add( track.getTitle().toLowerCase() );
-		matchableText.add( Normalizer.normalize( track.getFullAlbumTitle(), Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-		matchableText.add( track.getFullAlbumTitle().toLowerCase() );
-
-		for ( String token : lowerCaseFilterTokens ) {
-			boolean tokenMatches = false;
-			for ( String test : matchableText ) {
-				if ( test.contains( token ) ) {
-					tokenMatches = true;
-				}
-			}
-
-			if ( !tokenMatches ) {
-				return false;
-			}
-		}
-
-		return true;
 	}
 	
 	@SuppressWarnings("incomplete-switch")
