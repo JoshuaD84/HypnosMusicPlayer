@@ -65,15 +65,21 @@ public class ThrottledTrackFilter {
 			matchableText.add( track.getTitle().toLowerCase() );
 			matchableText.add( track.getFullAlbumTitle().toLowerCase() );
 			
-			matchableText.add( Normalizer.normalize( track.getArtist(), Normalizer.Form.NFD )
-				.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+			if ( track.getArtist().matches( ".*[^\\p{ASCII}]+.*" ) ) {
+				matchableText.add( Normalizer.normalize( track.getArtist(), Normalizer.Form.NFD )
+					.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+			}
 			
-			matchableText.add( Normalizer.normalize( track.getTitle(), Normalizer.Form.NFD )
-				.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+			if ( track.getTitle().matches( ".*[^\\p{ASCII}]+.*" ) ) {
+				matchableText.add( Normalizer.normalize( track.getTitle(), Normalizer.Form.NFD )
+					.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+			}
 			
-			matchableText.add( Normalizer.normalize( track.getFullAlbumTitle(), Normalizer.Form.NFD )
-				.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-
+			if ( track.getFullAlbumTitle().matches( ".*[^\\p{ASCII}]+.*" ) ) {
+				matchableText.add( Normalizer.normalize( track.getFullAlbumTitle(), Normalizer.Form.NFD )
+					.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+			}
+			
 			String[] lowerCaseFilterTokens = filterText.toLowerCase().split( "\\s+" );
 			for ( String token : lowerCaseFilterTokens ) {
 				boolean tokenMatches = false;
