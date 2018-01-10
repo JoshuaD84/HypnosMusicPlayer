@@ -194,11 +194,16 @@ public class Persister {
 	}
 
 	public void loadCurrentList() {
-		try ( ObjectInputStream dataIn = new ObjectInputStream( new GZIPInputStream( new FileInputStream( currentFile ) ) ) ) {
+		try ( ObjectInputStream dataIn = new ObjectInputStream( new FileInputStream( currentFile ) ) ) {
 			audioSystem.getCurrentList().setState ( (CurrentListState)dataIn.readObject() );
 			
 		} catch ( Exception e ) {
-			LOGGER.warning( "Unable to read library data from disk, continuing." );
+			try ( ObjectInputStream dataIn = new ObjectInputStream( new GZIPInputStream( new FileInputStream( currentFile ) ) ) ) {
+				audioSystem.getCurrentList().setState ( (CurrentListState)dataIn.readObject() );
+				
+			} catch ( Exception e2 ) {
+				LOGGER.warning( "Unable to read library data from disk, continuing." );
+			}
 		}
 	}
 
@@ -263,21 +268,35 @@ public class Persister {
 	public void saveCurrentList () {
 		File tempCurrentFile = new File ( currentFile.toString() + ".temp" );
 		
-		try ( GZIPOutputStream currentListOut = new GZIPOutputStream( new BufferedOutputStream( new FileOutputStream( tempCurrentFile ) ) ); ) {
-
-			ByteArrayOutputStream byteWriter = new ByteArrayOutputStream();
-			ObjectOutputStream bytesOut = new ObjectOutputStream( byteWriter );
-
-			bytesOut.writeObject( audioSystem.getCurrentList().getState() );
-
-			currentListOut.write( byteWriter.toByteArray() );
-			currentListOut.flush();
-			currentListOut.close();
-			
-			Files.move( tempCurrentFile.toPath(), currentFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
-
-		} catch ( Exception e ) {
-			LOGGER.warning( "Unable to save library data to disk, continuing." );
+		if ( audioSystem.getCurrentList().getState().getItems().size() < 500 ) {
+			try ( ObjectOutputStream currentListOut = new ObjectOutputStream( new FileOutputStream( tempCurrentFile ) ) ) {
+				currentListOut.writeObject( audioSystem.getCurrentList().getState() );
+				currentListOut.flush();
+				currentListOut.close();
+				
+				Files.move( tempCurrentFile.toPath(), currentFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
+				
+			} catch ( Exception e ) {
+				LOGGER.warning( "Unable to save library data to disk, continuing." );
+			}
+		} else {
+		
+			try ( GZIPOutputStream currentListOut = new GZIPOutputStream( new BufferedOutputStream( new FileOutputStream( tempCurrentFile ) ) ); ) {
+	
+				ByteArrayOutputStream byteWriter = new ByteArrayOutputStream();
+				ObjectOutputStream bytesOut = new ObjectOutputStream( byteWriter );
+	
+				bytesOut.writeObject( audioSystem.getCurrentList().getState() );
+	
+				currentListOut.write( byteWriter.toByteArray() );
+				currentListOut.flush();
+				currentListOut.close();
+				
+				Files.move( tempCurrentFile.toPath(), currentFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
+	
+			} catch ( Exception e ) {
+				LOGGER.warning( "Unable to save library data to disk, continuing." );
+			}
 		}
 	}
 

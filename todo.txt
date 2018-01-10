@@ -13,6 +13,8 @@ Now:
    Review and include this answer
       https://stackoverflow.com/questions/48144750/how-can-i-debug-a-nullpointerexception-where-the-stacktrace-doesnt-reference-my/48145928#48145928
    
+   Don't allow tag table columns to be reordered
+   
 Key Testing before next release:
 	Make sure browse button still works in various systems. I changed FXUI.openFileBrowser -- Desktop.getDesktop().open() to .browse()
 	
@@ -23,6 +25,8 @@ Key Testing before next release:
 	Try out the throttled table filters on different sytems, see if stuff breaks
 	
 General
+   Scroll speed on lyrics scroll pane when the lyrics almost-but-dont-quite fit one full screen is really slow. 
+
 	Select two unrelated albums -> Right click play -> no change to shuffle, i expected it to set it to sequential
 		Maybe add a "Multiple Albums" type
 	
@@ -299,5 +303,26 @@ General
 
 		https://sourceforge.net/p/launch4j/discussion/332684/thread/75bbbd93/
 		https://stackoverflow.com/questions/7506329/embed-java-into-a-c-application
-		
+	
+	Exception, nothing bad happened	
+		Jan 8, 2018 01:52:03 AM net.joshuad.hypnos.fxui.FXUI lambda$applySettings$15
+		INFO: Unable to apply setting: VOLUME to UI.
+		java.lang.NullPointerException
+			at net.joshuad.hypnos.audio.AudioPlayer.requestVolumePercent(Unknown Source)
+			at net.joshuad.hypnos.audio.AudioSystem.setVolumePercent(Unknown Source)
+			at net.joshuad.hypnos.fxui.FXUI.lambda$applySettings$15(Unknown Source)
+			at java.util.Map.forEach(Map.java:630)
+			at net.joshuad.hypnos.fxui.FXUI.applySettings(Unknown Source)
+			at net.joshuad.hypnos.Persister.loadPreWindowSettings(Unknown Source)
+			at net.joshuad.hypnos.Persister.loadDataBeforeShowWindow(Unknown Source)
+			at net.joshuad.hypnos.Hypnos.start(Unknown Source)
+			at com.sun.javafx.application.LauncherImpl.lambda$launchApplication1$161(LauncherImpl.java:863)
+			at com.sun.javafx.application.PlatformImpl.lambda$runAndWait$174(PlatformImpl.java:326)
+			at com.sun.javafx.application.PlatformImpl.lambda$null$172(PlatformImpl.java:295)
+			at java.security.AccessController.doPrivileged(Native Method)
+			at com.sun.javafx.application.PlatformImpl.lambda$runLater$173(PlatformImpl.java:294)
+			at com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:95)
+			at com.sun.glass.ui.win.WinApplication._runLoop(Native Method)
+			at com.sun.glass.ui.win.WinApplication.lambda$null$147(WinApplication.java:177)
+			at java.lang.Thread.run(Thread.java:748)
 
