@@ -1357,71 +1357,79 @@ public class CurrentListPane extends BorderPane {
 
 	@SuppressWarnings("unchecked")
 	public void setSortMode ( DefaultSortMode sortMode ) {
-		switch ( sortMode ) {
-			case ARTIST:
-				currentListTable.getSortOrder().clear();
-				currentListTable.getSortOrder().add( artistColumn );
-				artistColumn.setSortType( SortType.ASCENDING );
-				break;
-			case ARTIST_ALBUM_NUMBER:
-				currentListTable.getSortOrder().clear();
-				currentListTable.getSortOrder().add( artistColumn );
-				currentListTable.getSortOrder().add( albumColumn );
-				currentListTable.getSortOrder().add( numberColumn );
-				artistColumn.setSortType( SortType.ASCENDING );
-				albumColumn.setSortType( SortType.ASCENDING );
-				numberColumn.setSortType( SortType.ASCENDING );
-				break;
-			case ARTIST_NUMBER:
-				currentListTable.getSortOrder().clear();
-				currentListTable.getSortOrder().add( artistColumn );
-				currentListTable.getSortOrder().add( numberColumn );
-				artistColumn.setSortType( SortType.ASCENDING );
-				numberColumn.setSortType( SortType.ASCENDING );
-				break;
-			case ARTIST_TITLE:
-				currentListTable.getSortOrder().clear();
-				currentListTable.getSortOrder().add( artistColumn );
-				currentListTable.getSortOrder().add( titleColumn );
-				artistColumn.setSortType( SortType.ASCENDING );
-				titleColumn.setSortType( SortType.ASCENDING );
-				break;
-			case ARTIST_YEAR_ALBUM_NUMBER:
-				currentListTable.getSortOrder().clear();
-				currentListTable.getSortOrder().add( artistColumn );
-				currentListTable.getSortOrder().add( yearColumn );
-				currentListTable.getSortOrder().add( albumColumn );
-				currentListTable.getSortOrder().add( numberColumn );
-				artistColumn.setSortType( SortType.ASCENDING );
-				yearColumn.setSortType( SortType.ASCENDING );
-				albumColumn.setSortType( SortType.ASCENDING );
-				numberColumn.setSortType( SortType.ASCENDING );
-				break;
-			case NUMBER:
-				currentListTable.getSortOrder().clear();
-				currentListTable.getSortOrder().add( numberColumn );
-				numberColumn.setSortType( SortType.ASCENDING );
-				break;
-			case NO_CHANGE:
-				//Do nothing
-				break;
-			case YEAR_ALBUM_NUMBER:
-				currentListTable.getSortOrder().clear();
-				currentListTable.getSortOrder().add( yearColumn );
-				currentListTable.getSortOrder().add( albumColumn );
-				currentListTable.getSortOrder().add( numberColumn );
-				yearColumn.setSortType( SortType.ASCENDING );
-				albumColumn.setSortType( SortType.ASCENDING );
-				numberColumn.setSortType( SortType.ASCENDING );
-				break;
-			case ALBUM_NUMBER:
-				currentListTable.getSortOrder().clear();
-				currentListTable.getSortOrder().add( albumColumn );
-				currentListTable.getSortOrder().add( numberColumn );
-				albumColumn.setSortType( SortType.ASCENDING );
-				numberColumn.setSortType( SortType.ASCENDING );
-			default:
-				break;
+		Runnable runMe = () -> {
+			switch ( sortMode ) {
+				case ARTIST:
+					currentListTable.getSortOrder().clear();
+					currentListTable.getSortOrder().add( artistColumn );
+					artistColumn.setSortType( SortType.ASCENDING );
+					break;
+				case ARTIST_ALBUM_NUMBER:
+					currentListTable.getSortOrder().clear();
+					currentListTable.getSortOrder().add( artistColumn );
+					currentListTable.getSortOrder().add( albumColumn );
+					currentListTable.getSortOrder().add( numberColumn );
+					artistColumn.setSortType( SortType.ASCENDING );
+					albumColumn.setSortType( SortType.ASCENDING );
+					numberColumn.setSortType( SortType.ASCENDING );
+					break;
+				case ARTIST_NUMBER:
+					currentListTable.getSortOrder().clear();
+					currentListTable.getSortOrder().add( artistColumn );
+					currentListTable.getSortOrder().add( numberColumn );
+					artistColumn.setSortType( SortType.ASCENDING );
+					numberColumn.setSortType( SortType.ASCENDING );
+					break;
+				case ARTIST_TITLE:
+					currentListTable.getSortOrder().clear();
+					currentListTable.getSortOrder().add( artistColumn );
+					currentListTable.getSortOrder().add( titleColumn );
+					artistColumn.setSortType( SortType.ASCENDING );
+					titleColumn.setSortType( SortType.ASCENDING );
+					break;
+				case ARTIST_YEAR_ALBUM_NUMBER:
+					currentListTable.getSortOrder().clear();
+					currentListTable.getSortOrder().add( artistColumn );
+					currentListTable.getSortOrder().add( yearColumn );
+					currentListTable.getSortOrder().add( albumColumn );
+					currentListTable.getSortOrder().add( numberColumn );
+					artistColumn.setSortType( SortType.ASCENDING );
+					yearColumn.setSortType( SortType.ASCENDING );
+					albumColumn.setSortType( SortType.ASCENDING );
+					numberColumn.setSortType( SortType.ASCENDING );
+					break;
+				case NUMBER:
+					currentListTable.getSortOrder().clear();
+					currentListTable.getSortOrder().add( numberColumn );
+					numberColumn.setSortType( SortType.ASCENDING );
+					break;
+				case NO_CHANGE:
+					//Do nothing
+					break;
+				case YEAR_ALBUM_NUMBER:
+					currentListTable.getSortOrder().clear();
+					currentListTable.getSortOrder().add( yearColumn );
+					currentListTable.getSortOrder().add( albumColumn );
+					currentListTable.getSortOrder().add( numberColumn );
+					yearColumn.setSortType( SortType.ASCENDING );
+					albumColumn.setSortType( SortType.ASCENDING );
+					numberColumn.setSortType( SortType.ASCENDING );
+					break;
+				case ALBUM_NUMBER:
+					currentListTable.getSortOrder().clear();
+					currentListTable.getSortOrder().add( albumColumn );
+					currentListTable.getSortOrder().add( numberColumn );
+					albumColumn.setSortType( SortType.ASCENDING );
+					numberColumn.setSortType( SortType.ASCENDING );
+				default:
+					break;
+			}
+		};
+		
+		if ( Platform.isFxApplicationThread() ) {
+			runMe.run();
+		} else {
+			Platform.runLater( runMe );
 		}
 	}
 }

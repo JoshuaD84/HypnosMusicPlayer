@@ -65,8 +65,7 @@ public class CurrentListState implements Serializable {
 				
 			} else {
 				Album album = albums.get( 0 );
-				retMe ="Album: " + album.getAlbumArtist() + " - " + album.getYear() + " - " + album.getFullAlbumTitle();
-				
+				retMe ="Album: " + album.getAlbumArtist() + " - " + album.getYear() + " - " + album.getAlbumTitle();
 			}
 			
 			if ( mode == Mode.ALBUM_REORDERED ) {
