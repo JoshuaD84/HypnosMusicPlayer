@@ -159,7 +159,7 @@ General
 
 	Playlist throttled filter, but man, who's going to have over 1000 playlists? 
 
-
+	Search for artist / album image data possibilities online, show in a window, let user choose. 
 
 :::: Lyric Failures ::::
 
