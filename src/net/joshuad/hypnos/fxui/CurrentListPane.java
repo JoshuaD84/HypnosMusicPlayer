@@ -1179,7 +1179,7 @@ public class CurrentListPane extends BorderPane {
 	}
 	
 	@SuppressWarnings("incomplete-switch")
-	public void applySettings( EnumMap<Persister.Setting, String> settings ) {
+	public void applySettingsBeforeWindowShown( EnumMap<Persister.Setting, String> settings ) {
 		settings.forEach( ( setting, value )-> {
 			try {
 				switch ( setting ) {

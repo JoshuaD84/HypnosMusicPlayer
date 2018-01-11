@@ -1,12 +1,4 @@
 Now:
-	If you load albumsAndTracks but not sources Hypnos acts real wierd. Goes back and forth between not responding. On Windows confirmed. 
-		Does not happen on linux, but still, this is a wierd state -- library without sources. 	
-
-	Persister loadPreWindow and PostWindowSettings  -- check the EnumMap after applying the setting for any items. 
-		if there is stuff log it as "not applied settings" 
-		
-	Select an album in the library. Drag and album cover to the art pane. It is set, but the display doesn't update
-	
 	CLI Issues
 		Select Multiple Files in File Browser, Right click, open with Hypnos -
 			Not all the tracks appear on the current list, and it doesn't start playing the first one
@@ -16,21 +8,9 @@ Now:
 	
 		Calling commandline switches at the appimage exits before output is printed. Kinda lame
 		
-	
-Key Testing before next release:
-	Make sure browse button still works in various systems. I changed FXUI.openFileBrowser -- Desktop.getDesktop().open() to .browse()
-	
-	Try deleting settings and seeing if the UI lays out properly
-	
-	Try resetting tables to defaults manually
-	
-	Try out the throttled table filters on different sytems, see if stuff breaks
-	
-	Test the CLI
-	
-	
-	
 General
+	Add tabs in setting window (log tab) to show previous two logs as well. 
+
 	I emptied the current list and library and playing track, and the art stayed. probably good to get rid of that
 
 	Select two unrelated albums -> Right click play -> no change to shuffle, i expected it to set it to sequential
@@ -39,10 +19,7 @@ General
 	Set an option to sort by album artist instead of artist on artist column in current list
 	
 	If you delete a list of tracks down so that it matches an album, set title bar to that album
-	
-	Current List - On loading a new album or playlist or list of tracks, try to distribute excess space such that everything can be seen
-		if not possible, do nothing
-	
+
 	KDE Neon
 		Can't drag and drop an mp3 into hypnos
 			onDragOver doesn't seem to hear the drag event. 
@@ -51,6 +28,9 @@ General
 			https://stackoverflow.com/questions/48131760/desktop-getdesktop-open-folder-in-kde-opens-up-gwenview-instead-of-dolphin
 		
 	Refactor Library
+		If you load albumsAndTracks but not sources Hypnos acts real wierd. Goes back and forth between not responding. On Windows confirmed. 
+			Does not happen on linux, but still, this is a wierd state -- library without sources. 
+			
 		Make a source directory a class, not just a path.
 			Library Source Directories - highlight in red if they are missing. 
 
@@ -177,10 +157,14 @@ General
 
 	Playlist throttled filter, but man, who's going to have over 1000 playlists? 
 
+
+
 :::: Lyric Failures ::::
 
 	
 :::: Java / JavaFX stuff ::::
+	Window shows as a little sliver before appearing fully, ditto for settings window
+	
 	Get java to release memory back sometimes. We use a lot on load
 		https://stackoverflow.com/questions/30458195/does-gc-release-back-memory-to-os
       Apparently it can be done with hotspot jvm. Need to research
@@ -198,7 +182,7 @@ General
    
    Don't allow tag table columns to be reordered
    
-	Try to fit all data in current list table by adjusting columns that aren't no-resize on setCurrentList
+	Try to fit all data in current list table by adjusting columns that aren't no-resize on setCurrentList, if not possible, do nothing
 		I did some work on this. It conflicts with our FormattedAlbumCell because there, to keep it from wrapping
 		we setminwidth to double.max, causing the fit function to fail. 
 		I used the reflection stuff from this thread, and I think it would've worked if not for this issue:
@@ -293,8 +277,6 @@ General
 	Play mounted audio cd
 		http://www.jsresources.org/examples/CddaPlayer.java.html
 
-
-
 :::: OS Specific ::::
 	
 	Windows
@@ -312,25 +294,20 @@ General
 		https://sourceforge.net/p/launch4j/discussion/332684/thread/75bbbd93/
 		https://stackoverflow.com/questions/7506329/embed-java-into-a-c-application
 	
-	Exception, nothing bad happened	
-		Jan 8, 2018 01:52:03 AM net.joshuad.hypnos.fxui.FXUI lambda$applySettings$15
-		INFO: Unable to apply setting: VOLUME to UI.
-		java.lang.NullPointerException
-			at net.joshuad.hypnos.audio.AudioPlayer.requestVolumePercent(Unknown Source)
-			at net.joshuad.hypnos.audio.AudioSystem.setVolumePercent(Unknown Source)
-			at net.joshuad.hypnos.fxui.FXUI.lambda$applySettings$15(Unknown Source)
-			at java.util.Map.forEach(Map.java:630)
-			at net.joshuad.hypnos.fxui.FXUI.applySettings(Unknown Source)
-			at net.joshuad.hypnos.Persister.loadPreWindowSettings(Unknown Source)
-			at net.joshuad.hypnos.Persister.loadDataBeforeShowWindow(Unknown Source)
-			at net.joshuad.hypnos.Hypnos.start(Unknown Source)
-			at com.sun.javafx.application.LauncherImpl.lambda$launchApplication1$161(LauncherImpl.java:863)
-			at com.sun.javafx.application.PlatformImpl.lambda$runAndWait$174(PlatformImpl.java:326)
-			at com.sun.javafx.application.PlatformImpl.lambda$null$172(PlatformImpl.java:295)
-			at java.security.AccessController.doPrivileged(Native Method)
-			at com.sun.javafx.application.PlatformImpl.lambda$runLater$173(PlatformImpl.java:294)
-			at com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:95)
-			at com.sun.glass.ui.win.WinApplication._runLoop(Native Method)
-			at com.sun.glass.ui.win.WinApplication.lambda$null$147(WinApplication.java:177)
-			at java.lang.Thread.run(Thread.java:748)
-
+	Linux
+		http://blog.noizeramp.com/2005/08/31/packaging-java-applications-for-ubuntu-and-other-debians/
+	
+Key Testing before next release:
+	Make sure browse button still works in various systems. I changed FXUI.openFileBrowser -- Desktop.getDesktop().open() to .browse()
+	
+	Try deleting settings and seeing if the UI lays out properly
+	
+	Try resetting tables to defaults manually
+	
+	Try out the throttled table filters on different sytems, see if stuff breaks
+	
+	Test the CLI
+	
+	Settings load and load appearance
+	
+	

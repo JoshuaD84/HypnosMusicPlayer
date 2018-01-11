@@ -714,12 +714,33 @@ public class Hypnos extends Application {
 				switch ( getOS() ) {
 					case NIX:
 					case OSX: {
-						EnumMap <Setting, String> loadMeLater = persister.loadDataBeforeShowWindow();
+						EnumMap <Setting, String> pendingSettings = persister.loadSettingsFromDisk();
+						persister.loadCurrentList();
+						ui.applySettingsBeforeWindowShown( pendingSettings );
+						audioSystem.applySettings ( pendingSettings );
+						
+						//TODO: This def doesn't belong here. 
+						if ( pendingSettings.containsKey( Setting.LOADER_SPEED ) ) {
+							Hypnos.setLoaderSpeed( LoaderSpeed.valueOf( pendingSettings.get( Setting.LOADER_SPEED ) ) );
+							pendingSettings.remove( Setting.LOADER_SPEED );
+						}
+						
 						ui.showMainWindow();
 						
 						Thread finishLoadingThread = new Thread ( () -> {
-
-							Platform.runLater( () -> persister.loadDataAfterShowWindow( loadMeLater ) );
+							Platform.runLater( () -> {
+								ui.applySettingsAfterWindowShown( pendingSettings );
+								persister.logUnusedSettings ( pendingSettings );
+							});
+							persister.loadAlbumsAndTracks();
+							persister.loadSources();
+							persister.loadQueue();
+							audioSystem.linkQueueToCurrentList();
+							persister.loadHistory();
+							persister.loadPlaylists();
+							persister.loadHotkeys();
+							ui.refreshHotkeyList();
+							
 							audioSystem.start();
 							
 							applyCLICommands( commands );
@@ -754,8 +775,28 @@ public class Hypnos extends Application {
 					case WIN_VISTA:
 					case WIN_XP:
 					default: {
-						EnumMap <Setting, String> loadMeLater = persister.loadDataBeforeShowWindow();
-						persister.loadDataAfterShowWindow( loadMeLater );
+						EnumMap <Setting, String> pendingSettings = persister.loadSettingsFromDisk();
+						persister.loadCurrentList();
+						audioSystem.applySettings ( pendingSettings );
+						
+						//TODO: This def doesn't belong here. 
+						if ( pendingSettings.containsKey( Setting.LOADER_SPEED ) ) {
+							Hypnos.setLoaderSpeed( LoaderSpeed.valueOf( pendingSettings.get( Setting.LOADER_SPEED ) ) );
+							pendingSettings.remove( Setting.LOADER_SPEED );
+						}
+						
+						ui.applySettingsBeforeWindowShown( pendingSettings );
+						ui.applySettingsAfterWindowShown( pendingSettings );
+						
+						persister.logUnusedSettings ( pendingSettings );
+						
+						persister.loadAlbumsAndTracks();
+						persister.loadSources();
+						persister.loadQueue();
+						audioSystem.linkQueueToCurrentList();
+						persister.loadHistory();
+						persister.loadPlaylists();
+						persister.loadHotkeys();
 						
 						audioSystem.start();
 						

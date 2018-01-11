@@ -26,7 +26,6 @@ import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import net.joshuad.hypnos.LibraryUpdater.LoaderSpeed;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.FXUI;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
@@ -108,10 +107,6 @@ public class Persister {
 		
 		createNecessaryFolders();
 	}
-	
-	public File getPlaylistDirectory() {
-		return playlistsDirectory;
-	}
 
 	private void createNecessaryFolders () {
 		if ( playlistsDirectory.exists() && !playlistsDirectory.isDirectory() ) {
@@ -119,6 +114,7 @@ public class Persister {
 				Files.delete( playlistsDirectory.toPath() );
 				LOGGER.info( "Playlists directory location existed but was not a directory. Removed: " + playlistsDirectory.toString() ); 
 			} catch ( IOException e ) {
+				//TODO: Notify user
 				LOGGER.warning( "Playlists directory exists but is a normal file, and I can't remove it."
 					+ " Playlist data may be lost after program is terminated."
 					+ playlistsDirectory.toString()
@@ -131,30 +127,12 @@ public class Persister {
 			if ( playlistDirCreated ) {
 				LOGGER.info( "Playlist directory did not exist. Created: " + playlistsDirectory.toString() ); 
 			} else {
+				//TODO: Notify user
 				LOGGER.warning( "Cannot create playlists directory. Playlist data may be lost after program is terminated." + playlistsDirectory.toString() );
 			}
 		}
 	}
 
-	public EnumMap <Setting, String> loadDataBeforeShowWindow () {
-		loadCurrentList();
-		EnumMap <Setting, String> loadMeLater = loadPreWindowSettings();
-		return loadMeLater;
-	}
-
-	public void loadDataAfterShowWindow ( EnumMap <Setting, String> loadMe ) {
-		loadPostWindowSettings( loadMe );
-		loadAlbumsAndTracks();
-		loadSources();
-		loadQueue();
-		audioSystem.linkQueueToCurrentList();
-		loadHistory();
-		loadPlaylists();
-		loadHotkeys();
-		ui.refreshHotkeyList();
-	}
-	
-	//REFACTOR: I don't think this way of doing things is very great, two almost identical functions. W/e it works for now. 
 	public void saveAllData( EnumMap <Setting, ? extends Object> fromAudioSystem, EnumMap <Setting, ? extends Object> fromUI ) {
 		createNecessaryFolders();
 		saveAlbumsAndTracks();
@@ -167,16 +145,10 @@ public class Persister {
 		saveHotkeys();	
 	}
 
-	public void saveAllData () {
-		createNecessaryFolders();
-		saveAlbumsAndTracks();
-		saveSources();
-		saveCurrentList();
-		saveQueue();
-		saveHistory();
-		saveLibraryPlaylists();
-		saveSettings();
-		saveHotkeys();
+	public void saveSettings () {
+		EnumMap <Setting, ? extends Object> fromAudioSystem = audioSystem.getSettings();
+		EnumMap <Setting, ? extends Object> fromUI = ui.getSettings();
+		saveSettings ( fromAudioSystem, fromUI );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -190,7 +162,6 @@ public class Persister {
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to read library source directory list from disk, continuing." );
 		}
-		
 	}
 
 	public void loadCurrentList() {
@@ -244,6 +215,21 @@ public class Persister {
 			
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to read library data from disk, continuing." );
+		}
+	}
+
+	public void loadPlaylists () {
+
+		try ( DirectoryStream <Path> stream = Files.newDirectoryStream( playlistsDirectory.toPath() ); ) {
+			for ( Path child : stream ) {
+				Playlist playlist = Playlist.loadPlaylist( child );
+				if ( playlist != null ) {
+					library.addPlaylist( playlist );
+				}
+			}
+
+		} catch ( IOException e ) {
+			LOGGER.log( Level.WARNING, "Unable to load playlists from disk.", e );
 		}
 	}
 
@@ -379,21 +365,6 @@ public class Persister {
 		}
 	}
 
-	public void loadPlaylists () {
-
-		try ( DirectoryStream <Path> stream = Files.newDirectoryStream( playlistsDirectory.toPath() ); ) {
-			for ( Path child : stream ) {
-				Playlist playlist = Playlist.loadPlaylist( child );
-				if ( playlist != null ) {
-					library.addPlaylist( playlist );
-				}
-			}
-
-		} catch ( IOException e ) {
-			LOGGER.log( Level.WARNING, "Unable to load playlists from disk.", e );
-		}
-	}
-
 	public void saveLibraryPlaylists () {
 		
 		ArrayList <Playlist> playlists = new ArrayList <> ( library.getPlaylists() );
@@ -432,7 +403,6 @@ public class Persister {
 			LOGGER.log( Level.WARNING, "Unable to delete playlist file: " + targetFile, e );
 		}
 	}
-	
 	
 	//Assumptions: playlist != null, playlist.name is not null or empty, and no playlists in library have the same name. 
 	private void saveLibaryPlaylist ( Playlist playlist ) throws IOException {
@@ -491,12 +461,6 @@ public class Persister {
 		}
 	}
 	
-	public void saveSettings() {
-		EnumMap <Setting, ? extends Object> fromAudioSystem = audioSystem.getSettings();
-		EnumMap <Setting, ? extends Object> fromUI = ui.getSettings();
-		saveSettings ( fromAudioSystem, fromUI );
-	}
-
 	public void saveSettings ( EnumMap <Setting, ? extends Object> fromAudioSystem, EnumMap <Setting, ? extends Object> fromUI ) {
 		
 		File tempSettingsFile = new File ( settingsFile.toString() + ".temp" );
@@ -526,28 +490,17 @@ public class Persister {
 		}
 	}
 	
-	public void loadPostWindowSettings ( EnumMap <Setting, String> loadMe ) {
-		ui.applySettings( loadMe );
-	}
+	public EnumMap <Setting, String> loadSettingsFromDisk () {
+		EnumMap <Setting, String> settings = new EnumMap <Setting, String>( Setting.class );
 
-	//TODO: There is a much better way to do this. Reorganize this code
-	// 1 -- read settings into two enum maps, return them
-	// 2 -- call loadPre
-	// 3 -- later call loadPost
-	public EnumMap <Setting, String> loadPreWindowSettings () {
-		EnumMap <Setting, String> loadMeNow = new EnumMap <Setting, String>( Setting.class );
-		EnumMap <Setting, String> loadMeLater = new EnumMap <Setting, String>( Setting.class );
-
-		try ( FileReader fileReader = new FileReader( settingsFile ); ) {
-
+		try ( FileReader fileReader = new FileReader( settingsFile ) ) {
 			BufferedReader settingsIn = new BufferedReader( fileReader );
-
 			for ( String line; (line = settingsIn.readLine()) != null; ) {
 				Setting setting;
 				try {
 					setting = Setting.valueOf( line.split( ":\\s+" )[0] );
 				} catch ( IllegalArgumentException e ) {
-					LOGGER.info( "Found invalid setting: " + line.split( ":\\s+" )[0] + ", continuing." );
+					LOGGER.info( "Found invalid setting: " + line.split( ":\\s+" )[0] + ", ignoring." );
 					continue;
 				}
 				
@@ -558,30 +511,25 @@ public class Persister {
 					//Do nothing, some settings can be empty
 				}
 					
-
-				switch ( setting ) {
-					case LOADER_SPEED:
-						Hypnos.setLoaderSpeed( LoaderSpeed.valueOf( value ) );
-						
-					case LIBRARY_TAB_ALBUMS_VISIBLE:
-					case LIBRARY_TAB_TRACKS_VISIBLE:
-					case LIBRARY_TAB_PLAYLISTS_VISIBLE:
-						loadMeLater.put( setting, value );
-						break;
-						
-					default:
-						loadMeNow.put( setting, value );
-						break;
-				}
+				settings.put ( setting, value );
 			}
 
 		} catch ( Exception e ) {
 			LOGGER.log( Level.WARNING, "Unable to read settings from disk, continuing.", e );
 		}
-
-		ui.applySettings( loadMeNow );
-		audioSystem.applySettings ( loadMeNow );
 		
-		return loadMeLater;
+		return settings;
+	}
+
+	public void logUnusedSettings ( EnumMap <Setting, String> pendingSettings ) {
+		if ( pendingSettings.size() == 0 ) return;
+		
+		String message = "";
+		for ( Setting setting : pendingSettings.keySet() ) {
+			if ( message.length() > 0 ) message += "\n";
+			message += setting.toString() + ": " + pendingSettings.get( setting );
+		}
+		
+		LOGGER.info ( "Some settings were read from disk but not applied:\n" + message );
 	}
 }

@@ -1068,8 +1068,8 @@ public class FXUI implements PlayerListener {
 		retMe.put ( Setting.PRIMARY_SPLIT_PERCENT, getPrimarySplitPercent() );
 		retMe.put ( Setting.ART_CURRENT_SPLIT_PERCENT, getCurrentListSplitPercent() );
 		retMe.put ( Setting.ART_SPLIT_PERCENT, getArtSplitPercent() );
-		retMe.put ( Setting.PROMPT_BEFORE_OVERWRITE, showUpdateAvailableInUI.getValue() );
-		retMe.put ( Setting.SHOW_UPDATE_AVAILABLE_IN_MAIN_WINDOW, promptBeforeOverwrite.getValue() );
+		retMe.put ( Setting.PROMPT_BEFORE_OVERWRITE, promptBeforeOverwrite.getValue() );
+		retMe.put ( Setting.SHOW_UPDATE_AVAILABLE_IN_MAIN_WINDOW, showUpdateAvailableInUI.getValue() );
 		retMe.put ( Setting.THEME, theme );
 		
 		EnumMap <Persister.Setting, ? extends Object> librarySettings = libraryPane.getSettings();
@@ -1116,8 +1116,12 @@ public class FXUI implements PlayerListener {
 		libraryPane.trackTable.refresh();
 	}
 
+	public void applySettingsAfterWindowShown ( EnumMap<Persister.Setting, String> settings ) {
+		libraryPane.applySettingsAfterWindowShown( settings );
+	}
+
 	@SuppressWarnings("incomplete-switch")
-	public void applySettings( EnumMap<Persister.Setting, String> settings ) {
+	public void applySettingsBeforeWindowShown( EnumMap<Persister.Setting, String> settings ) {
 		settings.forEach( ( setting, value )-> {
 			try {
 				switch ( setting ) {
@@ -1206,11 +1210,10 @@ public class FXUI implements PlayerListener {
 			}
 		});
 		
-		libraryPane.applySettings( settings );
-		currentListPane.applySettings( settings );
-		settingsWindow.updateSettings();
+		libraryPane.applySettingsBeforeWindowShown( settings );
+		currentListPane.applySettingsBeforeWindowShown( settings );
+		settingsWindow.updateSettingsBeforeWindowShown();
 	}
-
 
 	public Stage getMainStage () {
 		return mainStage;

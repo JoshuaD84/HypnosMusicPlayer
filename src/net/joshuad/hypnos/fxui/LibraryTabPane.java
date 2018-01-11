@@ -1686,7 +1686,7 @@ public class LibraryTabPane extends StretchedTabPane {
 	}
 
 	@SuppressWarnings("incomplete-switch")
-	public void applySettings ( EnumMap<Persister.Setting, String> settings ) {
+	public void applySettingsBeforeWindowShown ( EnumMap<Persister.Setting, String> settings ) {
 		settings.forEach( ( setting, value )-> {
 			try {
 				switch ( setting ) {
@@ -1785,18 +1785,6 @@ public class LibraryTabPane extends StretchedTabPane {
 						break;
 					case PL_TABLE_LENGTH_COLUMN_WIDTH:
 						playlistLengthColumn.setPrefWidth( Double.valueOf( value ) );
-						settings.remove ( setting );
-						break;
-					case LIBRARY_TAB_ALBUMS_VISIBLE:
-						setAlbumsVisible( Boolean.valueOf ( value ) );
-						settings.remove ( setting );
-						break;
-					case LIBRARY_TAB_TRACKS_VISIBLE:
-						setTracksVisible( Boolean.valueOf ( value ) );
-						settings.remove ( setting );
-						break;
-					case LIBRARY_TAB_PLAYLISTS_VISIBLE:
-						setPlaylistsVisible( Boolean.valueOf ( value ) );
 						settings.remove ( setting );
 						break;
 					case ALBUM_COLUMN_ORDER: {
@@ -1977,6 +1965,30 @@ public class LibraryTabPane extends StretchedTabPane {
 						settings.remove ( setting );
 						break;
 					}
+				}
+			} catch ( Exception e ) {
+				LOGGER.log( Level.INFO, "Unable to apply setting: " + setting + " to UI.", e );
+			}
+		});
+	}
+
+	@SuppressWarnings("incomplete-switch")
+	public void applySettingsAfterWindowShown ( EnumMap <Setting, String> settings ) {
+		settings.forEach( ( setting, value )-> {
+			try {
+				switch ( setting ) {
+					case LIBRARY_TAB_ALBUMS_VISIBLE:
+						setAlbumsVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
+						break;
+					case LIBRARY_TAB_TRACKS_VISIBLE:
+						setTracksVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
+						break;
+					case LIBRARY_TAB_PLAYLISTS_VISIBLE:
+						setPlaylistsVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
+						break;
 				}
 			} catch ( Exception e ) {
 				LOGGER.log( Level.INFO, "Unable to apply setting: " + setting + " to UI.", e );

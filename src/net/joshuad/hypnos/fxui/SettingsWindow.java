@@ -350,7 +350,7 @@ public class SettingsWindow extends Stage {
 		return hotkeysTab;
 	}
 	
-	public void updateSettings() {
+	public void updateSettingsBeforeWindowShown() {
 		
 		switch ( audioSystem.getCurrentList().getDefaultTrackRepeatMode() ) {
 			case NO_CHANGE:
