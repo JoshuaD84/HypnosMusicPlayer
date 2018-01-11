@@ -5,13 +5,15 @@ Now:
 	Select Multiple Files in File Browser, Right click, open with Hypnos -
 		Not all the tracks appear on the current list, and it doesn't start playing the first one
 		Also the pause button kinda bugs out
-
-	Don't try to initialize a decoder if track.isMissingFile();
-	
+		
+		When loading files from the commandline and you give a relative path, it assumes its relative to hypnos's directory, not the user.
+				
 	Persister loadPreWindow and PostWindowSettings  -- check the EnumMap after applying the setting for any items. 
 		if there is stuff log it as "not applied settings" 
 		
 	Select an album in the library. Drag and album cover to the art pane. It is set, but the display doesn't update
+	
+	calling commandline switches at the appimage exits before output is printed. Kinda lame
 	
 Key Testing before next release:
 	Make sure browse button still works in various systems. I changed FXUI.openFileBrowser -- Desktop.getDesktop().open() to .browse()
@@ -23,6 +25,8 @@ Key Testing before next release:
 	Try out the throttled table filters on different sytems, see if stuff breaks
 	
 General
+	I emptied the current list and library and playing track, and the art stayed. probably good to get rid of that
+
 	Select two unrelated albums -> Right click play -> no change to shuffle, i expected it to set it to sequential
 		Maybe add a "Multiple Albums" type
 	

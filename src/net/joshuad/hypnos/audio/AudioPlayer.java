@@ -79,7 +79,8 @@ public class AudioPlayer {
 					try {
 						decoder = getDecoder ( currentRequest );
 						
-					} catch ( IllegalStateException e ) {
+					} catch ( Exception e ) {
+						LOGGER.log( Level.INFO, "Unable to initialize decoder for: " + currentRequest.getFilename(), e );
 						decoder = null;
 					}
 
@@ -93,7 +94,6 @@ public class AudioPlayer {
 						
 					} else {
 						stopRequested = false;
-						LOGGER.info( "Unable to initialize decoder for: " + currentRequest.getFilename() );
 						state = PlayState.STOPPED;
 						controller.playerStopped( StopReason.UNABLE_TO_START_TRACK );
 					}
