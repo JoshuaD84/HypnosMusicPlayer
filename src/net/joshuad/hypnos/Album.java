@@ -144,7 +144,7 @@ public class Album implements Serializable, AlbumInfoSource {
 	public Image getAlbumArtistImage () {
 		for ( Track track : tracks ) {
 			if ( track.getAlbumCoverImage() != null ) {
-				return track.getAlbumArtistImage();
+				return track.getArtistImage();
 			}
 		}
 		return null;

@@ -61,7 +61,7 @@ public class ImagesPanel extends SplitPane {
 		startImageLoaderThread();
 	}
 	
-	public void setupAlbumImage () {
+	private void setupAlbumImage () {
 		
 		ContextMenu menu = new ContextMenu();
 		
@@ -225,7 +225,7 @@ public class ImagesPanel extends SplitPane {
 						requestedAlbum = null;
 						
 						Image albumImage = loadMeTrack.getAlbumCoverImage();
-						Image artistImage = loadMeTrack.getAlbumArtistImage();
+						Image artistImage = loadMeTrack.getArtistImage();
 						
 						SimpleBooleanProperty imagesDisplayed = new SimpleBooleanProperty ( false );
 						Platform.runLater( () -> {
@@ -251,7 +251,7 @@ public class ImagesPanel extends SplitPane {
 		imageLoader.start();
 	}
 	
-	public void setupArtistImage () {
+	private void setupArtistImage () {
 		
 		ContextMenu menu = new ContextMenu();
 		
@@ -492,8 +492,6 @@ public class ImagesPanel extends SplitPane {
 		});
 	}
 	
-
-	
 	private void promptAndSaveArtistImage ( byte[] buffer ) {
 		Track targetTrack = ui.currentImagesTrack;
 		
@@ -588,7 +586,6 @@ public class ImagesPanel extends SplitPane {
 	public void setImages ( Track track ) {
 		setImages ( track, null );
 	}
-	
 	
 	public void setImages ( Album album ) {
 		setImages ( album.getTracks().get( 0 ), album );

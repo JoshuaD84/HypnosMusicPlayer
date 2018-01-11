@@ -968,12 +968,13 @@ public class Track implements Serializable, AlbumInfoSource {
 		return null;
 	}
 	
-	public Image getAlbumArtistImage ( ) {
+	public Image getArtistImage ( ) {
 				
 		if ( tagImagePriority() == ArtistTagImagePriority.TRACK ) {
 			Image tagArtistImage = getTagArtistImage();
 			if ( tagArtistImage != null ) return tagArtistImage;
 		}
+		
 		if ( hasAlbumDirectory() ) {
 	
 			if ( this.getPath().getParent() != null ) {
@@ -1014,10 +1015,13 @@ public class Track implements Serializable, AlbumInfoSource {
 		try {
 			if ( artworkList != null ) {
 				for ( Artwork artwork : artworkList ) {
-					
 					if ( artwork.getPictureType() == 7 ) {
 						Image leadArtistImage = SwingFXUtils.toFXImage( (BufferedImage) artwork.getImage(), null );
 						if ( leadArtistImage != null ) return leadArtistImage;
+					
+					} else if ( artwork.getPictureType() == 8 ) {
+						Image artistImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
+						if ( artistImage != null ) return artistImage;
 						
 					} else if ( artwork.getPictureType() == 12 ) {
 						Image writerImage = SwingFXUtils.toFXImage( (BufferedImage) artwork.getImage(), null );
@@ -1036,7 +1040,6 @@ public class Track implements Serializable, AlbumInfoSource {
 		} catch ( Exception e ) {
 			LOGGER.log( Level.INFO, "Error when trying to load tag images for file" + getPath(), e );
 		}
-	
 		return null;
 	}
 	
