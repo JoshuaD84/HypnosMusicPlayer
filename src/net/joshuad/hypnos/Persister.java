@@ -162,6 +162,8 @@ public class Persister {
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to read library source directory list from disk, continuing." );
 		}
+		
+		library.setSourcesHasUnsavedData( false );
 	}
 
 	public void loadCurrentList() {
@@ -176,6 +178,8 @@ public class Persister {
 				LOGGER.warning( "Unable to read library data from disk, continuing." );
 			}
 		}
+		
+		audioSystem.getCurrentList().setHasUnsavedData( false );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -186,6 +190,8 @@ public class Persister {
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to read queue data from disk, continuing." );
 		}
+		
+		audioSystem.getQueue().setHasUnsavedData( false );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -196,6 +202,8 @@ public class Persister {
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to read history from disk, continuing." );
 		}
+		audioSystem.getHistory().setHasUnsavedData( false );
+		
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -205,6 +213,7 @@ public class Persister {
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to read hotkeys from disk, continuing." );
 		}
+		hotkeys.setHasUnsavedData( false );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -219,13 +228,13 @@ public class Persister {
 	}
 
 	public void loadPlaylists () {
-
 		try ( DirectoryStream <Path> stream = Files.newDirectoryStream( playlistsDirectory.toPath() ); ) {
 			for ( Path child : stream ) {
 				Playlist playlist = Playlist.loadPlaylist( child );
 				if ( playlist != null ) {
 					library.addPlaylist( playlist );
 				}
+				playlist.setHasUnsavedData( false );
 			}
 
 		} catch ( IOException e ) {
@@ -234,6 +243,7 @@ public class Persister {
 	}
 
 	public void saveSources () {
+		if ( !library.sourcesHasUnsavedData() ) return;
 		File tempSourcesFile = new File ( sourcesFile.toString() + ".temp" );
 		try ( ObjectOutputStream sourcesOut = new ObjectOutputStream( new FileOutputStream( tempSourcesFile ) ); ) {
 			ArrayList <String> searchPaths = new ArrayList <String>( library.musicSourcePaths.size() );
@@ -246,12 +256,15 @@ public class Persister {
 
 			Files.move( tempSourcesFile.toPath(), sourcesFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 			
+			library.setSourcesHasUnsavedData( false );
+			
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to save library source directory list to disk, continuing." );
 		}
 	}
 	
 	public void saveCurrentList () {
+		if ( !audioSystem.getCurrentList().hasUnsavedData() ) return;
 		File tempCurrentFile = new File ( currentFile.toString() + ".temp" );
 		
 		if ( audioSystem.getCurrentList().getState().getItems().size() < 500 ) {
@@ -261,6 +274,8 @@ public class Persister {
 				currentListOut.close();
 				
 				Files.move( tempCurrentFile.toPath(), currentFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
+
+				audioSystem.getCurrentList().setHasUnsavedData( false );
 				
 			} catch ( Exception e ) {
 				LOGGER.warning( "Unable to save library data to disk, continuing." );
@@ -279,7 +294,9 @@ public class Persister {
 				currentListOut.close();
 				
 				Files.move( tempCurrentFile.toPath(), currentFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
-	
+
+				audioSystem.getCurrentList().setHasUnsavedData( false );
+				
 			} catch ( Exception e ) {
 				LOGGER.warning( "Unable to save library data to disk, continuing." );
 			}
@@ -287,7 +304,8 @@ public class Persister {
 	}
 
 	public void saveQueue () {
-
+		if ( !audioSystem.getQueue().hasUnsavedData() ) return;
+		
 		File tempQueueFile = new File ( queueFile.toString() + ".temp" );
 		try ( ObjectOutputStream queueListOut = new ObjectOutputStream( new FileOutputStream( tempQueueFile ) ) ) {
 			queueListOut.writeObject( new ArrayList <Track>( audioSystem.getQueue().getData() ) );
@@ -295,13 +313,16 @@ public class Persister {
 			queueListOut.close();
 			
 			Files.move( tempQueueFile.toPath(), queueFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
-
+			
+			audioSystem.getQueue().setHasUnsavedData( false );
+			
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to save queue to disk, continuing." );
 		}
 	}
 
 	public void saveHistory () {
+		if ( !audioSystem.getHistory().hasUnsavedData() ) return;
 
 		File tempHistoryFile = new File ( historyFile.toString() + ".temp" );
 		
@@ -312,13 +333,16 @@ public class Persister {
 			historyListOut.close();
 			
 			Files.move( tempHistoryFile.toPath(), historyFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
-
+			
+			audioSystem.getHistory().setHasUnsavedData( false );
+			
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to save history to disk, continuing." );
 		}
 	}
 	
 	public void saveHotkeys () {
+		if ( !hotkeys.hasUnsavedData() ) return;
 		
 		File tempHotkeysFile = new File ( hotkeysFile.toString() + ".temp" );
 
@@ -329,6 +353,8 @@ public class Persister {
 			
 			Files.move( tempHotkeysFile.toPath(), hotkeysFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 
+			hotkeys.setHasUnsavedData( false );
+			
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to save hotkeys to disk, continuing." );
 		}
@@ -377,12 +403,16 @@ public class Persister {
 				continue;
 			}
 			
+			if ( !playlist.hasUnsavedData() ) continue;
+			
 			try {
 				saveLibaryPlaylist ( playlist );
+				playlist.setHasUnsavedData( false );
 			} catch ( IOException e ) {
 				LOGGER.warning ( "Unable to save library playlist " + playlist.getName() + ": " + e.getMessage() );
 				errors.add( playlist );
 			}
+			
 		}
 		
 		if ( errors.size() > 0 ) {

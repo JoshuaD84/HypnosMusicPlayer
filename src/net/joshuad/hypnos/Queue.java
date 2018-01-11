@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 public class Queue {
@@ -13,7 +14,21 @@ public class Queue {
 
 	final private ObservableList <Track> queue = FXCollections.observableArrayList ( new ArrayList <Track>() );
 	
-	public Queue() {}
+	transient private boolean hasUnsavedData = false;
+	
+	public Queue() {
+		queue.addListener( (ListChangeListener.Change<? extends Track> change) -> {
+			hasUnsavedData = true;			
+		});
+	}
+	
+	public boolean hasUnsavedData() {
+		return hasUnsavedData;
+	}
+	
+	public void setHasUnsavedData( boolean b ) {
+		hasUnsavedData = b;
+	}
 	
 	public synchronized void queueTrack ( Track track ) {
 		queueTrack ( queue.size(), track );

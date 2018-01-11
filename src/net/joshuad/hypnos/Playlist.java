@@ -17,17 +17,34 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+
 public class Playlist implements Serializable {
 	private static final Logger LOGGER = Logger.getLogger( Playlist.class.getName() );
 	
 	private static final long serialVersionUID = 1L;
 
-	private List <Track> tracks;
+	private ObservableList <Track> tracks = FXCollections.observableArrayList( new ArrayList <Track>() );
 	
 	private String name;
 	
+	private transient boolean hasUnsavedData = false;
+	
 	public Playlist ( String name ) {
 		this ( name, new ArrayList <Track> () );
+		tracks.addListener( (ListChangeListener.Change<? extends Track> change) -> {
+			hasUnsavedData = true;			
+		});
+	}
+	
+	public boolean hasUnsavedData() {
+		return hasUnsavedData;
+	}
+	
+	public void setHasUnsavedData( boolean b ) {
+		hasUnsavedData = b;
 	}
 	
 	public Playlist ( String name, List <Track> tracks ) {
@@ -130,9 +147,13 @@ public class Playlist implements Serializable {
 		return tracks;
 	}
 	
-	public void setTracks( List <Track> tracks ) {
-		if ( tracks == null ) this.tracks = new ArrayList <Track> ();
-		else this.tracks = new ArrayList <Track> ( tracks );
+	public void setTracks( List <Track> newTracks ) {
+		if ( tracks == null ) {
+			tracks.clear();
+		} else {
+			tracks.clear();
+			tracks.addAll( newTracks );
+		}
 	}
 
 	public void addTrack ( Track track ) {

@@ -7,17 +7,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.scene.control.TableColumn;
-import net.joshuad.hypnos.CurrentList.DefaultSortMode;
-import net.joshuad.hypnos.Persister.Setting;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
@@ -78,6 +75,8 @@ public class CurrentList {
 	private DefaultSortMode playlistSortMode = DefaultSortMode.ARTIST_TITLE;
 	
 	List <Thread> noLoadThreads = new ArrayList <Thread> ();
+
+	transient private boolean hasUnsavedData = false;
 	
 	public CurrentList ( AudioSystem audioSystem, Queue queue ) {
 		this.queue = queue;
@@ -85,6 +84,18 @@ public class CurrentList {
 		
 		startListWatcher();
 		
+		items.addListener( (ListChangeListener.Change<? extends Track> change) -> {
+			hasUnsavedData = true;			
+		});
+		
+	}
+	
+	public boolean hasUnsavedData() {
+		return hasUnsavedData;
+	}
+	
+	public void setHasUnsavedData( boolean b ) {
+		hasUnsavedData = b;
 	}
 	
 	public void addNoLoadThread ( Thread t ) {

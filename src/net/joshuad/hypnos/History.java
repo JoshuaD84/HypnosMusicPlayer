@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 public class History {
@@ -12,7 +13,21 @@ public class History {
 
 	private final ObservableList <Track> history = FXCollections.observableArrayList( new ArrayList <Track>(MAX_HISTORY_SIZE) );
 	
-	public History() {}
+	private transient boolean hasUnsavedData = false;
+	
+	public History() {
+		history.addListener( (ListChangeListener.Change<? extends Track> change) -> {
+			hasUnsavedData = true;			
+		});
+	}
+	
+	public boolean hasUnsavedData() {
+		return hasUnsavedData;
+	}
+	
+	public void setHasUnsavedData( boolean b ) {
+		hasUnsavedData = b;
+	}
 	
 	public void trackPlayed ( Track track ) {
 		

@@ -8,11 +8,36 @@ Now:
 	
 		Calling commandline switches at the appimage exits before output is printed. Kinda lame
 		
+	Improve performance and load time
+		Don't write stuff to disk unless it has been changed.
+			Playlists - done
+			settings - Workaround
+			queue - fixed
+			history - fixed
+			current list - fixed
+			data - already good
+			sources
+			hotkeys - fixed
+		
+	Export playlist as a folder
+		Copy all of the music files into that folder. Prepend them with index number? 
+		Warn if the total copy is larger than X MB or more than X tracks
+	
 General
+	Marketa Irglova Album -- keeps doing that, then ui crashes
+		Jan 11, 2018 00:02:21 AM net.joshuad.hypnos.audio.decoders.FlacDecoder playSingleFrame
+		INFO: Error reading block from flac file.
+		net.joshuad.hypnos.audio.decoders.FlacDecoderLogic$FormatException: Sync code expected
+			at net.joshuad.hypnos.audio.decoders.FlacDecoderLogic.readNextBlock(Unknown Source)
+			at net.joshuad.hypnos.audio.decoders.FlacDecoder.playSingleFrame(Unknown Source)
+			at net.joshuad.hypnos.audio.AudioPlayer.runPlayerThread(Unknown Source)
+			at net.joshuad.hypnos.audio.AudioPlayer.lambda$new$0(Unknown Source)
+			at java.lang.Thread.run(Thread.java:748)
+			
+		It didn't happen again
+
 	Allow each playlist to specify their sort order
 	
-	Add tabs in setting window (log tab) to show previous two logs as well. 
-
 	I emptied the current list and library and playing track, and the art stayed. probably good to get rid of that
 
 	Select two unrelated albums -> Right click play -> no change to shuffle, i expected it to set it to sequential
@@ -58,10 +83,6 @@ General
 		Maybe allow a filter for file type and lossy vs not lossy
 			Maybe just a special search text "type:mp3", "type:lossy"
 			I dunno making search box script is alot. 	
-
-	Export playlist as a folder
-		Copy all of the music files into that folder. Prepend them with index number? 
-		Warn if the total copy is larger than X MB or more than X tracks
 	
 	Drag and drop from misc places to system
 		playlist table -> m3u
@@ -104,11 +125,9 @@ General
 	Tag auto fix button
 
 	Bug report dialog
-	
-	Playlist browse issues
-		? Add right click > browse and F4 to playlist table -- show playlist folder  
 		
 	Maybe add sorting of roman numerals? 
+		https://gist.github.com/julienhaversano/9197588
 	
 	Show in tag edit window when a file doesn't support a particular tag type
 	

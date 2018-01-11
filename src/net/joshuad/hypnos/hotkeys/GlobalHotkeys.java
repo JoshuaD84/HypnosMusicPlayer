@@ -56,6 +56,15 @@ public class GlobalHotkeys implements NativeKeyListener {
 	
 	private EnumMap <Hotkey, KeyState> hotkeyMap = new EnumMap <Hotkey, KeyState> ( Hotkey.class );
 	
+	transient private boolean hasUnsavedData = false;
+	
+	public boolean hasUnsavedData() {
+		return hasUnsavedData;
+	}
+	
+	public void setHasUnsavedData( boolean b ) {
+		hasUnsavedData = b;
+	}
 	
 	public static GlobalHotkeys start() {
 		GlobalHotkeys hotkeys;
@@ -117,6 +126,7 @@ public class GlobalHotkeys implements NativeKeyListener {
 		lastKeyState.setDisplay ( display );
 		
 		hotkeyMap.put( hotkey, lastKeyState );
+		hasUnsavedData = true;
 		
 		return true;
 	}
@@ -124,6 +134,7 @@ public class GlobalHotkeys implements NativeKeyListener {
 	public void clearHotkey ( Hotkey key ) {
 		if ( key == null ) return;
 		hotkeyMap.remove( key );
+		hasUnsavedData = true;
 	}
 	
 	public String getDisplay ( Hotkey hotkey ) {

@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
@@ -61,6 +62,7 @@ public class Library {
 	final SortedList <TagError> tagErrorsSorted = new SortedList <TagError>( tagErrorsFiltered );
 	
 	final ObservableList <Path> musicSourcePaths = FXCollections.observableArrayList();
+	private boolean sourcesHaveUnsavedData = false;
 	
 	Vector <Album> albumsToAdd = new Vector <Album>();
 	Vector <Album> albumsToRemove = new Vector <Album>();
@@ -95,6 +97,18 @@ public class Library {
 				Hypnos.getUI().notifyUserError( message );
 			}
 		}
+		
+		musicSourcePaths.addListener( (ListChangeListener.Change<? extends Path> change) -> {
+			sourcesHaveUnsavedData = true;			
+		});
+	}
+	
+	public boolean sourcesHasUnsavedData() {
+		return sourcesHaveUnsavedData;
+	}
+	
+	public void setSourcesHasUnsavedData( boolean b ) {
+		sourcesHaveUnsavedData = b;
 	}
 
 	public void startLoader( Persister persister ) {
@@ -118,7 +132,6 @@ public class Library {
 						
 					} else if ( !sourceToUpdate.isEmpty() ) {
 						updateOneSource();
-						albumTrackDataChangedSinceLastSave = true;
 						
 					} else if ( purgeOrphansAndMissing && albumsToRemove.isEmpty() && tracksToRemove.isEmpty() ) {
 						boolean missingFiles = purgeMissingFiles();
@@ -144,8 +157,11 @@ public class Library {
 						persister.saveQueue();
 						persister.saveHistory();
 						persister.saveLibraryPlaylists();
-						persister.saveSettings();
 						persister.saveHotkeys();
+
+						//there's no easy way to check if settings changed right now, so we just don't bother
+						//it's not a big deal if they are lost. 
+						//persister.saveSettings(); 
 						
 						lastSaveTime = System.currentTimeMillis();
 					}
