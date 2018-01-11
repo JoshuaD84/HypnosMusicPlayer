@@ -811,6 +811,22 @@ public class FXUI implements PlayerListener {
 			}
 		});
 	}
+	
+	public void openFileNatively ( Path logFileBackup ) {
+		// PENDING: This is the better way once openjdk and openjfx supports it:
+		// getHostServices().showDocument(file.toURI().toString());
+				
+		SwingUtilities.invokeLater( new Runnable() {
+			public void run () {
+				try {
+					Desktop.getDesktop().open( logFileBackup.toFile() );
+				} catch ( IOException e ) {
+					//TODO: Notify user
+					LOGGER.log( Level.INFO, "Unable to open native file viewer.", e );
+				}
+			}
+		});
+	}
 
 	private void hackTooltipStartTiming() {
 	    try {

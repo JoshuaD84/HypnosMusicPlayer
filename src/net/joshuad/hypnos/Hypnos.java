@@ -130,7 +130,7 @@ public class Hypnos extends Application {
 	private static String buildDate;
 	private static Path rootDirectory;
 	private static Path configDirectory;
-	private static Path logFile;
+	private static Path logFile, logFileBackup, logFileBackup2;
 	private static boolean isStandalone = false;
 	private static boolean isDeveloping = false;
 	private static boolean globalHotkeysDisabled = false;
@@ -209,6 +209,10 @@ public class Hypnos extends Application {
 	
 	public static Path getLogFile() {
 		return logFile;
+	}
+	
+	public static Path getLogFileBackup() {
+		return logFileBackup;
 	}
 	
 	public static Persister getPersister() {
@@ -448,8 +452,8 @@ public class Hypnos extends Application {
 	
 	private void setupLogFile() {
 		logFile = configDirectory.resolve( "hypnos.log" );
-		Path logFileBackup = configDirectory.resolve( "hypnos.log.1" );
-		Path logFileBackup2 = configDirectory.resolve( "hypnos.log.2" );
+		logFileBackup = configDirectory.resolve( "hypnos.log.1" );
+		logFileBackup2 = configDirectory.resolve( "hypnos.log.2" );
 		
 		if ( Files.exists( logFileBackup ) ) {
 			try {

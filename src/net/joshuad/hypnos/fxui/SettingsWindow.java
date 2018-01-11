@@ -142,10 +142,10 @@ public class SettingsWindow extends Stage {
 		tabPane = new TabPane();
 		
 		Tab settingsTab = setupSettingsTab( root, ui );
-		globalHotkeysTab = setupGlobalHotkeysTab ( root );
-		Tab hotkeysTab = setupHotkeysTab ( root );
+		globalHotkeysTab = setupGlobalHotkeysTab( root );
+		Tab hotkeysTab = setupHotkeysTab( root );
 		Tab logTab = setupLogTab( root );
-		Tab tagTab = setupTagTab ( root );
+		Tab tagTab = setupTagTab( root );
 		Tab aboutTab = setupAboutTab( root ); 
 		
 		tabPane.getTabs().addAll( settingsTab, hotkeysTab, globalHotkeysTab, logTab, tagTab, aboutTab );
@@ -153,7 +153,6 @@ public class SettingsWindow extends Stage {
 		tabPane.prefWidthProperty().bind( root.widthProperty() );
 		tabPane.prefHeightProperty().bind( root.heightProperty() );
 
-		
 		VBox primaryPane = new VBox();
 		primaryPane.getChildren().addAll( tabPane );
 		root.getChildren().add( primaryPane );
@@ -742,10 +741,10 @@ public class SettingsWindow extends Stage {
 		VBox logPane = new VBox();
 		logTab.setContent( logPane );
 		logPane.setAlignment( Pos.CENTER );
-		logPane.setPadding( new Insets ( 10 ) );
+		logPane.setPadding( new Insets( 10 ) );
 		
-		Label headerLabel = new Label ( "Error Log" );
-		headerLabel.setPadding( new Insets ( 0, 0, 10, 0 ) );
+		Label headerLabel = new Label( "Error Log" );
+		headerLabel.setPadding( new Insets( 0, 0, 10, 0 ) );
 		headerLabel.setWrapText( true );
 		headerLabel.setTextAlignment( TextAlignment.CENTER );
 		headerLabel.setStyle( "-fx-font-size: 20px; -fx-font-weight: bold" );
@@ -758,6 +757,7 @@ public class SettingsWindow extends Stage {
 		
 		Thread logReader = new Thread( () -> {
 			try ( 
+				//TODO: don't call hypnos directly
 				BufferedReader reader = new BufferedReader( new FileReader( Hypnos.getLogFile().toFile() ) ); 
 			){
 				while ( true ) {
@@ -781,7 +781,6 @@ public class SettingsWindow extends Stage {
 		logReader.setName( "Log UI Text Loader" );
 		logReader.setDaemon( true );
 		logReader.start();
-		
 		
 		Button exportButton = new Button ( "Export Log File" );
 		
@@ -809,13 +808,17 @@ public class SettingsWindow extends Stage {
 				LOGGER.log( Level.WARNING, "Unable to export log file.", ex );
 			}
 		});
-			
-		HBox exportBox = new HBox();
-		exportBox.setAlignment( Pos.TOP_CENTER );
-		exportBox.getChildren().add ( exportButton );
-		exportBox.setPadding( new Insets ( 5, 0, 0, 0 ) );
 		
-		logPane.getChildren().addAll( logView, exportBox );
+		Button previousLog = new Button ( "View Last Log" );
+		//TODO: don't call hypnos directly
+		previousLog.setOnAction( e -> ui.openFileNatively ( Hypnos.getLogFileBackup() ) );
+			
+		HBox controlBox = new HBox();
+		controlBox.setAlignment( Pos.TOP_CENTER );
+		controlBox.getChildren().addAll( exportButton, previousLog );
+		controlBox.setPadding( new Insets ( 5, 0, 0, 0 ) );
+		
+		logPane.getChildren().addAll( logView, controlBox );
 		
 		return logTab;
 	}

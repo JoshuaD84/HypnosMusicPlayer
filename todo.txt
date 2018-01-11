@@ -9,6 +9,8 @@ Now:
 		Calling commandline switches at the appimage exits before output is printed. Kinda lame
 		
 General
+	Allow each playlist to specify their sort order
+	
 	Add tabs in setting window (log tab) to show previous two logs as well. 
 
 	I emptied the current list and library and playing track, and the art stayed. probably good to get rid of that
