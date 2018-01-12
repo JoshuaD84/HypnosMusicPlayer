@@ -1,4 +1,14 @@
 Now:
+   Windows - Global hotkeys don't show in settings tab until you try to set one, then they all appear
+
+   Windows - You can replace the hex version of "javaw.exe" with "hypno.exe" to get a reasonable-named process
+
+   Windows - Select Multiple Files - No Option to play in Hypnos. Add that
+
+   When you press 1-2-3 or ctrl-1-2-3, select the find box. maybe no need for ctrl + f
+
+   Start playing when a track or tracks are loaded from socket
+
 	CLI Issues
 		Select Multiple Files in File Browser, Right click, open with Hypnos -
 			Not all the tracks appear on the current list, and it doesn't start playing the first one
@@ -7,17 +17,6 @@ Now:
 		When loading files from the commandline and you give a relative path, it assumes its relative to hypnos's directory, not the user.
 	
 		Calling commandline switches at the appimage exits before output is printed. Kinda lame
-		
-	Improve performance and load time
-		Don't write stuff to disk unless it has been changed.
-			Playlists - done
-			settings - Workaround
-			queue - fixed
-			history - fixed
-			current list - fixed
-			data - already good
-			sources
-			hotkeys - fixed
 		
 	Export playlist as a folder
 		Copy all of the music files into that folder. Prepend them with index number? 
@@ -82,7 +81,9 @@ General
 		
 		Maybe allow a filter for file type and lossy vs not lossy
 			Maybe just a special search text "type:mp3", "type:lossy"
-			I dunno making search box script is alot. 	
+			I dunno making search box script is alot. 
+		
+		Give user feedback about the disk scanner and the abiliyt to control it	
 	
 	Drag and drop from misc places to system
 		playlist table -> m3u
@@ -191,7 +192,7 @@ General
       Apparently it can be done with hotspot jvm. Need to research
 
 	Windows - Volume takes a split second to change.
-      https://stackoverflow.com/questions/48183626/delay-when-changing-audio-volume-on-windows
+  g   https://stackoverflow.com/questions/48183626/delay-when-changing-audio-volume-on-windows
       I also posted a bug report
 
 	Review and include this answer
@@ -320,13 +321,17 @@ General
 	
 Key Testing before next release:
 	Make sure browse button still works in various systems. I changed FXUI.openFileBrowser -- Desktop.getDesktop().open() to .browse()
-	
+      Ok in windows
+
 	Try deleting settings and seeing if the UI lays out properly
-	
+      Ok in windows
+
 	Try resetting tables to defaults manually
-	
+      Ok windows
+      
 	Try out the throttled table filters on different sytems, see if stuff breaks
-	
+      Seems OK windows
+
 	Test the CLI
 	
 	Settings load and load appearance
