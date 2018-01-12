@@ -1670,18 +1670,21 @@ public class LibraryTabPane extends StretchedTabPane {
 		if ( addSourcePlaylistsImage != null ) addSourcePlaylistsImage.setEffect( null );
 	}
 
-	public void focusTopOfCurrentTable () {
+	public void focusFilterOfCurrentTab () {
 		if( getSelectionModel().getSelectedItem() == albumTab ) {
 			albumTable.requestFocus();
-			albumTable.getSelectionModel().select( albumTable.getSelectionModel().getFocusedIndex() );
+			albumFilterBox.requestFocus();
+			albumTable.getSelectionModel().clearSelection();
 			
 		} else if( getSelectionModel().getSelectedItem() == trackTab ) {
 			trackTable.requestFocus();
-			trackTable.getSelectionModel().select( trackTable.getSelectionModel().getFocusedIndex() );
+			trackFilterBox.requestFocus();
+			trackTable.getSelectionModel().clearSelection();
 			
 		} else if( getSelectionModel().getSelectedItem() == playlistTab ) {
 			playlistTable.requestFocus();
-			playlistTable.getSelectionModel().select( playlistTable.getSelectionModel().getFocusedIndex() );
+			playlistFilterBox.requestFocus();
+			playlistTable.getSelectionModel().clearSelection();
 		}
 	}
 

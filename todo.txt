@@ -5,8 +5,6 @@ Now:
 
    Windows - Select Multiple Files - No Option to play in Hypnos. Add that
 
-   When you press 1-2-3 or ctrl-1-2-3, select the find box. maybe no need for ctrl + f
-
    Start playing when a track or tracks are loaded from socket
 
 	CLI Issues

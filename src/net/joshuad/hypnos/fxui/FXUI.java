@@ -238,25 +238,6 @@ public class FXUI implements PlayerListener {
 				e.consume();
 				currentListPane.currentListSave.fire();
 
-			} else if ( e.getCode() == KeyCode.F && e.isControlDown() 
-			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				e.consume();
-				Tab currentLibraryTab = libraryPane.getSelectionModel().getSelectedItem();
-
-				if ( libraryPane.albumTab == currentLibraryTab ) {
-					libraryPane.albumFilterBox.requestFocus();
-					libraryPane.albumTable.getSelectionModel().clearSelection();
-
-				} else if ( libraryPane.trackTab == currentLibraryTab ) {
-					libraryPane.trackFilterBox.requestFocus();
-					libraryPane.trackTable.getSelectionModel().clearSelection();
-
-				} else if ( libraryPane.playlistTab == currentLibraryTab ) {
-					libraryPane.playlistFilterBox.requestFocus();
-					libraryPane.playlistTable.getSelectionModel().clearSelection();
-				}
-
-
 			} else if ( e.getCode() == KeyCode.E && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
@@ -276,22 +257,22 @@ public class FXUI implements PlayerListener {
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
 				libraryPane.getSelectionModel().select( 0 );
-				Platform.runLater( () -> libraryPane.focusTopOfCurrentTable() );
+				Platform.runLater( () -> libraryPane.focusFilterOfCurrentTab() );
 
 			} else if ( e.getCode() == KeyCode.DIGIT2 /* With or without control */
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
 				libraryPane.getSelectionModel().select( 1 );
-				Platform.runLater( () -> libraryPane.focusTopOfCurrentTable() );
+				Platform.runLater( () -> libraryPane.focusFilterOfCurrentTab() );
 	
 			} else if ( e.getCode() == KeyCode.DIGIT3 /* With or without control */
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
 				libraryPane.getSelectionModel().select( 2 );
-				Platform.runLater( () -> libraryPane.focusTopOfCurrentTable() );
+				Platform.runLater( () -> libraryPane.focusFilterOfCurrentTab() );
 				
-			} else if ( e.getCode() == KeyCode.F
-			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+			} else if ( e.getCode() == KeyCode.F /* With or without control */
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
 				//We put it in runlater to keep the key from being passed down to the filter box
 				Platform.runLater( () -> {

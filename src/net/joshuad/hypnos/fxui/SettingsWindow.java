@@ -1255,8 +1255,6 @@ public class SettingsWindow extends Stage {
 		"    Volume Up                                Numpad 9\n" +
 		"    Toggle Shuffle Mode                      S\n" +	
 		"    Toggle Repeat Mode                       R\n" +
-		"    Search the Current List                  F\n" +
-		"    Search the Library                       Ctrl + F\n" +
 		"    Show Lyrics on Current Track             Shift + L\n" +
 		"    Toggle Library Collapsed                 Ctrl + L\n" +
 		"    Toggle Artwork Collapsed                 Ctrl + ;\n" +
@@ -1266,9 +1264,10 @@ public class SettingsWindow extends Stage {
 		"    Save Current List as Playlist            Ctrl + S\n" +	
 		"    Open files                               Ctrl + O\n" +
 		"    Export Current List as Playlist          Ctrl + E\n" +	
-		"    Select the First Tab in Library          1 or Ctrl + 1\n" +
-		"    Select the Second Tab in Library         2 or Ctrl + 2\n" +
-		"    Select the Third Tab in Library          3 or Ctrl + 3\n" +							
+		"    Search the Current List                  F or Ctrl + F\n" +
+		"    Search the First Tab in Library          1 or Ctrl + 1\n" +
+		"    Search the Second Tab in Library         2 or Ctrl + 2\n" +
+		"    Search the Third Tab in Library          3 or Ctrl + 3\n" +							
 		"\n" +
 		"Playlists, Albums, Tracks\n" +
 		"    Queue Item                               Q\n" + 	 					
