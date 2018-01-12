@@ -1,12 +1,11 @@
 Now:
-   Windows - Global hotkeys don't show in settings tab until you try to set one, then they all appear
+	Windows - Global hotkeys don't show in settings tab until you try to set one, then they all appear
 
-   Windows - You can replace the hex version of "javaw.exe" with "hypno.exe" to get a reasonable-named process
+	Windows - You can replace the hex version of "javaw.exe" with "hypno.exe" to get a reasonable-named process
+		Make it so launch4j doesn't persist. 
 
-   Windows - Select Multiple Files - No Option to play in Hypnos. Add that
-
-   Start playing when a track or tracks are loaded from socket
-
+	Windows - Select Multiple Files in explorer - No Option to play in Hypnos. Add that
+  
 	CLI Issues
 		Select Multiple Files in File Browser, Right click, open with Hypnos -
 			Not all the tracks appear on the current list, and it doesn't start playing the first one
@@ -19,6 +18,10 @@ Now:
 	Export playlist as a folder
 		Copy all of the music files into that folder. Prepend them with index number? 
 		Warn if the total copy is larger than X MB or more than X tracks
+		
+	If the user drag and drops on the current list, set the current order to what the sorted order, get rid of sort column rules
+	
+	Album Default Sort Order not applying correctly. 
 	
 General
 	Marketa Irglova Album -- keeps doing that, then ui crashes
@@ -333,5 +336,7 @@ Key Testing before next release:
 	Test the CLI
 	
 	Settings load and load appearance
+	
+	Start playing when a track or tracks are loaded from socket
 	
 	

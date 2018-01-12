@@ -100,15 +100,10 @@ public class CurrentListPane extends BorderPane {
 	AudioSystem audioSystem;
 	Library library;
 	
-	final FilteredList <CurrentListTrack> currentListFiltered;
-	final SortedList <CurrentListTrack> currentListSorted;
-	
 	public CurrentListPane( FXUI ui, AudioSystem audioSystem, Library library ) {
 		this.ui = ui;
 		this.audioSystem = audioSystem;
 		this.library = library;
-		currentListFiltered = new FilteredList <CurrentListTrack> ( audioSystem.getCurrentList().getItems(), p -> true );
-		currentListSorted = new SortedList <CurrentListTrack>( currentListFiltered );
 		
 		loadImages();
 		setupTable();
@@ -398,7 +393,7 @@ public class CurrentListPane extends BorderPane {
 			}
 		});
 		
-		currentListTableFilter = new ThrottledTrackFilter ( currentListFiltered );
+		currentListTableFilter = new ThrottledTrackFilter ( audioSystem.getCurrentList().getFilteredItems() );
 		
 		infoLabelAndFilter.textProperty().addListener( new ChangeListener <String> () {
 			@Override
@@ -669,8 +664,8 @@ public class CurrentListPane extends BorderPane {
 		currentListTable.getColumns().addAll( playingColumn, numberColumn, artistColumn,
 			yearColumn, albumColumn, titleColumn, lengthColumn );
 		currentListTable.setEditable( false );
-		currentListTable.setItems( currentListSorted );
-		currentListSorted.comparatorProperty().bind( currentListTable.comparatorProperty() );
+		currentListTable.setItems( audioSystem.getCurrentList().getSortedItems() );
+		audioSystem.getCurrentList().getSortedItems().comparatorProperty().bind( currentListTable.comparatorProperty() );
 		
 		HypnosResizePolicy resizePolicy = new HypnosResizePolicy();
 		currentListTable.setColumnResizePolicy( resizePolicy );

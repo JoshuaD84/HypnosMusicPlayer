@@ -617,6 +617,8 @@ public class Hypnos extends Application {
 				if ( newList.size() > 0 ) {
 					Platform.runLater( () -> {
 						audioSystem.getCurrentList().setTracksPathList( newList );
+						audioSystem.next();
+						audioSystem.play();
 					});
 				}
 			}

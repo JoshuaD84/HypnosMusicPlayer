@@ -190,11 +190,13 @@ public class AudioSystem {
 	}
 	
 	public void next ( boolean startPaused ) {
+		
+		List <CurrentListTrack> items = currentList.getSortedItems();
 
 		if ( queue.hasNext() ) {
 			playTrack( queue.getNextTrack(), startPaused );
 			
-		} else if ( currentList.getItems().size() == 0 ) {
+		} else if ( items.size() == 0 ) {
 			stop ( StopReason.EMPTY_LIST );
 			return;
 			
@@ -202,7 +204,7 @@ public class AudioSystem {
 			playTrack ( history.getLastTrack() );
 
 		} else if ( shuffleMode == ShuffleMode.SEQUENTIAL ) {
-			ListIterator <CurrentListTrack> currentListIterator = currentList.getItems().listIterator();
+			ListIterator <CurrentListTrack> currentListIterator = items.listIterator();
 			boolean didSomething = false;
 			
 			while ( currentListIterator.hasNext() ) {
@@ -216,12 +218,12 @@ public class AudioSystem {
 						stop( StopReason.END_OF_CURRENT_LIST );
 						didSomething = true;
 					
-					} else if ( currentList.getItems().size() <= 0 ) {
+					} else if ( items.size() <= 0 ) {
 						stop( StopReason.EMPTY_LIST );
 						didSomething = true;
 
-					} else if ( repeatMode == RepeatMode.REPEAT && currentList.getItems().size() > 0 ) {
-						playTrack( currentList.getItems().get( 0 ), startPaused );
+					} else if ( repeatMode == RepeatMode.REPEAT && items.size() > 0 ) {
+						playTrack( items.get( 0 ), startPaused );
 						didSomething = true;
 					}
 					
@@ -229,8 +231,8 @@ public class AudioSystem {
 				}
 			}
 			if ( !didSomething ) {
-				if ( currentList.getItems().size() > 0 ) {
-					playTrack ( currentList.getItems().get( 0 ), startPaused );
+				if ( items.size() > 0 ) {
+					playTrack ( items.get( 0 ), startPaused );
 				}
 			}
 			
@@ -239,7 +241,7 @@ public class AudioSystem {
 				
 				shuffleTracksPlayedCounter = 1;
 				// TODO: Ban the most recent X tracks from playing
-				int currentListSize = currentList.getItems().size();
+				int currentListSize = items.size();
 				int collisionWindowSize = currentListSize / 3; // TODO: Fine tune this amount
 				int permittedRetries = 3; // TODO: fine tune this number
 	
@@ -256,7 +258,7 @@ public class AudioSystem {
 				}
 	
 				do {
-					playMe = currentList.getItems().get( randomGenerator.nextInt( currentList.getItems().size() ) );
+					playMe = items.get( randomGenerator.nextInt( items.size() ) );
 					if ( !collisionWindow.contains( playMe ) ) {
 						foundMatch = true;
 					} else {
@@ -267,9 +269,9 @@ public class AudioSystem {
 				playTrack( playMe, startPaused );
 				
 			} else {
-				if ( shuffleTracksPlayedCounter < currentList.getItems().size() ) {
+				if ( shuffleTracksPlayedCounter < items.size() ) {
 					List <Track> alreadyPlayed = previousStack.subList( 0, shuffleTracksPlayedCounter );
-					ArrayList <Track> viableTracks = new ArrayList <Track>( currentList.getItems() );
+					ArrayList <Track> viableTracks = new ArrayList <Track>( items );
 					viableTracks.removeAll( alreadyPlayed );
 					Track playMe = viableTracks.get( randomGenerator.nextInt( viableTracks.size() ) );
 					playTrack( playMe, startPaused );
@@ -280,8 +282,7 @@ public class AudioSystem {
 			} 
 		}
 	}
-	
-	
+		
 	public int getCurrentTrackIndex() {
 		for ( int k = 0 ; k < currentList.getItems().size(); k++ ) {
 			if ( currentList.getItems().get( k ).getIsCurrentTrack() ) {
@@ -610,7 +611,7 @@ public class AudioSystem {
 
 			consecutiveFailedToStartCount++;
 			
-			if ( consecutiveFailedToStartCount <= currentList.getItems().size() ) {
+			if ( consecutiveFailedToStartCount <= currentList.getSortedItems().size() ) {
 				next ( false );
 			} 
 		}

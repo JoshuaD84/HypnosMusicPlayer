@@ -15,6 +15,8 @@ import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
@@ -56,6 +58,8 @@ public class CurrentList {
 	Playlist currentPlaylist;
 	
 	private final ObservableList <CurrentListTrack> items = FXCollections.observableArrayList(); 
+	private final FilteredList <CurrentListTrack> currentListFiltered = new FilteredList <CurrentListTrack>( items, p -> true );
+	private final SortedList <CurrentListTrack> currentListSorted = new SortedList <CurrentListTrack>( currentListFiltered );
 	
 	private final List <CurrentListListener> listeners = new ArrayList<CurrentListListener> ();
 	
@@ -1007,5 +1011,13 @@ public class CurrentList {
 		audioSystem.next( false );
 		//Hypnos.getLibrary().albumsToUpdate.addAll( playlists );  //TODO: update the playlist from disc?
 		
+	}
+
+	public FilteredList <CurrentListTrack> getFilteredItems () {
+		return currentListFiltered;
+	}
+	
+	public SortedList <CurrentListTrack> getSortedItems () {
+		return currentListSorted;
 	}
 }
