@@ -148,7 +148,12 @@
 		<mkdir dir="${temp}/Hypnos/" />
 		
 		<launch4j jarPath="${jarFile}" configFile="${packaging}/l4j-hypnos.xml" outfile="${temp}/Hypnos/Hypnos.exe" />
-				
+			
+		<exec executable="${packaging}/editl4jjavaw.sh">
+			<arg value="${temp}/Hypnos/Hypnos.exe" />
+			<arg value="${temp}" />
+		</exec>
+		
 		<copy todir="${temp}/Hypnos/" >
 			<fileset dir="stage" >
 				<exclude name="**/config/**" />
@@ -186,7 +191,6 @@
 		<copy todir="${temp}/Hypnos.app/Contents/Hypnos/jre" >
 			<fileset dir="packaging/jres/osx" />
 		</copy>
-		
 		
 		<tar destfile="${dist}/hypnos-osx-${version-simple}_${TODAY}_b${build.number}.tgz" longfile="gnu" compression="gzip">
 

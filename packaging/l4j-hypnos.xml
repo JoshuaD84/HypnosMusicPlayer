@@ -8,7 +8,7 @@
   <priority>normal</priority>
   <downloadUrl>http://java.com/download</downloadUrl>
   <supportUrl></supportUrl>
-  <stayAlive>true</stayAlive>
+  <stayAlive>false</stayAlive>
   <manifest></manifest>
   <icon>icon.ico</icon>
   <classPath>
