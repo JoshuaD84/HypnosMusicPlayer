@@ -239,6 +239,11 @@ public class FXUI implements PlayerListener {
 				e.consume();
 				currentListPane.saveMenuItem.fire();
 
+			} else if ( e.getCode() == KeyCode.W && !e.isControlDown()  //TODO: DELETE THSI
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				e.consume();
+				currentListPane.currentListTable.getSortOrder().clear();
+				
 			} else if ( e.getCode() == KeyCode.E && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();

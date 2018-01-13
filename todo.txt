@@ -15,11 +15,10 @@ Now:
 	
 		Calling commandline switches at the appimage exits before output is printed. Kinda lame
 		
-	If the user drag and drops from / on the current list, set the current order to what the sorted order, get rid of sort column rules
-	
 	Album Default Sort Order not applying correctly. 
 	
 	New playlists not being saved.
+		Josh Radio was lost somehow
 	
 General
 	Allow each playlist to specify their sort order

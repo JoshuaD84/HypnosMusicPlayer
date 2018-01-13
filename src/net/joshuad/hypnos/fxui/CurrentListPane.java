@@ -714,16 +714,25 @@ public class CurrentListPane extends BorderPane {
 					case PLAYLIST_INFO:
 					case TAG_ERROR_LIST:
 					case HISTORY: {
-						audioSystem.getCurrentList().appendTracks ( container.getTracks() );
+						List <Track> tracks = container.getTracks();
+						if ( tracks.size() > 0 ) {
+							audioSystem.getCurrentList().setItemsToSortedOrder();
+							currentListTable.getSortOrder().clear();
+							audioSystem.getCurrentList().appendTracks( tracks );
+						}
 					
 					} break;
 
 					case PLAYLIST_LIST: {
-						audioSystem.getCurrentList().appendPlaylists ( container.getPlaylists() );
+						audioSystem.getCurrentList().setItemsToSortedOrder();
+						currentListTable.getSortOrder().clear();
+						audioSystem.getCurrentList().appendPlaylists( container.getPlaylists() );
 						
 					} break;
 					
 					case ALBUM_LIST: {
+						audioSystem.getCurrentList().setItemsToSortedOrder();
+						currentListTable.getSortOrder().clear();
 						audioSystem.getCurrentList().appendAlbums ( container.getAlbums() );
 					} break;
 					
@@ -749,6 +758,9 @@ public class CurrentListPane extends BorderPane {
 									}
 								}
 							}
+
+							audioSystem.getCurrentList().setItemsToSortedOrder();
+							currentListTable.getSortOrder().clear();
 							audioSystem.getCurrentList().appendTracks( tracksToCopy );
 						}
 						
@@ -777,6 +789,8 @@ public class CurrentListPane extends BorderPane {
 				}
 				
 				if ( !tracksToAdd.isEmpty() ) {
+					audioSystem.getCurrentList().setItemsToSortedOrder();
+					currentListTable.getSortOrder().clear();
 					audioSystem.getCurrentList().insertTrackPathList ( 0, tracksToAdd );
 				}
 
@@ -1039,6 +1053,8 @@ public class CurrentListPane extends BorderPane {
 					
 					switch ( container.getSource() ) {
 						case ALBUM_LIST: {
+							audioSystem.getCurrentList().setItemsToSortedOrder();
+							currentListTable.getSortOrder().clear();
 							audioSystem.getCurrentList().insertAlbums( dropIndex, container.getAlbums() );
 						} break;
 						
@@ -1048,10 +1064,14 @@ public class CurrentListPane extends BorderPane {
 						case PLAYLIST_INFO:
 						case TAG_ERROR_LIST:
 						case HISTORY: {
+							audioSystem.getCurrentList().setItemsToSortedOrder();
+							currentListTable.getSortOrder().clear();
 							audioSystem.getCurrentList().insertTracks( dropIndex, Utils.convertTrackList( container.getTracks() ) );
 						} break;
 						
 						case CURRENT_LIST: {
+							audioSystem.getCurrentList().setItemsToSortedOrder();
+							currentListTable.getSortOrder().clear();
 							List<Integer> draggedIndices = container.getIndices();
 							
 							audioSystem.getCurrentList().moveTracks ( draggedIndices, dropIndex );
@@ -1083,6 +1103,8 @@ public class CurrentListPane extends BorderPane {
 										}
 									}
 								}
+								audioSystem.getCurrentList().setItemsToSortedOrder();
+								currentListTable.getSortOrder().clear();
 								audioSystem.getCurrentList().insertTracks ( dropIndex, tracksToCopy );
 							}
 							
@@ -1112,6 +1134,8 @@ public class CurrentListPane extends BorderPane {
 					}
 					
 					if ( !tracksToAdd.isEmpty() ) {
+						audioSystem.getCurrentList().setItemsToSortedOrder();
+						currentListTable.getSortOrder().clear();
 						int dropIndex = row.isEmpty() ? dropIndex = currentListTable.getItems().size() : row.getIndex();
 						audioSystem.getCurrentList().insertTrackPathList ( dropIndex, tracksToAdd );
 					}

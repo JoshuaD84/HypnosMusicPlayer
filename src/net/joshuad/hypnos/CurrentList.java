@@ -1032,4 +1032,8 @@ public class CurrentList {
 		
 		return currentListSortedNoFilter;
 	}
+	
+	public void setItemsToSortedOrder() {
+		items.setAll( new ArrayList<CurrentListTrack> ( currentListSorted ) );
+	}
 }
