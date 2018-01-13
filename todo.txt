@@ -15,13 +15,11 @@ Now:
 	
 		Calling commandline switches at the appimage exits before output is printed. Kinda lame
 		
-	Export playlist as a folder
-		Copy all of the music files into that folder. Prepend them with index number? 
-		Warn if the total copy is larger than X MB or more than X tracks
-		
 	If the user drag and drops from / on the current list, set the current order to what the sorted order, get rid of sort column rules
 	
 	Album Default Sort Order not applying correctly. 
+	
+	New playlists not being saved.
 	
 General
 	Allow each playlist to specify their sort order

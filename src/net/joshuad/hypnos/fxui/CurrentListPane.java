@@ -3,6 +3,7 @@ package net.joshuad.hypnos.fxui;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -80,7 +81,7 @@ public class CurrentListPane extends BorderPane {
 	
 	Button toggleRepeatButton, toggleShuffleButton;
 	Button showQueueButton;
-	MenuItem currentListSave, currentListExport, currentListLoad, historyMenuItem;
+	MenuItem saveMenuItem, exportToM3U, exportToFolder, loadMenuItem, historyMenuItem;
 	MenuItem playMenuItem, playNextMenuItem, queueMenuItem, editTagMenuItem, infoMenuItem;
 	MenuItem lyricsMenuItem, cropMenuItem, removeMenuItem, browseMenuItem, addToPlaylistMenuItem;
 	
@@ -460,9 +461,10 @@ public class CurrentListPane extends BorderPane {
 		currentListMenu.setTooltip ( new Tooltip ( "Current List Controls" ) );
 		currentListMenu.setGraphic ( menuImage );
 		MenuItem currentListClear = new MenuItem ( "Clear" );
-		currentListSave = new MenuItem ( "Save" );
-		currentListExport = new MenuItem ( "Export" );
-		currentListLoad = new MenuItem ( "Load Files" );
+		saveMenuItem = new MenuItem ( "Save" );
+		exportToM3U = new MenuItem ( "Export as M3U" );
+		exportToFolder = new MenuItem ( "Export as Folder" );
+		loadMenuItem = new MenuItem ( "Load Files" );
 		historyMenuItem = new MenuItem ( "History" );
 		MenuItem currentListShuffle = new MenuItem ( "Shuffle" );
 		MenuItem searchMenuItem = new MenuItem ( "Search" );
@@ -480,7 +482,7 @@ public class CurrentListPane extends BorderPane {
 			}
 		});
 		
-		currentListSave.setOnAction( new EventHandler <ActionEvent>() {
+		saveMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
 				ui.promptAndSavePlaylist( new ArrayList <Track>( audioSystem.getCurrentList().getItems() ) );
@@ -501,7 +503,7 @@ public class CurrentListPane extends BorderPane {
 			}
 		});
 		
-		currentListLoad.setOnAction( new EventHandler <ActionEvent>() {
+		loadMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
 				FileChooser fileChooser = new FileChooser();
@@ -530,7 +532,7 @@ public class CurrentListPane extends BorderPane {
 			}
 		});
 		
-		currentListExport.setOnAction( ( ActionEvent e ) -> {
+		exportToM3U.setOnAction( ( ActionEvent e ) -> {
 			File targetFile = ui.promptUserForPlaylistFile();
 			if ( targetFile == null ) {
 				return;
@@ -568,12 +570,24 @@ public class CurrentListPane extends BorderPane {
 			}
 		});
 		
+		exportToFolder.setOnAction( ( ActionEvent e ) -> {
+			File targetFile = ui.promptUserForFolder();
+			if ( targetFile == null ) {
+				return;
+			}
+			
+			List<CurrentListTrack> tracks = audioSystem.getCurrentList().getSortedItemsNoFilter();
+			
+			//TODO: Get rid of Hypnos.get
+			Hypnos.getPersister().exportTracksToFolder ( tracks, targetFile.toPath() );
+		});
+		
 		searchMenuItem.setOnAction( ( ActionEvent e ) -> {
 			infoLabelAndFilter.beginEditing();
 		});
 		
 		currentListMenu.getItems().addAll ( currentListClear, currentListShuffle, searchMenuItem, 
-			currentListExport, currentListSave, currentListLoad, historyMenuItem );
+			exportToM3U, exportToFolder, saveMenuItem, loadMenuItem, historyMenuItem );
 		
 		currentListControls.getChildren().addAll( toggleShuffleButton, toggleRepeatButton, showQueueButton,
 				infoLabelAndFilter, currentListLength, currentListMenu );

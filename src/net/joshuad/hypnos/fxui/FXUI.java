@@ -62,6 +62,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -236,17 +237,17 @@ public class FXUI implements PlayerListener {
 			if ( e.getCode() == KeyCode.S && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
-				currentListPane.currentListSave.fire();
+				currentListPane.saveMenuItem.fire();
 
 			} else if ( e.getCode() == KeyCode.E && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
-				currentListPane.currentListExport.fire();
+				currentListPane.exportToM3U.fire();
 
 			} else if ( e.getCode() == KeyCode.O && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
-				currentListPane.currentListLoad.fire();
+				currentListPane.loadMenuItem.fire();
 
 			} else if ( e.getCode() == KeyCode.P && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
@@ -1439,6 +1440,12 @@ public class FXUI implements PlayerListener {
 		return targetFile;
 	}
 	
+	public File promptUserForFolder() {
+		DirectoryChooser dirChooser = new DirectoryChooser();
+		dirChooser.setTitle( "Export Playlist As Folder" );
+		File targetFile = dirChooser.showDialog( mainStage );
+		return targetFile;
+	}
 	
 	public void alertUser ( AlertType type, String title, String header, String content, double textWidth ) {
 		Alert alert = new Alert( type );

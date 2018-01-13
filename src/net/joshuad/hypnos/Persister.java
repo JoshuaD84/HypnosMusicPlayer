@@ -14,6 +14,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,11 +22,13 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import javafx.scene.control.Alert.AlertType;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.FXUI;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
@@ -407,7 +410,6 @@ public class Persister {
 			
 			try {
 				saveLibaryPlaylist ( playlist );
-				playlist.setHasUnsavedData( false );
 			} catch ( IOException e ) {
 				LOGGER.warning ( "Unable to save library playlist " + playlist.getName() + ": " + e.getMessage() );
 				errors.add( playlist );
@@ -489,6 +491,8 @@ public class Persister {
 			Files.deleteIfExists( tempFile );
 			
 		}
+
+		playlist.setHasUnsavedData( false );
 	}
 	
 	public void saveSettings ( EnumMap <Setting, ? extends Object> fromAudioSystem, EnumMap <Setting, ? extends Object> fromUI ) {
@@ -561,5 +565,38 @@ public class Persister {
 		}
 		
 		LOGGER.info ( "Some settings were read from disk but not applied:\n" + message );
+	}
+	
+	public void exportTracksToFolder ( List <? extends Track> tracks, Path targetFolder ) {
+		
+		if ( !Files.isDirectory( targetFolder ) ) {
+			ui.alertUser( AlertType.WARNING, "Unable to Copy the following files:", "Unable to Copy Files", 
+				"Destination is not a folder", 800 );
+			return;
+		}
+		
+		String error = "";
+		
+		int playlistIndex = 1;
+		for ( Track track : tracks ) {
+			String number = String.format( "%02d", playlistIndex );
+			String extension = Utils.getFileExtension( track.getPath() );
+			String name = track.getArtist() + " - " + track.getTitle();
+			Path targetOut = targetFolder.resolve( number + " - " + name + "." + extension );
+			try {
+				Files.copy(	track.getPath(), targetOut );
+			} catch ( FileAlreadyExistsException ex ) {
+				if ( !error.equals( "" ) ) error += "\n\n";
+				error += "File already exists, not overwritten: " + targetOut;
+			} catch ( IOException ex ) {
+				if ( !error.equals( "" ) ) error += "\n\n";
+				error += "Unable to save file (" + ex.getMessage() + "): " + targetOut;
+			}
+			playlistIndex++;
+		}
+		
+		if ( !error.equals( "" ) ) {
+			ui.alertUser( AlertType.WARNING, "Unable to Copy the following files:", "Unable to Copy Files", error, 800 );
+		}
 	}
 }

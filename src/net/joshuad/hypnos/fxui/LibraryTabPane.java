@@ -59,6 +59,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.TextAlignment;
 import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.AlphanumComparator;
+import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.Persister;
@@ -1335,10 +1336,11 @@ public class LibraryTabPane extends StretchedTabPane {
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem renameMenuItem = new MenuItem( "Rename" );
 		MenuItem infoMenuItem = new MenuItem( "Track List" );
-		MenuItem exportMenuItem = new MenuItem( "Export" );
+		MenuItem exportM3UMenuItem = new MenuItem( "Export as M3U" );
+		MenuItem exportFolderMenuItem = new MenuItem ( "Export as Folder" );
 		MenuItem removeMenuItem = new MenuItem( "Remove" );
 		contextMenu.getItems().addAll( playMenuItem, appendMenuItem, playNextMenuItem, enqueueMenuItem, 
-				renameMenuItem, infoMenuItem, exportMenuItem, removeMenuItem );
+				renameMenuItem, infoMenuItem, exportM3UMenuItem, exportFolderMenuItem, removeMenuItem );
 
 		playMenuItem.setOnAction( ( ActionEvent event ) -> {
 			if ( ui.okToReplaceCurrentList() ) {
@@ -1367,7 +1369,7 @@ public class LibraryTabPane extends StretchedTabPane {
 			ui.playlistInfoWindow.show();
 		});
 		
-		exportMenuItem.setOnAction( ( ActionEvent event ) -> {
+		exportM3UMenuItem.setOnAction( ( ActionEvent event ) -> {
 			File targetFile = ui.promptUserForPlaylistFile();
 			
 			if ( targetFile == null ) {
@@ -1387,6 +1389,18 @@ public class LibraryTabPane extends StretchedTabPane {
 				ui.alertUser ( AlertType.ERROR, "Warning", "Unable to save playlist.", "Unable to save the playlist to the specified location", 400 );
 			}
 			
+		});
+		
+		exportFolderMenuItem.setOnAction( ( ActionEvent event ) -> {
+			File targetFile = ui.promptUserForFolder();
+			if ( targetFile == null ) {
+				return;
+			}
+			
+			List<Track> tracks = playlistTable.getSelectionModel().getSelectedItem().getTracks();
+			
+			//TODO: Get rid of Hypnos.get
+			Hypnos.getPersister().exportTracksToFolder ( tracks, targetFile.toPath() );
 		});
 
 		removeMenuItem.setOnAction( ( ActionEvent event ) -> {
