@@ -98,7 +98,7 @@ public class FXUI implements PlayerListener {
 	SplitPane currentListSplitPane;
 	public ImagesPanel artSplitPane; //TODO: Probably make this private
 	public LibraryTabPane libraryPane; //TODO: make private
-	CurrentListPane currentListPane;
+	public CurrentListPane currentListPane; //TODO: make private 
 	
 	Image warningAlertImageSource;
 	

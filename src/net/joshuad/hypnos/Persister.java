@@ -278,7 +278,7 @@ public class Persister {
 				audioSystem.getCurrentList().setHasUnsavedData( false );
 				
 			} catch ( Exception e ) {
-				LOGGER.warning( "Unable to save library data to disk, continuing." );
+				LOGGER.log( Level.WARNING, "Unable to save current list data to disk, continuing.", e );
 			}
 		} else {
 		
@@ -298,7 +298,7 @@ public class Persister {
 				audioSystem.getCurrentList().setHasUnsavedData( false );
 				
 			} catch ( Exception e ) {
-				LOGGER.warning( "Unable to save library data to disk, continuing." );
+				LOGGER.log( Level.WARNING, "Unable to save current list data to disk, continuing.", e );
 			}
 		}
 	}

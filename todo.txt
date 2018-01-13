@@ -19,23 +19,11 @@ Now:
 		Copy all of the music files into that folder. Prepend them with index number? 
 		Warn if the total copy is larger than X MB or more than X tracks
 		
-	If the user drag and drops on the current list, set the current order to what the sorted order, get rid of sort column rules
+	If the user drag and drops from / on the current list, set the current order to what the sorted order, get rid of sort column rules
 	
 	Album Default Sort Order not applying correctly. 
 	
 General
-	Marketa Irglova Album -- keeps doing that, then ui crashes
-		Jan 11, 2018 00:02:21 AM net.joshuad.hypnos.audio.decoders.FlacDecoder playSingleFrame
-		INFO: Error reading block from flac file.
-		net.joshuad.hypnos.audio.decoders.FlacDecoderLogic$FormatException: Sync code expected
-			at net.joshuad.hypnos.audio.decoders.FlacDecoderLogic.readNextBlock(Unknown Source)
-			at net.joshuad.hypnos.audio.decoders.FlacDecoder.playSingleFrame(Unknown Source)
-			at net.joshuad.hypnos.audio.AudioPlayer.runPlayerThread(Unknown Source)
-			at net.joshuad.hypnos.audio.AudioPlayer.lambda$new$0(Unknown Source)
-			at java.lang.Thread.run(Thread.java:748)
-			
-		It didn't happen again
-
 	Allow each playlist to specify their sort order
 	
 	I emptied the current list and library and playing track, and the art stayed. probably good to get rid of that

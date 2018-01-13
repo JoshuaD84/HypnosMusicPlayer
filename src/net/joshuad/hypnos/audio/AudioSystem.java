@@ -11,6 +11,8 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import net.joshuad.hypnos.CurrentList;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.History;
@@ -191,7 +193,8 @@ public class AudioSystem {
 	
 	public void next ( boolean startPaused ) {
 		
-		List <CurrentListTrack> items = currentList.getSortedItems();
+		List<CurrentListTrack> items = currentList.getSortedItemsNoFilter();
+
 
 		if ( queue.hasNext() ) {
 			playTrack( queue.getNextTrack(), startPaused );

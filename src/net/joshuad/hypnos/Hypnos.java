@@ -696,9 +696,7 @@ public class Hypnos extends Application {
 			determineOS();
 			setupRootDirectory(); 
 			setupConfigDirectory();
-			
 			setupJavaLibraryPath();
-			
 			determineVersionInfo();
 			
 			String[] args = getParameters().getRaw().toArray ( new String[0] );

@@ -60,6 +60,7 @@ public class CurrentList {
 	private final ObservableList <CurrentListTrack> items = FXCollections.observableArrayList(); 
 	private final FilteredList <CurrentListTrack> currentListFiltered = new FilteredList <CurrentListTrack>( items, p -> true );
 	private final SortedList <CurrentListTrack> currentListSorted = new SortedList <CurrentListTrack>( currentListFiltered );
+	private SortedList <CurrentListTrack> currentListSortedNoFilter;
 	
 	private final List <CurrentListListener> listeners = new ArrayList<CurrentListListener> ();
 	
@@ -1019,5 +1020,16 @@ public class CurrentList {
 	
 	public SortedList <CurrentListTrack> getSortedItems () {
 		return currentListSorted;
+	}
+
+	public List <CurrentListTrack> getSortedItemsNoFilter () {
+		if ( currentListSortedNoFilter == null ) {
+			//REFACTOR: This is the right way to do this, but it's really bad in terms of module independence
+			//Fix it at some point. 
+			currentListSortedNoFilter = new SortedList <CurrentListTrack> ( items );
+			currentListSortedNoFilter.comparatorProperty().bind( Hypnos.getUI().currentListPane.currentListTable.comparatorProperty() );
+		}
+		
+		return currentListSortedNoFilter;
 	}
 }

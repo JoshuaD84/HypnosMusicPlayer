@@ -16,7 +16,6 @@ import java.util.logging.Logger;
 import org.jaudiotagger.tag.FieldKey;
 
 import javafx.application.Platform;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;

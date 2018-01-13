@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -18,8 +17,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -77,7 +74,7 @@ public class CurrentListPane extends BorderPane {
 
 	HBox currentListControls; 
 
-	TableView <CurrentListTrack> currentListTable;
+	public TableView <CurrentListTrack> currentListTable; //TODO: Make private
 	TableColumn playingColumn, artistColumn, yearColumn, albumColumn, titleColumn, numberColumn, lengthColumn;
 	ContextMenu currentListColumnSelectorMenu;
 	
