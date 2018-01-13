@@ -1389,6 +1389,9 @@ public class CurrentListPane extends BorderPane {
 	public void setSortMode ( DefaultSortMode sortMode ) {
 		Runnable runMe = () -> {
 			switch ( sortMode ) {
+				case NONE: 
+					currentListTable.getSortOrder().clear();
+					break;
 				case ARTIST:
 					currentListTable.getSortOrder().clear();
 					currentListTable.getSortOrder().add( artistColumn );

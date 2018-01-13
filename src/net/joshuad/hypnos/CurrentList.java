@@ -42,6 +42,7 @@ public class CurrentList {
 	}
 	
 	public enum DefaultSortMode {
+		NONE,
 		NUMBER,
 		ARTIST,
 		ARTIST_TITLE,

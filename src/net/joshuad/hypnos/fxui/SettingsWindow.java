@@ -112,13 +112,13 @@ public class SettingsWindow extends Stage {
 	private List <TextField> globalHotkeyFields = new ArrayList<> ();
 	
 	final ObservableList<String> sortOptions = FXCollections.observableArrayList( 
-			"No Change", "#", "Artist", "Artist - Title", 
+			"No Change", "None", "#", "Artist", "Artist - Title", 
 			"Album - #", "Artist - #", "Artist - Album - #", 
 			"Year - Album - #", "Artist - Year - Album - #"
 		);
 		//TODO: This sortOptionModes is the right way. Do it for shuffle and repeat too
 	final List<DefaultSortMode> sortOptionModes = Arrays.asList( 
-		DefaultSortMode.NO_CHANGE, DefaultSortMode.NUMBER, DefaultSortMode.ARTIST, DefaultSortMode.ARTIST_TITLE,
+		DefaultSortMode.NO_CHANGE, DefaultSortMode.NONE, DefaultSortMode.NUMBER, DefaultSortMode.ARTIST, DefaultSortMode.ARTIST_TITLE,
 		DefaultSortMode.ALBUM_NUMBER, DefaultSortMode.ARTIST_NUMBER, DefaultSortMode.ARTIST_ALBUM_NUMBER, 
 		DefaultSortMode.YEAR_ALBUM_NUMBER, DefaultSortMode.ARTIST_YEAR_ALBUM_NUMBER
 	);
@@ -599,7 +599,7 @@ public class SettingsWindow extends Stage {
 		
 		albumSortChoices = new ChoiceBox <String>( sortOptions );
 		shuffleGrid.add ( albumSortChoices, 3, row );
-		albumSortChoices.getSelectionModel().select( 6 );
+		albumSortChoices.getSelectionModel().select( 1 );
 		albumSortChoices.getSelectionModel().selectedIndexProperty().addListener( new ChangeListener<Number>() {
 			@Override
 			public void changed ( ObservableValue <? extends Number> observableValue, Number oldValue, Number newValue ) {
@@ -658,7 +658,7 @@ public class SettingsWindow extends Stage {
 		
 		trackSortChoices = new ChoiceBox <String>( sortOptions );
 		shuffleGrid.add ( trackSortChoices, 3, row );
-		trackSortChoices.getSelectionModel().select( 6 );
+		trackSortChoices.getSelectionModel().select( 1 );
 		trackSortChoices.getSelectionModel().selectedIndexProperty().addListener( new ChangeListener<Number>() {
 			@Override
 			public void changed ( ObservableValue <? extends Number> observableValue, Number oldValue, Number newValue ) {
@@ -717,7 +717,7 @@ public class SettingsWindow extends Stage {
 		
 		playlistSortChoices = new ChoiceBox <String>( sortOptions );
 		shuffleGrid.add ( playlistSortChoices, 3, row );
-		playlistSortChoices.getSelectionModel().select( 3 );
+		playlistSortChoices.getSelectionModel().select( 1 );
 		playlistSortChoices.getSelectionModel().selectedIndexProperty().addListener( new ChangeListener<Number>() {
 			@Override
 			public void changed ( ObservableValue <? extends Number> observableValue, Number oldValue, Number newValue ) {
