@@ -40,19 +40,6 @@ public class CurrentList {
 	public enum DefaultRepeatMode {
 		PLAY_ONCE, REPEAT, NO_CHANGE
 	}
-	
-	public enum DefaultSortMode {
-		NONE,
-		NUMBER,
-		ARTIST,
-		ARTIST_TITLE,
-		ARTIST_NUMBER,
-		ARTIST_ALBUM_NUMBER,
-		ARTIST_YEAR_ALBUM_NUMBER,
-		ALBUM_NUMBER,
-		YEAR_ALBUM_NUMBER,
-		NO_CHANGE
-	}
 		
 	Mode mode = Mode.EMPTY;
 	final List <Album> currentAlbums = new ArrayList <Album> ();
@@ -75,10 +62,6 @@ public class CurrentList {
 	private DefaultRepeatMode albumRepeatMode = DefaultRepeatMode.PLAY_ONCE;
 	private DefaultRepeatMode trackRepeatMode = DefaultRepeatMode.NO_CHANGE;
 	private DefaultRepeatMode playlistRepeatMode = DefaultRepeatMode.REPEAT;
-	
-	private DefaultSortMode albumSortMode = DefaultSortMode.YEAR_ALBUM_NUMBER;
-	private DefaultSortMode trackSortMode = DefaultSortMode.YEAR_ALBUM_NUMBER;
-	private DefaultSortMode playlistSortMode = DefaultSortMode.ARTIST_TITLE;
 	
 	List <Thread> noLoadThreads = new ArrayList <Thread> ();
 
@@ -221,18 +204,6 @@ public class CurrentList {
 		this.playlistRepeatMode = mode;
 	}
 	
-	public void setDefaultAlbumSortMode  ( DefaultSortMode mode ) {
-		this.albumSortMode = mode;
-	}
-	
-	public void setDefaultTrackSortMode  ( DefaultSortMode mode ) {
-		this.trackSortMode = mode;
-	}
-	
-	public void setDefaultPlaylistSortMode  ( DefaultSortMode mode ) {
-		this.playlistSortMode = mode;
-	}
-	
 	public DefaultShuffleMode getDefaultTrackShuffleMode () {
 		return trackShuffleMode;
 	}
@@ -255,18 +226,6 @@ public class CurrentList {
 	
 	public DefaultRepeatMode getDefaultPlaylistRepeatMode () {
 		return playlistRepeatMode;
-	}
-	
-	public DefaultSortMode getDefaultTrackSortMode () {
-		return trackSortMode;
-	}
-	
-	public DefaultSortMode getDefaultAlbumSortMode () {
-		return albumSortMode;
-	}
-	
-	public DefaultSortMode getDefaultPlaylistSortMode () {
-		return playlistSortMode;
 	}
 	
 	public void setState( CurrentListState state ) {
@@ -815,20 +774,17 @@ public class CurrentList {
 		
 		DefaultShuffleMode shuffleTarget;
 		DefaultRepeatMode repeatTarget;
-		DefaultSortMode sortTarget = getCurrentDefaultSortMode();
 		
 		switch ( mode ) {
 			case ALBUM:
 			case ALBUM_REORDERED:
 				shuffleTarget = albumShuffleMode;
 				repeatTarget = albumRepeatMode;
-				sortTarget = albumSortMode;
 				break;
 				
 			case PLAYLIST:
 				shuffleTarget = playlistShuffleMode;
 				repeatTarget = playlistRepeatMode;
-				sortTarget = playlistSortMode;
 				break;
 				
 			case PLAYLIST_UNSAVED:
@@ -836,7 +792,6 @@ public class CurrentList {
 			default:
 				shuffleTarget = trackShuffleMode;
 				repeatTarget = trackRepeatMode;
-				sortTarget = trackSortMode;
 				break;
 			
 		}
@@ -864,31 +819,6 @@ public class CurrentList {
 			case REPEAT:
 				audioSystem.setRepeatMode( RepeatMode.REPEAT );
 				break;
-		}
-		
-		switch ( sortTarget ) {
-			case NO_CHANGE:
-				break;
-			default:
-				Hypnos.getUI().setCurrentListSortMode ( sortTarget ); //TODO: inject ui instead of asking for it
-				break;
-		}
-	}
-	
-	public DefaultSortMode getCurrentDefaultSortMode() {
-		switch ( mode ) {
-			case ALBUM:
-			case ALBUM_REORDERED:
-				return albumSortMode;
-				
-			case PLAYLIST:
-				return playlistSortMode;
-
-			case PLAYLIST_UNSAVED:
-			case EMPTY:
-			default:
-				return trackSortMode;
-			
 		}
 	}
 	

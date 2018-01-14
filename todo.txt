@@ -18,9 +18,6 @@ Now:
 	
 	All default sort orders don't appear to be saving correctly
 	
-	I'm tempted to just get rid of that sort order system and let playlists specify a sort order, shuffle type, and repeat type
-		Allow each playlist to specify their sort order
-	
 	New playlists not being saved.
 		Josh Radio was lost somehow
 		

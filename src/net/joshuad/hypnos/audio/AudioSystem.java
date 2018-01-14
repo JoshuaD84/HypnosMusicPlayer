@@ -432,10 +432,6 @@ public class AudioSystem {
 		retMe.put ( Setting.DEFAULT_REPEAT_ALBUMS, currentList.getDefaultAlbumRepeatMode().toString() );
 		retMe.put ( Setting.DEFAULT_REPEAT_PLAYLISTS, currentList.getDefaultPlaylistRepeatMode().toString() );
 		
-		retMe.put ( Setting.DEFAULT_SORT_TRACKS, currentList.getDefaultTrackSortMode().toString() );
-		retMe.put ( Setting.DEFAULT_SORT_ALBUMS, currentList.getDefaultAlbumSortMode().toString() );
-		retMe.put ( Setting.DEFAULT_SORT_PLAYLISTS, currentList.getDefaultPlaylistSortMode().toString() );
-		
 		return retMe;
 	}
 	
@@ -517,21 +513,6 @@ public class AudioSystem {
 					
 				case DEFAULT_SHUFFLE_TRACKS:
 					getCurrentList().setDefaultTrackShuffleMode( CurrentList.DefaultShuffleMode.valueOf( value )  );
-					settings.remove ( setting );
-					break;
-					
-				case DEFAULT_SORT_ALBUMS:
-					getCurrentList().setDefaultAlbumSortMode( CurrentList.DefaultSortMode.valueOf( value ) );
-					settings.remove ( setting );
-					break;
-					
-				case DEFAULT_SORT_PLAYLISTS:
-					getCurrentList().setDefaultPlaylistSortMode( CurrentList.DefaultSortMode.valueOf( value ) );
-					settings.remove ( setting );
-					break;
-					
-				case DEFAULT_SORT_TRACKS:
-					getCurrentList().setDefaultTrackSortMode( CurrentList.DefaultSortMode.valueOf( value )  );
 					settings.remove ( setting );
 					break;
 				}

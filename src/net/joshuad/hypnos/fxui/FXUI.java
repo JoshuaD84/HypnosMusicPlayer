@@ -68,7 +68,6 @@ import javafx.util.Callback;
 import javafx.util.Duration;
 import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.CurrentList;
-import net.joshuad.hypnos.CurrentList.DefaultSortMode;
 import net.joshuad.hypnos.CurrentListState;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.Hypnos;
@@ -1527,10 +1526,6 @@ public class FXUI implements PlayerListener {
 
 	public void setUpdateAvailable ( boolean updateAvailable ) {
 		this.updateAvailable.setValue( updateAvailable );
-	}
-
-	public void setCurrentListSortMode ( DefaultSortMode sortMode ) {
-		currentListPane.setSortMode ( sortMode );
 	}
 }
 

@@ -63,7 +63,6 @@ import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.AlphanumComparator.CaseHandling;
-import net.joshuad.hypnos.CurrentList.DefaultSortMode;
 import net.joshuad.hypnos.Persister.Setting;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
@@ -211,8 +210,6 @@ public class CurrentListPane extends BorderPane {
 		currentListTable.getColumns().remove( lengthColumn );
 		currentListTable.getColumns().add( lengthColumn );
 
-		setSortMode( audioSystem.getCurrentList().getCurrentDefaultSortMode() );
-
 		artistColumn.setPrefWidth( 100 );
 		numberColumn.setPrefWidth( 40 );
 		yearColumn.setPrefWidth( 60 );
@@ -353,8 +350,6 @@ public class CurrentListPane extends BorderPane {
 					});
 					
 				}
-					
-				
 			}
 		});
 		
@@ -1385,87 +1380,6 @@ public class CurrentListPane extends BorderPane {
 		retMe.put ( Setting.CL_TABLE_LENGTH_COLUMN_SHOW, lengthColumn.isVisible() );
 		
 		return retMe;
-	}
-
-	@SuppressWarnings("unchecked")
-	public void setSortMode ( DefaultSortMode sortMode ) {
-		Runnable runMe = () -> {
-			switch ( sortMode ) {
-				case NONE: 
-					currentListTable.getSortOrder().clear();
-					break;
-				case ARTIST:
-					currentListTable.getSortOrder().clear();
-					currentListTable.getSortOrder().add( artistColumn );
-					artistColumn.setSortType( SortType.ASCENDING );
-					break;
-				case ARTIST_ALBUM_NUMBER:
-					currentListTable.getSortOrder().clear();
-					currentListTable.getSortOrder().add( artistColumn );
-					currentListTable.getSortOrder().add( albumColumn );
-					currentListTable.getSortOrder().add( numberColumn );
-					artistColumn.setSortType( SortType.ASCENDING );
-					albumColumn.setSortType( SortType.ASCENDING );
-					numberColumn.setSortType( SortType.ASCENDING );
-					break;
-				case ARTIST_NUMBER:
-					currentListTable.getSortOrder().clear();
-					currentListTable.getSortOrder().add( artistColumn );
-					currentListTable.getSortOrder().add( numberColumn );
-					artistColumn.setSortType( SortType.ASCENDING );
-					numberColumn.setSortType( SortType.ASCENDING );
-					break;
-				case ARTIST_TITLE:
-					currentListTable.getSortOrder().clear();
-					currentListTable.getSortOrder().add( artistColumn );
-					currentListTable.getSortOrder().add( titleColumn );
-					artistColumn.setSortType( SortType.ASCENDING );
-					titleColumn.setSortType( SortType.ASCENDING );
-					break;
-				case ARTIST_YEAR_ALBUM_NUMBER:
-					currentListTable.getSortOrder().clear();
-					currentListTable.getSortOrder().add( artistColumn );
-					currentListTable.getSortOrder().add( yearColumn );
-					currentListTable.getSortOrder().add( albumColumn );
-					currentListTable.getSortOrder().add( numberColumn );
-					artistColumn.setSortType( SortType.ASCENDING );
-					yearColumn.setSortType( SortType.ASCENDING );
-					albumColumn.setSortType( SortType.ASCENDING );
-					numberColumn.setSortType( SortType.ASCENDING );
-					break;
-				case NUMBER:
-					currentListTable.getSortOrder().clear();
-					currentListTable.getSortOrder().add( numberColumn );
-					numberColumn.setSortType( SortType.ASCENDING );
-					break;
-				case NO_CHANGE:
-					//Do nothing
-					break;
-				case YEAR_ALBUM_NUMBER:
-					currentListTable.getSortOrder().clear();
-					currentListTable.getSortOrder().add( yearColumn );
-					currentListTable.getSortOrder().add( albumColumn );
-					currentListTable.getSortOrder().add( numberColumn );
-					yearColumn.setSortType( SortType.ASCENDING );
-					albumColumn.setSortType( SortType.ASCENDING );
-					numberColumn.setSortType( SortType.ASCENDING );
-					break;
-				case ALBUM_NUMBER:
-					currentListTable.getSortOrder().clear();
-					currentListTable.getSortOrder().add( albumColumn );
-					currentListTable.getSortOrder().add( numberColumn );
-					albumColumn.setSortType( SortType.ASCENDING );
-					numberColumn.setSortType( SortType.ASCENDING );
-				default:
-					break;
-			}
-		};
-		
-		if ( Platform.isFxApplicationThread() ) {
-			runMe.run();
-		} else {
-			Platform.runLater( runMe );
-		}
 	}
 }
 
