@@ -1,4 +1,9 @@
 Now:
+	Improve library checker
+		http://crackingjavainterviews.blogspot.com/2013/05/efficient-way-to-calculate-checksum-of.html
+		
+	Add a place to drag and drop folders (or navigate to them) to demand that they be rescanned immediately.
+
 	Windows - Global hotkeys don't show in settings tab until you try to set one, then they all appear
 
 	Windows - Select Multiple Files in explorer - No Option to play in Hypnos. Add that

@@ -74,6 +74,7 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 		return FileVisitResult.CONTINUE;
 	}
 	
+	@Override	
 	public FileVisitResult visitFileFailed( Path file, IOException exc ) {
 		return FileVisitResult.CONTINUE;
 	}
