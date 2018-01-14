@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Optional;
@@ -376,9 +377,31 @@ public class LibraryTabPane extends StretchedTabPane {
 		playlistFilterBox.setOnKeyPressed( ( KeyEvent event ) -> {
 			if ( event.getCode() == KeyCode.ESCAPE ) {
 				playlistFilterBox.clear();
+			
 			} else if ( event.getCode() == KeyCode.DOWN ) {
 				playlistTable.requestFocus();
 				playlistTable.getSelectionModel().select( playlistTable.getSelectionModel().getFocusedIndex() );
+			
+			} else if ( event.getCode() == KeyCode.ENTER && 
+			!event.isAltDown() && !event.isShiftDown() && !event.isControlDown() && !event.isMetaDown() ) {
+				event.consume();
+				Playlist playMe = playlistTable.getSelectionModel().getSelectedItem();
+				if( playMe == null ) playlistTable.getItems().get( 0 );
+				audioSystem.getCurrentList().setAndPlayPlaylist( playMe );
+				
+			} else if ( event.getCode() == KeyCode.ENTER && event.isShiftDown()
+			&& !event.isAltDown() && !event.isControlDown() && !event.isMetaDown() ) {
+				event.consume();
+				Playlist playMe = playlistTable.getSelectionModel().getSelectedItem();
+				if( playMe == null ) playlistTable.getItems().get( 0 );
+				audioSystem.getQueue().queueAllPlaylists( Arrays.asList( playMe ) );
+				
+			} else if ( event.getCode() == KeyCode.ENTER && event.isControlDown()
+			&& !event.isAltDown() && !event.isShiftDown() && !event.isMetaDown() ) {
+				event.consume();
+				Playlist playMe = playlistTable.getSelectionModel().getSelectedItem();
+				if( playMe == null ) playlistTable.getItems().get( 0 );
+				audioSystem.getCurrentList().appendPlaylist( playMe );
 			}
 		});
 		
@@ -438,9 +461,31 @@ public class LibraryTabPane extends StretchedTabPane {
 		trackFilterBox.setOnKeyPressed( ( KeyEvent event ) -> {
 			if ( event.getCode() == KeyCode.ESCAPE ) {
 				trackFilterBox.clear();
+				
 			} else if ( event.getCode() == KeyCode.DOWN ) {
 				trackTable.requestFocus();
 				trackTable.getSelectionModel().select( trackTable.getSelectionModel().getFocusedIndex() );
+				
+			} else if ( event.getCode() == KeyCode.ENTER && 
+			!event.isAltDown() && !event.isShiftDown() && !event.isControlDown() && !event.isMetaDown() ) {
+				event.consume();
+				Track playMe = trackTable.getSelectionModel().getSelectedItem();
+				if( playMe == null ) trackTable.getItems().get( 0 );
+				audioSystem.playTrack( playMe );
+				
+			} else if ( event.getCode() == KeyCode.ENTER && event.isShiftDown()
+			&& !event.isAltDown() && !event.isControlDown() && !event.isMetaDown() ) {
+				event.consume();
+				Track playMe = trackTable.getSelectionModel().getSelectedItem();
+				if( playMe == null ) trackTable.getItems().get( 0 );
+				audioSystem.getQueue().queueTrack( playMe );
+				
+			} else if ( event.getCode() == KeyCode.ENTER && event.isControlDown()
+			&& !event.isAltDown() && !event.isShiftDown() && !event.isMetaDown() ) {
+				event.consume();
+				Track playMe = trackTable.getSelectionModel().getSelectedItem();
+				if( playMe == null ) trackTable.getItems().get( 0 );
+				audioSystem.getCurrentList().appendTrack( playMe );
 			}
 		});
 		
@@ -502,13 +547,32 @@ public class LibraryTabPane extends StretchedTabPane {
 		
 		albumFilterBox.setOnKeyPressed( ( KeyEvent event ) -> {
 			if ( event.getCode() == KeyCode.ESCAPE ) {
+				event.consume();
 				albumFilterBox.clear();
 			} else if ( event.getCode() == KeyCode.DOWN ) {
+				event.consume();
 				albumTable.requestFocus();
 				albumTable.getSelectionModel().select( albumTable.getSelectionModel().getFocusedIndex() );
+			} else if ( event.getCode() == KeyCode.ENTER && 
+			!event.isAltDown() && !event.isShiftDown() && !event.isControlDown() && !event.isMetaDown() ) {
+				event.consume();
+				Album playMe = albumTable.getSelectionModel().getSelectedItem();
+				if( playMe == null ) albumTable.getItems().get( 0 );
+				audioSystem.getCurrentList().setAndPlayAlbum( playMe );
+			} else if ( event.getCode() == KeyCode.ENTER && event.isShiftDown()
+			&& !event.isAltDown() && !event.isControlDown() && !event.isMetaDown() ) {
+				event.consume();
+				Album playMe = albumTable.getSelectionModel().getSelectedItem();
+				if( playMe == null ) albumTable.getItems().get( 0 );
+				audioSystem.getQueue().queueAllAlbums( Arrays.asList( playMe ) );
+			} else if ( event.getCode() == KeyCode.ENTER && event.isControlDown()
+			&& !event.isAltDown() && !event.isShiftDown() && !event.isMetaDown() ) {
+				event.consume();
+				Album playMe = albumTable.getSelectionModel().getSelectedItem();
+				if( playMe == null ) albumTable.getItems().get( 0 );
+				audioSystem.getCurrentList().appendAlbum( playMe );
 			}
 		});
-		
 		
 		float width = 33;
 		float height = 26;
@@ -747,7 +811,8 @@ public class LibraryTabPane extends StretchedTabPane {
 		
 		playMenuItem.setOnAction( event -> {
 			if ( ui.okToReplaceCurrentList() ) {
-				audioSystem.getCurrentList().setAndPlayAlbums( albumTable.getSelectionModel().getSelectedItems() );
+				List <Album> playMe = albumTable.getSelectionModel().getSelectedItems();
+				audioSystem.getCurrentList().setAndPlayAlbums( playMe );
 			}
 		});
 

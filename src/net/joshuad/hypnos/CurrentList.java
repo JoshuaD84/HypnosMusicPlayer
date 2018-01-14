@@ -892,7 +892,6 @@ public class CurrentList {
 		}
 	}
 	
-	
 	public void playlistsSet ( List <Playlist> playlists ) {
 		
 		if ( playlists == null ) {

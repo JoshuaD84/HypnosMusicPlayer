@@ -1,4 +1,6 @@
 Now:
+	Change Cntrl + F to search on whatever item we have currently selected -- playlist, track, album tables, or current list table
+	
 	Windows - Global hotkeys don't show in settings tab until you try to set one, then they all appear
 
 	Windows - Select Multiple Files in explorer - No Option to play in Hypnos. Add that
@@ -17,13 +19,12 @@ Now:
 	All default sort orders don't appear to be saving correctly
 	
 	I'm tempted to just get rid of that sort order system and let playlists specify a sort order, shuffle type, and repeat type
+		Allow each playlist to specify their sort order
 	
 	New playlists not being saved.
 		Josh Radio was lost somehow
-	
+		
 General
-	Allow each playlist to specify their sort order
-	
 	I emptied the current list and library and playing track, and the art stayed. probably good to get rid of that
 
 	Select two unrelated albums -> Right click play -> no change to shuffle, i expected it to set it to sequential

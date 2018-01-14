@@ -366,7 +366,9 @@ public class CurrentListPane extends BorderPane {
 			if ( e.getCode() == KeyCode.ENTER
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
-				audioSystem.playTrack( currentListTable.getSelectionModel().getSelectedItem() );
+				Track playMe = currentListTable.getSelectionModel().getSelectedItem();
+				if ( playMe == null ) playMe = currentListTable.getItems().get( 0 );
+				audioSystem.playTrack( playMe );
 				
 			} else if ( e.getCode() == KeyCode.F2
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
