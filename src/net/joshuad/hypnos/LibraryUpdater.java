@@ -38,7 +38,7 @@ public class LibraryUpdater {
 				}
 				
 				try {
-					Thread.sleep ( 15 );
+					Thread.sleep ( sleepTimeMS );
 				} catch ( InterruptedException e ) {
 					LOGGER.log ( Level.FINE, "Sleep interupted during wait period." );
 				}
