@@ -30,7 +30,7 @@ public class Playlist implements Serializable {
 	
 	private String name;
 	
-	private transient boolean hasUnsavedData = false;
+	private transient boolean hasUnsavedData = true;
 	
 	public Playlist ( String name ) {
 		this ( name, new ArrayList <Track> () );

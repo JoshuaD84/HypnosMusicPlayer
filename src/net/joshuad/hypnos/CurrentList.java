@@ -177,7 +177,7 @@ public class CurrentList {
 	}
 		
 	public CurrentListState getState () {
-		return new CurrentListState ( items, currentAlbums, currentPlaylist, mode );
+		return new CurrentListState ( new ArrayList<CurrentListTrack>( items ), currentAlbums, currentPlaylist, mode );
 	}
 	
 	public void setDefaultAlbumShuffleMode ( DefaultShuffleMode mode ) {

@@ -300,6 +300,7 @@ public class FXUI implements PlayerListener {
 						currentListPane.currentListTable.getSelectionModel().clearSelection();
 					});
 				}
+				
 			} else if ( e.getCode() == KeyCode.R
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
