@@ -76,7 +76,6 @@ public class CurrentList {
 		items.addListener( (ListChangeListener.Change<? extends Track> change) -> {
 			hasUnsavedData = true;			
 		});
-		
 	}
 	
 	public boolean hasUnsavedData() {
@@ -264,6 +263,8 @@ public class CurrentList {
 		for ( int index : itemIndices ) {
 			items.set( index, shuffleMe.remove( 0 ) );
 		}
+
+		listReordered();
 	}
 		
 	public void clearList() {

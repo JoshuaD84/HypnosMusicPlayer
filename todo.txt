@@ -1,6 +1,5 @@
 Now:
 	Improve library checker
-		http://crackingjavainterviews.blogspot.com/2013/05/efficient-way-to-calculate-checksum-of.html
 		
 	Add a place to drag and drop folders (or navigate to them) to demand that they be rescanned immediately.
 
@@ -22,8 +21,6 @@ General
 
 	Select two unrelated albums -> Right click play -> no change to shuffle, i expected it to set it to sequential
 		Maybe add a "Multiple Albums" type
-	
-	Set an option to sort by album artist instead of artist on artist column in current list
 	
 	If you delete a list of tracks down so that it matches an album, set title bar to that album
 
