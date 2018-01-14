@@ -13,16 +13,16 @@ import java.util.logging.Logger;
 
 import net.joshuad.hypnos.fxui.SettingsWindow;
 
-public class Updater {
+public class UpdateChecker {
 	private static final Logger LOGGER = Logger.getLogger( SettingsWindow.class.getName() );
 	
 	private DateFormat releaseDateFormat = new SimpleDateFormat ( "yyyy-MM-dd" );
 	
-	public Updater() {}
+	public UpdateChecker() {}
 	
 	public boolean updateAvailable () {
 		
-		if ( !Updater.class.getResource( "Updater.class" ).toString().startsWith( "jar" ) ) {
+		if ( !UpdateChecker.class.getResource( "UpdateChecker.class" ).toString().startsWith( "jar" ) ) {
 			if ( Hypnos.isDeveloping() ) {
 				//This is what happens when I am working on the project and I don't want to see extraneous prints. 
 				return false;

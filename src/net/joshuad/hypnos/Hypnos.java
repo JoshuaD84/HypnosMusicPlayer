@@ -756,7 +756,7 @@ public class Hypnos extends Application {
 							
 							LOGGER.info( "Hypnos finished loading." );
 							
-							Updater updater = new Updater();
+							UpdateChecker updater = new UpdateChecker();
 							boolean updateAvailable = updater.updateAvailable();
 							if ( updateAvailable ) LOGGER.info( "Updates available" );
 							ui.setUpdateAvailable ( updateAvailable );
@@ -815,7 +815,7 @@ public class Hypnos extends Application {
 						
 						LOGGER.info( "Hypnos finished loading." );
 
-						Updater updater = new Updater();
+						UpdateChecker updater = new UpdateChecker();
 						boolean updateAvailable = updater.updateAvailable();
 						if ( updateAvailable ) LOGGER.info( "Updates available" );
 					} 

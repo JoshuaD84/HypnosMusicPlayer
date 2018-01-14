@@ -271,8 +271,6 @@ public class LibraryUpdater {
 						}
 					}
 					
-				
-					
 				} finally {
 					runLaterPending = false;
 				}
