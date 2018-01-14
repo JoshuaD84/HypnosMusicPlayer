@@ -1,6 +1,4 @@
 Now:
-	Change Cntrl + F to search on whatever item we have currently selected -- playlist, track, album tables, or current list table
-	
 	Windows - Global hotkeys don't show in settings tab until you try to set one, then they all appear
 
 	Windows - Select Multiple Files in explorer - No Option to play in Hypnos. Add that
@@ -13,10 +11,6 @@ Now:
 		When loading files from the commandline and you give a relative path, it assumes its relative to hypnos's directory, not the user.
 	
 		Calling commandline switches at the appimage exits before output is printed. Kinda lame
-		
-	Album Default Sort Order not applying correctly. 
-	
-	All default sort orders don't appear to be saving correctly
 	
 	New playlists not being saved.
 		Josh Radio was lost somehow
@@ -177,13 +171,13 @@ General
       Apparently it can be done with hotspot jvm. Need to research
 
 	Windows - Volume takes a split second to change.
-  g   https://stackoverflow.com/questions/48183626/delay-when-changing-audio-volume-on-windows
-      I also posted a bug report
+		https://stackoverflow.com/questions/48183626/delay-when-changing-audio-volume-on-windows
+		I also posted a bug report
 
 	Review and include this answer
-      https://stackoverflow.com/questions/48144750/how-can-i-debug-a-nullpointerexception-where-the-stacktrace-doesnt-reference-my/48145928#48145928
-      1/10 - I did this, and it makes the UI feel worse. Not sure how to deal w/ that. Maybe I just catch the exception
-      and move on with life instead
+		https://stackoverflow.com/questions/48144750/how-can-i-debug-a-nullpointerexception-where-the-stacktrace-doesnt-reference-my/48145928#48145928
+		1/10 - I did this, and it makes the UI feel worse. Not sure how to deal w/ that. Maybe I just catch the exception
+		and move on with life instead
 
    Scroll speed on lyrics scroll pane when the lyrics almost-but-dont-quite fit one full screen is really slow. 
    
@@ -306,21 +300,21 @@ General
 	
 Key Testing before next release:
 	Make sure browse button still works in various systems. I changed FXUI.openFileBrowser -- Desktop.getDesktop().open() to .browse()
-      Ok in windows
+		Ok in windows
 
 	Try deleting settings and seeing if the UI lays out properly
-      Ok in windows
+		Ok in windows
 
 	Try resetting tables to defaults manually
-      Ok windows
+		Ok windows
       
 	Try out the throttled table filters on different sytems, see if stuff breaks
-      Seems OK windows
+		Seems OK windows
 
 	Test the CLI
+		Confirm it start playing when a track or tracks are loaded from socket
 	
 	Settings load and load appearance
 	
-	Start playing when a track or tracks are loaded from socket
 	
 	

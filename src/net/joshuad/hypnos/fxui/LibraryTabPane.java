@@ -402,7 +402,8 @@ public class LibraryTabPane extends StretchedTabPane {
 				Playlist playMe = playlistTable.getSelectionModel().getSelectedItem();
 				if( playMe == null ) playlistTable.getItems().get( 0 );
 				audioSystem.getCurrentList().appendPlaylist( playMe );
-			}
+			
+			} 
 		});
 		
 		double width = 33;

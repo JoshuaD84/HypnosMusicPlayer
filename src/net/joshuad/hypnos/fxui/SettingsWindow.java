@@ -1211,10 +1211,11 @@ public class SettingsWindow extends Stage {
 		"    Save Current List as Playlist            Ctrl + S\n" +	
 		"    Open files                               Ctrl + O\n" +
 		"    Export Current List as Playlist          Ctrl + E\n" +	
-		"    Search the Current List                  F or Ctrl + F\n" +
-		"    Search the First Tab in Library          1 or Ctrl + 1\n" +
-		"    Search the Second Tab in Library         2 or Ctrl + 2\n" +
-		"    Search the Third Tab in Library          3 or Ctrl + 3\n" +							
+		"    Filter the Current List                  F" +
+		"    Filter the First Tab in Library          1 or Ctrl + 1\n" +
+		"    Filter the Second Tab in Library         2 or Ctrl + 2\n" +
+		"    Filter the Third Tab in Library          3 or Ctrl + 3\n" +	
+		"    Filter whichever table has focus         Ctrl + F\n" +							
 		"\n" +
 		"Playlists, Albums, Tracks\n" +
 		"    Queue Item                               Q\n" + 	 					

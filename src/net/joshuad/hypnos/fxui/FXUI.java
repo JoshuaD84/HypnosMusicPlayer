@@ -275,15 +275,31 @@ public class FXUI implements PlayerListener {
 				libraryPane.getSelectionModel().select( 2 );
 				Platform.runLater( () -> libraryPane.focusFilterOfCurrentTab() );
 				
-			} else if ( e.getCode() == KeyCode.F /* With or without control */
-			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+			} else if ( e.getCode() == KeyCode.F
+			&& !e.isControlDown() && !e.isShiftDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
 				//We put it in runlater to keep the key from being passed down to the filter box
 				Platform.runLater( () -> {
 					currentListPane.infoLabelAndFilter.beginEditing();
 					currentListPane.currentListTable.getSelectionModel().clearSelection();
 				});
-
+				
+			} else if ( e.getCode() == KeyCode.F && e.isControlDown() 
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				e.consume();
+				
+				//TODO: this isn't perfect. If a button has focus, it doesn't trigger
+				if ( libraryPane.isFocused() || libraryPane.albumTable.isFocused()
+				|| libraryPane.trackTable.isFocused() || libraryPane.playlistTable.isFocused() ) {
+					libraryPane.focusFilterOfCurrentTab();
+					
+				} else {
+					//We put it in runlater to keep the key from being passed down to the filter box
+					Platform.runLater( () -> {
+						currentListPane.infoLabelAndFilter.beginEditing();
+						currentListPane.currentListTable.getSelectionModel().clearSelection();
+					});
+				}
 			} else if ( e.getCode() == KeyCode.R
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
