@@ -208,6 +208,17 @@ public class LibraryLocationWindow extends Stage {
 		primaryPane.getChildren().addAll( musicSourceTable, priorityBox, controlBox );
 		root.getChildren().add( primaryPane );
 		setScene( scene );
+		
+		scene.addEventFilter( KeyEvent.KEY_PRESSED, new EventHandler <KeyEvent>() {
+			@Override
+			public void handle ( KeyEvent e ) {
+				if ( e.getCode() == KeyCode.ESCAPE
+				&& !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() && !e.isAltDown() ) {
+					hide();
+					e.consume();
+				}
+			}
+		});
 	}
 	
 	public void setLoaderSpeedDisplay ( LoaderSpeed speed ) {
