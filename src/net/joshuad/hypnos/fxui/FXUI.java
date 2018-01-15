@@ -260,18 +260,21 @@ public class FXUI implements PlayerListener {
 			} else if ( e.getCode() == KeyCode.DIGIT1 /* With or without control */
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
+				setLibraryCollapsed( false );
 				libraryPane.getSelectionModel().select( 0 );
 				Platform.runLater( () -> libraryPane.focusFilterOfCurrentTab() );
 
 			} else if ( e.getCode() == KeyCode.DIGIT2 /* With or without control */
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
+				setLibraryCollapsed( false );
 				libraryPane.getSelectionModel().select( 1 );
 				Platform.runLater( () -> libraryPane.focusFilterOfCurrentTab() );
 	
 			} else if ( e.getCode() == KeyCode.DIGIT3 /* With or without control */
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
+				setLibraryCollapsed( false );
 				libraryPane.getSelectionModel().select( 2 );
 				Platform.runLater( () -> libraryPane.focusFilterOfCurrentTab() );
 				
@@ -1029,27 +1032,48 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public void toggleArtPaneCollapsed() {
-		if ( currentListSplitPaneRestoredPosition != null && currentListSplitPane.getDividerPositions()[0] >= .99d  ) {
-			currentListSplitPane.setDividerPosition( 0, currentListSplitPaneRestoredPosition );
-			currentListSplitPaneRestoredPosition = null;
-		} else if ( currentListSplitPane.getDividerPositions()[0] >= .99d ) {
-			currentListSplitPane.setDividerPosition( 0, currentListSplitPaneDefault );
-		} else {
+		setArtPaneCollapsed( !isArtPaneCollapsed() );
+	}
+	
+	public boolean isArtPaneCollapsed() {
+		return currentListSplitPane.getDividerPositions()[0] >= .99d;
+	}
+	
+	public void setArtPaneCollapsed( boolean target ) {
+		if( target ) {
 			currentListSplitPaneRestoredPosition = currentListSplitPane.getDividerPositions()[0];
 			currentListSplitPane.setDividerPosition( 0, 1 );
+		} else {
+			if ( currentListSplitPaneRestoredPosition != null ) {
+				currentListSplitPane.setDividerPosition( 0, currentListSplitPaneRestoredPosition );
+				currentListSplitPaneRestoredPosition = null;
+			} else if ( currentListSplitPane.getDividerPositions()[0] >= .99d ) {
+				currentListSplitPane.setDividerPosition( 0, currentListSplitPaneDefault );
+			}
 		}
 	}
 	
 	public void toggleLibraryCollapsed() {
-		if ( primarySplitPaneRestoredPosition != null && primarySplitPane.getDividerPositions()[0] <= .01d ) {
-			primarySplitPane.setDividerPosition( 0, primarySplitPaneRestoredPosition );
-			primarySplitPaneRestoredPosition = null;
-		} else if ( primarySplitPane.getDividerPositions()[0] <= .01d ) {
-			primarySplitPane.setDividerPosition( 0, primarySplitPaneDefault );
-		} else {
+		setLibraryCollapsed( !isLibraryCollapsed() );
+	}
+		
+		
+	public void setLibraryCollapsed( boolean target ) {
+		if ( target ) {
 			primarySplitPaneRestoredPosition = primarySplitPane.getDividerPositions()[0];
 			primarySplitPane.setDividerPosition( 0, 0 );
+		} else {
+			if ( primarySplitPaneRestoredPosition != null ) {
+				primarySplitPane.setDividerPosition( 0, primarySplitPaneRestoredPosition );
+				primarySplitPaneRestoredPosition = null;
+			} else if ( primarySplitPane.getDividerPositions()[0] <= .01d ) {
+				primarySplitPane.setDividerPosition( 0, primarySplitPaneDefault );
+			} 
 		}
+	}
+	
+	public boolean isLibraryCollapsed() {
+		return primarySplitPane.getDividerPositions()[0] <= .01d;
 	}
 	
 	public void fixTables() {
