@@ -80,7 +80,7 @@ public class Library {
 	private Vector <Path> sourceToRemove = new Vector <Path>();
 	private Vector <Path> sourceToUpdate = new Vector <Path>();
 		
-	private boolean purgeOrphansAndMissing = true;
+	private boolean purgeMissing = true, purgeOrphans = true;
 	
 	private int loaderSleepTimeMS = 50;
 	
@@ -120,7 +120,8 @@ public class Library {
 			
 			@Override
 			public void run() {
-				int purgeCounter = 0;
+				int orphanCounter = 0;
+				int missingCounter = 0;
 				while ( true ) {
 					if ( !sourceToRemove.isEmpty() ) {
 						removeOneSource();
@@ -133,19 +134,27 @@ public class Library {
 					} else if ( !sourceToUpdate.isEmpty() ) {
 						updateOneSource();
 						
-					} else if ( purgeOrphansAndMissing && albumsToRemove.isEmpty() && tracksToRemove.isEmpty() ) {
+					} else if ( purgeMissing && albumsToRemove.isEmpty() && tracksToRemove.isEmpty() ) {
 						boolean missingFiles = purgeMissingFiles();
-						boolean orphans = purgeOrphans();
-						purgeOrphansAndMissing = false;
+						purgeMissing = false;
 						
-						if ( missingFiles || orphans ) {
+						if ( missingFiles ) {
 							albumTrackDataChangedSinceLastSave = true;
 						}
-					
+						
+					} else if ( purgeOrphans && albumsToRemove.isEmpty() && tracksToRemove.isEmpty() ) {
+						boolean orphans = purgeOrphans();
+						purgeOrphans = false;
+						
+						if ( orphans ) {
+							albumTrackDataChangedSinceLastSave = true;
+						}
+						
 					} else {
 						processWatcherEvents(); //Note: this blocks for 250ms, see function
 					}
 
+					//TODO: This really doesn't belong here. 
 					if ( System.currentTimeMillis() - lastSaveTime > SAVE_ALL_INTERVAL ) {
 						if ( albumTrackDataChangedSinceLastSave ) {
 							persister.saveAlbumsAndTracks();
@@ -168,12 +177,19 @@ public class Library {
 					
 					try {
 						Thread.sleep( loaderSleepTimeMS );
-						purgeCounter++;
+						orphanCounter++;
+						missingCounter++;
 						
-						if ( purgeCounter > 20 ) {
+						if ( orphanCounter > 1000 ) {
 							//TODO: This is a hack because things aren't setup right. Get all these threads and arraylists coordinating properly. 
-							purgeOrphansAndMissing = true;
-							purgeCounter = 0;
+							purgeOrphans = true;
+							orphanCounter = 0;
+						}
+						
+						if ( missingCounter > 50 ) {
+							//TODO: This is a hack because things aren't setup right. Get all these threads and arraylists coordinating properly. 
+							purgeMissing = true;
+							missingCounter = 0;
 						}
 						
 					} catch ( InterruptedException e ) {
