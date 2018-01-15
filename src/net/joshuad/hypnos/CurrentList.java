@@ -65,7 +65,7 @@ public class CurrentList {
 	
 	List <Thread> noLoadThreads = new ArrayList <Thread> ();
 
-	transient private boolean hasUnsavedData = false;
+	transient private boolean hasUnsavedData = true;
 	
 	public CurrentList ( AudioSystem audioSystem, Queue queue ) {
 		this.queue = queue;
@@ -871,7 +871,6 @@ public class CurrentList {
 	
 	public void tracksAdded () {
 		if ( mode == Mode.PLAYLIST ) {
-			boolean listsMatch = true;
 			
 			if ( currentPlaylist.getTracks().equals( items ) ) {
 				mode = Mode.PLAYLIST;			
@@ -923,7 +922,7 @@ public class CurrentList {
 
 		notifyListenersStateChanged();
 	}
-
+	
 	public void setAndPlayAlbum ( Album album ) {
 		setAndPlayAlbums( Arrays.asList( album ) );
 	}

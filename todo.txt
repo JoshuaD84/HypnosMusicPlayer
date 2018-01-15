@@ -16,14 +16,14 @@ Now:
 	
 		Calling commandline switches at the appimage exits before output is printed. Kinda lame
 
+	Fingerlings 3 false error
+	
 General
 	I emptied the current list and library and playing track, and the art stayed. probably good to get rid of that
 
 	Select two unrelated albums -> Right click play -> no change to shuffle, i expected it to set it to sequential
 		Maybe add a "Multiple Albums" type
 	
-	If you delete a list of tracks down so that it matches an album, set title bar to that album
-
 	KDE Neon
 		Can't drag and drop an mp3 into hypnos
 			onDragOver doesn't seem to hear the drag event. 
@@ -167,7 +167,7 @@ General
 	
 	Get java to release memory back sometimes. We use a lot on load
 		https://stackoverflow.com/questions/30458195/does-gc-release-back-memory-to-os
-      Apparently it can be done with hotspot jvm. Need to research
+		Apparently it can be done with hotspot jvm. Need to research
 
 	Windows - Volume takes a split second to change.
 		https://stackoverflow.com/questions/48183626/delay-when-changing-audio-volume-on-windows
@@ -275,7 +275,7 @@ General
 			
 			
 	Play mounted audio cd
-		http://www.jsresources.org/examples/CddaPlayer.java.html
+		Linux - Linux converts the CDA to WAV, and you can just play it.
 
 :::: OS Specific ::::
 	

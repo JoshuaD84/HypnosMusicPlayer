@@ -13,7 +13,7 @@ public class History {
 
 	private final ObservableList <Track> history = FXCollections.observableArrayList( new ArrayList <Track>(MAX_HISTORY_SIZE) );
 	
-	private transient boolean hasUnsavedData = false;
+	private transient boolean hasUnsavedData = true;
 	
 	public History() {
 		history.addListener( (ListChangeListener.Change<? extends Track> change) -> {

@@ -14,7 +14,7 @@ public class Queue {
 
 	final private ObservableList <Track> queue = FXCollections.observableArrayList ( new ArrayList <Track>() );
 	
-	transient private boolean hasUnsavedData = false;
+	transient private boolean hasUnsavedData = true;
 	
 	public Queue() {
 		queue.addListener( (ListChangeListener.Change<? extends Track> change) -> {

@@ -259,7 +259,7 @@ public class Hypnos extends Application {
 				
 			case HIGH:
 				MusicFileVisitor.setSleepTimeBetweenVisits( 0 );
-				library.setLoaderSleepTimeMS( 0 );
+				library.setLoaderSleepTimeMS( 10 );
 				libraryUpdater.setMaxChangesPerUpdate ( 20000 );
 				libraryUpdater.setSleepTimeMS( 2 );
 				break;

@@ -80,6 +80,9 @@ section "install"
 
    #Registry Info for context menus
    #WriteRegStr HKCR ".flac\shell\Hypnos\command" "" "$INSTDIR\Hypnos.exe $\"%1$\""
+ 	#WriteRegStr HKCR "Directory\shell\Open with Hypnos" "" "$(SHELLEXT_ADD)"
+	#WriteRegStr HKCR "Directory\shell\Open with Hypnos\command" "" '$INSTDIR\${APPNAME}.exe "%1"'
+	#WriteRegStr HKCR "Directory\shell\Open with Hypnos\${APPNAME}.exe"
 
 sectionEnd
  

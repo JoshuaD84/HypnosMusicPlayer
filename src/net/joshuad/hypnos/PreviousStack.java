@@ -6,7 +6,7 @@ import java.util.List;
 /* 
  * Guarantees: 
  * - No null tracks in the stack
- * - It's impossible for the same track to appear twice or more consecuitively. 
+ * - It's impossible for the same track to appear twice or more consecutively. 
  */
 
 public class PreviousStack {
