@@ -85,16 +85,16 @@ public class FlacDecoder extends AbstractDecoder {
 		return false;
 	}
 
+	//Because this is the first attempt of two to decode flacs, don't display UI error in this class's errors. 
+	//The other one might succeed
 	@Override
 	public boolean openStreamsAt ( double seekPercent ) {
 		try {
-
 			decodedInput = new FlacDecoderLogic ( track.getPath().toAbsolutePath().toFile() );
 			if ( decodedInput.numSamples == 0 ) throw new FlacDecoderLogic.FormatException("Unknown audio length");
 		} catch ( IOException e ) {
 			String message = "Unable to decode flac file:" + track.getPath().toString();
 			LOGGER.log( Level.WARNING, message );
-			Hypnos.getUI().notifyUserError( message ); //TODO: inject instead of ask
 			return false;
 		}
 		
@@ -107,17 +107,14 @@ public class FlacDecoder extends AbstractDecoder {
 		} catch ( LineUnavailableException exception ) {
 			String message = "The audio output line could not be opened due to resource restrictions.";
 			LOGGER.log( Level.WARNING, message, exception );
-			Hypnos.getUI().notifyUserError( message ); //TODO: inject instead of ask
 			return false;
 		} catch ( IllegalStateException exception ) {
 			String message = "The audio output line is already open.";
 			LOGGER.log( Level.WARNING, message, exception );
-			Hypnos.getUI().notifyUserError( message ); //TODO: inject instead of ask
 			return false;
 		} catch ( SecurityException exception ) {
 			String message = "The audio output line could not be opened due to security restrictions.";
 			LOGGER.log( Level.WARNING, message, exception );
-			Hypnos.getUI().notifyUserError( message ); //TODO: inject instead of ask
 			return false;
 		} 
 		
@@ -136,7 +133,6 @@ public class FlacDecoder extends AbstractDecoder {
 			} catch ( IOException e ) {
 				String message = "Unable to seek.";
 				LOGGER.log( Level.WARNING, message, e );
-				Hypnos.getUI().notifyUserError( message ); //TODO: inject instead of ask
 			}
 			
 			clipStartTimeMS = (long)( ( track.getLengthS() * 1000 ) * seekPercent );

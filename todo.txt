@@ -15,8 +15,6 @@ Now:
 		When loading files from the commandline and you give a relative path, it assumes its relative to hypnos's directory, not the user.
 	
 		Calling commandline switches at the appimage exits before output is printed. Kinda lame
-
-	Fingerlings 3 false error
 	
 General
 	I emptied the current list and library and playing track, and the art stayed. probably good to get rid of that
