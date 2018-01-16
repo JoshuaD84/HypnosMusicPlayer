@@ -195,7 +195,6 @@ public class AudioSystem {
 		
 		List<CurrentListTrack> items = currentList.getSortedItemsNoFilter();
 
-
 		if ( queue.hasNext() ) {
 			playTrack( queue.getNextTrack(), startPaused );
 			

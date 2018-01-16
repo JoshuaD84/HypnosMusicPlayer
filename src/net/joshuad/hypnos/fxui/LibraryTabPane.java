@@ -60,7 +60,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.TextAlignment;
 import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.AlphanumComparator;
-import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.Persister;
@@ -751,7 +750,7 @@ public class LibraryTabPane extends StretchedTabPane {
 				
 			} else if ( e.getCode() == KeyCode.ENTER && e.isShiftDown()
 			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
-				audioSystem.getCurrentList().insertAlbums( 0,  albumTable.getSelectionModel().getSelectedItems() );
+				audioSystem.getCurrentList().insertAlbums( 0, albumTable.getSelectionModel().getSelectedItems() );
 				
 			} else if ( e.getCode() == KeyCode.ENTER && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {

@@ -362,9 +362,13 @@ public class CurrentList {
 	}
 		
 	public void setTracksPathList ( List <Path> paths ) {
+		setTracksPathList ( paths, null );
+	}
+	
+	public void setTracksPathList ( List <Path> paths, Runnable afterLoad ) {
 		clearList();
 		queue.clear();
-		appendTracksPathList ( paths );
+		appendTracksPathList ( paths, afterLoad );
 	}
 	
 	public void appendTrack ( String location ) {
@@ -384,8 +388,13 @@ public class CurrentList {
 	}
 		
 	public void appendTracksPathList ( List <Path> paths ) {
-		insertTrackPathList ( items.size(), paths );
+		insertTrackPathList ( items.size(), paths, null );
 	}
+	
+	public void appendTracksPathList ( List <Path> paths, Runnable afterLoad ) {
+		insertTrackPathList ( items.size(), paths, afterLoad );
+	}
+		
 	
 	public void insertTracks ( int index, List<? extends Track> tracks ) {
 		if ( tracks == null || tracks.size() <= 0 ) {
@@ -428,7 +437,11 @@ public class CurrentList {
 		}
 	}
 	
-	public void insertTrackPathList ( int index, List <Path> paths ) {
+	public void insertTrackPathList ( int index, List<Path> paths ) {
+		insertTrackPathList ( index, paths, null );
+	}
+	
+	public void insertTrackPathList ( int index, List <Path> paths, Runnable doAfterLoad ) {
 		
 		Runnable runMe = new Runnable() {
 			public void run() {
@@ -473,6 +486,10 @@ public class CurrentList {
 				//This fixes two problems -- red rows in current list not being white after deleting and D&D
 				//and the table not refreshing after drag & drop of folder
 				Hypnos.getUI().refreshCurrentList();
+				
+				if ( doAfterLoad != null ) {
+					doAfterLoad.run();
+				}
 			
 			}
 			

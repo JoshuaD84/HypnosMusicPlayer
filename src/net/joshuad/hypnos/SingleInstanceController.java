@@ -36,30 +36,30 @@ public class SingleInstanceController {
 		return isFirstInstance;
 	}
 	
-	public boolean startCLICommandListener( Hypnos hypnos ) {
-		
+	public boolean startCLICommandListener ( Hypnos hypnos ) {
+
 		if ( !isFirstInstance ) {
 			throw new IllegalStateException( "Cannot start a command line listener if we are not the first instance." );
 		}
-			
+
 		@SuppressWarnings("unchecked")
-		Thread t = new Thread ( () -> {
+		Thread t = new Thread( () -> {
 			while ( true ) {
 				try {
-					Socket clientSocket = serverSocket.accept(); //It blocks here while listening
+					Socket clientSocket = serverSocket.accept(); // It blocks here indefinitely while listening
 					ObjectInputStream in = new ObjectInputStream( clientSocket.getInputStream() );
-					
 					Object dataIn = in.readObject();
-					
+
 					if ( dataIn instanceof List ) {
-						hypnos.applyCLICommands ( (List <SocketCommand>) dataIn );
+						List <SocketCommand> items = (List <SocketCommand>) dataIn;
+						hypnos.applyCLICommands( items );
 					}
-					
+
 				} catch ( Exception e ) {
 					LOGGER.log( Level.INFO, e.getClass() + ": Read error at commandline parser", e );
 				}
 			}
-		});
+		} );
 		
 		t.setName( "CLI Listener" );
 		t.setDaemon( true );
@@ -67,6 +67,7 @@ public class SingleInstanceController {
 		return true;
 	}
 	
+	//TODO: make sure we close socket
 	public void sendCommandsThroughSocket( List <SocketCommand> commands ) {
 		try (
 			Socket clientSocket = new Socket( InetAddress.getByName(null), port );
@@ -74,7 +75,7 @@ public class SingleInstanceController {
 		){
 			out.writeObject( commands );
 		} catch ( Exception e ) {
-			LOGGER.log( Level.INFO, "Difficulty sending commands through socket, UI may not accept commands." );
+			LOGGER.log( Level.INFO, "Error sending commands through socket, UI may not accept commands." );
 		}
 	}
 }

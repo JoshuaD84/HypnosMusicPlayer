@@ -587,12 +587,15 @@ public class Hypnos extends Application {
 		ui.warnUserAlbumsMissing ( missing );
 	}
 	
+	
+	private long setTracksLastTime = 0;
+	
 	@SuppressWarnings("unchecked")
 	public void applyCLICommands ( List <SocketCommand> commands ) {
 		
+		ArrayList<Path> newList = new ArrayList<Path>();
 		for ( SocketCommand command : commands ) {
 			if ( command.getType() == SocketCommand.CommandType.SET_TRACKS ) {
-				ArrayList<Path> newList = new ArrayList<Path>();
 				
 				for ( File file : (List<File>) command.getObject() ) {
 					if ( file.isDirectory() ) {
@@ -613,15 +616,27 @@ public class Hypnos extends Application {
 						LOGGER.info( "Recived non-music, non-playlist file, ignoring: " + file );
 					}
 				}
-				
-				if ( newList.size() > 0 ) {
-					Platform.runLater( () -> {
-						audioSystem.getCurrentList().setTracksPathList( newList );
-						audioSystem.next();
-						audioSystem.play();
-					});
-				}
 			}
+		}
+		
+		if ( newList.size() > 0 ) {
+			if ( System.currentTimeMillis() - setTracksLastTime > 5000 ) {
+				Platform.runLater( () -> {
+					audioSystem.getCurrentList().setTracksPathList( newList,
+						new Runnable() {
+							@Override
+							public void run() {
+								audioSystem.next( false );
+							}
+						}
+					);
+				});
+			} else {
+				Platform.runLater( () -> {
+					audioSystem.getCurrentList().appendTracksPathList ( newList );
+				});
+			}
+			setTracksLastTime = System.currentTimeMillis();
 		}
 
 		for ( SocketCommand command : commands ) {
