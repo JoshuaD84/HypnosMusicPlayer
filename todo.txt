@@ -12,9 +12,13 @@ Now:
 			Not all the tracks appear on the current list, and it doesn't start playing the first one
 			Also the pause button kinda bugs out
 			
-		When loading files from the commandline and you give a relative path, it assumes its relative to hypnos's directory, not the user.
+		Linux - When loading files from the commandline and you give a relative path, it assumes its relative to hypnos's directory, not the user.
+			This can be addressed in the script
 	
-		Calling commandline switches at the appimage exits before output is printed. Kinda lame
+		Linux - Calling commandline switches at the appimage exits before output is printed.
+		
+		When hypnos is already running, some stuff is printed that I don't like seeing. in this case, only print a short notification taht
+			info was sent to current running. Don't show logging data. 
 	
 General
 	I emptied the current list and library and playing track, and the art stayed. probably good to get rid of that

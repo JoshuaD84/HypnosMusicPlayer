@@ -1,7 +1,6 @@
 package net.joshuad.hypnos;
 
 import java.io.File;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -12,6 +11,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -32,9 +32,11 @@ public class CLIParser {
 	private static final String VOLUME_UP = "volume-up";
 	private static final String SEEK_BACK = "seek-back";
 	private static final String SEEK_FORWARD = "seek-forward";
+	private static final String BASE_DIR = "base-dir";
 	
 	CommandLineParser parser;
 	Options options;
+	Options helpOptions;
 	
 	
 	public CLIParser ( ) {
@@ -52,9 +54,16 @@ public class CLIParser {
 		options.addOption( null, VOLUME_UP, false, "Turn up the volume" );
 		options.addOption( null, SEEK_BACK, false, "Seek back 5 seconds" );
 		options.addOption( null, SEEK_FORWARD, false, "Seek forward 5 seconds" );
+		options.addOption( null, BASE_DIR, true, "Define the base directory from which to interpret relative file arguments" );
 		
 		parser = new DefaultParser();
 		
+		helpOptions = new Options();
+		for ( Option option : options.getOptions() ) {
+			if ( !option.getLongOpt().equals( BASE_DIR ) ) {
+				helpOptions.addOption( option );
+			}
+		}
 	}
 	
 	public ArrayList <SocketCommand> parseCommands ( String[] args ) {
@@ -66,7 +75,7 @@ public class CLIParser {
 			
 			if ( line.hasOption( HELP ) ) {
 				HelpFormatter formatter = new HelpFormatter();
-				formatter.printHelp( "hypnos <options>", options );
+				formatter.printHelp( "hypnos <options>", helpOptions );
 				System.exit( 0 );
 			}
 
@@ -114,11 +123,22 @@ public class CLIParser {
 				retMe.add( new SocketCommand ( SocketCommand.CommandType.CONTROL, SocketCommand.SEEK_FORWARD ) );
 			}
 			
+			Path baseDir = Paths.get( System.getProperty("user.dir") );
+
+			if ( line.hasOption( BASE_DIR ) ) {
+				baseDir = Paths.get( line.getOptionValue( BASE_DIR ) );
+			}
+			
 			ArrayList<File> filesToLoad = new ArrayList<File> ();
-			String baseDir = System.getProperty("user.dir");
 			for ( String leftOverArgument : line.getArgList() ) {
-				Path absolutePath = FileSystems.getDefault().getPath( Paths.get( leftOverArgument ).toString() ).normalize().toAbsolutePath();
-				filesToLoad.add( absolutePath.toFile() );
+				
+				Path argumentPath = Paths.get( leftOverArgument ).normalize();
+				
+				if ( !argumentPath.isAbsolute() ) {
+					argumentPath = baseDir.resolve( argumentPath ).toAbsolutePath().normalize();
+				}
+				
+				filesToLoad.add( argumentPath.toFile() );
 			}
 			
 			if ( filesToLoad.size() > 0 ) {
