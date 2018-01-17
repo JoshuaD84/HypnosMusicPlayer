@@ -6,10 +6,7 @@ Now:
 	Windows - Global hotkeys don't show in settings tab until you try to set one, then they all appear
 
 	Windows - Select Multiple Files in explorer - No Option to play in Hypnos. Add that
-  
-	CLI Issues	
-		Linux - Calling commandline switches at the appimage exits before output is printed.
-	
+  	
 	Strange log on launch
 		Jan 16, 2018 03:30:03 AM net.joshuad.hypnos.audio.AudioSystem lambda$applySettings$0
 		INFO: Error loading current list track number: Index: 28, Size: 5
@@ -22,6 +19,8 @@ Now:
 		open the track list for that album
 	
 General
+	Large images from web have trouble with Drag and Drop
+	
 	I emptied the current list and library and playing track, and the art stayed. probably good to get rid of that
 
 	Select two unrelated albums -> Right click play -> no change to shuffle, i expected it to set it to sequential

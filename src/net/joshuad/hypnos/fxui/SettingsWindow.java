@@ -1211,7 +1211,7 @@ public class SettingsWindow extends Stage {
 		"    Save Current List as Playlist            Ctrl + S\n" +	
 		"    Open files                               Ctrl + O\n" +
 		"    Export Current List as Playlist          Ctrl + E\n" +	
-		"    Filter the Current List                  F" +
+		"    Filter the Current List                  F\n" +
 		"    Filter the First Tab in Library          1 or Ctrl + 1\n" +
 		"    Filter the Second Tab in Library         2 or Ctrl + 2\n" +
 		"    Filter the Third Tab in Library          3 or Ctrl + 3\n" +	
