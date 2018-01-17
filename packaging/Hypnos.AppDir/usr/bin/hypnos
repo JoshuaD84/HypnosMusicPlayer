@@ -3,6 +3,4 @@
 ROOT=$PWD
 DIR="$(dirname "$(readlink -f "$0")")"
 cd $DIR
-./jre/bin/hypnos -jar -Xmx600m -XX:+UseG1GC -XX:+UseStringDeduplication hypnos.jar "$@" --base-dir="$ROOT" &
-disown
-exit 0
+exec ./jre/bin/hypnos -jar -Xmx600m -XX:+UseG1GC -XX:+UseStringDeduplication hypnos.jar "$@" --base-dir="$ROOT"

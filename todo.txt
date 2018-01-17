@@ -9,9 +9,6 @@ Now:
   
 	CLI Issues	
 		Linux - Calling commandline switches at the appimage exits before output is printed.
-		
-		When hypnos is already running, some stuff is printed that I don't like seeing. in this case, only print a short notification taht
-			info was sent to current running. Don't show logging data. 
 	
 	Strange log on launch
 		Jan 16, 2018 03:30:03 AM net.joshuad.hypnos.audio.AudioSystem lambda$applySettings$0
