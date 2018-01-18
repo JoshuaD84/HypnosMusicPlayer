@@ -278,20 +278,16 @@ public class CurrentList {
 
 		Runnable runMe = new Runnable() {
 			public void run() {
-				int tracksRemoved = 0;
-				for ( int k = indicies.size() - 1; k >= 0; k-- ) {
-					if ( indicies.get( k ) >= 0 && indicies.get ( k ) < currentListSorted.size() ) {
-						CurrentListTrack itemRemoved = currentListSorted.remove ( indicies.get( k ).intValue() );
-						
-						if ( indicies.get( k ) > 0 && itemRemoved.isLastCurrentListTrack() ) {
-							currentListSorted.get( indicies.get( k ) - 1 ).setIsLastCurrentListTrack( true );
-						}
-							
-						tracksRemoved++;
-					}
+				
+				List <Track> removeMe = new ArrayList<Track> ();
+				
+				for ( int index : indicies ) {
+					removeMe.add( currentListSorted.get( index ) );
 				}
 				
-				if ( tracksRemoved > 0 ) {
+				boolean changed = items.removeAll( removeMe );
+				
+				if ( changed ) {
 					if ( items.size() == 0 ) {
 						listCleared();
 						currentPlaylist = null;

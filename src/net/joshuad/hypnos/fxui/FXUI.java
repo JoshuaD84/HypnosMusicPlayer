@@ -549,7 +549,6 @@ public class FXUI implements PlayerListener {
 		
 	//REFACTOR: Does this function need to exist? 
 	void removeFromCurrentList ( List<Integer> removeMe ) {
-		
 		if ( !removeMe.isEmpty() ) {
 			audioSystem.getCurrentList().removeTracksAtIndices ( removeMe );
 		}
