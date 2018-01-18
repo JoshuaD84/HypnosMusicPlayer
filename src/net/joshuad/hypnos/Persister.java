@@ -160,51 +160,52 @@ public class Persister {
 			for ( String pathString : searchPaths ) {
 				library.requestUpdateSource( Paths.get( pathString ) );
 			}
-			
+
+			library.setSourcesHasUnsavedData( false );
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to read library source directory list from disk, continuing." );
 		}
 		
-		library.setSourcesHasUnsavedData( false );
 	}
 
 	public void loadCurrentList() {
 		try ( ObjectInputStream dataIn = new ObjectInputStream( new FileInputStream( currentFile ) ) ) {
 			audioSystem.getCurrentList().setState ( (CurrentListState)dataIn.readObject() );
+			audioSystem.getCurrentList().setHasUnsavedData( false );
 			
 		} catch ( Exception e ) {
 			try ( ObjectInputStream dataIn = new ObjectInputStream( new GZIPInputStream( new FileInputStream( currentFile ) ) ) ) {
 				audioSystem.getCurrentList().setState ( (CurrentListState)dataIn.readObject() );
+				audioSystem.getCurrentList().setHasUnsavedData( false );
 				
 			} catch ( Exception e2 ) {
 				LOGGER.warning( "Unable to read library data from disk, continuing." );
 			}
 		}
 		
-		audioSystem.getCurrentList().setHasUnsavedData( false );
 	}
 
 	@SuppressWarnings("unchecked")
 	public void loadQueue () {
 		try ( ObjectInputStream queueIn = new ObjectInputStream( new FileInputStream( queueFile ) ); ) {
 			audioSystem.getQueue().queueAllTracks( (ArrayList <Track>) queueIn.readObject() );
+			audioSystem.getQueue().setHasUnsavedData( false );
 			
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to read queue data from disk, continuing." );
 		}
 		
-		audioSystem.getQueue().setHasUnsavedData( false );
 	}
 
 	@SuppressWarnings("unchecked")
 	public void loadHistory () {
 		try ( ObjectInputStream historyIn = new ObjectInputStream( new FileInputStream( historyFile ) ); ) {
 			audioSystem.getHistory().setData( (ArrayList <Track>) historyIn.readObject() );
+			audioSystem.getHistory().setHasUnsavedData( false );
 		
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to read history from disk, continuing." );
 		}
-		audioSystem.getHistory().setHasUnsavedData( false );
 		
 	}
 	
@@ -212,10 +213,10 @@ public class Persister {
 	public void loadHotkeys () {
 		try ( ObjectInputStream hotkeysIn = new ObjectInputStream( new FileInputStream( hotkeysFile ) ); ) {
 			hotkeys.setMap( (EnumMap <Hotkey, KeyState>) hotkeysIn.readObject() );
+			hotkeys.setHasUnsavedData( false );
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to read hotkeys from disk, continuing." );
 		}
-		hotkeys.setHasUnsavedData( false );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -306,7 +307,9 @@ public class Persister {
 	}
 
 	public void saveQueue () {
-		if ( !audioSystem.getQueue().hasUnsavedData() ) return;
+		if ( !audioSystem.getQueue().hasUnsavedData() ) {
+			return;
+		}
 		
 		File tempQueueFile = new File ( queueFile.toString() + ".temp" );
 		try ( ObjectOutputStream queueListOut = new ObjectOutputStream( new FileOutputStream( tempQueueFile ) ) ) {

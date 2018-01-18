@@ -56,7 +56,7 @@ public class GlobalHotkeys implements NativeKeyListener {
 	
 	private EnumMap <Hotkey, KeyState> hotkeyMap = new EnumMap <Hotkey, KeyState> ( Hotkey.class );
 	
-	transient private boolean hasUnsavedData = false;
+	transient private boolean hasUnsavedData = true;
 	
 	public boolean hasUnsavedData() {
 		return hasUnsavedData;
