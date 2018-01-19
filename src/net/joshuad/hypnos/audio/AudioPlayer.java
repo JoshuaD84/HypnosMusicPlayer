@@ -175,6 +175,7 @@ public class AudioPlayer {
 			} catch ( Exception e ) {
 				//Note: We catch everything here because this loop has to keep running no matter what, or the program can't play music. 
 				LOGGER.log( Level.WARNING, "Exception in AudioPlayer Loop.", e );
+				requestStop(); //TODO: this sets the wrong reason for stopping, but w/e
 			}
 		}
 	}

@@ -284,7 +284,6 @@ public class Persister {
 				LOGGER.log( Level.WARNING, "Unable to save current list data to disk, continuing.", e );
 			}
 		} else {
-		
 			try ( GZIPOutputStream currentListOut = new GZIPOutputStream( new BufferedOutputStream( new FileOutputStream( tempCurrentFile ) ) ); ) {
 	
 				ByteArrayOutputStream byteWriter = new ByteArrayOutputStream();

@@ -7,14 +7,6 @@ Now:
 
 	Windows - Select Multiple Files in explorer - No Option to play in Hypnos. Add that
   	
-	Strange log on launch
-		Jan 16, 2018 03:30:03 AM net.joshuad.hypnos.audio.AudioSystem lambda$applySettings$0
-		INFO: Error loading current list track number: Index: 28, Size: 5
-		
-	Jan 16, 2018 03:52:12 AM net.joshuad.hypnos.Persister saveCurrentList
-		WARNING: Unable to save current list data to disk, continuing.
-		java.io.NotSerializableException: com.sun.javafx.collections.ObservableListWrapper
-	
 	Show Album button on a track
 		open the track list for that album
 	

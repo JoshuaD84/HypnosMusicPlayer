@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
@@ -26,7 +27,8 @@ public class Playlist implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
-	private ObservableList <Track> tracks = FXCollections.observableArrayList( new ArrayList <Track>() );
+	private List <Track> trackData = new ArrayList<Track>();
+	private transient ObservableList <Track> tracks = FXCollections.observableArrayList( trackData );
 	
 	private String name;
 	
@@ -195,5 +197,10 @@ public class Playlist implements Serializable {
 		String baseFileName =  fileSafeName + getName().hashCode();
 		
 		return baseFileName;
+	}
+	
+	private void readObject ( ObjectInputStream in ) throws IOException, ClassNotFoundException {
+		in.defaultReadObject();
+		tracks = FXCollections.observableArrayList( trackData );
 	}
 }
