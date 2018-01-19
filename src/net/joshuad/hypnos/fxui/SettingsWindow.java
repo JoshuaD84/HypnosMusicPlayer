@@ -987,6 +987,10 @@ public class SettingsWindow extends Stage {
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				enqueueMenuItem.fire();
 				
+			} else if ( e.getCode() == KeyCode.G && e.isControlDown()
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				goToAlbumMenuItem.fire();
+				
 			} else if ( e.getCode() == KeyCode.Q && e.isShiftDown()
 			&& !e.isAltDown() && !e.isControlDown()  && !e.isMetaDown() ) {
 				playNextMenuItem.fire();
@@ -1065,10 +1069,6 @@ public class SettingsWindow extends Stage {
 			
 			return row;
 		});
-		
-		
-		
-		
 		
 		pane.getChildren().addAll( tagTable );
 		
@@ -1243,6 +1243,7 @@ public class SettingsWindow extends Stage {
 		"\n" +
 		"Any Track\n" +
 		"    Show Lyrics                              L\n" +
+		"    Select the track's album in library      Ctrl + G\n" + 
 		"\n" +
 		"All Tables\n" +
 		"    Deselect                                 Esc\n" +

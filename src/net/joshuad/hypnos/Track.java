@@ -111,6 +111,8 @@ public class Track implements Serializable, AlbumInfoSource {
 	private String encodingType = "";
 	private String format = "";
 	
+	private long diskTimeStamp = 0;
+	
 	private static final DirectoryStream.Filter<Path> imageFileFilter = new DirectoryStream.Filter<Path>() {
 		@Override
 		public boolean accept ( Path entry ) throws IOException {
@@ -139,6 +141,7 @@ public class Track implements Serializable, AlbumInfoSource {
 		this.isVBR = track.isVBR;
 		this.encodingType = track.encodingType;
 		this.format = track.format;
+		this.diskTimeStamp = track.diskTimeStamp;
 		
 		/* REFACTOR - Something like this, to avoid programmer mistakes. 
 		   for ( Field field : Track.class.getFields() ) {
@@ -212,6 +215,14 @@ public class Track implements Serializable, AlbumInfoSource {
 		}
 
 		parseFileName();
+		
+		this.diskTimeStamp = trackFile.lastModified();
+	}
+	
+	
+	//TODO: i made this and then stopped coding for the day. Pick up from here or remove it. 
+	public boolean needsRefreshFromDisk ( ) {
+		return diskTimeStamp != trackFile.lastModified();
 	}
 	
 	private AudioFile getAudioFile() throws IOException, CannotReadException, TagException, ReadOnlyFileException, InvalidAudioFrameException {

@@ -730,7 +730,7 @@ public class LibraryTabPane extends StretchedTabPane {
 			} else if ( e.getCode() == KeyCode.Q && e.isShiftDown() 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
 				playNextMenuItem.fire();
-				
+
 			} else if ( e.getCode() == KeyCode.F2 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				editTagMenuItem.fire();
@@ -1206,6 +1206,10 @@ public class LibraryTabPane extends StretchedTabPane {
 			} else if ( e.getCode() == KeyCode.Q && e.isShiftDown()
 			&& !e.isAltDown() && !e.isControlDown()  && !e.isMetaDown() ) {
 				playNextMenuItem.fire();
+				
+			} else if ( e.getCode() == KeyCode.G && e.isControlDown()
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				goToAlbumMenuItem.fire();
 							
 			} else if ( e.getCode() == KeyCode.F2 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {

@@ -145,6 +145,10 @@ public class HistoryWindow extends Stage {
 				enqueueMenuItem.fire();
 				e.consume();
 				
+			} else if ( e.getCode() == KeyCode.G && e.isControlDown()
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				goToAlbumMenuItem.fire();
+				
 			} else if ( e.getCode() == KeyCode.Q && e.isShiftDown() 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
 				playNextMenuItem.fire();

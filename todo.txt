@@ -3,33 +3,42 @@ Now:
 		Log / status
 		some controls, maybe
 		
-	Add a place to drag and drop folders (or navigate to them) to demand that they be rescanned immediately.
-
 	Windows - Global hotkeys don't show in settings tab until you try to set one, then they all appear
 
 	Windows - Select Multiple Files in explorer - No Option to play in Hypnos. Add that
-  	
-	Show Album button on a track
-		open the track list for that album
-	
-	Go to album hotkey, maybe
-	
+  		
 	Drag and Drop to playlist info window doesn't affect the playlist itself
-	
-General
+		
 	Large images from web have trouble with Drag and Drop
-	
-	I emptied the current list and library and playing track, and the art stayed. probably good to get rid of that
 
-	Select two unrelated albums -> Right click play -> no change to shuffle, i expected it to set it to sequential
-		Maybe add a "Multiple Albums" type
+	Hover effects on transparent image buttons
+		Settings Button
+		Volume button
+		https://stackoverflow.com/questions/47765228/is-it-possible-to-set-tthe-hsv-for-a-color-adjust-via-css
+		settingsButton.setOnMouseEntered( e -> settingsImage.setEffect( this.darkThemeButtonsHover ) );
+		settingsButton.setOnMouseExited( e -> settingsImage.setEffect( isDarkTheme()? darkThemeButtons : null ) );
+		This is kind of a pain. We need to hard code the values, convert from hsv to color adjust, and also probably have white button images instead of black. 
 	
+	Interface with Last.fm scrobbler
+		https://github.com/jkovacs/lastfm-java
+		https://github.com/thomwiggers/lastfm-java
+		https://stackoverflow.com/questions/22766572/last-fm-java-api-get-recenttracks-of-a-user-within-a-data-range
+
+
+After Beta 3
+
 	KDE Neon
 		Can't drag and drop an mp3 into hypnos
 			onDragOver doesn't seem to hear the drag event. 
 		
 		User said it opened the track instead of opening folder. Confirmed on KDE Neon image on my computer, it opened gwenview 
 			https://stackoverflow.com/questions/48131760/desktop-getdesktop-open-folder-in-kde-opens-up-gwenview-instead-of-dolphin
+			
+	I emptied the current list and library and playing track, and the art stayed. probably good to get rid of that
+	
+	Add a place to drag and drop folders (or navigate to them) to demand that they be rescanned immediately.
+
+	Search for artist / album image data possibilities online, show in a window, let user choose. 
 		
 	Refactor Library
 		If you load albumsAndTracks but not sources Hypnos acts real wierd. Goes back and forth between not responding. On Windows confirmed. 
@@ -62,26 +71,14 @@ General
 			I dunno making search box script is alot. 
 		
 		Give user feedback about the disk scanner and the abiliyt to control it	
-	
+
+			
 	Drag and drop from misc places to system
 		playlist table -> m3u
 		track table, history, queue, info windows, current table -> single tracks
 		album table -> folder
 		
-	Hover effects on transparent image buttons
-		Settings Button
-		Volume button
-		https://stackoverflow.com/questions/47765228/is-it-possible-to-set-tthe-hsv-for-a-color-adjust-via-css
-		settingsButton.setOnMouseEntered( e -> settingsImage.setEffect( this.darkThemeButtonsHover ) );
-		settingsButton.setOnMouseExited( e -> settingsImage.setEffect( isDarkTheme()? darkThemeButtons : null ) );
-		This is kind of a pain. We need to hard code the values, convert from hsv to color adjust, and also probably have white button images instead of black. 
-		
 	Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
-	
-	Interface with Last.fm scrobbler
-		https://github.com/jkovacs/lastfm-java
-		https://github.com/thomwiggers/lastfm-java
-		https://stackoverflow.com/questions/22766572/last-fm-java-api-get-recenttracks-of-a-user-within-a-data-range
 
 	Missing tracks are deleted from currentlist after restart if CurrentList.mode == ALBUM instead of remaining and being highlighted in red
 
@@ -100,7 +97,7 @@ General
 			http://sourceforge.net/projects/jxgrabkey/
 			
 			JNativeHook - No consumption of hotkey
-
+	
 	Tag auto fix button
 
 	Bug report dialog
@@ -112,6 +109,8 @@ General
 	
 	If something gets dropped into config/playlists, update the UI to include it? 
 	
+	Playlist throttled filter, but man, who's going to have over 1000 playlists? 
+
 	Memory Hog issue	
 		With an empty library and no current list and nothing loaded uses about 175mb on Windows 7.
 			Clicking around the UI and using every UI feature except for loading library or tracks can climb it to about 300mb
@@ -154,11 +153,8 @@ General
 		flipping through tracks quickly by hitting next button also causes memory spike. Not terrible. 
 				
 		2017/12/25 - I was able to temper this problem significantly by having only one image loader thread and by setting -Xmx
-
-	Playlist throttled filter, but man, who's going to have over 1000 playlists? 
-
-	Search for artist / album image data possibilities online, show in a window, let user choose. 
-
+		
+		
 :::: Lyric Failures ::::
 
 	
@@ -167,11 +163,13 @@ General
 	
 	Get java to release memory back sometimes. We use a lot on load
 		https://stackoverflow.com/questions/30458195/does-gc-release-back-memory-to-os
-		Apparently it can be done with hotspot jvm. Need to research
+		-XX:GCTimeRatio=19 -XX:MinHeapFreeRatio=20- XX:MaxHeapFreeRatio=30
+			Doesn't work on my system. It seems to keep the memory it grabs. 
+			Added a folder to library, let it load, then removed it. Memory jumped from 250mb to 850mb
 
 	Windows - Volume takes a split second to change.
 		https://stackoverflow.com/questions/48183626/delay-when-changing-audio-volume-on-windows
-		I also posted a bug report
+		https://bugs.java.com/bugdatabase/view_bug.do?bug_id=JDK-8195124
 
 	Review and include this answer
 		https://stackoverflow.com/questions/48144750/how-can-i-debug-a-nullpointerexception-where-the-stacktrace-doesnt-reference-my/48145928#48145928
@@ -218,11 +216,13 @@ General
 		https://stackoverflow.com/questions/47950917/stop-tableview-small-scroll-when-adding-content-to-bottom-of-table
 		1/2/18 - Bug submitted to bugs.java.com
 		
-	Inconsistent eyEvent consumption - https://stackoverflow.com/questions/48054928/inconsistent-keyevent-consumption-by-textfield
+	Inconsistent KeyEvent consumption - https://stackoverflow.com/questions/48054928/inconsistent-keyevent-consumption-by-textfield
 		Resolved in java 9 apparently
 	
 	Java 9
 		Using java 9 to launch hypnos crashes. I can't get either OpenSDK or OracleSDK to run, for different reasons
+		
+		Also:
 			WARNING: An illegal reflective access operation has occurred
 			WARNING: Illegal reflective access by net.joshuad.hypnos.Hypnos (file:/home/joshua/workbench/hypnos-9-test/hypnos.jar) to field java.lang.ClassLoader.sys_paths
 			WARNING: Please consider reporting this to the maintainers of net.joshuad.hypnos.Hypnos
@@ -272,7 +272,6 @@ General
 			Guessing this problem is isolated to my system and my strange sound card. 
 			
 		mp3 - No known issues
-			
 			
 	Play mounted audio cd
 		Linux - Linux converts the CDA to WAV, and you can just play it.

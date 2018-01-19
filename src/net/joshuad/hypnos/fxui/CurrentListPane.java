@@ -831,6 +831,10 @@ public class CurrentListPane extends BorderPane {
 				queueMenuItem.fire();
 				e.consume();	
 				
+			} else if ( e.getCode() == KeyCode.G && e.isControlDown()
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				goToAlbumMenuItem.fire();
+				
 			} else if ( e.getCode() == KeyCode.Q && e.isShiftDown()
 			&& !e.isControlDown() && !e.isAltDown() && !e.isMetaDown() ) {
 				playNextMenuItem.fire();

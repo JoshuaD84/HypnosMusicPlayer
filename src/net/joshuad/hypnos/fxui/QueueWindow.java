@@ -172,7 +172,11 @@ public class QueueWindow extends Stage {
 				} else {
 					this.hide();
 				}
-
+				
+			} else if ( e.getCode() == KeyCode.G && e.isControlDown()
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				goToAlbumMenuItem.fire();
+				
 			} else if ( e.getCode() == KeyCode.F2 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				editTagMenuItem.fire();

@@ -1582,6 +1582,7 @@ public class FXUI implements PlayerListener {
 				libraryPane.albumTable.requestFocus();
 				libraryPane.albumTable.scrollTo( album );
 				libraryPane.setAlbumsVisible( true );
+				if ( isLibraryCollapsed() ) setLibraryCollapsed( false );
 				libraryPane.getSelectionModel().select( libraryPane.albumTab );
 				break;
 			}
