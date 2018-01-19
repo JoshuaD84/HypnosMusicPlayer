@@ -23,12 +23,16 @@ Now:
 		https://github.com/jkovacs/lastfm-java
 		https://github.com/thomwiggers/lastfm-java
 		https://stackoverflow.com/questions/22766572/last-fm-java-api-get-recenttracks-of-a-user-within-a-data-range
+	
+	Issue with saving current list. I had just loaded a playlist and re-opened
+		Jan 19, 2018 03:06:20 AM net.joshuad.hypnos.audio.AudioSystem lambda$applySettings$0
+		INFO: Error loading current list track number: Index: 83, Size: 8
 
 
 After Beta 3
 
 	KDE Neon
-		Can't drag and drop an mp3 into hypnos
+		Can't drag ad drop an mp3 into hypnos
 			onDragOver doesn't seem to hear the drag event. 
 		
 		User said it opened the track instead of opening folder. Confirmed on KDE Neon image on my computer, it opened gwenview 

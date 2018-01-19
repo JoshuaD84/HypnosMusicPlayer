@@ -1017,9 +1017,7 @@ public class FXUI implements PlayerListener {
 		SplitPane.setResizableWithParent( primarySplitPane, Boolean.FALSE );
 			
 		hackTooltipStartTiming();
-	
-		libraryPane.updateLibraryListPlaceholder();
-		
+			
 		Platform.runLater( () -> {
 			try {
 				Thread.sleep ( 100 );
@@ -1587,6 +1585,10 @@ public class FXUI implements PlayerListener {
 				break;
 			}
 		}
+	}
+
+	public void setLibraryLabelsToLoading () {
+		libraryPane.setLabelsToLoading();
 	}
 }
 

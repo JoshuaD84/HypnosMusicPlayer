@@ -117,6 +117,10 @@ public class LibraryTabPane extends StretchedTabPane {
 	Label filteredTrackListLabel = new Label( "No tracks match." );
 	Label filteredPlaylistLabel = new Label( "No playlists match." );
 	
+	Label loadingAlbumListLabel = new Label( "Loading..." );
+	Label loadingTrackListLabel = new Label( "Loading..." );
+	Label loadingPlaylistListLabel = new Label( "Loading..." );
+	
 	CheckBox trackListCheckBox;
 	TextField trackFilterBox, albumFilterBox, playlistFilterBox;
 	
@@ -1696,7 +1700,6 @@ public class LibraryTabPane extends StretchedTabPane {
 	}
 	
 	public void updateLibraryListPlaceholder() {
-
 		if ( library.getAlbums().isEmpty() ) {
 			if ( albumTable.getPlaceholder() != emptyAlbumListLabel ) {
 				albumTable.setPlaceholder( emptyAlbumListLabel );
@@ -2205,5 +2208,11 @@ public class LibraryTabPane extends StretchedTabPane {
 		retMe.put ( Setting.HIDE_ALBUM_TRACKS, trackListCheckBox.isSelected() );
 		
 		return retMe;
+	}
+
+	public void setLabelsToLoading () {
+		albumTable.setPlaceholder( loadingAlbumListLabel );
+		trackTable.setPlaceholder( loadingTrackListLabel );
+		playlistTable.setPlaceholder( loadingPlaylistListLabel );
 	}
 }

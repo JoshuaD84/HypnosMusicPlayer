@@ -744,7 +744,8 @@ public class Hypnos extends Application {
 							Hypnos.setLoaderSpeed( LoaderSpeed.valueOf( pendingSettings.get( Setting.LOADER_SPEED ) ) );
 							pendingSettings.remove( Setting.LOADER_SPEED );
 						}
-						
+
+						ui.setLibraryLabelsToLoading();
 						ui.showMainWindow();
 						
 						Thread finishLoadingThread = new Thread ( () -> {
@@ -759,6 +760,9 @@ public class Hypnos extends Application {
 							persister.loadHistory();
 							persister.loadPlaylists();
 							persister.loadHotkeys();
+							
+							Platform.runLater( () -> ui.libraryPane.updateLibraryListPlaceholder() );
+							
 							ui.refreshHotkeyList();
 							
 							audioSystem.start();
@@ -826,6 +830,7 @@ public class Hypnos extends Application {
 						libraryUpdater.start();
 						library.startLoader( persister );
 						ui.showMainWindow();
+						ui.libraryPane.updateLibraryListPlaceholder();
 						ui.fixTables();
 						
 						LOGGER.info( "Hypnos finished loading." );
