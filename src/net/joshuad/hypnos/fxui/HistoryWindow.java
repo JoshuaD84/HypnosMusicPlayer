@@ -118,12 +118,14 @@ public class HistoryWindow extends Stage {
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem infoMenuItem = new MenuItem( "Info" );
 		MenuItem lyricsMenuItem = new MenuItem( "Lyrics" );
+		MenuItem goToAlbumMenuItem = new MenuItem( "Go to Album" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		MenuItem removeMenuItem = new MenuItem( "Remove from History" );
 		trackContextMenu.getItems().addAll( 
 			playMenuItem, appendMenuItem, playNextMenuItem, enqueueMenuItem,
-			editTagMenuItem, infoMenuItem, lyricsMenuItem, browseMenuItem, addToPlaylistMenuItem, removeMenuItem 
+			editTagMenuItem, infoMenuItem, lyricsMenuItem, goToAlbumMenuItem, 
+			browseMenuItem, addToPlaylistMenuItem, removeMenuItem 
 		);
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
@@ -192,6 +194,10 @@ public class HistoryWindow extends Stage {
 		historyTable.setRowFactory( tv -> {
 			TableRow <Track> row = new TableRow <>();
 			row.setContextMenu( trackContextMenu );
+			
+			row.setOnContextMenuRequested( event -> { 
+				goToAlbumMenuItem.setDisable( row.getItem().getAlbumPath() == null );
+			});
 			
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
@@ -313,6 +319,10 @@ public class HistoryWindow extends Stage {
 					}
 				}
 			}
+		});
+		
+		goToAlbumMenuItem.setOnAction( ( event ) -> {
+			ui.goToAlbumOfTrack ( historyTable.getSelectionModel().getSelectedItem() );
 		});
 
 		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {

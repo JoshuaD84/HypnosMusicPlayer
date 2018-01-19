@@ -52,6 +52,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.stage.FileChooser;
+import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.AlphanumComparator;
 import net.joshuad.hypnos.CurrentListState;
 import net.joshuad.hypnos.CurrentListTrack;
@@ -82,7 +83,7 @@ public class CurrentListPane extends BorderPane {
 	Button showQueueButton;
 	MenuItem saveMenuItem, exportToM3U, exportToFolder, loadMenuItem, historyMenuItem;
 	MenuItem playMenuItem, playNextMenuItem, queueMenuItem, editTagMenuItem, infoMenuItem;
-	MenuItem lyricsMenuItem, cropMenuItem, removeMenuItem, browseMenuItem, addToPlaylistMenuItem;
+	MenuItem lyricsMenuItem, cropMenuItem, removeMenuItem, goToAlbumMenuItem, browseMenuItem, addToPlaylistMenuItem;
 	
 	ImageView noRepeatImage, repeatImage, repeatOneImage, sequentialImage, shuffleImage;
 	ImageView queueImage, historyImage, menuImage;
@@ -805,6 +806,7 @@ public class CurrentListPane extends BorderPane {
 		lyricsMenuItem = new MenuItem( "Lyrics" );
 		cropMenuItem = new MenuItem( "Crop" );
 		removeMenuItem = new MenuItem( "Remove" );
+		goToAlbumMenuItem = new MenuItem( "Go to Album" );
 		browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 
@@ -873,7 +875,7 @@ public class CurrentListPane extends BorderPane {
 		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
 		contextMenu.getItems().addAll( 
 			playMenuItem, playNextMenuItem, queueMenuItem, editTagMenuItem, infoMenuItem, lyricsMenuItem,
-			browseMenuItem, addToPlaylistMenuItem, cropMenuItem, removeMenuItem 
+			goToAlbumMenuItem, browseMenuItem, addToPlaylistMenuItem, cropMenuItem, removeMenuItem 
 		);
 		
 		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
@@ -952,6 +954,10 @@ public class CurrentListPane extends BorderPane {
 			}
 		});
 		
+		goToAlbumMenuItem.setOnAction( ( event ) -> {
+			ui.goToAlbumOfTrack ( currentListTable.getSelectionModel().getSelectedItem() );
+		});
+		
 		removeMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
@@ -987,9 +993,12 @@ public class CurrentListPane extends BorderPane {
 		
 		currentListTable.setRowFactory( tv -> {
 			TableRow <CurrentListTrack> row = new TableRow <>();
-			
 
 			row.setContextMenu( contextMenu );
+			
+			row.setOnContextMenuRequested( event -> { 
+				goToAlbumMenuItem.setDisable( row.getItem().getAlbumPath() == null );
+			});
 			
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && !row.isEmpty() ) {

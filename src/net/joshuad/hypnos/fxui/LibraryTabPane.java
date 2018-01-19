@@ -1078,11 +1078,12 @@ public class LibraryTabPane extends StretchedTabPane {
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem infoMenuItem = new MenuItem( "Info" );
 		MenuItem lyricsMenuItem = new MenuItem( "Lyrics" );
+		MenuItem goToAlbumMenuItem = new MenuItem( "Go to Album" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		trackContextMenu.getItems().addAll ( 
-			playMenuItem, playNextMenuItem, appendMenuItem, enqueueMenuItem, 
-			editTagMenuItem, infoMenuItem, lyricsMenuItem, browseMenuItem, addToPlaylistMenuItem );
+			playMenuItem, playNextMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, 
+			infoMenuItem, lyricsMenuItem, goToAlbumMenuItem, browseMenuItem, addToPlaylistMenuItem );
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
@@ -1156,7 +1157,6 @@ public class LibraryTabPane extends StretchedTabPane {
 			}
 		});
 		
-		
 		infoMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
@@ -1173,6 +1173,10 @@ public class LibraryTabPane extends StretchedTabPane {
 			}
 		});
 
+		goToAlbumMenuItem.setOnAction( ( event ) -> {
+			ui.goToAlbumOfTrack ( trackTable.getSelectionModel().getSelectedItem() );
+		});
+		
 		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			// PENDING: This is the better way, once openjdk and openjfx supports
 			// it: getHostServices().showDocument(file.toURI().toString());
@@ -1277,6 +1281,7 @@ public class LibraryTabPane extends StretchedTabPane {
 		});
 
 		trackTable.setRowFactory( tv -> {
+
 			TableRow <Track> row = new TableRow <>();
 			
 			row.setContextMenu( trackContextMenu );
@@ -1285,6 +1290,10 @@ public class LibraryTabPane extends StretchedTabPane {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
 					audioSystem.playTrack( row.getItem(), false );
 				}
+			});
+			
+			row.setOnContextMenuRequested( event -> { 
+				goToAlbumMenuItem.setDisable( row.getItem().getAlbumPath() == null );
 			});
 			
 			row.setOnDragOver( event -> {
@@ -1736,7 +1745,6 @@ public class LibraryTabPane extends StretchedTabPane {
 		if ( addSourceTracksImage != null ) addSourceTracksImage.setEffect( buttonColor );
 		if ( addSourceAlbumsImage != null ) addSourceAlbumsImage.setEffect( buttonColor );
 		if ( addSourcePlaylistsImage != null ) addSourcePlaylistsImage.setEffect( buttonColor );
-		
 	}
 
 	public void removeDarkTheme () {

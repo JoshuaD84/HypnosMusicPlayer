@@ -821,10 +821,13 @@ public class SettingsWindow extends Stage {
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem infoMenuItem = new MenuItem( "Info" );
 		MenuItem lyricsMenuItem = new MenuItem( "Lyrics" );
+		MenuItem goToAlbumMenuItem = new MenuItem( "Go to Album" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
-		trackContextMenu.getItems().addAll( playMenuItem, playNextMenuItem, appendMenuItem, enqueueMenuItem, 
-			editTagMenuItem, infoMenuItem, lyricsMenuItem, browseMenuItem, addToPlaylistMenuItem );
+		trackContextMenu.getItems().addAll( 
+				playMenuItem, playNextMenuItem, appendMenuItem, enqueueMenuItem, 
+				editTagMenuItem, infoMenuItem, lyricsMenuItem, goToAlbumMenuItem, 
+				browseMenuItem, addToPlaylistMenuItem );
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
@@ -957,6 +960,10 @@ public class SettingsWindow extends Stage {
 				ui.lyricsWindow.show();
 			}
 		});
+		
+		goToAlbumMenuItem.setOnAction( ( event ) -> {
+			ui.goToAlbumOfTrack ( tagTable.getSelectionModel().getSelectedItem().getTrack() );
+		});
 
 		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			// PENDING: This is the better way, once openjdk and openjfx supports
@@ -1024,6 +1031,10 @@ public class SettingsWindow extends Stage {
 			TableRow <TagError> row = new TableRow <>();
 
 			row.setContextMenu( trackContextMenu );
+			
+			row.setOnContextMenuRequested( event -> { 
+				goToAlbumMenuItem.setDisable( row.getItem().getTrack().getAlbumPath() == null );
+			});
 			
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {

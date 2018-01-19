@@ -1,5 +1,7 @@
 Now:
 	Improve library checker
+		Log / status
+		some controls, maybe
 		
 	Add a place to drag and drop folders (or navigate to them) to demand that they be rescanned immediately.
 
@@ -9,6 +11,10 @@ Now:
   	
 	Show Album button on a track
 		open the track list for that album
+	
+	Go to album hotkey, maybe
+	
+	Drag and Drop to playlist info window doesn't affect the playlist itself
 	
 General
 	Large images from web have trouble with Drag and Drop

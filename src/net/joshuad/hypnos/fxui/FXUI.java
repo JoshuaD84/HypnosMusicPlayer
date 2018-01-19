@@ -1567,6 +1567,26 @@ public class FXUI implements PlayerListener {
 	public void setUpdateAvailable ( boolean updateAvailable ) {
 		this.updateAvailable.setValue( updateAvailable );
 	}
+
+	public void goToAlbumOfTrack ( Track track ) {
+		Path albumPath = track.getAlbumPath();
+		if ( albumPath == null ) {
+			LOGGER.info( "Requested to 'go to album' of a track that is not part of an album, ignoring." );
+			return;
+		}
+		
+		for ( Album album : library.getAlbums() ) {
+			if ( album.getPath().equals( albumPath ) ) {
+				libraryPane.albumTable.getSelectionModel().clearSelection();
+				libraryPane.albumTable.getSelectionModel().select( album );
+				libraryPane.albumTable.requestFocus();
+				libraryPane.albumTable.scrollTo( album );
+				libraryPane.setAlbumsVisible( true );
+				libraryPane.getSelectionModel().select( libraryPane.albumTab );
+				break;
+			}
+		}
+	}
 }
 
 class LineNumbersCellFactory<T, E> implements Callback<TableColumn<T, E>, TableCell<T, E>> {

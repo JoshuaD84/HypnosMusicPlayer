@@ -297,6 +297,7 @@ public class Transport extends VBox {
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem infoMenuItem = new MenuItem( "Info" );
 		MenuItem lyricsMenuItem = new MenuItem( "Lyrics" );
+		MenuItem goToAlbumMenuItem = new MenuItem( "Go to Album" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		
@@ -405,6 +406,10 @@ public class Transport extends VBox {
 			}
 		});
 		
+		goToAlbumMenuItem.setOnAction( ( event ) -> {
+			ui.goToAlbumOfTrack ( audioSystem.getCurrentTrack() );
+		});
+		
 		browseMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
@@ -414,7 +419,8 @@ public class Transport extends VBox {
 		
 		ContextMenu currentTrackButtonMenu = new ContextMenu();
 		currentTrackButtonMenu.getItems().addAll( playMenuItem, appendMenuItem, playNextMenuItem, 
-			enqueueMenuItem, editTagMenuItem, infoMenuItem, lyricsMenuItem, browseMenuItem, addToPlaylistMenuItem );
+			enqueueMenuItem, editTagMenuItem, infoMenuItem, lyricsMenuItem, goToAlbumMenuItem,
+			browseMenuItem, addToPlaylistMenuItem );
 		
 		currentTrackButton.setContextMenu( currentTrackButtonMenu );
 		

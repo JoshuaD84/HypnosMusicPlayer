@@ -128,12 +128,13 @@ public class PlaylistInfoWindow extends Stage {
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem infoMenuItem = new MenuItem( "Info" );
 		MenuItem lyricsMenuItem = new MenuItem( "Lyrics" );
+		MenuItem goToAlbumMenuItem = new MenuItem( "Go to Album" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		MenuItem removeMenuItem = new MenuItem ( "Remove" );
 		contextMenu.getItems().addAll ( 
 			playMenuItem, appendMenuItem, playNextMenuItem, enqueueMenuItem, editTagMenuItem, 
-			infoMenuItem, lyricsMenuItem, browseMenuItem, addToPlaylistMenuItem, removeMenuItem 
+			infoMenuItem, lyricsMenuItem, goToAlbumMenuItem, browseMenuItem, addToPlaylistMenuItem, removeMenuItem 
 		);
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
@@ -233,6 +234,10 @@ public class PlaylistInfoWindow extends Stage {
 			}
 		});
 		
+		goToAlbumMenuItem.setOnAction( ( event ) -> {
+			ui.goToAlbumOfTrack ( trackTable.getSelectionModel().getSelectedItem() );
+		});
+		
 		browseMenuItem.setOnAction( event -> {
 			ui.openFileBrowser( trackTable.getSelectionModel().getSelectedItem().getPath() );
 		});
@@ -280,6 +285,10 @@ public class PlaylistInfoWindow extends Stage {
 			TableRow <Track> row = new TableRow <>();
 
 			row.setContextMenu( contextMenu );
+			
+			row.setOnContextMenuRequested( event -> { 
+				goToAlbumMenuItem.setDisable( row.getItem().getAlbumPath() == null );
+			});
 
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {

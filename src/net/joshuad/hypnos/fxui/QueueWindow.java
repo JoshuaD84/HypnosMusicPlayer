@@ -151,13 +151,14 @@ public class QueueWindow extends Stage {
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem infoMenuItem = new MenuItem( "Info" );
 		MenuItem lyricsMenuItem = new MenuItem( "Lyrics" );
+		MenuItem goToAlbumMenuItem = new MenuItem( "Go to Album" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		MenuItem cropMenuItem = new MenuItem( "Crop" );
 		MenuItem removeMenuItem = new MenuItem( "Remove from Queue" );
 		contextMenu.getItems().addAll( 
 			playMenuItem, appendMenuItem, editTagMenuItem, infoMenuItem, lyricsMenuItem,
-			browseMenuItem, addToPlaylistMenuItem, cropMenuItem, removeMenuItem 
+			goToAlbumMenuItem, browseMenuItem, addToPlaylistMenuItem, cropMenuItem, removeMenuItem 
 		);
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
@@ -227,6 +228,10 @@ public class QueueWindow extends Stage {
 					audioSystem.playTrack( row.getItem(), false );
 				}
 			} );
+			
+			row.setOnContextMenuRequested( event -> { 
+				goToAlbumMenuItem.setDisable( row.getItem().getAlbumPath() == null );
+			});
 			
 			row.setOnDragDetected( event -> {
 				if ( !row.isEmpty() ) {
@@ -511,6 +516,10 @@ public class QueueWindow extends Stage {
 				ui.lyricsWindow.setTrack( queueTable.getSelectionModel().getSelectedItem() );
 				ui.lyricsWindow.show();
 			}
+		});
+		
+		goToAlbumMenuItem.setOnAction( ( event ) -> {
+			ui.goToAlbumOfTrack ( queueTable.getSelectionModel().getSelectedItem() );
 		});
 		
 		browseMenuItem.setOnAction( ( ActionEvent event ) -> {
