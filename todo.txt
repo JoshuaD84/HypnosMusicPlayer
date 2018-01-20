@@ -12,11 +12,14 @@ Now:
 		
 	Large images from web have trouble with Drag and Drop
 
-	Interface with Last.fm scrobbler
-		https://github.com/jkovacs/lastfm-java
-		https://github.com/thomwiggers/lastfm-java
-		https://stackoverflow.com/questions/22766572/last-fm-java-api-get-recenttracks-of-a-user-within-a-data-range
-
+	Last.fm scrobbler		
+		prompt for password on first attempt if no password saved
+		Hotkeys
+		place love button on transport and style it right
+		Does the lastfm scrobbler block while trying to connect? If so, maybe do it on a thread. 
+		
+	Update availbable indicator not working
+		
 
 After Beta 3
 	KDE Neon

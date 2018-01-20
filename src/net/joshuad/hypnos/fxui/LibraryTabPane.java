@@ -1074,6 +1074,26 @@ public class LibraryTabPane extends StretchedTabPane {
 		
 		trackTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 
+		Menu lastFMMenu = new Menu( "LastFM" );
+		MenuItem loveMenuItem = new MenuItem ( "Love" );
+		MenuItem unloveMenuItem = new MenuItem ( "Unlove" );
+		MenuItem scrobbleMenuItem = new MenuItem ( "Scrobble" );
+		lastFMMenu.getItems().addAll ( loveMenuItem, unloveMenuItem, scrobbleMenuItem );
+		lastFMMenu.setVisible ( false );
+		lastFMMenu.visibleProperty().bind( ui.showLastFMWidgets );
+		
+		loveMenuItem.setOnAction( ( event ) -> {
+			ui.audioSystem.getLastFM().loveTrack( trackTable.getSelectionModel().getSelectedItem() );
+		});
+		
+		unloveMenuItem.setOnAction( ( event ) -> {
+			ui.audioSystem.getLastFM().unloveTrack( trackTable.getSelectionModel().getSelectedItem() );
+		});
+		
+		scrobbleMenuItem.setOnAction( ( event ) -> {
+			ui.audioSystem.getLastFM().scrobbleTrack( trackTable.getSelectionModel().getSelectedItem() );
+		});
+		
 		ContextMenu trackContextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem playNextMenuItem = new MenuItem( "Play Next" );
@@ -1087,7 +1107,8 @@ public class LibraryTabPane extends StretchedTabPane {
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		trackContextMenu.getItems().addAll ( 
 			playMenuItem, playNextMenuItem, appendMenuItem, enqueueMenuItem, editTagMenuItem, 
-			infoMenuItem, lyricsMenuItem, goToAlbumMenuItem, browseMenuItem, addToPlaylistMenuItem );
+			infoMenuItem, lyricsMenuItem, goToAlbumMenuItem, browseMenuItem, addToPlaylistMenuItem,
+			lastFMMenu );
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 

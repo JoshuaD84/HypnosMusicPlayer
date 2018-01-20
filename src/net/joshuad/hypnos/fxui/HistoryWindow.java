@@ -110,6 +110,26 @@ public class HistoryWindow extends Stage {
 		albumColumn.setMaxWidth ( 30000 );
 		titleColumn.setMaxWidth ( 30000 );
 		
+		Menu lastFMMenu = new Menu( "LastFM" );
+		MenuItem loveMenuItem = new MenuItem ( "Love" );
+		MenuItem unloveMenuItem = new MenuItem ( "Unlove" );
+		MenuItem scrobbleMenuItem = new MenuItem ( "Scrobble" );
+		lastFMMenu.getItems().addAll ( loveMenuItem, unloveMenuItem, scrobbleMenuItem );
+		lastFMMenu.setVisible ( false );
+		lastFMMenu.visibleProperty().bind( ui.showLastFMWidgets );
+		
+		loveMenuItem.setOnAction( ( event ) -> {
+			ui.audioSystem.getLastFM().loveTrack( historyTable.getSelectionModel().getSelectedItem() );
+		});
+		
+		unloveMenuItem.setOnAction( ( event ) -> {
+			ui.audioSystem.getLastFM().unloveTrack( historyTable.getSelectionModel().getSelectedItem() );
+		});
+		
+		scrobbleMenuItem.setOnAction( ( event ) -> {
+			ui.audioSystem.getLastFM().scrobbleTrack( historyTable.getSelectionModel().getSelectedItem() );
+		});
+		
 		ContextMenu trackContextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem appendMenuItem = new MenuItem( "Append" );
@@ -125,7 +145,7 @@ public class HistoryWindow extends Stage {
 		trackContextMenu.getItems().addAll( 
 			playMenuItem, appendMenuItem, playNextMenuItem, enqueueMenuItem,
 			editTagMenuItem, infoMenuItem, lyricsMenuItem, goToAlbumMenuItem, 
-			browseMenuItem, addToPlaylistMenuItem, removeMenuItem 
+			browseMenuItem, addToPlaylistMenuItem, lastFMMenu, removeMenuItem 
 		);
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );

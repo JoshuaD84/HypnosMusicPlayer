@@ -144,6 +144,25 @@ public class QueueWindow extends Stage {
 		
 		queueTable.getColumns().addAll( numberColumn, artistColumn, titleColumn );
 		
+		Menu lastFMMenu = new Menu( "LastFM" );
+		MenuItem loveMenuItem = new MenuItem ( "Love" );
+		MenuItem unloveMenuItem = new MenuItem ( "Unlove" );
+		MenuItem scrobbleMenuItem = new MenuItem ( "Scrobble" );
+		lastFMMenu.getItems().addAll ( loveMenuItem, unloveMenuItem, scrobbleMenuItem );
+		lastFMMenu.setVisible ( false );
+		lastFMMenu.visibleProperty().bind( ui.showLastFMWidgets );
+		
+		loveMenuItem.setOnAction( ( event ) -> {
+			ui.audioSystem.getLastFM().loveTrack( queueTable.getSelectionModel().getSelectedItem() );
+		});
+		
+		unloveMenuItem.setOnAction( ( event ) -> {
+			ui.audioSystem.getLastFM().unloveTrack( queueTable.getSelectionModel().getSelectedItem() );
+		});
+		
+		scrobbleMenuItem.setOnAction( ( event ) -> {
+			ui.audioSystem.getLastFM().scrobbleTrack( queueTable.getSelectionModel().getSelectedItem() );
+		});
 		
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
@@ -158,7 +177,8 @@ public class QueueWindow extends Stage {
 		MenuItem removeMenuItem = new MenuItem( "Remove from Queue" );
 		contextMenu.getItems().addAll( 
 			playMenuItem, appendMenuItem, editTagMenuItem, infoMenuItem, lyricsMenuItem,
-			goToAlbumMenuItem, browseMenuItem, addToPlaylistMenuItem, cropMenuItem, removeMenuItem 
+			goToAlbumMenuItem, browseMenuItem, addToPlaylistMenuItem, 
+			lastFMMenu, cropMenuItem, removeMenuItem 
 		);
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );

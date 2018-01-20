@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -29,11 +31,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -64,6 +68,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.util.Duration;
 import net.joshuad.hypnos.CurrentList.DefaultRepeatMode;
 import net.joshuad.hypnos.CurrentList.DefaultShuffleMode;
 import net.joshuad.hypnos.Hypnos;
@@ -101,6 +106,9 @@ public class SettingsWindow extends Stage {
 	private ChoiceBox <String> playlistRepeatChoices;
 	private ChoiceBox <String> playlistSortChoices;
 	
+	private TextField userInput;
+	private PasswordField passwordInput;
+	
 	private ToggleButton lightTheme, darkTheme;
 	private ToggleGroup themeToggleGroup;
 	
@@ -133,9 +141,10 @@ public class SettingsWindow extends Stage {
 		Tab hotkeysTab = setupHotkeysTab( root );
 		Tab logTab = setupLogTab( root );
 		Tab tagTab = setupTagTab( root );
+		Tab lastFMTab = setupLastFMTab( root );
 		Tab aboutTab = setupAboutTab( root ); 
 		
-		tabPane.getTabs().addAll( settingsTab, hotkeysTab, globalHotkeysTab, logTab, tagTab, aboutTab );
+		tabPane.getTabs().addAll( settingsTab, hotkeysTab, globalHotkeysTab, logTab, tagTab, lastFMTab, aboutTab );
 		
 		tabPane.prefWidthProperty().bind( root.widthProperty() );
 		tabPane.prefHeightProperty().bind( root.heightProperty() );
@@ -156,6 +165,11 @@ public class SettingsWindow extends Stage {
 		} catch ( FileNotFoundException e ) {
 			LOGGER.warning( "Unable to load program icon: resources/icon.png" );
 		}
+		
+		this.setOnShowing( ( event ) -> { 
+			userInput.setText( audioSystem.getLastFM().getUsername() );
+			passwordInput.setText( audioSystem.getLastFM().getPasswordMD5() );
+		});
 		
 		scene.addEventFilter( KeyEvent.KEY_PRESSED, new EventHandler <KeyEvent>() {
 			@Override
@@ -813,6 +827,26 @@ public class SettingsWindow extends Stage {
 		tagTable.prefWidthProperty().bind( pane.widthProperty() );
 		tagTable.prefHeightProperty().bind( pane.heightProperty() );
 		
+		Menu lastFMMenu = new Menu( "LastFM" );
+		MenuItem loveMenuItem = new MenuItem ( "Love" );
+		MenuItem unloveMenuItem = new MenuItem ( "Unlove" );
+		MenuItem scrobbleMenuItem = new MenuItem ( "Scrobble" );
+		lastFMMenu.getItems().addAll ( loveMenuItem, unloveMenuItem, scrobbleMenuItem );
+		lastFMMenu.setVisible ( false );
+		lastFMMenu.visibleProperty().bind( ui.showLastFMWidgets );
+		
+		loveMenuItem.setOnAction( ( event ) -> {
+			ui.audioSystem.getLastFM().loveTrack( tagTable.getSelectionModel().getSelectedItem().getTrack() );
+		});
+		
+		unloveMenuItem.setOnAction( ( event ) -> {
+			ui.audioSystem.getLastFM().unloveTrack( tagTable.getSelectionModel().getSelectedItem().getTrack() );
+		});
+		
+		scrobbleMenuItem.setOnAction( ( event ) -> {
+			ui.audioSystem.getLastFM().scrobbleTrack( tagTable.getSelectionModel().getSelectedItem().getTrack() );
+		});
+		
 		ContextMenu trackContextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem playNextMenuItem = new MenuItem( "Play Next" );
@@ -827,7 +861,7 @@ public class SettingsWindow extends Stage {
 		trackContextMenu.getItems().addAll( 
 				playMenuItem, playNextMenuItem, appendMenuItem, enqueueMenuItem, 
 				editTagMenuItem, infoMenuItem, lyricsMenuItem, goToAlbumMenuItem, 
-				browseMenuItem, addToPlaylistMenuItem );
+				browseMenuItem, addToPlaylistMenuItem, lastFMMenu );
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
@@ -1075,6 +1109,88 @@ public class SettingsWindow extends Stage {
 		return tab;
 	}
 	
+	private Tab setupLastFMTab( Pane root ) {
+		
+		Label headerLabel = new Label( "LastFM" );
+		headerLabel.setPadding( new Insets( 0, 0, 10, 0 ) );
+		headerLabel.setWrapText( true );
+		headerLabel.setTextAlignment( TextAlignment.CENTER );
+		headerLabel.setStyle( "-fx-font-size: 20px; -fx-font-weight: bold" );
+		
+		userInput = new TextField();
+		passwordInput = new PasswordField();
+		CheckBox scrobbleCheckbox = new CheckBox();
+		CheckBox savePasswordCheckbox = new CheckBox();
+		CheckBox showInUICheckbox = new CheckBox();
+		Label scrobbleLabel = new Label ( "Scrobble on Play:");
+		Label passwordLabel = new Label ( "Save Password:" );
+		Label showInUILabel = new Label ( "Show LastFM in UI:" );
+		scrobbleLabel.setPadding( new Insets ( 0, 0, 0, 60 ) );
+		passwordLabel.setPadding( new Insets ( 0, 0, 0, 60 ) );
+		showInUILabel.setPadding( new Insets ( 0, 0, 0, 60 ) );
+		Button connectButton = new Button( "Save and Connect" );
+		
+		scrobbleCheckbox.selectedProperty().bindBidirectional( audioSystem.doLastFMScrobbleProperty() );
+		showInUICheckbox.selectedProperty().bindBidirectional( ui.showLastFMWidgets );
+		savePasswordCheckbox.selectedProperty().bindBidirectional( audioSystem.lastFMSavePasswordProperty() );
+		
+		connectButton.setOnAction( (ActionEvent e) -> {
+			audioSystem.getLastFM().setCredentials( userInput.getText(), passwordInput.getText() );
+			audioSystem.getLastFM().connect();
+		});
+		
+		
+		GridPane loginPane = new GridPane();
+		loginPane.setHgap( 5 );
+		loginPane.setVgap( 5 );
+		loginPane.add( new Label ( "Username:"), 0, 0 );
+		loginPane.add( userInput, 1, 0 );
+		loginPane.add( new Label ( "Password:"), 0, 1 );
+		loginPane.add( passwordInput, 1, 1 );
+		
+		loginPane.add( connectButton, 0, 2 );
+
+		loginPane.add( scrobbleLabel, 2, 0 );
+		loginPane.add( scrobbleCheckbox, 3, 0 );
+
+		loginPane.add( passwordLabel, 2, 1 );
+		loginPane.add( savePasswordCheckbox, 3, 1 );
+		
+		loginPane.add( showInUILabel, 2, 2 );
+		loginPane.add( showInUICheckbox, 3, 2 );
+		
+		
+		TextArea logView = new TextArea();
+		logView.setEditable( false );
+		logView.setWrapText( true );
+		logView.prefHeightProperty().bind( root.heightProperty() );
+		logView.prefWidthProperty().bind( root.widthProperty() );
+		
+		Timeline lastFMUpdater = new Timeline();
+		lastFMUpdater.setCycleCount( Timeline.INDEFINITE );
+		KeyFrame updateFrame = new KeyFrame( Duration.millis(1000), ae -> {
+			logView.setText( audioSystem.getLastFM().getLog().toString() );
+		});
+		
+		lastFMUpdater.getKeyFrames().add( updateFrame );
+		lastFMUpdater.play();
+
+		Tab lastFMTab = new Tab ( "LastFM" );
+		lastFMTab.setClosable( false );
+		
+		VBox logPane = new VBox();
+		logPane.setAlignment( Pos.TOP_CENTER );
+		lastFMTab.setContent( logPane );
+		logPane.setPadding( new Insets( 10 ) );
+		logPane.setSpacing( 20 );
+		logPane.prefHeightProperty().bind( root.heightProperty() );
+		logPane.prefWidthProperty().bind( root.widthProperty() );
+		
+		logPane.getChildren().addAll( headerLabel, loginPane, logView );
+		
+		return lastFMTab;
+	}
+	
 	private Tab setupAboutTab ( Pane root ) {
 		Tab aboutTab = new Tab ( "About" );
 		aboutTab.setClosable( false );
@@ -1187,7 +1303,7 @@ public class SettingsWindow extends Stage {
 		
 		return aboutTab;
 	}
-
+	
 	public boolean hotkeysDisabledForConfig () {
 		if ( tabPane == null ) return false;
 		if ( globalHotkeysTab == null ) return false;

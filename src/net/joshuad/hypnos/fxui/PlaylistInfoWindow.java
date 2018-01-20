@@ -120,6 +120,26 @@ public class PlaylistInfoWindow extends Stage {
 		trackTable.prefWidthProperty().bind( primaryPane.widthProperty() );
 		trackTable.prefHeightProperty().bind( primaryPane.heightProperty() );
 		
+		Menu lastFMMenu = new Menu( "LastFM" );
+		MenuItem loveMenuItem = new MenuItem ( "Love" );
+		MenuItem unloveMenuItem = new MenuItem ( "Unlove" );
+		MenuItem scrobbleMenuItem = new MenuItem ( "Scrobble" );
+		lastFMMenu.getItems().addAll ( loveMenuItem, unloveMenuItem, scrobbleMenuItem );
+		lastFMMenu.setVisible ( false );
+		lastFMMenu.visibleProperty().bind( ui.showLastFMWidgets );
+		
+		loveMenuItem.setOnAction( ( event ) -> {
+			ui.audioSystem.getLastFM().loveTrack( trackTable.getSelectionModel().getSelectedItem() );
+		});
+		
+		unloveMenuItem.setOnAction( ( event ) -> {
+			ui.audioSystem.getLastFM().unloveTrack( trackTable.getSelectionModel().getSelectedItem() );
+		});
+		
+		scrobbleMenuItem.setOnAction( ( event ) -> {
+			ui.audioSystem.getLastFM().scrobbleTrack( trackTable.getSelectionModel().getSelectedItem() );
+		});
+		
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem appendMenuItem = new MenuItem( "Append" );
@@ -134,7 +154,8 @@ public class PlaylistInfoWindow extends Stage {
 		MenuItem removeMenuItem = new MenuItem ( "Remove" );
 		contextMenu.getItems().addAll ( 
 			playMenuItem, appendMenuItem, playNextMenuItem, enqueueMenuItem, editTagMenuItem, 
-			infoMenuItem, lyricsMenuItem, goToAlbumMenuItem, browseMenuItem, addToPlaylistMenuItem, removeMenuItem 
+			infoMenuItem, lyricsMenuItem, goToAlbumMenuItem, browseMenuItem, addToPlaylistMenuItem, 
+			lastFMMenu, removeMenuItem 
 		);
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );

@@ -11,8 +11,8 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javafx.collections.ObservableList;
-import javafx.collections.transformation.SortedList;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import net.joshuad.hypnos.CurrentList;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.History;
@@ -23,6 +23,7 @@ import net.joshuad.hypnos.PreviousStack;
 import net.joshuad.hypnos.Queue;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
+import net.joshuad.hypnos.lastfm.LastFM;
 import net.joshuad.hypnos.Persister.Setting;
 
 public class AudioSystem {
@@ -67,8 +68,12 @@ public class AudioSystem {
 	private final History history; 
 	private final PreviousStack previousStack;
 	private final CurrentList currentList;
+	private final LastFM lastFM;
 	
 	private Double unmutedVolume = null;
+	
+	private final BooleanProperty lastFMDoScrobble = new SimpleBooleanProperty ( false );
+	private final BooleanProperty lastFMSavePassword = new SimpleBooleanProperty ( false );
 	
 	public AudioSystem () {
 		player = new AudioPlayer ( this );
@@ -76,6 +81,7 @@ public class AudioSystem {
 		history = new History();
 		previousStack = new PreviousStack();
 		currentList = new CurrentList( this, queue );
+		lastFM = new LastFM();
 	}
 	
 	public void start() {
@@ -431,11 +437,22 @@ public class AudioSystem {
 		retMe.put ( Setting.DEFAULT_REPEAT_ALBUMS, currentList.getDefaultAlbumRepeatMode().toString() );
 		retMe.put ( Setting.DEFAULT_REPEAT_PLAYLISTS, currentList.getDefaultPlaylistRepeatMode().toString() );
 		
+		retMe.put( Setting.LASTFM_USERNAME, lastFM.getUsername() );
+		
+		if ( lastFMSavePassword.get() ) {
+			retMe.put( Setting.LASTFM_PASSWORD_MD5, lastFM.getPasswordMD5() );
+		}
+		
+		retMe.put( Setting.LASTFM_SAVE_PASSWORD, lastFMSavePassword.getValue().toString() );
+		
+		retMe.put( Setting.LASTFM_SCROBBLE_ON_PLAY, lastFMDoScrobble.getValue().toString() );
+		
 		return retMe;
 	}
 	
 	@SuppressWarnings("incomplete-switch")
 	public void applySettings ( EnumMap <Persister.Setting, String> settings ) {
+		
 		settings.forEach( ( setting, value )-> {
 			try {
 				switch ( setting ) {
@@ -511,8 +528,28 @@ public class AudioSystem {
 					break;
 					
 				case DEFAULT_SHUFFLE_TRACKS:
-					getCurrentList().setDefaultTrackShuffleMode( CurrentList.DefaultShuffleMode.valueOf( value )  );
+					getCurrentList().setDefaultTrackShuffleMode( CurrentList.DefaultShuffleMode.valueOf( value ) );
 					settings.remove ( setting );
+					break;
+					
+				case LASTFM_USERNAME:
+					lastFM.setUsername ( value );
+					settings.remove ( setting );
+					break;
+					
+				case LASTFM_PASSWORD_MD5:
+					lastFM.setPassword ( value );
+					settings.remove ( setting );
+					break;
+					
+				case LASTFM_SCROBBLE_ON_PLAY:
+					this.lastFMDoScrobble.setValue( Boolean.valueOf( value ) );
+					settings.remove ( setting );
+					break;
+					
+				case LASTFM_SAVE_PASSWORD:
+					this.lastFMSavePassword.setValue( Boolean.valueOf( value ) );
+					settings.remove( setting );
 					break;
 				}
 			} catch ( Exception e ) {
@@ -548,6 +585,9 @@ public class AudioSystem {
 		for ( PlayerListener listener : playerListeners ) {
 			listener.playerStarted( track );
 		}
+		if ( lastFMDoScrobble.getValue() ) {
+			lastFM.scrobbleTrack( track.getArtist(), track.getTitle() );
+		}
 	}
 	
 	private void notifyListenersPaused () {
@@ -579,8 +619,6 @@ public class AudioSystem {
 			listener.playerRepeatModeChanged( newMode );
 		}
 	}
-	
-	
 	
 	//REFACTOR: Make these a listener interface, and add this object as a listener to player? 	
 	
@@ -690,6 +728,22 @@ public class AudioSystem {
 			unmutedVolume = player.getVolumePercent();
 			player.requestVolumePercent( 0 );
 		}
+	}
+
+	public LastFM getLastFM () {
+		return lastFM;
+	}
+	
+	public BooleanProperty doLastFMScrobbleProperty() {
+		return lastFMDoScrobble;
+	}
+	
+	public BooleanProperty lastFMSavePasswordProperty() {
+		return lastFMSavePassword;
+	}
+	
+	public boolean doLastFMScrobble() {
+		return lastFMDoScrobble.getValue();
 	}
 }
 

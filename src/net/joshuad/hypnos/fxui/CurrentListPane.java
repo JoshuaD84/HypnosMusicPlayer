@@ -86,7 +86,7 @@ public class CurrentListPane extends BorderPane {
 	MenuItem lyricsMenuItem, cropMenuItem, removeMenuItem, goToAlbumMenuItem, browseMenuItem, addToPlaylistMenuItem;
 	
 	ImageView noRepeatImage, repeatImage, repeatOneImage, sequentialImage, shuffleImage;
-	ImageView queueImage, historyImage, menuImage;
+	ImageView queueImage, menuImage;
 
 	Image repeatImageSource;
 
@@ -167,15 +167,6 @@ public class CurrentListPane extends BorderPane {
 		} catch ( Exception e ) {
 			LOGGER.log( Level.WARNING, "Unable to load queue icon: resources/queue.png", e );
 		}
-		
-		try {
-			historyImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/history.png" ).toFile() ) ) );
-			historyImage.setFitWidth( currentListControlsButtonFitWidth );
-			historyImage.setFitHeight( currentListControlsButtonFitHeight );
-		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load history icon: resources/history.png", e );
-		}
-		
 		
 		try {
 			menuImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/menu.png" ).toFile() ) ) );
@@ -874,12 +865,33 @@ public class CurrentListPane extends BorderPane {
 			}
 		});
 		
+		Menu lastFMMenu = new Menu( "LastFM" );
+		MenuItem loveMenuItem = new MenuItem ( "Love" );
+		MenuItem unloveMenuItem = new MenuItem ( "Unlove" );
+		MenuItem scrobbleMenuItem = new MenuItem ( "Scrobble" );
+		lastFMMenu.getItems().addAll ( loveMenuItem, unloveMenuItem, scrobbleMenuItem );
+		lastFMMenu.setVisible ( false );
+		lastFMMenu.visibleProperty().bind( ui.showLastFMWidgets );
+		
+		loveMenuItem.setOnAction( ( event ) -> {
+			ui.audioSystem.getLastFM().loveTrack( currentListTable.getSelectionModel().getSelectedItem() );
+		});
+		
+		unloveMenuItem.setOnAction( ( event ) -> {
+			ui.audioSystem.getLastFM().unloveTrack( currentListTable.getSelectionModel().getSelectedItem() );
+		});
+		
+		scrobbleMenuItem.setOnAction( ( event ) -> {
+			ui.audioSystem.getLastFM().scrobbleTrack( currentListTable.getSelectionModel().getSelectedItem() );
+		});
+		
+		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
 		addToPlaylistMenuItem.getItems().add( newPlaylistButton );
 		contextMenu.getItems().addAll( 
 			playMenuItem, playNextMenuItem, queueMenuItem, editTagMenuItem, infoMenuItem, lyricsMenuItem,
-			goToAlbumMenuItem, browseMenuItem, addToPlaylistMenuItem, cropMenuItem, removeMenuItem 
+			goToAlbumMenuItem, browseMenuItem, addToPlaylistMenuItem, lastFMMenu, cropMenuItem, removeMenuItem 
 		);
 		
 		newPlaylistButton.setOnAction( new EventHandler <ActionEvent>() {
@@ -1200,7 +1212,6 @@ public class CurrentListPane extends BorderPane {
 		if ( shuffleImage != null ) shuffleImage.setEffect( darkThemeButtons );
 		if ( menuImage != null ) menuImage.setEffect( darkThemeButtons );
 		if ( queueImage != null ) queueImage.setEffect( darkThemeButtons );
-		if ( historyImage != null ) historyImage.setEffect( darkThemeButtons );
 		
 		currentListTable.refresh();
 	}
@@ -1213,7 +1224,6 @@ public class CurrentListPane extends BorderPane {
 		if ( shuffleImage != null ) shuffleImage.setEffect( ui.lightThemeButtonEffect );
 		if ( menuImage != null ) menuImage.setEffect( ui.lightThemeButtonEffect );
 		if ( queueImage != null ) queueImage.setEffect( ui.lightThemeButtonEffect );
-		if ( historyImage != null ) historyImage.setEffect( ui.lightThemeButtonEffect );
 		
 		currentListTable.refresh();
 	}

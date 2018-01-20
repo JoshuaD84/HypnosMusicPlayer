@@ -48,7 +48,7 @@ public class Transport extends VBox {
 	ImageView settingsImage;
 	ImageView[] volumeImages = new ImageView[ 4 ];
 	
-	Button togglePlayButton, previousButton, nextButton, stopButton;
+	Button togglePlayButton, previousButton, nextButton, stopButton, loveButton;
 	Button showSettingsButton;
 	Hyperlink updateAvailableButton;
 	
@@ -128,6 +128,9 @@ public class Transport extends VBox {
 		stopButton.setMinSize( 42, 35 );
 		stopButton.setMaxSize( 42, 35 );
 		stopButton.setTooltip( new Tooltip( "Stop" ) );
+		
+		loveButton = new Button ( "❤" );
+		loveButton.setTooltip( new Tooltip( "Love on LastFM" ) );
 
 		previousButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -169,6 +172,16 @@ public class Transport extends VBox {
 			}
 		} );
 
+		loveButton.setOnAction( ( ActionEvent e ) -> {
+			audioSystem.getLastFM().loveTrack( audioSystem.getCurrentTrack() );
+		});
+		loveButton.setVisible( false );
+		loveButton.setManaged( false );
+		loveButton.visibleProperty().bindBidirectional( ui.showLastFMWidgets );
+		ui.showLastFMWidgets.addListener( ( observable, oldValue, newValue ) -> {
+			loveButton.setManaged( newValue );
+		});
+		
 		timeElapsedLabel = new Label( "" );
 		timeRemainingLabel = new Label( "" );
 
@@ -444,10 +457,30 @@ public class Transport extends VBox {
 			}
 		});
 		
+		Menu lastFMMenu = new Menu( "LastFM" );
+		MenuItem loveMenuItem = new MenuItem ( "Love" );
+		MenuItem unloveMenuItem = new MenuItem ( "Unlove" );
+		MenuItem scrobbleMenuItem = new MenuItem ( "Scrobble" );
+		lastFMMenu.getItems().addAll ( loveMenuItem, unloveMenuItem, scrobbleMenuItem );
+		lastFMMenu.setVisible ( false );
+		lastFMMenu.visibleProperty().bind( ui.showLastFMWidgets );
+		
+		loveMenuItem.setOnAction( ( event ) -> {
+			ui.audioSystem.getLastFM().loveTrack( ui.audioSystem.getCurrentTrack() );
+		});
+		
+		unloveMenuItem.setOnAction( ( event ) -> {
+			ui.audioSystem.getLastFM().unloveTrack( ui.audioSystem.getCurrentTrack() );
+		});
+		
+		scrobbleMenuItem.setOnAction( ( event ) -> {
+			ui.audioSystem.getLastFM().scrobbleTrack( ui.audioSystem.getCurrentTrack() );
+		});
+		
 		ContextMenu currentTrackButtonMenu = new ContextMenu();
 		currentTrackButtonMenu.getItems().addAll( playMenuItem, appendMenuItem, playNextMenuItem, 
 			enqueueMenuItem, editTagMenuItem, infoMenuItem, lyricsMenuItem, goToAlbumMenuItem,
-			browseMenuItem, addToPlaylistMenuItem );
+			browseMenuItem, addToPlaylistMenuItem, lastFMMenu );
 		
 		currentTrackButton.setContextMenu( currentTrackButtonMenu );
 		

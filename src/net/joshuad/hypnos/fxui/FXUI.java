@@ -154,6 +154,7 @@ public class FXUI implements PlayerListener {
 	
 	private SimpleBooleanProperty showUpdateAvailableInUI = new SimpleBooleanProperty ( true ); 
 	private SimpleBooleanProperty updateAvailable = new SimpleBooleanProperty ( false );
+	SimpleBooleanProperty showLastFMWidgets = new SimpleBooleanProperty ( false );
 	
 	boolean doPlaylistSaveWarning = true;
 	
@@ -1112,6 +1113,7 @@ public class FXUI implements PlayerListener {
 		retMe.put ( Setting.PROMPT_BEFORE_OVERWRITE, promptBeforeOverwrite.getValue() );
 		retMe.put ( Setting.SHOW_UPDATE_AVAILABLE_IN_MAIN_WINDOW, showUpdateAvailableInUI.getValue() );
 		retMe.put ( Setting.THEME, theme );
+		retMe.put ( Setting.SHOW_LASTFM_IN_UI, showLastFMWidgets.getValue().toString() );
 		
 		EnumMap <Persister.Setting, ? extends Object> librarySettings = libraryPane.getSettings();
 		for ( Persister.Setting setting : librarySettings.keySet() ) {
@@ -1244,6 +1246,11 @@ public class FXUI implements PlayerListener {
 							applyLightTheme();
 						}
 						settings.remove ( setting );
+						break;
+						
+					case SHOW_LASTFM_IN_UI:
+						this.showLastFMWidgets.set( Boolean.valueOf( value )  );
+						settings.remove( setting );
 						break;
 				}
 			} catch ( Exception e ) {
