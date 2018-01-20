@@ -62,3 +62,16 @@
 }
 
 
+/* Light theme stuff, maybe put this in its own file at some point */
+
+
+.tableAlbumDisc {
+	-fx-text-fill: hsb(230, 75%, 100%); 
+}
+
+.tableAlbumType {
+	-fx-text-fill: hsb(260, 75%, 100%); 
+}
+
+
+

@@ -1754,13 +1754,13 @@ public class LibraryTabPane extends StretchedTabPane {
 		if ( addSourcePlaylistsImage != null ) addSourcePlaylistsImage.setEffect( buttonColor );
 	}
 
-	public void removeDarkTheme () {
-		if ( albumFilterClearImage != null ) albumFilterClearImage.setEffect( null );
-		if ( trackFilterClearImage != null ) trackFilterClearImage.setEffect( null );
-		if ( playlistFilterClearImage != null ) playlistFilterClearImage.setEffect( null );
-		if ( addSourceTracksImage != null ) addSourceTracksImage.setEffect( null );
-		if ( addSourceAlbumsImage != null ) addSourceAlbumsImage.setEffect( null );
-		if ( addSourcePlaylistsImage != null ) addSourcePlaylistsImage.setEffect( null );
+	public void applyLightTheme () {
+		if ( albumFilterClearImage != null ) albumFilterClearImage.setEffect( ui.lightThemeButtonEffect );
+		if ( trackFilterClearImage != null ) trackFilterClearImage.setEffect( ui.lightThemeButtonEffect );
+		if ( playlistFilterClearImage != null ) playlistFilterClearImage.setEffect( ui.lightThemeButtonEffect );
+		if ( addSourceTracksImage != null ) addSourceTracksImage.setEffect( ui.lightThemeButtonEffect );
+		if ( addSourceAlbumsImage != null ) addSourceAlbumsImage.setEffect( ui.lightThemeButtonEffect );
+		if ( addSourcePlaylistsImage != null ) addSourcePlaylistsImage.setEffect( ui.lightThemeButtonEffect );
 	}
 
 	public void focusFilterOfCurrentTab () {

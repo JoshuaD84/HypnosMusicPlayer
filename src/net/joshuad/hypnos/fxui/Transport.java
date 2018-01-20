@@ -67,10 +67,28 @@ public class Transport extends VBox {
 
 	HBox volumePane;
 
-	ColorAdjust darkThemeTransportButtons = new ColorAdjust(); {
-		darkThemeTransportButtons.setSaturation( -1 );
-		darkThemeTransportButtons.setHue( 1 );
-		darkThemeTransportButtons.setBrightness( .55 );
+	ColorAdjust lightThemeButtonEffect = new ColorAdjust(); {
+		lightThemeButtonEffect.setBrightness( -.75d );
+		lightThemeButtonEffect.setHue( 0 );
+		lightThemeButtonEffect.setSaturation( 0 );
+	}
+	
+	ColorAdjust lightThemeButtonsHover = new ColorAdjust(); {
+		lightThemeButtonsHover.setBrightness( -.5d );
+		lightThemeButtonsHover.setSaturation( .7d );
+		lightThemeButtonsHover.setHue( -.875d );
+	}
+	
+	ColorAdjust darkThemeButtonEffect = new ColorAdjust(); {
+		darkThemeButtonEffect.setBrightness( -.4d );
+		darkThemeButtonEffect.setHue( 0 );
+		darkThemeButtonEffect.setSaturation( 0 );
+	}
+	
+	ColorAdjust darkThemeButtonsHover = new ColorAdjust(); {
+		darkThemeButtonsHover.setBrightness( -.2d );
+		darkThemeButtonsHover.setSaturation( .4d );
+		darkThemeButtonsHover.setHue( -.75d );
 	}
 	
 	FXUI ui;
@@ -88,6 +106,7 @@ public class Transport extends VBox {
 		togglePlayButton.setMinSize( 42, 35 );
 		togglePlayButton.setMaxSize( 42, 35 );
 		togglePlayButton.setTooltip( new Tooltip( "Toggle Play/Pause" ) );
+
 		
 		previousButton = new Button ( "" );
 		previousButton.setGraphic( previousImage );
@@ -196,6 +215,11 @@ public class Transport extends VBox {
 		volumeMuteButton.getStyleClass().add( "volumeButton" );
 		volumeMuteButton.setTooltip( new Tooltip ( "Toggle Mute" ) );
 		volumeMuteButton.setOnAction( e -> audioSystem.toggleMute() );
+		volumeMuteButton.hoverProperty().addListener( ( obserable, oldValue, newValue ) -> {
+			for ( ImageView volumeImage : volumeImages ) {
+				applyHover ( volumeImage, newValue );
+			}
+		});
 
 		volumeSlider = new Slider();
 		volumeSlider.setMin( 0 );
@@ -244,6 +268,9 @@ public class Transport extends VBox {
 		showSettingsButton.getStyleClass().add( "settingsButton" );
 		showSettingsButton.setTooltip( new Tooltip( "Configuration and Information" ) );
 		showSettingsButton.setOnAction ( e -> ui.settingsWindow.show() );
+		showSettingsButton.hoverProperty().addListener( ( obserable, oldValue, newValue ) -> {
+			applyHover ( settingsImage, newValue );
+		});
 		
 		updateAvailableButton = new Hyperlink ( "!" );
 		updateAvailableButton.getStyleClass().add( "updateButton" );
@@ -431,7 +458,14 @@ public class Transport extends VBox {
 		setId( "transport" );
 	}
 	
-	
+	private void applyHover ( ImageView image, Boolean hasHover ) {
+		if ( hasHover ) {
+			image.setEffect ( ui.isDarkTheme() ? darkThemeButtonsHover : lightThemeButtonsHover );
+		} else {
+			image.setEffect ( ui.isDarkTheme() ? darkThemeButtonEffect : lightThemeButtonEffect );
+		}
+	}
+
 	private void loadImages() {
 		double volFitWidth = 55 * .52;
 		double volFitHeight = 45 * .52;
@@ -527,28 +561,28 @@ public class Transport extends VBox {
 	
 	public void applyDarkTheme () {
 		
-		if ( stopImage != null ) stopImage.setEffect( darkThemeTransportButtons );
-		if ( nextImage != null ) nextImage.setEffect( darkThemeTransportButtons );
-		if ( previousImage != null ) previousImage.setEffect( darkThemeTransportButtons );
-		if ( pauseImage != null ) pauseImage.setEffect( darkThemeTransportButtons );
-		if ( playImage != null ) playImage.setEffect( darkThemeTransportButtons );
-		if ( settingsImage != null ) settingsImage.setEffect( darkThemeTransportButtons );
+		if ( stopImage != null ) stopImage.setEffect( darkThemeButtonEffect );
+		if ( nextImage != null ) nextImage.setEffect( darkThemeButtonEffect );
+		if ( previousImage != null ) previousImage.setEffect( darkThemeButtonEffect );
+		if ( pauseImage != null ) pauseImage.setEffect( darkThemeButtonEffect );
+		if ( playImage != null ) playImage.setEffect( darkThemeButtonEffect );
+		if ( settingsImage != null ) settingsImage.setEffect( darkThemeButtonEffect );
 		
 		for ( int k = 0; k < volumeImages.length; k++ ) {
-			if ( volumeImages[k] != null ) volumeImages[k].setEffect( darkThemeTransportButtons );
+			if ( volumeImages[k] != null ) volumeImages[k].setEffect( darkThemeButtonEffect );
 		}
 	}	
 	
-	public void removeDarkTheme() {
-		if ( stopImage != null ) stopImage.setEffect( null );
-		if ( nextImage != null ) nextImage.setEffect( null );
-		if ( previousImage != null ) previousImage.setEffect( null );
-		if ( pauseImage != null ) pauseImage.setEffect( null );
-		if ( playImage != null ) playImage.setEffect( null );
-		if ( settingsImage != null ) settingsImage.setEffect( null );
+	public void applyLightTheme() {
+		if ( stopImage != null ) stopImage.setEffect( lightThemeButtonEffect );
+		if ( nextImage != null ) nextImage.setEffect( lightThemeButtonEffect );
+		if ( previousImage != null ) previousImage.setEffect( lightThemeButtonEffect );
+		if ( pauseImage != null ) pauseImage.setEffect( lightThemeButtonEffect );
+		if ( playImage != null ) playImage.setEffect( lightThemeButtonEffect );
+		if ( settingsImage != null ) settingsImage.setEffect( lightThemeButtonEffect );
 		
 		for ( int k = 0; k < volumeImages.length; k++ ) {
-			if ( volumeImages[k] != null ) volumeImages[k].setEffect( null );
+			if ( volumeImages[k] != null ) volumeImages[k].setEffect( lightThemeButtonEffect );
 		}
 	}
 	
@@ -600,7 +634,7 @@ public class Transport extends VBox {
 
 
 	public ColorAdjust getDarkThemeButtonAdjust () {
-		return darkThemeTransportButtons;
+		return darkThemeButtonEffect;
 	}
 
 	public void doAfterShowProcessing () {		

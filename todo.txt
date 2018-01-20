@@ -2,6 +2,7 @@ Now:
 	Improve library checker
 		Log / status
 		some controls, maybe
+		use the diskTimeStamp variables I added
 		
 	Windows - Global hotkeys don't show in settings tab until you try to set one, then they all appear
 
@@ -11,26 +12,13 @@ Now:
 		
 	Large images from web have trouble with Drag and Drop
 
-	Hover effects on transparent image buttons
-		Settings Button
-		Volume button
-		https://stackoverflow.com/questions/47765228/is-it-possible-to-set-tthe-hsv-for-a-color-adjust-via-css
-		settingsButton.setOnMouseEntered( e -> settingsImage.setEffect( this.darkThemeButtonsHover ) );
-		settingsButton.setOnMouseExited( e -> settingsImage.setEffect( isDarkTheme()? darkThemeButtons : null ) );
-		This is kind of a pain. We need to hard code the values, convert from hsv to color adjust, and also probably have white button images instead of black. 
-	
 	Interface with Last.fm scrobbler
 		https://github.com/jkovacs/lastfm-java
 		https://github.com/thomwiggers/lastfm-java
 		https://stackoverflow.com/questions/22766572/last-fm-java-api-get-recenttracks-of-a-user-within-a-data-range
-	
-	Issue with saving current list. I had just loaded a playlist and re-opened
-		Jan 19, 2018 03:06:20 AM net.joshuad.hypnos.audio.AudioSystem lambda$applySettings$0
-		INFO: Error loading current list track number: Index: 83, Size: 8
 
 
 After Beta 3
-
 	KDE Neon
 		Can't drag ad drop an mp3 into hypnos
 			onDragOver doesn't seem to hear the drag event. 
@@ -212,7 +200,7 @@ After Beta 3
 	
 	Tiny drop shadow on transport buttons when in dark theme. It's the line HBox, VBox, #transport { ... -fx-background-color: #222222 ... }
 	
-	Showing any dialog prevents window drag resize in ubuntu / other linux?
+	Showing any dialog prevents window drag resize in ubuntu / other linux
 		http://bugs.java.com/bugdatabase/view_bug.do?bug_id=8140491
 		https://stackoverflow.com/questions/33134791/javafx-stage-cant-be-resized-after-showing-a-dialog
 	
@@ -238,9 +226,7 @@ After Beta 3
 
  	Make LibraryUpdater part of Library. Is there a way to abstract out the Platform -> RunLater part? I feel like we're just stuck w/ that, which kind of ties to us JavaFX. 
  		Maybe ui.runMe ( Runnable ), and then the UI can decide whether to launch a new thread, have a thread idling, do it on this thread, or use something like Platform.runLater()	
-	
-	a better structure for persister
-	
+		
 	a better structure for hotkey commands (maybe combine with commandline commands?)
 		
 :::: Decoders ::::

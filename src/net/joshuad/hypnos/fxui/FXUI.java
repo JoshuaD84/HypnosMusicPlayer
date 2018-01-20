@@ -139,10 +139,14 @@ public class FXUI implements PlayerListener {
 	private Double currentListSplitPaneRestoredPosition = null;
 	private Double primarySplitPaneRestoredPosition = null;
 
-	private ColorAdjust darkThemeButtons = new ColorAdjust(); {
-		darkThemeButtons.setSaturation( -1 );
-		darkThemeButtons.setHue( 1 );
-		darkThemeButtons.setBrightness( .75 );
+	private ColorAdjust darkThemeButtonEffect = new ColorAdjust(); {
+		darkThemeButtonEffect.setBrightness( -.3d );
+	}
+	
+	ColorAdjust lightThemeButtonEffect = new ColorAdjust(); {
+		lightThemeButtonEffect.setBrightness( -.75d );
+		lightThemeButtonEffect.setHue( 0 );
+		lightThemeButtonEffect.setSaturation( 0 );
 	}
 	
 	//TODO: this doesn't really belong in the UI, but we don't have a better place atm. 
@@ -408,10 +412,6 @@ public class FXUI implements PlayerListener {
 		audioSystem.addPlayerListener ( this );
 	}
 	
-	public ColorAdjust getDarkThemeTransportButtonsAdjust () {
-		return transport.getDarkThemeButtonAdjust();
-	}
-	
 	private void setupFont() {
 		Path stylesheet; 
 		switch ( Hypnos.getOS() ) {
@@ -509,12 +509,12 @@ public class FXUI implements PlayerListener {
 			lyricsWindow.getScene().getStylesheets().add( darkSheet );
 			
 			transport.applyDarkTheme();
-			libraryPane.applyDarkTheme( darkThemeButtons );
-			currentListPane.applyDarkTheme ( darkThemeButtons );
+			libraryPane.applyDarkTheme( darkThemeButtonEffect );
+			currentListPane.applyDarkTheme ( darkThemeButtonEffect );
 		}
 	}
 	
-	public void removeDarkTheme() {	
+	public void applyLightTheme() {	
 		isDarkTheme = false;
 		
 		String darkSheet = fileToStylesheetString( darkStylesheet );
@@ -538,9 +538,9 @@ public class FXUI implements PlayerListener {
 		trackInfoWindow.getScene().getStylesheets().remove( darkSheet );
 		lyricsWindow.getScene().getStylesheets().remove( darkSheet );
 		
-		transport.removeDarkTheme();
-		libraryPane.removeDarkTheme();
-		currentListPane.removeDarkTheme();
+		transport.applyLightTheme();
+		libraryPane.applyLightTheme();
+		currentListPane.applyLightTheme();
 	}
 	
 	public boolean isDarkTheme() {
@@ -695,7 +695,9 @@ public class FXUI implements PlayerListener {
 		if ( warningAlertImageSource != null ) {
 			ImageView warningImage = new ImageView ( warningAlertImageSource );
 			if ( isDarkTheme() ) {
-				warningImage.setEffect( darkThemeButtons );
+				warningImage.setEffect( darkThemeButtonEffect );
+			} else {
+				warningImage.setEffect( lightThemeButtonEffect );
 			}
 				
 			warningImage.setFitHeight( 50 );
@@ -1239,7 +1241,7 @@ public class FXUI implements PlayerListener {
 						if ( value.equalsIgnoreCase( "dark" ) ) {
 							applyDarkTheme();
 						} else {
-							removeDarkTheme();
+							applyLightTheme();
 						}
 						settings.remove ( setting );
 						break;

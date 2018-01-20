@@ -1205,15 +1205,15 @@ public class CurrentListPane extends BorderPane {
 		currentListTable.refresh();
 	}
 
-	public void removeDarkTheme () {
-		if ( noRepeatImage != null ) noRepeatImage.setEffect( null );
-		if ( repeatImage != null ) repeatImage.setEffect( null );
-		if ( repeatOneImage != null ) repeatOneImage.setEffect( null );
-		if ( sequentialImage != null ) sequentialImage.setEffect( null );
-		if ( shuffleImage != null ) shuffleImage.setEffect( null );
-		if ( menuImage != null ) menuImage.setEffect( null );
-		if ( queueImage != null ) queueImage.setEffect( null );
-		if ( historyImage != null ) historyImage.setEffect( null );
+	public void applyLightTheme () {
+		if ( noRepeatImage != null ) noRepeatImage.setEffect( ui.lightThemeButtonEffect );
+		if ( repeatImage != null ) repeatImage.setEffect( ui.lightThemeButtonEffect );
+		if ( repeatOneImage != null ) repeatOneImage.setEffect( ui.lightThemeButtonEffect );
+		if ( sequentialImage != null ) sequentialImage.setEffect( ui.lightThemeButtonEffect );
+		if ( shuffleImage != null ) shuffleImage.setEffect( ui.lightThemeButtonEffect );
+		if ( menuImage != null ) menuImage.setEffect( ui.lightThemeButtonEffect );
+		if ( queueImage != null ) queueImage.setEffect( ui.lightThemeButtonEffect );
+		if ( historyImage != null ) historyImage.setEffect( ui.lightThemeButtonEffect );
 		
 		currentListTable.refresh();
 	}
@@ -1420,13 +1420,13 @@ class CurrentListTrackStateCell extends TableCell <CurrentListTrack, CurrentList
 	
 	protected void updateImageThemes ( ) {
 		if ( ui.isDarkTheme() && !isDarkTheme ) {
-			playImage.setEffect( ui.getDarkThemeTransportButtonsAdjust() );
-			pauseImage.setEffect( ui.getDarkThemeTransportButtonsAdjust() );
+			playImage.setEffect( ui.transport.darkThemeButtonEffect );
+			pauseImage.setEffect( ui.transport.darkThemeButtonEffect );
 			isDarkTheme = true;
 			
-		} else if ( !ui.isDarkTheme() && isDarkTheme ) {
-			playImage.setEffect( null );
-			pauseImage.setEffect( null );	
+		} else if ( !ui.isDarkTheme() ) {
+			playImage.setEffect( ui.transport.lightThemeButtonEffect );
+			pauseImage.setEffect( ui.transport.lightThemeButtonEffect );	
 			isDarkTheme = false;
 		}
 	}

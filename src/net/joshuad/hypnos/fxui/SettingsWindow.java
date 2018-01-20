@@ -471,7 +471,7 @@ public class SettingsWindow extends Stage {
 				if ( newValue == null ) {
 					//Do nothing
 				} else if ( newValue == lightTheme ) {
-					ui.removeDarkTheme();
+					ui.applyLightTheme();
 					
 				} else if ( newValue == darkTheme ) {
 					ui.applyDarkTheme();
