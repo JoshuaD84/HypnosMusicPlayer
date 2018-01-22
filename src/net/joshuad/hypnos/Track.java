@@ -48,7 +48,7 @@ public class Track implements Serializable, AlbumInfoSource {
 	
 	private transient Vector <TagError> tagErrors = new Vector <TagError> ();
 	
-	private transient LovedState lovedState = LovedState.UNKNOWN;
+	private transient LovedState lovedState = LovedState.NOT_SET;
 
 	public enum Format {
 		FLAC ( "flac" ),
@@ -1093,7 +1093,7 @@ public class Track implements Serializable, AlbumInfoSource {
 	private void readObject ( ObjectInputStream in ) throws IOException, ClassNotFoundException {
 		in.defaultReadObject();
 		tagErrors = new Vector <TagError> ();
-		lovedState = LovedState.UNKNOWN;
+		lovedState = LovedState.NOT_SET;
 	}
 
 	public LovedState getLovedState () {

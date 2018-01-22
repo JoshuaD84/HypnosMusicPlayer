@@ -18,7 +18,7 @@ import net.joshuad.hypnos.Hypnos;
 
 public class LastFM {
 	
-	public enum LovedState { UNKNOWN, TRUE, FALSE };
+	public enum LovedState { TRUE, FALSE, NOT_SET, CANNOT_GET_DATA };
 	
 	private String key = "accf97169875efd9a189520ee542c1f6";
 	private String secret = "534851bcd3b6441dc91c9c970c766666";
@@ -188,7 +188,13 @@ public class LastFM {
 		if ( success ) notifiedUserOfFailedAttempt = false;
 	}
 	
-	public LovedState isLoved ( String artist, String title ) {
+	public LovedState isLoved ( net.joshuad.hypnos.Track track, boolean fromCache ) {
+		if ( track == null ) return LovedState.FALSE;
+		if ( fromCache && track.getLovedState() != LovedState.NOT_SET ) return track.getLovedState();
+		
+		String artist = track.getArtist();
+		String title = track.getTitle();
+		
 		if ( artist == null || title == null ) {
 			//TODO: logging?
 			return LovedState.FALSE;
@@ -199,7 +205,8 @@ public class LastFM {
 		
 		if ( session == null ) {
 			log.append( "[" + timeStamp + "] Invalid session, cannot check if loved: " + artist + " - " + title + "\n" );
- 			return LovedState.UNKNOWN;
+			track.setLovedState( LovedState.CANNOT_GET_DATA );
+ 			return LovedState.CANNOT_GET_DATA;
 		} 
 		
 		Collection<Track> lovedTracks = User.getLovedTracks( session.getUsername(), key ).getPageResults();
@@ -210,31 +217,31 @@ public class LastFM {
 			
 			if ( test.getArtist().toLowerCase().equals( artist.toLowerCase() )
 			&& test.getName().toLowerCase().equals( title.toLowerCase() ) ) {
+				track.setLovedState( LovedState.TRUE );
 				return LovedState.TRUE;
 			}
 		}
+		track.setLovedState( LovedState.FALSE );
 		return LovedState.FALSE;
 	}
 
-	public LovedState isLoved ( net.joshuad.hypnos.Track currentTrack, boolean fromCache ) {
-		if ( currentTrack == null ) return LovedState.FALSE;
-		
-		if ( fromCache && currentTrack.getLovedState() != LovedState.UNKNOWN ) return currentTrack.getLovedState();
-		
-		return isLoved ( currentTrack.getArtist(), currentTrack.getTitle() );
-	}
+
 
 	public void toggleLoveTrack ( net.joshuad.hypnos.Track track ) {
 		switch ( isLoved ( track, false ) ) {
 			case FALSE:
-				loveTrack ( track );
+				loveTrack( track );
 				break;
 			case TRUE:
-				unloveTrack ( track );
+				unloveTrack( track );
 				break;
-			case UNKNOWN:
-				//Do nothing
+			case CANNOT_GET_DATA:
+				notifyUserIfNeeded( false );
 				break;
+			case NOT_SET:
+				//This should be impossible. 
+				break;
+				
 		}
 	}
 
