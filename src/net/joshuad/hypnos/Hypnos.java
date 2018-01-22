@@ -832,6 +832,7 @@ public class Hypnos extends Application {
 						ui.showMainWindow();
 						ui.libraryPane.updateLibraryListPlaceholder();
 						ui.fixTables();
+						ui.settingsWindow.refreshHotkeyFields();
 						
 						LOGGER.info( "Hypnos finished loading." );
 

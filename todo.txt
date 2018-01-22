@@ -1,6 +1,4 @@
 Now:
-	Windows - Global hotkeys don't show in settings tab until you try to set one, then they all appear
-
 	Windows - Select Multiple Files in explorer - No Option to play in Hypnos. Add that
 		
 	Windows - First hover over the love button makes it shift positions
