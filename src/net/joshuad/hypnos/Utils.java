@@ -28,7 +28,7 @@ public class Utils {
 	private static transient final Logger LOGGER = Logger.getLogger( Utils.class.getName() );
 	
 	private static String[] musicExtStrings = new String[] { "flac", "mp3", "ogg", "m4a", "m4b", "m4r", "aac", "wav" }; //PENDING: use Track.Format instead
-	private static String[] imageExtStrings = new String[] { "jpg", "png", "gif" };
+	private static String[] imageExtStrings = new String[] { "jpg", "jpeg", "png", "gif" };
 	private static String[] playlistExtStrings = new String[] { "m3u" };
 		
 	public static final ArrayList <String> musicExtensions = new ArrayList <String> ( Arrays.asList ( musicExtStrings ) );  
@@ -39,6 +39,19 @@ public class Utils {
 			return isMusicFile ( entry );			
 		}
 	};
+	
+	public static boolean hasImageExtension ( String url ) {
+		String testExtension = url.substring ( url.lastIndexOf( "." ) + 1 ).toLowerCase();
+		
+		for ( String imageExtension : imageExtStrings ) {
+			if ( imageExtension.toLowerCase().equals( testExtension ) ) { 
+				return true;
+			}
+		}
+		
+		return false;
+	}
+		
 	
 	public static boolean isImageFile ( File testFile ) {
 		return isImageFile ( testFile.toPath() );
@@ -58,16 +71,7 @@ public class Utils {
 			
 		} 
 		
-		String testExtension = fileName.substring ( fileName.lastIndexOf( "." ) + 1 ).toLowerCase();
-		
-		for ( String imageExtension : imageExtStrings ) {
-			if ( imageExtension.toLowerCase().equals( testExtension ) ) { 
-				return true;
-			}
-		}
-		
-		return false;
-				
+		return hasImageExtension ( fileName );
 	}
 	  
 	public static String toReleaseTitleCase ( String input ) {

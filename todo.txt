@@ -5,11 +5,7 @@ Now:
   		
 	Drag and Drop to playlist info window doesn't affect the playlist itself
 		
-	Large images from web have trouble with Drag and Drop
-
 	Windows - First hover over the love button makes it shift positions
-
-		
 
 After Beta 3
 	Improve library checker
@@ -18,6 +14,8 @@ After Beta 3
 		use the diskTimeStamp variables I added
 		
 	AppImage - Combine the two scripts that are currently being used to launch hypnos and make them one
+	
+	Allow drag and drop of track to image panes
 	
 	Last.fm		
 		Hotkeys?

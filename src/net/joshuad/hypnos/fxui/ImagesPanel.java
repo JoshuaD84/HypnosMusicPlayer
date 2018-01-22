@@ -4,6 +4,9 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -39,6 +42,10 @@ import net.joshuad.hypnos.Track.ArtistTagImagePriority;
 import net.joshuad.hypnos.audio.AudioSystem;
 
 public class ImagesPanel extends SplitPane {
+
+	static final DataFormat textContentFormat = DataFormat.lookupMimeType( "text/plain" );
+	static final DataFormat byteBufferFormat = DataFormat.lookupMimeType( "application/octet-stream" );
+	
 	private static final Logger LOGGER = Logger.getLogger( ImagesPanel.class.getName() );
 
 	ResizableImageView albumImage;
@@ -192,18 +199,23 @@ public class ImagesPanel extends SplitPane {
 				setImages ( ui.currentImagesTrack );
 		
 			} else {
-				for ( DataFormat contentType : db.getContentTypes() ) {
-
-					try {
-						if ( contentType == DataFormat.lookupMimeType("application/octet-stream" ) ) {
-							ByteBuffer buffer = (ByteBuffer)db.getContent( contentType );
-							track.setAndSaveAlbumImage( buffer.array(), audioSystem );
-						}
-					} catch ( Exception e ) {
-						LOGGER.log( Level.WARNING, "Unable to set album image from drop source.", e );
-					}
-				}
+				byte[] buffer = getImageBytesFromDragboard( db );
 				
+				if ( buffer != null ) {
+					track.setAndSaveAlbumImage( buffer, audioSystem );
+				} else {
+					String url = "";
+					if ( db.getContentTypes().contains( textContentFormat ) ) {
+						url = (String)db.getContent( textContentFormat ) + "\n\n";
+					}
+					
+					String message = 
+						"Cannot pull image from dropped source.\n\n" +
+						url + 
+						"Try saving the image to disk and dragging from disk rather than web.";
+					LOGGER.warning( message.replaceAll( "\n\n", " " ) );
+					ui.notifyUserError( message );
+				}
 				event.setDropCompleted( true );
 				event.consume();
 			}
@@ -474,16 +486,23 @@ public class ImagesPanel extends SplitPane {
 				}
 		
 			} else {
-				for ( DataFormat contentType : db.getContentTypes() ) {
-					try {
-						if ( contentType == DataFormat.lookupMimeType("application/octet-stream" ) ) {
-							
-							ByteBuffer buffer = (ByteBuffer)db.getContent( contentType );
-							promptAndSaveArtistImage ( buffer.array() );
-						} 
-					} catch ( Exception e ) {
-						LOGGER.log( Level.WARNING, "Unable to set artist image from drop source.", e );
+				
+				byte[] buffer = getImageBytesFromDragboard( db );
+				
+				if ( buffer != null ) {
+					promptAndSaveArtistImage ( buffer );
+				} else {
+					String url = "";
+					if ( db.getContentTypes().contains( textContentFormat ) ) {
+						url = (String)db.getContent( textContentFormat ) + "\n\n";
 					}
+					
+					String message = 
+						"Cannot pull image from dropped source.\n\n" +
+						url + 
+						"Try saving the image to disk and dragging from disk rather than web.";
+					LOGGER.warning( message.replaceAll( "\n\n", " " ) );
+					ui.notifyUserError( message );
 				}
 			}
 			
@@ -630,6 +649,48 @@ public class ImagesPanel extends SplitPane {
 		} catch ( Exception e ) {
 			artistImagePane.setCenter( null );
 		}
+	}
+	
+	
+	private byte[] getImageBytesFromDragboard ( Dragboard db ) {
+		byte[] retMe = null;
+		
+		if ( db.getContentTypes().contains( textContentFormat ) ) {
+			URL url;
+			try {
+				String file = (String) db.getContent( textContentFormat );
+				
+				if ( Utils.hasImageExtension( file ) ) {
+					url = new URL( (String) db.getContent( textContentFormat ) );
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					try ( InputStream is = url.openStream () ) {
+						byte[] byteChunk = new byte [ 4096 ]; 
+						int n;
+	
+						while ( (n = is.read( byteChunk )) > 0 ) {
+							baos.write( byteChunk, 0, n );
+						}
+	
+						retMe = baos.toByteArray();
+						
+					} catch ( IOException e ) {
+						LOGGER.log ( Level.WARNING, "Unable to pull image from internet (" + db.getContent( textContentFormat ) + ")", e );
+					}
+				} else {
+					LOGGER.warning( "Received drop of a non-image file, ignored: " + db.getContent( textContentFormat ) );
+				}
+				
+			} catch ( MalformedURLException e1 ) {
+				LOGGER.warning( "Unable to parse url: " + db.getContent( textContentFormat ) );
+			}
+		} 
+		
+		if ( retMe == null && db.getContentTypes().contains( byteBufferFormat ) ) {
+			retMe = ((ByteBuffer)db.getContent( byteBufferFormat )).array();
+			if ( retMe.length < 100 ) retMe = null; //This is a hack. 
+		}
+
+		return retMe;
 	}
 	
 }

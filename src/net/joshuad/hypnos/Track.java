@@ -707,7 +707,7 @@ public class Track implements Serializable, AlbumInfoSource {
 					tag.addField( artwork );
 				}
 			}
-
+			
 			Artwork artwork = new StandardArtwork();
 			artwork.setBinaryData( buffer );
 			artwork.setPictureType( type ); 
