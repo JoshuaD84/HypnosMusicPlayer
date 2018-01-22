@@ -146,7 +146,6 @@ public class BackupFlacDecoder extends AbstractDecoder {
 				FlacAudioHeader flacAudioHeader = (FlacAudioHeader) audioHeader;
 				
 				long decodedLengthBytes = flacAudioHeader.getNoOfSamples() * flacAudioHeader.getBitsPerSample() / 8  * 2;
-				double lengthMS = flacAudioHeader.getPreciseTrackLength() * 1000;
 				int byteTarget = (int)(requestPercent * decodedLengthBytes);
 				
 				return byteTarget;

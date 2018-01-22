@@ -15,9 +15,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.joshuad.hypnos.Track;
@@ -27,13 +25,10 @@ import net.joshuad.hypnos.lyrics.LyricsFetcher;
 public class LyricsWindow extends Stage {
 	
 	private FXUI ui;
-	
-	private Track track = null;
+
+	private Track track;
 	
 	private LyricsFetcher lyricsParser = new LyricsFetcher();
-	
-	private TextFlow titleFlow;
-	private Text titleText;
 	
 	private TextArea lyricsArea;
 	private Label headerLabel = new Label ( "" );

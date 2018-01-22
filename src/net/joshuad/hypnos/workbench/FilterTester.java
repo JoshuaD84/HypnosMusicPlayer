@@ -2,9 +2,7 @@ package net.joshuad.hypnos.workbench;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.Normalizer;
 import java.util.ArrayList;
-import java.util.Random;
 
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;

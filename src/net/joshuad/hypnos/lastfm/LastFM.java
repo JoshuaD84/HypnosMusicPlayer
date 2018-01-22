@@ -225,8 +225,6 @@ public class LastFM {
 		return LovedState.FALSE;
 	}
 
-
-
 	public void toggleLoveTrack ( net.joshuad.hypnos.Track track ) {
 		switch ( isLoved ( track, false ) ) {
 			case FALSE:
