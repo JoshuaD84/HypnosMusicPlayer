@@ -12,7 +12,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import net.joshuad.hypnos.CurrentList;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.History;
@@ -73,7 +75,8 @@ public class AudioSystem {
 	private Double unmutedVolume = null;
 	
 	private final BooleanProperty lastFMDoScrobble = new SimpleBooleanProperty ( false );
-	private final BooleanProperty lastFMSavePassword = new SimpleBooleanProperty ( false );
+	private boolean scrobbledThisTrack = false;
+	private final DoubleProperty lastFMScrobbleTime = new SimpleDoubleProperty ( 0 );
 	
 	public AudioSystem () {
 		player = new AudioPlayer ( this );
@@ -439,13 +442,12 @@ public class AudioSystem {
 		
 		retMe.put( Setting.LASTFM_USERNAME, lastFM.getUsername() );
 		
-		if ( lastFMSavePassword.get() ) {
-			retMe.put( Setting.LASTFM_PASSWORD_MD5, lastFM.getPasswordMD5() );
-		}
-		
-		retMe.put( Setting.LASTFM_SAVE_PASSWORD, lastFMSavePassword.getValue().toString() );
+		retMe.put( Setting.LASTFM_PASSWORD_MD5, lastFM.getPasswordMD5() );
 		
 		retMe.put( Setting.LASTFM_SCROBBLE_ON_PLAY, lastFMDoScrobble.getValue().toString() );
+		
+		retMe.put( Setting.LASTFM_SCROBBLE_TIME, this.lastFMScrobbleTime.getValue().toString() );
+		
 		
 		return retMe;
 	}
@@ -547,8 +549,8 @@ public class AudioSystem {
 					settings.remove ( setting );
 					break;
 					
-				case LASTFM_SAVE_PASSWORD:
-					this.lastFMSavePassword.setValue( Boolean.valueOf( value ) );
+				case LASTFM_SCROBBLE_TIME:
+					this.lastFMScrobbleTime.setValue( Double.valueOf( value ) );
 					settings.remove( setting );
 					break;
 				}
@@ -569,9 +571,16 @@ public class AudioSystem {
 		}
 	}
 	
-	private void notifyListenersPositionChanged ( int positionMS, int lengthMS ) {
+	private void notifyListenersPositionChanged ( Track track, int positionMS, int lengthMS ) {
 		for ( PlayerListener listener : playerListeners ) {
 			listener.playerPositionChanged( positionMS, lengthMS );
+		}
+		
+		if ( !scrobbledThisTrack && lastFMDoScrobble.getValue() ) {
+			if ( positionMS / (double)lengthMS >= this.lastFMScrobbleTime.get() ) {
+				lastFM.scrobbleTrack( track );
+				scrobbledThisTrack = true;
+			}
 		}
 	}
 	
@@ -579,14 +588,17 @@ public class AudioSystem {
 		for ( PlayerListener listener : playerListeners ) {
 			listener.playerStopped( track, reason );
 		}
+		
+		if ( !scrobbledThisTrack && lastFMDoScrobble.getValue() && reason == StopReason.TRACK_FINISHED && track != null ) {
+			lastFM.scrobbleTrack( track );
+			scrobbledThisTrack = true;
+		}
 	}
 	
 	private void notifyListenersStarted ( Track track ) {
+		scrobbledThisTrack = false;
 		for ( PlayerListener listener : playerListeners ) {
 			listener.playerStarted( track );
-		}
-		if ( lastFMDoScrobble.getValue() ) {
-			lastFM.scrobbleTrack( track.getArtist(), track.getTitle() );
 		}
 	}
 	
@@ -623,7 +635,7 @@ public class AudioSystem {
 	//REFACTOR: Make these a listener interface, and add this object as a listener to player? 	
 	
 	private int consecutiveFailedToStartCount = 0;
-	void playerStopped ( StopReason reason ) { 
+	void playerStopped ( Track track, StopReason reason ) { 
 		if ( reason == StopReason.TRACK_FINISHED ) {
 			next ( false );
 			consecutiveFailedToStartCount = 0;
@@ -637,7 +649,7 @@ public class AudioSystem {
 			} 
 		}
 		
-		notifyListenersStopped ( history.getLastTrack(), reason );
+		notifyListenersStopped ( track, reason );
 	}
 
 	void playerPaused () {
@@ -656,8 +668,8 @@ public class AudioSystem {
 		notifyListenersStarted( track );
 	}
 
-	void playerTrackPositionChanged ( int positionMS, int lengthMS ) {
-		notifyListenersPositionChanged ( positionMS, lengthMS );
+	void playerTrackPositionChanged ( Track track, int positionMS, int lengthMS ) {
+		notifyListenersPositionChanged ( track, positionMS, lengthMS );
 	}
 	
 	public void playTrack ( Track track ) {
@@ -737,13 +749,17 @@ public class AudioSystem {
 	public BooleanProperty doLastFMScrobbleProperty() {
 		return lastFMDoScrobble;
 	}
-	
-	public BooleanProperty lastFMSavePasswordProperty() {
-		return lastFMSavePassword;
-	}
-	
+
 	public boolean doLastFMScrobble() {
 		return lastFMDoScrobble.getValue();
+	}
+	
+	public void setScrobbleTime( double value ) {
+		lastFMScrobbleTime.set( value );
+	}
+
+	public DoubleProperty scrobbleTimeProperty () {
+		return lastFMScrobbleTime;
 	}
 }
 

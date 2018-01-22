@@ -38,7 +38,7 @@ public class Library {
 	private WatchService watcher;
     private final HashMap<WatchKey,Path> keys = new HashMap <WatchKey,Path> ();
     
-    private MusicFileVisitor fileWalker = null; //YOU MUST SET THIS TO NULL AFTER IT WALKS
+    private InitialScanFileVisitor fileWalker = null; //YOU MUST SET THIS TO NULL AFTER IT WALKS
     
 	private Thread loaderThread;
 	private final ModifiedFileUpdaterThread modifiedFileDelayedUpdater;
@@ -439,7 +439,7 @@ public class Library {
 	
 	private void loadOneSource() {
 		Path selectedPath = sourceToAdd.get( 0 );
-		fileWalker = new MusicFileVisitor( this );
+		fileWalker = new InitialScanFileVisitor( this );
 		try {
 
 			Files.walkFileTree ( 
@@ -462,7 +462,7 @@ public class Library {
 	
 	private void updateOneSource() {
 		Path selectedPath = sourceToUpdate.get( 0 );
-		fileWalker = new MusicFileVisitor( this );
+		fileWalker = new InitialScanFileVisitor( this );
 		try {
 			Files.walkFileTree ( 
 				selectedPath, 

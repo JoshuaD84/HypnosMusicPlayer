@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -31,7 +32,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -39,6 +39,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Slider;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
@@ -1120,25 +1121,39 @@ public class SettingsWindow extends Stage {
 		userInput = new TextField();
 		passwordInput = new PasswordField();
 		CheckBox scrobbleCheckbox = new CheckBox();
-		CheckBox savePasswordCheckbox = new CheckBox();
 		CheckBox showInUICheckbox = new CheckBox();
-		Label scrobbleLabel = new Label ( "Scrobble on Play:");
-		Label passwordLabel = new Label ( "Save Password:" );
+		Label scrobbleLabel = new Label ( "Scrobble Automatically:" );
+		Label scrobbleTime = new Label ( "At Beginning" );
 		Label showInUILabel = new Label ( "Show LastFM in UI:" );
 		scrobbleLabel.setPadding( new Insets ( 0, 0, 0, 60 ) );
-		passwordLabel.setPadding( new Insets ( 0, 0, 0, 60 ) );
+		scrobbleTime.setPadding( new Insets ( 0, 0, 0, 60 ) );
 		showInUILabel.setPadding( new Insets ( 0, 0, 0, 60 ) );
 		Button connectButton = new Button( "Save and Connect" );
 		
+		Slider scrobbleTimeSlider = new Slider ( 0, 1, 0 );
+		scrobbleTimeSlider.setMajorTickUnit( .25 );
+		scrobbleTimeSlider.setMinorTickCount( 0 );
+		scrobbleTimeSlider.valueProperty().addListener( (observable, oldValue, newValue) -> {
+			if ( newValue.doubleValue() == 0 ) {
+				scrobbleTime.setText( "At Beginning" );
+				audioSystem.setScrobbleTime ( 0 );
+			} else if ( newValue.doubleValue() == 1 ) {
+				scrobbleTime.setText( "After Finish" );
+				audioSystem.setScrobbleTime ( 1d );
+			} else {
+				scrobbleTime.setText( "After playing " + new DecimalFormat( "##%").format ( newValue.doubleValue() ) );
+				audioSystem.setScrobbleTime ( newValue.doubleValue() );
+			}
+		});
+		
 		scrobbleCheckbox.selectedProperty().bindBidirectional( audioSystem.doLastFMScrobbleProperty() );
 		showInUICheckbox.selectedProperty().bindBidirectional( ui.showLastFMWidgets );
-		savePasswordCheckbox.selectedProperty().bindBidirectional( audioSystem.lastFMSavePasswordProperty() );
+		scrobbleTimeSlider.valueProperty().bindBidirectional( audioSystem.scrobbleTimeProperty() );
 		
 		connectButton.setOnAction( (ActionEvent e) -> {
 			audioSystem.getLastFM().setCredentials( userInput.getText(), passwordInput.getText() );
 			audioSystem.getLastFM().connect();
 		});
-		
 		
 		GridPane loginPane = new GridPane();
 		loginPane.setHgap( 5 );
@@ -1148,17 +1163,16 @@ public class SettingsWindow extends Stage {
 		loginPane.add( new Label ( "Password:"), 0, 1 );
 		loginPane.add( passwordInput, 1, 1 );
 		
-		loginPane.add( connectButton, 0, 2 );
+		loginPane.add( connectButton, 1, 2 );
 
-		loginPane.add( scrobbleLabel, 2, 0 );
-		loginPane.add( scrobbleCheckbox, 3, 0 );
+		loginPane.add( showInUILabel, 2, 0 );
+		loginPane.add( showInUICheckbox, 3, 0 );
+		
+		loginPane.add( scrobbleLabel, 2, 1 );
+		loginPane.add( scrobbleCheckbox, 3, 1 );
 
-		loginPane.add( passwordLabel, 2, 1 );
-		loginPane.add( savePasswordCheckbox, 3, 1 );
-		
-		loginPane.add( showInUILabel, 2, 2 );
-		loginPane.add( showInUICheckbox, 3, 2 );
-		
+		loginPane.add( scrobbleTime, 2, 2 );
+		loginPane.add( scrobbleTimeSlider, 3, 2 );
 		
 		TextArea logView = new TextArea();
 		logView.setEditable( false );
@@ -1169,7 +1183,10 @@ public class SettingsWindow extends Stage {
 		Timeline lastFMUpdater = new Timeline();
 		lastFMUpdater.setCycleCount( Timeline.INDEFINITE );
 		KeyFrame updateFrame = new KeyFrame( Duration.millis(1000), ae -> {
-			logView.setText( audioSystem.getLastFM().getLog().toString() );
+			String string = audioSystem.getLastFM().getLog().toString();
+			if ( !string.equals( logView.getText() ) ) {
+				logView.setText( string );
+			}
 		});
 		
 		lastFMUpdater.getKeyFrames().add( updateFrame );
@@ -1186,7 +1203,11 @@ public class SettingsWindow extends Stage {
 		logPane.prefHeightProperty().bind( root.heightProperty() );
 		logPane.prefWidthProperty().bind( root.widthProperty() );
 		
-		logPane.getChildren().addAll( headerLabel, loginPane, logView );
+		Hyperlink lastFMLink = new Hyperlink ( "last.fm" );
+		lastFMLink.setStyle( "-fx-text-fill: #0A95C8" );
+		lastFMLink.setOnAction( e-> ui.openWebBrowser( "http://last.fm" ) );
+		
+		logPane.getChildren().addAll( headerLabel, loginPane, logView, lastFMLink );
 		
 		return lastFMTab;
 	}

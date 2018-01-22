@@ -8,9 +8,9 @@ import java.util.logging.Logger;
 
 /* Note: this class is not designed for repeat uses. */
 
-public class MusicFileVisitor extends SimpleFileVisitor <Path> {
+public class InitialScanFileVisitor extends SimpleFileVisitor <Path> {
 
-	private static transient final Logger LOGGER = Logger.getLogger( MusicFileVisitor.class.getName() );
+	private static transient final Logger LOGGER = Logger.getLogger( InitialScanFileVisitor.class.getName() );
 	
 	private boolean walkInterrupted = false;
 	
@@ -18,7 +18,7 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 	
 	private static long sleepTime = 2;
 	
-	public MusicFileVisitor ( Library library ) {
+	public InitialScanFileVisitor ( Library library ) {
 		this.library = library;
 	}
 	
@@ -47,8 +47,8 @@ public class MusicFileVisitor extends SimpleFileVisitor <Path> {
 				
 					library.addAlbum( album );
 					library.addTracks( album.getTracks() );
-					
 					return FileVisitResult.SKIP_SIBLINGS;
+					
 				} catch ( Exception e ) {
 					LOGGER.info( "Unable to load album track. " + file.toAbsolutePath().toString() );
 					return FileVisitResult.CONTINUE;

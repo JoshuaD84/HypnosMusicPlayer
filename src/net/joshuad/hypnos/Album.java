@@ -17,8 +17,6 @@ public class Album implements Serializable, AlbumInfoSource {
 	private File directory;
 	ArrayList <Track> tracks;
 
-	private long diskTimestamp = 0;
-	
 	public Album ( Path albumDirectory ) throws Exception {
 		this.directory = albumDirectory.toFile();
 		

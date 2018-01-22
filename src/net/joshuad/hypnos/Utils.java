@@ -258,6 +258,7 @@ public class Utils {
 		return string.toLowerCase();
 	}
 	
+	//TODO: This is slow as hell. And in a key place in the library loader
 	public static boolean isAlbumDirectory ( Path path ) {
 		if ( !Files.isDirectory( path ) ) return false;
 		

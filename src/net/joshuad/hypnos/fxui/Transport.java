@@ -27,10 +27,16 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.Hypnos;
@@ -39,11 +45,12 @@ import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.StopReason;
+import net.joshuad.hypnos.lastfm.LastFM.LovedState;
 
 public class Transport extends VBox {
 	private static final Logger LOGGER = Logger.getLogger( Transport.class.getName() );
 	
-	ImageView playImage, pauseImage, stopImage, nextImage, previousImage;
+	ImageView playImage, pauseImage, stopImage, nextImage, previousImage, loveImage;
 	Image playImageSource, pauseImageSource;
 	ImageView settingsImage;
 	ImageView[] volumeImages = new ImageView[ 4 ];
@@ -91,6 +98,44 @@ public class Transport extends VBox {
 		darkThemeButtonsHover.setHue( -.75d );
 	}
 	
+	ColorAdjust darkThemeLovedEffect = new ColorAdjust(); {
+		darkThemeLovedEffect.setBrightness( -.4d );
+		darkThemeLovedEffect.setHue( .15d );
+		darkThemeLovedEffect.setSaturation( .75d );
+	}
+	
+	ColorAdjust darkThemeNotLovedEffect = new ColorAdjust(); {
+		darkThemeNotLovedEffect.setBrightness( -.4d );
+		darkThemeNotLovedEffect.setHue( 0 );
+		darkThemeNotLovedEffect.setSaturation( 0 );
+	}
+	
+	ColorAdjust lightThemeLovedEffect = new ColorAdjust(); {
+		lightThemeLovedEffect.setBrightness( -.1d );
+		lightThemeLovedEffect.setHue( .0d );
+		lightThemeLovedEffect.setSaturation( .6d );
+	}
+	
+	ColorAdjust lightThemeNotLovedEffect = new ColorAdjust(); {
+		lightThemeNotLovedEffect.setBrightness( -.3d );
+		lightThemeNotLovedEffect.setHue( -0d );
+		lightThemeNotLovedEffect.setSaturation( .0d );
+	}
+	
+	Border loveBorder = new Border ( new BorderStroke ( 
+		Color.TRANSPARENT, 
+		BorderStrokeStyle.NONE, 
+		new CornerRadii ( 5 ),
+		BorderWidths.DEFAULT
+	));
+	
+	Border loveBorderHover = new Border ( new BorderStroke ( 
+		Color.GREY, 
+		BorderStrokeStyle.DOTTED, 
+		new CornerRadii ( 5 ),
+		BorderWidths.DEFAULT
+	));
+	
 	FXUI ui;
 	AudioSystem audioSystem;
 	
@@ -129,8 +174,6 @@ public class Transport extends VBox {
 		stopButton.setMaxSize( 42, 35 );
 		stopButton.setTooltip( new Tooltip( "Stop" ) );
 		
-		loveButton = new Button ( "❤" );
-		loveButton.setTooltip( new Tooltip( "Love on LastFM" ) );
 
 		previousButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -172,14 +215,33 @@ public class Transport extends VBox {
 			}
 		} );
 
-		loveButton.setOnAction( ( ActionEvent e ) -> {
-			audioSystem.getLastFM().loveTrack( audioSystem.getCurrentTrack() );
-		});
+		loveButton = new Button( );
+		loveButton.setTooltip( new Tooltip( "Love on LastFM" ) );
 		loveButton.setVisible( false );
 		loveButton.setManaged( false );
+		loveButton.getStyleClass().add( "loveButton" );
+		loveButton.setPadding( new Insets ( 0, 10, 0, 10 ) );
 		loveButton.visibleProperty().bindBidirectional( ui.showLastFMWidgets );
+		loveButton.setBorder( loveBorder );
+		
 		ui.showLastFMWidgets.addListener( ( observable, oldValue, newValue ) -> {
 			loveButton.setManaged( newValue );
+			if ( audioSystem.isStopped() ) loveButton.setGraphic( null );
+			else loveButton.setGraphic( loveImage );
+			updateLovedIndicator( false );
+		});
+		
+		loveButton.setOnAction( ( ActionEvent e ) -> {
+			Thread taskThread = new Thread (() -> {
+				audioSystem.getLastFM().toggleLoveTrack( audioSystem.getCurrentTrack() );
+				Platform.runLater( () -> updateLovedIndicator( false ) );
+			});
+			taskThread.setDaemon( true );
+			taskThread.start();
+		});
+		
+		loveButton.hoverProperty().addListener( ( observable, oldValue, newValue ) -> {
+			loveButton.setBorder( newValue ? loveBorderHover : loveBorder );
 		});
 		
 		timeElapsedLabel = new Label( "" );
@@ -290,17 +352,17 @@ public class Transport extends VBox {
 		updateAvailableButton.setTooltip( new Tooltip( "An Update is Available!" ) );
 		updateAvailableButton.setOnAction ( event -> ui.openWebBrowser( "http://hypnosplayer.org" ) );
 		
-		switch ( Hypnos.getOS() ) {
-			case WIN_10: case WIN_7: case WIN_8: case WIN_UNKNOWN: case WIN_VISTA: case WIN_XP:
-				showSettingsButton.setPadding( new Insets ( 5, 5, 0, 5 ) );
-				updateAvailableButton.setPadding( new Insets ( 5, 5, 5, 0 ) );
-				break;
+		//switch ( Hypnos.getOS() ) {
+		//	case WIN_10: case WIN_7: case WIN_8: case WIN_UNKNOWN: case WIN_VISTA: case WIN_XP:
+				showSettingsButton.setPadding( new Insets ( 7, 5, 0, 5 ) );
+				updateAvailableButton.setPadding( new Insets ( 7, 5, 5, 0 ) );
+		//		break;
 				
-			case NIX: case OSX: case UNKNOWN:
-				showSettingsButton.setPadding( new Insets ( 0, 5, 0, 5 ) );
-				updateAvailableButton.setPadding( new Insets ( 5, 5, 5, 0 ) );
-				break;
-		}
+		//	case NIX: case OSX: case UNKNOWN:
+		//		showSettingsButton.setPadding( new Insets ( 0, 5, 0, 5 ) );
+		//		updateAvailableButton.setPadding( new Insets ( 5, 5, 5, 0 ) );
+		//		break;
+		//}
 		
 		//Make it not take up space when it is not visible.
 		updateAvailableButton.managedProperty().bind( updateAvailableButton.visibleProperty() );
@@ -316,12 +378,17 @@ public class Transport extends VBox {
 		currentTrackButton = new Button( "" );
 		currentTrackButton.setPadding( new Insets ( 10, 0, 0, 0 ) );
 		currentTrackButton.getStyleClass().add( "trackName" );
-		playingTrackInfo.setCenter( currentTrackButton );
+		
+		HBox currentTrackBox = new HBox();
+		currentTrackBox.setAlignment( Pos.BOTTOM_CENTER );
+		currentTrackBox.getChildren().addAll( currentTrackButton, loveButton );
+		
+		playingTrackInfo.setCenter( currentTrackBox );
 		playingTrackInfo.setRight( settingsBox );
 		playingTrackInfo.setLeft( settingsWidthPadding );
+		settingsWidthPadding.minWidthProperty().bind( settingsBox.widthProperty() );
 		
 		currentTrackButton.setOnMouseClicked( ( MouseEvent event ) -> {
-			
 			if ( event.getButton() == MouseButton.PRIMARY ) {
 				ui.selectCurrentTrack();
 			}
@@ -426,7 +493,6 @@ public class Transport extends VBox {
 			}
 		});
 		
-		
 		infoMenuItem.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
@@ -491,6 +557,16 @@ public class Transport extends VBox {
 		setId( "transport" );
 	}
 	
+	private void updateLovedIndicator( boolean fromCache ) {
+		LovedState loved = audioSystem.getLastFM().isLoved( audioSystem.getCurrentTrack(), fromCache );
+	
+		if ( loved == LovedState.TRUE ) {
+			loveImage.setEffect ( ui.isDarkTheme() ? darkThemeLovedEffect : lightThemeLovedEffect );
+		} else {
+			loveImage.setEffect ( ui.isDarkTheme() ? darkThemeNotLovedEffect : lightThemeNotLovedEffect );
+		}
+	}
+	
 	private void applyHover ( ImageView image, Boolean hasHover ) {
 		if ( hasHover ) {
 			image.setEffect ( ui.isDarkTheme() ? darkThemeButtonsHover : lightThemeButtonsHover );
@@ -544,8 +620,6 @@ public class Transport extends VBox {
 		}
 		
 		playImage = null;
-		pauseImage = null;
-		
 		try {
 			playImageSource = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/play.png" ).toFile() ) );
 			playImage = new ImageView ( playImageSource );
@@ -554,7 +628,8 @@ public class Transport extends VBox {
 		} catch ( Exception e ) {
 			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/play.png", e );
 		}
-		
+
+		pauseImage = null;
 		try {
 			pauseImageSource = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/pause.png" ).toFile() ) );
 			pauseImage = new ImageView ( pauseImageSource );
@@ -590,6 +665,16 @@ public class Transport extends VBox {
 		} catch ( Exception e ) {
 			LOGGER.log( Level.WARNING, "Unable to load previous icon: resources/stop.png", e );
 		}
+		
+		loveImage = null;
+		try {
+			Image loveImageSource = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/love.png" ).toFile() ) );
+			loveImage = new ImageView ( loveImageSource );
+			loveImage.setFitHeight( 14 );
+			loveImage.setFitWidth( 14 );
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load play icon: resources/love.png", e );
+		}
 	}
 	
 	public void applyDarkTheme () {
@@ -604,6 +689,7 @@ public class Transport extends VBox {
 		for ( int k = 0; k < volumeImages.length; k++ ) {
 			if ( volumeImages[k] != null ) volumeImages[k].setEffect( darkThemeButtonEffect );
 		}
+		updateLovedIndicator( true );
 	}	
 	
 	public void applyLightTheme() {
@@ -617,6 +703,7 @@ public class Transport extends VBox {
 		for ( int k = 0; k < volumeImages.length; k++ ) {
 			if ( volumeImages[k] != null ) volumeImages[k].setEffect( lightThemeButtonEffect );
 		}
+		updateLovedIndicator( true );
 	}
 	
 	public void update ( int timeElapsedS, int timeRemainingS, double percent )  {
@@ -636,6 +723,7 @@ public class Transport extends VBox {
 					timeElapsedLabel.setText( "" );
 					timeRemainingLabel.setText( "" );
 					currentTrackButton.setText( "" );
+					loveButton.setText( "" );
 					currentTrackTooltip.setText( "No current track." );
 			
 					StackPane thumb = (StackPane) trackPositionSlider.lookup( ".thumb" );
@@ -673,5 +761,58 @@ public class Transport extends VBox {
 	public void doAfterShowProcessing () {		
 		StackPane thumb = (StackPane) trackPositionSlider.lookup( ".thumb" );
 		thumb.setVisible( false );
+	}
+
+	public void playerStarted ( Track track ) {
+		Runnable runMe = () -> {
+			StackPane thumb = (StackPane) trackPositionSlider.lookup( ".thumb" );
+			thumb.setVisible( true );
+			
+			currentTrackButton.setText( track.getArtist() + " - " + track.getTitle() );
+			currentTrackTooltip.setText( 
+				"Album: " + track.getAlbumTitle() + "\n" +
+				"Year: " + track.getYear() + "\n" +
+				"Length: " + Utils.getLengthDisplay( track.getLengthS() ) + "\n" + 
+				"Encoding: " + track.getShortEncodingString()
+			);
+	
+			togglePlayButton.setGraphic( pauseImage );
+			
+			if ( ui.showLastFMWidgets.get() ) {
+				loveButton.setGraphic( loveImage );
+				
+				Thread taskThread = new Thread (() -> {
+					LovedState loved = audioSystem.getLastFM().isLoved( audioSystem.getCurrentTrack(), false );
+					Platform.runLater( () -> updateLovedIndicator( true ) );
+				});
+				
+				taskThread.setDaemon( true );
+				taskThread.start();
+			}
+		};
+		
+		if ( Platform.isFxApplicationThread() ) {
+			runMe.run();
+		} else {
+			Platform.runLater( runMe );
+		}
+	}
+
+	public void playerStopped ( Track track, StopReason reason ) {
+		
+		Runnable runMe = () -> {
+			update ( 0, 0, 0 ); //values don't matter.
+			volumeSlider.setDisable( false );
+			volumeMuteButton.setDisable( false );
+
+			if ( ui.showLastFMWidgets.get() ) loveButton.setGraphic( null );
+		};
+		
+		if ( Platform.isFxApplicationThread() ) {
+			runMe.run();
+		} else {
+			Platform.runLater( runMe );
+		}
+		
 	}
 }

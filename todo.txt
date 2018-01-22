@@ -1,9 +1,4 @@
 Now:
-	Improve library checker
-		Log / status
-		some controls, maybe
-		use the diskTimeStamp variables I added
-		
 	Windows - Global hotkeys don't show in settings tab until you try to set one, then they all appear
 
 	Windows - Select Multiple Files in explorer - No Option to play in Hypnos. Add that
@@ -12,16 +7,34 @@ Now:
 		
 	Large images from web have trouble with Drag and Drop
 
-	Last.fm scrobbler		
-		prompt for password on first attempt if no password saved
-		Hotkeys
-		place love button on transport and style it right
-		Does the lastfm scrobbler block while trying to connect? If so, maybe do it on a thread. 
-		
-	Update availbable indicator not working
+	Windows - First hover over the love button makes it shift positions
+
 		
 
 After Beta 3
+	Improve library checker
+		Log / status
+		some controls, maybe
+		use the diskTimeStamp variables I added
+		
+	AppImage - Combine the two scripts that are currently being used to launch hypnos and make them one
+	
+	Last.fm		
+		Hotkeys?
+			use keypad+ and keypad-		
+				
+		Fancy stuff:
+			Heart column on current list
+			Update full library by looking at user.getLovedTracks
+			dynamically update lastfm context menu based on love state
+		
+		
+	Allow multiple values for global hotkeys?
+	
+	Multi monitor positioning doesn't seem to work right all the time
+	
+	Sometimes the track title disappears while playing
+
 	KDE Neon
 		Can't drag ad drop an mp3 into hypnos
 			onDragOver doesn't seem to hear the drag event. 

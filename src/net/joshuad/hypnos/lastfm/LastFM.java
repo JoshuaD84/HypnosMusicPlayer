@@ -1,6 +1,7 @@
 package net.joshuad.hypnos.lastfm;
 
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -10,11 +11,15 @@ import de.umass.lastfm.Caller;
 import de.umass.lastfm.Result;
 import de.umass.lastfm.Session;
 import de.umass.lastfm.Track;
+import de.umass.lastfm.User;
 import de.umass.lastfm.scrobble.ScrobbleResult;
 import de.umass.util.StringUtilities;
+import net.joshuad.hypnos.Hypnos;
 
 public class LastFM {
-
+	
+	public enum LovedState { UNKNOWN, TRUE, FALSE };
+	
 	private String key = "accf97169875efd9a189520ee542c1f6";
 	private String secret = "534851bcd3b6441dc91c9c970c766666";
 	private String username = "";
@@ -23,6 +28,8 @@ public class LastFM {
 	private Session session;
 	
 	private boolean triedConnectWithTheseCredentials = true;
+	
+	private boolean notifiedUserOfFailedAttempt = false;
 	
 	StringBuffer log = new StringBuffer();
 	
@@ -70,15 +77,37 @@ public class LastFM {
 		
 		triedConnectWithTheseCredentials = true;
 	}
+	
+	//This should be called after any attempted write to lastfm
+	public void notifyUserIfNeeded( boolean success ) {
+		if ( success ) {
+			notifiedUserOfFailedAttempt = false;
+			
+		} else if ( !success && !notifiedUserOfFailedAttempt ) {
+			Hypnos.getUI().notifyUserError( 
+				"Unable to connect to lastfm.\n\n" +
+				"Check your internet connection, username, and password.\n\n" + 
+				"(This popup won't appear again this session.)" );
+			notifiedUserOfFailedAttempt  = true;
+		}
+	}
 
-	public void scrobbleTrack( String artist, String title ) {
+	public void scrobbleTrack ( net.joshuad.hypnos.Track track ) {
+		String timeStamp = timeStampFormat.format( new Date ( System.currentTimeMillis() ) );
+		
+		if ( track == null ) {
+			log.append ( "[" + timeStamp + "] Asked to scrobble a null track, ignoring.\n" );
+			return;
+		}
+		
+		String artist = track.getArtist();
+		String title = track.getTitle();
 		
 		if ( !triedConnectWithTheseCredentials ) connect();
 		
-		String timeStamp = timeStampFormat.format( new Date ( System.currentTimeMillis() ) );
-		
 		if ( session == null ) {
 			log.append( "[" + timeStamp + "] Invalid session, unable to scrobble: " + artist + " - " + title + "\n" );
+			notifyUserIfNeeded( false );
 			return;
 		} 
 					
@@ -91,15 +120,27 @@ public class LastFM {
 		log.append ( success ? "success!" : "failed." );
 		log.append ( "\n" );
 		
+		notifyUserIfNeeded( success );
+		
 		return;
-	}
+	}	
 	
-	public void loveTrack( String artist, String title ) {
-		if ( !triedConnectWithTheseCredentials ) connect();
+	public void loveTrack ( net.joshuad.hypnos.Track track ) {
 		String timeStamp = timeStampFormat.format( new Date ( System.currentTimeMillis() ) );
+		
+		if ( track == null ) {
+			log.append ( "[" + timeStamp + "] Asked to love a null track, ignoring.\n" );
+			return;
+		}
+		
+		String artist = track.getArtist();
+		String title = track.getTitle();
+		
+		if ( !triedConnectWithTheseCredentials ) connect();
 		
 		if ( session == null ) {
 			log.append( "[" + timeStamp + "] Invalid session, unable to love: " + artist + " - " + title + "\n" );
+			notifyUserIfNeeded( false );
 			return;
 		} 
 		
@@ -108,17 +149,29 @@ public class LastFM {
 		Result result = Track.love( artist, title, session );
 
 		boolean success = result.isSuccessful();
+		if ( success ) track.setLovedState ( LovedState.TRUE );
 		
 		log.append ( success ? "success!" : "failed - " + result.getErrorMessage() );
 		log.append ( "\n" );
+		
+		notifyUserIfNeeded( success );
 	}
 	
-	public void unloveTrack( String artist, String title ) {
-		if ( !triedConnectWithTheseCredentials ) connect();
+	public void unloveTrack ( net.joshuad.hypnos.Track track ) {
 		String timeStamp = timeStampFormat.format( new Date ( System.currentTimeMillis() ) );
+		if ( track == null ) {
+			log.append ( "[" + timeStamp + "] Asked to unlove a null track, ignoring.\n" );
+			return;
+		}
+		
+		String artist = track.getArtist();
+		String title = track.getTitle();
+		
+		if ( !triedConnectWithTheseCredentials ) connect();
 		
 		if ( session == null ) {
 			log.append( "[" + timeStamp + "] Invalid session, unable to unlove: " + artist + " - " + title + "\n" );
+			notifyUserIfNeeded( false );
 			return;
 		} 
 		
@@ -127,37 +180,63 @@ public class LastFM {
 		Result result = Track.unlove( artist, title, session );
 
 		boolean success = result.isSuccessful();
+		if ( success ) track.setLovedState ( LovedState.FALSE );
 		
 		log.append ( success ? "success!" : "failed - " + result.getErrorMessage() );
 		log.append ( "\n" );
+
+		if ( success ) notifiedUserOfFailedAttempt = false;
 	}
 	
-	public void loveTrack ( net.joshuad.hypnos.Track track ) {
+	public LovedState isLoved ( String artist, String title ) {
+		if ( artist == null || title == null ) {
+			//TODO: logging?
+			return LovedState.FALSE;
+		}
+		
+		if ( !triedConnectWithTheseCredentials ) connect();
 		String timeStamp = timeStampFormat.format( new Date ( System.currentTimeMillis() ) );
-		if ( track == null ) {
-			log.append ( "[" + timeStamp + "] Asked to love a null track, ignoring.\n" );
-		} else {
-			loveTrack( track.getArtist(), track.getTitle() );
+		
+		if ( session == null ) {
+			log.append( "[" + timeStamp + "] Invalid session, cannot check if loved: " + artist + " - " + title + "\n" );
+ 			return LovedState.UNKNOWN;
+		} 
+		
+		Collection<Track> lovedTracks = User.getLovedTracks( session.getUsername(), key ).getPageResults();
+		//TODO: error checking
+		
+		for ( Track test : lovedTracks ) {
+			//TODO: Fuzzy matching?
+			
+			if ( test.getArtist().toLowerCase().equals( artist.toLowerCase() )
+			&& test.getName().toLowerCase().equals( title.toLowerCase() ) ) {
+				return LovedState.TRUE;
+			}
+		}
+		return LovedState.FALSE;
+	}
+
+	public LovedState isLoved ( net.joshuad.hypnos.Track currentTrack, boolean fromCache ) {
+		if ( currentTrack == null ) return LovedState.FALSE;
+		
+		if ( fromCache && currentTrack.getLovedState() != LovedState.UNKNOWN ) return currentTrack.getLovedState();
+		
+		return isLoved ( currentTrack.getArtist(), currentTrack.getTitle() );
+	}
+
+	public void toggleLoveTrack ( net.joshuad.hypnos.Track track ) {
+		switch ( isLoved ( track, false ) ) {
+			case FALSE:
+				loveTrack ( track );
+				break;
+			case TRUE:
+				unloveTrack ( track );
+				break;
+			case UNKNOWN:
+				//Do nothing
+				break;
 		}
 	}
-	
-	public void unloveTrack ( net.joshuad.hypnos.Track track ) {
-		String timeStamp = timeStampFormat.format( new Date ( System.currentTimeMillis() ) );
-		if ( track == null ) {
-			log.append ( "[" + timeStamp + "] Asked to unlove a null track, ignoring.\n" );
-		} else {
-			unloveTrack( track.getArtist(), track.getTitle() );
-		}
-	}
-	
-	public void scrobbleTrack ( net.joshuad.hypnos.Track track ) {
-		String timeStamp = timeStampFormat.format( new Date ( System.currentTimeMillis() ) );
-		if ( track == null ) {
-			log.append ( "[" + timeStamp + "] Asked to scrobble a null track, ignoring.\n" );
-		} else {
-			scrobbleTrack( track.getArtist(), track.getTitle() );
-		}
-	}	
 
 	public StringBuffer getLog () {
 		return log;
@@ -170,15 +249,6 @@ public class LastFM {
 	public String getPasswordMD5() {
 		return password;
 	}
-	
-	
-	public static void main( String[] args ) {
-		LastFM lastFM = new LastFM();
-		lastFM.setCredentials( "HypnosTest", "ADD ME WHEN TESTING" );
-		lastFM.scrobbleTrack( "Bowerbirds", "Hooves" );
-		lastFM.scrobbleTrack( "Sufjan Stevens", "All of Me Wants All Of You" );
-		
-		System.out.println( lastFM.log.toString() );
-	}
+
 
 }

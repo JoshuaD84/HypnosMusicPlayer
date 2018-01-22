@@ -244,21 +244,21 @@ public class Hypnos extends Application {
 		
 		switch ( speed ) {
 			case LOW:
-				MusicFileVisitor.setSleepTimeBetweenVisits( 150 );
+				InitialScanFileVisitor.setSleepTimeBetweenVisits( 150 );
 				library.setLoaderSleepTimeMS( 250 );
 				libraryUpdater.setMaxChangesPerUpdate ( 500 );
 				libraryUpdater.setSleepTimeMS( 60 );
 				break;
 				
 			case MED:
-				MusicFileVisitor.setSleepTimeBetweenVisits( 50 );
+				InitialScanFileVisitor.setSleepTimeBetweenVisits( 50 );
 				library.setLoaderSleepTimeMS( 50 );
 				libraryUpdater.setMaxChangesPerUpdate ( 2000 );
 				libraryUpdater.setSleepTimeMS( 15 );
 				break;
 				
 			case HIGH:
-				MusicFileVisitor.setSleepTimeBetweenVisits( 0 );
+				InitialScanFileVisitor.setSleepTimeBetweenVisits( 0 );
 				library.setLoaderSleepTimeMS( 10 );
 				libraryUpdater.setMaxChangesPerUpdate ( 20000 );
 				libraryUpdater.setSleepTimeMS( 2 );
@@ -786,7 +786,7 @@ public class Hypnos extends Application {
 						} );
 						
 						finishLoadingThread.setName ( "Hypnos Load Finisher for Nix" );
-						finishLoadingThread.setDaemon( true );
+						finishLoadingThread.setDaemon( false );
 						finishLoadingThread.start();
 					} 
 					break;

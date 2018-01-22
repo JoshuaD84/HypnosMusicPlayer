@@ -27,7 +27,11 @@
 
 .settingsButton {
 	-fx-background-color: transparent;
-	-fx-font-size: 32px;
+}
+
+.loveButton {
+	-fx-background-color: transparent;
+	-fx-font-size: 18px;
 }
 
 .updateButton {

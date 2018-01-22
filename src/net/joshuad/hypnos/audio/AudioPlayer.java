@@ -57,12 +57,13 @@ public class AudioPlayer {
 		while ( true ) {
 			try {
 				if ( state != PlayState.STOPPED && stopRequested ) {
+					Track thisTrack = decoder.getTrack();
 					track = null;
 					state = PlayState.STOPPED;
 					AbstractDecoder closeMe = decoder;
 					decoder = null;
 					closeMe.closeAllResources();
-					controller.playerStopped( StopReason.USER_REQUESTED );
+					controller.playerStopped( thisTrack, StopReason.USER_REQUESTED );
 					stopRequested = false;
 				}	
 
@@ -95,7 +96,7 @@ public class AudioPlayer {
 					} else {
 						stopRequested = false;
 						state = PlayState.STOPPED;
-						controller.playerStopped( StopReason.UNABLE_TO_START_TRACK );
+						controller.playerStopped( null, StopReason.UNABLE_TO_START_TRACK );
 					}
 					
 				} 
@@ -150,10 +151,12 @@ public class AudioPlayer {
 						updateTrackPosition();
 						
 						if ( finishedPlaying ) {
+							Track thisTrack = decoder.getTrack();
 							decoder.closeAllResources();
 							decoder = null;
 							state = PlayState.STOPPED;
-							controller.playerStopped( StopReason.TRACK_FINISHED );
+							controller.playerTrackPositionChanged( thisTrack, (int)getPositionMS(), (int)getPositionMS() );
+							controller.playerStopped( thisTrack, StopReason.TRACK_FINISHED );
 						}			
 
 					} else {
@@ -385,7 +388,7 @@ public class AudioPlayer {
 			timeElapsedMS = (int)( lengthMS * seekPercentRequested );
 		}
 		
-		controller.playerTrackPositionChanged ( timeElapsedMS, lengthMS );
+		controller.playerTrackPositionChanged ( track, timeElapsedMS, lengthMS );
 	}
 
 	public double getVolumePercent () {

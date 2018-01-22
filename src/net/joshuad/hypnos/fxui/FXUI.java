@@ -59,7 +59,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -1280,31 +1279,17 @@ public class FXUI implements PlayerListener {
 
 	@Override
 	public void playerStopped ( Track track, StopReason reason ) {
-		Platform.runLater( () -> {
-			updateTransport( 0, 0, 0 ); //values don't matter. 
-			transport.volumeSlider.setDisable( false );
-			transport.volumeMuteButton.setDisable( false );
-		});
+		transport.playerStopped ( track, reason );
 	}
 
 
 	@Override
 	public void playerStarted ( Track track ) {
 		Platform.runLater( () -> {
-			transport.togglePlayButton.setGraphic( transport.pauseImage );
 			
+			transport.playerStarted ( track );
+
 			currentListPane.currentListTable.refresh();
-	
-			StackPane thumb = (StackPane) transport.trackPositionSlider.lookup( ".thumb" );
-			thumb.setVisible( true );
-			
-			transport.currentTrackButton.setText( track.getArtist() + " - " + track.getTitle() );
-			transport.currentTrackTooltip.setText( 
-				"Album: " + track.getAlbumTitle() + "\n" +
-				"Year: " + track.getYear() + "\n" +
-				"Length: " + Utils.getLengthDisplay( track.getLengthS() ) + "\n" + 
-				"Encoding: " + track.getShortEncodingString()
-			);
 			
 			artSplitPane.setImages( track );
 			

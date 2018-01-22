@@ -376,7 +376,7 @@ public class ImagesPanel extends SplitPane {
 					Platform.runLater( () -> setImages ( ui.currentImagesTrack ) );
 				});
 				workerThread.setName ( "Album Artist Image Tag Saver" );
-				workerThread.setDaemon( false );
+				workerThread.setDaemon( true );
 				workerThread.start();
 			} catch ( Exception e2 ) {
 				LOGGER.log( Level.WARNING, "Unable to load image data from file: " + imageFile, e2 );
@@ -416,7 +416,7 @@ public class ImagesPanel extends SplitPane {
 					Platform.runLater( () -> setImages ( ui.currentImagesTrack ) );
 				});
 				workerThread.setName ( "Album Artist Image Tag Saver" );
-				workerThread.setDaemon( false );
+				workerThread.setDaemon( true );
 				workerThread.start();
 			} catch ( Exception e2 ) {
 				LOGGER.log( Level.WARNING, "Unable to load image data from file: " + imageFile, e2 );
@@ -570,7 +570,7 @@ public class ImagesPanel extends SplitPane {
 					});
 
 					workerThread.setName ( "Artist Image Tag Saver" );
-					workerThread.setDaemon( false );
+					workerThread.setDaemon( true );
 					workerThread.start();
 					break;
 					
