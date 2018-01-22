@@ -6,6 +6,9 @@ Now:
 	Windows - First hover over the love button makes it shift positions
 	
 After Beta 3
+
+	Drag and Drop to Playlist Info update current list if it is that playlist unchanged
+	
 	File name in tag window somewhere
 	
 	Improve library checker

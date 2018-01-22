@@ -750,20 +750,23 @@ public class FXUI implements PlayerListener {
 		Optional <String> result = dialog.showAndWait();
 		if ( result.isPresent() ) {
 			String enteredName = result.get().trim();
-
+			
+			Playlist updatedPlaylist = null;
 			for ( Playlist test : library.getPlaylists() ) {
 				if ( test.getName().equals( enteredName ) ) {
-					library.removePlaylist ( test );
+					test.setTracks( tracks );
+					updatedPlaylist = test;
 					break;
 				}
 			}
-
-			Playlist newPlaylist = new Playlist( enteredName, new ArrayList <Track> ( tracks ) );
-			library.addPlaylist ( newPlaylist );
+			
+			if ( updatedPlaylist == null ) {
+				updatedPlaylist = new Playlist( enteredName, new ArrayList <Track> ( tracks ) );
+				library.addPlaylist ( updatedPlaylist );
+			}	
 			
 			CurrentListState state = audioSystem.getCurrentList().getState();
-			
-			CurrentListState newState = new CurrentListState ( state.getItems(), state.getAlbums(), newPlaylist, CurrentList.Mode.PLAYLIST );
+			CurrentListState newState = new CurrentListState ( state.getItems(), state.getAlbums(), updatedPlaylist, CurrentList.Mode.PLAYLIST );
 			
 			audioSystem.getCurrentList().setState( newState );
 			return true;
