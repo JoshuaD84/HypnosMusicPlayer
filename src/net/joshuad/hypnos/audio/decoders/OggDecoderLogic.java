@@ -54,9 +54,8 @@ public class OggDecoderLogic {
 		joggSyncState.init();
 		joggSyncState.buffer( bufferSize );
 		
-		boolean readHeader = readHeader();
-		
-		boolean initialized = initializeSound();
+		readHeader();
+		initializeSound();
 	}
 	
 	private boolean readHeader () {

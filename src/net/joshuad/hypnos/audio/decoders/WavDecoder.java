@@ -10,14 +10,6 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.SourceDataLine;
 
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.audio.AudioHeader;
-import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.TagException;
-
 import net.joshuad.hypnos.Track;
 
 public class WavDecoder extends AbstractDecoder {
@@ -107,12 +99,6 @@ public class WavDecoder extends AbstractDecoder {
 	
 	private long getBytePosition ( long targetTimeMS ) {
 		int headerOffset = 0;
-		try {
-			AudioFile audioFile = AudioFileIO.read( track.getPath().toFile() );
-			AudioHeader audioHeader = audioFile.getAudioHeader();
-		} catch ( CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e ) {
-			//Can't read header, no big deal. Just assume 0. 
-		}
 
 		double lengthMS = decodedInput.getFrameLength() / decodedInput.getFormat().getFrameRate() * 1000;
 		long lengthBytes = track.getPath().toFile().length();

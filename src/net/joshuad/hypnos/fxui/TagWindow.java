@@ -618,7 +618,6 @@ public class TagWindow extends Stage {
 					List<Artwork> artworkList = tag.getArtworkList();
 					
 					for ( MultiFileImageTagPair tagPair : imageTagPairs ) {
-						boolean added = false;
 						for ( Artwork artwork : artworkList ) {
 							ImageFieldKey artworkKey = ImageFieldKey.getKeyFromTagIndex( artwork.getPictureType() );
 							

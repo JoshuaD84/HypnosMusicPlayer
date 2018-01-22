@@ -111,7 +111,7 @@ public class FXUI implements PlayerListener {
 	AlbumInfoWindow albumInfoWindow;
 	LibraryLocationWindow libraryLocationWindow;
 	HistoryWindow historyWindow;
-	SettingsWindow settingsWindow;
+	public SettingsWindow settingsWindow;
 	TrackInfoWindow trackInfoWindow;
 	LyricsWindow lyricsWindow;
 	

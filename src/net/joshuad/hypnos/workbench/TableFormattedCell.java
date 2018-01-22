@@ -19,7 +19,7 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
 public class TableFormattedCell extends Application {
-	private static final Logger LOG = Logger.getLogger( TableFormattedCell.class.getName() );
+	private static final Logger LOGGER = Logger.getLogger( TableFormattedCell.class.getName() );
 
 	public static class MyCell extends TableCell <Locale, Locale> {
 

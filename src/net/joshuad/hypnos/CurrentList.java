@@ -645,12 +645,9 @@ public class CurrentList {
 		Runnable runMe = new Runnable() {
 			public void run() {
 				int targetIndex = index > items.size() ? items.size() : index;
-				boolean insertedAtEnd = ( targetIndex == items.size() );
 				
 				boolean startedEmpty = false;
 				if ( items.size() == 0 ) startedEmpty = true;
-				
-				Mode startMode = mode;
 				
 				List<Track> addMe = new ArrayList<Track> ();
 				for ( Playlist playlist : playlists ) {

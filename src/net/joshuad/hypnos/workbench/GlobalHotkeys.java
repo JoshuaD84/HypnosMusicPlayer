@@ -46,7 +46,7 @@ public class GlobalHotkeys implements NativeKeyListener {
 	}
 	
 	public static void main ( String[] args ) {
-		GlobalHotkeys hotkeys = start();
+		start();
 	}
 	
 	public static GlobalHotkeys start() {

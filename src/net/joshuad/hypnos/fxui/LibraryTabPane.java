@@ -932,7 +932,6 @@ public class LibraryTabPane extends StretchedTabPane {
 			row.setOnDragDetected( event -> {
 				if ( !row.isEmpty() ) {
 					
-					ArrayList <Integer> indices = new ArrayList <Integer>( albumTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Album> albums = new ArrayList <Album>( albumTable.getSelectionModel().getSelectedItems() );
 					ArrayList <Track> tracks = new ArrayList <Track> ();
 					
@@ -1513,7 +1512,7 @@ public class LibraryTabPane extends StretchedTabPane {
 			
 			Alert alert = new Alert( AlertType.CONFIRMATION );
 			ui.applyCurrentTheme( alert );
-			ui.setAlertWindowIcon( alert );
+			FXUI.setAlertWindowIcon( alert );
 			double x = ui.mainStage.getX() + ui.mainStage.getWidth() / 2 - 220; //It'd be nice to use alert.getWidth() / 2, but it's NAN now. 
 			double y = ui.mainStage.getY() + ui.mainStage.getHeight() / 2 - 50;
 			
@@ -1707,6 +1706,7 @@ public class LibraryTabPane extends StretchedTabPane {
 					}
 					
 					if ( !playlistsToAdd.isEmpty() ) {
+						//TODO: use dropIndex
 						int dropIndex = row.isEmpty() ? dropIndex = library.getPlaylists().size() : row.getIndex();
 						library.addPlaylists( playlistsToAdd );
 					}

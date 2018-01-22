@@ -1,14 +1,16 @@
 Now:
-	Windows - Global hotkeys don't show in settings tab until you try to set one, then they all appear
-
 	Windows - Select Multiple Files in explorer - No Option to play in Hypnos. Add that
-		
-	Windows - First hover over the love button makes it shift positions
+	
 	
 After Beta 3
-
 	Drag and Drop to Playlist Info update current list if it is that playlist unchanged
 	
+	Windows - First hover over the love button makes it shift positions
+		Launch Hypnos without lastfm widgets showing
+		turn on last fm widgets
+		hover over love button -- it shifts
+		If you launch with lastfm showing, doesn't happen
+		
 	File name in tag window somewhere
 	
 	Improve library checker

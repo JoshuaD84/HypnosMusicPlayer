@@ -782,7 +782,8 @@ public class Transport extends VBox {
 				loveButton.setGraphic( loveImage );
 				
 				Thread taskThread = new Thread (() -> {
-					LovedState loved = audioSystem.getLastFM().isLoved( audioSystem.getCurrentTrack(), false );
+					//Load the data to cache now, so we can access it quickly w/ Platform call
+					audioSystem.getLastFM().isLoved( audioSystem.getCurrentTrack(), false ); 
 					Platform.runLater( () -> updateLovedIndicator( true ) );
 				});
 				

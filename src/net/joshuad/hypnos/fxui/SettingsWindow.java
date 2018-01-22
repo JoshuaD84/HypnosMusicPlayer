@@ -99,13 +99,10 @@ public class SettingsWindow extends Stage {
 	
 	private ChoiceBox <String> albumShuffleChoices;
 	private ChoiceBox <String> albumRepeatChoices;
-	private ChoiceBox <String> albumSortChoices;
 	private ChoiceBox <String> trackShuffleChoices;
 	private ChoiceBox <String> trackRepeatChoices;
-	private ChoiceBox <String> trackSortChoices;
 	private ChoiceBox <String> playlistShuffleChoices;
 	private ChoiceBox <String> playlistRepeatChoices;
-	private ChoiceBox <String> playlistSortChoices;
 	
 	private TextField userInput;
 	private PasswordField passwordInput;

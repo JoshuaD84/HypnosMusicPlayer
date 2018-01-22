@@ -1349,8 +1349,6 @@ public class CurrentListPane extends BorderPane {
 
 		EnumMap <Persister.Setting, Object> retMe = new EnumMap <Persister.Setting, Object> ( Persister.Setting.class );
 		
-		List <String> albumSortOrder = new ArrayList<> ();
-		
 		String sortOrderValue = "";
 		
 		for ( TableColumn<CurrentListTrack, ?> column : currentListTable.getSortOrder() ) {
