@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -88,7 +87,7 @@ public class PlaylistInfoWindow extends Stage {
 	public void setPlaylist ( Playlist playlist ) { 
 		this.playlist = playlist;
 		if ( playlist != null ) {
-			trackTable.setItems( FXCollections.observableArrayList ( playlist.getTracks() ) );
+			trackTable.setItems( playlist.getTracks() );
 			this.setTitle( "Playlist Info: " + playlist.getName() );
 		}
 	}
@@ -119,6 +118,106 @@ public class PlaylistInfoWindow extends Stage {
 		trackTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 		trackTable.prefWidthProperty().bind( primaryPane.widthProperty() );
 		trackTable.prefHeightProperty().bind( primaryPane.heightProperty() );
+		
+		trackTable.setOnDragOver( event -> {
+			Dragboard db = event.getDragboard();
+			if ( db.hasContent( FXUI.DRAGGED_TRACKS ) || db.hasFiles() ) {
+				event.acceptTransferModes( TransferMode.COPY );
+				event.consume();
+			}
+		} );
+		
+		trackTable.setOnDragDropped( event -> {
+			Dragboard db = event.getDragboard();
+			if ( db.hasContent( FXUI.DRAGGED_TRACKS ) ) {
+
+				DraggedTrackContainer container = (DraggedTrackContainer) db.getContent( FXUI.DRAGGED_TRACKS );
+				
+				switch ( container.getSource() ) {
+					case PLAYLIST_LIST: {
+						if ( container.getPlaylists() == null ) {
+							LOGGER.fine ( "Recieved null data from playlist list, ignoring." );
+							
+						} else {
+							List <Track> tracksToCopy = new ArrayList<Track>();
+							for ( Playlist playlist : container.getPlaylists() ) {
+								if ( playlist == null ) {
+									LOGGER.fine ( "Recieved null playlist from playlist list, ignoring." );
+								} else {
+									tracksToCopy.addAll( playlist.getTracks() );
+								}
+									
+							}
+							trackTable.getItems().addAll ( tracksToCopy );
+						}
+					} break;
+					
+					case ALBUM_LIST: {
+						if ( container.getAlbums() == null ) {
+							LOGGER.fine ( "Recieved null data from playlist list, ignoring." );
+							
+						} else {
+							List <Track> tracksToCopy = new ArrayList<Track>();
+							for ( Album album : container.getAlbums() ) {
+								if ( album == null ) {
+									LOGGER.fine ( "Null album dropped in playlist window, ignoring." );
+								} else {
+									tracksToCopy.addAll( album.getTracks() );
+								}
+							}
+							trackTable.getItems().addAll ( tracksToCopy );
+						}
+					} break;
+					
+					case TRACK_LIST:
+					case ALBUM_INFO:
+					case HISTORY: 
+					case CURRENT_LIST:
+					case TAG_ERROR_LIST:
+					case QUEUE: {
+						List <Track> tracksToCopy = container.getTracks();
+						trackTable.getItems().addAll( tracksToCopy );
+					} break;
+					
+					case PLAYLIST_INFO: {
+						//Not possible; table is currently empty
+					} break;
+				}
+
+				event.setDropCompleted( true );
+				event.consume();
+
+			} else if ( db.hasFiles() ) {
+				ArrayList <Path> pathsToAdd = new ArrayList<Path> ();
+				
+				for ( File file : db.getFiles() ) {
+					Path droppedPath = Paths.get( file.getAbsolutePath() );
+					if ( Utils.isMusicFile( droppedPath ) ) {
+						pathsToAdd.add( droppedPath );
+					
+					} else if ( Files.isDirectory( droppedPath ) ) {
+						pathsToAdd.addAll( Utils.getAllTracksInDirectory( droppedPath ) );
+					
+					} else if ( Utils.isPlaylistFile ( droppedPath ) ) {
+						List<Path> paths = Playlist.getTrackPaths( droppedPath );
+						pathsToAdd.addAll( paths );
+					}
+				}
+				
+				ArrayList <Track> tracksToAdd = new ArrayList<Track> ( pathsToAdd.size() );
+				
+				for ( Path path : pathsToAdd ) {
+					tracksToAdd.add( new Track ( path ) );
+				}
+				
+				if ( !tracksToAdd.isEmpty() ) {
+					trackTable.getItems().addAll( tracksToAdd );
+				}
+
+				event.setDropCompleted( true );
+				event.consume();
+			}
+		} );
 		
 		Menu lastFMMenu = new Menu( "LastFM" );
 		MenuItem loveMenuItem = new MenuItem ( "Love" );
@@ -273,20 +372,16 @@ public class PlaylistInfoWindow extends Stage {
 		});
 
 		removeMenuItem.setOnAction( event -> {
-			List <Track> newTracks = new ArrayList<> ();
+			List <Track> removeMe = new ArrayList<> ();
 			
 			for ( int k = 0; k < playlist.getTracks().size(); k++ ) {
-				if ( !trackTable.getSelectionModel().getSelectedIndices().contains( k ) ) {
-					newTracks.add( playlist.getTracks().get( k ) );
+				if ( trackTable.getSelectionModel().getSelectedIndices().contains( k ) ) {
+					removeMe.add( playlist.getTracks().get( k ) );
 				}
 			}
-			
-			Playlist newPlaylist = new Playlist ( playlist.getName(), newTracks );
-			
-			library.removePlaylist( playlist );
-			library.addPlaylist( newPlaylist );
-			this.setPlaylist( newPlaylist );
-			
+
+			trackTable.getSelectionModel().clearSelection();
+			playlist.getTracks().removeAll( removeMe );
 		});
 		
 		playMenuItem.setOnAction( event -> {
@@ -373,12 +468,12 @@ public class PlaylistInfoWindow extends Stage {
 								List <Track> tracksToCopy = new ArrayList<Track>();
 								for ( Album album : container.getAlbums() ) {
 									if ( album == null ) {
-										LOGGER.fine ( "Recieved null playlist from playlist list, ignoring." );
+										LOGGER.fine ( "Null album dropped in playlist window, ignoring." );
 									} else {
 										tracksToCopy.addAll( album.getTracks() );
 									}
 								}
-								trackTable.getItems().addAll ( tracksToCopy );
+								trackTable.getItems().addAll ( dropIndex, tracksToCopy );
 							}
 						} break;
 						
@@ -390,13 +485,6 @@ public class PlaylistInfoWindow extends Stage {
 						case QUEUE: {
 							List <Track> tracksToCopy = container.getTracks();
 							trackTable.getItems().addAll( dropIndex, tracksToCopy );
-							
-							Playlist newList = new Playlist ( playlist.getName(), new ArrayList <Track> ( trackTable.getItems() ) );
-							library.removePlaylist( playlist );
-							library.addPlaylist( newList );
-							
-							playlist = newList;
-							
 						} break;
 						
 						case PLAYLIST_INFO: {
@@ -462,7 +550,7 @@ public class PlaylistInfoWindow extends Stage {
 					event.setDropCompleted( true );
 					event.consume();
 				}
-			} );
+			});
 		
 
 			return row;

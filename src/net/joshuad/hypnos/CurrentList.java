@@ -617,6 +617,8 @@ public class CurrentList {
 	}
 	
 	public void appendPlaylists ( List<Playlist> playlists ) {
+		
+		
 		boolean startedEmpty = false;
 		if ( items.size() == 0 ) startedEmpty = true;
 		

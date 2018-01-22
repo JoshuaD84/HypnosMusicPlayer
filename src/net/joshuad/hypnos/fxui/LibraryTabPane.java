@@ -1650,7 +1650,7 @@ public class LibraryTabPane extends StretchedTabPane {
 					List <Playlist> selectedPlaylists = playlistTable.getSelectionModel().getSelectedItems();
 					List <Track> tracks = new ArrayList <Track> ();
 					
-					List <Playlist> serializableList = new ArrayList ( selectedPlaylists );
+					List <Playlist> serializableList = new ArrayList<Playlist> ( selectedPlaylists );
 					
 					for ( Playlist playlist : selectedPlaylists ) {
 						tracks.addAll ( playlist.getTracks() );

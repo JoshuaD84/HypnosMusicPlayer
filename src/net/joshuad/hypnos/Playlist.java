@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
@@ -27,8 +28,10 @@ public class Playlist implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
-	private List <Track> trackData = new ArrayList<Track>();
-	private transient ObservableList <Track> tracks = FXCollections.observableArrayList( trackData );
+	//This is only used and accurate during serialization
+	private List <Track> trackDataForSerialization = new ArrayList<Track>(); 
+	
+	private transient ObservableList <Track> tracks = FXCollections.observableArrayList( trackDataForSerialization );
 	
 	private String name;
 	
@@ -37,7 +40,7 @@ public class Playlist implements Serializable {
 	public Playlist ( String name ) {
 		this ( name, new ArrayList <Track> () );
 		tracks.addListener( (ListChangeListener.Change<? extends Track> change) -> {
-			hasUnsavedData = true;			
+			hasUnsavedData = true;
 		});
 	}
 	
@@ -145,7 +148,7 @@ public class Playlist implements Serializable {
 		return tracks.size();
 	}
 	
-	public List <Track> getTracks () {
+	public ObservableList <Track> getTracks () {
 		return tracks;
 	}
 	
@@ -199,8 +202,15 @@ public class Playlist implements Serializable {
 		return baseFileName;
 	}
 	
+	
+	private void writeObject ( ObjectOutputStream out ) throws IOException {
+		trackDataForSerialization.clear();
+		trackDataForSerialization.addAll( tracks );
+		out.defaultWriteObject();
+	}
+	
 	private void readObject ( ObjectInputStream in ) throws IOException, ClassNotFoundException {
 		in.defaultReadObject();
-		tracks = FXCollections.observableArrayList( trackData );
+		tracks = FXCollections.observableArrayList( trackDataForSerialization );
 	}
 }
