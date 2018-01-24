@@ -1,8 +1,15 @@
 Now:
-	Windows - Select Multiple Files in explorer - No Option to play in Hypnos. Add that
+	Windows - Right click > open with not working
+		Log file isn't touched.			
+	
+	Windows - 
+		C:\Users\Joshua\Desktop\music\1970 - Curtis>"C:\Program Files\Hypnos\Hypnos.exe" "08 - Give It Up.flac"
+			INFO: Recived non-music, non-playlist file, ignoring: 
+			C:\Program Files\Hypnos\01 - (Don't Worry) If There's a Hell Below We're All Going to Go.flac
 	
 	
 After Beta 3
+	Windows - Log doesn't have the proper new lines for notepad
 	Drag and Drop to Playlist Info update current list if it is that playlist unchanged
 	
 	Windows - First hover over the love button makes it shift positions
@@ -121,6 +128,8 @@ After Beta 3
 	If something gets dropped into config/playlists, update the UI to include it? 
 	
 	Playlist throttled filter, but man, who's going to have over 1000 playlists? 
+	
+	Add email link to bug link in about tab
 
 	Memory Hog issue	
 		With an empty library and no current list and nothing loaded uses about 175mb on Windows 7.
@@ -322,6 +331,14 @@ Key Testing before next release:
 		Confirm it start playing when a track or tracks are loaded from socket
 	
 	Settings load and load appearance
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+

@@ -1229,7 +1229,8 @@ public class SettingsWindow extends Stage {
 		website.setStyle( "-fx-font-size: 20px; -fx-text-fill: #0A95C8" );
 		aboutPane.getStyleClass().add( "aboutPaneURL" );
 
-		Label versionNumber = new Label ( Hypnos.getVersion() + ", Build: " + Hypnos.getBuild() + "\n" + Hypnos.getBuildDate() );
+		String labelString = Hypnos.getVersion() + ", Build: " + Hypnos.getBuild() + "\n" + Hypnos.getBuildDate() ;
+		Label versionNumber = new Label ( labelString );
 		versionNumber.setTextAlignment( TextAlignment.CENTER );
 		versionNumber.setStyle( "-fx-font-size: 16px; -fx-text-fill: #020202" );
 		versionNumber.setPadding( new Insets ( 0, 0, 20, 0 ) );
@@ -1300,12 +1301,33 @@ public class SettingsWindow extends Stage {
 		licenseLink.getStyleClass().add( "aboutPaneURL" );
 		
 		String gplurl = "https://www.gnu.org/licenses/gpl-3.0-standalone.html";
-		licenseLink.setTooltip ( new Tooltip ( url ) );
+		licenseLink.setTooltip ( new Tooltip ( gplurl ) );
 		licenseLink.setOnAction( ( ActionEvent e ) -> {
 			ui.openWebBrowser( gplurl );
 		});
 		
 		licenseBox.getChildren().addAll( licenseLabel, licenseLink );
+		
+		HBox bugBox = new HBox();
+		bugBox.setStyle( "-fx-background-color: transparent" );
+		bugBox.setAlignment( Pos.CENTER );
+		Label bugLabel = new Label ( "Report a Bug:" );
+		bugLabel.setStyle( "-fx-text-fill: #020202" );
+		bugLabel.getStyleClass().add( "aboutPaneText" );
+		
+		Hyperlink bugGitLink = new Hyperlink ( "on GitHub" );
+		bugGitLink.setStyle( "-fx-text-fill: #0A95C8" );
+		bugGitLink.getStyleClass().add( "aboutPaneURL" );
+		
+		String bugGitHubURL = "https://github.com/JoshuaD84/HypnosMusicPlayer/issues";
+		bugGitLink.setTooltip ( new Tooltip ( bugGitHubURL ) );
+		bugGitLink.setOnAction( ( ActionEvent e ) -> {
+			ui.openWebBrowser( bugGitHubURL );
+		});
+		
+		bugBox.getChildren().addAll( bugLabel, bugGitLink );
+		
+		
 		
 		String updateURL = "http://hypnosplayer.org";
 		updateLink = new Hyperlink ( "Update Available!" );
@@ -1317,7 +1339,9 @@ public class SettingsWindow extends Stage {
 		updateLink.setTooltip ( new Tooltip ( updateURL ) );
 		updateLink.visibleProperty().bind( ui.updateAvailableProperty() );
 		
-		aboutPane.getChildren().addAll ( name, website, versionNumber, logo, authorBox, sourceBox, licenseBox, updateLink );
+		
+		aboutPane.getChildren().addAll ( name, website, versionNumber, logo, 
+			authorBox, sourceBox, licenseBox, bugBox, updateLink );
 		
 		return aboutTab;
 	}

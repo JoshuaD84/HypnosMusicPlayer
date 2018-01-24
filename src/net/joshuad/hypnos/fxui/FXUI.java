@@ -1516,7 +1516,7 @@ public class FXUI implements PlayerListener {
 	public Track getCurrentImagesTrack() {
 		return currentImagesTrack;
 	}
-	
+
 	public void openWebBrowser ( String url ) {
 		
 		switch ( Hypnos.getOS() ) {
