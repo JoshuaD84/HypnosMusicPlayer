@@ -97,9 +97,4 @@ public class ThrottledTrackFilter {
 			return true;
 		});
 	}
-
-	public String getFilter () {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }
