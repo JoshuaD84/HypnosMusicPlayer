@@ -1024,11 +1024,11 @@ public class FXUI implements PlayerListener {
 		hackTooltipStartTiming();
 			
 		Platform.runLater( () -> {
+			//This is a bad hack to give the album /track pane data time to load
 			try {
 				Thread.sleep ( 100 );
 			} catch ( InterruptedException e ) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//Do nothing
 			}
 		});
 	}

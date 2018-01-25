@@ -2,37 +2,13 @@
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
-  <errTitle></errTitle>
-  <cmdLine></cmdLine>
   <chdir>.</chdir>
   <priority>normal</priority>
-  <downloadUrl>http://java.com/download</downloadUrl>
-  <supportUrl></supportUrl>
   <stayAlive>false</stayAlive>
-  <manifest></manifest>
   <icon>icon.ico</icon>
-  <classPath>
-    <mainClass>net.joshuad.hypnos.Hypnos</mainClass>
-    <cp>lib\commons-cli-1.4.jar</cp>
-    <cp>lib\commons-io-2.5.jar</cp>
-    <cp>lib\commons-text-1.1.jar</cp>
-    <cp>lib\commons-lang3-3.7.jar</cp>
-    <cp>lib\fuzzywuzzy-1.1.8.jar</cp>
-    <cp>lib\jaad-0.8.4-nospi.jar</cp>
-    <cp>lib</cp>
-    <cp>lib\jaudiotagger-2.2.6-SNAPSHOT.jar</cp>
-    <cp>lib\jflac-1.2.jar</cp>
-    <cp>lib\jl1.0.1.jar</cp>
-    <cp>lib\jnativehook-2.0.2.jar</cp>
-    <cp>lib\jogg-0.0.7.jar</cp>
-    <cp>lib\jorbis-0.0.15.jar</cp>
-    <cp>lib\jsoup-1.11.2.jar</cp>
-  </classPath>
   <jre>
     <path>jre</path>
-    <bundledJre64Bit>false</bundledJre64Bit>
-    <minVersion></minVersion>
-    <maxVersion></maxVersion>
+    <bundledJre64Bit>true</bundledJre64Bit>
     <jdkPreference>preferJre</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
     <opt>-Djava.library.path=&quot;lib&quot;</opt>

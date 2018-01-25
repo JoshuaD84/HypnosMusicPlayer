@@ -25,6 +25,7 @@ import net.joshuad.hypnos.PreviousStack;
 import net.joshuad.hypnos.Queue;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
+import net.joshuad.hypnos.fxui.FXUI;
 import net.joshuad.hypnos.lastfm.LastFM;
 import net.joshuad.hypnos.Persister.Setting;
 
@@ -78,6 +79,8 @@ public class AudioSystem {
 	private boolean scrobbledThisTrack = false;
 	private final DoubleProperty lastFMScrobbleTime = new SimpleDoubleProperty ( 0 );
 	
+	private FXUI ui;
+	
 	public AudioSystem () {
 		player = new AudioPlayer ( this );
 		queue = new Queue();
@@ -85,6 +88,10 @@ public class AudioSystem {
 		previousStack = new PreviousStack();
 		currentList = new CurrentList( this, queue );
 		lastFM = new LastFM();
+	}
+	
+	public void setUI ( FXUI ui ) {
+		this.ui = ui;
 	}
 	
 	public void start() {
@@ -465,7 +472,7 @@ public class AudioSystem {
 						albumPath = trackPath.toAbsolutePath().getParent();
 					}
 					Track track = new Track ( trackPath, albumPath );
-					Hypnos.getUI().artSplitPane.setImages( track ); //TODO: 
+					ui.artSplitPane.setImages( track ); //TODO: 
 					playTrack( track, true );
 					settings.remove ( setting );
 					break;

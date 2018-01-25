@@ -1,14 +1,11 @@
-Now:
-	Windows - Right click > open with not working
-		Log file isn't touched.			
-	
-	Windows - 
-		C:\Users\Joshua\Desktop\music\1970 - Curtis>"C:\Program Files\Hypnos\Hypnos.exe" "08 - Give It Up.flac"
-			INFO: Recived non-music, non-playlist file, ignoring: 
-			C:\Program Files\Hypnos\01 - (Don't Worry) If There's a Hell Below We're All Going to Go.flac
-	
-	
 After Beta 3
+
+	Windows -> Open with causes the name not to appear.
+			
+	Windows 
+		Send a file via command line when hypnos isn't playing -- it starts
+		Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on curernt list	
+		
 	Windows - Log doesn't have the proper new lines for notepad
 	Drag and Drop to Playlist Info update current list if it is that playlist unchanged
 	

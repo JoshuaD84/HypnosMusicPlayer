@@ -713,13 +713,13 @@ public class Hypnos extends Application {
 			setupConfigDirectory();
 			setupJavaLibraryPath();
 			determineVersionInfo();
-			
+
 			String[] args = getParameters().getRaw().toArray ( new String[0] );
 			CLIParser parser = new CLIParser( );
 			ArrayList <SocketCommand> commands = parser.parseCommands( args );
 			
 			SingleInstanceController singleInstanceController = new SingleInstanceController();
-					
+
 			if ( singleInstanceController.isFirstInstance() ) {
 				setupLogFile();
 				library = new Library();
@@ -727,6 +727,7 @@ public class Hypnos extends Application {
 				startGlobalHotkeyListener();
 				
 				ui = new FXUI ( stage, library, audioSystem, hotkeys );
+				audioSystem.setUI ( ui );
 				libraryUpdater = new LibraryUpdater ( library, audioSystem, ui );
 				
 				persister = new Persister ( ui, library, audioSystem, hotkeys );
