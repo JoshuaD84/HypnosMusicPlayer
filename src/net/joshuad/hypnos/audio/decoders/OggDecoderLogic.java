@@ -251,8 +251,6 @@ public class OggDecoderLogic {
 	void skipToPercent ( double percent ) {
 		try {
 			long bytesToSkip = (long)(totalBytesInStream * percent);
-			System.out.println ( "Asked to skip to percent: " + percent ); //TODO: DD
-			System.out.println( "Asked to skip N bytes: " + bytesToSkip ); //TODO: DD
 			
 			int iteration = 0;
 			while ( bytesToSkip > 0 && iteration < 100 ) {

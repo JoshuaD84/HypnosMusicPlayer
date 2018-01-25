@@ -115,7 +115,6 @@ public class CurrentListPane extends BorderPane {
 		double currentListControlsButtonFitWidth = 15;
 		double currentListControlsButtonFitHeight = 15;
 		
-		//TODO: Fix warning messages
 		try {
 			noRepeatImage = new ImageView ( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/no-repeat.png" ).toFile() ) ) );
 			noRepeatImage.setFitWidth( currentListControlsButtonFitWidth );

@@ -240,11 +240,6 @@ public class FXUI implements PlayerListener {
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
 				currentListPane.saveMenuItem.fire();
-
-			} else if ( e.getCode() == KeyCode.W && !e.isControlDown()  //TODO: DELETE THSI
-			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				e.consume();
-				currentListPane.currentListTable.getSortOrder().clear();
 				
 			} else if ( e.getCode() == KeyCode.E && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
@@ -814,7 +809,7 @@ public class FXUI implements PlayerListener {
 				try {
 					Desktop.getDesktop().browse( showMe.toURI() );
 				} catch ( IOException e ) {
-					//TODO: Notify user
+					notifyUserError( "Unable to open native file browser." );
 					LOGGER.log( Level.INFO, "Unable to open native file browser.", e );
 				}
 			}
@@ -830,7 +825,7 @@ public class FXUI implements PlayerListener {
 				try {
 					Desktop.getDesktop().open( logFileBackup.toFile() );
 				} catch ( IOException e ) {
-					//TODO: Notify user
+					notifyUserError( "Unable to open native file file viewer for:\n" + logFileBackup );
 					LOGGER.log( Level.INFO, "Unable to open native file viewer.", e );
 				}
 			}

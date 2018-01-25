@@ -119,7 +119,7 @@ public class Persister {
 				Files.delete( playlistsDirectory.toPath() );
 				LOGGER.info( "Playlists directory location existed but was not a directory. Removed: " + playlistsDirectory.toString() ); 
 			} catch ( IOException e ) {
-				//TODO: Notify user
+				ui.notifyUserError( "Playlist directory (" + playlistsDirectory + ") exists but is not a directory.\n\nPlaylist data will not be saved." );
 				LOGGER.warning( "Playlists directory exists but is a normal file, and I can't remove it."
 					+ " Playlist data may be lost after program is terminated."
 					+ playlistsDirectory.toString()
@@ -132,7 +132,7 @@ public class Persister {
 			if ( playlistDirCreated ) {
 				LOGGER.info( "Playlist directory did not exist. Created: " + playlistsDirectory.toString() ); 
 			} else {
-				//TODO: Notify user
+				ui.notifyUserError( "Cannot create playlist directory (" + playlistsDirectory + ").\n\nPlaylist data will not be saved." );
 				LOGGER.warning( "Cannot create playlists directory. Playlist data may be lost after program is terminated." + playlistsDirectory.toString() );
 			}
 		}

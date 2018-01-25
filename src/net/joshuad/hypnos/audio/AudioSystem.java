@@ -472,7 +472,7 @@ public class AudioSystem {
 						albumPath = trackPath.toAbsolutePath().getParent();
 					}
 					Track track = new Track ( trackPath, albumPath );
-					ui.artSplitPane.setImages( track ); //TODO: 
+					ui.artSplitPane.setImages( track ); 
 					playTrack( track, true );
 					settings.remove ( setting );
 					break;

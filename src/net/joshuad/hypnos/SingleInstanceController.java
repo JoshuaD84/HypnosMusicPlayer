@@ -67,7 +67,6 @@ public class SingleInstanceController {
 		return true;
 	}
 	
-	//TODO: make sure we close socket
 	public void sendCommandsThroughSocket( List <SocketCommand> commands ) {
 		try (
 			Socket clientSocket = new Socket( InetAddress.getByName(null), port );
