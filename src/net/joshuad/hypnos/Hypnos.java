@@ -385,9 +385,7 @@ public class Hypnos extends Application {
 	}
 	
 	private void setupConfigDirectory () {
-		// PENDING: We might want to make a few fall-throughs if these locations
-		// don't exist.
-		// TODO: Test this on OSX 
+		// PENDING: We might want to make a few fall-throughs if these locations don't exist.
 		String home = System.getProperty( "user.home" );
 
 		if ( Hypnos.isStandalone() ) {

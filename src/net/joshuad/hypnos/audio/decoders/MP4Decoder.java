@@ -96,9 +96,7 @@ public class MP4Decoder extends AbstractDecoder {
 
 			audioOutput.start(); //TODO: deal with startPaused here instead of where I do it?
 			
-			if ( seekPercent != 0 ) {
-				//TODO: seek should be supported since we're using a random access file, test it. 
-				
+			if ( seekPercent != 0 ) {				
 				double lengthMS = movie.getDuration() * 1000;
 				
 				int framesDumped = 0;

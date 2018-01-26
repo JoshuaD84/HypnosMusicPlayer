@@ -353,13 +353,6 @@ public class OggDecoderLogic {
 
 		jorbisBlock.init( jorbisDspState );
 
-		/* TODO: Put this somewhere useful
-		if ( !AudioSystem.isLineSupported( datalineInfo ) ) {
-			System.err.println( "Audio output line is not supported." );
-			return false;
-		}
-		*/
-
 		pcmInfo = new float [ 1 ] [] [];
 		pcmIndex = new int [ jorbisInfo.channels ];
 

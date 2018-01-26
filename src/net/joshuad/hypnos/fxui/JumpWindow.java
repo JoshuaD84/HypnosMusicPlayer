@@ -348,7 +348,8 @@ public class JumpWindow extends Stage {
 			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				browseMenuItem.fire();
 				e.consume();
-				
+			
+			//TODO: This doesn't seem to work
 			} else if ( e.getCode() == KeyCode.R && e.isShiftDown() //PENDING: Put this on the hotkey list? 
 			&& !e.isControlDown() && !e.isAltDown() && !e.isMetaDown() ) {
 				shuffleMenuItem.fire();
