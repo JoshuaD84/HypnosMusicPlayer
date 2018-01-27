@@ -3,6 +3,74 @@
 <title>Hypnos Beta 3 Release Notes</title>
 </head>
 <body>
+<h1>Hypnos - Beta 3 Release Notes</h1>
+<p>Released: </p>
+<h2>New Features</h2>
+<ul>
+	<li>Update available notifications (unobtrusive and can be disabled)</li>
+	<li>LastFM integration -- scrobbling, love, and unlove.</li>
+	<li>Windows: installer instead of zip</li>
+	<li>Filter boxes feel smoother and don't cause UI to choke for large libraries</li>
+	<li>'Go to Album' menu option -- finds the album for a track, highlights it in the library album pane (Ctrl + G)</li>
+	<li>Linux: Show loading placeholders in library at start, if needed</li>
+	<li>Allow exporting of the current list or playlist as a folder of files, named intelligently (copied)</li>
+	<li>Windows: proper process name</li>
+	<li>Library Filter replacing Jump Box (Hotkey: F)</li>
+	<li>Hotkeys for Library Searches (Ctrl + 1, Ctrl + 2, Ctrl + 3)</li>
+	<li>Ctrl + F searches whichever table is currently selected</li>
+	<li>Hotkey for Lyric for this song (Shift + L)</li>
+	<li>Improved lyrics search</li>
+	<li>Allow library panes to be hidden (maybe you don't use playlists, etc.)</li>
+	<li>Improved interaction with filterboxes and tables -- down arrow works as expected now</li>
+	<li>Save table settings and sort settings from session to session</li>
+	<li>View Last Log button</li>
+	<li>Remove all unnecessary disk writes, significantly improving performance.</li>
+	<li>Update library code to reduce CPU spikes</li>
+	<li>Linux: Properly handled CLI arguments</li>
+	<li>Improved "open with" support</li>
+	<li>Hover effects on transport buttons</li>
+	<li>Add bug report link to about tab</li>
+	<li>Escape now closes all popup windows</li>
+	<li>Improved misc. error notifications for the user</li>
+</ul>
+	
+<h2>Bugs Fixed</h2>
+<ul>
+	<li>m4a playback speed fixed.</li>
+	<li>Mono mp3 playback fixed.</li>
+	<li>Oggs seek better.</li>
+	<li>Drag and drop of large images to hypnos from web works now</li>
+	<li>Windows: populate global hotkey list on launch</li>
+	<li>Ignore missing files with tag editor on multiple selection, to avoid failure</li>
+	<li>UI style wasn't loading if the hypnos proram directory had a space in it. Fixed.</li>
+	<li>Splitpane divider position on linux on first launch now sane</li>
+	<li>Use GZip when saving / loading very large current lists, to avoid long exit and load times</li>
+	<li>Loading images from tags wasn't always working. Is now.</li>
+	<li>Show that the current list has been shuffled if a subset of tracks are shuffled</li>
+</ul>
+	
+<h2>Roadmap</h2>
+<p>I hope to release one more beta and then finally version 1. I have a handful of remaining issues I know about, and I'm sure there are plenty of bugs I haven't found yet.</p>
+	
+<h3>Pending Issues</h3>
+<ul>
+	<li>ALAC support</li>
+	<li>m4b support</li>
+	<li>Improved OGG support</li>
+	<li>Improved library updater -- make it faster and less resource intensive</li>
+	<li>Improved library updater -- provide a status to user, and maybe let them pause.</li>
+	<li>Smaller memory footprint</li>
+	<li>Drag and drop from hypnos to other locations, like desktop or file browser</li>
+	<li>Minimize to tray Icon for systems that support it</li>
+	<li>Reduce the size of the executable file</li>
+	<li>Fix a big pile of small bugs</li>
+</ul>
+	
+<br />
+<br />
+<br />
+<hr />
+	
 <h1>Hypnos - Beta 2 Release Notes</h1>
 <p>Released: 2017-12-28</p>
 <h2>New Features</h2>
