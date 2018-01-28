@@ -311,8 +311,12 @@ After Beta 3
 	
 	Linux
 		http://blog.noizeramp.com/2005/08/31/packaging-java-applications-for-ubuntu-and-other-debians/
-	
-Key Testing before next release:
+::::: watch list :::::
+	2018/01/28 - "VM Thread" causing spikes in CPU usage and stutters in playback. 
+
+
+:::::  Key Testing before next release ::::: 
+
 	Make sure browse button still works in various systems. I changed FXUI.openFileBrowser -- Desktop.getDesktop().open() to .browse()
 		Ok in windows
 

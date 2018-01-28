@@ -1166,12 +1166,14 @@ public class FXUI implements PlayerListener {
 			try {
 				switch ( setting ) {
 					case WINDOW_X_POSITION:
-						mainStage.setX( Double.valueOf( value ) );
+						double xPosition = Math.max( Double.valueOf( value ) , 0 );
+						mainStage.setX( xPosition );
 						settings.remove ( setting );
 						break;
 						
 					case WINDOW_Y_POSITION:
-						mainStage.setY( Double.valueOf( value ) );
+						double yPosition = Math.max( Double.valueOf( value ) , 0 );
+						mainStage.setY( yPosition );
 						settings.remove ( setting );
 						break;
 						
