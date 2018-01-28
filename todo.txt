@@ -1,8 +1,4 @@
 File name in tag window somewhere
-
-Broken settings file 
-
-If playlist library is filtered, the right click menu doesn't have playlists on it
 	
 After Beta 3
 	Windows -> Open with causes the name not to appear.
@@ -35,7 +31,6 @@ After Beta 3
 			Heart column on current list
 			Update full library by looking at user.getLovedTracks
 			dynamically update lastfm context menu based on love state
-		
 		
 	Allow multiple values for global hotkeys?
 	

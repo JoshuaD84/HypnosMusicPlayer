@@ -596,7 +596,7 @@ public class FXUI implements PlayerListener {
 
 		items.remove( 1, items.size() );
 
-		for ( Playlist playlist : library.getPlaylistSorted() ) {
+		for ( Playlist playlist : library.getPlaylists() ) {
 			MenuItem newItem = new MenuItem( playlist.getName() );
 			newItem.setUserData( playlist );
 			newItem.setOnAction( eventHandler );
