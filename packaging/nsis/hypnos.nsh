@@ -1,7 +1,8 @@
 !define APPNAME "Hypnos Music Player"
 !define APP_DIR_NAME "Hypnos"
 !define COMPANYNAME "JoshuaD.net"
-!define MENU_DIR_NAME "Hypnos"
+!define MENU_DIR_NAME "Hypnos Music Player"
+!define MENU_SHORTCUT_NAME "Hypnos"
 # These three must be integers?
 # !define VERSIONMAJOR Beta3
 # !define VERSIONBUILD 1
@@ -58,7 +59,7 @@ section "install"
  
 	# Start Menu
 	createDirectory "$SMPROGRAMS\${MENU_DIR_NAME}"
-	createShortCut "$SMPROGRAMS\${MENU_DIR_NAME}\${APPNAME}.lnk" "$INSTDIR\Hypnos.exe" "" "$INSTDIR\resources\icon.ico"
+	createShortCut "$SMPROGRAMS\${MENU_DIR_NAME}\${MENU_SHORTCUT_NAME}.lnk" "$INSTDIR\Hypnos.exe" "" "$INSTDIR\resources\icon.ico"
  
 	# Registry information for add/remove programs
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "DisplayName" "${APPNAME}"
@@ -101,7 +102,7 @@ functionEnd
 section "uninstall"
  
 	# Remove Start Menu launcher
-	delete "$SMPROGRAMS\${MENU_DIR_NAME}\${APPNAME}.lnk"
+	delete "$SMPROGRAMS\${MENU_DIR_NAME}\${MENU_SHORTCUT_NAME}.lnk"
 	# Try to remove the Start Menu folder - this will only happen if it is empty
 	rmDir "$SMPROGRAMS\${MENU_DIR_NAME}"
  
