@@ -508,15 +508,15 @@ public class Persister {
 
 			fromAudioSystem.forEach( ( key, value ) -> {
 				String valueOut = value == null ? "null" : value.toString();
-				settingsOut.printf( "%s: %s\n", key, valueOut );
+				settingsOut.printf( "%s: %s%s", key, valueOut, System.lineSeparator() );
 			} );
 
 			fromUI.forEach( ( key, value ) -> {
 				String valueOut = value == null ? "null" : value.toString();
-				settingsOut.printf( "%s: %s\n", key, valueOut );
+				settingsOut.printf( "%s: %s%s", key, valueOut, System.lineSeparator() );
 			} );
 			
-			settingsOut.printf( "%s: %s\n", Setting.LOADER_SPEED, Hypnos.getLoaderSpeed() );
+			settingsOut.printf( "%s: %s%s", Setting.LOADER_SPEED, Hypnos.getLoaderSpeed(), System.lineSeparator() );
 
 			settingsOut.flush();
 			settingsOut.close();

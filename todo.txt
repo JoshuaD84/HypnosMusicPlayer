@@ -5,6 +5,9 @@ Windows - Log doesn't have the proper new lines for notepad
 Broken settings file 
 
 If playlist library is filtered, the right click menu doesn't have playlists on it
+
+Windows Installer
+	Change start menu folder entry to "Hypnos Music Player" and change shortcut to just "Hypnos"
 	
 After Beta 3
 	Windows -> Open with causes the name not to appear.
