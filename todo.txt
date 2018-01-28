@@ -1,4 +1,11 @@
+File name in tag window somewhere
 
+Windows - Log doesn't have the proper new lines for notepad
+
+Broken settings file 
+
+If playlist library is filtered, the right click menu doesn't have playlists on it
+	
 After Beta 3
 	Windows -> Open with causes the name not to appear.
 			
@@ -6,7 +13,7 @@ After Beta 3
 		Send a file via command line when hypnos isn't playing -- it starts
 		Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on curernt list	
 		
-	Windows - Log doesn't have the proper new lines for notepad
+	
 	Drag and Drop to Playlist Info update current list if it is that playlist unchanged
 	
 	Windows - First hover over the love button makes it shift positions
@@ -14,8 +21,6 @@ After Beta 3
 		turn on last fm widgets
 		hover over love button -- it shifts
 		If you launch with lastfm showing, doesn't happen
-		
-	File name in tag window somewhere
 	
 	Improve library checker
 		Log / status

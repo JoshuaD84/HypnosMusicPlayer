@@ -166,10 +166,11 @@ public class Hypnos extends Application {
 			String retMe = dateFormat.format( new Date ( record.getMillis() ) )
 				  + " " + record.getLoggerName()
 				  + " " + record.getSourceMethodName()
-				  + "\n"
+				  + System.lineSeparator()
 				  + record.getLevel() + ": " + record.getMessage()
 				  + exceptionMessage
-				  + "\n\n";
+				  + System.lineSeparator()
+				  + System.lineSeparator();
 			
 			return retMe;
 		}
