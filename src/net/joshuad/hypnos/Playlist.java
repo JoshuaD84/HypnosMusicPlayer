@@ -178,10 +178,10 @@ public class Playlist implements Serializable {
 			PrintWriter playlistOut = new PrintWriter( new BufferedWriter( new OutputStreamWriter ( fileOut, "UTF8" ) ) );
 			playlistOut.println( "#EXTM3U" );
 			
-			playlistOut.printf( "#Name: %s\n\n", getName() );
+			playlistOut.printf( "#Name: %s%s%s", getName(), System.lineSeparator(), System.lineSeparator()  );
 
 			for ( Track track : getTracks() ) {
-				playlistOut.printf( "#EXTINF:%d,%s - %s\n", track.getLengthS(), track.getArtist(), track.getTitle() );
+				playlistOut.printf( "#EXTINF:%d,%s - %s%s", track.getLengthS(), track.getArtist(), track.getTitle(), System.lineSeparator() );
 				playlistOut.println( track.getPath().toString() );
 				playlistOut.println();
 			}

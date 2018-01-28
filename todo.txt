@@ -1,7 +1,5 @@
 File name in tag window somewhere
 
-Windows - Log doesn't have the proper new lines for notepad
-
 Broken settings file 
 
 If playlist library is filtered, the right click menu doesn't have playlists on it
