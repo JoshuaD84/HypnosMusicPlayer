@@ -1,5 +1,3 @@
-Put two copies of a track on the current list
-	Remove one of them. They both disappear
 
 After Beta 3
 	Windows -> Open with causes the name not to appear.

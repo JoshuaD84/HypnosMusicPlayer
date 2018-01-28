@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Objects;
@@ -279,14 +280,22 @@ public class CurrentList {
 		Runnable runMe = new Runnable() {
 			public void run() {
 				
-				List <Track> removeMe = new ArrayList<Track> ();
+				List <Integer> indicesToBeRemoved = new ArrayList <>();
 				
-				for ( int index : indices ) {
-					removeMe.add( currentListSorted.get( index ) );
+				for ( int index : indices ) { 
+					indicesToBeRemoved.add( currentListFiltered.getSourceIndex( 
+						currentListSorted.getSourceIndex( index ) ) );
 				}
 				
-				boolean changed = items.removeAll( removeMe );
+				indicesToBeRemoved.sort( Comparator.reverseOrder() );
 				
+				boolean changed = false;
+				for ( Integer index : indicesToBeRemoved ) {
+					CurrentListTrack removed = items.remove( index.intValue() );
+					
+					if ( !changed && removed != null ) changed = true;
+				}
+								
 				if ( changed ) {
 					if ( items.size() == 0 ) {
 						listCleared();
