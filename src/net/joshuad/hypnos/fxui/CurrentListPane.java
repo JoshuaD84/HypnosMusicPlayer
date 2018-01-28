@@ -979,6 +979,7 @@ public class CurrentListPane extends BorderPane {
 				int selectAfterDelete = selectedIndexes.get( 0 ) - 1;
 				currentListTable.getSelectionModel().clearSelection();
 				ui.removeFromCurrentList ( removeMe );
+				//TODO: Either use selectAfterDelete or get rid of it. 
 			}
 		});
 				

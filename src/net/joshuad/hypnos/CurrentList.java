@@ -274,14 +274,14 @@ public class CurrentList {
 		items.clear();
 	}
 	
-	public void removeTracksAtIndices ( List <Integer> indicies ) {
+	public void removeTracksAtIndices ( List <Integer> indices ) {
 
 		Runnable runMe = new Runnable() {
 			public void run() {
 				
 				List <Track> removeMe = new ArrayList<Track> ();
 				
-				for ( int index : indicies ) {
+				for ( int index : indices ) {
 					removeMe.add( currentListSorted.get( index ) );
 				}
 				
