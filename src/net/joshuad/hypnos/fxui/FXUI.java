@@ -235,7 +235,7 @@ public class FXUI implements PlayerListener {
 			}
 		};
 				
-		primaryContainer.setOnKeyPressed( ( KeyEvent e ) -> { 
+		primaryContainer.setOnKeyReleased( ( KeyEvent e ) -> { 
 			if ( e.getCode() == KeyCode.S && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();

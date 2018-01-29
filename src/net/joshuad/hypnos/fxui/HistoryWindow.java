@@ -88,18 +88,6 @@ public class HistoryWindow extends Stage {
 		historyTable.setItems( audioSystem.getHistory().getItems() );
 		historyTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 
-		historyTable.setOnKeyPressed( new EventHandler <KeyEvent>() {
-			@Override
-			public void handle ( final KeyEvent keyEvent ) {
-				if ( keyEvent.getCode().equals( KeyCode.DELETE ) ) {
-					ObservableList <Integer> indexes = historyTable.getSelectionModel().getSelectedIndices();
-					for ( int index : indexes ) { 
-						audioSystem.getQueue().remove( index );
-					}
-				}
-			}
-		});
-
 		TableColumn numberColumn = new TableColumn( "#" );
 		TableColumn artistColumn = new TableColumn( "Artist" );
 		TableColumn albumColumn = new TableColumn( "Album" );
@@ -150,7 +138,7 @@ public class HistoryWindow extends Stage {
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
-		historyTable.setOnKeyPressed( ( KeyEvent e ) -> {
+		historyTable.setOnKeyReleased( ( KeyEvent e ) -> {
 			if ( e.getCode() == KeyCode.ESCAPE 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				if ( historyTable.getSelectionModel().getSelectedItems().size() > 0 ) {

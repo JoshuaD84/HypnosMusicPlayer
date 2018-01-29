@@ -346,7 +346,7 @@ public class CurrentListPane extends BorderPane {
 		infoLabelAndFilter.prefWidthProperty().bind( currentListControls.widthProperty() );
 		infoLabelAndFilter.setFilteredTable( currentListTable );
 		
-		infoLabelAndFilter.getFilter().setOnKeyPressed( ( KeyEvent e ) -> {
+		infoLabelAndFilter.getFilter().setOnKeyReleased( ( KeyEvent e ) -> {
 			if ( e.getCode() == KeyCode.ENTER
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
@@ -798,7 +798,7 @@ public class CurrentListPane extends BorderPane {
 		browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 
-		currentListTable.setOnKeyPressed( ( KeyEvent e ) -> {
+		currentListTable.setOnKeyReleased( ( KeyEvent e ) -> {
 			if ( e.getCode() == KeyCode.ESCAPE
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				currentListTable.getSelectionModel().clearSelection();

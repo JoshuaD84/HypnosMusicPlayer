@@ -1006,7 +1006,7 @@ public class SettingsWindow extends Stage {
 			}
 		});
 
-		tagTable.setOnKeyPressed( ( KeyEvent e ) -> {
+		tagTable.setOnKeyReleased( ( KeyEvent e ) -> {
 			if ( e.getCode() == KeyCode.ESCAPE 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				tagTable.getSelectionModel().clearSelection();

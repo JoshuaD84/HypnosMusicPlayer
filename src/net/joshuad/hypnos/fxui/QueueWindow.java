@@ -183,7 +183,7 @@ public class QueueWindow extends Stage {
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 		
-		queueTable.setOnKeyPressed( ( KeyEvent e ) -> {
+		queueTable.setOnKeyReleased( ( KeyEvent e ) -> {
 			if ( e.getCode() == KeyCode.ESCAPE 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				if ( queueTable.getSelectionModel().getSelectedItems().size() > 0 ) {

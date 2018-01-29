@@ -1,12 +1,28 @@
-File name in tag window somewhere
+If you load albumsAndTracks but not sources Hypnos acts real wierd. Goes back and forth between not responding. On Windows confirmed. 
+	Does not happen on linux, but still, this is a wierd state -- library without sources. 
 	
+	Maria had it crash her computer in the following use case:
+		1. Install new version
+		2. Move music folder from E: to F:
+		3. notice nothing's in the library
+		4. Add F:\music (without removing E:\music)
+		5. Hard crash
+		
+	LastFm - If someone loves a track, update love indicator immediately, and switch it back if failure. don't wait for success to update UI
+	
+	Windows - EXE Wrapper doesn't behave well with pinning.  Try changing icon in javaw.exe		
+	
+
 After Beta 3
+	look at settings as they are written out, some issues
+		X & Y Position: Sometimes it doesn't report correctly
+		Window size: it always shows the actual window size. Do we want to write out the cached windowed mode sizes if maximized? 
+	
 	Windows -> Open with causes the name not to appear.
 			
 	Windows 
 		Send a file via command line when hypnos isn't playing -- it starts
 		Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on curernt list	
-		
 	
 	Drag and Drop to Playlist Info update current list if it is that playlist unchanged
 	
@@ -38,6 +54,9 @@ After Beta 3
 	
 	Sometimes the track title disappears while playing
 
+	File name in tag window somewhere
+		I tried doing what I have on the album track list window. It looked ugly and cluttered. 
+
 	KDE Neon
 		Can't drag ad drop an mp3 into hypnos
 			onDragOver doesn't seem to hear the drag event. 
@@ -52,9 +71,6 @@ After Beta 3
 	Search for artist / album image data possibilities online, show in a window, let user choose. 
 		
 	Refactor Library
-		If you load albumsAndTracks but not sources Hypnos acts real wierd. Goes back and forth between not responding. On Windows confirmed. 
-			Does not happen on linux, but still, this is a wierd state -- library without sources. 
-			
 		Make a source directory a class, not just a path.
 			Library Source Directories - highlight in red if they are missing. 
 

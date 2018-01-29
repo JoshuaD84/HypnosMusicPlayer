@@ -284,7 +284,7 @@ public class AlbumInfoWindow extends Stage {
 			}
 		});
 		
-		trackTable.setOnKeyPressed( ( KeyEvent e ) -> {
+		trackTable.setOnKeyReleased( ( KeyEvent e ) -> {
 			if ( e.getCode() == KeyCode.ESCAPE 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				trackTable.getSelectionModel().clearSelection();
