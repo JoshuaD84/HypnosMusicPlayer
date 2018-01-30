@@ -232,6 +232,18 @@ public class Transport extends VBox {
 		});
 		
 		loveButton.setOnAction( ( ActionEvent e ) -> {
+			boolean currentlyLoved = false;
+			
+			if ( loveImage.getEffect() == darkThemeLovedEffect || loveImage.getEffect() == lightThemeLovedEffect ) {
+				currentlyLoved = true;
+			}
+			
+			if ( currentlyLoved ) {
+				loveImage.setEffect ( ui.isDarkTheme() ? darkThemeNotLovedEffect : lightThemeNotLovedEffect );
+			} else {
+				loveImage.setEffect ( ui.isDarkTheme() ? darkThemeLovedEffect : lightThemeLovedEffect );
+			}
+			
 			Thread taskThread = new Thread (() -> {
 				audioSystem.getLastFM().toggleLoveTrack( audioSystem.getCurrentTrack() );
 				Platform.runLater( () -> updateLovedIndicator( false ) );

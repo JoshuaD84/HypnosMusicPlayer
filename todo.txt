@@ -1,5 +1,3 @@
-LastFm - If someone loves a track, update love indicator immediately, and switch it back if failure. don't wait for success to update UI
-
 After Beta 3
 	Windows - EXE Wrapper doesn't behave well with pinning.  Try changing icon in javaw.exe		
 
