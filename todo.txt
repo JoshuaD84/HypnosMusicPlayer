@@ -6,8 +6,9 @@ After Beta 3
 		Window size: it always shows the actual window size. Do we want to write out the cached windowed mode sizes if maximized? 
 		Multi monitor positioning doesn't seem to work right all the time
 	
-	Windows -> Open with causes the name not to appear.
-			
+	Sometimes the track title disappears while playing
+	Windows -> Open with causes the current track button to not show the current track's name. 
+		
 	Windows 
 		Send a file via command line when hypnos isn't playing -- it starts
 		Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on curernt list	
@@ -37,9 +38,6 @@ After Beta 3
 			dynamically update lastfm context menu based on love state
 		
 	Allow multiple values for global hotkeys?
-	
-	
-	Sometimes the track title disappears while playing
 
 	File name in tag window somewhere
 		I tried doing what I have on the album track list window. It looked ugly and cluttered. 
@@ -55,7 +53,7 @@ After Beta 3
 	
 	Add a place to drag and drop folders (or navigate to them) to demand that they be rescanned immediately.
 
-	Search for artist / album image data possibilities online, show in a window, let user choose. 
+	Search for artist / album image possibilities online, show in a window, let user choose. 
 		
 	Refactor Library
 		Make a source directory a class, not just a path.
@@ -84,8 +82,7 @@ After Beta 3
 			Maybe just a special search text "type:mp3", "type:lossy"
 			I dunno making search box script is alot. 
 		
-		Give user feedback about the disk scanner and the abiliyt to control it	
-
+		Give user feedback about the disk scanner and the ability to control it	
 			
 	Drag and drop from misc places to system
 		playlist table -> m3u
@@ -288,9 +285,12 @@ After Beta 3
 		mp3 - No known issues
 			
 	Play mounted audio cd
-		Linux - Linux converts the CDA to WAV, and you can just play it.
+		Linux is OK - Linux converts the CDA to WAV, and you can just play it. Buffering isn't great.
+		Windows - ?
 
 :::: OS Specific ::::
+
+	https://stackoverflow.com/questions/17305524/simplicity-for-executing-java-from-c
 	
 	Windows
 		NSIS
@@ -309,29 +309,9 @@ After Beta 3
 	
 	Linux
 		http://blog.noizeramp.com/2005/08/31/packaging-java-applications-for-ubuntu-and-other-debians/
+		
 ::::: watch list :::::
 	2018/01/28 - "VM Thread" causing spikes in CPU usage and stutters in playback. 
-
-
-:::::  Key Testing before next release ::::: 
-
-	Make sure browse button still works in various systems. I changed FXUI.openFileBrowser -- Desktop.getDesktop().open() to .browse()
-		Ok in windows
-
-	Try deleting settings and seeing if the UI lays out properly
-		Ok in windows
-
-	Try resetting tables to defaults manually
-		Ok windows
-      
-	Try out the throttled table filters on different sytems, see if stuff breaks
-		Seems OK windows
-
-	Test the CLI
-		Confirm it start playing when a track or tracks are loaded from socket
-	
-	Settings load and load appearance
-
 
 
 

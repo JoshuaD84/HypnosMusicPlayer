@@ -138,7 +138,7 @@ public class HistoryWindow extends Stage {
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
 
-		historyTable.setOnKeyReleased( ( KeyEvent e ) -> {
+		historyTable.setOnKeyPressed( ( KeyEvent e ) -> {
 			if ( e.getCode() == KeyCode.ESCAPE 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				if ( historyTable.getSelectionModel().getSelectedItems().size() > 0 ) {

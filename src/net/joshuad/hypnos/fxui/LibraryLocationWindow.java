@@ -152,7 +152,7 @@ public class LibraryLocationWindow extends Stage {
 			}
 		});
 
-		musicSourceTable.setOnKeyReleased( new EventHandler <KeyEvent>() {
+		musicSourceTable.setOnKeyPressed( new EventHandler <KeyEvent>() {
 			@Override
 			public void handle ( final KeyEvent keyEvent ) {
 				if ( keyEvent.getCode().equals( KeyCode.DELETE ) ) {

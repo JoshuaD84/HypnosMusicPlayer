@@ -111,7 +111,7 @@ public class JumpWindow extends Stage {
 			}
 		});
 		
-		trackFilterBox.setOnKeyReleased( ( KeyEvent event ) -> {
+		trackFilterBox.setOnKeyPressed( ( KeyEvent event ) -> {
 			if ( event.getCode() == KeyCode.ESCAPE ) {
 				if ( !trackFilterBox.getText().isEmpty() ) {
 					trackFilterBox.clear();
@@ -312,7 +312,7 @@ public class JumpWindow extends Stage {
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 
-		trackTable.setOnKeyReleased( ( KeyEvent e ) -> {
+		trackTable.setOnKeyPressed( ( KeyEvent e ) -> {
 			
 			if ( e.getCode() == KeyCode.ESCAPE
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {

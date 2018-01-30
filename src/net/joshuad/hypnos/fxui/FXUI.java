@@ -235,7 +235,7 @@ public class FXUI implements PlayerListener {
 			}
 		};
 				
-		primaryContainer.setOnKeyReleased( ( KeyEvent e ) -> { 
+		primaryContainer.setOnKeyPressed( ( KeyEvent e ) -> { 
 			if ( e.getCode() == KeyCode.S && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
@@ -313,8 +313,8 @@ public class FXUI implements PlayerListener {
 				e.consume();
 				currentListPane.toggleShuffleButton.fire();
 
-			} else if ( e.getCode() == KeyCode.H
-			&& !e.isControlDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+			} else if ( e.getCode() == KeyCode.H && e.isControlDown() 
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
 				historyWindow.show();
 

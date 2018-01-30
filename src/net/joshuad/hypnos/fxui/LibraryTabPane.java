@@ -377,7 +377,7 @@ public class LibraryTabPane extends StretchedTabPane {
 			});
 		});
 		
-		playlistFilterBox.setOnKeyReleased( ( KeyEvent event ) -> {
+		playlistFilterBox.setOnKeyPressed( ( KeyEvent event ) -> {
 			if ( event.getCode() == KeyCode.ESCAPE ) {
 				playlistFilterBox.clear();
 			
@@ -462,7 +462,7 @@ public class LibraryTabPane extends StretchedTabPane {
 			}
 		});
 		
-		trackFilterBox.setOnKeyReleased( ( KeyEvent event ) -> {
+		trackFilterBox.setOnKeyPressed( ( KeyEvent event ) -> {
 			if ( event.getCode() == KeyCode.ESCAPE ) {
 				trackFilterBox.clear();
 				
@@ -549,7 +549,7 @@ public class LibraryTabPane extends StretchedTabPane {
 			}
 		});
 		
-		albumFilterBox.setOnKeyReleased( ( KeyEvent event ) -> {
+		albumFilterBox.setOnKeyPressed( ( KeyEvent event ) -> {
 			if ( event.getCode() == KeyCode.ESCAPE ) {
 				event.consume();
 				albumFilterBox.clear();
@@ -717,7 +717,7 @@ public class LibraryTabPane extends StretchedTabPane {
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		MenuItem infoMenuItem = new MenuItem( "Track List" );
 		
-		albumTable.setOnKeyReleased( ( KeyEvent e ) -> {
+		albumTable.setOnKeyPressed( ( KeyEvent e ) -> {
 			if ( e.getCode() == KeyCode.ESCAPE 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				if ( albumFilterBox.getText().length() > 0 ) {
@@ -1210,7 +1210,7 @@ public class LibraryTabPane extends StretchedTabPane {
 			}
 		});
 		
-		trackTable.setOnKeyReleased( ( KeyEvent e ) -> {
+		trackTable.setOnKeyPressed( ( KeyEvent e ) -> {
 			if ( e.getCode() == KeyCode.ESCAPE 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				if ( trackFilterBox.getText().length() > 0 ) {
@@ -1548,7 +1548,7 @@ public class LibraryTabPane extends StretchedTabPane {
 		    }
 		});
 
-		playlistTable.setOnKeyReleased( ( KeyEvent e ) -> {
+		playlistTable.setOnKeyPressed( ( KeyEvent e ) -> {
 			if ( e.getCode() == KeyCode.ESCAPE ) {
 				if ( playlistFilterBox.getText().length() > 0 ) {
 					playlistFilterBox.clear();
