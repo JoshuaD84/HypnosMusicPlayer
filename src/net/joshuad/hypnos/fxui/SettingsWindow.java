@@ -1125,7 +1125,7 @@ public class SettingsWindow extends Stage {
 		scrobbleLabel.setPadding( new Insets ( 0, 0, 0, 60 ) );
 		scrobbleTime.setPadding( new Insets ( 0, 0, 0, 60 ) );
 		showInUILabel.setPadding( new Insets ( 0, 0, 0, 60 ) );
-		Button connectButton = new Button( "Save and Connect" );
+		Button connectButton = new Button( "Save and Test" );
 		
 		Slider scrobbleTimeSlider = new Slider ( 0, 1, 0 );
 		scrobbleTimeSlider.setMajorTickUnit( .25 );
