@@ -157,7 +157,7 @@ public class Persister {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void loadSources () {
+	public boolean loadSources () {
 		try ( ObjectInputStream sourcesIn = new ObjectInputStream( new FileInputStream( sourcesFile ) ); ) {
 			ArrayList <String> searchPaths = (ArrayList <String>) sourcesIn.readObject();
 			for ( String pathString : searchPaths ) {
@@ -165,10 +165,13 @@ public class Persister {
 			}
 
 			library.setSourcesHasUnsavedData( false );
+			return true;
+			
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to read library source directory list from disk, continuing." );
 		}
 		
+		return false;
 	}
 
 	public void loadCurrentList() {

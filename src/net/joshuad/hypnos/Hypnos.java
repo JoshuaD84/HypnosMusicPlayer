@@ -753,8 +753,12 @@ public class Hypnos extends Application {
 								ui.applySettingsAfterWindowShown( pendingSettings );
 								persister.logUnusedSettings ( pendingSettings );
 							});
-							persister.loadAlbumsAndTracks();
-							persister.loadSources();
+
+							boolean sourcesLoaded = persister.loadSources();
+							if ( sourcesLoaded ) {
+								persister.loadAlbumsAndTracks();
+							}
+							
 							persister.loadQueue();
 							audioSystem.linkQueueToCurrentList();
 							persister.loadHistory();
@@ -814,8 +818,11 @@ public class Hypnos extends Application {
 						
 						persister.logUnusedSettings ( pendingSettings );
 						
-						persister.loadAlbumsAndTracks();
-						persister.loadSources();
+						boolean sourcesLoaded = persister.loadSources();
+						if ( sourcesLoaded ) {
+							persister.loadAlbumsAndTracks();
+						}
+						
 						persister.loadQueue();
 						audioSystem.linkQueueToCurrentList();
 						persister.loadHistory();

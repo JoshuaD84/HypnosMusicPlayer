@@ -1,22 +1,12 @@
-If you load albumsAndTracks but not sources Hypnos acts real wierd. Goes back and forth between not responding. On Windows confirmed. 
-	Does not happen on linux, but still, this is a wierd state -- library without sources. 
-	
-	Maria had it crash her computer in the following use case:
-		1. Install new version
-		2. Move music folder from E: to F:
-		3. notice nothing's in the library
-		4. Add F:\music (without removing E:\music)
-		5. Hard crash
-		
-	LastFm - If someone loves a track, update love indicator immediately, and switch it back if failure. don't wait for success to update UI
-	
-	Windows - EXE Wrapper doesn't behave well with pinning.  Try changing icon in javaw.exe		
-	
+LastFm - If someone loves a track, update love indicator immediately, and switch it back if failure. don't wait for success to update UI
 
 After Beta 3
+	Windows - EXE Wrapper doesn't behave well with pinning.  Try changing icon in javaw.exe		
+
 	look at settings as they are written out, some issues
 		X & Y Position: Sometimes it doesn't report correctly
 		Window size: it always shows the actual window size. Do we want to write out the cached windowed mode sizes if maximized? 
+		Multi monitor positioning doesn't seem to work right all the time
 	
 	Windows -> Open with causes the name not to appear.
 			
@@ -50,7 +40,6 @@ After Beta 3
 		
 	Allow multiple values for global hotkeys?
 	
-	Multi monitor positioning doesn't seem to work right all the time
 	
 	Sometimes the track title disappears while playing
 
