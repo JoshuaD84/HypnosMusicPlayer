@@ -2,6 +2,10 @@
 	-fx-font: 14px Calibri;
 }
 
+.monospaced {
+	-fx-font: 14px "Lucida Console";
+}
+
 .tooltip {
 	-fx-font-size: 14px;
 }

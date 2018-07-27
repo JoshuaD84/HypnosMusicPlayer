@@ -174,8 +174,7 @@ public class FXUI implements PlayerListener {
 		} catch ( FileNotFoundException e ) {
 			LOGGER.warning( "Unable to load program icon: resources/icon.png" );
 		}
-		
-		setupFont();
+
 		loadImages();
 
 		libraryPane = new LibraryTabPane( this, audioSystem, library );
@@ -192,7 +191,8 @@ public class FXUI implements PlayerListener {
 		settingsWindow = new SettingsWindow ( this, library, hotkeys, audioSystem );
 		trackInfoWindow = new TrackInfoWindow ( this );
 		lyricsWindow = new LyricsWindow ( this );
-
+		
+		setupFont();
 		applyBaseTheme();
 		applyDarkTheme();
 		
@@ -436,8 +436,18 @@ public class FXUI implements PlayerListener {
 			);
 			return;
 		}
-		
 		scene.getStylesheets().add( fontSheet );
+		libraryLocationWindow.getScene().getStylesheets().add( fontSheet );
+		settingsWindow.getScene().getStylesheets().add( fontSheet );
+		queueWindow.getScene().getStylesheets().add( fontSheet );
+		tagWindow.getScene().getStylesheets().add( fontSheet );
+		playlistInfoWindow.getScene().getStylesheets().add( fontSheet );
+		albumInfoWindow.getScene().getStylesheets().add( fontSheet );
+		libraryLocationWindow.getScene().getStylesheets().add( fontSheet );
+		historyWindow.getScene().getStylesheets().add( fontSheet );
+		settingsWindow.getScene().getStylesheets().add( fontSheet );
+		trackInfoWindow.getScene().getStylesheets().add( fontSheet );
+		lyricsWindow.getScene().getStylesheets().add( fontSheet );
 	}
 	
 	private void loadImages() {

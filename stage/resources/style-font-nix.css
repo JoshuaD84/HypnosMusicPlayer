@@ -1,3 +1,7 @@
 .root {
 	-fx-font-family: "Dejavu Sans";
 }
+
+.monospaced {
+	-fx-font-family: "Lucida Console";
+}

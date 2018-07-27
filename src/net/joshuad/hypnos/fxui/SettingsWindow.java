@@ -198,7 +198,7 @@ public class SettingsWindow extends Stage {
 		hotkeyPane.setAlignment( Pos.CENTER );
 		hotkeyPane.setPadding( new Insets ( 10 ) );
 		
-		Label headerLabel = new Label ( "Hot Keys" );
+		Label headerLabel = new Label ( "Hotkeys" );
 		headerLabel.setPadding( new Insets ( 0, 0, 10, 0 ) );
 		headerLabel.setWrapText( true );
 		headerLabel.setTextAlignment( TextAlignment.CENTER );
@@ -209,8 +209,9 @@ public class SettingsWindow extends Stage {
 		hotkeyView.setEditable( false );
 		hotkeyView.prefHeightProperty().bind( root.heightProperty() );
 		hotkeyView.setWrapText( false );
-		hotkeyView.setFont( Font.font( "Monospaced", hotkeyView.getFont().getSize() ) );
-		
+		hotkeyView.getStyleClass().add( "monospaced" );
+		//hotkeyView.setFont( Font.font( "Monospaced" ) );
+		//System.out.println ( "Size: " + hotkeyView.getFont().getSize() );
 		hotkeyView.setText( hotkeyText );
 		
 		hotkeyPane.getChildren().addAll( hotkeyView );
@@ -708,7 +709,7 @@ public class SettingsWindow extends Stage {
 		headerLabel.setTextAlignment( TextAlignment.CENTER );
 		headerLabel.setStyle( "-fx-font-size: 20px; -fx-font-weight: bold" );
 		logPane.getChildren().add( headerLabel );
-		
+
 		TextArea logView = new TextArea();
 		logView.setEditable( false );
 		logView.prefHeightProperty().bind( root.heightProperty() );

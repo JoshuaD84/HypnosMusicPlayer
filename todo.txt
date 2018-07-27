@@ -1,5 +1,15 @@
+Test before release:
+	Linux 
+		Monospaced font. added .monospaced to style-font-nix.css. Does it appear in hotkeys tab of settings properly?
+		
 After Beta 3
 	Trigger hotkeys on release instead of press. but you need to make sure you're handling the filter boxes right as well
+
+
+Now:
+	Windows - Select Multiple Files in explorer - No Option to play in Hypnos. Add that
+
+   Fix child stage font size on windows.
 	
 	Windows - EXE Wrapper doesn't behave well with pinning.  Try changing icon in javaw.exe		
 
