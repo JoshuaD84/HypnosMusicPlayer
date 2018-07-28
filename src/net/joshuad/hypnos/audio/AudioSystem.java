@@ -66,7 +66,7 @@ public class AudioSystem {
 	
 	private int shuffleTracksPlayedCounter = 0;
 	
-	private final AudioPlayer player;
+	private final VLCAudioPlayer player;
 	private final Queue queue;
 	private final History history; 
 	private final PreviousStack previousStack;
@@ -82,7 +82,7 @@ public class AudioSystem {
 	private FXUI ui;
 	
 	public AudioSystem () {
-		player = new AudioPlayer ( this );
+		player = new VLCAudioPlayer ( this );
 		queue = new Queue();
 		history = new History();
 		previousStack = new PreviousStack();
@@ -94,8 +94,8 @@ public class AudioSystem {
 		this.ui = ui;
 	}
 	
-	public void start() {
-		player.start();
+	public void start() { //TODO: DD
+	//	player.start();
 	}
 	
 	public void unpause () {
@@ -136,6 +136,8 @@ public class AudioSystem {
 		notifyListenersStopped( stoppedTrack, reason ); 
 		
 		shuffleTracksPlayedCounter = 0;
+		
+		player.releaseResources();
 	}
 	
 	public void previous ( ) {
@@ -480,6 +482,7 @@ public class AudioSystem {
 				case TRACK_POSITION:
 					seekMS( Long.parseLong( value ) );
 					settings.remove ( setting );
+					playerTrackPositionChanged ( player.getTrack(), (int)Long.parseLong( value ), player.getTrack().getLengthS() * 1000 );
 					break;
 					
 				case SHUFFLE:
