@@ -692,6 +692,7 @@ public class Hypnos extends Application {
 		EnumMap <Setting, ? extends Object> fromAudioSystem = audioSystem.getSettings();
 		EnumMap <Setting, ? extends Object> fromUI = ui.getSettings();
 		audioSystem.stop ( StopReason.USER_REQUESTED );
+		audioSystem.releaseResources();
 		persister.saveAllData( fromAudioSystem, fromUI );
 		System.exit ( exitCode.ordinal() );
 	}
