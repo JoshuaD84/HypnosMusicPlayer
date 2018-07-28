@@ -11,6 +11,10 @@ Now:
 
 	Windows - Select Multiple Files in explorer - No Option to play in Hypnos. Add that
 	
+   Stop and then play. it advances the track. Start from #1 probably.
+
+   Trigger hotkeys on release instead of press. but you need to make sure you're handling the filter boxes right as well
+
 	Windows - EXE Wrapper doesn't behave well with pinning.  Try changing icon in javaw.exe		
 
 	look at settings as they are written out, some issues
