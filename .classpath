@@ -8,19 +8,12 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="stage/lib/commons-cli-1.4.jar"/>
 	<classpathentry kind="lib" path="stage/lib/fuzzywuzzy-1.1.8.jar"/>
-	<classpathentry kind="lib" path="stage/lib/jaad-0.8.4-nospi.jar"/>
 	<classpathentry kind="lib" path="stage/lib/jaudiotagger-2.2.6-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="stage/lib/jflac-1.2.jar"/>
-	<classpathentry kind="lib" path="stage/lib/jl1.0.1.jar"/>
-	<classpathentry kind="lib" path="stage/lib/jogg-0.0.7.jar"/>
-	<classpathentry kind="lib" path="stage/lib/jorbis-0.0.15.jar"/>
 	<classpathentry kind="lib" path="stage/lib/commons-io-2.5.jar"/>
 	<classpathentry kind="lib" path="stage/lib/jsoup-1.11.2.jar"/>
 	<classpathentry kind="lib" path="stage/lib/commons-text-1.1.jar"/>
 	<classpathentry kind="lib" path="stage/lib/commons-lang3-3.7.jar"/>
 	<classpathentry kind="lib" path="stage/lib/jnativehook-2.0.2.jar"/>
-	<classpathentry kind="lib" path="stage/lib/mp3spi1.9.5.jar"/>
-	<classpathentry kind="lib" path="stage/lib/tritonus_share.jar"/>
 	<classpathentry kind="lib" path="stage/lib/jlastfm.jar"/>
 	<classpathentry kind="lib" path="D:/programming/workspace-win/Hypnos-Win/stage/lib/vlc/jna-3.5.2.jar"/>
 	<classpathentry kind="lib" path="D:/programming/workspace-win/Hypnos-Win/stage/lib/vlc/platform-3.5.2.jar"/>

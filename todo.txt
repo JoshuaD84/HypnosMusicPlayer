@@ -7,6 +7,8 @@ After Beta 3
 
 
 Now:
+	Escape after hitting ctrl + 1 -> make it do something
+
 	Windows - Select Multiple Files in explorer - No Option to play in Hypnos. Add that
 	
 	Windows - EXE Wrapper doesn't behave well with pinning.  Try changing icon in javaw.exe		
