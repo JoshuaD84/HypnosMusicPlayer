@@ -136,7 +136,9 @@ public class AudioSystem {
 		notifyListenersStopped( stoppedTrack, reason ); 
 		
 		shuffleTracksPlayedCounter = 0;
-		
+	}
+	
+	public void releaseResources() {
 		player.releaseResources();
 	}
 	
