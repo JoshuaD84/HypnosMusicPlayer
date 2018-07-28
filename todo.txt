@@ -8,8 +8,6 @@ After Beta 3
 
 Now:
 	Windows - Select Multiple Files in explorer - No Option to play in Hypnos. Add that
-
-   Fix child stage font size on windows.
 	
 	Windows - EXE Wrapper doesn't behave well with pinning.  Try changing icon in javaw.exe		
 
@@ -264,38 +262,8 @@ Now:
 		
 :::: Decoders ::::
 
-	Playback Problems
-		Ogg - In general OGG playback is garbage. 
-			seeking is done using read() instead of skip(), so it's slow.
-			three-silver.ogg takes a long time to load and stop. Not sure about seek.
-			
-		Wav
-			organfinale.wav - 	java.lang.IllegalArgumentException: No line matching interface SourceDataLine 
-								supporting format PCM_FLOAT 44100.0 Hz, 32 bit, stereo, 8 bytes/frame,  is supported.
-								I can look at downsampling: http://www.jsresources.org/examples/SampleRateConverter.html
-			
-		Apple lossless codec (m4a) - no support					
-			https://github.com/soiaf/Java-Apple-Lossless-decoder
-			
-		m4b	- Currently disabled in AudioPlayer.java -> getDecoder 
-			https://stackoverflow.com/questions/44750751/why-are-m4bs-playing-at-faster-speeds
-			I need to set the sample rate to one of these: 96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350 
-			The files seem te report the wrong sample rate. JAAD acutally reads them. 
-		
-			acts: 11025 - > reports 44100
-			artofwar: 11025 -> reports 22050
-			cardtrick: 22050 -> reports 44100
-			whitefang: 16000 -> reports 44100
-			
-		m4a - no known problems
-			
-		flac - no known problems, but 24bit files give me the volume issue on at least linux
-			I can look at downsampling: http://www.jsresources.org/examples/SampleRateConverter.html
-			I'm also fine w/ how things are I think. 
-			Guessing this problem is isolated to my system and my strange sound card. 
-			
-		mp3 - No known issues
-			
+	Does the new decoder work on linux?
+
 	Play mounted audio cd
 		Linux is OK - Linux converts the CDA to WAV, and you can just play it. Buffering isn't great.
 		Windows - ?

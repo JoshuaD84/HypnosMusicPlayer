@@ -693,7 +693,7 @@ public class AudioSystem {
 	}
 	                                                                 
 	public void playTrack ( Track track, boolean startPaused, boolean addToPreviousNextStack ) {
-				
+
 		player.requestPlayTrack( track, startPaused );
 		for ( CurrentListTrack listTrack : currentList.getItems() ) {
 			listTrack.setIsCurrentTrack( false );
