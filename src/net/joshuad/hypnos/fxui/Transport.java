@@ -27,6 +27,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.BorderStroke;
@@ -327,8 +328,22 @@ public class Transport extends VBox {
 			}
 		};
 		
+		EventHandler<ScrollEvent> volumeSliderScrollHandler = new EventHandler<ScrollEvent> () {
+			@Override
+			public void handle ( ScrollEvent event ) {
+				if ( event.getDeltaY() < 0 ) {
+					audioSystem.decrementVolume();
+				} else if ( event.getDeltaY() > 0 ) {
+					audioSystem.incrementVolume();
+				}
+			}
+		};
+		
+		volumeMuteButton.setOnScroll ( volumeSliderScrollHandler );
+		
 		volumeSlider.setOnMouseDragged ( volumeSliderHandler );
 		volumeSlider.setOnMouseClicked ( volumeSliderHandler );
+		volumeSlider.setOnScroll( volumeSliderScrollHandler );
 		
 		volumePane = new HBox();
 		volumePane.getChildren().addAll( volumeMuteButton, volumeSlider );
