@@ -1,9 +1,6 @@
-Test before release:
-	Linux 
-		Monospaced font. added .monospaced to style-font-nix.css. Does it appear in hotkeys tab of settings properly?
-		
-After Beta 3
-	Trigger hotkeys on release instead of press. but you need to make sure you're handling the filter boxes right as well
+Trigger hotkeys on release instead of press. but you need to make sure you're handling the filter boxes right as well
+	
+Exporting playlist as folder freezes UI. 	
 
 
 Now:
