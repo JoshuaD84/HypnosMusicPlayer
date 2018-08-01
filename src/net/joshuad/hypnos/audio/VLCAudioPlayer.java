@@ -1,5 +1,6 @@
 package net.joshuad.hypnos.audio;
 
+import java.nio.file.Path;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -7,6 +8,7 @@ import java.util.logging.Logger;
 
 import com.sun.jna.NativeLibrary;
 
+import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.audio.AudioSystem.StopReason;
 import uk.co.caprica.vlcj.binding.internal.libvlc_state_t;
@@ -41,8 +43,11 @@ public class VLCAudioPlayer {
 	
 	public VLCAudioPlayer( AudioSystem controller ) {
 		this.controller = controller;
+		
 
-		NativeLibrary.addSearchPath( RuntimeUtil.getLibVlcLibraryName(), NATIVE_LIBRARY_SEARCH_PATH );
+		String nativeVLCLibPath = Hypnos.getRootDirectory().resolve( "lib/vlc" ).toAbsolutePath().toString(); 
+		
+		NativeLibrary.addSearchPath( RuntimeUtil.getLibVlcLibraryName(), nativeVLCLibPath );
 		vlcComponent = new AudioMediaPlayerComponent();
 		mediaPlayer = vlcComponent.getMediaPlayer();
 		
