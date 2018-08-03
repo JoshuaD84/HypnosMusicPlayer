@@ -51,8 +51,8 @@
 													lib/jl1.0.1.jar lib/jnativehook-2.0.2.jar 
 													lib/jogg-0.0.7.jar lib/jorbis-0.0.15.jar lib/jsoup-1.11.2.jar
 													lib/mp3spi1.9.5.jar lib/tritonus_share.jar lib/jlastfm.jar
-													lib/vlc/jna-3.5.2.jar lib/vlc/platform-3.5.2.jar 
-													lib/vlc/slf4j-api-1.7.10.jar lib/vlc/vlcj-3.10.1.jar
+													lib/jna-3.5.2.jar lib/platform-3.5.2.jar 
+													lib/slf4j-api-1.7.10.jar lib/vlcj-3.10.1.jar
 													" />
 				<attribute name="Implementation-Version" value="${version}" />
 				<attribute name="Build-Date" value="${TODAY}" />
@@ -171,6 +171,10 @@
 		<exec executable="makensis">
 			<arg value="${packaging}/nsis/hypnos.nsh" />
 		</exec>
+		<move
+			file="${dist}/Hypnos-Installer.exe"
+			tofile="${dist}/Hypnos-Win-32bit-${version-simple}_${TODAY}_b${build.number}.exe" 
+		/>
 		
 		<delete dir="${temp}" />
 		

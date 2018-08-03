@@ -1,6 +1,5 @@
 package net.joshuad.hypnos.audio;
 
-import java.nio.file.Path;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -10,6 +9,7 @@ import com.sun.jna.NativeLibrary;
 
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Track;
+import net.joshuad.hypnos.Hypnos.ExitCode;
 import net.joshuad.hypnos.audio.AudioSystem.StopReason;
 import uk.co.caprica.vlcj.binding.internal.libvlc_state_t;
 import uk.co.caprica.vlcj.component.AudioMediaPlayerComponent;
@@ -32,7 +32,6 @@ public class VLCAudioPlayer {
 
 	private AudioMediaPlayerComponent vlcComponent;
 	private MediaPlayer mediaPlayer;
-	private static final String NATIVE_LIBRARY_SEARCH_PATH = "stage\\lib\\vlc";
 	
 	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 	private Runnable notifyFinished = new Runnable () {
@@ -44,15 +43,37 @@ public class VLCAudioPlayer {
 	public VLCAudioPlayer( AudioSystem controller ) {
 		this.controller = controller;
 		
-
-		String nativeVLCLibPath = Hypnos.getRootDirectory().resolve( "lib/vlc" ).toAbsolutePath().toString(); 
+		String nativeVLCLibPath = "";
+		
+		switch ( Hypnos.getOS() ) {
+			case NIX:
+				nativeVLCLibPath = Hypnos.getRootDirectory().resolve( "lib/nix/vlc" ).toAbsolutePath().toString();
+				break;
+			case OSX:
+				nativeVLCLibPath = Hypnos.getRootDirectory().resolve( "lib/osx/vlc" ).toAbsolutePath().toString();
+				break;
+			case UNKNOWN:
+				break;
+			case WIN_10:
+			case WIN_7:
+			case WIN_8:
+			case WIN_UNKNOWN:
+			case WIN_VISTA:
+			case WIN_XP:
+				nativeVLCLibPath = Hypnos.getRootDirectory().resolve( "lib/win/vlc" ).toAbsolutePath().toString();
+				break;
+			default:
+				LOGGER.warning( "Cannot determine OS, unable to load native VLC libraries. Exiting." );
+				Hypnos.exit( ExitCode.UNKNOWN_ERROR );
+				break;
+			
+		}
 		
 		NativeLibrary.addSearchPath( RuntimeUtil.getLibVlcLibraryName(), nativeVLCLibPath );
 		vlcComponent = new AudioMediaPlayerComponent();
 		mediaPlayer = vlcComponent.getMediaPlayer();
 		
 		mediaPlayer.addMediaPlayerEventListener(new MediaPlayerEventAdapter() {
-			
 			
 			public void finished ( MediaPlayer player ) {
 				scheduler.schedule( notifyFinished, 50, TimeUnit.MILLISECONDS );
