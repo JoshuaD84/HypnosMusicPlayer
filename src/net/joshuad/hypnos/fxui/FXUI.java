@@ -910,6 +910,31 @@ public class FXUI implements PlayerListener {
 		alert.showAndWait();
 	}
 	
+	public static void notifyUserInstallLibVLC() {
+		Alert alert = new Alert ( AlertType.INFORMATION );
+		setAlertWindowIcon ( alert );
+		
+		alert.setTitle( "Information" );
+		alert.setHeaderText( "Unable to launch Hypnos" );
+		
+		String message = "Hypnos depends on LibVLC and LibVLCCore to decode audio, which are not installed on your system." +
+			"\n\nPlease install libvlc using your system software manager. For example: " + 
+			"\n\nUbuntu: 'sudo apt install vlc'";
+			
+		alert.setContentText( message );
+		alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+		
+		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		int width = gd.getDisplayMode().getWidth();
+		int height = gd.getDisplayMode().getHeight();
+		
+		//NOTE: I can't get the alert's width and height yet, so i just have to eyeball it. Hopefully this is good. 
+		alert.setX ( width / 2 - 320 / 2 );
+		alert.setY ( height / 2 - 300 / 2 );
+		
+		alert.showAndWait();
+	}
+	
 	public static void setAlertWindowIcon ( Alert alert ) {
 		Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
 		try {
@@ -1361,41 +1386,6 @@ public class FXUI implements PlayerListener {
 		settingsWindow.refreshHotkeyFields();
 	}
 	
-	public void warnUserVolumeNotSet() {
-		Platform.runLater( () -> {
-			Alert alert = new Alert( AlertType.ERROR );
-			double x = mainStage.getX() + mainStage.getWidth() / 2 - 220; //It'd be nice to use alert.getWidth() / 2, but it's NAN now. 
-			double y = mainStage.getY() + mainStage.getHeight() / 2 - 150;
-			
-			setAlertWindowIcon( alert );
-			applyCurrentTheme( alert );
-			
-			alert.setX( x );
-			alert.setY( y );
-			
-			alert.setTitle( "Warning" );
-			alert.setHeaderText( "Unable to set volume." );
-				
-			Text text = new Text(
-				"Hypnos is unable to set the volume to less than 100% for this audio format.\n\n" +
-				"Please set your physical speakers and system sound " +
-				"to a reasonable level to avoid damaging your ear drums and audio system " +
-				"before unpausing.");
-			
-			text.setWrappingWidth( 500 );
-			text.getStyleClass().add( "alert-text" );
-			HBox holder = new HBox();
-			holder.getChildren().add( text );
-			holder.setPadding( new Insets ( 10, 10, 10, 10 ) );
-			alert.getDialogPane().setContent( holder );
-			audioSystem.setVolumePercent( 1 );
-
-			Tooltip.uninstall( transport.volumePane, transport.volumeDisabledTooltip );
-			
-			alert.showAndWait();
-		});
-	}
-
 	public void warnUserPlaylistsNotSaved ( List <Playlist> errors ) {
 		if ( doPlaylistSaveWarning ) {
 			Platform.runLater( () -> {

@@ -1,5 +1,3 @@
-Trigger hotkeys on release instead of press. but you need to make sure you're handling the filter boxes right as well
-	
 Exporting playlist as folder freezes UI. 	
 
 

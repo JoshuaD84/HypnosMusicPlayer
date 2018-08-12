@@ -11,6 +11,7 @@ import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Hypnos.ExitCode;
 import net.joshuad.hypnos.audio.AudioSystem.StopReason;
+import net.joshuad.hypnos.fxui.FXUI;
 import uk.co.caprica.vlcj.binding.internal.libvlc_state_t;
 import uk.co.caprica.vlcj.component.AudioMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.MediaPlayer;
@@ -47,7 +48,7 @@ public class VLCAudioPlayer {
 		
 		switch ( Hypnos.getOS() ) {
 			case NIX:
-				nativeVLCLibPath = Hypnos.getRootDirectory().resolve( "lib/nix/vlc" ).toAbsolutePath().toString();
+				nativeVLCLibPath = Hypnos.getRootDirectory().resolve( "lib/nix/vlc/" ).toAbsolutePath().toString();
 				break;
 			case OSX:
 				nativeVLCLibPath = Hypnos.getRootDirectory().resolve( "lib/osx/vlc" ).toAbsolutePath().toString();
@@ -66,12 +67,17 @@ public class VLCAudioPlayer {
 				LOGGER.warning( "Cannot determine OS, unable to load native VLC libraries. Exiting." );
 				Hypnos.exit( ExitCode.UNKNOWN_ERROR );
 				break;
-			
 		}
 		
-		NativeLibrary.addSearchPath( RuntimeUtil.getLibVlcLibraryName(), nativeVLCLibPath );
-		vlcComponent = new AudioMediaPlayerComponent();
-		mediaPlayer = vlcComponent.getMediaPlayer();
+		//TODO: 
+		try {
+			NativeLibrary.addSearchPath( RuntimeUtil.getLibVlcLibraryName(), nativeVLCLibPath );
+			vlcComponent = new AudioMediaPlayerComponent();
+			mediaPlayer = vlcComponent.getMediaPlayer();
+		} catch ( Exception e ) {
+			FXUI.notifyUserInstallLibVLC();
+			Hypnos.exit( ExitCode.AUDIO_ERROR );
+		}
 		
 		mediaPlayer.addMediaPlayerEventListener(new MediaPlayerEventAdapter() {
 			

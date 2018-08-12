@@ -92,6 +92,8 @@
 				<fileset dir="stage" >
 					<exclude name="**/config/**" />
 					<exclude name="**/bin/**" />
+					<exclude name="**/lib/win/" />
+					<exclude name="**/lib/osx/" />
 				</fileset>
 			</copy>
 			
@@ -120,6 +122,8 @@
 				<fileset dir="stage" >
 					<exclude name="**/config/**" />
 					<exclude name="**/bin/**" />
+					<exclude name="**/lib/win/" />
+					<exclude name="**/lib/osx/" />
 				</fileset>
 			</copy>
 			
@@ -160,6 +164,8 @@
 			<fileset dir="stage" >
 				<exclude name="**/config/**" />
 				<exclude name="**/bin/**" />
+				<exclude name="**/lib/nix/" />
+				<exclude name="**/lib/osx/" />
 				<exclude name="hypnos.jar" />
 			</fileset>
 			<mappedresources>
