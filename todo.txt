@@ -1,7 +1,12 @@
-Exporting playlist as folder freezes UI. 	
+Linux volume doesn't persist properly 
+
+
 
 
 Now:
+
+	Exporting playlist as folder freezes UI. 	
+
 	Escape after hitting ctrl + 1 -> make it do something
 
 	Windows - Select Multiple Files in explorer - No Option to play in Hypnos. Add that

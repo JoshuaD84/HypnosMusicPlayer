@@ -148,7 +148,7 @@
 		classpath="${launch4j.dir}/launch4j.jar:${launch4j.dir}/lib/xstream.jar"  
 	/>
 			
-	<target name="dist-win" depends="jar" description="Make a .zip with an embedded JRE for windows.">
+	<target name="dist-win" depends="jar" description="Make an installer for windows.">
 		
 		<delete dir="${temp}" />
 		<mkdir dir="${temp}/Hypnos/" />
@@ -179,7 +179,7 @@
 		</exec>
 		<move
 			file="${dist}/Hypnos-Installer.exe"
-			tofile="${dist}/Hypnos-Win-32bit-${version-simple}_${TODAY}_b${build.number}.exe" 
+			tofile="${dist}/Hypnos-Win-${version-simple}_${TODAY}_b${build.number}.exe" 
 		/>
 		
 		<delete dir="${temp}" />
