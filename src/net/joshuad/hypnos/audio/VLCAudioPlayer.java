@@ -3,6 +3,7 @@ package net.joshuad.hypnos.audio;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.sun.jna.NativeLibrary;
@@ -64,19 +65,20 @@ public class VLCAudioPlayer {
 				nativeVLCLibPath = Hypnos.getRootDirectory().resolve( "lib/win/vlc" ).toAbsolutePath().toString();
 				break;
 			default:
-				LOGGER.warning( "Cannot determine OS, unable to load native VLC libraries. Exiting." );
+				LOGGER.severe( "Cannot determine OS, unable to load native VLC libraries. Exiting." );
+				//TODO: Notify user system not supported
 				Hypnos.exit( ExitCode.UNKNOWN_ERROR );
 				break;
 		}
 		
-		//TODO: 
 		try {
 			NativeLibrary.addSearchPath( RuntimeUtil.getLibVlcLibraryName(), nativeVLCLibPath );
 			vlcComponent = new AudioMediaPlayerComponent();
 			mediaPlayer = vlcComponent.getMediaPlayer();
 		} catch ( Exception e ) {
-			FXUI.notifyUserInstallLibVLC();
-			Hypnos.exit( ExitCode.AUDIO_ERROR );
+			LOGGER.log( Level.SEVERE, "Unable to load VLC libaries.", e );
+			FXUI.notifyUserVLCLibraryError();
+			Hypnos.exit( ExitCode.LIBRARY_ERROR );
 		}
 		
 		mediaPlayer.addMediaPlayerEventListener(new MediaPlayerEventAdapter() {
@@ -195,10 +197,6 @@ public class VLCAudioPlayer {
 		updateControllerTrackPosition();
 	}
 	
-	public boolean volumeChangeSupported() {
-		return true; //TODO: Test
-	}
-
 	public PlayState getState() {
 		if ( isStopped() ) return PlayState.STOPPED;
 		else if ( isPaused() ) return PlayState.PAUSED;

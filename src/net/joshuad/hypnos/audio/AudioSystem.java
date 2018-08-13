@@ -423,11 +423,6 @@ public class AudioSystem {
 		return player.isStopped();
 	}
 	
-	public boolean volumeChangeSupported() {
-		return player.volumeChangeSupported();
-	}
-	
-	
 	public EnumMap <Persister.Setting, String> getSettings () {
 		EnumMap <Persister.Setting, String> retMe = new EnumMap <Persister.Setting, String> ( Persister.Setting.class );
 		

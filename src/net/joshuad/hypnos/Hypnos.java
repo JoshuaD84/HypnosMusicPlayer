@@ -54,7 +54,8 @@ public class Hypnos extends Application {
 	public enum ExitCode {
 		NORMAL,
 		UNKNOWN_ERROR,
-		AUDIO_ERROR
+		AUDIO_ERROR,
+		LIBRARY_ERROR
 	}
 	
 	public enum OS {
@@ -686,10 +687,10 @@ public class Hypnos extends Application {
 	public static void exit ( ExitCode exitCode ) {
 		LOGGER.info( "Exit requested: " + exitCode.toString() );
 		if ( audioSystem != null && ui != null ) {
-			audioSystem.stop ( StopReason.USER_REQUESTED );
-			audioSystem.releaseResources();
 			EnumMap <Setting, ? extends Object> fromAudioSystem = audioSystem.getSettings();
 			EnumMap <Setting, ? extends Object> fromUI = ui.getSettings();
+			audioSystem.stop ( StopReason.USER_REQUESTED );
+			audioSystem.releaseResources();
 			persister.saveAllData( fromAudioSystem, fromUI );
 		}
 		System.exit ( exitCode.ordinal() );

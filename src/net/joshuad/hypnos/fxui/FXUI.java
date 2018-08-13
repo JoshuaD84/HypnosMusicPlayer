@@ -910,16 +910,14 @@ public class FXUI implements PlayerListener {
 		alert.showAndWait();
 	}
 	
-	public static void notifyUserInstallLibVLC() {
+	public static void notifyUserVLCLibraryError() {
 		Alert alert = new Alert ( AlertType.INFORMATION );
 		setAlertWindowIcon ( alert );
 		
 		alert.setTitle( "Information" );
 		alert.setHeaderText( "Unable to launch Hypnos" );
 		
-		String message = "Hypnos depends on LibVLC and LibVLCCore to decode audio, which are not installed on your system." +
-			"\n\nPlease install libvlc using your system software manager. For example: " + 
-			"\n\nUbuntu: 'sudo apt install vlc'";
+		String message = "Hypnos's libraries have been removed or corrupted. Please reinstall hypnos.";
 			
 		alert.setContentText( message );
 		alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
@@ -1327,18 +1325,6 @@ public class FXUI implements PlayerListener {
 			currentListPane.currentListTable.refresh();
 			
 			artSplitPane.setImages( track );
-			
-			boolean disableVolume = !audioSystem.volumeChangeSupported();
-			
-			if ( disableVolume ) {
-				transport.volumeSlider.setDisable( true );
-				transport.volumeMuteButton.setDisable( true );
-				Tooltip.install( transport.volumePane, transport.volumeDisabledTooltip );
-			} else {
-				transport.volumeSlider.setDisable( false );
-				transport.volumeMuteButton.setDisable( false );
-				Tooltip.uninstall( transport.volumePane, transport.volumeDisabledTooltip );
-			}
 		});
 	}
 
