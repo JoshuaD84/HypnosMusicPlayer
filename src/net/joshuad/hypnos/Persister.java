@@ -188,7 +188,6 @@ public class Persister {
 				LOGGER.warning( "Unable to read library data from disk, continuing." );
 			}
 		}
-		
 	}
 
 	@SuppressWarnings("unchecked")
@@ -200,7 +199,6 @@ public class Persister {
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to read queue data from disk, continuing." );
 		}
-		
 	}
 
 	@SuppressWarnings("unchecked")
@@ -212,7 +210,6 @@ public class Persister {
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to read history from disk, continuing." );
 		}
-		
 	}
 	
 	@SuppressWarnings("unchecked")

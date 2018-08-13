@@ -151,31 +151,32 @@ public class LibraryUpdater {
 										List <Album> currentListAlbums = audioSystem.getCurrentList().getState().getAlbums();
 										
 										//TODO: handle this when we have multiple discs loaded
-										if ( currentListAlbums.size() == 1 && updateMe.equals( currentListAlbums.get( 0 ) )
-										&& audioSystem.getCurrentList().getState().getMode() == CurrentList.Mode.ALBUM
-										){
-											
-											Track currentArtImages = ui.getCurrentImagesTrack();
-											List <CurrentListTrack> selectedItems = new ArrayList<> ( ui.getSelectedTracks() );
-											Track currentTrack = audioSystem.getCurrentTrack();
-											
-											audioSystem.getCurrentList().setAlbum( updateMe, false );
-											library.albumsToUpdate.remove( updateMe ); //prevent an infinite loop
-											
-											ui.artSplitPane.setImages( currentArtImages );
-											ui.setSelectedTracks ( selectedItems );
-											
-											if ( currentTrack != null ) {
-												for ( CurrentListTrack currentListTrack : audioSystem.getCurrentList().getItems() ) {
-													if ( currentListTrack.equals( currentTrack ) ) {
-														currentListTrack.setIsCurrentTrack( true );
-														currentListTrack.setIsLastCurrentListTrack( true );
-														break;
+										if ( audioSystem.getCurrentList().allowAlbumReload() == true ) {
+											if ( currentListAlbums.size() == 1 && updateMe.equals( currentListAlbums.get( 0 ) )
+											&& audioSystem.getCurrentList().getState().getMode() == CurrentList.Mode.ALBUM
+											){
+												
+												Track currentArtImages = ui.getCurrentImagesTrack();
+												List <CurrentListTrack> selectedItems = new ArrayList<> ( ui.getSelectedTracks() );
+												Track currentTrack = audioSystem.getCurrentTrack();
+												
+												audioSystem.getCurrentList().setAlbum( updateMe, false );
+												library.albumsToUpdate.remove( updateMe ); //prevent an infinite loop
+												
+												ui.artSplitPane.setImages( currentArtImages );
+												ui.setSelectedTracks ( selectedItems );
+												
+												if ( currentTrack != null ) {
+													for ( CurrentListTrack currentListTrack : audioSystem.getCurrentList().getItems() ) {
+														if ( currentListTrack.equals( currentTrack ) ) {
+															currentListTrack.setIsCurrentTrack( true );
+															currentListTrack.setIsLastCurrentListTrack( true );
+															break;
+														}
 													}
 												}
 											}
 										}
-										
 									} else {
 										library.albums.add( updateSource );
 									}

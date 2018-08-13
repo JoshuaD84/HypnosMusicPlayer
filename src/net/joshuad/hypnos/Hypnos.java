@@ -724,11 +724,9 @@ public class Hypnos extends Application {
 				library = new Library();
 				audioSystem = new AudioSystem();
 				startGlobalHotkeyListener();
-				
 				ui = new FXUI ( stage, library, audioSystem, hotkeys );
 				audioSystem.setUI ( ui );
 				libraryUpdater = new LibraryUpdater ( library, audioSystem, ui );
-				
 				persister = new Persister ( ui, library, audioSystem, hotkeys );
 				
 				switch ( getOS() ) {

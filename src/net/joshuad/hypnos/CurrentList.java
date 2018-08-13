@@ -68,6 +68,9 @@ public class CurrentList {
 
 	transient private boolean hasUnsavedData = true;
 	
+	private boolean allowAlbumReload = true; //Allow the album to be reloaded if the disk is changed
+		//usually enabled, but disabled for the current list after restarting hypnos
+	
 	public CurrentList ( AudioSystem audioSystem, Queue queue ) {
 		this.queue = queue;
 		this.audioSystem = audioSystem;
@@ -85,6 +88,10 @@ public class CurrentList {
 	
 	public void setHasUnsavedData( boolean b ) {
 		hasUnsavedData = b;
+	}
+	
+	public boolean allowAlbumReload () {
+		return allowAlbumReload;
 	}
 	
 	public void addNoLoadThread ( Thread t ) {
@@ -240,6 +247,9 @@ public class CurrentList {
 		mode = state.getMode();
 		
 		notifyListenersStateChanged();
+
+		allowAlbumReload = false;
+		
 	}
 	
 	public Playlist getCurrentPlaylist () {
@@ -705,12 +715,14 @@ public class CurrentList {
 	}
 	
 	public void notifyListenersStateChanged() {
+
 		CurrentListState state = getState();
 		for ( CurrentListListener listener : listeners ) {
 			listener.stateChanged ( state );
 		}
+
+		allowAlbumReload = true;
 	}
-	
 	
 	public void albumsSet ( List <Album> input ) {
 		
@@ -891,6 +903,7 @@ public class CurrentList {
 	}
 	
 	public void tracksAdded () {
+		
 		if ( mode == Mode.PLAYLIST ) {
 			
 			if ( currentPlaylist.getTracks().equals( items ) ) {
@@ -905,6 +918,7 @@ public class CurrentList {
 		}
 		
 		notifyListenersStateChanged();
+		
 	}
 	
 	public void tracksRemoved () {
