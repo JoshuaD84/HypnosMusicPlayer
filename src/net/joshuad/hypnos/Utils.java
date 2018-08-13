@@ -22,17 +22,15 @@ import javax.imageio.ImageIO;
 
 
 import me.xdrop.fuzzywuzzy.FuzzySearch;
+import net.joshuad.hypnos.Track.Format;
 
 public class Utils {
 
 	private static transient final Logger LOGGER = Logger.getLogger( Utils.class.getName() );
 	
-	private static String[] musicExtStrings = new String[] { "flac", "mp3", "ogg", "m4a", "m4b", "m4r", "aac", "wav", "cda" }; //PENDING: use Track.Format instead
 	private static String[] imageExtStrings = new String[] { "jpg", "jpeg", "png", "gif" };
 	private static String[] playlistExtStrings = new String[] { "m3u" };
 		
-	public static final ArrayList <String> musicExtensions = new ArrayList <String> ( Arrays.asList ( musicExtStrings ) );  
-	
 	public static final DirectoryStream.Filter<Path> musicFileFilter = new DirectoryStream.Filter<Path>() {
 		@Override
 		public boolean accept ( Path entry ) throws IOException {
@@ -117,13 +115,9 @@ public class Utils {
 		
 		String testExtension = fileName.substring ( fileName.lastIndexOf( "." ) + 1 ).toLowerCase();
 		
-		for ( String musicExtension : musicExtensions ) {
-			if ( musicExtension.toLowerCase().equals( testExtension ) ) { 
-				return true;
-			}
-		}
+		Format format = Format.getFormat( testExtension );
 		
-		return false;
+		return format != null;
 	}
 	
 	

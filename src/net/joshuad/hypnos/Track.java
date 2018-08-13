@@ -59,7 +59,15 @@ public class Track implements Serializable, AlbumInfoSource {
 		M4B ( "m4b" ),
 		M4R ( "m4r" ),
 		AAC ( "AAC" ),
-		
+		AIFF ( "aiff" ),
+		AC3 ( "ac3" ),
+		AMR ( "amr" ),
+		AU ( "au" ),
+		MID ( "mid" ),
+		MKA ( "mka" ),
+		RA ( "ra" ),
+		VOC ( "voc" ),
+		WMA ( "wma" ),
 		UNKNOWN ( "" );
 		
 		final String extension;
@@ -69,6 +77,16 @@ public class Track implements Serializable, AlbumInfoSource {
 		
 		public String getExtension () {
 			return extension;
+		}
+		
+		public static Format getFormat ( String extension ) {
+			extension = extension.replaceAll( "^\\.", "" );
+			for ( Format format : Format.values() ) {
+				if ( format.getExtension().equalsIgnoreCase( extension ) ) {
+					return format;
+				}
+			}
+			return null;
 		}
 	}
 	

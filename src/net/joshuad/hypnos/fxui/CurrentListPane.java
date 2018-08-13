@@ -63,6 +63,7 @@ import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.AlphanumComparator.CaseHandling;
 import net.joshuad.hypnos.Persister.Setting;
+import net.joshuad.hypnos.Track.Format;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
@@ -496,8 +497,8 @@ public class CurrentListPane extends BorderPane {
 				
 				ArrayList <String> filters = new ArrayList <String> ();
 				
-				for ( String ending : Utils.musicExtensions ) {
-					filters.add( "*." + ending );
+				for ( Format format : Format.values() ) {
+					filters.add( "*." + format.getExtension() );
 				}
 				
 				FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter( "Audio Files", filters );
