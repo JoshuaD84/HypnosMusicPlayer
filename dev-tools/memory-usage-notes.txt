@@ -1,0 +1,52 @@
+	Memory Hog issue	
+		With an empty library and no current list and nothing loaded uses about 175mb on Windows 7.
+			Clicking around the UI and using every UI feature except for loading library or tracks can climb it to about 300mb
+			loading a folder of 58 albums climbs the usage to ~400mb. Removing seems to push it to 411mb
+			loading a folder of 2460 albums climbs to the usage to 1.7GB
+			closing and reopening 
+			closing and reopening:
+				drives it up to 1.4gb + (i'm sure it would keep going for a while longer)
+				with library loader and library updater disabled puts the memory at 320mb
+				with updater disabled puts the memory at 1.2+ (probably would've kept climbing)
+				with loader disabled it stops at ~367mb. 
+			
+			SO loader is a source of memory consumption definitely. 
+				-Xmx600m fixed this on windows 7. Kept it floating around 450mb. 
+			
+		loading images definitely makes it real bad. Fixing that will help, but won't solve it. 
+		
+		scrolling up and down the album or track table table does increase memory usage, but "only" by 100-200mb. 
+		
+		Start Hypnos
+		Load a big library ( /d/music)
+		Let it finish loading
+		Close and reopen hypnos
+		1.6GB memory footprint
+		
+		Start Hypnos
+		Load a big library (/d/music)
+		during load -- 1.26GB
+		after load - 721MB
+		after restart hypnos - 1.5GB
+		it seems to stay there. I let it run for about 10 minutes, no drop in memory usage. 
+		
+		stopping the libraryUpdater and libraryLoader seems to cut into the problem tremendously
+		
+		Even after stopping updater and loader, it creeps up. It looks like everytime a new song is played?
+			confirmed. Each new song spikes the memory. Just flipping through the songs without playing them causes it
+				Is this related to the skipping issue? - doesn't seem to be with one or two tracks after ramping up the memory
+			Was able to get it to 3 GB just by flipping through tracks. Could probably go higher. 
+		
+		flipping through tracks quickly by hitting next button also causes memory spike. Not terrible. 
+				
+		2017/12/25 - I was able to temper this problem significantly by having only one image loader thread and by setting -Xmx
+		
+			Windows - Volume takes a split second to change.
+
+	
+	Get java to release memory back sometimes. We use a lot on load
+		https://stackoverflow.com/questions/30458195/does-gc-release-back-memory-to-os
+		-XX:GCTimeRatio=19 -XX:MinHeapFreeRatio=20- XX:MaxHeapFreeRatio=30
+			Doesn't work on my system. It seems to keep the memory it grabs. 
+			Added a folder to library, let it load, then removed it. Memory jumped from 250mb to 850mb
+		

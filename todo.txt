@@ -1,30 +1,43 @@
-Linux volume doesn't persist properly 
-
-
-
-
-Now:
-
-	Exporting playlist as folder freezes UI. 	
-
-	Escape after hitting ctrl + 1 -> make it do something
-
-	Windows - Select Multiple Files in explorer - No Option to play in Hypnos. Add that
-	
-   Stop and then play. it advances the track. Start from #1 probably.
-
-   Trigger hotkeys on release instead of press. but you need to make sure you're handling the filter boxes right as well
-
-	Windows - EXE Wrapper doesn't behave well with pinning.  Try changing icon in javaw.exe		
-
-	look at settings as they are written out, some issues
-		X & Y Position: Sometimes it doesn't report correctly
-		Window size: it always shows the actual window size. Do we want to write out the cached windowed mode sizes if maximized? 
-		Multi monitor positioning doesn't seem to work right all the time
-	
-	Sometimes the track title disappears while playing
-	Windows -> Open with causes the current track button to not show the current track's name. 
+Before Next Release
+	All
+		Exporting playlist as folder freezes UI. 
+		Stop and then play with nothing selected. it advances the track. Start from #1 if in sequential mode
+		Drag and drop from title of current song to places
 		
+		Right click menu settings for playlists -- shuffle, repeat, etc. 
+		
+		Play mounted audio cd
+		
+		Don't allow tag table columns to be reordered
+		
+		Escape after hitting ctrl + 1 -> make it do something
+		
+		Show in tag edit window when a file doesn't support a particular tag type
+
+		Missing tracks are deleted from currentlist after restart if CurrentList.mode == ALBUM instead of remaining and being highlighted in red
+		
+	Windows
+		Select Multiple Files in explorer - No Option to play in Hypnos. Add that
+		
+		Hotkey with win + x released causees start menu to show
+		
+		EXE Wrapper doesn't behave well with pinning.  Try changing icon in javaw.exe	
+
+		Open with causes the current track button to not show the current track's name. 
+		
+		Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
+
+
+
+
+
+
+
+
+
+
+
+Future		
 	Windows 
 		Send a file via command line when hypnos isn't playing -- it starts
 		Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on curernt list	
@@ -44,17 +57,6 @@ Now:
 		
 	AppImage - Combine the two scripts that are currently being used to launch hypnos and make them one
 		
-	Last.fm		
-		Hotkeys?
-			use keypad+ and keypad-		
-				
-		Fancy stuff:
-			Heart column on current list
-			Update full library by looking at user.getLovedTracks
-			dynamically update lastfm context menu based on love state
-		
-	Allow multiple values for global hotkeys?
-
 	File name in tag window somewhere
 		I tried doing what I have on the album track list window. It looked ugly and cluttered. 
 
@@ -68,46 +70,11 @@ Now:
 	I emptied the current list and library and playing track, and the art stayed. probably good to get rid of that
 	
 	Add a place to drag and drop folders (or navigate to them) to demand that they be rescanned immediately.
-
-	Search for artist / album image possibilities online, show in a window, let user choose. 
-		
-	Refactor Library
-		Make a source directory a class, not just a path.
-			Library Source Directories - highlight in red if they are missing. 
-
-		An album will form from tracks if you edit them and they aren't currently an album. But an album won't split if you edit tags and make it not be an album.
-			Is this desired behavior? I feel like probably no -- it can create different states based on the same disk contents, which doesn't make sense
-					
-		Sometimes there are duplicated tracks in the track list
-		
-		When removing all sources, it takes a long time to remove everything (5+ seconds)
-			This is because of the processWatcherEvents function taking lots of time on load. 
-			
-		Setup a currentList.updateAlbum and updatePlaylist system
-			Doesn't change artwork
-			CurrentplayingTrack is the same one
-			updates data and locations
-			
-		Library load and unload time
-		
-		Loader status % complete thing
-		
-		Allow sources to be hidden
-		
-		Maybe allow a filter for file type and lossy vs not lossy
-			Maybe just a special search text "type:mp3", "type:lossy"
-			I dunno making search box script is alot. 
-		
-		Give user feedback about the disk scanner and the ability to control it	
 			
 	Drag and drop from misc places to system
 		playlist table -> m3u
-		track table, history, queue, info windows, current table -> single tracks
+		track table, history, queue, info windows, current table -> copy single tracks
 		album table -> folder
-		
-	Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
-
-	Missing tracks are deleted from currentlist after restart if CurrentList.mode == ALBUM instead of remaining and being highlighted in red
 
 	Redo global hotkeys, do it on a system-by-system type basis.
 		https://stackoverflow.com/questions/79658/react-on-global-hotkey-in-a-java-program-on-windows-linux-mac
@@ -126,88 +93,18 @@ Now:
 			JNativeHook - No consumption of hotkey
 	
 	Tag auto fix button
-
-	Bug report dialog
 		
 	Maybe add sorting of roman numerals? 
 		https://gist.github.com/julienhaversano/9197588
 	
-	Show in tag edit window when a file doesn't support a particular tag type
+	If something gets dropped into config/playlists folders, update the UI to include it? 
 	
-	If something gets dropped into config/playlists, update the UI to include it? 
-	
-	Playlist throttled filter, but man, who's going to have over 1000 playlists? 
-	
-	Add email link to bug link in about tab
+	Playlist throttled filter, but who's going to have over 1000 playlists? 
 
-	Memory Hog issue	
-		With an empty library and no current list and nothing loaded uses about 175mb on Windows 7.
-			Clicking around the UI and using every UI feature except for loading library or tracks can climb it to about 300mb
-			loading a folder of 58 albums climbs the usage to ~400mb. Removing seems to push it to 411mb
-			loading a folder of 2460 albums climbs to the usage to 1.7GB
-			closing and reopening 
-			closing and reopening:
-				drives it up to 1.4gb + (i'm sure it would keep going for a while longer)
-				with library loader and library updater disabled puts the memory at 320mb
-				with updater disabled puts the memory at 1.2+ (probably would've kept climbing)
-				with loader disabled it stops at ~367mb. 
-			
-			SO loader is a source of memory consumption definitely. 
-				-Xmx600m fixed this on windows 7. Kept it floating around 450mb. 
-			
-		loading images definitely makes it real bad. Fixing that will help, but won't solve it. 
-		
-		scrolling up and down the album or track table table does increase memory usage, but "only" by 100-200mb. 
-		
-		Start Hypnos
-		Load a big library ( /d/music)
-		Let it finish loading
-		Close and reopen hypnos
-		1.6GB memory footprint
-		
-		Start Hypnos
-		Load a big library (/d/music)
-		during load -- 1.26GB
-		after load - 721MB
-		after restart hypnos - 1.5GB
-		it seems to stay there. I let it run for about 10 minutes, no drop in memory usage. 
-		
-		stopping the libraryUpdater and libraryLoader seems to cut into the problem tremendously
-		
-		Even after stopping updater and loader, it creeps up. It looks like everytime a new song is played?
-			confirmed. Each new song spikes the memory. Just flipping through the songs without playing them causes it
-				Is this related to the skipping issue? - doesn't seem to be with one or two tracks after ramping up the memory
-			Was able to get it to 3 GB just by flipping through tracks. Could probably go higher. 
-		
-		flipping through tracks quickly by hitting next button also causes memory spike. Not terrible. 
-				
-		2017/12/25 - I was able to temper this problem significantly by having only one image loader thread and by setting -Xmx
-		
-		
-:::: Lyric Failures ::::
 
-	
 :::: Java / JavaFX stuff ::::
-	Window shows as a little sliver before appearing fully, ditto for settings window
-	
-	Get java to release memory back sometimes. We use a lot on load
-		https://stackoverflow.com/questions/30458195/does-gc-release-back-memory-to-os
-		-XX:GCTimeRatio=19 -XX:MinHeapFreeRatio=20- XX:MaxHeapFreeRatio=30
-			Doesn't work on my system. It seems to keep the memory it grabs. 
-			Added a folder to library, let it load, then removed it. Memory jumped from 250mb to 850mb
-
-	Windows - Volume takes a split second to change.
-		https://stackoverflow.com/questions/48183626/delay-when-changing-audio-volume-on-windows
-		https://bugs.java.com/bugdatabase/view_bug.do?bug_id=JDK-8195124
-
-	Review and include this answer
-		https://stackoverflow.com/questions/48144750/how-can-i-debug-a-nullpointerexception-where-the-stacktrace-doesnt-reference-my/48145928#48145928
-		1/10 - I did this, and it makes the UI feel worse. Not sure how to deal w/ that. Maybe I just catch the exception
-		and move on with life instead
-
    Scroll speed on lyrics scroll pane when the lyrics almost-but-dont-quite fit one full screen is really slow. 
    
-   Don't allow tag table columns to be reordered
    
 	Try to fit all data in current list table by adjusting columns that aren't no-resize on setCurrentList, if not possible, do nothing
 		I did some work on this. It conflicts with our FormattedAlbumCell because there, to keep it from wrapping
@@ -216,8 +113,6 @@ Now:
 			https://stackoverflow.com/questions/23284437/javafx-tablecolumn-resize-to-fit-cell-content
 		Of course, I would have to then check table width, fail gracefully and revert, or distribute excess space. 
 		
-	Add a ton of albums to the current list. (close and reopen hypnos?) Ctrl + A, delete. Exception. UI is broken
-
 	Resize Policy
 		Windowed mode, shrink window until a scrollbar appears. Maximize window so scrollbar disappears -- Scrollbar width is still accounted for
 		
@@ -265,14 +160,36 @@ Now:
  		Maybe ui.runMe ( Runnable ), and then the UI can decide whether to launch a new thread, have a thread idling, do it on this thread, or use something like Platform.runLater()	
 		
 	a better structure for hotkey commands (maybe combine with commandline commands?)
+	
+			
+	Refactor Library
+		Make a source directory a class, not just a path.
+			Library Source Directories - highlight in red if they are missing. 
+
+		An album will form from tracks if you edit them and they aren't currently an album. But an album won't split if you edit tags and make it not be an album.
+			Is this desired behavior? I feel like probably no -- it can create different states based on the same disk contents, which doesn't make sense
+					
+		Sometimes there are duplicated tracks in the track list
 		
-:::: Decoders ::::
-
-	Does the new decoder work on linux?
-
-	Play mounted audio cd
-		Linux is OK - Linux converts the CDA to WAV, and you can just play it. Buffering isn't great.
-		Windows - ?
+		When removing all sources, it takes a long time to remove everything (5+ seconds)
+			This is because of the processWatcherEvents function taking lots of time on load. 
+			
+		Setup a currentList.updateAlbum and updatePlaylist system
+			Doesn't change artwork
+			CurrentplayingTrack is the same one
+			updates data and locations
+			
+		Library load and unload time
+		
+		Loader status % complete thing
+		
+		Allow sources to be hidden
+		
+		Maybe allow a filter for file type and lossy vs not lossy
+			Maybe just a special search text "type:mp3", "type:lossy"
+			I dunno making search box script is alot. 
+		
+		Give user feedback about the disk scanner and the ability to control it	
 
 :::: OS Specific ::::
 
@@ -293,9 +210,6 @@ Now:
 		https://sourceforge.net/p/launch4j/discussion/332684/thread/75bbbd93/
 		https://stackoverflow.com/questions/7506329/embed-java-into-a-c-application
 	
-	Linux
-		http://blog.noizeramp.com/2005/08/31/packaging-java-applications-for-ubuntu-and-other-debians/
-		
 ::::: watch list :::::
 	2018/01/28 - "VM Thread" causing spikes in CPU usage and stutters in playback. 
 
