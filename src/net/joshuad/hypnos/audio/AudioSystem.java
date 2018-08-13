@@ -131,6 +131,7 @@ public class AudioSystem {
 		
 		for ( CurrentListTrack track : currentList.getItems() ) {
 			track.setIsCurrentTrack( false );
+			track.setIsLastCurrentListTrack( false );
 		}
 
 		notifyListenersStopped( stoppedTrack, reason ); 

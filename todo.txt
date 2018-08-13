@@ -1,7 +1,7 @@
 Before Next Release
 	All
 		Exporting playlist as folder freezes UI. 
-		Stop and then play with nothing selected. it advances the track. Start from #1 if in sequential mode
+				
 		Drag and drop from title of current song to places
 		
 		Right click menu settings for playlists -- shuffle, repeat, etc. 
@@ -15,6 +15,8 @@ Before Next Release
 		Show in tag edit window when a file doesn't support a particular tag type
 
 		Missing tracks are deleted from currentlist after restart if CurrentList.mode == ALBUM instead of remaining and being highlighted in red
+		
+		Make a collection of test files. 
 		
 	Windows
 		Select Multiple Files in explorer - No Option to play in Hypnos. Add that
