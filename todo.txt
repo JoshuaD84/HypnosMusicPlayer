@@ -7,12 +7,8 @@ Before Next Release
 		Right click menu settings for playlists -- shuffle, repeat, etc. 
 		
 		Play mounted audio cd
-		
-		Escape after hitting ctrl + 1 -> make it do something
-		
+				
 		Show in tag edit window when a file doesn't support a particular tag type
-
-		Missing tracks are deleted from currentlist after restart if CurrentList.mode == ALBUM instead of remaining and being highlighted in red
 		
 		Make a collection of test files. 
 		

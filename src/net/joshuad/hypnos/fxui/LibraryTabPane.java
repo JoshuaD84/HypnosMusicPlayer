@@ -380,6 +380,12 @@ public class LibraryTabPane extends StretchedTabPane {
 		playlistFilterBox.setOnKeyPressed( ( KeyEvent event ) -> {
 			if ( event.getCode() == KeyCode.ESCAPE ) {
 				playlistFilterBox.clear();
+				if ( playlistFilterBox.getText().length() > 0 ) {
+					playlistFilterBox.clear();
+				} else {
+					playlistTable.requestFocus();
+				}
+				event.consume();
 			
 			} else if ( event.getCode() == KeyCode.DOWN ) {
 				playlistTable.requestFocus();
@@ -464,7 +470,14 @@ public class LibraryTabPane extends StretchedTabPane {
 		
 		trackFilterBox.setOnKeyPressed( ( KeyEvent event ) -> {
 			if ( event.getCode() == KeyCode.ESCAPE ) {
+				
 				trackFilterBox.clear();
+				if ( trackFilterBox.getText().length() > 0 ) {
+					trackFilterBox.clear();
+				} else {
+					trackTable.requestFocus();
+				}
+				event.consume();
 				
 			} else if ( event.getCode() == KeyCode.DOWN ) {
 				trackTable.requestFocus();
@@ -552,7 +565,12 @@ public class LibraryTabPane extends StretchedTabPane {
 		albumFilterBox.setOnKeyPressed( ( KeyEvent event ) -> {
 			if ( event.getCode() == KeyCode.ESCAPE ) {
 				event.consume();
-				albumFilterBox.clear();
+				if ( albumFilterBox.getText().length() > 0 ) {
+					albumFilterBox.clear();
+				} else {
+					albumTable.requestFocus();
+				}
+				
 			} else if ( event.getCode() == KeyCode.DOWN ) {
 				event.consume();
 				albumTable.requestFocus();
