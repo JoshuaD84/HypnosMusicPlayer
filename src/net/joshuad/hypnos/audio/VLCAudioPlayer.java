@@ -41,6 +41,10 @@ public class VLCAudioPlayer {
 			controller.playerStopped( currentTrack, StopReason.TRACK_FINISHED );
 		}
 	};
+
+	private final int NO_TARGET = -1;
+	
+	private int targetVolume = NO_TARGET; 
 	
 	public VLCAudioPlayer( AudioSystem controller ) {
 		this.controller = controller;
@@ -140,6 +144,18 @@ public class VLCAudioPlayer {
 	
 	public void requestPlayTrack( Track track, boolean startPaused ) {
 		mediaPlayer.playMedia( track.getPath().toString() );
+		
+		if ( targetVolume != NO_TARGET ) {
+
+			final int target = targetVolume;
+			scheduler.schedule( new Runnable() {
+				public void run() {
+					mediaPlayer.setVolume( target );
+					targetVolume = NO_TARGET;
+				}
+			}, 50, TimeUnit.MILLISECONDS );
+		}
+		
 		currentTrack = track;
 		
 		if ( startPaused ) {
@@ -161,12 +177,13 @@ public class VLCAudioPlayer {
 		
 		int vlcValue = (int)(volumePercent * 100f); 
 		
-		mediaPlayer.setVolume(  vlcValue );
-		controller.volumeChanged ( mediaPlayer.getVolume()/100f );
-	}
-	
-	public Track getTrack() {
-		return currentTrack;
+		if ( this.isStopped() ) {
+			targetVolume = vlcValue;
+			controller.volumeChanged ( targetVolume/100f );
+		} else {
+			mediaPlayer.setVolume( vlcValue );
+			controller.volumeChanged ( mediaPlayer.getVolume()/100f );
+		}
 	}
 		
 	public double getVolumePercent () {
@@ -174,6 +191,10 @@ public class VLCAudioPlayer {
 		double hypnosVolume = ((double)vlcVolume)/100;
 		return hypnosVolume;
 	}	
+	
+	public Track getTrack() {
+		return currentTrack;
+	}
 	
 	public void requestSeekPercent ( double seekPercent ) {
 		mediaPlayer.setPosition( (float)seekPercent );
