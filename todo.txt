@@ -5,6 +5,18 @@ Before Next Release
 		Drag and drop from title of current song to places
 		
 		Right click menu settings for playlists -- shuffle, repeat, etc. 
+			
+			RadioMenuItem noChange = new RadioMenuItem ( "None" );
+			RadioMenuItem sequential = new RadioMenuItem ( "Sequential" );
+			RadioMenuItem shuffle = new RadioMenuItem ( "Shuffle" );
+			
+			ToggleGroup shuffleGroup = new ToggleGroup();
+			noChange.setToggleGroup( shuffleGroup );
+			sequential.setToggleGroup( shuffleGroup );
+			shuffle.setToggleGroup( shuffleGroup );
+		    
+			Menu shuffleMode = new Menu ( "Shuffle Mode" );
+			shuffleMode.getItems().addAll( noChange, sequential, shuffle );
 		
 		Play mounted audio cd
 				

@@ -1448,7 +1448,6 @@ public class LibraryTabPane extends StretchedTabPane {
 		emptyPlaylistLabel.setTextAlignment( TextAlignment.CENTER );
 		emptyPlaylistLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
 		playlistTable.setPlaceholder( emptyPlaylistLabel );
-
 		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem appendMenuItem = new MenuItem( "Append" );		
@@ -1459,6 +1458,8 @@ public class LibraryTabPane extends StretchedTabPane {
 		MenuItem exportM3UMenuItem = new MenuItem( "Export as M3U" );
 		MenuItem exportFolderMenuItem = new MenuItem ( "Export as Folder" );
 		MenuItem removeMenuItem = new MenuItem( "Remove" );
+		
+		
 		contextMenu.getItems().addAll( playMenuItem, appendMenuItem, playNextMenuItem, enqueueMenuItem, 
 				renameMenuItem, infoMenuItem, exportM3UMenuItem, exportFolderMenuItem, removeMenuItem );
 
