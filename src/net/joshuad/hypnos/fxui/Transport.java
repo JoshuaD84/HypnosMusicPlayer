@@ -64,9 +64,7 @@ public class Transport extends VBox {
 	Label timeRemainingLabel = new Label( "" );
 	Button currentTrackButton;
 	Tooltip currentTrackTooltip;
-	
-	Tooltip volumeDisabledTooltip = new Tooltip ( "Volume control not supported for tracks with this encoding." );
-	
+		
 	Slider trackPositionSlider;
 	Slider volumeSlider;
 	Button volumeMuteButton;

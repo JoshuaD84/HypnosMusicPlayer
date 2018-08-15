@@ -1,5 +1,7 @@
 Before Next Release
 	All
+		As possible, minimize to system tray
+		
 		Exporting playlist as folder freezes UI. 
 				
 		Drag and drop from title of current song to places
