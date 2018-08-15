@@ -800,13 +800,16 @@ public class CurrentListPane extends BorderPane {
 		browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 
-		currentListTable.setOnKeyPressed( ( KeyEvent e ) -> {
-			if ( e.getCode() == KeyCode.ESCAPE
+		currentListTable.addEventFilter( KeyEvent.KEY_PRESSED, ( KeyEvent e ) -> { 
+			if ( e.getCode() == KeyCode.ESCAPE 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				currentListTable.getSelectionModel().clearSelection();
 				e.consume();
-				
-			} else if ( e.getCode() == KeyCode.DELETE      
+			}
+		});
+		
+		currentListTable.setOnKeyPressed( ( KeyEvent e ) -> {
+			if ( e.getCode() == KeyCode.DELETE      
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				removeMenuItem.fire();
 				e.consume();
