@@ -295,7 +295,8 @@ public class QueueWindow extends Stage {
 						case TAG_ERROR_LIST:
 						case ALBUM_INFO:
 						case PLAYLIST_INFO:
-						case TRACK_LIST: {
+						case TRACK_LIST: 
+						case CURRENT_TRACK: {
 							List <Track> tracksToCopy = container.getTracks();
 							audioSystem.getQueue().queueAllTracks( tracksToCopy, dropIndex );
 							
@@ -412,7 +413,8 @@ public class QueueWindow extends Stage {
 					case ALBUM_INFO:
 					case PLAYLIST_INFO:
 					case TAG_ERROR_LIST:
-					case TRACK_LIST: {
+					case TRACK_LIST:
+					case CURRENT_TRACK: {
 						List <Track> tracksToCopy = container.getTracks();
 						audioSystem.getQueue().queueAllTracks( tracksToCopy );
 					} break;

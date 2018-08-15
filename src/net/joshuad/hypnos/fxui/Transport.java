@@ -1,6 +1,7 @@
 package net.joshuad.hypnos.fxui;
 
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,9 +26,12 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.BorderStroke;
@@ -46,6 +50,7 @@ import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.StopReason;
+import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 import net.joshuad.hypnos.lastfm.LastFM.LovedState;
 
 public class Transport extends VBox {
@@ -421,6 +426,19 @@ public class Transport extends VBox {
 		
 		currentTrackTooltip = new Tooltip ( "" );
 		currentTrackButton.setTooltip( currentTrackTooltip );
+		
+		currentTrackButton.setOnDragDetected( event -> {
+			if ( audioSystem.getCurrentTrack() != null ) {
+				ArrayList <Track> tracks = new ArrayList<> ( Arrays.asList( audioSystem.getCurrentTrack() ) );
+				DraggedTrackContainer dragObject = new DraggedTrackContainer( null, tracks, null, null, DragSource.CURRENT_TRACK );
+				Dragboard db = currentTrackButton.startDragAndDrop( TransferMode.COPY );
+				db.setDragView( currentTrackButton.snapshot( null, null ) );
+				ClipboardContent cc = new ClipboardContent();
+				cc.put( FXUI.DRAGGED_TRACKS, dragObject );
+				db.setContent( cc );
+				event.consume();
+			}
+		});
 		
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem appendMenuItem = new MenuItem( "Append" );

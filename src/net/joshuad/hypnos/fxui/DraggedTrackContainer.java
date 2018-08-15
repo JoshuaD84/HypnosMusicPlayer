@@ -20,7 +20,8 @@ public class DraggedTrackContainer implements Serializable {
 		PLAYLIST_INFO,
 		ALBUM_INFO,
 		QUEUE,
-		HISTORY
+		HISTORY,
+		CURRENT_TRACK
 	}
 	
 	private List<Track> tracks;

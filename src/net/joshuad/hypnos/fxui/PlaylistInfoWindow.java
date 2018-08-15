@@ -174,7 +174,8 @@ public class PlaylistInfoWindow extends Stage {
 					case HISTORY: 
 					case CURRENT_LIST:
 					case TAG_ERROR_LIST:
-					case QUEUE: {
+					case QUEUE: 
+					case CURRENT_TRACK: {
 						List <Track> tracksToCopy = container.getTracks();
 						trackTable.getItems().addAll( tracksToCopy );
 					} break;
@@ -482,7 +483,8 @@ public class PlaylistInfoWindow extends Stage {
 						case HISTORY: 
 						case CURRENT_LIST:
 						case TAG_ERROR_LIST:
-						case QUEUE: {
+						case QUEUE:
+						case CURRENT_TRACK: {
 							List <Track> tracksToCopy = container.getTracks();
 							trackTable.getItems().addAll( dropIndex, tracksToCopy );
 						} break;

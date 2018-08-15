@@ -700,7 +700,8 @@ public class CurrentListPane extends BorderPane {
 					case ALBUM_INFO:
 					case PLAYLIST_INFO:
 					case TAG_ERROR_LIST:
-					case HISTORY: {
+					case HISTORY: 
+					case CURRENT_TRACK: {
 						List <Track> tracks = container.getTracks();
 						if ( tracks.size() > 0 ) {
 							audioSystem.getCurrentList().setItemsToSortedOrder();
@@ -1084,7 +1085,8 @@ public class CurrentListPane extends BorderPane {
 						case ALBUM_INFO:
 						case PLAYLIST_INFO:
 						case TAG_ERROR_LIST:
-						case HISTORY: {
+						case HISTORY: 
+						case CURRENT_TRACK: {
 							audioSystem.getCurrentList().setItemsToSortedOrder();
 							currentListTable.getSortOrder().clear();
 							audioSystem.getCurrentList().insertTracks( dropIndex, Utils.convertTrackList( container.getTracks() ) );
