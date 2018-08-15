@@ -1,9 +1,5 @@
 Before Next Release
-	All
-		Set empty table text for playlist window
-		
-		Mess with the tranforms on .snapshot (null, null) when starting a drag
-		
+	All				
 		As possible, minimize to system tray
 		
 		Exporting playlist as folder freezes UI. 
@@ -41,17 +37,10 @@ Before Next Release
 		
 		Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
 
-
-
-
-
-
-
-
-
-
-
 Future		
+
+	Mess with the tranforms on .snapshot (null, null) when starting a drag
+
 	Windows 
 		Send a file via command line when hypnos isn't playing -- it starts
 		Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on curernt list	
