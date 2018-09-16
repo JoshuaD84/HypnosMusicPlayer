@@ -13,6 +13,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
@@ -118,6 +119,7 @@ public class PlaylistInfoWindow extends Stage {
 		trackTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 		trackTable.prefWidthProperty().bind( primaryPane.widthProperty() );
 		trackTable.prefHeightProperty().bind( primaryPane.heightProperty() );
+		trackTable.setPlaceholder( new Label( "Empty Playlist." ) );
 		
 		trackTable.setOnDragOver( event -> {
 			Dragboard db = event.getDragboard();
@@ -174,7 +176,8 @@ public class PlaylistInfoWindow extends Stage {
 					case HISTORY: 
 					case CURRENT_LIST:
 					case TAG_ERROR_LIST:
-					case QUEUE: {
+					case QUEUE: 
+					case CURRENT_TRACK: {
 						List <Track> tracksToCopy = container.getTracks();
 						trackTable.getItems().addAll( tracksToCopy );
 					} break;
@@ -482,7 +485,8 @@ public class PlaylistInfoWindow extends Stage {
 						case HISTORY: 
 						case CURRENT_LIST:
 						case TAG_ERROR_LIST:
-						case QUEUE: {
+						case QUEUE:
+						case CURRENT_TRACK: {
 							List <Track> tracksToCopy = container.getTracks();
 							trackTable.getItems().addAll( dropIndex, tracksToCopy );
 						} break;

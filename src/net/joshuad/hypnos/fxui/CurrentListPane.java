@@ -63,6 +63,7 @@ import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.AlphanumComparator.CaseHandling;
 import net.joshuad.hypnos.Persister.Setting;
+import net.joshuad.hypnos.Track.Format;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
@@ -496,8 +497,8 @@ public class CurrentListPane extends BorderPane {
 				
 				ArrayList <String> filters = new ArrayList <String> ();
 				
-				for ( String ending : Utils.musicExtensions ) {
-					filters.add( "*." + ending );
+				for ( Format format : Format.values() ) {
+					filters.add( "*." + format.getExtension() );
 				}
 				
 				FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter( "Audio Files", filters );
@@ -699,7 +700,8 @@ public class CurrentListPane extends BorderPane {
 					case ALBUM_INFO:
 					case PLAYLIST_INFO:
 					case TAG_ERROR_LIST:
-					case HISTORY: {
+					case HISTORY: 
+					case CURRENT_TRACK: {
 						List <Track> tracks = container.getTracks();
 						if ( tracks.size() > 0 ) {
 							audioSystem.getCurrentList().setItemsToSortedOrder();
@@ -798,13 +800,16 @@ public class CurrentListPane extends BorderPane {
 		browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 
-		currentListTable.setOnKeyPressed( ( KeyEvent e ) -> {
-			if ( e.getCode() == KeyCode.ESCAPE
+		currentListTable.addEventFilter( KeyEvent.KEY_PRESSED, ( KeyEvent e ) -> { 
+			if ( e.getCode() == KeyCode.ESCAPE 
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				currentListTable.getSelectionModel().clearSelection();
 				e.consume();
-				
-			} else if ( e.getCode() == KeyCode.DELETE      
+			}
+		});
+		
+		currentListTable.setOnKeyPressed( ( KeyEvent e ) -> {
+			if ( e.getCode() == KeyCode.DELETE      
 			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				removeMenuItem.fire();
 				e.consume();
@@ -1083,7 +1088,8 @@ public class CurrentListPane extends BorderPane {
 						case ALBUM_INFO:
 						case PLAYLIST_INFO:
 						case TAG_ERROR_LIST:
-						case HISTORY: {
+						case HISTORY: 
+						case CURRENT_TRACK: {
 							audioSystem.getCurrentList().setItemsToSortedOrder();
 							currentListTable.getSortOrder().clear();
 							audioSystem.getCurrentList().insertTracks( dropIndex, Utils.convertTrackList( container.getTracks() ) );

@@ -1,9 +1,10 @@
 Before Next Release
-	All
-		Exporting playlist as folder freezes UI. 
-				
-		Drag and drop from title of current song to places
+	All				
+		As possible, minimize to system tray
 		
+		Exporting playlist as folder freezes UI. 
+			Unintuitive result: If you try to export a few files, you get the whole list
+									
 		Right click menu settings for playlists -- shuffle, repeat, etc. 
 			
 			RadioMenuItem noChange = new RadioMenuItem ( "None" );
@@ -24,6 +25,8 @@ Before Next Release
 		
 		Make a collection of test files. 
 		
+		https://stackoverflow.com/questions/51851572/java-fx-button-is-staying-pressed-after-drag-event
+		
 	Windows
 		Select Multiple Files in explorer - No Option to play in Hypnos. Add that
 		
@@ -33,16 +36,12 @@ Before Next Release
 
 		Open with causes the current track button to not show the current track's name. 
 		
-
-
-
-
-
-
-
-
+		Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
 
 Future		
+
+	Mess with the tranforms on .snapshot (null, null) when starting a drag
+
 	Windows 
 		Send a file via command line when hypnos isn't playing -- it starts
 		Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on curernt list	
