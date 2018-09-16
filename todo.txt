@@ -33,9 +33,6 @@ Before Next Release
 
 		Open with causes the current track button to not show the current track's name. 
 		
-		Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
-
-
 
 
 

@@ -54,8 +54,7 @@ public class Hypnos extends Application {
 	public enum ExitCode {
 		NORMAL,
 		UNKNOWN_ERROR,
-		AUDIO_ERROR,
-		LIBRARY_ERROR
+		AUDIO_ERROR
 	}
 	
 	public enum OS {

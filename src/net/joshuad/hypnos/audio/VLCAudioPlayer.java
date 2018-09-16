@@ -82,7 +82,7 @@ public class VLCAudioPlayer {
 		} catch ( Exception e ) {
 			LOGGER.log( Level.SEVERE, "Unable to load VLC libaries.", e );
 			FXUI.notifyUserVLCLibraryError();
-			Hypnos.exit( ExitCode.LIBRARY_ERROR );
+			Hypnos.exit( ExitCode.AUDIO_ERROR );
 		}
 		
 		mediaPlayer.addMediaPlayerEventListener(new MediaPlayerEventAdapter() {
