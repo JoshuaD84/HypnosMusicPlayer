@@ -30,13 +30,12 @@ Before Next Release
 	Windows
 		Select Multiple Files in explorer - No Option to play in Hypnos. Add that
 		
-		Hotkey with win + x released causees start menu to show
+		Hotkey with win + x released causees start menu to show	
+			https://github.com/kwhat/jnativehook/issues/235
 		
 		EXE Wrapper doesn't behave well with pinning.  Try changing icon in javaw.exe	
 
 		Open with causes the current track button to not show the current track's name. 
-		
-		Windows 7 - Songs with strange characters display as noise -- Neon Genesis Evangelion
 
 Future		
 

@@ -14,22 +14,15 @@ import java.net.URL;
 import java.text.*;
 import java.util.*;
 
-// Java 8 code
 public class AwtTrayIconTest extends Application {
 
     // one icon location is shared between the application tray icon and task bar icon.
     // you could also use multiple icons to allow for clean display of tray icons on hi-dpi devices.
     private static final String iconImageLoc =
-            "http://icons.iconarchive.com/icons/scafer31000/bubble-circle-3/16/GameCenter-icon.png";
+            "http://icons.iconarchive.com/icons/hopstarter/sleek-xp-basic/24/Home-icon.png";
 
     // application stage is stored so that it can be shown and hidden based on system tray icon operations.
     private Stage stage;
-
-    // a timer allowing the tray icon to provide a periodic notification event.
-    private Timer notificationTimer = new Timer();
-
-    // format used to display the current time in a tray icon notification.
-    private DateFormat timeFormat = SimpleDateFormat.getTimeInstance();
 
     // sets up the javafx application.
     // a tray icon is setup for the icon, but the main stage remains invisible until the user
@@ -124,7 +117,6 @@ public class AwtTrayIconTest extends Application {
             // tray icon (removing the tray icon will also shut down AWT).
             java.awt.MenuItem exitItem = new java.awt.MenuItem("Exit");
             exitItem.addActionListener(event -> {
-                notificationTimer.cancel();
                 Platform.exit();
                 tray.remove(trayIcon);
             });
@@ -135,24 +127,6 @@ public class AwtTrayIconTest extends Application {
             popup.addSeparator();
             popup.add(exitItem);
             trayIcon.setPopupMenu(popup);
-
-            // create a timer which periodically displays a notification message.
-            notificationTimer.schedule(
-                    new TimerTask() {
-                        @Override
-                        public void run() {
-                            javax.swing.SwingUtilities.invokeLater(() ->
-                                trayIcon.displayMessage(
-                                        "hello",
-                                        "The time is now " + timeFormat.format(new Date()),
-                                        java.awt.TrayIcon.MessageType.INFO
-                                )
-                            );
-                        }
-                    },
-                    5_000,
-                    60_000
-            );
 
             // add the application tray icon to the system tray.
             tray.add(trayIcon);

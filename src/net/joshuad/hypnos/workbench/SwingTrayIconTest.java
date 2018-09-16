@@ -34,11 +34,13 @@ package net.joshuad.hypnos.workbench;
  * TrayIconDemo.java
  */
 
+import java.awt.Image;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.net.URL;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -72,22 +74,28 @@ public class SwingTrayIconTest extends Application {
 		
 		stage.setScene(new Scene( root, 300, 250));
 		
+		System.out.println ( "System tray supported: " + SystemTray.isSupported() );
+		
 		SwingUtilities.invokeLater( new Runnable() {
 			public void run () {
 				try {
-					BufferedImage trayImg = ImageIO.read( new File( "bulb.gif" ) );
-					ImageIcon ii = new ImageIcon( trayImg );
+					
+					URL url = new URL("http://icons.iconarchive.com/icons/hopstarter/sleek-xp-basic/24/Home-icon.png");
+					Image image = ImageIO.read(url);
+					ImageIcon ii = new ImageIcon( image );
 					final TrayIcon trayIcon = new TrayIcon( ii.getImage(), null );
 
 					trayIcon.addMouseListener( new MouseAdapter() {
 
 						public void mousePressed ( MouseEvent e ) {
-
-							Platform.runLater( () -> {
-								menu.setX( e.getX() );
-								menu.setY( e.getY() );
-								menu.show ( stage );
-							});
+							
+							if ( e.getButton() == MouseEvent.BUTTON3 ) {	
+								Platform.runLater( () -> {
+									menu.setX( e.getX() );
+									menu.setY( e.getY() );
+									menu.show ( stage );
+								});
+							}
 						}
 					} );
 
