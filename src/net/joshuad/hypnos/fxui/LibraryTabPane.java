@@ -742,6 +742,7 @@ public class LibraryTabPane extends StretchedTabPane {
 		MenuItem playNextMenuItem = new MenuItem( "Play Next" );
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
+		MenuItem sortByNewestMenuItem = new MenuItem ( "Sort by Add Date" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		MenuItem infoMenuItem = new MenuItem( "Track List" );
@@ -798,7 +799,7 @@ public class LibraryTabPane extends StretchedTabPane {
 		
 		contextMenu.getItems().addAll( 
 			playMenuItem, appendMenuItem, playNextMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, 
-			browseMenuItem, addToPlaylistMenuItem
+			sortByNewestMenuItem, browseMenuItem, addToPlaylistMenuItem
 		);
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
@@ -818,6 +819,8 @@ public class LibraryTabPane extends StretchedTabPane {
 				ui.promptAndSavePlaylist ( tracks );
 			}
 		});
+		
+		
 
 		EventHandler addToPlaylistHandler = new EventHandler <ActionEvent>() {
 			@Override
@@ -859,6 +862,11 @@ public class LibraryTabPane extends StretchedTabPane {
 		
 		enqueueMenuItem.setOnAction( event -> {
 			audioSystem.getQueue().queueAllAlbums( albumTable.getSelectionModel().getSelectedItems() );
+		});
+		
+		sortByNewestMenuItem.setOnAction( event -> {
+			albumTable.getSortOrder().clear();
+			albumTable.getSortOrder().add( albumAddedDateColumn );
 		});
 		
 		editTagMenuItem.setOnAction( event -> {
