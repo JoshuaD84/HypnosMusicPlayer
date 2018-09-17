@@ -1,21 +1,28 @@
 package net.joshuad.hypnos;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
+import java.util.logging.Logger;
 
 import javafx.scene.image.Image;
 
 public class Album implements Serializable, AlbumInfoSource {
+	private static transient final Logger LOGGER = Logger.getLogger( Album.class.getName() );
 	
 	private static final long serialVersionUID = 1L;
 	
 	private File directory;
 	ArrayList <Track> tracks;
+	long creationTimeMS = 0;
 
 	public Album ( Path albumDirectory ) throws Exception {
 		this.directory = albumDirectory.toFile();
@@ -38,6 +45,12 @@ public class Album implements Serializable, AlbumInfoSource {
 			
 			tracks.sort ( Comparator.comparing( Track::getTrackNumber ) );
 		} 
+		
+		try {
+			creationTimeMS = Files.readAttributes( directory.toPath(), BasicFileAttributes.class ).creationTime().toMillis();
+		} catch ( IOException e ) {
+			LOGGER.info( "Unable to determine file creation time for album, assuming it is very old." + directory.toString() );
+		}
 	}
 	
 	public String getAlbumArtist () {
@@ -71,6 +84,12 @@ public class Album implements Serializable, AlbumInfoSource {
 		} else {
 			return tracks.get( 0 ).getFullAlbumTitle();
 		}
+	}
+	
+	public String getDateAddedString () {
+		//TODO: "Today, Yesterday, etc."
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		return sdf.format( new Date ( this.creationTimeMS ) );
 	}
 	
 	public Integer getDiscNumber() {
@@ -113,7 +132,6 @@ public class Album implements Serializable, AlbumInfoSource {
 		}
 	}
 	
-	
 	public Path getPath () {
 		return directory.toPath();
 	}
@@ -148,10 +166,6 @@ public class Album implements Serializable, AlbumInfoSource {
 			}
 		}
 		return null;
-	}
-	
-	public Album getThis() {
-		return this;
 	}
 }
 

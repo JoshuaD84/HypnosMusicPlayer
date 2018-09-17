@@ -98,7 +98,7 @@ public class LibraryTabPane extends StretchedTabPane {
 	ContextMenu tabMenu;
 	TableColumn playlistNameColumn, playlistLengthColumn, playlistTracksColumn;
 	TableColumn trackArtistColumn, trackLengthColumn, trackNumberColumn, trackAlbumColumn, trackTitleColumn;
-	TableColumn albumArtistColumn, albumYearColumn, albumAlbumColumn;
+	TableColumn albumArtistColumn, albumYearColumn, albumAddedDateColumn, albumAlbumColumn;
 	
 	CheckMenuItem showAlbums; 
 	CheckMenuItem showTracks;
@@ -650,6 +650,7 @@ public class LibraryTabPane extends StretchedTabPane {
 	@SuppressWarnings("unchecked")
 	public void resetAlbumTableSettingsToDefault() {
 		albumArtistColumn.setVisible( true );
+		albumAddedDateColumn.setVisible( false );
 		albumYearColumn.setVisible( true );
 		albumAlbumColumn.setVisible( true );
 		
@@ -657,6 +658,8 @@ public class LibraryTabPane extends StretchedTabPane {
 		albumTable.getColumns().add( albumArtistColumn );
 		albumTable.getColumns().remove( albumYearColumn );
 		albumTable.getColumns().add( albumYearColumn );
+		albumTable.getColumns().remove( albumAddedDateColumn );
+		albumTable.getColumns().add( albumAddedDateColumn );
 		albumTable.getColumns().remove( albumAlbumColumn );
 		albumTable.getColumns().add( albumAlbumColumn );
 
@@ -667,44 +670,51 @@ public class LibraryTabPane extends StretchedTabPane {
 		albumArtistColumn.setPrefWidth( 100 );
 		albumYearColumn.setPrefWidth( 60 );
 		albumAlbumColumn.setPrefWidth( 100 );
+		albumAddedDateColumn.setPrefWidth ( 90 );
 		
-		albumTable.getColumnResizePolicy().call(new ResizeFeatures (  albumTable, null, 0d ) );
+		albumTable.getColumnResizePolicy().call( new ResizeFeatures ( albumTable, null, 0d ) );
 	}
 	
 	public void setupAlbumTable () {
 		albumArtistColumn = new TableColumn( "Artist" );
 		albumYearColumn = new TableColumn( "Year" );
 		albumAlbumColumn = new TableColumn( "Album" );
+		albumAddedDateColumn = new TableColumn ( "Added" );
 
 		albumArtistColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
 		albumAlbumColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
 
 		albumArtistColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "albumArtist" ) );
 		albumYearColumn.setCellValueFactory( new PropertyValueFactory <Album, Integer>( "year" ) );
-		
 		albumAlbumColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "FullAlbumTitle" ) );
+		albumAddedDateColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "dateAddedString" ) );
+		
 		albumAlbumColumn.setCellFactory( e -> new FormattedAlbumCell() );
 		
 		albumColumnSelectorMenu = new ContextMenu ();
 		CheckMenuItem artistMenuItem = new CheckMenuItem ( "Show Artist Column" );
 		CheckMenuItem yearMenuItem = new CheckMenuItem ( "Show Year Column" );
 		CheckMenuItem albumMenuItem = new CheckMenuItem ( "Show Album Column" );
+		CheckMenuItem dateAddedMenuItem = new CheckMenuItem ( "Show Added Column" );
 		MenuItem defaultMenuItem = new MenuItem ( "Reset to Default View" );
 		
 		artistMenuItem.setSelected( true );
 		yearMenuItem.setSelected( true );
 		albumMenuItem.setSelected( true );
-		albumColumnSelectorMenu.getItems().addAll( artistMenuItem, yearMenuItem, albumMenuItem, defaultMenuItem );
+		dateAddedMenuItem.setSelected( false );
+		albumColumnSelectorMenu.getItems().addAll( artistMenuItem, yearMenuItem, dateAddedMenuItem, albumMenuItem, defaultMenuItem );
 		albumArtistColumn.setContextMenu( albumColumnSelectorMenu );
 		albumYearColumn.setContextMenu( albumColumnSelectorMenu );
 		albumAlbumColumn.setContextMenu( albumColumnSelectorMenu );
+		albumAddedDateColumn.setContextMenu( albumColumnSelectorMenu );
 		artistMenuItem.selectedProperty().bindBidirectional( albumArtistColumn.visibleProperty() );
 		yearMenuItem.selectedProperty().bindBidirectional( albumYearColumn.visibleProperty() );
 		albumMenuItem.selectedProperty().bindBidirectional( albumAlbumColumn.visibleProperty() );
-		defaultMenuItem.setOnAction( ( e ) -> this.resetAlbumTableSettingsToDefault() );
+		dateAddedMenuItem.selectedProperty().bindBidirectional( albumAddedDateColumn.visibleProperty() );
+		defaultMenuItem.setOnAction( e -> this.resetAlbumTableSettingsToDefault() );
 
 		albumTable = new TableView();
-		albumTable.getColumns().addAll( albumArtistColumn, albumYearColumn, albumAlbumColumn );
+		albumTable.getColumns().addAll( albumArtistColumn, albumYearColumn, albumAddedDateColumn, albumAlbumColumn );
 		albumTable.setEditable( false );
 		albumTable.setItems( library.getAlbumsSorted() );
 		albumTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
@@ -714,6 +724,7 @@ public class LibraryTabPane extends StretchedTabPane {
 		HypnosResizePolicy resizePolicy = new HypnosResizePolicy();
 		albumTable.setColumnResizePolicy( resizePolicy );
 		resizePolicy.registerFixedWidthColumns( albumYearColumn );
+		resizePolicy.registerFixedWidthColumns( albumAddedDateColumn );
 		
 		emptyAlbumListLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
 		emptyAlbumListLabel.setWrapText( true );
@@ -1845,6 +1856,10 @@ public class LibraryTabPane extends StretchedTabPane {
 					case AL_TABLE_ALBUM_COLUMN_SHOW:
 						albumAlbumColumn.setVisible( Boolean.valueOf ( value ) );
 						settings.remove ( setting );
+						break;					
+					case AL_TABLE_ADDED_COLUMN_SHOW:
+						albumAddedDateColumn.setVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
 						break;
 					case TR_TABLE_ARTIST_COLUMN_SHOW:
 						trackArtistColumn.setVisible( Boolean.valueOf ( value ) );
@@ -1878,13 +1893,16 @@ public class LibraryTabPane extends StretchedTabPane {
 						playlistLengthColumn.setVisible( Boolean.valueOf ( value ) );
 						settings.remove ( setting );
 						break;
-						
 					case AL_TABLE_ARTIST_COLUMN_WIDTH: 
 						albumArtistColumn.setPrefWidth( Double.valueOf( value ) );
 						settings.remove ( setting );
 						break;
 					case AL_TABLE_YEAR_COLUMN_WIDTH: 
 						albumYearColumn.setPrefWidth( Double.valueOf( value ) );
+						settings.remove ( setting );
+						break;
+					case AL_TABLE_ADDED_COLUMN_WIDTH: 
+						albumAddedDateColumn.setPrefWidth( Double.valueOf( value ) );
 						settings.remove ( setting );
 						break;
 					case AL_TABLE_ALBUM_COLUMN_WIDTH: 
@@ -1938,6 +1956,9 @@ public class LibraryTabPane extends StretchedTabPane {
 								} else if ( columnName.equals( "album" ) ) {
 									albumTable.getColumns().remove( albumAlbumColumn );
 									albumTable.getColumns().add( newIndex, albumAlbumColumn );
+								} else if ( columnName.equals( "added" ) ) {
+									albumTable.getColumns().remove( albumAddedDateColumn );
+									albumTable.getColumns().add( newIndex, albumAddedDateColumn );
 								}
 								newIndex++;
 							} catch ( Exception e ) {
@@ -2026,6 +2047,9 @@ public class LibraryTabPane extends StretchedTabPane {
 									} else if ( columnName.equals( "album" ) ) {
 										albumTable.getSortOrder().add( albumAlbumColumn );
 										albumAlbumColumn.setSortType( sortType );
+									} else if ( columnName.equals( "added" ) ) {
+										albumTable.getSortOrder().add( albumAddedDateColumn );
+										albumAddedDateColumn.setSortType( sortType );
 									}
 								} catch ( Exception e ) {
 									LOGGER.log( Level.INFO, "Unable to set album table sort order: '" + value + "'", e );
@@ -2142,6 +2166,8 @@ public class LibraryTabPane extends StretchedTabPane {
 				albumColumnOrderValue += "artist ";
 			} else if ( column == albumYearColumn ) {
 				albumColumnOrderValue += "year ";
+			} else if ( column == albumAddedDateColumn ) {
+				albumColumnOrderValue += "added ";
 			} else if ( column == albumAlbumColumn ) {
 				albumColumnOrderValue += "album ";
 			}
@@ -2156,6 +2182,8 @@ public class LibraryTabPane extends StretchedTabPane {
 				albumSortValue += "year-" + albumYearColumn.getSortType() + " ";
 			} else if ( column == albumAlbumColumn ) {
 				albumSortValue += "album-" + albumAlbumColumn.getSortType() + " ";
+			} else if ( column == this.albumAddedDateColumn ) {
+				albumSortValue += "added-" + albumAddedDateColumn.getSortType() + " ";
 			}
 		}
 		retMe.put ( Setting.ALBUM_SORT_ORDER, albumSortValue );
@@ -2220,6 +2248,7 @@ public class LibraryTabPane extends StretchedTabPane {
 		retMe.put ( Setting.AL_TABLE_ARTIST_COLUMN_SHOW, albumArtistColumn.isVisible() );
 		retMe.put ( Setting.AL_TABLE_YEAR_COLUMN_SHOW, albumYearColumn.isVisible() );
 		retMe.put ( Setting.AL_TABLE_ALBUM_COLUMN_SHOW, albumAlbumColumn.isVisible() );
+		retMe.put ( Setting.AL_TABLE_ADDED_COLUMN_SHOW, albumAddedDateColumn.isVisible() );
 		retMe.put ( Setting.TR_TABLE_ARTIST_COLUMN_SHOW, trackArtistColumn.isVisible() );
 		retMe.put ( Setting.TR_TABLE_NUMBER_COLUMN_SHOW, trackNumberColumn.isVisible() );
 		retMe.put ( Setting.TR_TABLE_TITLE_COLUMN_SHOW, trackTitleColumn.isVisible() );
@@ -2231,6 +2260,7 @@ public class LibraryTabPane extends StretchedTabPane {
 		
 		retMe.put ( Setting.AL_TABLE_ARTIST_COLUMN_WIDTH, albumArtistColumn.getPrefWidth() );
 		retMe.put ( Setting.AL_TABLE_YEAR_COLUMN_WIDTH, albumYearColumn.getPrefWidth() );
+		retMe.put ( Setting.AL_TABLE_ADDED_COLUMN_WIDTH, albumAddedDateColumn.getPrefWidth() );
 		retMe.put ( Setting.AL_TABLE_ALBUM_COLUMN_WIDTH, albumAlbumColumn.getPrefWidth() );
 		retMe.put ( Setting.TR_TABLE_ARTIST_COLUMN_WIDTH, trackArtistColumn.getPrefWidth() );
 		retMe.put ( Setting.TR_TABLE_NUMBER_COLUMN_WIDTH, trackNumberColumn.getPrefWidth() );

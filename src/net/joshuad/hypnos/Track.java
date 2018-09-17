@@ -40,11 +40,11 @@ import net.joshuad.hypnos.audio.AudioSystem.StopReason;
 import net.joshuad.hypnos.lastfm.LastFM.LovedState;
 
 public class Track implements Serializable, AlbumInfoSource {
+	private static transient final Logger LOGGER = Logger.getLogger( Track.class.getName() );
 	
 	private static final long serialVersionUID = 1L;
 	public static final int NO_TRACK_NUMBER = -885533;
 	
-	private static transient final Logger LOGGER = Logger.getLogger( Track.class.getName() );
 	
 	private transient Vector <TagError> tagErrors = new Vector <TagError> ();
 	
