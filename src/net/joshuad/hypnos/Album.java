@@ -18,8 +18,8 @@ import javafx.scene.image.Image;
 public class Album implements Serializable, AlbumInfoSource {
 	private static transient final Logger LOGGER = Logger.getLogger( Album.class.getName() );
 	
-	private static final long serialVersionUID = 1L;
-	
+	private static final long serialVersionUID = 2L;
+
 	private File directory;
 	ArrayList <Track> tracks;
 	long creationTimeMS = 0;

@@ -1,6 +1,3 @@
-Before Next Release
-   All
-      don't allow file date to be 0MS for albums
 
 Future		
 	All				
