@@ -1,6 +1,9 @@
 Before Next Release
+   All
+      don't allow file date to be 0MS for albums
+
+Future		
 	All				
-		As possible, minimize to system tray
 		
 		Exporting playlist as folder freezes UI. 
 			Unintuitive result: If you try to export a few files, you get the whole list
@@ -36,9 +39,8 @@ Before Next Release
 		EXE Wrapper doesn't behave well with pinning.  Try changing icon in javaw.exe	
 
 		Open with causes the current track button to not show the current track's name. 
-
-Future		
-
+	As possible, minimize to system tray
+	
 	Mess with the tranforms on .snapshot (null, null) when starting a drag
 
 	Windows 

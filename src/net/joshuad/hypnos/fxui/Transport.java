@@ -779,6 +779,7 @@ public class Transport extends VBox {
 	//@Override
 	public void playerVolumeChanged ( double newVolumePercent ) {
 		Platform.runLater( () -> {
+			System.out.println ( "Volume Changed Heard: " + newVolumePercent ); //TODO: 
 			double min = volumeSlider.getMin();
 			double max = volumeSlider.getMax();
 			

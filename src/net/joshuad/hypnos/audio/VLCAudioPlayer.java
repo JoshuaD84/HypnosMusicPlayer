@@ -182,7 +182,7 @@ public class VLCAudioPlayer {
 			controller.volumeChanged ( targetVolume/100f );
 		} else {
 			mediaPlayer.setVolume( vlcValue );
-			controller.volumeChanged ( mediaPlayer.getVolume()/100f );
+			controller.volumeChanged ( vlcValue/100f );
 		}
 	}
 		
