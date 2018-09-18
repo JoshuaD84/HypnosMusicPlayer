@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import javafx.beans.property.DoubleProperty;
 import javafx.scene.control.Alert.AlertType;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.FXUI;
@@ -569,38 +570,5 @@ public class Persister {
 		}
 		
 		LOGGER.info ( "Some settings were read from disk but not applied:\n" + message );
-	}
-	
-	public void exportTracksToFolder ( List <? extends Track> tracks, Path targetFolder ) {
-		
-		if ( !Files.isDirectory( targetFolder ) ) {
-			ui.alertUser( AlertType.WARNING, "Unable to Copy the following files:", "Unable to Copy Files", 
-				"Destination is not a folder", 800 );
-			return;
-		}
-		
-		String error = "";
-		
-		int playlistIndex = 1;
-		for ( Track track : tracks ) {
-			String number = String.format( "%02d", playlistIndex );
-			String extension = Utils.getFileExtension( track.getPath() );
-			String name = track.getArtist() + " - " + track.getTitle();
-			Path targetOut = targetFolder.resolve( number + " - " + name + "." + extension );
-			try {
-				Files.copy(	track.getPath(), targetOut );
-			} catch ( FileAlreadyExistsException ex ) {
-				if ( !error.equals( "" ) ) error += "\n\n";
-				error += "File already exists, not overwritten: " + targetOut;
-			} catch ( IOException ex ) {
-				if ( !error.equals( "" ) ) error += "\n\n";
-				error += "Unable to save file (" + ex.getMessage() + "): " + targetOut;
-			}
-			playlistIndex++;
-		}
-		
-		if ( !error.equals( "" ) ) {
-			ui.alertUser( AlertType.WARNING, "Unable to Copy the following files:", "Unable to Copy Files", error, 800 );
-		}
 	}
 }

@@ -553,20 +553,21 @@ public class CurrentListPane extends BorderPane {
 				saveMe.saveAs( targetFile );
 				
 			} catch ( IOException e1 ) {
-				ui.alertUser ( AlertType.ERROR, "Warning", "Unable to save playlist.", "Unable to save the playlist to the specified location", 400 );
+				ui.alertUser ( AlertType.ERROR, "Warning", "Unable to save playlist.", "Unable to save the playlist to the specified location" );
 			}
 		});
 		
 		exportToFolder.setOnAction( ( ActionEvent e ) -> {
-			File targetFile = ui.promptUserForFolder();
-			if ( targetFile == null ) {
-				return;
+			
+			List<CurrentListTrack> tracks = currentListTable.getSelectionModel().getSelectedItems();
+			
+			if ( tracks.size() == 0 ) {
+				tracks = audioSystem.getCurrentList().getSortedItemsNoFilter();
 			}
 			
-			List<CurrentListTrack> tracks = audioSystem.getCurrentList().getSortedItemsNoFilter();
+			List<Track> exportMe = new ArrayList <Track> ( tracks );
 			
-			//TODO: Get rid of Hypnos.get
-			Hypnos.getPersister().exportTracksToFolder ( tracks, targetFile.toPath() );
+			ui.exportPopup.export( exportMe );
 		});
 		
 		searchMenuItem.setOnAction( ( ActionEvent e ) -> {

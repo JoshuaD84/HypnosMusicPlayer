@@ -65,7 +65,7 @@ public class HistoryWindow extends Stage {
 		initOwner( ui.getMainStage() );
 		setTitle( "History" );
 		setWidth( 600 );
-		setHeight ( 400 );
+		setHeight( 400 );
 		
 		try {
 			getIcons().add( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) ) );

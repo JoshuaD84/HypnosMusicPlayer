@@ -47,6 +47,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.Alert.AlertType;
@@ -114,6 +115,7 @@ public class FXUI implements PlayerListener {
 	public SettingsWindow settingsWindow;
 	TrackInfoWindow trackInfoWindow;
 	LyricsWindow lyricsWindow;
+	ExportPlaylistPopup exportPopup;
 	
 	final AudioSystem audioSystem;
 	final Library library;
@@ -191,6 +193,7 @@ public class FXUI implements PlayerListener {
 		settingsWindow = new SettingsWindow ( this, library, hotkeys, audioSystem );
 		trackInfoWindow = new TrackInfoWindow ( this );
 		lyricsWindow = new LyricsWindow ( this );
+		exportPopup = new ExportPlaylistPopup ( this );
 		
 		setupFont();
 		applyBaseTheme();
@@ -1468,7 +1471,7 @@ public class FXUI implements PlayerListener {
 		return targetFile;
 	}
 	
-	public void alertUser ( AlertType type, String title, String header, String content, double textWidth ) {
+	public void alertUser ( AlertType type, String title, String header, String content ) {
 		Alert alert = new Alert( type );
 		alert.getDialogPane().applyCss();
 		double x = mainStage.getX() + mainStage.getWidth() / 2 - 220; //It'd be nice to use alert.getWidth() / 2, but it's NAN now. 
@@ -1483,15 +1486,12 @@ public class FXUI implements PlayerListener {
 		setAlertWindowIcon ( alert );
 		
 		applyCurrentTheme ( alert );
-						
-		Text text = new Text( content );
+		TextArea textArea = new TextArea();
+		textArea.setEditable( false );
+		textArea.setWrapText( true );
+		textArea.setText( content );
 		
-		text.setWrappingWidth( textWidth );
-		text.getStyleClass().add( "alert-text" );
-		HBox holder = new HBox();
-		holder.getChildren().add( text );
-		holder.setPadding( new Insets ( 10, 10, 10, 10 ) );
-		alert.getDialogPane().setContent( holder );
+		alert.getDialogPane().setContent( textArea );
 		
 		alert.showAndWait(); 
 	}

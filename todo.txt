@@ -1,10 +1,7 @@
+Add Scrollbar to "Unable to Copy" window text content. 
 
 Future		
 	All				
-		
-		Exporting playlist as folder freezes UI. 
-			Unintuitive result: If you try to export a few files, you get the whole list
-									
 		Right click menu settings for playlists -- shuffle, repeat, etc. 
 			
 			RadioMenuItem noChange = new RadioMenuItem ( "None" );

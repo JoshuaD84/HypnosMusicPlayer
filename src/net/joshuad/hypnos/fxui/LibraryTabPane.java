@@ -60,6 +60,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.TextAlignment;
 import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.AlphanumComparator;
+import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.Persister;
@@ -1526,21 +1527,14 @@ public class LibraryTabPane extends StretchedTabPane {
 				saveMe.saveAs( targetFile );
 				
 			} catch ( IOException e1 ) {
-				ui.alertUser ( AlertType.ERROR, "Warning", "Unable to save playlist.", "Unable to save the playlist to the specified location", 400 );
+				ui.alertUser ( AlertType.ERROR, "Warning", "Unable to save playlist.", "Unable to save the playlist to the specified location" );
 			}
 			
 		});
 		
 		exportFolderMenuItem.setOnAction( ( ActionEvent event ) -> {
-			File targetFile = ui.promptUserForFolder();
-			if ( targetFile == null ) {
-				return;
-			}
-			
-			List<Track> tracks = playlistTable.getSelectionModel().getSelectedItem().getTracks();
-			
-			//TODO: Get rid of Hypnos.get
-			Hypnos.getPersister().exportTracksToFolder ( tracks, targetFile.toPath() );
+			List<Track> exportMe = playlistTable.getSelectionModel().getSelectedItem().getTracks();
+			ui.exportPopup.export( exportMe );
 		});
 
 		removeMenuItem.setOnAction( ( ActionEvent event ) -> {
