@@ -1,4 +1,4 @@
-Add Scrollbar to "Unable to Copy" window text content. 
+Truncate date to just year
 
 Future		
 	All				

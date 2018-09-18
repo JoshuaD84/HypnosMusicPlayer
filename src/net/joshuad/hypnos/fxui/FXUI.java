@@ -451,6 +451,7 @@ public class FXUI implements PlayerListener {
 		settingsWindow.getScene().getStylesheets().add( fontSheet );
 		trackInfoWindow.getScene().getStylesheets().add( fontSheet );
 		lyricsWindow.getScene().getStylesheets().add( fontSheet );
+		exportPopup.getScene().getStylesheets().add( fontSheet );
 	}
 	
 	private void loadImages() {
@@ -490,6 +491,7 @@ public class FXUI implements PlayerListener {
 		settingsWindow.getScene().getStylesheets().add( baseSheet );
 		trackInfoWindow.getScene().getStylesheets().add( baseSheet );
 		lyricsWindow.getScene().getStylesheets().add( baseSheet );
+		exportPopup.getScene().getStylesheets().add( baseSheet );
 	}
 	
 	public void applyDarkTheme() {
@@ -515,6 +517,7 @@ public class FXUI implements PlayerListener {
 			settingsWindow.getScene().getStylesheets().add( darkSheet );
 			trackInfoWindow.getScene().getStylesheets().add( darkSheet );
 			lyricsWindow.getScene().getStylesheets().add( darkSheet );
+			exportPopup.getScene().getStylesheets().add( darkSheet );
 			
 			transport.applyDarkTheme();
 			libraryPane.applyDarkTheme( darkThemeButtonEffect );
@@ -545,6 +548,7 @@ public class FXUI implements PlayerListener {
 		settingsWindow.getScene().getStylesheets().remove( darkSheet );
 		trackInfoWindow.getScene().getStylesheets().remove( darkSheet );
 		lyricsWindow.getScene().getStylesheets().remove( darkSheet );
+		exportPopup.getScene().getStylesheets().remove( darkSheet );
 		
 		transport.applyLightTheme();
 		libraryPane.applyLightTheme();
