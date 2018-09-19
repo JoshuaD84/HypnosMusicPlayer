@@ -1,3 +1,44 @@
+Features that need System-by-System attention
+
+	Global Hotkeys
+		Linux
+			Can't consume the hotkey
+			
+		Windows
+			Winkey + <Something> doesn't work right. If you release the keys in the wrong order, the windows menu opens
+				https://github.com/kwhat/jnativehook/issues/235
+				
+				
+	System Tray
+		Linux
+		
+		Windows
+	
+	
+	Mounted Audio CDs
+		Linux
+		
+		Windows
+		
+
+	Executable Wrapping
+		Linux - I'm happy with appimages
+		
+		Windows
+			EXE Wrapper doesn't behave well with pinning.  Try changing icon in javaw.exe
+			
+			
+	System Integration
+		Linux - Seems good
+		
+		Windows
+			Select Multiple Files in explorer - No Option to play in Hypnos. Add that	
+			"Open with" causes the current track button to not show the current track's name. 
+			Commandline Interface	
+				Send a file via command line when hypnos isn't playing -- it starts
+				Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on current list
+			
+
 Truncate date to just year
 
 Future		
@@ -15,9 +56,7 @@ Future
 		    
 			Menu shuffleMode = new Menu ( "Shuffle Mode" );
 			shuffleMode.getItems().addAll( noChange, sequential, shuffle );
-		
-		Play mounted audio cd
-				
+						
 		Show in tag edit window when a file doesn't support a particular tag type
 		
 		Make a collection of test files. 
@@ -25,21 +64,7 @@ Future
 		https://stackoverflow.com/questions/51851572/java-fx-button-is-staying-pressed-after-drag-event
 		
 	Windows
-		Select Multiple Files in explorer - No Option to play in Hypnos. Add that
-		
-		Hotkey with win + x released causees start menu to show	
-			https://github.com/kwhat/jnativehook/issues/235
-		
-		EXE Wrapper doesn't behave well with pinning.  Try changing icon in javaw.exe	
 
-		Open with causes the current track button to not show the current track's name. 
-	As possible, minimize to system tray
-	
-	Mess with the tranforms on .snapshot (null, null) when starting a drag
-
-	Windows 
-		Send a file via command line when hypnos isn't playing -- it starts
-		Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on curernt list	
 	
 	Drag and Drop to Playlist Info update current list if it is that playlist unchanged
 	
@@ -101,9 +126,7 @@ Future
 	Playlist throttled filter, but who's going to have over 1000 playlists? 
 
 
-:::: Java / JavaFX stuff ::::
-
-		
+:::: Java / JavaFX stuff ::::		
 	Don't allow tag table columns to be reordered
 		8/12/2018 - Currently not supported by java 8 / javafx8
 		
