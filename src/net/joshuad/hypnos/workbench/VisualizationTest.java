@@ -29,7 +29,6 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -65,7 +64,7 @@ public class VisualizationTest extends VlcjTest {
     private final Canvas canvas;
     private final JPanel controlsPane;
     private final JLabel typeLabel;
-    private final JComboBox comboBox;
+    private final JComboBox<String> comboBox;
     private final JButton playButton;
     private final JLabel widthLabel;
     private final JTextField widthTextField;
@@ -102,7 +101,7 @@ public class VisualizationTest extends VlcjTest {
         controlsPane.setLayout(new BoxLayout(controlsPane, BoxLayout.X_AXIS));
         typeLabel = new JLabel("Type:");
         typeLabel.setDisplayedMnemonic('t');
-        comboBox = new JComboBox(new String[] {"scope", "spectrometer", "spectrum", "vuMeter"});
+        comboBox = new JComboBox<String>(new String[] {"scope", "spectrometer", "spectrum", "vuMeter"});
         typeLabel.setLabelFor(comboBox);
         widthLabel = new JLabel("Width:");
         widthLabel.setDisplayedMnemonic('w');

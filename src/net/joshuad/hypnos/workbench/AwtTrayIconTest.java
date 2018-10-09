@@ -11,8 +11,6 @@ import javafx.stage.*;
 import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.net.URL;
-import java.text.*;
-import java.util.*;
 
 public class AwtTrayIconTest extends Application {
 

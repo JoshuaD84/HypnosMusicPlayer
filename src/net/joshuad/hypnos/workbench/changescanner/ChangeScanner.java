@@ -49,7 +49,6 @@ public class ChangeScanner extends SimpleFileVisitor <Path> {
 		return FileVisitResult.CONTINUE;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static void main( String[] args ) {
 
 		ChangeScanner scanner = new ChangeScanner();

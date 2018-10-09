@@ -1,5 +1,4 @@
 Features that need System-by-System attention
-
 	Global Hotkeys
 		Linux
 			Can't consume the hotkey
@@ -7,7 +6,6 @@ Features that need System-by-System attention
 		Windows
 			Winkey + <Something> doesn't work right. If you release the keys in the wrong order, the windows menu opens
 				https://github.com/kwhat/jnativehook/issues/235
-				
 				
 	System Tray
 		Linux
@@ -39,8 +37,6 @@ Features that need System-by-System attention
 				Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on current list
 			
 
-Truncate date to just year
-
 Future		
 	All				
 		Right click menu settings for playlists -- shuffle, repeat, etc. 
@@ -62,9 +58,6 @@ Future
 		Make a collection of test files. 
 		
 		https://stackoverflow.com/questions/51851572/java-fx-button-is-staying-pressed-after-drag-event
-		
-	Windows
-
 	
 	Drag and Drop to Playlist Info update current list if it is that playlist unchanged
 	

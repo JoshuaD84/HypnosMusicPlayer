@@ -39,7 +39,6 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.net.URL;
 
 import javax.imageio.ImageIO;

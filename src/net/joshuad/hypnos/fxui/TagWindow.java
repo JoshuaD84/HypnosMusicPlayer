@@ -546,7 +546,6 @@ public class TagWindow extends Stage {
 			nextButton.setVisible( false );
 		}
 		
-		
 		try {
 			
 			Track firstTrack = tracks.get( 0 );
@@ -634,7 +633,6 @@ public class TagWindow extends Stage {
 			for ( MultiFileImageTagPair tagPair : imageTagPairs ) {
 				
 				if ( tagPair.getKey() == ImageFieldKey.ALBUM_FRONT || tagPair.getKey() == ImageFieldKey.ARTIST ) continue;
-				
 				
 				if ( tagPair.getImageData() == null ) {
 					hideMe.add ( tagPair );

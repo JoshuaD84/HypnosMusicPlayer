@@ -3,7 +3,6 @@ package net.joshuad.hypnos.workbench;
 import com.sun.jna.NativeLibrary;
 
 import uk.co.caprica.vlcj.binding.LibVlc;
-import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.runtime.RuntimeUtil;
 
 public class VLCJLinuxTest {
