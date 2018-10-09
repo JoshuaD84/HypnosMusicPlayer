@@ -866,6 +866,7 @@ public class LibraryTabPane extends StretchedTabPane {
 		
 		sortByNewestMenuItem.setOnAction( event -> {
 			albumTable.getSortOrder().clear();
+			albumAddedDateColumn.setSortType( SortType.DESCENDING );
 			albumTable.getSortOrder().add( albumAddedDateColumn );
 		});
 		
