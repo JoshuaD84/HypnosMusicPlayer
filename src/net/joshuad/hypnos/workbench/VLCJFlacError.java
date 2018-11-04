@@ -23,13 +23,13 @@ public class VLCJFlacError {
 	
 	/*
 		"D:\\test\\o.flac",   //works
-		"D:\\test\\ö.flac",   //does not work
+		"D:\\test\\ï¿½.flac",   //does not work
 		"test\\o.flac",       //works
-		"test\\ö.flac",       //does not work
-		"test/ö.flac",        //works
-		"ö.flac",             //works
-		"../ö.flac",          //works
-		"../test/ö.flac"      //works
+		"test\\ï¿½.flac",       //does not work
+		"test/ï¿½.flac",        //works
+		"ï¿½.flac",             //works
+		"../ï¿½.flac",          //works
+		"../test/ï¿½.flac"      //works
 		
 	*/
 	
@@ -37,7 +37,7 @@ public class VLCJFlacError {
 	
 	public static void main( String[] args ) throws Exception {
 		
-		String targetFile = "D:/test/ö.flac";
+		String targetFile = "D:/test/ï¿½.flac";
 		
 		String nativeVLCLibPath = Paths.get( vlcLibPath ).toAbsolutePath().toString();
 		
@@ -46,9 +46,9 @@ public class VLCJFlacError {
 		MediaPlayer mediaPlayer = vlcComponent.getMediaPlayer();
 								
 		//Path root = Paths.get( System.getProperty("user.dir") );
-		//String playMe = root.relativize( Paths.get( "D:\\test\\ö.flac" ) ).toString().replaceAll( "\\\\", "/" );
+		//String playMe = root.relativize( Paths.get( "D:\\test\\ï¿½.flac" ) ).toString().replaceAll( "\\\\", "/" );
 	
-		String encoded = encode( targetFile );
+		String encoded = targetFile;
 		System.out.println ( targetFile + " -> " + encoded );
 		mediaPlayer.playMedia( encoded );
 		

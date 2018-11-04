@@ -66,7 +66,11 @@ public class Album implements Serializable, AlbumInfoSource {
 		if ( tracks.size() == 0 || tracks.get( 0 ) == null ) {
 			return ""; //TODO: Maybe cache the info
 		} else {
-			return tracks.get( 0 ).getYear();
+			if ( tracks.get( 0 ).getYear().length() > 4 ) {
+				return tracks.get( 0 ).getYear().substring( 0, 4 );
+			} else {
+				return tracks.get( 0 ).getYear();
+			}
 		}
 	}
 	

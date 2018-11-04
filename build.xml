@@ -222,7 +222,7 @@
 		
 	</target>
 	
-	<target name="dist-all" depends="dist-nix-32bit, dist-nix-64bit, dist-win" description="Make all distribution files.">
+	<target name="dist-all" depends="dist-nix-64bit, dist-win" description="Make all distribution files.">
 	</target>
 
 
