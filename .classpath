@@ -19,5 +19,6 @@
 	<classpathentry kind="lib" path="stage/lib/platform-3.5.2.jar"/>
 	<classpathentry kind="lib" path="stage/lib/slf4j-api-1.7.10.jar"/>
 	<classpathentry kind="lib" path="stage/lib/vlcj-3.10.1.jar"/>
+	<classpathentry kind="lib" path="stage/lib/slf4j-simple-1.6.1.jar"/>
 	<classpathentry kind="output" path="stage/bin"/>
 </classpath>

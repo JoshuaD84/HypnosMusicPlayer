@@ -1,5 +1,8 @@
 package net.joshuad.hypnos.audio;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -143,10 +146,30 @@ public class VLCAudioPlayer {
 	}
 	
 	public void requestPlayTrack( Track track, boolean startPaused ) {
-		mediaPlayer.playMedia( track.getPath().toString() );
+		
+		String targetFile = track.getPath().toString();
+		
+		//Address this bug: https://github.com/caprica/vlcj/issues/645
+		switch ( Hypnos.getOS() ) {
+			case NIX:
+			case OSX:
+			case UNKNOWN:
+			default:
+				break;
+			case WIN_10:
+			case WIN_7:
+			case WIN_8:
+			case WIN_UNKNOWN:
+			case WIN_VISTA:
+			case WIN_XP:
+				//Assumes filename is an absolute file location. 
+				targetFile = new File( targetFile ).toURI().toASCIIString().replaceFirst( "file:/", "file:///" );
+				break;
+		}
+		
+		mediaPlayer.playMedia( targetFile );
 		
 		if ( targetVolume != NO_TARGET ) {
-
 			final int target = targetVolume;
 			scheduler.schedule( new Runnable() {
 				public void run() {
