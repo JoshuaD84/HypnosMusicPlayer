@@ -702,7 +702,7 @@ public class SettingsWindow extends Stage {
 		logPane.setAlignment( Pos.CENTER );
 		logPane.setPadding( new Insets( 10 ) );
 		
-		Label headerLabel = new Label( "Error Log" );
+		Label headerLabel = new Label( "Log" );
 		headerLabel.setPadding( new Insets( 0, 0, 10, 0 ) );
 		headerLabel.setWrapText( true );
 		headerLabel.setTextAlignment( TextAlignment.CENTER );

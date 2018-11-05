@@ -1,5 +1,3 @@
-Change "Error Log" to "Log"
-
 Beta 4 testing release
 
 	Windows 7 
