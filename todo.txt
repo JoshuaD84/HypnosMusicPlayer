@@ -1,31 +1,52 @@
+Change "Error Log" to "Log"
+
+Beta 4 testing release
+
+	Windows 7 
+		Green Light
+		
+	Ubuntu 18.04
+		
+	Ubuntu 16.04
+
+
 Features that need System-by-System attention
 	Global Hotkeys
+		https://stackoverflow.com/questions/79658/react-on-global-hotkey-in-a-java-program-on-windows-linux-mac
+		Some Global Hotkeys aren't consumed - Win + C, Win + X, etc.  
 		Linux
-			Can't consume the hotkey
+			http://sourceforge.net/projects/jxgrabkey/
+			JNativeHook - No consumption of hotkey
 			
 		Windows
-			Winkey + <Something> doesn't work right. If you release the keys in the wrong order, the windows menu opens
+			JNativeHook: Winkey + <Something> doesn't work right. If you release the keys in the wrong order, the windows menu opens
 				https://github.com/kwhat/jnativehook/issues/235
+				
+			jkeymaster - windows + x keys not supported
+			JHotKeys - I can't find a jar, and having trouble building one. 
 				
 	System Tray
 		Linux
-		
+			Probably not doable
+			
 		Windows
-	
+			Probably doable
 	
 	Mounted Audio CDs
 		Linux
 		
 		Windows
+			Does not work
 		
 
 	Executable Wrapping
 		Linux - I'm happy with appimages
-		
+			Need to reduce size of appimage by testing on various systems and getting rid of unnecessary libraries
+			
 		Windows
 			EXE Wrapper doesn't behave well with pinning.  Try changing icon in javaw.exe
-			
-			
+			https://www.howtogeek.com/75983/stupid-geek-tricks-how-to-modify-the-icon-of-an-.exe-file/
+				
 	System Integration
 		Linux - Seems good
 		
@@ -38,6 +59,8 @@ Features that need System-by-System attention
 			
 
 Future		
+	Can I expand encoding information display using vlc? 
+	
 	All				
 		Right click menu settings for playlists -- shuffle, repeat, etc. 
 			
@@ -87,27 +110,11 @@ Future
 	I emptied the current list and library and playing track, and the art stayed. probably good to get rid of that
 	
 	Add a place to drag and drop folders (or navigate to them) to demand that they be rescanned immediately.
+		Maybe add a right click > rescan button on library window
 			
 	Drag and drop from misc places to system
 		playlist table -> m3u
 		track table, history, queue, info windows, current table -> copy single tracks
-		album table -> folder
-
-	Redo global hotkeys, do it on a system-by-system type basis.
-		https://stackoverflow.com/questions/79658/react-on-global-hotkey-in-a-java-program-on-windows-linux-mac
-		Some Global Hotkeys aren't consumed - Win + C, Win + X, etc.  
-			
-		Windows:
-			jkeymaster - windows + x keys not supported
-			
-			JHotKeys - I can't find a jar, and having trouble building one. 
-		
-			JNativeHook: Hotkey consumption for win keys is bad -- if you press win + v it works, but if you release the win button first, stuff breaks badly 
-				
-		Linux
-			http://sourceforge.net/projects/jxgrabkey/
-			
-			JNativeHook - No consumption of hotkey
 	
 	Tag auto fix button
 		
