@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -995,13 +996,13 @@ public class CurrentListPane extends BorderPane {
 
 				ObservableList <Integer> selectedIndexes = currentListTable.getSelectionModel().getSelectedIndices();
 				
-				List <Integer> removeMe = new ArrayList<Integer> ( selectedIndexes );
+				List <Integer> removeMe = new ArrayList<Integer> ( selectedIndexes.size() );
 				for ( int k = 0; k < currentListTable.getItems().size(); k++ ) {
 					if ( !selectedIndexes.contains( k ) ) {
 						removeMe.add ( k );
 					}
 				}
-				
+
 				ui.removeFromCurrentList ( removeMe );
 				currentListTable.getSelectionModel().clearSelection();
 			}

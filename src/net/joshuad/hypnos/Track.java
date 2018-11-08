@@ -45,7 +45,6 @@ public class Track implements Serializable, AlbumInfoSource {
 	private static final long serialVersionUID = 1L;
 	public static final int NO_TRACK_NUMBER = -885533;
 	
-	
 	private transient Vector <TagError> tagErrors = new Vector <TagError> ();
 	
 	private transient LovedState lovedState = LovedState.NOT_SET;
@@ -63,7 +62,6 @@ public class Track implements Serializable, AlbumInfoSource {
 		AC3 ( "ac3" ),
 		AMR ( "amr" ),
 		AU ( "au" ),
-		MID ( "mid" ),
 		MKA ( "mka" ),
 		RA ( "ra" ),
 		VOC ( "voc" ),
