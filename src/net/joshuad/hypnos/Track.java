@@ -65,8 +65,7 @@ public class Track implements Serializable, AlbumInfoSource {
 		MKA ( "mka" ),
 		RA ( "ra" ),
 		VOC ( "voc" ),
-		WMA ( "wma" ),
-		UNKNOWN ( "" );
+		WMA ( "wma" );
 		
 		final String extension;
 		Format ( String extension ) {
