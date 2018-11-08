@@ -5,8 +5,6 @@ Beta 4 testing release
 		Green Light
 
 	Ubuntu 18.04
-		INFO: Volume requested to be turned down below 0. Setting to 0 instead.
-			This happens after closing and re-opening hypnos, I think with the player stopped
 
 	Ubuntu 16.04
 		Build 53 - cannot play WMA or RA - libavcodec.so.57 needed

@@ -1,8 +1,6 @@
 package net.joshuad.hypnos.audio;
 
 import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -44,10 +42,8 @@ public class VLCAudioPlayer {
 			controller.playerStopped( currentTrack, StopReason.TRACK_FINISHED );
 		}
 	};
-
-	private final int NO_TARGET = -1;
 	
-	private int targetVolume = NO_TARGET; 
+	private int currentVolume = 100; 
 	
 	public VLCAudioPlayer( AudioSystem controller ) {
 		this.controller = controller;
@@ -169,15 +165,12 @@ public class VLCAudioPlayer {
 		
 		mediaPlayer.playMedia( targetFile );
 		
-		if ( targetVolume != NO_TARGET ) {
-			final int target = targetVolume;
-			scheduler.schedule( new Runnable() {
-				public void run() {
-					mediaPlayer.setVolume( target );
-					targetVolume = NO_TARGET;
-				}
-			}, 50, TimeUnit.MILLISECONDS );
-		}
+		final int target = currentVolume;
+		scheduler.schedule( new Runnable() {
+			public void run() {
+				mediaPlayer.setVolume( target );
+			}
+		}, 50, TimeUnit.MILLISECONDS );
 		
 		currentTrack = track;
 		
@@ -187,7 +180,7 @@ public class VLCAudioPlayer {
 	}
 	
 	//VLC accepts 0 ... 200 as range for volume
-	public void requestVolumePercent ( double volumePercent ) { //: allow up to 200% volume, maybe. VLC supports it. 
+	public void requestVolumePercent ( double volumePercent ) { //TODO: allow up to 200% volume, maybe. VLC supports it. 
 		if ( volumePercent < 0 ) {
 			LOGGER.info( "Volume requested to be turned down below 0. Setting to 0 instead." );
 			volumePercent = 0;
@@ -200,17 +193,17 @@ public class VLCAudioPlayer {
 		
 		int vlcValue = (int)(volumePercent * 100f); 
 		
-		if ( this.isStopped() ) {
-			targetVolume = vlcValue;
-			controller.volumeChanged ( targetVolume/100f );
-		} else {
-			mediaPlayer.setVolume( vlcValue );
-			controller.volumeChanged ( vlcValue/100f );
+		if ( vlcValue != currentVolume ) {
+			currentVolume = vlcValue;
+			if ( !isStopped() ) {
+				mediaPlayer.setVolume( vlcValue );
+			}
+			controller.volumeChanged ( currentVolume/100f ); 
 		}
 	}
 		
 	public double getVolumePercent () {
-		int vlcVolume = mediaPlayer.getVolume();
+		int vlcVolume = currentVolume;
 		double hypnosVolume = ((double)vlcVolume)/100;
 		return hypnosVolume;
 	}	
