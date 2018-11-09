@@ -1,21 +1,32 @@
 Supported, tested
    MP3 - No Known Issues
+
    FLAC - No Known Issues
+
    OGG - No Known Issues
+
    WAV - No Known Issues
+
    M4A - No Known Issues
+
    M4B - No Known Issues
-   AAC - No Known Issues
+
+   AAC - position bar / track length does not work properly
+
    AIFF - No Known Issues
+
    MKA - No Known Issues
+
    WMA - No Known Issues
+
    MP4 - No Known Issues
+
    ALAC - No Known Issues
 
-Supported, but not tested
+Supported, but not fully tested
    RA
    VOC
-   AU
+   AU - position bar / track length does not work properly
    AMR
    M4R
-   AC3
+   AC3 - position bar / track length does not work properly
