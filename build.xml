@@ -110,38 +110,6 @@
 		</sequential>
 	</target>
 
-	<target name="dist-nix-32bit" depends="jar" description="Make an AppImage for 32 bit Linux">
-		<sequential>
-			<delete dir="${temp}" />
-			<mkdir dir="${temp}/" />
-			
-			<copy todir="${temp}/Hypnos.AppDir" >
-				<fileset dir="packaging/Hypnos.AppDir" />
-			</copy>	
-			
-			<copy todir="${temp}/Hypnos.AppDir/usr/bin" >
-				<fileset dir="stage" >
-					<exclude name="**/config/**" />
-					<exclude name="**/bin/**" />
-					<exclude name="**/lib/win/" />
-					<exclude name="**/lib/osx/" />
-				</fileset>
-			</copy>
-			
-			<copy todir="${temp}/Hypnos.AppDir/usr/bin/jre" >
-				<fileset dir="${packaging}/jres/linux-32bit" />
-			</copy>
-			
-			<exec executable="${appImageTool}">
-				<arg value="${temp}/Hypnos.AppDir" />
-				<arg value="--runtime-file" />
-				<arg value="${packaging}/runtime-i686" />
-				<arg value="${dist}/Hypnos-nix-32bit-${version-simple}_${TODAY}_b${build.number}.AppImage" />
-			</exec>
-			<delete dir="${temp}" />
-		</sequential>
-	</target>
-
 	<property name="launch4j.dir" location="/home/joshua/.local/opt/launch4j" />
 	<taskdef 
 		name="launch4j" 
@@ -225,6 +193,5 @@
 	
 	<target name="dist-all" depends="dist-nix-64bit, dist-win" description="Make all distribution files.">
 	</target>
-
-
 </project>
+
