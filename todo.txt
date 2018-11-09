@@ -1,17 +1,15 @@
-
 Beta 4 testing release
-
-	Windows 7
-		Green Light
-
-	Ubuntu 18.04
-
-	Ubuntu 16.04
-		Build 53 - cannot play WMA or RA - libavcodec.so.57 needed
-
-	Fedora 27.1.6
-		Build 53 - cannot play WMA or RA
-
+	Build 55
+		Windows 10
+	
+		Windows 7
+	
+		Ubuntu 18.04
+	
+		Ubuntu 16.04
+			
+		Fedora 27.1.6
+	
 
 Features that need System-by-System attention
 	Global Hotkeys

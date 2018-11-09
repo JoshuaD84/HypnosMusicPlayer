@@ -768,6 +768,7 @@ public class FXUI implements PlayerListener {
 				if ( test.getName().equals( enteredName ) ) {
 					test.setTracks( tracks );
 					updatedPlaylist = test;
+					libraryPane.playlistTable.refresh(); 
 					break;
 				}
 			}
