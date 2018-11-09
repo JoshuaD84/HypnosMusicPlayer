@@ -575,41 +575,6 @@ public class Track implements Serializable, AlbumInfoSource {
 			return encodingType;
 		}
 	}
-	
-	public Format getFormat () {
-		String fileName = getPath().getFileName().toString();
-		
-		String testExtension = fileName.substring ( fileName.lastIndexOf( "." ) + 1 ).toLowerCase();
-		
-		if ( testExtension.equals( Format.FLAC.getExtension() ) ) {
-			return Format.FLAC;
-		
-		} else if ( testExtension.equals( Format.MP3.getExtension() ) ) {
-			return Format.MP3;
-			
-		} else if ( testExtension.equals( Format.OGG.getExtension() ) ) {
-			return Format.OGG;
-			
-		} else if ( testExtension.equals( Format.M4A.getExtension() ) ) {
-			return Format.M4A;
-			
-		} else if ( testExtension.equals( Format.WAV.getExtension() ) ) {
-			return Format.WAV;
-			
-		} else if ( testExtension.equals( Format.M4B.getExtension() ) ) {
-			return Format.M4B;
-			
-		} else if ( testExtension.equals( Format.M4R.getExtension() ) ) {
-			return Format.M4R;
-			
-		} else if ( testExtension.equals( Format.AAC.getExtension() ) ) {
-			return Format.AAC;
-		
-		} else {
-			return Format.UNKNOWN;
-		}
-	}
-	
 	public boolean hasAlbumDirectory() {
 		return albumDirectory != null;
 	}
