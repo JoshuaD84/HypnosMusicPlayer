@@ -155,42 +155,6 @@
 		
 	</target>
 	
-	<target name="dist-osx" depends="jar" description="Make a .tgz for OSX." >			
-		<delete dir="${temp}" />
-		<mkdir dir="${temp}/" />
-		
-		<copy todir="${temp}/Hypnos.app" >
-			<fileset dir="packaging/Hypnos.app" />
-		</copy>	
-		
-		<copy todir="${temp}/Hypnos.app/Contents/Hypnos" >
-			<fileset dir="stage" >
-				<exclude name="**/config/**" />
-			</fileset>
-		</copy>
-		
-		<copy todir="${temp}/Hypnos.app/Contents/Hypnos/jre" >
-			<fileset dir="packaging/jres/osx" />
-		</copy>
-		
-		<tar destfile="${dist}/hypnos-osx-${version-simple}_${TODAY}_b${build.number}.tgz" longfile="gnu" compression="gzip">
-
-			<tarfileset dir="${temp}" filemode="755">
-				<include name="**/Hypnos" />
-				<include name="**/bin/java" />
-			</tarfileset>
-			
-			<tarfileset dir="${temp}">
-				<include name="**/*" />
-				<exclude name="**/Hypnos" />
-				<exclude name="**/bin/java" />
-			</tarfileset>
-		</tar>
-
-		<delete dir="${temp}" />
-		
-	</target>
-	
 	<target name="dist-all" depends="dist-nix-64bit, dist-win" description="Make all distribution files.">
 	</target>
 </project>
