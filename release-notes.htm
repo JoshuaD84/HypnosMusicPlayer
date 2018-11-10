@@ -2,10 +2,23 @@
 <head>
 <title>Hypnos Beta 4 Release Notes</title>
 </head>
-<body>
+<body style="max-width: 1000px; margin: 20 auto">
 
 <h1>Hypnos - Beta 4 Release Notes</h1>
-<p>Released: </p>
+<p>Released: 2018-11-09</p>
+<p>Hypnos beta 4 is released. I believe this will be the last beta, the next release should be version 1.</p>
+
+<p>I'm pretty happy with this release. The big change here is in the backend -- we are now using VLC's libraries to
+decode our audio. Java doesn't have great audio decoding support and the previous decoders were hodged together from
+various places and had some known issues. Outsourcing this set of problems to VLC lets me focus on the user experience
+and UI design, which is where I want to be focused. The only downside to this approach is that I have to bundle VLC's
+libraries, so the download got even larger. I hope to be able to shave it down with a future release. For now, I
+apologize to any users that are on a slow internet connection.</p>
+
+<p><strong>Note: Hypnos Beta 4 will not load your old library data, and will instead do a single rescan of your entire
+library.</strong> Playlists and settings will not be lost. It just has to rescan your library to pickup some additional
+metadata we are using.</p> 
+
 <h2>New Features</h2>
 <ul>
    <li>Audio decoding via VLC, which means a lot more file support and less buggy decoding</li>
@@ -22,7 +35,24 @@
    <li>Linux - Volume slider now works on all file types</li>
    <li>Add dark theme styling to export popup</li>
    <li>Don't freeze UI when exporting playlist as folder</li>
+   <li>Crop was misbehaving, repaired.</li>
+   <li>Update playlist pane properly when editing playlists that already exist</li>
 </ul>
+<h2>Known Issues</h2>
+<ul>
+   <li>Ubuntu 16.04, Fedora 27.1.6 - Opening system file location dialog sometimes crashes the virtual machine</li>
+   <li>Release is very large due to bundled libraries (VLC & Java). I hope to have it trimmed down significantly for
+   future releases.</li>
+   <li>32-bit linux version not released. I don't think anyone is using it, and it's alot more work to curate the
+   necessary libraries, test on 32-bit machines, make the builds, etc.  If there's an actual demand I could look at
+   bringing this back down the road, but I just don't think there are very many 32-bit desktop linux users still out
+   there.</li>   
+</ul>
+	
+<hr>
+<br>
+<br>
+<br>
 
 <h1>Hypnos - Beta 3 Release Notes</h1>
 <p>Released: 2018/01/29</p>
@@ -87,11 +117,6 @@
 	<li>Fix a big pile of small bugs</li>
 	<li>Windows - Pinning to taskbar doesn't seem to work great at the moment.</li>
 </ul>
-	
-<br />
-<br />
-<br />
-<hr />
 	
 <h1>Hypnos - Beta 2 Release Notes</h1>
 <p>Released: 2017-12-28</p>

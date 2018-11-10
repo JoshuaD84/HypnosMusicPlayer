@@ -1,15 +1,14 @@
 Beta 4 testing release
-	Build 55
-		Windows 10
-	
-		Windows 7
-	
-		Ubuntu 18.04
-	
-		Ubuntu 16.04
+	Build 56
+		Ubuntu 18.04 - Green light
 			
+		Windows 7 - Green light
+		
+		Windows 10 - Green light
+		
+		Ubuntu 16.04
 		Fedora 27.1.6
-	
+			Opening system file location dialog sometimes crashes virtual machine
 
 Features that need System-by-System attention
 	Global Hotkeys
