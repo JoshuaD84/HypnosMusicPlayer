@@ -42,7 +42,6 @@ public class SwingTrayIconTest2 {
         try {
             SystemTray.getSystemTray().add(trayIcon);
         } catch (AWTException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
         }
     }
@@ -55,16 +54,12 @@ public class SwingTrayIconTest2 {
                 try {
                     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                 } catch (ClassNotFoundException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 } catch (InstantiationException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 } catch (IllegalAccessException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 } catch (UnsupportedLookAndFeelException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
                 new SwingTrayIconTest2().initUI();

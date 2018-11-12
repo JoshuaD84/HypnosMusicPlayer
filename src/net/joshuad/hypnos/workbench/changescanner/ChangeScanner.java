@@ -75,7 +75,6 @@ public class ChangeScanner extends SimpleFileVisitor <Path> {
 				scanner
 			);
 		} catch ( IOException e ) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -95,7 +94,6 @@ public class ChangeScanner extends SimpleFileVisitor <Path> {
 				scanner
 			);
 		} catch ( IOException e ) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

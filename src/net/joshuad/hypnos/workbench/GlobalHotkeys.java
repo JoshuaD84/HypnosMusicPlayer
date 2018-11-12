@@ -100,10 +100,7 @@ public class GlobalHotkeys implements NativeKeyListener {
 	}
 
 	@Override
-	public void nativeKeyTyped(NativeKeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void nativeKeyTyped(NativeKeyEvent arg0) {}
 	
 }
 

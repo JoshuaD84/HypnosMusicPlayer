@@ -1739,8 +1739,6 @@ public class LibraryTabPane extends StretchedTabPane {
 					}
 					
 					if ( !playlistsToAdd.isEmpty() ) {
-						//TODO: use dropIndex
-						int dropIndex = row.isEmpty() ? dropIndex = library.getPlaylists().size() : row.getIndex();
 						library.addPlaylists( playlistsToAdd );
 					}
 

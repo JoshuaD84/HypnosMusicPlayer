@@ -185,7 +185,9 @@ public class GlobalHotkeys implements NativeKeyListener {
 	
 	public void nativeKeyReleased( NativeKeyEvent e ) {}
 	
-	public void nativeKeyTyped(NativeKeyEvent e) {}
+	public void nativeKeyTyped(NativeKeyEvent e) {
+		//TODO: Can I fix that windows win key bug with this? 
+	}
 	
 }
 

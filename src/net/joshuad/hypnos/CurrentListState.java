@@ -50,7 +50,6 @@ public class CurrentListState implements Serializable {
 		return Collections.unmodifiableList( tracks );
 	}
 	
-	//TODO: Change this to allow colors somehow
 	public String getDisplayString() {
 
 		String retMe = "";
