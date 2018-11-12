@@ -103,7 +103,10 @@ public class QueueWindow extends Stage {
 			}
 		});
 		
-		TableColumn<Track, String> numberColumn = new TableColumn<Track, String> ( "#" );
+		//TODO: I Don't like this <Track, Track> thing, it's inaccurate. 
+		//However, if we make it <Track, Integer> or <Track, String>, I get  cast error when add something
+		//to th queue and display the queue window. Gotta sort this out. 
+		TableColumn<Track, Track> numberColumn = new TableColumn<Track, Track> ( "#" );
 		TableColumn<Track, String> artistColumn = new TableColumn<Track, String> ( "Artist" );
 		TableColumn<Track, String> titleColumn = new TableColumn<Track, String> ( "Title" );
 		
@@ -111,20 +114,20 @@ public class QueueWindow extends Stage {
 		artistColumn.setMaxWidth( 45000 );
 		titleColumn.setMaxWidth ( 45000 );
 		
-		numberColumn.setCellValueFactory( new Callback <CellDataFeatures <Track, String>, ObservableValue <String>>() {
+		numberColumn.setCellValueFactory( new Callback <CellDataFeatures <Track, Track>, ObservableValue <Track>>() {
 			@SuppressWarnings("rawtypes") //REFACTOR: Figure out how to get rid of this. 
 			@Override
-			public ObservableValue <String> call ( CellDataFeatures <Track, String> p ) {
+			public ObservableValue <Track> call ( CellDataFeatures <Track, Track> p ) {
 				return new ReadOnlyObjectWrapper ( p.getValue() );
 			}
 		});
 
-		numberColumn.setCellFactory( new Callback <TableColumn <Track, String>, TableCell <Track, String>>() {
+		numberColumn.setCellFactory( new Callback <TableColumn <Track, Track>, TableCell <Track, Track>>() {
 			@Override
-			public TableCell <Track, String> call ( TableColumn <Track, String> param ) {
-				return new TableCell <Track, String>() {
+			public TableCell <Track, Track> call ( TableColumn <Track, Track> param ) {
+				return new TableCell <Track, Track>() {
 					@Override
-					protected void updateItem ( String item, boolean empty ) {
+					protected void updateItem ( Track item, boolean empty ) {
 						super.updateItem( item, empty );
 
 						if ( this.getTableRow() != null && item != null ) {

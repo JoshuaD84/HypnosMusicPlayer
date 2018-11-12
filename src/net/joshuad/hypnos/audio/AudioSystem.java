@@ -94,10 +94,6 @@ public class AudioSystem {
 		this.ui = ui;
 	}
 	
-	public void start() { //TODO: DD
-	//	player.start();
-	}
-	
 	public void unpause () {
 		player.requestUnpause();
 	}

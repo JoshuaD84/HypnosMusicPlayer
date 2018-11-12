@@ -748,8 +748,6 @@ public class Hypnos extends Application {
 							
 							ui.refreshHotkeyList();
 							
-							audioSystem.start();
-							
 							applyCLICommands( commands );
 							singleInstanceController.startCLICommandListener ( this );
 			
@@ -807,8 +805,6 @@ public class Hypnos extends Application {
 						persister.loadHistory();
 						persister.loadPlaylists();
 						persister.loadHotkeys();
-						
-						audioSystem.start();
 						
 						applyCLICommands( commands );
 						singleInstanceController.startCLICommandListener ( this );
