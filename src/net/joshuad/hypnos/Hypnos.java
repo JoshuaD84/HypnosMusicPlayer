@@ -497,21 +497,6 @@ public class Hypnos extends Application {
 		}
 	}
 	
-	private void setupJavaLibraryPath() {
-		// This makes it so the user doensn't have to specify -Djava.libary.path="./lib" at the 
-		// command line, making the .jar's double-clickable
-		System.setProperty( "java.library.path", getRootDirectory().resolve ("lib").toString() );
-		
-		try {
-			Field fieldSysPath = ClassLoader.class.getDeclaredField( "sys_paths" );
-			fieldSysPath.setAccessible( true );
-			fieldSysPath.set( null, null );
-			
-		} catch (NoSuchFieldException|SecurityException|IllegalArgumentException|IllegalAccessException e1) {
-			LOGGER.warning( "Unable to set java.library.path. A crash is likely imminent, but I'll try to continue running.");
-		}
-	}
-	
 	private void startGlobalHotkeyListener() {
 		hotkeys = GlobalHotkeys.start();
 	}
@@ -709,7 +694,6 @@ public class Hypnos extends Application {
 			determineOS();
 			setupRootDirectory(); 
 			setupConfigDirectory();
-			setupJavaLibraryPath();
 			determineVersionInfo();
 
 			String[] args = getParameters().getRaw().toArray ( new String[0] );
