@@ -29,7 +29,6 @@ public class TrackInfoWindow extends Stage {
 	
 	private TableView <TrackFieldPair> table;
 	
-	@SuppressWarnings("unchecked")
 	public TrackInfoWindow ( FXUI ui ) {
 		super();
 		

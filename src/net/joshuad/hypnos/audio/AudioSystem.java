@@ -730,7 +730,7 @@ public class AudioSystem {
 					queue.getData().set( index - 1, track );
 				} else {
 					LOGGER.fine( "Current list had a queue index beyond the length of the queue. Removing." );
-					track.getQueueIndices().remove( new Integer ( index ) );
+					track.getQueueIndices().remove( Integer.valueOf ( index ) );
 				}
 			}
 		}

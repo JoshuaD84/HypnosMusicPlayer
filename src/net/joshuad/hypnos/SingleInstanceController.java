@@ -42,7 +42,6 @@ public class SingleInstanceController {
 			throw new IllegalStateException( "Cannot start a command line listener if we are not the first instance." );
 		}
 
-		@SuppressWarnings("unchecked")
 		Thread t = new Thread( () -> {
 			while ( true ) {
 				try {

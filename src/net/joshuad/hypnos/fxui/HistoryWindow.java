@@ -87,10 +87,11 @@ public class HistoryWindow extends Stage {
 		historyTable.setItems( audioSystem.getHistory().getItems() );
 		historyTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 
-		TableColumn numberColumn = new TableColumn( "#" );
-		TableColumn artistColumn = new TableColumn( "Artist" );
-		TableColumn albumColumn = new TableColumn( "Album" );
-		TableColumn titleColumn = new TableColumn( "Title" );
+		TableColumn<Track, Integer> numberColumn = new TableColumn<Track, Integer>( "#" );
+		TableColumn<Track, String> artistColumn = new TableColumn<Track, String>( "Artist" );
+		TableColumn<Track, String> albumColumn = new TableColumn<Track, String>( "Album" );
+		TableColumn<Track, String> titleColumn = new TableColumn<Track, String>( "Title" );
+		
 		
 		numberColumn.setMaxWidth( 10000 );
 		artistColumn.setMaxWidth( 30000 );
@@ -346,19 +347,19 @@ public class HistoryWindow extends Stage {
 		});
 		
 		
-		numberColumn.setCellValueFactory( new Callback <CellDataFeatures <Track, Track>, ObservableValue <Track>>() {
+		numberColumn.setCellValueFactory( new Callback <CellDataFeatures <Track, Integer>, ObservableValue <Integer>>() {
 			@Override
-			public ObservableValue <Track> call ( CellDataFeatures <Track, Track> p ) {
-				return new ReadOnlyObjectWrapper( p.getValue() );
+			public ObservableValue <Integer> call ( CellDataFeatures <Track, Integer> p ) {
+				return new ReadOnlyObjectWrapper <Integer>( p.getValue(), "number" );
 			}
 		});
 
-		numberColumn.setCellFactory( new Callback <TableColumn <Track, Track>, TableCell <Track, Track>>() {
+		numberColumn.setCellFactory( new Callback <TableColumn <Track, Integer>, TableCell <Track, Integer>>() {
 			@Override
-			public TableCell <Track, Track> call ( TableColumn <Track, Track> param ) {
-				return new TableCell <Track, Track>() {
+			public TableCell <Track, Integer> call ( TableColumn <Track, Integer> param ) {
+				return new TableCell <Track, Integer>() {
 					@Override
-					protected void updateItem ( Track item, boolean empty ) {
+					protected void updateItem ( Integer item, boolean empty ) {
 						super.updateItem( item, empty );
 
 						if ( this.getTableRow() != null && item != null ) {

@@ -59,7 +59,6 @@ public class QueueWindow extends Stage {
 	AudioSystem audioSystem;
 	Library library;
 	
-	@SuppressWarnings("unchecked")
 	public QueueWindow ( FXUI ui, Library library, AudioSystem audioSystem, TagWindow tagWindow ) {
 		super();
 		this.ui = ui;
@@ -104,9 +103,9 @@ public class QueueWindow extends Stage {
 			}
 		});
 		
-		TableColumn numberColumn = new TableColumn<Track, String> ( "#" );
-		TableColumn artistColumn = new TableColumn<Track, String> ( "Artist" );
-		TableColumn titleColumn = new TableColumn<Track, String> ( "Title" );
+		TableColumn<Track, String> numberColumn = new TableColumn<Track, String> ( "#" );
+		TableColumn<Track, String> artistColumn = new TableColumn<Track, String> ( "Artist" );
+		TableColumn<Track, String> titleColumn = new TableColumn<Track, String> ( "Title" );
 		
 		numberColumn.setMaxWidth( 10000 );
 		artistColumn.setMaxWidth( 45000 );
@@ -120,12 +119,12 @@ public class QueueWindow extends Stage {
 			}
 		});
 
-		numberColumn.setCellFactory( new Callback <TableColumn <Track, Track>, TableCell <Track, Track>>() {
+		numberColumn.setCellFactory( new Callback <TableColumn <Track, String>, TableCell <Track, String>>() {
 			@Override
-			public TableCell <Track, Track> call ( TableColumn <Track, Track> param ) {
-				return new TableCell <Track, Track>() {
+			public TableCell <Track, String> call ( TableColumn <Track, String> param ) {
+				return new TableCell <Track, String>() {
 					@Override
-					protected void updateItem ( Track item, boolean empty ) {
+					protected void updateItem ( String item, boolean empty ) {
 						super.updateItem( item, empty );
 
 						if ( this.getTableRow() != null && item != null ) {

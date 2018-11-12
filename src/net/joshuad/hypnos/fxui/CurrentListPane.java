@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -76,7 +75,11 @@ public class CurrentListPane extends BorderPane {
 	HBox currentListControls; 
 
 	public TableView <CurrentListTrack> currentListTable; //TODO: Make private
-	TableColumn playingColumn, artistColumn, yearColumn, albumColumn, titleColumn, numberColumn, lengthColumn;
+	
+	TableColumn<CurrentListTrack, String> artistColumn, albumColumn, titleColumn, lengthColumn;
+	TableColumn<CurrentListTrack, CurrentListTrackState> playingColumn;
+	TableColumn<CurrentListTrack, Integer> yearColumn, numberColumn;
+	
 	ContextMenu currentListColumnSelectorMenu;
 	
 	Button toggleRepeatButton, toggleShuffleButton;
@@ -176,7 +179,6 @@ public class CurrentListPane extends BorderPane {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void resetTableSettingsToDefault() {
 		playingColumn.setVisible( true );
 		artistColumn.setVisible( true );
@@ -209,7 +211,7 @@ public class CurrentListPane extends BorderPane {
 		lengthColumn.setPrefWidth( 70 );
 		
 		((HypnosResizePolicy)currentListTable.getColumnResizePolicy()).call(
-			new ResizeFeatures (  currentListTable, null, (double)0 ) 
+			new ResizeFeatures<CurrentListTrack> ( currentListTable, null, (double)0 ) 
 		);
 	}
 	
@@ -244,9 +246,9 @@ public class CurrentListPane extends BorderPane {
 			}
 		});
 		
-		audioSystem.getQueue().getData().addListener( new ListChangeListener () {
+		audioSystem.getQueue().getData().addListener( new ListChangeListener<Track> () {
 			@Override
-			public void onChanged ( Change arg0 ) {
+			public void onChanged ( Change <? extends Track> arg0 ) {
 				if ( audioSystem.getQueue().isEmpty() ) {
 					showQueueButton.getStyleClass().removeAll ( "queueActive" );
 				} else {
@@ -271,7 +273,7 @@ public class CurrentListPane extends BorderPane {
 			}
 		});
 
-		EventHandler savePlaylistHandler = new EventHandler <ActionEvent>() {
+		EventHandler<ActionEvent> savePlaylistHandler = new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
 				String playlistName = ((Playlist) ((MenuItem) event.getSource()).getUserData()).getName();
@@ -288,9 +290,9 @@ public class CurrentListPane extends BorderPane {
 		currentListLength.setMinWidth( Region.USE_PREF_SIZE );
 		currentListLength.setPadding( new Insets ( 0, 10, 0, 10 ) );
 		
-		audioSystem.getCurrentList().getItems().addListener( new ListChangeListener () {
+		audioSystem.getCurrentList().getItems().addListener( new ListChangeListener<CurrentListTrack> () {
 			@Override
-			public void onChanged ( Change changes ) {
+			public void onChanged ( Change<? extends CurrentListTrack> changes ) {
 				int lengthS = 0;
 				
 				for ( Track track : audioSystem.getCurrentList().getItems() ) {
@@ -307,9 +309,9 @@ public class CurrentListPane extends BorderPane {
 			}
 		});
 		
-		currentListTable.getSelectionModel().getSelectedIndices().addListener ( new ListChangeListener() {
+		currentListTable.getSelectionModel().getSelectedIndices().addListener ( new ListChangeListener<Integer>() {
 			@Override
-			public void onChanged ( Change c ) {
+			public void onChanged ( Change<? extends Integer> c ) {
 				List<Integer> selected = currentListTable.getSelectionModel().getSelectedIndices();
 				
 				if ( selected.size() == 0 || selected.size() == 1 ) {
@@ -585,17 +587,17 @@ public class CurrentListPane extends BorderPane {
 	}
 	
 	private void setupTable () {
-		playingColumn = new TableColumn( "" );
-		artistColumn = new TableColumn( "Artist" );
-		yearColumn = new TableColumn( "Year" );
-		albumColumn = new TableColumn( "Album" );
-		titleColumn = new TableColumn( "Title" );
-		numberColumn = new TableColumn( "#" );
-		lengthColumn = new TableColumn( "Length" );
+		playingColumn = new TableColumn<CurrentListTrack, CurrentListTrackState>( "" );
+		artistColumn  = new TableColumn<CurrentListTrack, String>( "Artist" );
+		yearColumn = new TableColumn<CurrentListTrack, Integer>( "Year" );
+		albumColumn = new TableColumn<CurrentListTrack, String>( "Album" );
+		titleColumn = new TableColumn<CurrentListTrack, String>( "Title" );
+		numberColumn = new TableColumn<CurrentListTrack, Integer>( "#" );
+		lengthColumn = new TableColumn<CurrentListTrack, String>( "Length" );
 		
-		albumColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
-		artistColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
-		titleColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
+		albumColumn.setComparator( new AlphanumComparator<String>( CaseHandling.CASE_INSENSITIVE ) );
+		artistColumn.setComparator( new AlphanumComparator<String>( CaseHandling.CASE_INSENSITIVE ) );
+		titleColumn.setComparator( new AlphanumComparator<String>( CaseHandling.CASE_INSENSITIVE ) );
 		
 		playingColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, CurrentListTrackState>( "displayState" ) );
 		artistColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "artist" ) );
@@ -605,7 +607,7 @@ public class CurrentListPane extends BorderPane {
 		numberColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, Integer>( "trackNumber" ) );
 		lengthColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "lengthDisplay" ) );
 		
-		albumColumn.setCellFactory( e -> new FormattedAlbumCell() );
+		albumColumn.setCellFactory( e -> new FormattedAlbumCell<>() );
 
 		playingColumn.setCellFactory ( column -> { 
 				return new CurrentListTrackStateCell( ui, ui.transport.playImageSource, ui.transport.pauseImageSource ); 
@@ -660,7 +662,7 @@ public class CurrentListPane extends BorderPane {
 		titleMenuItem.selectedProperty().bindBidirectional( titleColumn.visibleProperty() );
 		lengthMenuItem.selectedProperty().bindBidirectional( lengthColumn.visibleProperty() );
 		
-		currentListTable = new TableView();
+		currentListTable = new TableView<CurrentListTrack> ();
 		currentListTable.getColumns().addAll( playingColumn, numberColumn, artistColumn,
 			yearColumn, albumColumn, titleColumn, lengthColumn );
 		currentListTable.setEditable( false );

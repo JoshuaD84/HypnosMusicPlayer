@@ -1,14 +1,8 @@
-Beta 4 testing release
-	Build 56
-		Ubuntu 18.04 - Green light
-			
-		Windows 7 - Green light
-		
-		Windows 10 - Green light
-		
-		Ubuntu 16.04
-		Fedora 27.1.6
-			Opening system file location dialog sometimes crashes virtual machine
+mp4s can sometimes be videos, so if they are added to the library scan folder you get videos in track/album list
+
+Lorde - Royales skips on my Ubuntu 18.04
+
+
 
 Features that need System-by-System attention
 	Global Hotkeys

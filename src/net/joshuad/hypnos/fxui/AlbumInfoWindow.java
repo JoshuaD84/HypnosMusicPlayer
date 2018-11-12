@@ -132,7 +132,6 @@ public class AlbumInfoWindow extends Stage {
 		locationField.setText( album.getPath().toString() );
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void setupAlbumTable ( VBox primaryPane ) {
 		
 		TableColumn<Track, Integer> trackNumberColumn = new TableColumn<Track, Integer>( "#" );

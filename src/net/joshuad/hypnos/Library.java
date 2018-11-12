@@ -569,7 +569,6 @@ public class Library {
 		}
 	}
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private boolean processWatcherEvents () {
 		WatchKey key;
 		try {
@@ -584,7 +583,7 @@ public class Library {
 		}
 
 		for ( WatchEvent <?> event : key.pollEvents() ) {
-			WatchEvent.Kind eventKind = event.kind();
+			WatchEvent.Kind<?> eventKind = event.kind();
 
 			WatchEvent <Path> watchEvent = (WatchEvent<Path>)event;
 			Path child = directory.resolve( watchEvent.context() );

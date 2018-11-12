@@ -153,7 +153,6 @@ public class Persister {
 		saveSettings ( fromAudioSystem, fromUI );
 	}
 
-	@SuppressWarnings("unchecked")
 	public boolean loadSources () {
 		try ( ObjectInputStream sourcesIn = new ObjectInputStream( new FileInputStream( sourcesFile ) ); ) {
 			ArrayList <String> searchPaths = (ArrayList <String>) sourcesIn.readObject();
@@ -187,7 +186,6 @@ public class Persister {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public void loadQueue () {
 		try ( ObjectInputStream queueIn = new ObjectInputStream( new FileInputStream( queueFile ) ); ) {
 			audioSystem.getQueue().queueAllTracks( (ArrayList <Track>) queueIn.readObject() );
@@ -198,7 +196,6 @@ public class Persister {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public void loadHistory () {
 		try ( ObjectInputStream historyIn = new ObjectInputStream( new FileInputStream( historyFile ) ); ) {
 			audioSystem.getHistory().setData( (ArrayList <Track>) historyIn.readObject() );
@@ -209,7 +206,6 @@ public class Persister {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void loadHotkeys () {
 		try ( ObjectInputStream hotkeysIn = new ObjectInputStream( new FileInputStream( hotkeysFile ) ); ) {
 			hotkeys.setMap( (EnumMap <Hotkey, KeyState>) hotkeysIn.readObject() );
@@ -219,7 +215,6 @@ public class Persister {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public void loadAlbumsAndTracks () {
 		try ( ObjectInputStream dataIn = new ObjectInputStream( new GZIPInputStream( new FileInputStream( dataFile ) ) ) ) {
 			library.albums.addAll( (ArrayList <Album>) dataIn.readObject() );

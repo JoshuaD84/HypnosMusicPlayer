@@ -9,7 +9,6 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.file.Files;
@@ -570,7 +569,6 @@ public class Hypnos extends Application {
 	
 	private long setTracksLastTime = 0;
 	
-	@SuppressWarnings("unchecked")
 	public void applyCLICommands ( List <SocketCommand> commands ) {
 		
 		ArrayList<Path> newList = new ArrayList<Path>();

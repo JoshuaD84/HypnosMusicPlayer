@@ -96,9 +96,14 @@ public class LibraryTabPane extends StretchedTabPane {
 	
 	ContextMenu playlistColumnSelectorMenu, trackColumnSelectorMenu, albumColumnSelectorMenu;
 	ContextMenu tabMenu;
-	TableColumn playlistNameColumn, playlistLengthColumn, playlistTracksColumn;
-	TableColumn trackArtistColumn, trackLengthColumn, trackNumberColumn, trackAlbumColumn, trackTitleColumn;
-	TableColumn albumArtistColumn, albumYearColumn, albumAddedDateColumn, albumAlbumColumn;
+	
+	TableColumn<Playlist, String> playlistNameColumn, playlistLengthColumn;
+	TableColumn<Playlist, Integer> playlistTracksColumn;
+	
+	TableColumn<Track, String> trackArtistColumn, trackLengthColumn, trackAlbumColumn, trackTitleColumn;
+	TableColumn<Track, Integer> trackNumberColumn;
+	
+	TableColumn<Album, String> albumArtistColumn, albumYearColumn, albumAddedDateColumn, albumAlbumColumn;
 	
 	CheckMenuItem showAlbums; 
 	CheckMenuItem showTracks;
@@ -647,7 +652,6 @@ public class LibraryTabPane extends StretchedTabPane {
 		trackListCheckBox.setTooltip( new Tooltip( "Only show tracks not in albums" ) );
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void resetAlbumTableSettingsToDefault() {
 		albumArtistColumn.setVisible( true );
 		albumAddedDateColumn.setVisible( false );
@@ -672,24 +676,24 @@ public class LibraryTabPane extends StretchedTabPane {
 		albumAlbumColumn.setPrefWidth( 100 );
 		albumAddedDateColumn.setPrefWidth ( 90 );
 		
-		albumTable.getColumnResizePolicy().call( new ResizeFeatures ( albumTable, null, 0d ) );
+		albumTable.getColumnResizePolicy().call( new ResizeFeatures<Album> ( albumTable, null, 0d ) );
 	}
 	
 	public void setupAlbumTable () {
-		albumArtistColumn = new TableColumn( "Artist" );
-		albumYearColumn = new TableColumn( "Year" );
-		albumAlbumColumn = new TableColumn( "Album" );
-		albumAddedDateColumn = new TableColumn ( "Added" );
+		albumArtistColumn = new TableColumn<Album, String>( "Artist" );
+		albumYearColumn = new TableColumn<Album, String>( "Year" );
+		albumAlbumColumn = new TableColumn<Album, String>( "Album" );
+		albumAddedDateColumn = new TableColumn<Album, String> ( "Added" );
 
-		albumArtistColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
-		albumAlbumColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
+		albumArtistColumn.setComparator( new AlphanumComparator<String>( CaseHandling.CASE_INSENSITIVE ) );
+		albumAlbumColumn.setComparator( new AlphanumComparator<String>( CaseHandling.CASE_INSENSITIVE ) );
 
 		albumArtistColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "albumArtist" ) );
-		albumYearColumn.setCellValueFactory( new PropertyValueFactory <Album, Integer>( "year" ) );
+		albumYearColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "year" ) );
 		albumAlbumColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "FullAlbumTitle" ) );
 		albumAddedDateColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "dateAddedString" ) );
 		
-		albumAlbumColumn.setCellFactory( e -> new FormattedAlbumCell() );
+		albumAlbumColumn.setCellFactory( e -> new FormattedAlbumCell<> () );
 		
 		albumColumnSelectorMenu = new ContextMenu ();
 		CheckMenuItem artistMenuItem = new CheckMenuItem ( "Show Artist Column" );
@@ -713,7 +717,7 @@ public class LibraryTabPane extends StretchedTabPane {
 		dateAddedMenuItem.selectedProperty().bindBidirectional( albumAddedDateColumn.visibleProperty() );
 		defaultMenuItem.setOnAction( e -> this.resetAlbumTableSettingsToDefault() );
 
-		albumTable = new TableView();
+		albumTable = new TableView<Album>();
 		albumTable.getColumns().addAll( albumArtistColumn, albumYearColumn, albumAddedDateColumn, albumAlbumColumn );
 		albumTable.setEditable( false );
 		albumTable.setItems( library.getAlbumsSorted() );
@@ -822,7 +826,7 @@ public class LibraryTabPane extends StretchedTabPane {
 		
 		
 
-		EventHandler addToPlaylistHandler = new EventHandler <ActionEvent>() {
+		EventHandler<ActionEvent> addToPlaylistHandler = new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
 				
@@ -993,7 +997,6 @@ public class LibraryTabPane extends StretchedTabPane {
 		});
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void resetTrackTableSettingsToDefault() {
 		trackArtistColumn.setVisible( true );
 		trackLengthColumn.setVisible( true );
@@ -1025,25 +1028,25 @@ public class LibraryTabPane extends StretchedTabPane {
 		trackAlbumColumn.setPrefWidth( 100 );
 		trackTitleColumn.setPrefWidth( 100 );
 		trackLengthColumn.setPrefWidth( 60 );
-		trackTable.getColumnResizePolicy().call(new ResizeFeatures ( trackTable, null, 0d ) );
+		trackTable.getColumnResizePolicy().call(new ResizeFeatures<Track> ( trackTable, null, 0d ) );
 	}
 	
 	public void setupTrackTable () {
-		trackArtistColumn = new TableColumn( "Artist" );
-		trackLengthColumn = new TableColumn( "Length" );
-		trackNumberColumn = new TableColumn( "#" );
-		trackAlbumColumn = new TableColumn( "Album" );
-		trackTitleColumn = new TableColumn( "Title" );
+		trackArtistColumn = new TableColumn<Track, String>( "Artist" );
+		trackLengthColumn = new TableColumn<Track, String>( "Length" );
+		trackNumberColumn = new TableColumn<Track, Integer>( "#" );
+		trackAlbumColumn = new TableColumn<Track, String>( "Album" );
+		trackTitleColumn = new TableColumn<Track, String>( "Title" );
 		
-		trackArtistColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
-		trackTitleColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
-		trackLengthColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
+		trackArtistColumn.setComparator( new AlphanumComparator<String>( CaseHandling.CASE_INSENSITIVE ) );
+		trackTitleColumn.setComparator( new AlphanumComparator<String>( CaseHandling.CASE_INSENSITIVE ) );
+		trackLengthColumn.setComparator( new AlphanumComparator<String>( CaseHandling.CASE_INSENSITIVE ) );
 
 		trackArtistColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Artist" ) );
 		trackTitleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
-		trackLengthColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "LengthDisplay" ) );
+		trackLengthColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "LengthDisplay" ) );
 		trackNumberColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "TrackNumber" ) );
-		trackAlbumColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "albumTitle" ) );
+		trackAlbumColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "albumTitle" ) );
 		
 		trackArtistColumn.setSortType( TableColumn.SortType.ASCENDING );
 
@@ -1089,9 +1092,8 @@ public class LibraryTabPane extends StretchedTabPane {
 		lengthMenuItem.selectedProperty().bindBidirectional( trackLengthColumn.visibleProperty() );
 		defaultMenuItem.setOnAction( ( e ) -> this.resetTrackTableSettingsToDefault() );
 		
-		trackTable = new TableView();
-		trackTable.getColumns().addAll( 
-			trackArtistColumn, trackAlbumColumn, trackNumberColumn, trackTitleColumn, trackLengthColumn );
+		trackTable = new TableView<Track>();
+		trackTable.getColumns().addAll( trackArtistColumn, trackAlbumColumn, trackNumberColumn, trackTitleColumn, trackLengthColumn );
 		
 		trackTable.setEditable( false );
 		trackTable.setItems( library.getTracksSorted() );
@@ -1158,7 +1160,7 @@ public class LibraryTabPane extends StretchedTabPane {
 			}
 		});
 
-		EventHandler addToPlaylistHandler = new EventHandler <ActionEvent>() {
+		EventHandler<ActionEvent> addToPlaylistHandler = new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent event ) {
 				Playlist playlist = (Playlist) ((MenuItem) event.getSource()).getUserData();
@@ -1402,7 +1404,6 @@ public class LibraryTabPane extends StretchedTabPane {
 		} );
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void resetPlaylistTableSettingsToDefault() {
 		playlistNameColumn.setVisible( true );
 		playlistLengthColumn.setVisible( true );
@@ -1420,20 +1421,20 @@ public class LibraryTabPane extends StretchedTabPane {
 		playlistNameColumn.setPrefWidth( 100 );
 		playlistTracksColumn.setPrefWidth( 90 );
 		playlistLengthColumn.setPrefWidth( 90 );
-		playlistTable.getColumnResizePolicy().call(new ResizeFeatures ( playlistTable, null, 0d ) );
+		playlistTable.getColumnResizePolicy().call(new ResizeFeatures<Playlist> ( playlistTable, null, 0d ) );
 	}
 
 	public void setupPlaylistTable () {
-		playlistNameColumn = new TableColumn( "Playlist" );
-		playlistLengthColumn = new TableColumn( "Length" );
-		playlistTracksColumn = new TableColumn( "Tracks" );
+		playlistNameColumn = new TableColumn<Playlist, String>( "Playlist" );
+		playlistLengthColumn = new TableColumn<Playlist, String>( "Length" );
+		playlistTracksColumn = new TableColumn<Playlist, Integer>( "Tracks" );
 
-		playlistLengthColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
+		playlistLengthColumn.setComparator( new AlphanumComparator<String>( CaseHandling.CASE_INSENSITIVE ) );
 		
 		//TODO: Are these the right types? Integer/String look wrong. 
-		playlistNameColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "Name" ) );
-		playlistLengthColumn.setCellValueFactory( new PropertyValueFactory <Album, Integer>( "LengthDisplay" ) );
-		playlistTracksColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "SongCount" ) );
+		playlistNameColumn.setCellValueFactory( new PropertyValueFactory <Playlist, String>( "Name" ) );
+		playlistLengthColumn.setCellValueFactory( new PropertyValueFactory <Playlist, String>( "LengthDisplay" ) );
+		playlistTracksColumn.setCellValueFactory( new PropertyValueFactory <Playlist, Integer>( "SongCount" ) );
 
 		playlistColumnSelectorMenu = new ContextMenu ();
 		CheckMenuItem nameMenuItem = new CheckMenuItem ( "Show Name Column" );

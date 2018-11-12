@@ -93,7 +93,6 @@ public class PlaylistInfoWindow extends Stage {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void setupPlaylistTable ( VBox primaryPane ) {
 		
 		TableColumn<Track, String> artistColumn = new TableColumn<Track, String>( "Artist" );

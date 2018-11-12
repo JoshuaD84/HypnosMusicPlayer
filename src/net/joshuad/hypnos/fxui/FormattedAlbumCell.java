@@ -7,7 +7,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.text.TextFlow;
 import net.joshuad.hypnos.AlbumInfoSource;
 
-public class FormattedAlbumCell extends TableCell <AlbumInfoSource, String> {
+public class FormattedAlbumCell<T extends AlbumInfoSource> extends TableCell<T, String> {
 
 	private TextFlow flow;
 	private Label albumName, albumType, albumDisc;
@@ -35,12 +35,11 @@ public class FormattedAlbumCell extends TableCell <AlbumInfoSource, String> {
 		setGraphic ( flow );
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void updateItem ( String text, boolean empty ) {
 		super.updateItem ( text, empty );
 		
-		TableRow <AlbumInfoSource> row = this.getTableRow();
+		TableRow <T> row = this.getTableRow();
 		AlbumInfoSource item = null;
 		
 		if ( row != null ) item = row.getItem();

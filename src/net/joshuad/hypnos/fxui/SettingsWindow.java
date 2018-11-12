@@ -782,7 +782,6 @@ public class SettingsWindow extends Stage {
 		return logTab;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private Tab setupTagTab ( Pane root ) {
 		Tab tab = new Tab ( "Tags" );
 		tab.setClosable( false );

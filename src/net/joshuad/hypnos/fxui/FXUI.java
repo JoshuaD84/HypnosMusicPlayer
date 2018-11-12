@@ -85,7 +85,6 @@ import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
 import net.joshuad.hypnos.audio.AudioSystem.StopReason;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
 
-@SuppressWarnings({ "rawtypes", "unchecked" }) // REFACTOR: Maybe get rid of this when I understand things better
 public class FXUI implements PlayerListener {
 	private static final Logger LOGGER = Logger.getLogger( FXUI.class.getName() );
 
@@ -226,9 +225,9 @@ public class FXUI implements PlayerListener {
 		((Group) scene.getRoot()).getChildren().addAll( primaryContainer );
 		mainStage.setScene( scene );
 
-		ChangeListener windowSizeListener = new ChangeListener () {
+		ChangeListener<Number> windowSizeListener = new ChangeListener<Number> () {
 			@Override
-			public void changed ( ObservableValue observable, Object oldValue, Object newValue ) {
+			public void changed ( ObservableValue<? extends Number> observable, Number oldValue, Number newValue ) {
 				if ( !mainStage.isMaximized() ) {
 					windowedWidth = mainStage.getWidth();
 					windowedHeight = mainStage.getHeight();

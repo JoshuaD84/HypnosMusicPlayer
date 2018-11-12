@@ -96,7 +96,6 @@ public class TagWindow extends Stage {
 	
 	FXUI ui;
 	
-	@SuppressWarnings({ "unchecked" })
 	public TagWindow( FXUI ui ) {
 		super();
 		this.ui = ui;

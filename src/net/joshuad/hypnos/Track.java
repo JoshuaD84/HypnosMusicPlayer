@@ -432,7 +432,7 @@ public class Track implements Serializable, AlbumInfoSource {
 				} else if ( rawText.matches("^[0-9]+/.*") ) {//if matches 23/<whatever>
 					discNumber = Integer.parseInt( rawText.split("/")[0] );
 					
-					if ( discCount == null || discCount.equals( "" ) ) {
+					if ( discCount == null ) {
 						discCount = Integer.parseInt( rawText.split("/")[1] );
 					}
 
@@ -442,7 +442,7 @@ public class Track implements Serializable, AlbumInfoSource {
 					//if matches 23/<whatever>
 					discNumber = Integer.parseInt( rawNoWhiteSpace.split("/")[0] );
 					
-					if ( discCount == null || discCount.equals( "" ) ) {
+					if ( discCount == null ) {
 						discCount = Integer.parseInt( rawNoWhiteSpace.split("/")[1] );
 					}
 

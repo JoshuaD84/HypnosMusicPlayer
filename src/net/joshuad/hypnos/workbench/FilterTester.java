@@ -44,21 +44,21 @@ public class FilterTester extends Application {
 			tracks.add( new Track ( path ) );
 		}
 			
-		TableColumn trackArtistColumn = new TableColumn( "Artist" );
-		TableColumn trackLengthColumn = new TableColumn( "Length" );
-		TableColumn trackNumberColumn = new TableColumn( "#" );
-		TableColumn trackAlbumColumn = new TableColumn( "Album" );
-		TableColumn trackTitleColumn = new TableColumn( "Title" );
+		TableColumn<Track, String> trackArtistColumn = new TableColumn<Track, String>( "Artist" );
+		TableColumn<Track, Integer> trackLengthColumn = new TableColumn<Track, Integer>( "Length" );
+		TableColumn<Track, Integer> trackNumberColumn = new TableColumn<Track, Integer>( "#" );
+		TableColumn<Track, String>  trackAlbumColumn = new TableColumn<Track, String>( "Album" );
+		TableColumn<Track, String>  trackTitleColumn = new TableColumn<Track, String>( "Title" );
 		
 		trackArtistColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Artist" ) );
 		trackTitleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
 		trackLengthColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "LengthDisplay" ) );
 		trackNumberColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "TrackNumber" ) );
-		trackAlbumColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "albumTitle" ) );
+		trackAlbumColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "albumTitle" ) );
 		
 		trackArtistColumn.setSortType( TableColumn.SortType.ASCENDING );
 
-		TableView <Track> trackTable = new TableView();
+		TableView <Track> trackTable = new TableView<Track>();
 		trackTable.getColumns().addAll( 
 			trackArtistColumn, trackAlbumColumn, trackNumberColumn, trackTitleColumn, trackLengthColumn );
 		

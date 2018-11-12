@@ -51,7 +51,6 @@ public class HypnosResizePolicy implements Callback <TableView.ResizeFeatures, B
 		fixedWidthColumns.remove ( column );
 	}
 	
-	@SuppressWarnings({ "unchecked" })
 	@Override
 	public Boolean call ( TableView.ResizeFeatures feature ) {
 			
@@ -249,7 +248,6 @@ public class HypnosResizePolicy implements Callback <TableView.ResizeFeatures, B
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private double calculateSpaceAvailable ( TableView table ) {
 		List <TableColumn> columns = table.getVisibleLeafColumns();
 		double spaceToDistribute = table.getWidth() - getScrollbarWidth ( table ) - 4; 
