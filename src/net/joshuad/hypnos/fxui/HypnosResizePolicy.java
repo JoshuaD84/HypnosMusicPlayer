@@ -1,5 +1,7 @@
 package net.joshuad.hypnos.fxui;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,6 +12,7 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 
@@ -35,7 +38,7 @@ import javafx.util.Callback;
  */
 
 
-@SuppressWarnings({ "rawtypes", "deprecation" })
+@SuppressWarnings({ "rawtypes" })
 public class HypnosResizePolicy implements Callback <TableView.ResizeFeatures, Boolean> {
 	
 	Vector <TableColumn<?, ?>> fixedWidthColumns = new Vector <TableColumn<?, ?>> ();
@@ -189,7 +192,7 @@ public class HypnosResizePolicy implements Callback <TableView.ResizeFeatures, B
 			//with the above operations. 
 			//I found it is better to do this at the end when the actual space create/destroyed is known, rather than doing at the top and then
 			//trying to get that much space from the other columns. Sometimes the other columns resist, and this creates a much smoother user experience. 
-			columnToResize.impl_setWidth ( columnToResize.getWidth() + calculateSpaceAvailable ( table ) );
+			setColumnWidth( columnToResize, columnToResize.getWidth() + calculateSpaceAvailable ( table ) );
 			
 			//If it's a manual resize, set pref-widths to these user specified widths. 
 			//The user manually set them now, so they like this size. Try to respect them on next resize.
@@ -211,14 +214,14 @@ public class HypnosResizePolicy implements Callback <TableView.ResizeFeatures, B
 				double targetWidth = column.getPrefWidth();
 				if ( targetWidth >= column.getMaxWidth() ) targetWidth = column.getMaxWidth();
 				else if ( targetWidth <= column.getMinWidth() ) targetWidth = column.getMinWidth();
-				column.impl_setWidth ( targetWidth );
+				setColumnWidth( column, targetWidth );
 			}
 		} else {
 			for ( TableColumn column : columns ) {			
 				double targetWidth = column.getWidth() + spaceToDistribute * ( column.getPrefWidth() / spaceWanted );
 				if ( targetWidth >= column.getMaxWidth() ) targetWidth = column.getMaxWidth();
 				else if ( targetWidth <= column.getMinWidth() ) targetWidth = column.getMinWidth();
-				column.impl_setWidth ( targetWidth );
+				setColumnWidth( column, targetWidth );
 			}
 		}	
 	}
@@ -232,8 +235,17 @@ public class HypnosResizePolicy implements Callback <TableView.ResizeFeatures, B
 			double targetWidth = column.getWidth() + space * ( column.getWidth() / totalWidth );
 			if ( targetWidth >= column.getMaxWidth() ) targetWidth = column.getMaxWidth();
 			else if ( targetWidth <= column.getMinWidth() ) targetWidth = column.getMinWidth();
-
-			column.impl_setWidth ( targetWidth );
+			setColumnWidth( column, targetWidth );
+		}
+	}
+	
+	private void setColumnWidth ( TableColumn column, double targetWidth ) {
+		try {
+			Method method = TableColumnBase.class.getDeclaredMethod( "doSetWidth", double.class );
+			method.setAccessible( true );
+			method.invoke( column, targetWidth );
+		} catch ( NoSuchMethodException | InvocationTargetException | IllegalAccessException e ) {
+			e.printStackTrace();
 		}
 	}
 

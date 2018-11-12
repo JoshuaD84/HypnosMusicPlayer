@@ -204,11 +204,11 @@ public class TagWindow extends Stage {
 			}
 		});
 		
-		Callback <TableColumn <MultiFileTextTagPair, Void>, TableCell <MultiFileTextTagPair, Void>> deleteCellFactory =
-			new Callback <TableColumn <MultiFileTextTagPair, Void>, TableCell <MultiFileTextTagPair, Void>>() {
+		Callback <TableColumn <MultiFileImageTagPair, Void>, TableCell <MultiFileImageTagPair, Void>> deleteCellFactory =
+			new Callback <TableColumn <MultiFileImageTagPair, Void>, TableCell <MultiFileImageTagPair, Void>>() {
 				@Override
-				public TableCell call ( final TableColumn <MultiFileTextTagPair, Void> param ) {
-					final TableCell <MultiFileTextTagPair, Void> cell = new TableCell <MultiFileTextTagPair, Void>() {
+				public TableCell call ( final TableColumn <MultiFileImageTagPair, Void> param ) {
+					final TableCell <MultiFileImageTagPair, Void> cell = new TableCell <MultiFileImageTagPair, Void>() {
 
 						final Button changeButton = new Button( "Set" );
 						final Button exportButton = new Button( "Export" );

@@ -16,3 +16,4 @@ build.num
 *.m4a
 hypnos.log
 .settings
+/.metadata/
