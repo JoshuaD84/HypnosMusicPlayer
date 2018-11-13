@@ -241,7 +241,7 @@ public class TagWindow extends Stage {
 									((MultiFileImageTagPair)this.getTableRow().getItem()).setImageData( imageBuffer );
 									this.getTableRow().getTableView().refresh();
 								} catch ( IOException e ) {
-									//TODO: LOGGING
+									LOGGER.warning( "Unable to read image data from file: " + targetFile );
 								}
 							} );
 							

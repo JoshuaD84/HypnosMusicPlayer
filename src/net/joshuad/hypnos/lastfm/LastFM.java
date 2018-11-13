@@ -196,7 +196,6 @@ public class LastFM {
 		String title = track.getTitle();
 		
 		if ( artist == null || title == null ) {
-			//TODO: logging?
 			return LovedState.FALSE;
 		}
 		
@@ -210,11 +209,8 @@ public class LastFM {
 		} 
 		
 		Collection<Track> lovedTracks = User.getLovedTracks( session.getUsername(), key ).getPageResults();
-		//TODO: error checking
 		
 		for ( Track test : lovedTracks ) {
-			//TODO: Fuzzy matching?
-			
 			if ( test.getArtist().toLowerCase().equals( artist.toLowerCase() )
 			&& test.getName().toLowerCase().equals( title.toLowerCase() ) ) {
 				track.setLovedState( LovedState.TRUE );

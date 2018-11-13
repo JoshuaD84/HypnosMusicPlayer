@@ -82,7 +82,7 @@ public class LibraryUpdater {
 						}
 						
 						library.playlistsToRemove.clear();
-						ui.libraryPane.updateLibraryListPlaceholder();
+						ui.getLibraryPane().updateLibraryListPlaceholder();
 					}
 				
 					synchronized ( library.playlistsToAdd ) {
@@ -98,7 +98,7 @@ public class LibraryUpdater {
 					
 					library.playlistsToUpdate.clear(); //PENDING: update playlists. 
 
-					ui.libraryPane.updateLibraryListPlaceholder();
+					ui.getLibraryPane().updateLibraryListPlaceholder();
 					
 					synchronized ( library.albumsToRemove ) {
 						if ( !library.albumsToRemove.isEmpty() ) {
@@ -107,7 +107,7 @@ public class LibraryUpdater {
 								changeCount++;
 							}
 							
-							ui.libraryPane.updateLibraryListPlaceholder();
+							ui.getLibraryPane().updateLibraryListPlaceholder();
 
 							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshAlbumTable(); //TODO: this may not be necessary. 
@@ -123,7 +123,7 @@ public class LibraryUpdater {
 								changeCount++;
 							}
 							
-							ui.libraryPane.updateLibraryListPlaceholder();
+							ui.getLibraryPane().updateLibraryListPlaceholder();
 
 							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshAlbumTable();  //TODO: this may not be necessary. 
@@ -163,7 +163,7 @@ public class LibraryUpdater {
 												audioSystem.getCurrentList().setAlbum( updateMe, false );
 												library.albumsToUpdate.remove( updateMe ); //prevent an infinite loop
 												
-												ui.artSplitPane.setImages( currentArtImages );
+												ui.setImages( currentArtImages );
 												ui.setSelectedTracks ( selectedItems );
 												
 												if ( currentTrack != null ) {
@@ -185,7 +185,7 @@ public class LibraryUpdater {
 	 							}
 								
 								if ( changeCount >= maxChangesPerUpdate ) {
-									ui.refreshAlbumTable();  //TODO: this may not be necessary. 
+									ui.refreshAlbumTable();  //this may not be necessary. 
 									return;
 								}
 							}
@@ -207,7 +207,7 @@ public class LibraryUpdater {
 								}
 							}
 
-							ui.libraryPane.updateLibraryListPlaceholder();
+							ui.getLibraryPane().updateLibraryListPlaceholder();
 							
 							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshTrackTable(); //TODO: this may not be necessary. 
@@ -228,7 +228,7 @@ public class LibraryUpdater {
 							}
 
 
-							ui.libraryPane.updateLibraryListPlaceholder();
+							ui.getLibraryPane().updateLibraryListPlaceholder();
 							
 							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshTrackTable(); //TODO: this may not be necessary. 
@@ -263,7 +263,7 @@ public class LibraryUpdater {
 							}
 
 
-							ui.libraryPane.updateLibraryListPlaceholder();
+							ui.getLibraryPane().updateLibraryListPlaceholder();
 							
 							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshTrackTable(); //TODO: this may not be necessary. 

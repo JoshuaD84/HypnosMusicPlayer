@@ -975,8 +975,6 @@ public class CurrentList {
 	public void setAndPlayPlaylists ( List <Playlist> playlists ) {
 		setPlaylists( playlists );
 		audioSystem.next( false );
-		//Hypnos.getLibrary().albumsToUpdate.addAll( playlists );  //TODO: update the playlist from disc?
-		
 	}
 
 	public FilteredList <CurrentListTrack> getFilteredItems () {
@@ -992,7 +990,7 @@ public class CurrentList {
 			//REFACTOR: This is the right way to do this, but it's really bad in terms of module independence
 			//Fix it at some point. 
 			currentListSortedNoFilter = new SortedList <CurrentListTrack> ( items );
-			currentListSortedNoFilter.comparatorProperty().bind( Hypnos.getUI().currentListPane.currentListTable.comparatorProperty() );
+			currentListSortedNoFilter.comparatorProperty().bind( Hypnos.getUI().getCurrentListPane().currentListTable.comparatorProperty() );
 		}
 		
 		return currentListSortedNoFilter;

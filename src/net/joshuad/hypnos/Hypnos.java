@@ -53,7 +53,8 @@ public class Hypnos extends Application {
 	public enum ExitCode {
 		NORMAL,
 		UNKNOWN_ERROR,
-		AUDIO_ERROR
+		AUDIO_ERROR, 
+		UNSUPPORTED_OS
 	}
 	
 	public enum OS {
@@ -744,7 +745,7 @@ public class Hypnos extends Application {
 							persister.loadPlaylists();
 							persister.loadHotkeys();
 							
-							Platform.runLater( () -> ui.libraryPane.updateLibraryListPlaceholder() );
+							Platform.runLater( () -> ui.getLibraryPane().updateLibraryListPlaceholder() );
 							
 							ui.refreshHotkeyList();
 							
@@ -812,7 +813,7 @@ public class Hypnos extends Application {
 						libraryUpdater.start();
 						library.startLoader( persister );
 						ui.showMainWindow();
-						ui.libraryPane.updateLibraryListPlaceholder();
+						ui.getLibraryPane().updateLibraryListPlaceholder();
 						ui.fixTables();
 						ui.settingsWindow.refreshHotkeyFields();
 						

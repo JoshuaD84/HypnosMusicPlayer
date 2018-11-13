@@ -204,8 +204,8 @@ public class Transport extends VBox {
 			@Override
 			public void handle ( ActionEvent e ) {
 				if ( audioSystem.isStopped() ) { 
-					if ( ui.currentListPane.currentListTable.getItems().size() != 0 ) {
-						CurrentListTrack selectedItem = ui.currentListPane.currentListTable.getSelectionModel().getSelectedItem();
+					if ( ui.getCurrentListPane().currentListTable.getItems().size() != 0 ) {
+						CurrentListTrack selectedItem = ui.getCurrentListPane().currentListTable.getSelectionModel().getSelectedItem();
 						
 						if ( selectedItem != null ) {
 							audioSystem.playTrack( selectedItem );
@@ -760,7 +760,7 @@ public class Transport extends VBox {
 					timeElapsedLabel.setText( Utils.getLengthDisplay( timeElapsedS ) );
 					timeRemainingLabel.setText( Utils.getLengthDisplay( -timeRemainingS ) );
 				} else if ( audioSystem.isStopped() ) {
-					ui.currentListPane.currentListTable.refresh();
+					ui.getCurrentListPane().currentListTable.refresh();
 					togglePlayButton.setGraphic( playImage );
 					trackPositionSlider.setValue( 0 );
 					timeElapsedLabel.setText( "" );

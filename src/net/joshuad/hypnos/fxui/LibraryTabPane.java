@@ -923,11 +923,11 @@ public class LibraryTabPane extends StretchedTabPane {
 		albumTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
 			
 		    if ( newSelection != null ) {
-		    	ui.artSplitPane.setImages ( newSelection );
+		    	ui.setImages ( newSelection );
 		    	ui.albumInfoWindow.setAlbum ( newSelection );
 		    	
 		    } else if ( audioSystem.getCurrentTrack() != null ) {
-		    	ui.artSplitPane.setImages ( audioSystem.getCurrentTrack() );
+		    	ui.setImages ( audioSystem.getCurrentTrack() );
 		    	
 		    } else {
 		    	//Do nothing, leave the old artwork there. We can set to null if we like that better
@@ -1313,11 +1313,11 @@ public class LibraryTabPane extends StretchedTabPane {
 		
 		trackTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
 		    if (newSelection != null) {
-		    	ui.artSplitPane.setImages ( newSelection );
+		    	ui.setImages ( newSelection );
 		    	ui.trackInfoWindow.setTrack( newSelection );
 		    	
 		    } else if ( audioSystem.getCurrentTrack() != null ) {
-		    	ui.artSplitPane.setImages ( audioSystem.getCurrentTrack() );
+		    	ui.setImages ( audioSystem.getCurrentTrack() );
 		    	
 		    } else {
 		    	//Do nothing, leave the old artwork there. We can set to null if we like that better, 

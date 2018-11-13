@@ -259,10 +259,9 @@ public class AudioSystem {
 			if ( repeatMode == RepeatMode.REPEAT ) {
 				
 				shuffleTracksPlayedCounter = 1;
-				// TODO: Ban the most recent X tracks from playing
 				int currentListSize = items.size();
-				int collisionWindowSize = currentListSize / 3; // TODO: Fine tune this amount
-				int permittedRetries = 3; // TODO: fine tune this number
+				int collisionWindowSize = currentListSize / 3; 
+				int permittedRetries = 3; 
 	
 				boolean foundMatch = false;
 				int retryCount = 0;
@@ -468,7 +467,7 @@ public class AudioSystem {
 						albumPath = trackPath.toAbsolutePath().getParent();
 					}
 					Track track = new Track ( trackPath, albumPath );
-					ui.artSplitPane.setImages( track ); 
+					ui.setImages( track ); 
 					playTrack( track, true );
 					settings.remove ( setting );
 					break;

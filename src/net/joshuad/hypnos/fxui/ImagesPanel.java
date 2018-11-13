@@ -151,8 +151,6 @@ public class ImagesPanel extends SplitPane {
 		});
 		
 		albumImagePane.setOnDragOver( event -> {
-			//Dragboard db = event.getDragboard();
-			//TODO: be discerning of what we accept
 			event.acceptTransferModes( TransferMode.COPY );
 			event.consume();
 		});
@@ -441,8 +439,6 @@ public class ImagesPanel extends SplitPane {
 		});
 		
 		artistImagePane.setOnDragOver( event -> {
-			//Dragboard db = event.getDragboard();
-			//TODO: be discerning of what we accept
 			event.acceptTransferModes( TransferMode.COPY );
 			event.consume();
 		});

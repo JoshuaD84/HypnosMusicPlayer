@@ -54,7 +54,7 @@ public class MetroScraper extends AbstractScraper {
 	}
 	
 	private  String makeURLReady ( String string ) {
-		//TODO: Unfortunately it doesn't appear that MetroScraper has a standard for handling "/".
+		//Unfortunately it doesn't appear that MetroScraper has a standard for handling "/".
 		//Sometimes it replaces it with - and sometims with an empty string
 		//See Bon Iver - Beth/Rest and Bright Eyes - Easy/Lucky/Free
 		return Normalizer.normalize( string, Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" )

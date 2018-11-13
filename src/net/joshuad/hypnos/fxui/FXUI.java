@@ -94,9 +94,9 @@ public class FXUI implements PlayerListener {
 
 	SplitPane primarySplitPane;
 	SplitPane currentListSplitPane;
-	public ImagesPanel artSplitPane; //TODO: Probably make this private
-	public LibraryTabPane libraryPane; //TODO: make private
-	public CurrentListPane currentListPane; //TODO: make private 
+	private ImagesPanel artSplitPane; 
+	private LibraryTabPane libraryPane; 
+	private CurrentListPane currentListPane; 
 	
 	Image warningAlertImageSource;
 	
@@ -124,10 +124,10 @@ public class FXUI implements PlayerListener {
 	private double windowedX = 50;
 	private double windowedY = 50;
 	
-	public Track currentImagesTrack = null; //TODO: Make private
-	public Album currentImagesAlbum = null; //TODO: Make private
+	public Track currentImagesTrack = null;
+	public Album currentImagesAlbum = null;
 	
-	public File darkStylesheet; //TODO: Make private
+	public File darkStylesheet;
 	private File baseStylesheet;
 	
 	private boolean isDarkTheme = false;
@@ -292,7 +292,6 @@ public class FXUI implements PlayerListener {
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
 				
-				//TODO: this isn't perfect. If a button has focus, it doesn't trigger
 				if ( libraryPane.isFocused() || libraryPane.albumTable.isFocused()
 				|| libraryPane.trackTable.isFocused() || libraryPane.playlistTable.isFocused() ) {
 					libraryPane.focusFilterOfCurrentTab();
@@ -1573,6 +1572,22 @@ public class FXUI implements PlayerListener {
 
 	public void setLibraryLabelsToLoading () {
 		libraryPane.setLabelsToLoading();
+	}
+
+	public void setImages ( Track newSelection ) {
+		artSplitPane.setImages( newSelection );
+	}
+	
+	public void setImages ( Album album ) {
+		artSplitPane.setImages( album );
+	}
+
+	public LibraryTabPane getLibraryPane () {
+		return libraryPane;
+	}
+
+	public CurrentListPane getCurrentListPane () {
+		return currentListPane;
 	}
 }
 

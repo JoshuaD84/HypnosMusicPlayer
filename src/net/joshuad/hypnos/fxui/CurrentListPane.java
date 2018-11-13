@@ -74,7 +74,7 @@ public class CurrentListPane extends BorderPane {
 
 	HBox currentListControls; 
 
-	public TableView <CurrentListTrack> currentListTable; //TODO: Make private
+	public TableView <CurrentListTrack> currentListTable;
 	
 	TableColumn<CurrentListTrack, String> artistColumn, albumColumn, titleColumn, lengthColumn;
 	TableColumn<CurrentListTrack, CurrentListTrackState> playingColumn;
@@ -988,7 +988,6 @@ public class CurrentListPane extends BorderPane {
 				int selectAfterDelete = selectedIndexes.get( 0 ) - 1;
 				currentListTable.getSelectionModel().clearSelection();
 				ui.removeFromCurrentList ( removeMe );
-				//TODO: Either use selectAfterDelete or get rid of it. 
 			}
 		});
 				
@@ -1011,7 +1010,7 @@ public class CurrentListPane extends BorderPane {
 		});
 		
 		currentListTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
-			ui.artSplitPane.setImages ( newSelection );
+			ui.setImages ( newSelection );
 		});
 		
 		currentListTable.setRowFactory( tv -> {

@@ -20,7 +20,7 @@ public class TagError {
 		DISC_NUMBER_HAS_TRACK ( "Disc # in N/N format." ),
 		DISC_NUMBER_INVALID_FORMAT ( "Disc # format invalid." ),
 		
-		CANNOT_READ_TAG ( "Unable to read tag." ); //TODO: break this into more categories -- file not found, no tag available, etc.
+		CANNOT_READ_TAG ( "Unable to read tag." ); 
 		
 		
 		private String message;

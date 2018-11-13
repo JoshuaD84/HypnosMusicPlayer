@@ -2,6 +2,8 @@ mp4s can sometimes be videos, so if they are added to the library scan folder yo
 
 Lorde - Royales skips on my Ubuntu 18.04
 
+Drag and Drop is acting wierd, pretty sure it's from java 11. 
+
 
 
 Features that need System-by-System attention

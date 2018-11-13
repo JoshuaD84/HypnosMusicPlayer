@@ -69,8 +69,7 @@ public class VLCAudioPlayer {
 				break;
 			default:
 				LOGGER.severe( "Cannot determine OS, unable to load native VLC libraries. Exiting." );
-				//TODO: Notify user system not supported
-				Hypnos.exit( ExitCode.UNKNOWN_ERROR );
+				Hypnos.exit( ExitCode.UNSUPPORTED_OS );
 				break;
 		}
 		

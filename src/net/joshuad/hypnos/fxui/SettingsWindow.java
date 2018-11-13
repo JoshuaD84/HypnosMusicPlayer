@@ -716,7 +716,6 @@ public class SettingsWindow extends Stage {
 		
 		Thread logReader = new Thread( () -> {
 			try ( 
-				//TODO: don't call hypnos directly
 				BufferedReader reader = new BufferedReader( new FileReader( Hypnos.getLogFile().toFile() ) ); 
 			){
 				while ( true ) {
@@ -769,7 +768,6 @@ public class SettingsWindow extends Stage {
 		});
 		
 		Button previousLog = new Button ( "View Last Log" );
-		//TODO: don't call hypnos directly
 		previousLog.setOnAction( e -> ui.openFileNatively ( Hypnos.getLogFileBackup() ) );
 			
 		HBox controlBox = new HBox();

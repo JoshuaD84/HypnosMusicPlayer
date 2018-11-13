@@ -252,7 +252,7 @@ public class HypnosResizePolicy implements Callback <TableView.ResizeFeatures, B
 		List <TableColumn> columns = table.getVisibleLeafColumns();
 		double spaceToDistribute = table.getWidth() - getScrollbarWidth ( table ) - 4; 
 	
-		//TODO: That -4 is annoying. I'm sure there's a way to actually get that value
+		//That -4 is annoying. I'm sure there's a way to actually get that value
 		//See thread here: https://stackoverflow.com/questions/47852175/how-to-spread-the-total-width-amongst-all-columns-on-table-construction
 		//Which is also implemented below in calculateSpaceAvailableNew
 		//Unfortunately, that solution didn't work on manual resizes. 

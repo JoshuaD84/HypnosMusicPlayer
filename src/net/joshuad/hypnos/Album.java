@@ -91,7 +91,6 @@ public class Album implements Serializable, AlbumInfoSource {
 	}
 	
 	public String getDateAddedString () {
-		//TODO: "Today, Yesterday, etc."
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		return sdf.format( new Date ( this.creationTimeMS ) );
 	}

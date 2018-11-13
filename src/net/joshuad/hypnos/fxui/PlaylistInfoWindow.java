@@ -370,7 +370,7 @@ public class PlaylistInfoWindow extends Stage {
 		});
 		
 		appendMenuItem.setOnAction( event -> {
-			ui.currentListPane.currentListTable.getItems().addAll( Utils.convertTrackList( trackTable.getSelectionModel().getSelectedItems() ) );
+			ui.getCurrentListPane().currentListTable.getItems().addAll( Utils.convertTrackList( trackTable.getSelectionModel().getSelectedItems() ) );
 		});
 
 		removeMenuItem.setOnAction( event -> {
