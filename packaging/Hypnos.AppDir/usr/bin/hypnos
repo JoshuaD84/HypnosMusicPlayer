@@ -6,7 +6,7 @@ cd $DIR
 exec ./jre/bin/hypnos -Xmx600m -XX:+UseG1GC -XX:+UseStringDeduplication \
 	-XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=30 \
 	--module-path ./jre/jfx \
-	--add-modules=javafx.controls \
+	--add-modules=javafx.controls,javafx.swing \
 	--add-opens javafx.controls/javafx.scene.control=ALL-UNNAMED \
 	-Djdk.gtk.version=2 \
 	-jar  hypnos.jar "$@" --base-dir="$ROOT"
