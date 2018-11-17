@@ -1,9 +1,9 @@
 mp4s can sometimes be videos, so if they are added to the library scan folder you get videos in track/album list
 
+go to album button -> clear search filter box
+
 Lorde - Royales skips on my Ubuntu 18.04
-
-Drag and Drop is acting wierd, pretty sure it's from java 11. 
-
+	It does not skip in VLC.  Maybe try putting all of the library back and see what happens
 
 
 Features that need System-by-System attention
@@ -143,6 +143,7 @@ Future
 
 	Double clicking on table-column dividers doesn't call resize:
 		https://stackoverflow.com/questions/47852239/customresizepolicy-not-triggering-when-a-columns-headers-divider-is-double-cli
+		not fixed in java 11 / javafx11
 
 	Tray Icon
 		I have a few demos that are all terrible. It looks like we need to wait for JavaFX to get this going for us.
@@ -157,10 +158,12 @@ Future
 	Showing any dialog prevents window drag resize in ubuntu / other linux
 		http://bugs.java.com/bugdatabase/view_bug.do?bug_id=8140491
 		https://stackoverflow.com/questions/33134791/javafx-stage-cant-be-resized-after-showing-a-dialog
+		Not fixed in java 11 / javafx11
 
 	While loading the library, the table view scrolls a little bit.
 		https://stackoverflow.com/questions/47950917/stop-tableview-small-scroll-when-adding-content-to-bottom-of-table
 		1/2/18 - Bug submitted to bugs.java.com
+		not fixed in java 11 / javafx11
 
 	Inconsistent KeyEvent consumption - https://stackoverflow.com/questions/48054928/inconsistent-keyevent-consumption-by-textfield
 		Resolved in java 9 apparently
