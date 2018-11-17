@@ -1,7 +1,7 @@
 <project name="Hypnos Music Player" default="compile" basedir=".">
 	
-	<property name="version" value="Beta 4" />
-	<property name="version-simple" value="beta4" />
+	<property name="version" value="Nightly" />
+	<property name="version-simple" value="nightly" />
 	<property name="version-tag" value="${version}" />
 	
 	<property name="src" location="src"/>
@@ -20,6 +20,7 @@
 	<path id="class.path">
 		<fileset dir="${stage}/lib">
 			<include name="**/*.jar" />
+			<include name="${packaging}/jres/linux-64bit/jfx/*.jar" />
 		</fileset>
 		<pathelement location="${jarFile}" />
 	</path>
@@ -35,8 +36,13 @@
 	</target>
 
 	<target name="compile" depends="init" description="compile the source">
-		<javac fork="yes" target="1.8" source ="1.8" includeantruntime="false" srcdir="." destdir="${build}">
+		<javac fork="yes" target="11" source ="11" includeantruntime="false" srcdir="." destdir="${build}">
 			<classpath refid="class.path" />
+			<classpath>
+				<fileset dir="${packaging}/jres/linux-64bit/jfx/">
+					<include name="*.jar" />
+				</fileset>
+			</classpath>
 		</javac>
 	</target>
 	
@@ -94,12 +100,14 @@
 					<exclude name="**/bin/**" />
 					<exclude name="**/lib/win/" />
 					<exclude name="**/lib/osx/" />
-					<!--exclude name="**/lib/nix/vlc/.git/" /-->
+					<exclude name="**/lib/nix/vlc/.git/" />
 				</fileset>
 			</copy>
 			
 			<copy todir="${temp}/Hypnos.AppDir/usr/bin/jre" >
-				<fileset dir="${packaging}/jres/linux-64bit" />
+				<fileset dir="${packaging}/jres/linux-64bit" >
+					<exclude name="${packaging}/jres/linux-64bit/.git/" />
+				</fileset>
 			</copy>
 			
 			<exec executable="${appImageTool}">

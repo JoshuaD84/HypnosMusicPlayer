@@ -1,10 +1,33 @@
+Java 11
+	Strip Linux JRE
+	Do Windows JRE
+	
+
 mp4s can sometimes be videos, so if they are added to the library scan folder you get videos in track/album list
 
 go to album button -> clear search filter box
 
+See commented jvm arguments in packaging/Hypnos/AppDir/usr/bin/hypnos
+
+Export then cancel at popup:
+	Exception in thread "JavaFX Application Thread" java.lang.NullPointerException
+	at net.joshuad.hypnos.fxui.ExportPlaylistPopup.export(Unknown Source)
+	at net.joshuad.hypnos.fxui.CurrentListPane.lambda$setupControlPane$14(Unknown Source)
+
+LastFM password field starts off filled in. Start it empty
+	Maybe add a "delete username and disconnect" button
+
 Lorde - Royales skips on my Ubuntu 18.04
 	It does not skip in VLC.  Maybe try putting all of the library back and see what happens
 
+AppImage Stuff:
+ 	[exec] WARNING: AppStream upstream metadata is missing, please consider creating it
+    [exec]          in usr/share/metainfo/hypnos.appdata.xml
+    [exec]          Please see https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
+    [exec]          for more information.
+    [exec] Please consider submitting your AppImage to AppImageHub, the crowd-sourced
+    [exec] central directory of available AppImages, by opening a pull request
+    [exec] at https://github.com/AppImage/appimage.github.io
 
 Features that need System-by-System attention
 	Global Hotkeys
@@ -167,17 +190,6 @@ Future
 
 	Inconsistent KeyEvent consumption - https://stackoverflow.com/questions/48054928/inconsistent-keyevent-consumption-by-textfield
 		Resolved in java 9 apparently
-
-	Java 9
-		Using java 9 to launch hypnos crashes. I can't get either OpenSDK or OracleSDK to run, for different reasons
-
-		Also:
-			WARNING: An illegal reflective access operation has occurred
-			WARNING: Illegal reflective access by net.joshuad.hypnos.Hypnos (file:/home/joshua/workbench/hypnos-9-test/hypnos.jar) to field java.lang.ClassLoader.sys_paths
-			WARNING: Please consider reporting this to the maintainers of net.joshuad.hypnos.Hypnos
-			WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
-			WARNING: All illegal access operations will be denied in a future release
-
 
 :::: Refactor / organize my code ::::
 
