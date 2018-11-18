@@ -112,7 +112,7 @@ public class AudioSystem {
 				player.requestUnpause();
 				break;
 			case PLAYING:
-				player.requestPlayTrack( player.getTrack(), false );
+				this.playTrack( player.getTrack(), false );
 				break;
 			case STOPPED:
 				next( false );

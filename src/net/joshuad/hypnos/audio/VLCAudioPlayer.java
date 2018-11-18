@@ -1,6 +1,7 @@
 package net.joshuad.hypnos.audio;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -143,6 +144,11 @@ public class VLCAudioPlayer {
 	public void requestPlayTrack( Track track, boolean startPaused ) {
 		
 		String targetFile = track.getPath().toString();
+		
+		if ( !Files.isRegularFile( track.getPath() ) || !Files.exists( track.getPath() ) ) {
+			scheduler.schedule( notifyFinished, 50, TimeUnit.MILLISECONDS );
+			return;
+		}
 		
 		//Address this bug: https://github.com/caprica/vlcj/issues/645
 		switch ( Hypnos.getOS() ) {
