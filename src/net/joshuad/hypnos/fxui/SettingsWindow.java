@@ -164,8 +164,12 @@ public class SettingsWindow extends Stage {
 		}
 		
 		this.setOnShowing( ( event ) -> { 
-			userInput.setText( audioSystem.getLastFM().getUsername() );
-			passwordInput.setText( audioSystem.getLastFM().getPasswordMD5() );
+			String username = audioSystem.getLastFM().getUsername();
+			String passwordMD5 = audioSystem.getLastFM().getPasswordMD5();
+			if ( !username.isBlank( ) ) {
+				userInput.setText( username );
+				passwordInput.setText( passwordMD5 );
+			}
 		});
 		
 		scene.addEventFilter( KeyEvent.KEY_PRESSED, new EventHandler <KeyEvent>() {
@@ -209,8 +213,6 @@ public class SettingsWindow extends Stage {
 		hotkeyView.prefHeightProperty().bind( root.heightProperty() );
 		hotkeyView.setWrapText( false );
 		hotkeyView.getStyleClass().add( "monospaced" );
-		//hotkeyView.setFont( Font.font( "Monospaced" ) );
-		//System.out.println ( "Size: " + hotkeyView.getFont().getSize() );
 		hotkeyView.setText( hotkeyText );
 		
 		hotkeyPane.getChildren().addAll( hotkeyView );
@@ -1122,7 +1124,6 @@ public class SettingsWindow extends Stage {
 		scrobbleLabel.setPadding( new Insets ( 0, 0, 0, 60 ) );
 		scrobbleTime.setPadding( new Insets ( 0, 0, 0, 60 ) );
 		showInUILabel.setPadding( new Insets ( 0, 0, 0, 60 ) );
-		Button connectButton = new Button( "Save and Test" );
 		
 		Slider scrobbleTimeSlider = new Slider ( 0, 1, 0 );
 		scrobbleTimeSlider.setMajorTickUnit( .25 );
@@ -1143,11 +1144,24 @@ public class SettingsWindow extends Stage {
 		scrobbleCheckbox.selectedProperty().bindBidirectional( audioSystem.doLastFMScrobbleProperty() );
 		showInUICheckbox.selectedProperty().bindBidirectional( ui.showLastFMWidgets );
 		scrobbleTimeSlider.valueProperty().bindBidirectional( audioSystem.scrobbleTimeProperty() );
-		
+
+		Button connectButton = new Button( "Connect" );
 		connectButton.setOnAction( (ActionEvent e) -> {
 			audioSystem.getLastFM().setCredentials( userInput.getText(), passwordInput.getText() );
 			audioSystem.getLastFM().connect();
 		});
+		
+		Button disconnectButton = new Button( "Disconnect" );
+		disconnectButton.setOnAction( (ActionEvent e) -> {
+			audioSystem.getLastFM().disconnectAndForgetCredentials();
+			userInput.clear();
+			passwordInput.clear();
+		});
+		
+		HBox connectPane = new HBox();
+		connectPane.setAlignment( Pos.CENTER );
+		connectPane.getChildren().addAll( connectButton, disconnectButton );
+		GridPane.setHalignment( connectPane, HPos.CENTER );
 		
 		GridPane loginPane = new GridPane();
 		loginPane.setHgap( 5 );
@@ -1157,7 +1171,7 @@ public class SettingsWindow extends Stage {
 		loginPane.add( new Label ( "Password:"), 0, 1 );
 		loginPane.add( passwordInput, 1, 1 );
 		
-		loginPane.add( connectButton, 1, 2 );
+		loginPane.add( connectPane, 0, 2, 2, 1 );
 
 		loginPane.add( showInUILabel, 2, 0 );
 		loginPane.add( showInUICheckbox, 3, 0 );

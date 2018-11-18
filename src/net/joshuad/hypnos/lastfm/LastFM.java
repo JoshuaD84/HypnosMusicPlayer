@@ -78,6 +78,17 @@ public class LastFM {
 		triedConnectWithTheseCredentials = true;
 	}
 	
+	public void disconnectAndForgetCredentials() {
+
+		setCredentials ( "", "" );
+		if ( session == null ) {
+			log.append ( "Not connected. Credentials forgotten.\n" );
+		} else {
+			session = null;
+			log.append ( "Disconnected and credentials forgotten.\n" );
+		}
+	}
+	
 	//This should be called after any attempted write to lastfm
 	public void notifyUserIfNeeded( boolean success ) {
 		if ( success ) {
