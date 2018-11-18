@@ -44,6 +44,8 @@ public class LibraryLocationWindow extends Stage {
 	Scene scene;
 	
 	Slider prioritySlider;
+
+	private final ProgressIndicatorBar progressBar;
 	
 	public LibraryLocationWindow ( Stage mainStage, Library library ) {
 		super();
@@ -161,13 +163,17 @@ public class LibraryLocationWindow extends Stage {
 			}
 		});
 		
+		progressBar = new ProgressIndicatorBar();
+		progressBar.prefWidthProperty().bind( widthProperty() );
+		progressBar.setPrefHeight( 30 );
+		
 		HBox controlBox = new HBox();
 		controlBox.getChildren().addAll( addButton, removeButton);
 		controlBox.setAlignment( Pos.CENTER );
 		controlBox.prefWidthProperty().bind( widthProperty() );
 		controlBox.setPadding( new Insets( 5 ) );
 		
-		Label priorityLabel = new Label ( "Load Speed:" );
+		Label priorityLabel = new Label ( "Scan Speed:" );
 		priorityLabel.setTooltip ( new Tooltip ( "How much resources to consume while loading and updating the library.\n(If your computer or hypnos is choppy while loading, try turning this down.)" ) );
 		priorityLabel.setPadding( new Insets ( 0, 10, 0, 0 ) );
 		
@@ -203,9 +209,13 @@ public class LibraryLocationWindow extends Stage {
 		
 		primaryPane.prefWidthProperty().bind( root.widthProperty() );
 		primaryPane.prefHeightProperty().bind( root.heightProperty() );
-		musicSourceTable.prefHeightProperty().bind( root.heightProperty().subtract( controlBox.heightProperty() ) );
+		musicSourceTable.prefHeightProperty().bind( 
+			root.heightProperty()
+			.subtract( controlBox.heightProperty() )
+			.subtract( progressBar.heightProperty() )
+			.subtract( priorityBox.heightProperty() ) );
 
-		primaryPane.getChildren().addAll( musicSourceTable, priorityBox, controlBox );
+		primaryPane.getChildren().addAll( musicSourceTable, progressBar, priorityBox, controlBox );
 		root.getChildren().add( primaryPane );
 		setScene( scene );
 		
@@ -234,5 +244,12 @@ public class LibraryLocationWindow extends Stage {
 				break;
 		}
 	}
-	
+
+	public void setLoaderStatus ( String message, double percentDone ) {
+		progressBar.setStatus( message, percentDone );
+	}
+
+	public void setLibraryLoaderStatusToStandby () {
+		setLoaderStatus ( "", 0 );
+	}
 }

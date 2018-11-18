@@ -370,8 +370,12 @@ public class Library {
 				LOGGER.fine ( "Interrupted while waiting for filewalker to terminate." );
 			}
 		}
-			
+		
 		Path removeMeSource = sourceToRemove.remove( 0 );
+		
+		String message = "Removing " + removeMeSource.toString() + "...";
+		
+		Hypnos.getUI().setLibraryLoaderStatus( message, 0 );
 
 		sourceToUpdate.remove( removeMeSource );
 		sourceToAdd.remove( removeMeSource );
@@ -420,26 +424,50 @@ public class Library {
 			});
 			
 		} else {
-		
+
 			ArrayList <Album> albumsCopy = new ArrayList <Album> ( albums );
+			ArrayList <Track> tracksCopy = new ArrayList <Track> ( tracks );
+			
+			int totalCount = albumsCopy.size() + tracksCopy.size();
+			
+			int countDone = 0;
 			for ( Album album : albumsCopy ) {
 				if ( album.getPath().toAbsolutePath().startsWith( removeMeSource ) ) {
 					removeAlbum ( album );
 				}
+				countDone++;
+				Hypnos.getUI().setLibraryLoaderStatus( message, countDone / (double)totalCount );
 			}
 			
-			ArrayList <Track> tracksCopy = new ArrayList <Track> ( tracks );
 			for ( Track track : tracksCopy ) {
 				if ( track.getPath().toAbsolutePath().startsWith( removeMeSource ) ) {
 					removeTrack( track );
 				}
+				countDone++;
+				Hypnos.getUI().setLibraryLoaderStatus( message, countDone / (double)totalCount );
 			}
 		}
+		
+		Hypnos.getUI().setLibraryLoaderStatusToStandby();
+	}
+	
+	private long getDirectoryCount ( Path dir ) throws IOException {
+	    return Files.walk(dir).parallel().filter(p -> p.toFile().isDirectory()).count();
 	}
 	
 	private void loadOneSource() {
 		Path selectedPath = sourceToAdd.get( 0 );
-		fileWalker = new InitialScanFileVisitor( this );
+		
+		long directoryCount = -1;
+		
+		try {
+			directoryCount = getDirectoryCount ( selectedPath );
+		} catch ( IOException e ) {
+			LOGGER.log( Level.INFO, "Unable to count directories, library loader progress bar will not function: " 
+				+ selectedPath.toString(), e );
+		}
+		
+		fileWalker = new InitialScanFileVisitor( this, "Scanning " + selectedPath.toString() + "...", directoryCount );
 		try {
 
 			Files.walkFileTree ( 
@@ -458,11 +486,23 @@ public class Library {
 			LOGGER.log( Level.WARNING, "Unable to load some files in path: " + selectedPath.toString(), e );
 		}
 		fileWalker = null;
+
+		Hypnos.getUI().setLibraryLoaderStatusToStandby();
 	}
 	
 	private void updateOneSource() {
 		Path selectedPath = sourceToUpdate.get( 0 );
-		fileWalker = new InitialScanFileVisitor( this );
+		
+		long directoryCount = -1;
+		
+		try {
+			directoryCount = getDirectoryCount ( selectedPath );
+		} catch ( IOException e ) {
+			LOGGER.log( Level.INFO, "Unable to count directories, library loader progress bar will not function: " 
+				+ selectedPath.toString(), e );
+		}
+		
+		fileWalker = new InitialScanFileVisitor( this, "Rescanning " + selectedPath.toString() + "...", directoryCount );
 		try {
 			Files.walkFileTree ( 
 				selectedPath, 
@@ -482,6 +522,8 @@ public class Library {
 		fileWalker = null;
 		
 		watcherRegisterAll ( selectedPath );
+		
+		Hypnos.getUI().setLibraryLoaderStatusToStandby();
 	}
 	
 	private boolean purgeMissingFiles() {
@@ -543,6 +585,7 @@ public class Library {
 	}
 	
 	private void watcherRegisterAll ( final Path start ) {
+		/* Note: in my testing, this takes less than a few seconds to run, depending on folder count */ 
 		try {
 			Files.walkFileTree( 
 				start, 
@@ -565,7 +608,7 @@ public class Library {
 			);
 		
 		} catch ( IOException e ) {
-			LOGGER.log( Level.INFO, "Unable to watch directory for changes: " + start.toString() );
+			LOGGER.log( Level.INFO, e.getMessage() + "\nUnable to watch directory for changes: " + start.toString(), e );
 		}
 	}
 	

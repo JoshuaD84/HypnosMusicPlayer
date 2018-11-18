@@ -1594,6 +1594,18 @@ public class FXUI implements PlayerListener {
 	public void setCurrentListFilterText ( String string ) {
 		currentListPane.infoLabelAndFilter.setText ( string );
 	}
+
+	public void setLibraryLoaderStatus ( String message, double percentDone ) {
+		Platform.runLater( () -> {
+			this.libraryLocationWindow.setLoaderStatus ( message, percentDone );
+		});		
+	}
+
+	public void setLibraryLoaderStatusToStandby () {
+		Platform.runLater( () -> {
+			this.libraryLocationWindow.setLibraryLoaderStatusToStandby ( );
+		});	
+	}
 }
 
 class LineNumbersCellFactory<T, E> implements Callback<TableColumn<T, E>, TableCell<T, E>> {

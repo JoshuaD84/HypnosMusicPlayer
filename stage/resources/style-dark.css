@@ -7,6 +7,10 @@ Basic color scheme:
 	Grey Any Value
 */
 
+.progress-indicator-text { 
+	-fx-fill: rgb( 175, 175, 175 );
+}
+
 .root, HBox, VBox {
     -fx-base: #282828;
     -fx-background: #282828;

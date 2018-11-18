@@ -66,7 +66,7 @@ public class ExportPlaylistPopup extends Stage {
 		progressBar.setPrefWidth( 400 );
 		progressBar.setPrefHeight( 40 );
 		
-		label = new Label ( "Hi Josh" );
+		label = new Label ( "" );
 
 		primaryPane.getChildren().addAll( progressBar, label );
 		root.getChildren().add( primaryPane );

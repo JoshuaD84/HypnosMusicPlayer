@@ -18,8 +18,14 @@ public class InitialScanFileVisitor extends SimpleFileVisitor <Path> {
 	
 	private static long sleepTime = 2;
 	
-	public InitialScanFileVisitor ( Library library ) {
+	private long directoryTotalCount = -1;
+	private long directoriesVisited = 0;
+	String message = "";
+	
+	public InitialScanFileVisitor ( Library library, String message, long directoryTotalCount ) {
 		this.library = library;
+		this.message = message;
+		this.directoryTotalCount = directoryTotalCount;
 	}
 	
 	public static void setSleepTimeBetweenVisits ( long timeMS ) {
@@ -71,6 +77,8 @@ public class InitialScanFileVisitor extends SimpleFileVisitor <Path> {
 	
 	@Override
 	public FileVisitResult postVisitDirectory( Path dir, IOException exc ) {
+		directoriesVisited++;
+		Hypnos.getUI().setLibraryLoaderStatus ( message, directoriesVisited / (double)directoryTotalCount );
 		return FileVisitResult.CONTINUE;
 	}
 	
@@ -86,7 +94,5 @@ public class InitialScanFileVisitor extends SimpleFileVisitor <Path> {
 	public boolean getWalkInterrupted() {
 		return walkInterrupted;
 	}
-		
-
 }
 

@@ -1,20 +1,40 @@
 Nov 17, 2018 22:09:28 PM net.joshuad.hypnos.Library watcherRegisterAll
 INFO: Unable to watch directory for changes: /d/download
+   https://stackoverflow.com/questions/53359456/best-way-to-watch-a-large-number-of-directories
 
 AppImage Stuff:
- 	[exec] WARNING: AppStream upstream metadata is missing, please consider creating it
-    [exec]          in usr/share/metainfo/hypnos.appdata.xml
-    [exec]          Please see https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps
-    [exec]          for more information.
-    [exec] Please consider submitting your AppImage to AppImageHub, the crowd-sourced
-    [exec] central directory of available AppImages, by opening a pull request
-    [exec] at https://github.com/AppImage/appimage.github.io
+    [exec] AppStream upstream metadata found in usr/share/metainfo/hypnos.appdata.xml
+    [exec] W - hypnos.appdata.xml:net.hypnosplayer.Hypnos
+    [exec]     The metainfo filename does not match the component ID.
+
+      If i rename it, then its not seen. If i name it hypnos.appdata.xml it's seen but rejected
 
 
+if you add two search locations:
+
+   AA
+   AA/BB
+
+   then you remove AA/BB
+
+   It creates a hole in AA
+
+   Solution: 
+      When removing a music source, check if it's a child of another source, if so, only remove the source
+
+      What about the opposite?  Remove AA, leaving AA/BB? 
+
+I emptied the current list and library and playing track, and the art stayed. probably good to get rid of that
+
+Add /d/download to sources. Let it finish scanning. Close hypnos. Re-open. Remove it during rescan:
+   Exception in thread "JavaFX Application Thread" java.util.NoSuchElementException
+      at java.base/java.util.AbstractList$Itr.next(AbstractList.java:377)
+      at net.joshuad.hypnos.Library.requestRemoveSources(Library.java:253)
+      at net.joshuad.hypnos.fxui.LibraryLocationWindow$4.handle(LibraryLocationWindow.java:153)
+      at net.joshuad.hypnos.fxui.LibraryLocationWindow$4.handle(LibraryLocationWindow.java:1)
 
 
-
-
+:::::::::::::
 
 
 Features that need System-by-System attention
@@ -68,6 +88,8 @@ Features that need System-by-System attention
 
 
 Future
+   Maybe change lyric window content on select track
+
 	Can I expand encoding information display using vlc?
 
 	All
@@ -104,8 +126,6 @@ Future
 		some controls, maybe
 		use the diskTimeStamp variables I added
 
-	AppImage - Combine the two scripts that are currently being used to launch hypnos and make them one
-
 	File name in tag window somewhere
 		I tried doing what I have on the album track list window. It looked ugly and cluttered.
 
@@ -115,8 +135,6 @@ Future
 
 		User said it opened the track instead of opening folder. Confirmed on KDE Neon image on my computer, it opened gwenview
 			https://stackoverflow.com/questions/48131760/desktop-getdesktop-open-folder-in-kde-opens-up-gwenview-instead-of-dolphin
-
-	I emptied the current list and library and playing track, and the art stayed. probably good to get rid of that
 
 	Add a place to drag and drop folders (or navigate to them) to demand that they be rescanned immediately.
 		Maybe add a right click > rescan button on library window
