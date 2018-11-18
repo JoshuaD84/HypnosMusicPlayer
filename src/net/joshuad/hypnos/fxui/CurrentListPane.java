@@ -92,8 +92,6 @@ public class CurrentListPane extends BorderPane {
 	ImageView queueImage, menuImage;
 
 	Image repeatImageSource;
-
-	ThrottledTrackFilter currentListTableFilter;
 	
 	InfoFilterHybrid infoLabelAndFilter;
 	
@@ -381,13 +379,11 @@ public class CurrentListPane extends BorderPane {
 			}
 		});
 		
-		currentListTableFilter = new ThrottledTrackFilter ( audioSystem.getCurrentList().getFilteredItems() );
-		
 		infoLabelAndFilter.textProperty().addListener( new ChangeListener <String> () {
 			@Override
 			public void changed ( ObservableValue <? extends String> observable, String oldValue, String newValue ) {
 				Platform.runLater( () -> {
-					currentListTableFilter.setFilter( newValue, false );
+					audioSystem.getCurrentList().setFilter( newValue, false );
 				});
 			}
 		});

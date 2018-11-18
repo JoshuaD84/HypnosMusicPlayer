@@ -21,6 +21,7 @@ import javafx.collections.transformation.SortedList;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
+import net.joshuad.hypnos.fxui.ThrottledTrackFilter;
 
 public class CurrentList {
 
@@ -52,6 +53,8 @@ public class CurrentList {
 	private SortedList <CurrentListTrack> currentListSortedNoFilter;
 	
 	private final List <CurrentListListener> listeners = new ArrayList<CurrentListListener> ();
+
+	ThrottledTrackFilter currentListTableFilter;
 	
 	private AudioSystem audioSystem;
 	private Queue queue;
@@ -74,6 +77,8 @@ public class CurrentList {
 	public CurrentList ( AudioSystem audioSystem, Queue queue ) {
 		this.queue = queue;
 		this.audioSystem = audioSystem;
+
+		currentListTableFilter = new ThrottledTrackFilter ( currentListFiltered );
 		
 		startListWatcher();
 		
@@ -319,7 +324,6 @@ public class CurrentList {
 		
 		doThreadAware ( runMe );
 	}
-	
 	
 	public void moveTracks ( List<Integer> fromLocations, int toLocation ) {
 		if ( fromLocations == null ) {
@@ -998,5 +1002,9 @@ public class CurrentList {
 	
 	public void setItemsToSortedOrder() {
 		items.setAll( new ArrayList<CurrentListTrack> ( currentListSorted ) );
+	}
+
+	public void setFilter ( String newValue, boolean b ) {
+		currentListTableFilter.setFilter( newValue, false );
 	}
 }

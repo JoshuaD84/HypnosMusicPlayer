@@ -38,7 +38,6 @@ public class CLIParser {
 	Options options;
 	Options helpOptions;
 	
-	
 	public CLIParser ( ) {
 
 		options = new Options();
@@ -55,7 +54,7 @@ public class CLIParser {
 		options.addOption( null, SEEK_BACK, false, "Seek back 5 seconds" );
 		options.addOption( null, SEEK_FORWARD, false, "Seek forward 5 seconds" );
 		options.addOption( null, BASE_DIR, true, "Define the base directory from which to interpret relative file arguments" );
-		
+
 		parser = new DefaultParser();
 		
 		helpOptions = new Options();

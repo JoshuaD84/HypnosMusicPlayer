@@ -2,8 +2,6 @@ it handles trying to play tracks that are missing poorly
 
 Clear current list filter when loading an album or playlist
 
-Maybe show appimage-extract option at commandline options for linux
-
 Nov 17, 2018 22:09:28 PM net.joshuad.hypnos.Library watcherRegisterAll
 INFO: Unable to watch directory for changes: /d/download
 
@@ -20,6 +18,11 @@ AppImage Stuff:
     [exec] Please consider submitting your AppImage to AppImageHub, the crowd-sourced
     [exec] central directory of available AppImages, by opening a pull request
     [exec] at https://github.com/AppImage/appimage.github.io
+
+
+
+
+
 
 Features that need System-by-System attention
 	Global Hotkeys
