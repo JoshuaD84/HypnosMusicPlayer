@@ -2,14 +2,10 @@ it handles trying to play tracks that are missing poorly
 
 Clear current list filter when loading an album or playlist
 
-mp4s can sometimes be videos, so if they are added to the library scan folder you get videos in track/album list
-
 Maybe show appimage-extract option at commandline options for linux
 
-Export then cancel at popup:
-	Exception in thread "JavaFX Application Thread" java.lang.NullPointerException
-	at net.joshuad.hypnos.fxui.ExportPlaylistPopup.export(Unknown Source)
-	at net.joshuad.hypnos.fxui.CurrentListPane.lambda$setupControlPane$14(Unknown Source)
+Nov 17, 2018 22:09:28 PM net.joshuad.hypnos.Library watcherRegisterAll
+INFO: Unable to watch directory for changes: /d/download
 
 LastFM password field starts off filled in. Start it empty
 	Maybe add a "delete username and disconnect" button

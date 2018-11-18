@@ -100,10 +100,14 @@ public class ExportPlaylistPopup extends Stage {
 		stopRequested = false;
 		progressBar.progressProperty().set( 0 );
 		
-		Path targetFolder = ui.promptUserForFolder().toPath();
-		if ( targetFolder == null ) {
+		File targetFile = ui.promptUserForFolder();
+		
+		if ( targetFile == null ) {
+			doingExport = false;
 			return;
 		}
+		
+		Path targetFolder = targetFile.toPath();
 		
 		this.show();
 		
