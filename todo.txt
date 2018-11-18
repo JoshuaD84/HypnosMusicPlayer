@@ -1,7 +1,3 @@
-Java 11
-	Strip Linux JRE
-	Do Windows JRE
-	
 it handles trying to play tracks that are missing poorly
 
 mp4s can sometimes be videos, so if they are added to the library scan folder you get videos in track/album list
@@ -17,7 +13,7 @@ Export then cancel at popup:
 
 LastFM password field starts off filled in. Start it empty
 	Maybe add a "delete username and disconnect" button
-	
+
 WIll Oldham - Party with Marty - MusixMatch lyric search, get a few spans in there
 
 
