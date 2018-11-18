@@ -1,8 +1,8 @@
 it handles trying to play tracks that are missing poorly
 
-mp4s can sometimes be videos, so if they are added to the library scan folder you get videos in track/album list
+Clear current list filter when loading an album or playlist
 
-go to album button -> clear search filter box
+mp4s can sometimes be videos, so if they are added to the library scan folder you get videos in track/album list
 
 Maybe show appimage-extract option at commandline options for linux
 
@@ -15,10 +15,6 @@ LastFM password field starts off filled in. Start it empty
 	Maybe add a "delete username and disconnect" button
 
 WIll Oldham - Party with Marty - MusixMatch lyric search, get a few spans in there
-
-
-Lorde - Royales skips on my Ubuntu 18.04
-	It does not skip in VLC.  Maybe try putting all of the library back and see what happens
 
 AppImage Stuff:
  	[exec] WARNING: AppStream upstream metadata is missing, please consider creating it

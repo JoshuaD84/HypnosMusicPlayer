@@ -2286,4 +2286,8 @@ public class LibraryTabPane extends StretchedTabPane {
 		trackTable.setPlaceholder( loadingTrackListLabel );
 		playlistTable.setPlaceholder( loadingPlaylistListLabel );
 	}
+
+	public void clearAlbumFilter () {
+		albumFilterBox.setText( "" );
+	}
 }

@@ -1558,6 +1558,7 @@ public class FXUI implements PlayerListener {
 		
 		for ( Album album : library.getAlbums() ) {
 			if ( album.getPath().equals( albumPath ) ) {
+				libraryPane.clearAlbumFilter();
 				libraryPane.albumTable.getSelectionModel().clearSelection();
 				libraryPane.albumTable.getSelectionModel().select( album );
 				libraryPane.albumTable.requestFocus();
