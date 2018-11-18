@@ -26,14 +26,6 @@ if you add two search locations:
 
 I emptied the current list and library and playing track, and the art stayed. probably good to get rid of that
 
-Add /d/download to sources. Let it finish scanning. Close hypnos. Re-open. Remove it during rescan:
-   Exception in thread "JavaFX Application Thread" java.util.NoSuchElementException
-      at java.base/java.util.AbstractList$Itr.next(AbstractList.java:377)
-      at net.joshuad.hypnos.Library.requestRemoveSources(Library.java:253)
-      at net.joshuad.hypnos.fxui.LibraryLocationWindow$4.handle(LibraryLocationWindow.java:153)
-      at net.joshuad.hypnos.fxui.LibraryLocationWindow$4.handle(LibraryLocationWindow.java:1)
-
-
 :::::::::::::
 
 

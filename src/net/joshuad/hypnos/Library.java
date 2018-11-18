@@ -250,7 +250,9 @@ public class Library {
 			fileWalker.interrupt();
 		}
 		
-		for ( Path path : paths ) {
+		ArrayList<Path> pathCopy = new ArrayList<> ( paths );
+		
+		for ( Path path : pathCopy ) {
 			musicSourcePaths.remove( path );
 		}
 	}
