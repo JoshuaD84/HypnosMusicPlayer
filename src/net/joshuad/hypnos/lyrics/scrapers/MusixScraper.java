@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import org.apache.commons.text.StringEscapeUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
 import net.joshuad.hypnos.lyrics.Lyrics;
 import net.joshuad.hypnos.lyrics.LyricsFetcher;
@@ -32,7 +33,11 @@ public class MusixScraper extends AbstractScraper {
 		try {
 			Document doc = Jsoup.connect( url ).get();
 			doc.outputSettings().prettyPrint( false );
-			lyrics = doc.getElementsByClass( "mxm-lyrics__content" ).html();
+			Elements lyricElement = doc.getElementsByClass( "mxm-lyrics__content" );
+			lyrics = lyricElement.html();
+			
+			lyrics = lyrics.replaceAll( "<span class=\"lyrics__content__.*\">", "" );
+			lyrics = lyrics.replaceAll( "</span>", "" );
 			
 		} catch ( IOException e ) {
 			return new Lyrics ( "", LyricsFetcher.LyricSite.MUSIX, url, Lyrics.ScrapeError.NOT_FOUND );
@@ -62,7 +67,7 @@ public class MusixScraper extends AbstractScraper {
 	
 	public static void main ( String [] args ) {
 		MusixScraper parser = new MusixScraper();
-		Lyrics result = parser.getLyrics( "Jenny Lewis with the Watson Twins", "Handle with Care" );
+		Lyrics result = parser.getLyrics( "Blind Guardian", "The Eldar" );
 		
 		if ( result.hadScrapeError() ) {
 			System.out.println ( "Error: " + result.getError() );
