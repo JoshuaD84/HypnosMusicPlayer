@@ -54,7 +54,6 @@ public class Track implements Serializable, AlbumInfoSource {
 		MP3 ( "mp3" ),
 		OGG ( "ogg" ),
 		ALAC ( "alac" ),
-		MP4 ( "mp4" ),
 		WAV ( "wav" ),
 		M4A ( "m4a" ),
 		M4B ( "m4b" ),
