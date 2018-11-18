@@ -764,6 +764,10 @@ public class AudioSystem {
 	public DoubleProperty scrobbleTimeProperty () {
 		return lastFMScrobbleTime;
 	}
+
+	public FXUI getUI () {
+		return ui;
+	}
 }
 
 

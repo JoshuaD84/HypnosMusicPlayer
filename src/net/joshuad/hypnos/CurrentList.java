@@ -377,6 +377,8 @@ public class CurrentList {
 	public void setTracks ( List <? extends Track> tracks, boolean clearQueue ) {
 		clearList();
 		if ( clearQueue ) queue.clear();
+		this.currentListTableFilter.setFilter( "", false );
+		audioSystem.getUI().setCurrentListFilterText( "" );
 		appendTracks ( tracks );
 	}
 		

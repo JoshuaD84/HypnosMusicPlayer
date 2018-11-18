@@ -92,6 +92,13 @@ public class InfoFilterHybrid extends BorderPane {
 		return filter.getText();
 	}
 	
+	public void setText ( String string ) {
+		if ( string == null ) string = "";
+		filter.setText( string );
+		editing = false;
+		updateDisplay();
+	}
+	
 	public void clearFilterText() {
 		filter.clear();
 		updateDisplay();
@@ -166,4 +173,5 @@ public class InfoFilterHybrid extends BorderPane {
 		
 		table.addEventFilter( KeyEvent.KEY_PRESSED, tableKeyFilter );
 	}
+
 }

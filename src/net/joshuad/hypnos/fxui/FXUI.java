@@ -1590,6 +1590,10 @@ public class FXUI implements PlayerListener {
 	public CurrentListPane getCurrentListPane () {
 		return currentListPane;
 	}
+	
+	public void setCurrentListFilterText ( String string ) {
+		currentListPane.infoLabelAndFilter.setText ( string );
+	}
 }
 
 class LineNumbersCellFactory<T, E> implements Callback<TableColumn<T, E>, TableCell<T, E>> {
