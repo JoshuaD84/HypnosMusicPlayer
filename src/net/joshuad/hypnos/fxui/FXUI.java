@@ -71,6 +71,7 @@ import javafx.util.Callback;
 import javafx.util.Duration;
 import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.CurrentList;
+import net.joshuad.hypnos.CurrentList.Mode;
 import net.joshuad.hypnos.CurrentListState;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.Hypnos;
@@ -782,7 +783,12 @@ public class FXUI implements PlayerListener {
 			}	
 			
 			CurrentListState state = audioSystem.getCurrentList().getState();
-			CurrentListState newState = new CurrentListState ( state.getItems(), state.getAlbums(), updatedPlaylist, CurrentList.Mode.PLAYLIST );
+			CurrentListState newState;
+			if ( state.getMode() == Mode.PLAYLIST || state.getMode() == Mode.PLAYLIST_UNSAVED ) {
+				newState = new CurrentListState ( state.getItems(), state.getAlbums(), updatedPlaylist, CurrentList.Mode.PLAYLIST );
+			} else {
+				newState = new CurrentListState ( state.getItems(), state.getAlbums(), null, state.getMode() );
+			}
 			
 			audioSystem.getCurrentList().setState( newState );
 			return true;
