@@ -44,7 +44,6 @@ import net.joshuad.hypnos.audio.AudioSystem;
 public class ImagesPanel extends SplitPane {
 
 	static final DataFormat textContentFormat = DataFormat.lookupMimeType( "text/plain" );
-	static final DataFormat byteBufferFormat = DataFormat.lookupMimeType( "application/octet-stream" );
 	
 	private static final Logger LOGGER = Logger.getLogger( ImagesPanel.class.getName() );
 
@@ -201,6 +200,7 @@ public class ImagesPanel extends SplitPane {
 				
 				if ( buffer != null ) {
 					track.setAndSaveAlbumImage( buffer, audioSystem );
+				
 				} else {
 					String url = "";
 					if ( db.getContentTypes().contains( textContentFormat ) ) {
@@ -208,15 +208,18 @@ public class ImagesPanel extends SplitPane {
 					}
 					
 					String message = 
-						"Cannot pull image from dropped source.\n\n" +
+						"Cannot save image from dropped source.\n\n" +
 						url + 
 						"Try saving the image to disk and dragging from disk rather than web.";
 					LOGGER.warning( message.replaceAll( "\n\n", " " ) );
 					ui.notifyUserError( message );
 				}
-				event.setDropCompleted( true );
-				event.consume();
+
+				setImages ( ui.currentImagesTrack );
 			}
+			
+			event.setDropCompleted( true );
+			event.consume();
 		});
 	}
 	
@@ -681,9 +684,22 @@ public class ImagesPanel extends SplitPane {
 			}
 		} 
 		
-		if ( retMe == null && db.getContentTypes().contains( byteBufferFormat ) ) {
+		if ( retMe == null ) {
+			DataFormat byteBufferFormat = null;
+			for ( DataFormat format : db.getContentTypes() ) { 
+				//Stupidly, DataFormat.lookupMimeType( "application/octet-stream" ) does not work.
+				//But this does. 
+				if ( "application/octet-stream".equals( format.getIdentifiers().toArray()[0] ) ) {
+					byteBufferFormat = format;
+				}
+			}
+			
+			if ( byteBufferFormat != null ) {
+				retMe = ((ByteBuffer)db.getContent( byteBufferFormat )).array();
+				if ( retMe.length < 100 ) retMe = null; //This is a hack. 
+			}
+
 			retMe = ((ByteBuffer)db.getContent( byteBufferFormat )).array();
-			if ( retMe.length < 100 ) retMe = null; //This is a hack. 
 		}
 
 		return retMe;

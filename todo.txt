@@ -5,21 +5,10 @@ AppImage Stuff:
 
       If i rename it, then its not seen. If i name it hypnos.appdata.xml it's seen but rejected
 
-Make drag and drop work from google image search
-
 if you add two search locations:
-
    AA
    AA/BB
-
-   then you remove AA/BB
-
-   It creates a hole in AA
-
-   Solution: 
-      When removing a music source, check if it's a child of another source, if so, only remove the source
-
-      What about the opposite?  Remove AA, leaving AA/BB? 
+   When you remove AA, AA/BB's files get deleted
 
 I emptied the current list and library and playing track, and the art stayed. probably good to get rid of that
 
@@ -210,16 +199,9 @@ Future
 
 		Library load and unload time
 
-		Loader status % complete thing
-
-		Allow sources to be hidden
-
 		Maybe allow a filter for file type and lossy vs not lossy
 			Maybe just a special search text "type:mp3", "type:lossy"
 			I dunno making search box script is alot.
-
-		Give user feedback about the disk scanner and the ability to control it
-
 :::: OS Specific ::::
 
 	https://stackoverflow.com/questions/17305524/simplicity-for-executing-java-from-c
