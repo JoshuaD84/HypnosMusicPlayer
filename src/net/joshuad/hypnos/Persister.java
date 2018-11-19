@@ -243,7 +243,7 @@ public class Persister {
 		if ( !library.sourcesHasUnsavedData() ) return;
 		File tempSourcesFile = new File ( sourcesFile.toString() + ".temp" );
 		try ( ObjectOutputStream sourcesOut = new ObjectOutputStream( new FileOutputStream( tempSourcesFile ) ); ) {
-			sourcesOut.writeObject( new ArrayList <MusicSearchLocation> ( library.musicSourceLocations ) );
+			sourcesOut.writeObject( new ArrayList <MusicSearchLocation> ( library.musicSearchLocations ) );
 			sourcesOut.flush();
 			sourcesOut.close();
 

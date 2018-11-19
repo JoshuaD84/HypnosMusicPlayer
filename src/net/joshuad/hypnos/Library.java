@@ -62,7 +62,7 @@ public class Library {
 	final FilteredList <TagError> tagErrorsFiltered = new FilteredList <TagError>( tagErrors, p -> true );
 	final SortedList <TagError> tagErrorsSorted = new SortedList <TagError>( tagErrorsFiltered );
 	
-	final ObservableList <MusicSearchLocation> musicSourceLocations = FXCollections.observableArrayList();
+	final ObservableList <MusicSearchLocation> musicSearchLocations = FXCollections.observableArrayList();
 	private boolean sourcesHaveUnsavedData = false;
 	
 	Vector <Album> albumsToAdd = new Vector <Album>();
@@ -99,7 +99,7 @@ public class Library {
 			}
 		}
 		
-		musicSourceLocations.addListener( (ListChangeListener.Change<? extends MusicSearchLocation> change) -> {
+		musicSearchLocations.addListener( (ListChangeListener.Change<? extends MusicSearchLocation> change) -> {
 			sourcesHaveUnsavedData = true;			
 		});
 	}
@@ -125,7 +125,7 @@ public class Library {
 				int missingCounter = 0;
 				while ( true ) {
 					
-					for ( MusicSearchLocation location : musicSourceLocations ) {
+					for ( MusicSearchLocation location : musicSearchLocations ) {
 						location.recheckValidity();
 					}
 					
@@ -217,7 +217,7 @@ public class Library {
 	public void requestUpdateSources ( List<MusicSearchLocation> locations ) {
 		sourceToUpdate.addAll( locations );
 		for ( MusicSearchLocation location : locations ) {
-			musicSourceLocations.add( location );
+			musicSearchLocations.add( location );
 		}
 	}
 	
@@ -230,7 +230,7 @@ public class Library {
 				if ( path.toFile().exists() && path.toFile().isDirectory() ) {
 
 					boolean addSelectedPathToList = true;
-					for ( MusicSearchLocation alreadyAddedLocation : musicSourceLocations ) {
+					for ( MusicSearchLocation alreadyAddedLocation : musicSearchLocations ) {
 						try {
 							if ( Files.isSameFile( path, alreadyAddedLocation.getPath() ) ) {
 								addSelectedPathToList = false;
@@ -240,7 +240,7 @@ public class Library {
 					
 					if ( addSelectedPathToList ) {
 						sourceToAdd.add ( location );
-						musicSourceLocations.add ( location );
+						musicSearchLocations.add ( location );
 						if ( fileWalker != null ) {
 							fileWalker.interrupt();
 						}
@@ -260,7 +260,7 @@ public class Library {
 		ArrayList<MusicSearchLocation> locationsCopy = new ArrayList<> ( locations );
 		
 		for ( MusicSearchLocation path : locationsCopy ) {
-			musicSourceLocations.remove( path );
+			musicSearchLocations.remove( path );
 		}
 	}
 	
@@ -388,9 +388,27 @@ public class Library {
 
 		sourceToUpdate.remove( removeMeLocation );
 		sourceToAdd.remove( removeMeLocation );
-		musicSourceLocations.remove( removeMeLocation );
+		musicSearchLocations.remove( removeMeLocation );
 		
-		if ( musicSourceLocations.size() == 0 ) {
+		boolean isChildOfAnotherLocation = false;
+		
+		for ( MusicSearchLocation searchLocation : musicSearchLocations ) {
+			try {
+				Path removeMeRealPath = removeMeLocation.getPath().toRealPath();
+				Path searchRealPath = searchLocation.getPath().toRealPath();
+				
+				if ( removeMeRealPath.startsWith( searchRealPath ) ) {
+					isChildOfAnotherLocation = true;
+				}
+			} catch ( IOException e ) {
+				//One of the paths doesn't exist. Do nothing
+			}
+		}
+		
+		if ( isChildOfAnotherLocation ) {
+			//Do nothing else. Don't delete any tracks or albums
+		
+		} else if ( musicSearchLocations.size() == 0 ) {
 
 			Platform.runLater( () -> {
 				synchronized ( albumsToAdd ) {
@@ -429,7 +447,6 @@ public class Library {
 					tagErrors.clear();
 				}
 				
-				Hypnos.getUI().getLibraryPane().updateLibraryListPlaceholder(); //REFACTOR: This desn't really belong here. 
 			});
 			
 		} else {
@@ -456,7 +473,8 @@ public class Library {
 				Hypnos.getUI().setLibraryLoaderStatus( message, countDone / (double)totalCount );
 			}
 		}
-		
+
+		Hypnos.getUI().getLibraryPane().updateLibraryListPlaceholder(); //REFACTOR: This desn't really belong here. 
 		Hypnos.getUI().setLibraryLoaderStatusToStandby();
 	}
 	
@@ -562,7 +580,7 @@ public class Library {
 		ArrayList <Album> albumsCopy = new ArrayList <Album> ( albums );
 		for ( Album album : albumsCopy ) {
 			boolean hasParent = false;
-			for ( MusicSearchLocation sourceLocation : musicSourceLocations ) {
+			for ( MusicSearchLocation sourceLocation : musicSearchLocations ) {
 				if ( album.getPath().toAbsolutePath().startsWith( sourceLocation.getPath() ) ) {
 					hasParent = true;
 				}
@@ -581,7 +599,7 @@ public class Library {
 		ArrayList <Track> tracksCopy = new ArrayList <Track> ( tracks );
 		for ( Track track : tracksCopy ) {
 			boolean hasParent = false;
-			for ( MusicSearchLocation sourceLocation : musicSourceLocations ) {
+			for ( MusicSearchLocation sourceLocation : musicSearchLocations ) {
 				if ( track.getPath().toAbsolutePath().startsWith( sourceLocation.getPath() ) ) {
 					hasParent = true;
 				}
@@ -644,8 +662,6 @@ public class Library {
 			return false;
 		}
 		
-		System.out.println ( "Directory: " + directory );
-
 		for ( WatchEvent <?> event : key.pollEvents() ) {
 			WatchEvent.Kind<?> eventKind = event.kind();
 
@@ -671,7 +687,7 @@ public class Library {
 				}
 			
 			} else if ( eventKind == StandardWatchEventKinds.OVERFLOW ) {
-				for ( MusicSearchLocation location : musicSourceLocations ) {
+				for ( MusicSearchLocation location : musicSearchLocations ) {
 					sourceToUpdate.add( location );
 				}
 			}
@@ -723,7 +739,7 @@ public class Library {
 	}
 
 	public ObservableList <MusicSearchLocation> getMusicSourcePaths () {
-		return musicSourceLocations;
+		return musicSearchLocations;
 	}
 
 	public FilteredList <Playlist> getPlaylistsFiltered () {
