@@ -1,7 +1,3 @@
-Nov 17, 2018 22:09:28 PM net.joshuad.hypnos.Library watcherRegisterAll
-INFO: Unable to watch directory for changes: /d/download
-   https://stackoverflow.com/questions/53359456/best-way-to-watch-a-large-number-of-directories
-
 AppImage Stuff:
     [exec] AppStream upstream metadata found in usr/share/metainfo/hypnos.appdata.xml
     [exec] W - hypnos.appdata.xml:net.hypnosplayer.Hypnos
@@ -10,8 +6,6 @@ AppImage Stuff:
       If i rename it, then its not seen. If i name it hypnos.appdata.xml it's seen but rejected
 
 Make drag and drop work from google image search
-
-Library Source Directories - highlight in red if they are missing.
 
 if you add two search locations:
 

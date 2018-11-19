@@ -16,6 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.Dragboard;
@@ -98,6 +99,33 @@ public class LibraryLocationWindow extends Stage {
 			}
 		} );
 		
+		musicSourceTable.setRowFactory( tv -> {
+			TableRow <MusicSearchLocation> row = new TableRow <>();
+
+			row.itemProperty().addListener( (obs, oldValue, newValue ) -> {
+				if ( newValue != null && row != null ) {
+			        if ( !newValue.validSearchLocationProperty().get() ) {
+			            row.getStyleClass().add( "file-missing" );
+			        } else {
+			            row.getStyleClass().remove( "file-missing" );
+			        }
+				}
+		    });
+			
+			row.itemProperty().addListener( ( obs, oldValue, newTrackValue ) -> {
+				if ( newTrackValue != null  && row != null ) {
+					newTrackValue.validSearchLocationProperty().addListener( ( o, old, newValue ) -> {
+						if ( !newValue ) {
+							row.getStyleClass().add( "file-missing" );
+						} else {
+							row.getStyleClass().remove( "file-missing" );
+						}
+					});
+				}
+			});
+			return row;
+		});
+
 		musicSourceTable.setOnDragDropped( event -> {
 			Dragboard db = event.getDragboard();
 			if ( db.hasFiles() ) {

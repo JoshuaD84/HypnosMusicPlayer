@@ -124,6 +124,11 @@ public class Library {
 				int orphanCounter = 0;
 				int missingCounter = 0;
 				while ( true ) {
+					
+					for ( MusicSearchLocation location : musicSourceLocations ) {
+						location.recheckValidity();
+					}
+					
 					if ( !sourceToRemove.isEmpty() ) {
 						removeOneSource();
 						albumTrackDataChangedSinceLastSave = true;
@@ -638,6 +643,8 @@ public class Library {
 		if ( directory == null ) {
 			return false;
 		}
+		
+		System.out.println ( "Directory: " + directory );
 
 		for ( WatchEvent <?> event : key.pollEvents() ) {
 			WatchEvent.Kind<?> eventKind = event.kind();
