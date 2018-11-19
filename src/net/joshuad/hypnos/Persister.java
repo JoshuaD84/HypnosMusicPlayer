@@ -16,7 +16,6 @@ import java.io.PrintWriter;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -155,9 +154,9 @@ public class Persister {
 
 	public boolean loadSources () {
 		try ( ObjectInputStream sourcesIn = new ObjectInputStream( new FileInputStream( sourcesFile ) ); ) {
-			ArrayList <String> searchPaths = (ArrayList <String>) sourcesIn.readObject();
-			for ( String pathString : searchPaths ) {
-				library.requestUpdateSource( Paths.get( pathString ) );
+			ArrayList <MusicSearchLocation> searchLocations = (ArrayList <MusicSearchLocation>) sourcesIn.readObject();
+			for ( MusicSearchLocation locations : searchLocations ) {
+				library.requestUpdateSource( locations );
 			}
 
 			library.setSourcesHasUnsavedData( false );
@@ -244,11 +243,7 @@ public class Persister {
 		if ( !library.sourcesHasUnsavedData() ) return;
 		File tempSourcesFile = new File ( sourcesFile.toString() + ".temp" );
 		try ( ObjectOutputStream sourcesOut = new ObjectOutputStream( new FileOutputStream( tempSourcesFile ) ); ) {
-			ArrayList <String> searchPaths = new ArrayList <String>( library.musicSourcePaths.size() );
-			for ( Path path : library.musicSourcePaths ) {
-				searchPaths.add( path.toString() );
-			}
-			sourcesOut.writeObject( searchPaths );
+			sourcesOut.writeObject( new ArrayList <MusicSearchLocation> ( library.musicSourceLocations ) );
 			sourcesOut.flush();
 			sourcesOut.close();
 

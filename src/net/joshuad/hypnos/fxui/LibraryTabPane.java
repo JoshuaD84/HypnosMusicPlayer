@@ -62,6 +62,7 @@ import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.AlphanumComparator;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Library;
+import net.joshuad.hypnos.MusicSearchLocation;
 import net.joshuad.hypnos.Persister;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
@@ -912,7 +913,7 @@ public class LibraryTabPane extends StretchedTabPane {
 				List <File> files = db.getFiles();
 				
 				for ( File file : files ) {
-					library.requestAddSource( file.toPath() );
+					library.requestAddSource( new MusicSearchLocation ( file.toPath() ) );
 				}
 
 				event.setDropCompleted( true );
@@ -963,7 +964,7 @@ public class LibraryTabPane extends StretchedTabPane {
 					List <File> files = db.getFiles();
 					
 					for ( File file : files ) {
-						library.requestAddSource( file.toPath() );
+						library.requestAddSource( new MusicSearchLocation ( file.toPath() ) );
 					}
 
 					event.setDropCompleted( true );
@@ -1340,7 +1341,7 @@ public class LibraryTabPane extends StretchedTabPane {
 				List <File> files = db.getFiles();
 				
 				for ( File file : files ) {
-					library.requestAddSource( file.toPath() );
+					library.requestAddSource( new MusicSearchLocation ( file.toPath() ) );
 				}
 
 				event.setDropCompleted( true );
@@ -1378,7 +1379,7 @@ public class LibraryTabPane extends StretchedTabPane {
 					List <File> files = db.getFiles();
 					
 					for ( File file : files ) {
-						library.requestAddSource( file.toPath() );
+						library.requestAddSource( new MusicSearchLocation ( file.toPath() ) );
 					}
 
 					event.setDropCompleted( true );

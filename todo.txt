@@ -11,6 +11,8 @@ AppImage Stuff:
 
 Make drag and drop work from google image search
 
+Library Source Directories - highlight in red if they are missing.
+
 if you add two search locations:
 
    AA
@@ -200,16 +202,14 @@ Future
 		Resolved in java 9 apparently
 
 :::: Refactor / organize my code ::::
+ 	Make LibraryUpdater part of Library. Is there a way to abstract out the Platform -> RunLater part? I feel like we're just stuck w/ that, which kind of ties to us JavaFX
 
- 	Make LibraryUpdater part of Library. Is there a way to abstract out the Platform -> RunLater part? I feel like we're just stuck w/ that, which kind of ties to us JavaFX.
  		Maybe ui.runMe ( Runnable ), and then the UI can decide whether to launch a new thread, have a thread idling, do it on this thread, or use something like Platform.runLater()
 
 	a better structure for hotkey commands (maybe combine with commandline commands?)
 
 
 	Refactor Library
-		Make a source directory a class, not just a path.
-			Library Source Directories - highlight in red if they are missing.
 
 		An album will form from tracks if you edit them and they aren't currently an album. But an album won't split if you edit tags and make it not be an album.
 			Is this desired behavior? I feel like probably no -- it can create different states based on the same disk contents, which doesn't make sense

@@ -1,7 +1,6 @@
 package net.joshuad.hypnos.fxui;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.List;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -34,10 +33,11 @@ import javafx.util.Callback;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.LibraryUpdater.LoaderSpeed;
+import net.joshuad.hypnos.MusicSearchLocation;
 
 public class LibraryLocationWindow extends Stage {
 
-	TableView <Path> musicSourceTable;
+	TableView <MusicSearchLocation> musicSourceTable;
 	
 	Library library;
 
@@ -60,7 +60,7 @@ public class LibraryLocationWindow extends Stage {
 		scene = new Scene( root );
 		VBox primaryPane = new VBox();
 
-		musicSourceTable = new TableView<Path> ();
+		musicSourceTable = new TableView<MusicSearchLocation> ();
 		Label emptyLabel = new Label( "No directories in your library. Either '+ Add' or drop directories here." );
 		emptyLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
 		emptyLabel.setWrapText( true );
@@ -84,13 +84,14 @@ public class LibraryLocationWindow extends Stage {
 			}
 		} );
 
-		TableColumn <Path, String> dirListColumn = new TableColumn<Path, String> ( "Location" );
-		dirListColumn.setCellValueFactory( new Callback <TableColumn.CellDataFeatures <Path, String>, ObservableValue <String>>() {
+		TableColumn <MusicSearchLocation, String> dirListColumn = new TableColumn<> ( "Location" );
+		dirListColumn.setCellValueFactory( 
+			new Callback <TableColumn.CellDataFeatures <MusicSearchLocation, String>, ObservableValue <String>>() {
 
 			@Override
-			public ObservableValue <String> call ( TableColumn.CellDataFeatures <Path, String> p ) {
+			public ObservableValue <String> call ( TableColumn.CellDataFeatures <MusicSearchLocation, String> p ) {
 				if ( p.getValue() != null ) {
-					return new SimpleStringProperty( p.getValue().toAbsolutePath().toString() );
+					return new SimpleStringProperty( p.getValue().getPath().toAbsolutePath().toString() );
 				} else {
 					return new SimpleStringProperty( "<no name>" );
 				}
@@ -103,7 +104,7 @@ public class LibraryLocationWindow extends Stage {
 				List <File> files = db.getFiles();
 				
 				for ( File file : files ) {
-					library.requestAddSource( file.toPath() );
+					library.requestAddSource( new MusicSearchLocation ( file.toPath() ) );
 				}
 
 				event.setDropCompleted( true );
@@ -141,7 +142,7 @@ public class LibraryLocationWindow extends Stage {
 			public void handle ( ActionEvent e ) {
 				File selectedFile = chooser.showDialog( me );
 				if ( selectedFile != null ) {
-					library.requestAddSource( selectedFile.toPath() );
+					library.requestAddSource( new MusicSearchLocation ( selectedFile.toPath() ) );
 				}
 			}
 		});

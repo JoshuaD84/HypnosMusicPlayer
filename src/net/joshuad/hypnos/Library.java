@@ -62,7 +62,7 @@ public class Library {
 	final FilteredList <TagError> tagErrorsFiltered = new FilteredList <TagError>( tagErrors, p -> true );
 	final SortedList <TagError> tagErrorsSorted = new SortedList <TagError>( tagErrorsFiltered );
 	
-	final ObservableList <Path> musicSourcePaths = FXCollections.observableArrayList();
+	final ObservableList <MusicSearchLocation> musicSourceLocations = FXCollections.observableArrayList();
 	private boolean sourcesHaveUnsavedData = false;
 	
 	Vector <Album> albumsToAdd = new Vector <Album>();
@@ -77,9 +77,9 @@ public class Library {
 	Vector <Playlist> playlistsToRemove = new Vector <Playlist>();
 	Vector <Playlist> playlistsToUpdate = new Vector <Playlist>();
 
-	private Vector <Path> sourceToAdd = new Vector <Path>();
-	private Vector <Path> sourceToRemove = new Vector <Path>();
-	private Vector <Path> sourceToUpdate = new Vector <Path>();
+	private Vector <MusicSearchLocation> sourceToAdd = new Vector <MusicSearchLocation>();
+	private Vector <MusicSearchLocation> sourceToRemove = new Vector <MusicSearchLocation>();
+	private Vector <MusicSearchLocation> sourceToUpdate = new Vector <MusicSearchLocation>();
 		
 	private boolean purgeMissing = true, purgeOrphans = true;
 	
@@ -99,7 +99,7 @@ public class Library {
 			}
 		}
 		
-		musicSourcePaths.addListener( (ListChangeListener.Change<? extends Path> change) -> {
+		musicSourceLocations.addListener( (ListChangeListener.Change<? extends MusicSearchLocation> change) -> {
 			sourcesHaveUnsavedData = true;			
 		});
 	}
@@ -209,32 +209,33 @@ public class Library {
 		this.loaderSleepTimeMS = timeMS;
 	}
 	
-	public void requestUpdateSources ( List<Path> paths ) {
-		sourceToUpdate.addAll( paths );
-		for ( Path path : paths ) {
-			musicSourcePaths.add( path );
+	public void requestUpdateSources ( List<MusicSearchLocation> locations ) {
+		sourceToUpdate.addAll( locations );
+		for ( MusicSearchLocation location : locations ) {
+			musicSourceLocations.add( location );
 		}
 	}
 	
-	public void requestAddSources ( List<Path> paths ) {
-		for ( Path path : paths ) {
+	public void requestAddSources ( List<MusicSearchLocation> locations ) {
+		for ( MusicSearchLocation location : locations ) {
+			Path path = location.getPath();
 			if ( path != null ) {
 				path = path.toAbsolutePath();
 				
 				if ( path.toFile().exists() && path.toFile().isDirectory() ) {
 
 					boolean addSelectedPathToList = true;
-					for ( Path alreadyAddedPath : musicSourcePaths ) {
+					for ( MusicSearchLocation alreadyAddedLocation : musicSourceLocations ) {
 						try {
-							if ( Files.isSameFile( path, alreadyAddedPath ) ) {
+							if ( Files.isSameFile( path, alreadyAddedLocation.getPath() ) ) {
 								addSelectedPathToList = false;
 							}
 						} catch ( IOException e1 ) {} // Do nothing, assume they don't match.
 					}
 					
 					if ( addSelectedPathToList ) {
-						sourceToAdd.add ( path );
-						musicSourcePaths.add( path );
+						sourceToAdd.add ( location );
+						musicSourceLocations.add ( location );
 						if ( fileWalker != null ) {
 							fileWalker.interrupt();
 						}
@@ -244,33 +245,33 @@ public class Library {
 		}
 	}	
 	
-	public void requestRemoveSources ( List<Path> paths ) {
-		sourceToRemove.addAll ( paths );
+	public void requestRemoveSources ( List<MusicSearchLocation> locations ) {
+		sourceToRemove.addAll ( locations );
 		
 		if ( fileWalker != null ) {
 			fileWalker.interrupt();
 		}
 		
-		ArrayList<Path> pathCopy = new ArrayList<> ( paths );
+		ArrayList<MusicSearchLocation> locationsCopy = new ArrayList<> ( locations );
 		
-		for ( Path path : pathCopy ) {
-			musicSourcePaths.remove( path );
+		for ( MusicSearchLocation path : locationsCopy ) {
+			musicSourceLocations.remove( path );
 		}
 	}
 	
-	public void requestUpdate ( Path path ) {
+	public void requestUpdate ( MusicSearchLocation path ) {
 		sourceToUpdate.add( path );
 	}
 	
-	public void requestUpdateSource ( Path path ) {
+	public void requestUpdateSource ( MusicSearchLocation path ) {
 		requestUpdateSources( Arrays.asList( path ) );
 	}
 
-	public void requestAddSource ( Path path ) {
+	public void requestAddSource ( MusicSearchLocation path ) {
 		requestAddSources( Arrays.asList( path ) );
 	}
 	
-	public void requestRemoveSource ( Path path ) {
+	public void requestRemoveSource ( MusicSearchLocation path ) {
 		requestRemoveSources ( Arrays.asList( path ) );
 	}
 	
@@ -374,17 +375,17 @@ public class Library {
 			}
 		}
 		
-		Path removeMeSource = sourceToRemove.remove( 0 );
+		MusicSearchLocation removeMeLocation = sourceToRemove.remove( 0 );
 		
-		String message = "Removing " + removeMeSource.toString() + "...";
+		String message = "Removing " + removeMeLocation.getPath().toString() + "...";
 		
 		Hypnos.getUI().setLibraryLoaderStatus( message, 0 );
 
-		sourceToUpdate.remove( removeMeSource );
-		sourceToAdd.remove( removeMeSource );
-		musicSourcePaths.remove( removeMeSource );
+		sourceToUpdate.remove( removeMeLocation );
+		sourceToAdd.remove( removeMeLocation );
+		musicSourceLocations.remove( removeMeLocation );
 		
-		if ( musicSourcePaths.size() == 0 ) {
+		if ( musicSourceLocations.size() == 0 ) {
 
 			Platform.runLater( () -> {
 				synchronized ( albumsToAdd ) {
@@ -435,7 +436,7 @@ public class Library {
 			
 			int countDone = 0;
 			for ( Album album : albumsCopy ) {
-				if ( album.getPath().toAbsolutePath().startsWith( removeMeSource ) ) {
+				if ( album.getPath().toAbsolutePath().startsWith( removeMeLocation.getPath() ) ) {
 					removeAlbum ( album );
 				}
 				countDone++;
@@ -443,7 +444,7 @@ public class Library {
 			}
 			
 			for ( Track track : tracksCopy ) {
-				if ( track.getPath().toAbsolutePath().startsWith( removeMeSource ) ) {
+				if ( track.getPath().toAbsolutePath().startsWith( removeMeLocation.getPath() ) ) {
 					removeTrack( track );
 				}
 				countDone++;
@@ -459,34 +460,34 @@ public class Library {
 	}
 	
 	private void loadOneSource() {
-		Path selectedPath = sourceToAdd.get( 0 );
+		MusicSearchLocation selectedLocation = sourceToAdd.get( 0 );
 		
 		long directoryCount = -1;
 		
 		try {
-			directoryCount = getDirectoryCount ( selectedPath );
+			directoryCount = getDirectoryCount ( selectedLocation.getPath() );
 		} catch ( IOException e ) {
 			LOGGER.log( Level.INFO, "Unable to count directories, library loader progress bar will not function: " 
-				+ selectedPath.toString(), e );
+				+ selectedLocation.getPath().toString(), e );
 		}
 		
-		fileWalker = new InitialScanFileVisitor( this, "Scanning " + selectedPath.toString() + "...", directoryCount );
+		fileWalker = new InitialScanFileVisitor( this, "Scanning " + selectedLocation.getPath().toString() + "...", directoryCount );
 		try {
 
 			Files.walkFileTree ( 
-				selectedPath, 
+					selectedLocation.getPath(), 
 				EnumSet.of( FileVisitOption.FOLLOW_LINKS ), 
 				Integer.MAX_VALUE,
 				fileWalker
 			);
 			
 			if ( !fileWalker.getWalkInterrupted() ) {
-				sourceToAdd.remove( selectedPath );
-				watcherRegisterAll ( selectedPath );
+				sourceToAdd.remove( selectedLocation );
+				watcherRegisterAll ( selectedLocation );
 			}
 			
 		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load some files in path: " + selectedPath.toString(), e );
+			LOGGER.log( Level.WARNING, "Unable to load some files in path: " + selectedLocation.getPath().toString(), e );
 		}
 		fileWalker = null;
 
@@ -494,37 +495,39 @@ public class Library {
 	}
 	
 	private void updateOneSource() {
-		Path selectedPath = sourceToUpdate.get( 0 );
+		MusicSearchLocation selectedLocation = sourceToUpdate.get( 0 );
 		
 		long directoryCount = -1;
 		
 		try {
-			directoryCount = getDirectoryCount ( selectedPath );
+			directoryCount = getDirectoryCount ( selectedLocation.getPath() );
 		} catch ( IOException e ) {
 			LOGGER.log( Level.INFO, "Unable to count directories, library loader progress bar will not function: " 
-				+ selectedPath.toString(), e );
+				+ selectedLocation.getPath().toString(), e );
 		}
 		
-		fileWalker = new InitialScanFileVisitor( this, "Rescanning " + selectedPath.toString() + "...", directoryCount );
+		fileWalker = new InitialScanFileVisitor( this, "Rescanning " + 
+			selectedLocation.getPath().toString() + "...", directoryCount );
+		
 		try {
 			Files.walkFileTree ( 
-				selectedPath, 
+				selectedLocation.getPath(), 
 				EnumSet.of( FileVisitOption.FOLLOW_LINKS ), 
 				Integer.MAX_VALUE,
 				fileWalker
 			);
 			
 			if ( !fileWalker.getWalkInterrupted() ) {
-				sourceToUpdate.remove( selectedPath );
+				sourceToUpdate.remove( selectedLocation );
 			}
 			
 		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load some files in path: " + selectedPath.toString(), e );
+			LOGGER.log( Level.WARNING, "Unable to load some files in path: " + selectedLocation.getPath().toString(), e );
 		}
 		
 		fileWalker = null;
 		
-		watcherRegisterAll ( selectedPath );
+		watcherRegisterAll ( selectedLocation );
 		
 		Hypnos.getUI().setLibraryLoaderStatusToStandby();
 	}
@@ -554,8 +557,8 @@ public class Library {
 		ArrayList <Album> albumsCopy = new ArrayList <Album> ( albums );
 		for ( Album album : albumsCopy ) {
 			boolean hasParent = false;
-			for ( Path sourcePath : musicSourcePaths ) {
-				if ( album.getPath().toAbsolutePath().startsWith( sourcePath ) ) {
+			for ( MusicSearchLocation sourceLocation : musicSourceLocations ) {
+				if ( album.getPath().toAbsolutePath().startsWith( sourceLocation.getPath() ) ) {
 					hasParent = true;
 				}
 			}
@@ -573,8 +576,8 @@ public class Library {
 		ArrayList <Track> tracksCopy = new ArrayList <Track> ( tracks );
 		for ( Track track : tracksCopy ) {
 			boolean hasParent = false;
-			for ( Path sourcePath : musicSourcePaths ) {
-				if ( track.getPath().toAbsolutePath().startsWith( sourcePath ) ) {
+			for ( MusicSearchLocation sourceLocation : musicSourceLocations ) {
+				if ( track.getPath().toAbsolutePath().startsWith( sourceLocation.getPath() ) ) {
 					hasParent = true;
 				}
 			}
@@ -587,11 +590,11 @@ public class Library {
 		return changed;
 	}
 	
-	private void watcherRegisterAll ( final Path start ) {
+	private void watcherRegisterAll ( final MusicSearchLocation start ) {
 		/* Note: in my testing, this takes less than a few seconds to run, depending on folder count */ 
 		try {
 			Files.walkFileTree( 
-				start, 
+				start.getPath(), 
 				EnumSet.of( FileVisitOption.FOLLOW_LINKS ), 
 				Integer.MAX_VALUE,
 				new SimpleFileVisitor <Path>() {
@@ -613,11 +616,12 @@ public class Library {
 		} catch ( IOException e ) {
 			if ( Hypnos.getOS() == OS.NIX && e.getMessage().matches( ".*inotify.*" ) ) {
 				Hypnos.getUI().notifyUserLinuxInotifyIssue();
-				LOGGER.log( Level.INFO, e.getMessage() + "\nUnable to watch directory for changes: " + start.toString() +
+				LOGGER.log( Level.INFO, e.getMessage() + "\nUnable to watch directory for changes: " + start.getPath().toString() +
 					"\nSee here for how to fix this error on linux: " + HypnosURLS.HELP_INOTIFY 
 				);
+				start.setHadInotifyError( true );
 			} else {
-				LOGGER.log( Level.INFO, e.getMessage() + "\nUnable to watch directory for changes: " + start.toString(), e );
+				LOGGER.log( Level.INFO, e.getMessage() + "\nUnable to watch directory for changes: " + start.getPath().toString(), e );
 			}
 		}
 	}
@@ -643,9 +647,9 @@ public class Library {
 
 			if ( eventKind == StandardWatchEventKinds.ENTRY_CREATE ) {
 				if ( Files.isDirectory( child ) ) {
-					sourceToAdd.add( child );  
+					sourceToAdd.add( new MusicSearchLocation ( child ) );  
 				} else {
-					sourceToAdd.add( child.getParent() );
+					sourceToAdd.add( new MusicSearchLocation ( child.getParent() ) );
 				}
 				
 			} else if ( eventKind == StandardWatchEventKinds.ENTRY_DELETE ) {
@@ -654,14 +658,14 @@ public class Library {
 				
 			} else if ( eventKind == StandardWatchEventKinds.ENTRY_MODIFY ) {
 				if ( Files.isDirectory( child ) ) {
-					modifiedFileDelayedUpdater.addUpdateItem( child );
+					modifiedFileDelayedUpdater.addUpdateItem( new MusicSearchLocation ( child ) );
 				} else {
-					modifiedFileDelayedUpdater.addUpdateItem( child );
+					modifiedFileDelayedUpdater.addUpdateItem( new MusicSearchLocation ( child ) );
 				}
 			
 			} else if ( eventKind == StandardWatchEventKinds.OVERFLOW ) {
-				for ( Path path : musicSourcePaths ) {
-					sourceToUpdate.add( path );
+				for ( MusicSearchLocation location : musicSourceLocations ) {
+					sourceToUpdate.add( location );
 				}
 			}
 
@@ -711,8 +715,8 @@ public class Library {
 		return playlists;
 	}
 
-	public ObservableList <Path> getMusicSourcePaths () {
-		return musicSourcePaths;
+	public ObservableList <MusicSearchLocation> getMusicSourcePaths () {
+		return musicSourceLocations;
 	}
 
 	public FilteredList <Playlist> getPlaylistsFiltered () {
@@ -753,7 +757,7 @@ class ModifiedFileUpdaterThread extends Thread {
 	public final int DELAY_LENGTH_MS = 1000; 
 	public int counter = DELAY_LENGTH_MS;
 	
-	Vector <Path> updateItems = new Vector <Path> ();
+	Vector <MusicSearchLocation> updateItems = new Vector <MusicSearchLocation> ();
 	Library library;
 	
 	public ModifiedFileUpdaterThread ( Library library ) {
@@ -774,19 +778,19 @@ class ModifiedFileUpdaterThread extends Thread {
 			if ( counter > 0 ) {
 				counter -= sleepTime; 
 			} else {
-				Vector <Path> copyUpdateItems = new Vector<Path> ( updateItems );
-				for ( Path path : copyUpdateItems ) {
-					library.requestUpdate ( path );
-					updateItems.remove( path );
+				Vector <MusicSearchLocation> copyUpdateItems = new Vector<MusicSearchLocation> ( updateItems );
+				for ( MusicSearchLocation location : copyUpdateItems ) {
+					library.requestUpdate ( location );
+					updateItems.remove( location );
 				}
 			}
 		}
 	}
 	
-	public void addUpdateItem ( Path path ) {
+	public void addUpdateItem ( MusicSearchLocation location ) {
 		counter = DELAY_LENGTH_MS;
-		if ( !updateItems.contains( path ) ) {
-			updateItems.add ( path );
+		if ( !updateItems.contains( location ) ) {
+			updateItems.add ( location );
 		}
 	}
 };
