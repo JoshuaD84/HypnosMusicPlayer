@@ -28,6 +28,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import net.joshuad.hypnos.Hypnos.OS;
 
 public class Library {
 
@@ -610,7 +611,14 @@ public class Library {
 			);
 		
 		} catch ( IOException e ) {
-			LOGGER.log( Level.INFO, e.getMessage() + "\nUnable to watch directory for changes: " + start.toString(), e );
+			if ( Hypnos.getOS() == OS.NIX && e.getMessage().matches( ".*inotify.*" ) ) {
+				Hypnos.getUI().notifyUserLinuxInotifyIssue();
+				LOGGER.log( Level.INFO, e.getMessage() + "\nUnable to watch directory for changes: " + start.toString() +
+					"\nSee here for how to fix this error on linux: " + HypnosURLS.HELP_INOTIFY 
+				);
+			} else {
+				LOGGER.log( Level.INFO, e.getMessage() + "\nUnable to watch directory for changes: " + start.toString(), e );
+			}
 		}
 	}
 	

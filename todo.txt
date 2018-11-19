@@ -9,6 +9,7 @@ AppImage Stuff:
 
       If i rename it, then its not seen. If i name it hypnos.appdata.xml it's seen but rejected
 
+Make drag and drop work from google image search
 
 if you add two search locations:
 
@@ -25,6 +26,13 @@ if you add two search locations:
       What about the opposite?  Remove AA, leaving AA/BB? 
 
 I emptied the current list and library and playing track, and the art stayed. probably good to get rid of that
+
+Bug
+   Open an album
+   right click on a track
+   select add to playlist -> new
+   create a playlist
+   album title seems to be the playlist, which is wrong.
 
 :::::::::::::
 

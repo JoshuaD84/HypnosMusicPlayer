@@ -43,6 +43,8 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableCell;
@@ -60,6 +62,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -71,6 +74,7 @@ import net.joshuad.hypnos.CurrentList;
 import net.joshuad.hypnos.CurrentListState;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.Hypnos;
+import net.joshuad.hypnos.HypnosURLS;
 import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.LibraryUpdater.LoaderSpeed;
 import net.joshuad.hypnos.Persister;
@@ -149,8 +153,9 @@ public class FXUI implements PlayerListener {
 		lightThemeButtonEffect.setSaturation( 0 );
 	}
 	
-	//TODO: this doesn't really belong in the UI, but we don't have a better place atm. 
+	//TODO: these don't really belong in the UI, but we don't have a better place atm. 
 	private SimpleBooleanProperty promptBeforeOverwrite = new SimpleBooleanProperty ( true );
+	private SimpleBooleanProperty showINotifyPopup = new SimpleBooleanProperty ( true );
 	
 	private SimpleBooleanProperty showUpdateAvailableInUI = new SimpleBooleanProperty ( true ); 
 	private SimpleBooleanProperty updateAvailable = new SimpleBooleanProperty ( false );
@@ -1147,6 +1152,7 @@ public class FXUI implements PlayerListener {
 		retMe.put ( Setting.ART_CURRENT_SPLIT_PERCENT, getCurrentListSplitPercent() );
 		retMe.put ( Setting.ART_SPLIT_PERCENT, getArtSplitPercent() );
 		retMe.put ( Setting.PROMPT_BEFORE_OVERWRITE, promptBeforeOverwrite.getValue() );
+		retMe.put ( Setting.SHOW_INOTIFY_ERROR_POPUP, showINotifyPopup.getValue() );
 		retMe.put ( Setting.SHOW_UPDATE_AVAILABLE_IN_MAIN_WINDOW, showUpdateAvailableInUI.getValue() );
 		retMe.put ( Setting.THEME, theme );
 		retMe.put ( Setting.SHOW_LASTFM_IN_UI, showLastFMWidgets.getValue().toString() );
@@ -1269,6 +1275,11 @@ public class FXUI implements PlayerListener {
 						
 					case PROMPT_BEFORE_OVERWRITE:
 						promptBeforeOverwrite.setValue( Boolean.valueOf( value ) );
+						settings.remove ( setting );
+						break;
+						
+					case SHOW_INOTIFY_ERROR_POPUP:
+						showINotifyPopup.setValue( Boolean.valueOf( value ) );
 						settings.remove ( setting );
 						break;
 						
@@ -1605,6 +1616,84 @@ public class FXUI implements PlayerListener {
 		Platform.runLater( () -> {
 			this.libraryLocationWindow.setLibraryLoaderStatusToStandby ( );
 		});	
+	}
+
+	public void notifyUserLinuxInotifyIssue () {
+		if ( showINotifyPopup.get() ) {
+			Platform.runLater( () -> {
+				Alert alert = new Alert( AlertType.WARNING );
+				
+				double x = mainStage.getX() + mainStage.getWidth() / 2 - 220; //It'd be nice to use alert.getWidth() / 2, but it's NAN now. 
+				double y = mainStage.getY() + mainStage.getHeight() / 2 - 50;
+				
+				alert.setX( x );
+				alert.setY( y );
+				
+				alert.setDialogPane( new DialogPane() {
+					@Override
+					protected Node createDetailsButton () {
+						CheckBox optOut = new CheckBox();
+						optOut.setPadding( new Insets ( 0, 20, 0, 0 ) );
+						optOut.setText( "Do not show popup again" );
+						optOut.setOnAction( e -> {
+							showINotifyPopup.set( !optOut.isSelected() );
+						});
+						return optOut;
+					}
+				});
+		
+				if ( warningAlertImageSource != null ) {
+					ImageView warningImage = new ImageView ( warningAlertImageSource );
+					if ( isDarkTheme() ) {
+						warningImage.setEffect( darkThemeButtonEffect );
+					} else {
+						warningImage.setEffect( lightThemeButtonEffect );
+					}
+						
+					warningImage.setFitHeight( 50 );
+					warningImage.setFitWidth( 50 );
+					alert.setGraphic( warningImage );
+				}
+				
+				setAlertWindowIcon ( alert );
+				applyCurrentTheme ( alert );
+		
+				alert.getDialogPane().getButtonTypes().addAll( ButtonType.OK );
+				
+				Label message = new Label ( 
+					"Hypnos is unable to watch for changes in some library\n" +
+					"directories due to system defined Linux inotify count\n" + 
+					"limitations.\n\n" + 
+					"This error is non-fatal: your full library will be\n" + 
+					"rescanned each time Hypnos is started, so any changes\n" + 
+					"will be included in Hypnos's library eventually. However\n" + 
+					"you will not get real-time updates when the file system\n" + 
+					"changes.\n\n" +
+					"If you would like real time updates (which are kind of nice)\n" +
+					"You can adjust this limit by editing your sysctl.conf file.\n\n"
+				);
+				
+				Hyperlink link = new Hyperlink ( "Click here for detailed instructions." );
+				link.setOnAction( e -> { openWebBrowser( HypnosURLS.HELP_INOTIFY ); } );
+				
+				VBox content = new VBox();
+				content.getChildren().addAll ( message, link );
+				
+				alert.getDialogPane().setContent( content );
+				alert.getDialogPane().setExpandableContent( new Group() );
+				alert.getDialogPane().setExpanded( false );
+				alert.getDialogPane().setGraphic( alert.getDialogPane().getGraphic() );
+				alert.setTitle( "Unable to Watch for Changes" );
+				alert.setHeaderText( null );
+				
+				Optional <ButtonType> result = alert.showAndWait();
+				
+				if ( result.isPresent() ) {
+					return;
+				}
+				return;
+			});
+		}
 	}
 }
 

@@ -331,12 +331,7 @@ public class SettingsWindow extends Stage {
 			String url = "http://www.hypnosplayer.org/help/linux-global-hotkey-consume/";
 			consumeHotkeyNote.setTooltip( new Tooltip ( url ) );
 			
-			consumeHotkeyNote.setOnAction(new EventHandler<ActionEvent>() {
-			    @Override
-			    public void handle(ActionEvent e) {
-			    	ui.openWebBrowser( url );
-			    }
-			});
+			consumeHotkeyNote.setOnAction( e -> { ui.openWebBrowser( url ); } );
 			
 			consumeHotkeyNote.setPadding( new Insets ( 0, 0, 0, 0 ) );
 			consumeHotkeyNote.setWrapText( true );
