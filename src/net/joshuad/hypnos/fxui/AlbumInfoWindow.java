@@ -152,6 +152,12 @@ public class AlbumInfoWindow extends Stage {
 		fileColumn.setEditable( false );
 		encodingColumn.setEditable( false );
 		
+		trackNumberColumn.setReorderable( false );
+		titleColumn.setReorderable( false );
+		lengthColumn.setReorderable( false );
+		fileColumn.setReorderable( false );
+		encodingColumn.setReorderable( false );
+		
 		trackNumberColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "trackNumber" ) );
 		titleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
 		lengthColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "LengthDisplay" ) );

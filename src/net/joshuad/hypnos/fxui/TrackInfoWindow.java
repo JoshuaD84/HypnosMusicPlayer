@@ -64,6 +64,9 @@ public class TrackInfoWindow extends Stage {
 		
 		labelColumn.setMaxWidth ( 25000 );
 		valueColumn.setMaxWidth ( 75000 );
+
+		labelColumn.setReorderable ( false );
+		valueColumn.setReorderable ( false );
 		
 		labelColumn.setCellValueFactory( new PropertyValueFactory <TrackFieldPair, String> ( "Label" ) );
 		valueColumn.setCellValueFactory( new PropertyValueFactory <TrackFieldPair, Object> ( "Value" ) );

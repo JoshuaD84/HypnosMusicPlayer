@@ -23,14 +23,7 @@ if you add two search locations:
 
 I emptied the current list and library and playing track, and the art stayed. probably good to get rid of that
 
-Bug
-   Open an album
-   right click on a track
-   select add to playlist -> new
-   create a playlist
-   album title seems to be the playlist, which is wrong.
-
-:::::::::::::
+::::::::::::
 
 
 Features that need System-by-System attention
@@ -150,9 +143,6 @@ Future
 
 
 :::: Java / JavaFX stuff ::::
-	Don't allow tag table columns to be reordered
-		8/12/2018 - Currently not supported by java 8 / javafx8
-
 	Scroll speed on lyrics scroll pane when the lyrics almost-but-dont-quite fit one full screen is really slow.
 
 	Try to fit all data in current list table by adjusting columns that aren't no-resize on setCurrentList, if not possible, do nothing

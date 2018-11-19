@@ -138,6 +138,9 @@ public class TagWindow extends Stage {
 		textTagColumn.setSortable( false );
 		textValueColumn.setSortable( false );
 		
+		textTagColumn.setReorderable( false );
+		textValueColumn.setReorderable( false );
+		
 		TableView <MultiFileTextTagPair> textTagTable = new TableView<MultiFileTextTagPair> ();
 		textTagTable.setItems ( textTagPairs );
 		textTagTable.getColumns().addAll( textTagColumn, textValueColumn );
@@ -154,6 +157,10 @@ public class TagWindow extends Stage {
 		imageValueColumn = new TableColumn( "Image" );
 		imageDeleteColumn = new TableColumn ( "Delete" );
 		
+		imageTagColumn.setReorderable( false );
+		imageValueColumn.setReorderable( false );
+		imageDeleteColumn.setReorderable( false );
+		
 		imageTagColumn.setStyle( "-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold; -fx-padding: 0 10 0 0; ");
 		imageValueColumn.setStyle( "-fx-alignment: CENTER;");
 		
@@ -167,6 +174,8 @@ public class TagWindow extends Stage {
 		imageTagColumn.setSortable( false );
 		imageValueColumn.setSortable( false );
 		imageDeleteColumn.setSortable ( false );
+		
+		
 		
 		imageValueColumn.setCellFactory( new Callback <TableColumn <MultiFileTextTagPair, byte[]>, TableCell <MultiFileTextTagPair, byte[]>> () {
 			@Override

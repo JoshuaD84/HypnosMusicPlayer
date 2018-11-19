@@ -803,7 +803,10 @@ public class SettingsWindow extends Stage {
 		pathColumn.setMaxWidth( 30000 );
 		filenameColumn.setMaxWidth ( 40000 );
 		messageColumn.setMaxWidth( 30000 );
-
+		
+		pathColumn.setReorderable( false );
+		filenameColumn.setReorderable ( false );
+		messageColumn.setReorderable( false );
 
 		tagTable = new TableView <TagError> ();
 		tagTable.getColumns().addAll( pathColumn, filenameColumn, messageColumn );
