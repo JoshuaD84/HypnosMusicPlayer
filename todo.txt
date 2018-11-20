@@ -5,11 +5,6 @@ AppImage Stuff:
 
       If i rename it, then its not seen. If i name it hypnos.appdata.xml it's seen but rejected
 
-if you add two search locations:
-   AA
-   AA/BB
-   When you remove AA, AA/BB's files get deleted
-
 I emptied the current list and library and playing track, and the art stayed. probably good to get rid of that
 
 Scan speeds 1 and 2 are very similar. 3 is much faster. Keep 3 the same, but speed up 2.

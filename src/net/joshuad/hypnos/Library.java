@@ -391,6 +391,7 @@ public class Library {
 		musicSearchLocations.remove( removeMeLocation );
 		
 		boolean isChildOfAnotherLocation = false;
+		List <MusicSearchLocation> childLocations = new ArrayList <> ();
 		
 		for ( MusicSearchLocation searchLocation : musicSearchLocations ) {
 			try {
@@ -400,6 +401,11 @@ public class Library {
 				if ( removeMeRealPath.startsWith( searchRealPath ) ) {
 					isChildOfAnotherLocation = true;
 				}
+				
+				if ( searchRealPath.startsWith( removeMeRealPath ) ) {
+					childLocations.add ( searchLocation );
+				}
+				
 			} catch ( IOException e ) {
 				//One of the paths doesn't exist. Do nothing
 			}
@@ -414,61 +420,72 @@ public class Library {
 				synchronized ( albumsToAdd ) {
 					albumsToAdd.clear();
 				}
-				
 				synchronized ( albumsToRemove ) {
 					albumsToRemove.clear();
 				}
-				
 				synchronized ( albumsToUpdate ) {
 					albumsToRemove.clear();
 				}
-				
 				synchronized ( albums ) {
 					albums.clear();
 				}
-				
 				synchronized ( tracksToAdd ) {
 					tracksToAdd.clear();
 				}
-				
 				synchronized ( tracksToRemove ) {
 					tracksToRemove.clear();
 				}
-				
 				synchronized ( tracksToUpdate ) {
 					tracksToUpdate.clear();
 				}
-				
 				synchronized ( tracks ) {
 					tracks.clear();
 				}
-				
 				synchronized ( tagErrors ) {
 					tagErrors.clear();
 				}
-				
 			});
 			
 		} else {
-
-			ArrayList <Album> albumsCopy = new ArrayList <Album> ( albums );
-			ArrayList <Track> tracksCopy = new ArrayList <Track> ( tracks );
+			
+			List <Album> albumsCopy = new ArrayList <Album> ( albums );
+			List <Track> tracksCopy = new ArrayList <Track> ( tracks );
 			
 			int totalCount = albumsCopy.size() + tracksCopy.size();
 			
 			int countDone = 0;
+			
 			for ( Album album : albumsCopy ) {
-				if ( album.getPath().toAbsolutePath().startsWith( removeMeLocation.getPath() ) ) {
+				boolean skip = false;
+				
+				for ( MusicSearchLocation childLocation : childLocations ) {
+					if ( album.getPath().toAbsolutePath().startsWith( childLocation.getPath() ) ) {
+						skip = true;
+					}
+				}
+				
+				if ( !skip && album.getPath().toAbsolutePath().startsWith( removeMeLocation.getPath() ) ) {
 					removeAlbum ( album );
 				}
+				
 				countDone++;
 				Hypnos.getUI().setLibraryLoaderStatus( message, countDone / (double)totalCount );
 			}
 			
 			for ( Track track : tracksCopy ) {
-				if ( track.getPath().toAbsolutePath().startsWith( removeMeLocation.getPath() ) ) {
+				//TODO: these toAbsolutePath()'s might mess things up w/ soft links
+				boolean skip = false;
+				
+				for ( MusicSearchLocation childLocation : childLocations ) {
+					if ( track.getPath().toAbsolutePath().startsWith( childLocation.getPath() ) ) {
+						skip = true;
+					}
+				}
+				
+				if ( !skip && track.getPath().toAbsolutePath().startsWith( removeMeLocation.getPath() ) ) {
 					removeTrack( track );
 				}
+				
 				countDone++;
 				Hypnos.getUI().setLibraryLoaderStatus( message, countDone / (double)totalCount );
 			}
