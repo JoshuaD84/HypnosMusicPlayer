@@ -21,6 +21,7 @@ import javax.imageio.ImageIO;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.ListChangeListener;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.scene.control.ContextMenu;
@@ -36,12 +37,18 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import net.joshuad.hypnos.Album;
+import net.joshuad.hypnos.CurrentListTrack;
+import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.Track.ArtistTagImagePriority;
 import net.joshuad.hypnos.audio.AudioSystem;
+import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
+import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
+import net.joshuad.hypnos.audio.AudioSystem.StopReason;
+import net.joshuad.hypnos.audio.PlayerListener;
 
-public class ImagesPanel extends SplitPane {
+public class ImagesPanel extends SplitPane implements PlayerListener {
 
 	static final DataFormat textContentFormat = DataFormat.lookupMimeType( "text/plain" );
 	
@@ -52,6 +59,9 @@ public class ImagesPanel extends SplitPane {
 
 	BorderPane albumImagePane;
 	BorderPane artistImagePane;
+	
+	Track currentImagesTrack = null;
+	Album currentImagesAlbum = null;
 	
 	FXUI ui;
 	AudioSystem audioSystem;
@@ -65,6 +75,19 @@ public class ImagesPanel extends SplitPane {
 		getItems().addAll( albumImagePane, artistImagePane );
 		
 		startImageLoaderThread();
+		
+		audioSystem.addPlayerListener ( this );
+		
+		audioSystem.getCurrentList().getItems().addListener ( 
+			new ListChangeListener<CurrentListTrack> () {
+				@Override
+				public void onChanged ( Change <? extends CurrentListTrack> arg0 ) {
+					if ( audioSystem.getCurrentList().getItems().size() == 0 ) {
+						currentListCleared();
+					}
+				}
+			}
+		);
 	}
 	
 	private void setupAlbumImage () {
@@ -81,7 +104,7 @@ public class ImagesPanel extends SplitPane {
 
 		setImage.setOnAction( ( ActionEvent event ) -> {
 				
-			Track track = ui.currentImagesTrack;
+			Track track = currentImagesTrack;
 			if ( track == null ) return;
 			
 			FileChooser fileChooser = new FileChooser(); 
@@ -96,11 +119,11 @@ public class ImagesPanel extends SplitPane {
 			
 			track.setAndSaveAlbumImage ( targetFile.toPath(), audioSystem );
 
-			setImages ( ui.currentImagesTrack );
+			setImages ( currentImagesTrack ); //We set it to current because it might've changed since we assigned Track track. 
 		});
 			
 		exportImage.setOnAction( ( ActionEvent event ) -> {
-			Track track = ui.currentImagesTrack;
+			Track track = currentImagesTrack;
 			if ( track == null ) return;
 			
 			FileChooser fileChooser = new FileChooser();
@@ -138,7 +161,7 @@ public class ImagesPanel extends SplitPane {
 		albumImagePane.getStyleClass().add( "artpane" );
 		
 		albumImagePane.setOnContextMenuRequested( ( ContextMenuEvent e ) -> {
-			boolean disableMenus = ui.currentImagesTrack == null;
+			boolean disableMenus = ( currentImagesTrack == null );
 			setImage.setDisable( disableMenus );
 			exportImage.setDisable( disableMenus );
 			
@@ -171,7 +194,7 @@ public class ImagesPanel extends SplitPane {
 		
 		albumImagePane.setOnDragDropped( event -> {
 			
-			Track track = ui.currentImagesTrack;
+			Track track = currentImagesTrack;
 			
 			if ( track == null ) return;
 			
@@ -193,7 +216,7 @@ public class ImagesPanel extends SplitPane {
 					}
 				}
 				
-				setImages ( ui.currentImagesTrack );
+				setImages ( currentImagesTrack );
 		
 			} else {
 				byte[] buffer = getImageBytesFromDragboard( db );
@@ -215,7 +238,7 @@ public class ImagesPanel extends SplitPane {
 					ui.notifyUserError( message );
 				}
 
-				setImages ( ui.currentImagesTrack );
+				setImages ( currentImagesTrack );
 			}
 			
 			event.setDropCompleted( true );
@@ -230,7 +253,6 @@ public class ImagesPanel extends SplitPane {
 		Thread imageLoader = new Thread() {
 			public void run() {
 				while ( true ) {
-					
 					if ( requestedTrack != null ) {
 						Track loadMeTrack = requestedTrack;
 						Album loadMeAlbum = requestedAlbum;
@@ -244,8 +266,8 @@ public class ImagesPanel extends SplitPane {
 						Platform.runLater( () -> {
 							setAlbumImage( albumImage );
 							setArtistImage( artistImage );
-							ui.currentImagesTrack = loadMeTrack;
-							ui.currentImagesAlbum = loadMeAlbum;
+							currentImagesTrack = loadMeTrack;
+							currentImagesAlbum = loadMeAlbum;
 							imagesDisplayed.setValue( true );
 						});
 						
@@ -287,13 +309,13 @@ public class ImagesPanel extends SplitPane {
 			boolean disableAlbum = true;
 			boolean disableArtist = true;
 			
-			if ( ui.currentImagesTrack == null ) {
+			if ( currentImagesTrack == null ) {
 				disableAllMenus = true;
 				
-			} else if ( ui.currentImagesTrack.hasAlbumDirectory() ) {
+			} else if ( currentImagesTrack.hasAlbumDirectory() ) {
 				disableAlbum = false;
 				
-				if ( Utils.isArtistDirectory( ui.currentImagesTrack.getAlbumPath().getParent() ) ) {
+				if ( Utils.isArtistDirectory( currentImagesTrack.getAlbumPath().getParent() ) ) {
 					disableArtist = false;
 				}
 			}
@@ -307,7 +329,7 @@ public class ImagesPanel extends SplitPane {
 		});
 
 		exportImage.setOnAction( ( ActionEvent event ) -> {
-			Track track = ui.currentImagesTrack;
+			Track track = currentImagesTrack;
 			if ( track == null ) return;
 			
 			FileChooser fileChooser = new FileChooser();
@@ -347,18 +369,18 @@ public class ImagesPanel extends SplitPane {
 		fileChooser.setTitle( "Set Artist Image" );
 		
 		setTrackArtistImage.setOnAction( ( ActionEvent e ) -> {
-			Track track = ui.currentImagesTrack;
+			Track track = currentImagesTrack;
 			if ( track == null ) return;
 			
 			File imageFile = fileChooser.showOpenDialog( ui.getMainStage() );
 			if ( imageFile == null ) return; 
 			
 			Track.saveArtistImageToTag ( track.getPath().toFile(), imageFile.toPath(), ArtistTagImagePriority.TRACK, false, audioSystem );
-			setImages ( ui.currentImagesTrack );
+			setImages ( currentImagesTrack );
 		});
 		
 		setAlbumArtistImage.setOnAction( ( ActionEvent e ) -> {
-			Track track = ui.currentImagesTrack;
+			Track track = currentImagesTrack;
 			if ( track == null ) return;
 			
 			File imageFile = fileChooser.showOpenDialog( ui.getMainStage() );
@@ -374,7 +396,7 @@ public class ImagesPanel extends SplitPane {
 				Path albumPath = track.getAlbumPath();
 			
 				Utils.saveImageToDisk( albumPath.resolve( "artist.png" ), buffer );
-				setImages ( ui.currentImagesTrack );
+				setImages ( currentImagesTrack );
 				Thread workerThread = new Thread ( () -> {
 					try ( DirectoryStream <Path> stream = Files.newDirectoryStream( albumPath ) ) {
 						for ( Path child : stream ) {
@@ -386,7 +408,7 @@ public class ImagesPanel extends SplitPane {
 						LOGGER.log( Level.WARNING, "Unable to get directory listing, artist tags not updated for album: " + albumPath, e3 );
 					}
 	
-					Platform.runLater( () -> setImages ( ui.currentImagesTrack ) );
+					Platform.runLater( () -> setImages ( currentImagesTrack ) );
 				});
 				workerThread.setName ( "Album Artist Image Tag Saver" );
 				workerThread.setDaemon( true );
@@ -398,7 +420,7 @@ public class ImagesPanel extends SplitPane {
 		});
 		
 		setArtistImage.setOnAction( ( ActionEvent e ) -> {
-			Track track = ui.currentImagesTrack;
+			Track track = currentImagesTrack;
 			if ( track == null ) return;
 			
 			File imageFile = fileChooser.showOpenDialog( ui.getMainStage() );
@@ -409,12 +431,12 @@ public class ImagesPanel extends SplitPane {
 				
 				//REFACTOR: put this code in a function, it's duplicated below. 
 				
-				if ( !Utils.isArtistDirectory( ui.currentImagesTrack.getAlbumPath().getParent() ) ) return;
+				if ( !Utils.isArtistDirectory( currentImagesTrack.getAlbumPath().getParent() ) ) return;
 				
 				Path artistPath = track.getAlbumPath().getParent();
 			
 				Utils.saveImageToDisk( artistPath.resolve( "artist.png" ), buffer );
-				setImages ( ui.currentImagesTrack );
+				setImages ( currentImagesTrack );
 				Thread workerThread = new Thread ( () -> {
 					try ( DirectoryStream <Path> stream = Files.newDirectoryStream( artistPath ) ) {
 						for ( Path child : stream ) {
@@ -426,7 +448,7 @@ public class ImagesPanel extends SplitPane {
 						LOGGER.log( Level.WARNING, "Unable to get directory listing, artist tags not updated for album: " + artistPath, e3 );
 					}
 	
-					Platform.runLater( () -> setImages ( ui.currentImagesTrack ) );
+					Platform.runLater( () -> setImages ( currentImagesTrack ) );
 				});
 				workerThread.setName ( "Album Artist Image Tag Saver" );
 				workerThread.setDaemon( true );
@@ -463,7 +485,7 @@ public class ImagesPanel extends SplitPane {
 		
 		artistImagePane.setOnDragDropped( event -> {
 			
-			Track track = ui.currentImagesTrack;
+			Track track = currentImagesTrack;
 			
 			if ( track == null ) return;
 			
@@ -511,7 +533,7 @@ public class ImagesPanel extends SplitPane {
 	}
 	
 	private void promptAndSaveArtistImage ( byte[] buffer ) {
-		Track targetTrack = ui.currentImagesTrack;
+		Track targetTrack = currentImagesTrack;
 		
 		if ( targetTrack != null ) {
 			
@@ -532,7 +554,7 @@ public class ImagesPanel extends SplitPane {
 				choices.add ( ArtistImageSaveDialog.Choice.ALBUM );
 			} 
 			
-			if ( ui.currentImagesAlbum == null ) {
+			if ( currentImagesAlbum == null ) {
 				choices.add ( ArtistImageSaveDialog.Choice.TRACK );
 			} 
 			
@@ -564,7 +586,7 @@ public class ImagesPanel extends SplitPane {
 				
 				case ALL:
 					Utils.saveImageToDisk( artistPath.resolve( "artist.png" ), buffer );
-					setImages ( ui.currentImagesTrack );
+					setImages ( currentImagesTrack );
 					//PENDING: What about ID3 tags? Set them only if they're not already set?  
 					break;
 					
@@ -572,7 +594,7 @@ public class ImagesPanel extends SplitPane {
 					
 					//REFACTOR: put this code in a function, it's duplicated above. 
 					Utils.saveImageToDisk( albumPath.resolve( "artist.png" ), buffer );
-					setImages ( ui.currentImagesTrack );
+					setImages ( currentImagesTrack );
 					Thread workerThread = new Thread ( () -> {
 						try ( DirectoryStream <Path> stream = Files.newDirectoryStream( albumPath ) ) {
 							for ( Path child : stream ) {
@@ -584,7 +606,7 @@ public class ImagesPanel extends SplitPane {
 							LOGGER.log( Level.WARNING, "Unable to list files in directory, artist tags not updated for album: " + albumPath, e );
 						}
 
-						Platform.runLater( () -> setImages ( ui.currentImagesTrack ) );
+						Platform.runLater( () -> setImages ( currentImagesTrack ) );
 					});
 
 					workerThread.setName ( "Artist Image Tag Saver" );
@@ -594,51 +616,66 @@ public class ImagesPanel extends SplitPane {
 					
 				case TRACK:
 					Track.saveArtistImageToTag ( targetTrack.getPath().toFile(), buffer, ArtistTagImagePriority.TRACK, overwriteAll, audioSystem );
-					setImages ( ui.currentImagesTrack );
+					setImages ( currentImagesTrack );
 					break;
 					
 			}
 		}
 	}
 	
-	public void setImages ( Track track ) {
+	private void setImages ( Track track ) {
 		setImages ( track, null );
 	}
 	
-	public void setImages ( Album album ) {
+	private void setImages ( Album album ) {
 		setImages ( album.getTracks().get( 0 ), album );
 	}
 	
-	public void setImages ( Track track, Album album ) {
+	private void clearImages() {
+		requestedTrack = null;
+		requestedAlbum = null;
+		currentImagesTrack = null;
+		currentImagesAlbum = null;
+		setAlbumImage ( null );
+		setArtistImage ( null );
+	}
+	
+	private void setImages ( Track track, Album album ) {
 		
 		if ( track != null && Files.exists( track.getPath() ) ) {
 			requestedTrack = track;
 			requestedAlbum = album;
 			
-		} else if ( track == null && ui.currentImagesTrack != null ) {
-			setImages ( ui.currentImagesTrack );
+		} else if ( track == null && currentImagesTrack != null ) {
+			setImages ( currentImagesTrack );
 			
-		} else {
-			ui.currentImagesTrack = null;
-			ui.currentImagesAlbum = null;
+		} else {	
+			requestedTrack = null;
+			requestedAlbum = null;
+			currentImagesTrack = null;
+			currentImagesAlbum = null;
 			setAlbumImage ( null );
 			setArtistImage ( null );
 		}
 	}
 
-	public void setAlbumImage ( Image image ) {
-		try {
-			albumImage = new ResizableImageView( image );
-			albumImage.setSmooth(true);
-			albumImage.setCache(true);
-			albumImage.setPreserveRatio( true );
-			albumImagePane.setCenter( albumImage );
-		} catch ( Exception e ) {
+	private void setAlbumImage ( Image image ) {
+		if ( image == null ) {
 			albumImagePane.setCenter( null );
+		} else {
+			try {
+				albumImage = new ResizableImageView( image );
+				albumImage.setSmooth(true);
+				albumImage.setCache(true);
+				albumImage.setPreserveRatio( true );
+				albumImagePane.setCenter( albumImage );
+			} catch ( Exception e ) {
+				albumImagePane.setCenter( null );
+			}
 		}
 	}
 
-	public void setArtistImage ( Image image ) {
+	private void setArtistImage ( Image image ) {
 		try {
 			artistImage = new ResizableImageView( image );
 			artistImage.setSmooth(true);
@@ -704,5 +741,77 @@ public class ImagesPanel extends SplitPane {
 
 		return retMe;
 	}
+
+	public void libraryCleared () {
+		Platform.runLater(() -> {
+			if ( audioSystem.getCurrentList().getItems().isEmpty() ) {
+				if ( audioSystem.isPlaying() ) {
+					setImages ( audioSystem.getCurrentTrack() );
+				} else {
+					clearImages();
+				}
+			}
+		});
+	}
 	
+	public void currentListCleared() {
+		if ( Hypnos.getLibrary().getAlbums().isEmpty() && Hypnos.getLibrary().getTracks().isEmpty() ) {
+			if ( audioSystem.isPlaying() ) {
+				setImages ( audioSystem.getCurrentTrack() );
+			} else {
+				clearImages();
+			}
+		}
+	}
+	
+	public void trackSelected ( Track selected ) {
+		setImages ( selected );
+	}
+	
+	public void albumSelected ( Album selected ) {
+		setImages ( selected );
+	}
+
+	@Override
+	public void playerStopped ( Track track, StopReason reason ) {
+		if ( audioSystem.getCurrentList().getItems().isEmpty()
+		&& Hypnos.getLibrary().getAlbums().isEmpty()
+		&& Hypnos.getLibrary().getTracks().isEmpty() ) {
+			clearImages();
+		}
+	}
+
+	@Override
+	public void playerStarted ( Track track ) {
+		setImages( track );
+	}
+	
+	@Override
+	public void playerUnpaused () {
+		setImages( audioSystem.getCurrentTrack() );
+	}
+
+	@Override
+	public void playerPositionChanged ( int positionMS, int lengthMS ) {}
+	
+	@Override 
+	public void playerPaused () {}
+	
+	@Override
+	public void playerVolumeChanged ( double newVolumePercent ) {}
+	
+	@Override
+	public void playerShuffleModeChanged ( ShuffleMode newMode ) {}
+	
+	@Override
+	public void playerRepeatModeChanged ( RepeatMode newMode ) {}
+
+	public void refreshImages () {
+		setImages ( currentImagesTrack, currentImagesAlbum );
+	}
+
+	public Track getCurrentImagesTrack () {
+		return currentImagesTrack;
+	}
+
 }

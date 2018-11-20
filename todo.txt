@@ -5,7 +5,10 @@ AppImage Stuff:
 
       If i rename it, then its not seen. If i name it hypnos.appdata.xml it's seen but rejected
 
-I emptied the current list and library and playing track, and the art stayed. probably good to get rid of that
+for non-album tracks check the current folder for artist image
+   Warpaint - Undertow (radiomix)
+
+Sometimes after restarting hypnos the volume isn't respected on the first track played
 
 ::::::::::::
 

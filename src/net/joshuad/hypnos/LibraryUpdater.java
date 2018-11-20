@@ -163,7 +163,7 @@ public class LibraryUpdater {
 												audioSystem.getCurrentList().setAlbum( updateMe, false );
 												library.albumsToUpdate.remove( updateMe ); //prevent an infinite loop
 												
-												ui.setImages( currentArtImages );
+												ui.trackSelected( currentArtImages );
 												ui.setSelectedTracks ( selectedItems );
 												
 												if ( currentTrack != null ) {

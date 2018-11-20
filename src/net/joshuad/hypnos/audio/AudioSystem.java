@@ -467,7 +467,7 @@ public class AudioSystem {
 						albumPath = trackPath.toAbsolutePath().getParent();
 					}
 					Track track = new Track ( trackPath, albumPath );
-					ui.setImages( track ); 
+					ui.trackSelected( track ); 
 					playTrack( track, true );
 					settings.remove ( setting );
 					break;

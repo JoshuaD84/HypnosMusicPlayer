@@ -1006,7 +1006,7 @@ public class CurrentListPane extends BorderPane {
 		});
 		
 		currentListTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
-			ui.setImages ( newSelection );
+			ui.trackSelected ( newSelection );
 		});
 		
 		currentListTable.setRowFactory( tv -> {

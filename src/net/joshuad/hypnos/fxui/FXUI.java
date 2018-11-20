@@ -129,9 +129,6 @@ public class FXUI implements PlayerListener {
 	private double windowedX = 50;
 	private double windowedY = 50;
 	
-	public Track currentImagesTrack = null;
-	public Album currentImagesAlbum = null;
-	
 	public File darkStylesheet;
 	private File baseStylesheet;
 	
@@ -642,7 +639,7 @@ public class FXUI implements PlayerListener {
 					currentListPane.currentListTable.scrollTo( itemIndex );
 				}
 			}
-			artSplitPane.setImages( selectMe );
+			artSplitPane.trackSelected( selectMe );
 		}
 	}
 	
@@ -1185,7 +1182,7 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public void refreshImages() {
-		artSplitPane.setImages ( getCurrentImagesTrack() );
+		artSplitPane.refreshImages ();
 	}
 	
 	public void refreshCurrentList () {
@@ -1342,12 +1339,8 @@ public class FXUI implements PlayerListener {
 	@Override
 	public void playerStarted ( Track track ) {
 		Platform.runLater( () -> {
-			
 			transport.playerStarted ( track );
-
 			currentListPane.currentListTable.refresh();
-			
-			artSplitPane.setImages( track );
 		});
 	}
 
@@ -1363,7 +1356,6 @@ public class FXUI implements PlayerListener {
 	public void playerUnpaused () {
 		Platform.runLater( () -> {
 			transport.togglePlayButton.setGraphic( transport.pauseImage );
-			artSplitPane.setImages( audioSystem.getCurrentTrack() );
 			currentListPane.currentListTable.refresh();//To get the play/pause image to update. 
 		});
 	}
@@ -1385,6 +1377,10 @@ public class FXUI implements PlayerListener {
 		Platform.runLater( () -> {
 			currentListPane.updateRepeatButtonImages();
 		});
+	}
+	
+	public void libraryCleared() {
+		artSplitPane.libraryCleared();
 	}
 
 	public boolean hotkeysDisabledForConfig () {
@@ -1517,7 +1513,7 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public Track getCurrentImagesTrack() {
-		return currentImagesTrack;
+		return artSplitPane.getCurrentImagesTrack();
 	}
 
 	public void openWebBrowser ( String url ) {
@@ -1592,12 +1588,12 @@ public class FXUI implements PlayerListener {
 		libraryPane.setLabelsToLoading();
 	}
 
-	public void setImages ( Track newSelection ) {
-		artSplitPane.setImages( newSelection );
+	public void trackSelected ( Track newSelection ) {
+		artSplitPane.trackSelected( newSelection );
 	}
 	
-	public void setImages ( Album album ) {
-		artSplitPane.setImages( album );
+	public void albumSelected ( Album album ) {
+		artSplitPane.albumSelected( album );
 	}
 
 	public LibraryTabPane getLibraryPane () {

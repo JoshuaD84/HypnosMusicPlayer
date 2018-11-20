@@ -155,6 +155,9 @@ public class Library {
 						if ( orphans ) {
 							albumTrackDataChangedSinceLastSave = true;
 						}
+						if ( albums.size() == 0 && tracks.size() == 0 ) {
+							Hypnos.getUI().libraryCleared();
+						}
 						
 					} else {
 						processWatcherEvents(); //Note: this blocks for 250ms, see function
@@ -491,6 +494,11 @@ public class Library {
 			}
 		}
 
+		if ( musicSearchLocations.isEmpty() ) {
+			System.out.println ( "Here" ); //TODO: DD
+			Hypnos.getUI().libraryCleared();
+		}
+		
 		Hypnos.getUI().getLibraryPane().updateLibraryListPlaceholder(); //REFACTOR: This desn't really belong here. 
 		Hypnos.getUI().setLibraryLoaderStatusToStandby();
 	}
