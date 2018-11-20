@@ -252,10 +252,10 @@ public class Hypnos extends Application {
 				break;
 				
 			case MED:
-				InitialScanFileVisitor.setSleepTimeBetweenVisits( 50 );
-				library.setLoaderSleepTimeMS( 50 );
-				libraryUpdater.setMaxChangesPerUpdate ( 2000 );
-				libraryUpdater.setSleepTimeMS( 15 );
+				InitialScanFileVisitor.setSleepTimeBetweenVisits( 25 );
+				library.setLoaderSleepTimeMS( 25 );
+				libraryUpdater.setMaxChangesPerUpdate ( 10000 );
+				libraryUpdater.setSleepTimeMS( 10 );
 				break;
 				
 			case HIGH:
