@@ -5,8 +5,6 @@ AppImage Stuff:
 
       If i rename it, then its not seen. If i name it hypnos.appdata.xml it's seen but rejected
 
-Sometimes after restarting hypnos the volume isn't respected on the first track played
-
 ::::::::::::
 
 
@@ -64,6 +62,7 @@ Future
    Maybe change lyric window content on select track
 
 	Can I expand encoding information display using vlc?
+      mediaPlayer.getMedia*
 
 	All
 		Right click menu settings for playlists -- shuffle, repeat, etc.

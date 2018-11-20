@@ -170,12 +170,11 @@ public class VLCAudioPlayer {
 		
 		mediaPlayer.playMedia( targetFile );
 		
-		final int target = currentVolume;
 		scheduler.schedule( new Runnable() {
 			public void run() {
-				mediaPlayer.setVolume( target );
+				mediaPlayer.setVolume( currentVolume );
 			}
-		}, 50, TimeUnit.MILLISECONDS );
+		}, 100, TimeUnit.MILLISECONDS );
 		
 		currentTrack = track;
 		
