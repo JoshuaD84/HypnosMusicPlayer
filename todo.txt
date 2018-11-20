@@ -5,9 +5,6 @@ AppImage Stuff:
 
       If i rename it, then its not seen. If i name it hypnos.appdata.xml it's seen but rejected
 
-for non-album tracks check the current folder for artist image
-   Warpaint - Undertow (radiomix)
-
 Sometimes after restarting hypnos the volume isn't respected on the first track played
 
 ::::::::::::

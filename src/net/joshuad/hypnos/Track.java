@@ -93,7 +93,6 @@ public class Track implements Serializable, AlbumInfoSource {
 		ALBUM ( 1 ), 
 		TRACK ( 2 );
 		
-		
 		private int value;
 		
 		ArtistTagImagePriority ( int value ) {
@@ -958,28 +957,25 @@ public class Track implements Serializable, AlbumInfoSource {
 			Image tagArtistImage = getTagArtistImage();
 			if ( tagArtistImage != null ) return tagArtistImage;
 		}
-		
-		if ( hasAlbumDirectory() ) {
 	
-			if ( this.getPath().getParent() != null ) {
+		if ( this.getPath().getParent() != null ) {
+		
+			Path targetPath = this.getPath().toAbsolutePath();
 			
-				Path targetPath = this.getPath().toAbsolutePath();
-				
-				ArrayList <Path> possibleFiles = new ArrayList <Path> ();
-				possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.png" ) );
-				possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.jpg" ) );
-				//possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.gif" ) );
-				
+			ArrayList <Path> possibleFiles = new ArrayList <Path> ();
+			possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.png" ) );
+			possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.jpg" ) );
+			if ( hasAlbumDirectory() ) {
 				if ( this.getPath().getParent().getParent() != null ) {
 					possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.png" ) );
 					possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.jpg" ) );
-					//possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.gif" ) );
 				}
-				
-				for ( Path test : possibleFiles ) {
-					if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
-						return new Image( test.toUri().toString() );
-					}
+			}
+			
+			for ( Path test : possibleFiles ) {
+				if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
+					System.out.println ( "Trying: " + test.toString() ); //TODO: DD
+					return new Image( test.toUri().toString() );
 				}
 			}
 		}
