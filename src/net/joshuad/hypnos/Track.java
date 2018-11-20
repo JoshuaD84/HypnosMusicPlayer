@@ -974,7 +974,6 @@ public class Track implements Serializable, AlbumInfoSource {
 			
 			for ( Path test : possibleFiles ) {
 				if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
-					System.out.println ( "Trying: " + test.toString() ); //TODO: DD
 					return new Image( test.toUri().toString() );
 				}
 			}
