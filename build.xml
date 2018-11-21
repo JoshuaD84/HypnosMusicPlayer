@@ -111,6 +111,7 @@
 			</copy>
 			
 			<exec executable="${appImageTool}">
+				<arg value="-n" />
 				<arg value="${temp}/Hypnos.AppDir" />
 				<arg value="${dist}/Hypnos-nix-64bit-${version-simple}_${TODAY}_b${build.number}.AppImage" />
 			</exec>

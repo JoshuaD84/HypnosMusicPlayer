@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2018 Joshua Hartwell  <joshua@joshuad.net> -->
+<component type="desktop-application">
+  <id>net.hypnosplayer.Hypnos</id>
+  <metadata_license>FSFAP</metadata_license>
+  <project_license>GPL-3.0</project_license>
+  <name>Hypnos Music Player</name>
+  <summary>Music Player and Library</summary>
+
+  <description>
+    <p>Hypnos is:
+    <ul>
+      <li>A cross-platform music player and music library with a simple but powerful interface.</li>
+      <li>For people who have a lot of albums and songs on their computer and want to listen to them without any headaches.</li>
+    </ul>
+    Features:
+    <ul>
+      <li>Support for all popular audio file formats, and some esoteric audio formats.</li>
+      <li>Library Scanner/Updater</li>
+      <li>Album, Track, and Playlist views</li>
+      <li>Simple Tag Editor</li>
+      <li>Custom Playlist Manager</li>
+      <li>Global Hotkeys</li>
+      <li>LastFM</li>
+      <li>Light and dark themes</li>
+      <li>History, queue, m3u and folder exporting</li>
+      <li>Tag error log</li>
+      <li>Artist and Album artwork display</li>
+    </ul>
+    </p>
+  </description>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>Main Window</caption>
+      <image>http://hypnosplayer.org/download/beta4/screenshot.png</image>
+    </screenshot>
+  </screenshots>
+
+  <url type="homepage">http://hypnosplayer.org</url>
+
+  <provides>
+    <binary>gnome-power-statistics</binary>
+  </provides>
+</component>
