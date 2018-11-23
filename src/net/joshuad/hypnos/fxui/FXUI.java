@@ -1383,10 +1383,6 @@ public class FXUI implements PlayerListener {
 		artSplitPane.libraryCleared();
 	}
 
-	public boolean hotkeysDisabledForConfig () {
-		return settingsWindow.hotkeysDisabledForConfig();
-	}
-
 	public void refreshHotkeyList () {
 		settingsWindow.refreshHotkeyFields();
 	}

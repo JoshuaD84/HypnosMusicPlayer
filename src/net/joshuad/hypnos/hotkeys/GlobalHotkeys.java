@@ -1,28 +1,17 @@
 package net.joshuad.hypnos.hotkeys;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
-import java.util.concurrent.AbstractExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
+import java.util.Map;
 import java.util.logging.Logger;
 
-import org.jnativehook.GlobalScreen;
-import org.jnativehook.NativeHookException;
-import org.jnativehook.NativeInputEvent;
-import org.jnativehook.keyboard.NativeKeyEvent;
-import org.jnativehook.keyboard.NativeKeyListener;
+import javafx.scene.input.KeyEvent;
+import net.joshuad.hypnos.Hypnos.OS;
 
-import net.joshuad.hypnos.Hypnos;
-
-public class GlobalHotkeys implements NativeKeyListener {
-	private static final Logger LOGGER = Logger.getLogger( GlobalHotkeys.class.getName() );
-
+public class GlobalHotkeys {
+	private static transient final Logger LOGGER = Logger.getLogger( GlobalHotkeys.class.getName() );
+	
 	public enum Hotkey {
 		PREVIOUS ( "Previous" ), 
 		NEXT ( "Next" ), 
@@ -42,185 +31,165 @@ public class GlobalHotkeys implements NativeKeyListener {
 		SKIP_FORWARD ( "Forward 5 Seconds" ),
 		SKIP_BACK ( "Back 5 Seconds" );
 		
-				
 		private String label;
 		Hotkey ( String label ) { this.label = label; }
 		public String getLabel () { return label; }
 	}
+
+	List<GlobalHotkeyListener> listeners = new ArrayList<>();
+
+	Map <Hotkey, HotkeyState> hotkeyMap = new EnumMap <> ( Hotkey.class );
 	
-	private static boolean disableHotkeys = false;
+	private boolean disabled = false;
+	boolean hasUnsavedData = false;
+	private boolean inEditMode = false;
 	
-	private static boolean disabled = false;
+	private SystemHotkeys system;
 	
-	private KeyState lastKeyState = null;
+	public GlobalHotkeys( OS operatingSystem, boolean disabled ) {
+		this.disabled = disabled;
+		try {
+			switch ( operatingSystem ) {
+				case NIX:
+					system = new LinuxGlobalHotkeys( this );
+					break;
+					
+				case OSX:
+					throw new HotkeyException ( "OSX does not currently support hotkeys." );
+					
+				case WIN_10:
+				case WIN_7:
+				case WIN_8:
+				case WIN_UNKNOWN:
+				case WIN_VISTA:
+				case WIN_XP:
+					system = new WindowsGlobalHotkeys( this );
+					break;
 	
-	private EnumMap <Hotkey, KeyState> hotkeyMap = new EnumMap <Hotkey, KeyState> ( Hotkey.class );
-	
-	transient private boolean hasUnsavedData = true;
-	
-	public boolean hasUnsavedData() {
-		return hasUnsavedData;
+				case UNKNOWN:
+				default:
+					throw new HotkeyException ( "Cannot recognize operating system." );
+				
+			}
+		} catch ( HotkeyException e ) {
+			system = new DummyGlobalHotkeys ( this );
+			disabled = true;
+			LOGGER.info( "Unable to setup global hotkeys, they are disabled: " + e.getMessage() );
+		}
 	}
 	
-	public void setHasUnsavedData( boolean b ) {
+	public void addListener ( GlobalHotkeyListener listener ) {
+		listeners.add ( listener );
+	}
+	
+	public boolean hasUnsavedData () {
+		return hasUnsavedData;
+	}
+
+	public void setHasUnsavedData ( boolean b ) {
 		hasUnsavedData = b;
 	}
 	
-	public static GlobalHotkeys start() {
-		GlobalHotkeys hotkeys;
-		if ( !disableHotkeys ) {
-			PrintStream out = System.out;
-			
-			try {
-				//This suppresses the lgpl banner from the hotkey library. 
-				System.setOut( new PrintStream ( new OutputStream() {
-				    @Override public void write(int b) throws IOException {}
-				}));
-			
-				//LogManager.getLogManager().reset();
-				Logger logger = Logger.getLogger( GlobalScreen.class.getPackage().getName() );
-				logger.setLevel( Level.OFF );
-				GlobalScreen.setEventDispatcher(new VoidDispatchService());
-				GlobalScreen.registerNativeHook();
-				
-			} catch ( NativeHookException ex ) {
-				LOGGER.warning( "There was a problem registering the global hotkey listeners. Global Hotkeys are disabled." );
-				disabled = true;
-			} finally {
-				System.setOut( out );
+	public boolean isDisabled() {
+		return disabled;
+	}
+	
+	public boolean registerFXHotkey ( Hotkey hotkey, KeyEvent event ) {
+		if ( isDisabled() ) return false;
+		return registerFXHotkey ( hotkey, new HotkeyState ( event ) );
+	}
+
+	public boolean registerFXHotkey ( Hotkey hotkey, HotkeyState keystate ) {
+		if ( isDisabled() ) return false;
+		if ( keystate == null ) return false;
+		
+		for ( Hotkey existingKey : hotkeyMap.keySet() ) {
+			if ( keystate.equals( hotkeyMap.get( existingKey ) ) ) {
+				clearHotkey ( existingKey );
 			}
 		}
 		
-		hotkeys = new GlobalHotkeys();
-		
-		if ( !disableHotkeys ) {
-			GlobalScreen.addNativeKeyListener( hotkeys );
-		} else {
-			disabled = true;
+		boolean result = system.registerHotkey ( hotkey, keystate );
+		if ( inEditMode ) {
+			system.unregisterHotkey ( hotkey );
 		}
 		
-		return hotkeys;
-	}
-	
-	public static void setDisableRequested ( boolean b ) {
-		disableHotkeys = b;
-	}
-	
-	public static boolean getDisableRequested ( ) {
-		return disableHotkeys;
-	}
-	
-	public GlobalHotkeys() {}
-	
-	public boolean registerLastCombination ( Hotkey hotkey, String display ) {
-		if ( lastKeyState == null ) return false;
-		if ( hotkey == null ) return false;
+		if ( result ) {
+			hotkeyMap.put( hotkey, keystate );
+			hasUnsavedData = true;
+		} 
 		
-		for ( Hotkey key : hotkeyMap.keySet() ) {
-			KeyState registeredHotkey = hotkeyMap.get( key );
-			if ( registeredHotkey != null && registeredHotkey.equals( lastKeyState ) ) {
-				hotkeyMap.remove( key );
+		return result;
+	}
+	
+	public void beginEditMode() {
+		if ( isDisabled() ) return;
+		if ( !inEditMode ) {
+			for ( Hotkey hotkey : hotkeyMap.keySet() ) {
+				system.unregisterHotkey ( hotkey );
 			}
+			inEditMode = true;
 		}
-		
-		lastKeyState.setDisplay ( display );
-		
-		hotkeyMap.put( hotkey, lastKeyState );
-		hasUnsavedData = true;
-		
-		return true;
+	}
+	
+	public void endEditMode() {
+		if ( isDisabled() ) return;
+		if ( inEditMode ) {
+			for ( Hotkey hotkey : hotkeyMap.keySet() ) {
+				system.registerHotkey ( hotkey, hotkeyMap.get( hotkey ) );
+			}
+			inEditMode = false;
+		}
+	}
+	
+	public void prepareToExit() {
+		for ( Hotkey hotkey : hotkeyMap.keySet() ) {
+			system.unregisterHotkey ( hotkey );
+		}
+	}
+	
+	public void clearAllHotkeys() {
+		if ( isDisabled() ) return;
+		for ( Hotkey hotkey : hotkeyMap.keySet() ) {
+			clearHotkey ( hotkey );
+		}
 	}
 	
 	public void clearHotkey ( Hotkey key ) {
+		if ( isDisabled() ) return;
 		if ( key == null ) return;
 		hotkeyMap.remove( key );
 		hasUnsavedData = true;
-	}
-	
-	public String getDisplay ( Hotkey hotkey ) {
-		KeyState keyState = hotkeyMap.get( hotkey );
-		
-		if ( keyState == null ) return "";
-		else return keyState.getDisplay();
-	}
-	
-	public void disable() {
-		disabled = true;
-	}
-	
-	public void enable() {
-		disabled = false;
-	}
-			
-	public void nativeKeyPressed ( NativeKeyEvent e ) {	
-		lastKeyState = new KeyState ( e.getKeyCode(), e.getModifiers() );
-		
-		if ( !Hypnos.hotkeysDisabledForConfig() ) {
-			for ( Hotkey hotkey : hotkeyMap.keySet() ) {
-				KeyState registeredHotkey = hotkeyMap.get( hotkey );
-				if ( registeredHotkey != null && registeredHotkey.equals( lastKeyState ) ) {
-					
-					Hypnos.doHotkeyAction ( hotkey );
-					
-					try {
-						//This is an attempt to consume the hotkey. Doesn't work in X11
-						Field f = NativeInputEvent.class.getDeclaredField("reserved");
-						f.setAccessible(true);
-						f.setShort(e, (short) 0x01);
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					}
-				}
-			}
-		}
+		system.unregisterHotkey ( key );
 	}
 
-	public EnumMap <Hotkey, KeyState> getMap() {
+	public Map <Hotkey, HotkeyState> getMap() {
 		return hotkeyMap;
 	}
 	
-	public void setMap ( EnumMap <Hotkey, KeyState> map ) {
+	public void setMap ( EnumMap <Hotkey, HotkeyState> map ) {
 		this.hotkeyMap = map;
-	}
-	
-	public void nativeKeyReleased( NativeKeyEvent e ) {}
-	
-	public void nativeKeyTyped(NativeKeyEvent e) {
-		//TODO: Can I fix that windows win key bug with this? 
-	}
-	
-}
 
-class VoidDispatchService extends AbstractExecutorService {
-	private boolean running = false;
-
-	public VoidDispatchService() {
-		running = true;
+		if ( isDisabled() ) return;
+		for ( Hotkey hotkey : map.keySet() ) {
+			registerFXHotkey ( hotkey, map.get( hotkey ) );
+		}
 	}
 
-	public void shutdown() {
-		running = false;
+	public String getDisplayText ( Hotkey hotkey ) {
+		HotkeyState state = hotkeyMap.get( hotkey );
+		
+		if ( state == null ) {
+			return "";
+		} else {
+			return hotkeyMap.get( hotkey ).getDisplayText( );
+		}
 	}
 
-	public List<Runnable> shutdownNow() {
-		running = false;
-		return new ArrayList<Runnable>(0);
-	}
-
-	public boolean isShutdown() {
-		return !running;
-	}
-
-	public boolean isTerminated() {
-		return !running;
-	}
-
-	public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
-		return true;
-	}
-
-	public void execute(Runnable r) {
-		r.run();
+	void systemHotkeyEventHappened ( Hotkey hotkey ) {
+		if ( isDisabled() ) return;
+		for ( GlobalHotkeyListener listener : listeners ) {
+			listener.hotkeyPressed ( hotkey );
+		}
 	}
 }
-

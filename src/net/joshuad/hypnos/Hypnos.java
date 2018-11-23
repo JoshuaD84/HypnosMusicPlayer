@@ -133,14 +133,14 @@ public class Hypnos extends Application {
 	private static Path logFile, logFileBackup, logFileBackup2;
 	private static boolean isStandalone = false;
 	private static boolean isDeveloping = false;
-	private static boolean globalHotkeysDisabled = false;
+	private static boolean disableGlobalHotkeysRequestedByProperties = false;
 	
 	private static Persister persister;
 	private static AudioSystem audioSystem;
 	private static FXUI ui;
 	private static LibraryUpdater libraryUpdater;
 	private static Library library;
-	private static GlobalHotkeys hotkeys;
+	private static GlobalHotkeys globalHotkeys;
 	
 	private static PrintStream originalOut;
 	private static PrintStream originalErr;
@@ -293,11 +293,11 @@ public class Hypnos extends Application {
 				
 		isStandalone = Boolean.getBoolean( "hypnos.standalone" );
 		isDeveloping = Boolean.getBoolean( "hypnos.developing" );
-		GlobalHotkeys.setDisableRequested ( Boolean.getBoolean( "hypnos.disableglobalhotkeys" ) );
+		disableGlobalHotkeysRequestedByProperties = Boolean.getBoolean( "hypnos.disableglobalhotkeys" );
 		
 		if ( isStandalone ) LOGGER.info ( "Running as standalone - requested by system properties set at program launch" );
 		if ( isDeveloping ) LOGGER.info ( "Running on development port - requested by system properties set at program launch" );
-		if ( GlobalHotkeys.getDisableRequested() ) LOGGER.info ( "Global hotkeys disabled - requested by system properties set at program launch" );
+		if ( disableGlobalHotkeysRequestedByProperties ) LOGGER.info ( "Global hotkeys disabled - requested by system properties set at program launch" );
 	}
 	
 	private void determineOS() {
@@ -497,20 +497,13 @@ public class Hypnos extends Application {
 		}
 	}
 	
-	private void startGlobalHotkeyListener() {
-		hotkeys = GlobalHotkeys.start();
-	}
-	
 	public static boolean globalHotkeysDisabled() {
-		return globalHotkeysDisabled;
-	}
-	
-	public static boolean hotkeysDisabledForConfig () {
-		return ui.hotkeysDisabledForConfig();
+		//TODO: ask hotkeys, don't keep a value in Hypnos
+		return disableGlobalHotkeysRequestedByProperties;
 	}
 
 	public static void doHotkeyAction ( Hotkey hotkey ) {
-		Platform.runLater( () -> {
+		Platform.runLater( () -> { //TODO: Should this runLater() be around everything or just show_hide_ui? 
 			switch ( hotkey ) {
 				case NEXT:
 					audioSystem.next();
@@ -669,6 +662,11 @@ public class Hypnos extends Application {
 
 	public static void exit ( ExitCode exitCode ) {
 		LOGGER.info( "Exit requested: " + exitCode.toString() );
+		
+		if ( globalHotkeys != null ) {
+			globalHotkeys.prepareToExit();
+		}
+		
 		if ( audioSystem != null && ui != null ) {
 			EnumMap <Setting, ? extends Object> fromAudioSystem = audioSystem.getSettings();
 			EnumMap <Setting, ? extends Object> fromUI = ui.getSettings();
@@ -705,11 +703,12 @@ public class Hypnos extends Application {
 				setupLogFile();
 				library = new Library();
 				audioSystem = new AudioSystem();
-				startGlobalHotkeyListener();
-				ui = new FXUI ( stage, library, audioSystem, hotkeys );
+				globalHotkeys = new GlobalHotkeys( getOS(), disableGlobalHotkeysRequestedByProperties );
+				globalHotkeys.addListener( Hypnos::doHotkeyAction );
+				ui = new FXUI ( stage, library, audioSystem, globalHotkeys );
 				audioSystem.setUI ( ui );
 				libraryUpdater = new LibraryUpdater ( library, audioSystem, ui );
-				persister = new Persister ( ui, library, audioSystem, hotkeys );
+				persister = new Persister ( ui, library, audioSystem, globalHotkeys );
 				
 				switch ( getOS() ) {
 					case NIX:

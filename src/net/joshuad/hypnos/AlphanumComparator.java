@@ -32,10 +32,7 @@ package net.joshuad.hypnos;
 
 /* Modified by JDH - 2017/12/19 - To allow case-insensitive handling */
 
-import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This is an updated version with enhancements made by Daniel Migowski,
@@ -154,14 +151,5 @@ public class AlphanumComparator<T> implements Comparator<String>
         }
 
         return s1Length - s2Length;
-    }
-    
-    /** 
-     * Shows an example of how the comparator works. 
-     * Feel free to delete this in your own code!
-     */
-    public static void main(String[] args) {
-    	List<String> values = Arrays.asList("dazzle2", "dazzle10", "dazzle1", "dazzle2.7", "dazzle2.10", "2", "10", "1", "EctoMorph6", "EctoMorph62", "EctoMorph7");
-    	System.out.println(values.stream().sorted(new AlphanumComparator<String>()).collect(Collectors.joining(" ")));
     }
 }

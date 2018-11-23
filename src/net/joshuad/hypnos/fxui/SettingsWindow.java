@@ -76,9 +76,9 @@ import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.TagError;
 import net.joshuad.hypnos.Track;
-import net.joshuad.hypnos.Hypnos.OS;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys.Hotkey;
+import net.joshuad.hypnos.hotkeys.HotkeyState;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 
@@ -134,7 +134,11 @@ public class SettingsWindow extends Stage {
 		tabPane = new TabPane();
 		
 		Tab settingsTab = setupSettingsTab( root, ui );
+
 		globalHotkeysTab = setupGlobalHotkeysTab( root );
+		globalHotkeysTab.setTooltip( new Tooltip ( "Global hotkeys disabled at launch" ) );
+		if ( hotkeys.isDisabled() ) globalHotkeysTab.setDisable( true );
+		
 		Tab hotkeysTab = setupHotkeysTab( root );
 		Tab logTab = setupLogTab( root );
 		Tab tagTab = setupTagTab( root );
@@ -142,6 +146,29 @@ public class SettingsWindow extends Stage {
 		Tab aboutTab = setupAboutTab( root ); 
 		
 		tabPane.getTabs().addAll( settingsTab, hotkeysTab, globalHotkeysTab, logTab, tagTab, lastFMTab, aboutTab );
+		
+		tabPane.getSelectionModel().selectedItemProperty().addListener(
+		    new ChangeListener<Tab>() {
+		        @Override
+		        public void changed(ObservableValue<? extends Tab> observable, Tab oldValue, Tab newValue) {
+		            if ( newValue == globalHotkeysTab ) {
+		            	hotkeys.beginEditMode();
+		            } else if ( oldValue == globalHotkeysTab ) {
+		            	hotkeys.endEditMode();
+		            }
+		        }
+		    }
+		);
+		
+		this.showingProperty().addListener( ( obs, previousValue, isNowShowing ) -> {
+			if ( isNowShowing ) {
+				if ( tabPane.getSelectionModel().getSelectedItem() == globalHotkeysTab ) {
+					hotkeys.beginEditMode();
+				}
+			} else {
+				hotkeys.endEditMode();
+			}
+		});
 		
 		tabPane.prefWidthProperty().bind( root.widthProperty() );
 		tabPane.prefHeightProperty().bind( root.heightProperty() );
@@ -251,64 +278,74 @@ public class SettingsWindow extends Stage {
 		GridPane.setHalignment( descriptionLabel, HPos.CENTER );
 		row++;
 		
-		for ( Hotkey key : Hotkey.values() ) {
-			Label label = new Label ( key.getLabel() );
-			label.setStyle( "-fx-alignment: center" );
+		for ( Hotkey hotkey : Hotkey.values() ) {
+			Label label = new Label ( hotkey.getLabel() );
+			label.setStyle( "-fx-alignment: center" ); //TODO: Put this in the stylesheet
 			label.setPadding( new Insets ( 0, 20, 0, 0 ) );
 			
 			TextField field = new TextField ();
-			field.setStyle( "-fx-alignment: center" );
+			field.setStyle( "-fx-alignment: center" ); //TODO: Put this in the stylesheet
 			field.setPrefWidth( 200 );
 			globalHotkeyFields.add ( field );
 			
-			field.setOnKeyPressed( ( KeyEvent e ) -> { 
-				
-				String shortcut = "";
-				if ( e.isControlDown() ) shortcut += "Ctrl + ";
-				if ( e.isAltDown() ) shortcut += "Alt + ";
-				if ( e.isShiftDown() ) shortcut += "Shift + ";
-				if ( e.isMetaDown() ) shortcut += "Meta + ";
+			field.setOnKeyPressed( ( KeyEvent keyEvent ) -> { 
+				String hotkeyText = HotkeyState.getDisplayText( keyEvent );
 				
 				boolean registered = false;
-				if ( e.getCode().isModifierKey() ) {
-					field.setText( shortcut );
-					
-				} else if ( e.getCode().equals( KeyCode.ESCAPE ) ) {
+				if ( keyEvent.getCode().equals( KeyCode.ESCAPE ) ) {
 					field.setText( "" );
-					hotkeys.clearHotkey ( key );
-				
-				} else {
-					shortcut += e.getCode().getName();
-					registered = hotkeys.registerLastCombination( key, shortcut );
+					hotkeys.clearHotkey ( hotkey );
 					
+				} else if ( keyEvent.getCode().isModifierKey() ) {
+					field.setText( hotkeyText );
+					hotkeys.clearHotkey ( hotkey );
+					
+				} else if ( keyEvent.getCode().equals( KeyCode.TAB ) ) {
+					//Do nothing, javafx automatically focus cycles
+					
+				} else {
+					registered = hotkeys.registerFXHotkey( hotkey, keyEvent );
 					if ( registered ) {
-						field.setText( shortcut );
+						field.setText( hotkeyText );
 						refreshHotkeyFields();
 					}
 				}
 
-				field.positionCaret( shortcut.length() );
-				
-				e.consume();
+				field.positionCaret( hotkeyText.length() );
+				keyEvent.consume();
 			});
 			
-			field.setOnKeyTyped( ( KeyEvent e ) -> {
-				e.consume();
+			field.addEventFilter(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
+			    @Override
+			    public void handle(KeyEvent event) {
+			    	event.consume();                    
+			    }
 			});
+			
+			field.focusedProperty().addListener( ( obs, oldVal, newVal ) -> {
+				//This fixes a particular bug on linux
+				//Have a hotkey (meta + X) registered with another program, then press 
+				//1. Meta, 2. X, 3. Release Meta, 4. Release X. 
+				// If you do that, you'll get the key area frozen at Meta +
+				refreshHotkeyFields();
+				//TODO: on linux I could use stop this to show a "registered with system already" thing
+				//not sure if it'll work on configurations other than xubuntu
+			} );
 			
 			field.setOnKeyReleased( ( KeyEvent e ) -> {
 				refreshHotkeyFields();
+				field.positionCaret( 0 );
 			});
 			
 			globalContent.add( label, 0, row );
 			globalContent.add( field, 1, row );
 			
-			hotkeyFields.put( key, field );
+			hotkeyFields.put( hotkey, field );
 			
 			row++;
 		}
 		
-		Label clearHotkeyLabel = new Label ( "(Use <ESC> to erase a global hotkey)" );
+		Label clearHotkeyLabel = new Label ( "(Use ESC to erase a global hotkey)" );
 		clearHotkeyLabel.setPadding( new Insets ( 20, 0, 20, 0 ) );
 		clearHotkeyLabel.setWrapText( true );
 		clearHotkeyLabel.setTextAlignment( TextAlignment.CENTER );
@@ -322,24 +359,6 @@ public class SettingsWindow extends Stage {
 			disabledNote.setPadding( new Insets ( 0, 0, 20, 0 ) );
 			GridPane.setHalignment( disabledNote, HPos.CENTER );
 			row++;
-		}
-		
-		if ( Hypnos.getOS() == OS.NIX ) {
-			
-			Hyperlink consumeHotkeyNote = new Hyperlink ( "Note: On Linux global hotkeys can not be consumed. Click here to read how to address this problem." );
-
-			String url = "http://www.hypnosplayer.org/help/linux-global-hotkey-consume/";
-			consumeHotkeyNote.setTooltip( new Tooltip ( url ) );
-			
-			consumeHotkeyNote.setOnAction( e -> { ui.openWebBrowser( url ); } );
-			
-			consumeHotkeyNote.setPadding( new Insets ( 0, 0, 0, 0 ) );
-			consumeHotkeyNote.setWrapText( true );
-			consumeHotkeyNote.setTextAlignment( TextAlignment.CENTER );
-			globalContent.add( consumeHotkeyNote, 0, row, 2, 1 );
-			GridPane.setHalignment( consumeHotkeyNote, HPos.CENTER );
-			row++;
-			
 		}
 		
 		return hotkeysTab;
@@ -436,9 +455,8 @@ public class SettingsWindow extends Stage {
 		for ( Hotkey key : Hotkey.values() ) {
 			TextField field = hotkeyFields.get( key );
 			if ( field == null ) continue;
-			
-			field.setText( hotkeys.getDisplay( key ) );
-		}
+			field.setText( hotkeys.getDisplayText( key ) );
+		}			
 	}
 	
 	private Tab setupSettingsTab ( Pane root, FXUI ui ) {
@@ -1335,9 +1353,7 @@ public class SettingsWindow extends Stage {
 		});
 		
 		bugBox.getChildren().addAll( bugLabel, bugGitLink );
-		
-		
-		
+
 		String updateURL = "http://hypnosplayer.org";
 		updateLink = new Hyperlink ( "Update Available!" );
 		updateLink.setStyle( "-fx-font-size: 20px; -fx-text-fill: #0A95C8" );
@@ -1353,18 +1369,6 @@ public class SettingsWindow extends Stage {
 			authorBox, sourceBox, licenseBox, bugBox, updateLink );
 		
 		return aboutTab;
-	}
-	
-	public boolean hotkeysDisabledForConfig () {
-		if ( tabPane == null ) return false;
-		if ( globalHotkeysTab == null ) return false;
-		if ( !this.isShowing() ) return false;
-		
-		if ( tabPane.getSelectionModel().getSelectedItem().equals( this.globalHotkeysTab ) )  {
-			return true;
-		}
-		
-		return false;
 	}
 	
 	private String hotkeyText = 

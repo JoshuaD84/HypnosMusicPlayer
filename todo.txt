@@ -1,34 +1,23 @@
-AppImage Stuff:
-    [exec] AppStream upstream metadata found in usr/share/metainfo/hypnos.appdata.xml
-    [exec] W - hypnos.appdata.xml:net.hypnosplayer.Hypnos
-    [exec]     The metainfo filename does not match the component ID.
+Hotkeys
+	windows intellitype work
+	Can we get hotkeys for wierd buttons on linux?
 
-      If i rename it, then its not seen. If i name it hypnos.appdata.xml it's seen but rejected
+	https://stackoverflow.com/questions/858766/generate-manifest-class-path-from-classpath-in-ant
+	
 
-::::::::::::
+Change the pause / unpause global hotkey to play / pause, so if it's stopped it starts playing
 
+When you try to launch hypnos a second time, just bring the existing window to the front, dont show popup
+	But maybe we can ask the existing window if it's responding, and if it's not then we can show popup
 
 Features that need System-by-System attention
-	Global Hotkeys
-		https://stackoverflow.com/questions/79658/react-on-global-hotkey-in-a-java-program-on-windows-linux-mac
-		Some Global Hotkeys aren't consumed - Win + C, Win + X, etc.
-		Linux
-			http://sourceforge.net/projects/jxgrabkey/
-			JNativeHook - No consumption of hotkey
-
-		Windows
-			JNativeHook: Winkey + <Something> doesn't work right. If you release the keys in the wrong order, the windows menu opens
-				https://github.com/kwhat/jnativehook/issues/235
-
-			jkeymaster - windows + x keys not supported
-			JHotKeys - I can't find a jar, and having trouble building one.
-
 	System Tray
 		Linux
-			Probably not doable
+			Probably not doable well with pure java, but can we create a child process and call a simple
+			gtk JNI thing, that interacts with hypnos via sockets?
 
 		Windows
-			Probably doable
+			Probably doable via swing
 
 	Mounted Audio CDs
 		Linux
@@ -37,7 +26,6 @@ Features that need System-by-System attention
 
 		Windows
 			Does not work
-
 
 	Executable Wrapping
 		Linux - I'm happy with appimages

@@ -28,8 +28,8 @@ import java.util.zip.GZIPOutputStream;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.FXUI;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
-import net.joshuad.hypnos.hotkeys.KeyState;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys.Hotkey;
+import net.joshuad.hypnos.hotkeys.HotkeyState;
 
 public class Persister {
 
@@ -207,7 +207,7 @@ public class Persister {
 	
 	public void loadHotkeys () {
 		try ( ObjectInputStream hotkeysIn = new ObjectInputStream( new FileInputStream( hotkeysFile ) ); ) {
-			hotkeys.setMap( (EnumMap <Hotkey, KeyState>) hotkeysIn.readObject() );
+			hotkeys.setMap( (EnumMap <Hotkey, HotkeyState>) hotkeysIn.readObject() );
 			hotkeys.setHasUnsavedData( false );
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to read hotkeys from disk, continuing." );
@@ -218,7 +218,6 @@ public class Persister {
 		try ( ObjectInputStream dataIn = new ObjectInputStream( new GZIPInputStream( new FileInputStream( dataFile ) ) ) ) {
 			library.albums.addAll( (ArrayList <Album>) dataIn.readObject() );
 			library.tracks.addAll( (ArrayList <Track>) dataIn.readObject() );
-			
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to read library data from disk, continuing." );
 		}
@@ -345,7 +344,7 @@ public class Persister {
 			hotkeysOut.flush();
 			hotkeysOut.close();
 			
-			Files.move( tempHotkeysFile.toPath(), hotkeysFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
+			Files.move( tempHotkeysFile.toPath(), hotkeysFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE );
 
 			hotkeys.setHasUnsavedData( false );
 			

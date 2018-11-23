@@ -495,7 +495,6 @@ public class Library {
 		}
 
 		if ( musicSearchLocations.isEmpty() ) {
-			System.out.println ( "Here" ); //TODO: DD
 			Hypnos.getUI().libraryCleared();
 		}
 		

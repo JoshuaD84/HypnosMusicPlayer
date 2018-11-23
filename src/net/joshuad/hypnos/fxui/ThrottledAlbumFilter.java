@@ -41,6 +41,7 @@ public class ThrottledAlbumFilter {
 			filterThread.setDaemon( true );
 			filterThread.start();
 		} catch ( Exception e ) {
+			//TODO: Logging, what is this exception? 
 			System.out.println ( "Caught here" );
 		}
 	}
