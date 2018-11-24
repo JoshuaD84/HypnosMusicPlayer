@@ -15,8 +15,8 @@ public class GlobalHotkeys {
 	public enum Hotkey {
 		PREVIOUS ( "Previous" ), 
 		NEXT ( "Next" ), 
+		PLAY_PAUSE ( "Play / Pause" ),
 		PLAY ( "Play" ), 
-		TOGGLE_PAUSE ( "Pause / Unpause" ),
 		STOP ( "Stop" ),
 		
 		VOLUME_UP ( "Volume Up" ),
@@ -26,7 +26,7 @@ public class GlobalHotkeys {
 		TOGGLE_SHUFFLE ( "Toggle Shuffle" ),
 		TOGGLE_REPEAT ( "Toggle Repeat" ),
 		
-		SHOW_HIDE_UI ( "Show/Hide Main Window" ),
+		SHOW_HIDE_UI ( "Show / Hide Main Window" ),
 		
 		SKIP_FORWARD ( "Forward 5 Seconds" ),
 		SKIP_BACK ( "Back 5 Seconds" );

@@ -102,6 +102,14 @@ public class AudioSystem {
 		player.requestPause();
 	}
 	
+	public void togglePlayPause () {
+		if ( player.isStopped() ) {
+			play();
+		} else {
+			togglePause();
+		}
+	}
+	
 	public void togglePause () {
 		player.requestTogglePause();
 	}

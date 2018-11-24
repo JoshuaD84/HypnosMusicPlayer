@@ -280,7 +280,7 @@ public class SettingsWindow extends Stage {
 		
 		for ( Hotkey hotkey : Hotkey.values() ) {
 			Label label = new Label ( hotkey.getLabel() );
-			label.setStyle( "-fx-alignment: center" ); //TODO: Put this in the stylesheet
+			GridPane.setHalignment( label, HPos.RIGHT );
 			label.setPadding( new Insets ( 0, 20, 0, 0 ) );
 			
 			TextField field = new TextField ();

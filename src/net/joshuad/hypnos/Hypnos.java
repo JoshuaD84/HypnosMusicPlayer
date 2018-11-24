@@ -531,8 +531,8 @@ public class Hypnos extends Application {
 				case TOGGLE_MUTE:
 					audioSystem.toggleMute();
 					break;
-				case TOGGLE_PAUSE:
-					audioSystem.togglePause();
+				case PLAY_PAUSE:
+					audioSystem.togglePlayPause();
 					break;
 				case TOGGLE_REPEAT:
 					audioSystem.toggleRepeatMode();
