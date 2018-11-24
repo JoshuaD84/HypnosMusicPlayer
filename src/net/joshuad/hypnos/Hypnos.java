@@ -833,6 +833,7 @@ public class Hypnos extends Application {
 					singleInstanceController.sendCommandsThroughSocket( Arrays.asList(
 							new SocketCommand ( SocketCommand.CommandType.CONTROL, SocketCommand.SHOW )
 					) );
+					
 					String message = "Hypnos is already running.";
 					System.out.println ( message );
 					FXUI.notifyUserHypnosRunning();

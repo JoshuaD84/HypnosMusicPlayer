@@ -91,7 +91,17 @@ public class GlobalHotkeys {
 	}
 	
 	public boolean isDisabled() {
-		return disabled;
+		return disabled || system instanceof DummyGlobalHotkeys;
+	}
+	
+	public String getReasonDisabled() {
+		if ( disabled ) {
+			return "Disabled at launch";
+		} else if ( system instanceof DummyGlobalHotkeys ) {
+			return "Global Hotkeys not currently supported by Hypnos for your Operating System.";
+		} else {
+			return "";
+		}
 	}
 	
 	public boolean registerFXHotkey ( Hotkey hotkey, KeyEvent event ) {

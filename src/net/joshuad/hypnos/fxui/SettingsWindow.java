@@ -136,8 +136,10 @@ public class SettingsWindow extends Stage {
 		Tab settingsTab = setupSettingsTab( root, ui );
 
 		globalHotkeysTab = setupGlobalHotkeysTab( root );
-		globalHotkeysTab.setTooltip( new Tooltip ( "Global hotkeys disabled at launch" ) );
-		if ( hotkeys.isDisabled() ) globalHotkeysTab.setDisable( true );
+		if ( hotkeys.isDisabled() ) {
+			globalHotkeysTab.setDisable( true );
+			globalHotkeysTab.setTooltip( new Tooltip ( hotkeys.getReasonDisabled() ) );
+		}
 		
 		Tab hotkeysTab = setupHotkeysTab( root );
 		Tab logTab = setupLogTab( root );

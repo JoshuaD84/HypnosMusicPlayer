@@ -7,8 +7,6 @@ Hotkeys
 When you try to launch hypnos a second time, just bring the existing window to the front, dont show popup
 	But maybe we can ask the existing window if it's responding, and if it's not then we can show popup
 
-If global hotkeys are disabled by the system for any reason, including dummy hotkeys, disable the tab
-
 Features that need System-by-System attention
 	System Tray
 		Linux
