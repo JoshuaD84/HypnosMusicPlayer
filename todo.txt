@@ -4,8 +4,7 @@ Hotkeys
 
 	https://stackoverflow.com/questions/858766/generate-manifest-class-path-from-classpath-in-ant
 
-When you try to launch hypnos a second time, just bring the existing window to the front, dont show popup
-	But maybe we can ask the existing window if it's responding, and if it's not then we can show popup
+Sync the jvm arguments in my various launch scripts, including within eclipse
 
 Features that need System-by-System attention
 	System Tray
@@ -44,6 +43,13 @@ Features that need System-by-System attention
 
 
 Future
+   Sometimes the art pane can become non-responsive. I dragged and dropped an image frm google and it stopped changing
+      I've seen it a few other times too.
+
+   Support for other scrobbling services. Dropdown box in the lastfm tab. Rename it "Scrobbling" or something
+
+   Maybe an artist tab on media library?
+
    Maybe change lyric window content on select track
 
 	Can I expand encoding information display using vlc?

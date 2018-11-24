@@ -601,6 +601,7 @@ public class FXUI implements PlayerListener {
 	public void toggleMinimized() {
 		if ( mainStage.isIconified() ) {
 			mainStage.setIconified( false );
+			mainStage.toFront();
 		} else {
 			mainStage.setIconified( true );
 		}
@@ -608,6 +609,7 @@ public class FXUI implements PlayerListener {
 	
 	public void restoreWindow() {
 		mainStage.setIconified( false );
+		mainStage.toFront();
 	}
 
 	public void updatePlaylistMenuItems ( ObservableList <MenuItem> items, EventHandler <ActionEvent> eventHandler ) {
@@ -904,13 +906,14 @@ public class FXUI implements PlayerListener {
 		return mainStage.isMaximized();
 	}
 	
-	public static void notifyUserHypnosRunning() {
+	public static void notifyUserHypnosNonResponsive() {
 		Alert alert = new Alert ( AlertType.INFORMATION );
 		setAlertWindowIcon ( alert );
 		
-		alert.setTitle( "Information" );
-		alert.setHeaderText( "Unable to launch Hypnos" );
-		alert.setContentText( "Hypnos is already running, and only one instance can run at a time. If you don't see it, please try terminating the orphaned process and try again." );
+		alert.setTitle( "Error" );
+		alert.setHeaderText( "Unable to Launch Hypnos" );
+		alert.setContentText( "A Hypnos process is running, but it has become non-responsive. " + 
+		   "Please end the existing process and then relaunch Hypnos." );
 		alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 		
 		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();

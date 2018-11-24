@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.joshuad.hypnos.SocketCommand.CommandType;
+
 public class SingleInstanceController {
 
 	private static final Logger LOGGER = Logger.getLogger( SingleInstanceController.class.getName() );
@@ -47,12 +49,15 @@ public class SingleInstanceController {
 				try {
 					Socket clientSocket = serverSocket.accept(); // It blocks here indefinitely while listening
 					ObjectInputStream in = new ObjectInputStream( clientSocket.getInputStream() );
+					ObjectOutputStream out = new ObjectOutputStream( clientSocket.getOutputStream() );
 					Object dataIn = in.readObject();
 
 					if ( dataIn instanceof List ) {
 						List <SocketCommand> items = (List <SocketCommand>) dataIn;
 						hypnos.applyCLICommands( items );
 					}
+					
+					out.writeObject( new SocketCommand ( CommandType.CONTROL, SocketCommand.RECEIPT_ACKNOWLEDGED ) );
 
 				} catch ( Exception e ) {
 					LOGGER.log( Level.INFO, e.getClass() + ": Read error at commandline parser", e );
@@ -66,15 +71,23 @@ public class SingleInstanceController {
 		return true;
 	}
 	
-	public void sendCommandsThroughSocket( List <SocketCommand> commands ) {
+	public boolean sendCommandsThroughSocket( List <SocketCommand> commands ) {
 		try (
 			Socket clientSocket = new Socket( InetAddress.getByName(null), port );
 			ObjectOutputStream out = new ObjectOutputStream( clientSocket.getOutputStream() );
+			ObjectInputStream in = new ObjectInputStream( clientSocket.getInputStream() );
 		){
+			clientSocket.setSoTimeout( 100 );
 			out.writeObject( commands );
+			Object dataIn = in.readObject();
+			if ( ((SocketCommand)dataIn).getObject().equals( SocketCommand.RECEIPT_ACKNOWLEDGED ) ) {
+				return true;
+			}
+			
 		} catch ( Exception e ) {
 			LOGGER.log( Level.INFO, "Error sending commands through socket, UI may not accept commands." );
 		}
+		return false;
 	}
 }
 

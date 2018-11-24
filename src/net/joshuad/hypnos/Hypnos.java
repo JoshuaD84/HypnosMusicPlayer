@@ -826,17 +826,18 @@ public class Hypnos extends Application {
 				}
 
 			} else {
-				singleInstanceController.sendCommandsThroughSocket( commands );
+				boolean gotResponse = singleInstanceController.sendCommandsThroughSocket( commands );
 				if ( commands.size() > 0 ) {
 					System.out.println ( "Commands sent to currently running Hypnos." );
-				} else {
-					singleInstanceController.sendCommandsThroughSocket( Arrays.asList(
-							new SocketCommand ( SocketCommand.CommandType.CONTROL, SocketCommand.SHOW )
-					) );
 					
-					String message = "Hypnos is already running.";
-					System.out.println ( message );
-					FXUI.notifyUserHypnosRunning();
+				} else if ( gotResponse ) {
+					singleInstanceController.sendCommandsThroughSocket( Arrays.asList(
+						new SocketCommand ( SocketCommand.CommandType.CONTROL, SocketCommand.SHOW )
+					));
+					System.out.println ( "Hypnos is already running, brought to front." );
+					
+				} else {
+					FXUI.notifyUserHypnosNonResponsive();
 				}
 				
 				System.exit ( 0 ); //We don't use Hypnos.exit here intentionally. 
