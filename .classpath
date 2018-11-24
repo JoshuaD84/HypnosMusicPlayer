@@ -13,7 +13,6 @@
 	<classpathentry kind="lib" path="stage/lib/jsoup-1.11.2.jar"/>
 	<classpathentry kind="lib" path="stage/lib/commons-text-1.1.jar"/>
 	<classpathentry kind="lib" path="stage/lib/commons-lang3-3.7.jar"/>
-	<classpathentry kind="lib" path="stage/lib/jnativehook-2.0.2.jar"/>
 	<classpathentry kind="lib" path="stage/lib/jlastfm.jar"/>
 	<classpathentry kind="lib" path="stage/lib/jna-3.5.2.jar"/>
 	<classpathentry kind="lib" path="stage/lib/platform-3.5.2.jar"/>

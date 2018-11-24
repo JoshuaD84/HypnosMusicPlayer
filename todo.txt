@@ -3,12 +3,13 @@ Hotkeys
 	Can we get hotkeys for wierd buttons on linux?
 
 	https://stackoverflow.com/questions/858766/generate-manifest-class-path-from-classpath-in-ant
-	
 
 Change the pause / unpause global hotkey to play / pause, so if it's stopped it starts playing
 
 When you try to launch hypnos a second time, just bring the existing window to the front, dont show popup
 	But maybe we can ask the existing window if it's responding, and if it's not then we can show popup
+
+If global hotkeys are disabled by the system for any reason, including dummy hotkeys, disable the tab
 
 Features that need System-by-System attention
 	System Tray
