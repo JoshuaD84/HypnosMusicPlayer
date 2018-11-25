@@ -429,9 +429,9 @@ public class FXUI implements PlayerListener {
 		Platform.setImplicitExit( false );
 		
 		mainStage.setOnCloseRequest( (WindowEvent t) -> {
+			System.out.println ( closeToSystemTray.get() );
 			if ( closeToSystemTray.get() ) {
-				currentListSplitPanePosition = currentListSplitPane.getDividerPositions()[0];
-				mainStage.hide();
+				hideMainWindow();
 			} else {
 				Hypnos.exit( ExitCode.NORMAL );
 			}
@@ -630,10 +630,7 @@ public class FXUI implements PlayerListener {
 	public void toggleMinimized() {
 		Platform.runLater( () -> {
 			if ( !mainStage.isShowing() ) {
-				mainStage.show();
-				mainStage.setIconified( false );
-				mainStage.toFront();
-				currentListSplitPane.setDividerPosition( 0, currentListSplitPanePosition );
+				restoreWindow();
 			} else if ( mainStage.isIconified() ) {
 				mainStage.setIconified( false );
 				mainStage.toFront();
@@ -644,8 +641,29 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public void restoreWindow() {
+		mainStage.show();
 		mainStage.setIconified( false );
 		mainStage.toFront();
+		currentListSplitPane.setDividerPosition( 0, currentListSplitPanePosition );
+	}
+	
+	public void hideMainWindow() {
+		currentListSplitPanePosition = currentListSplitPane.getDividerPositions()[0];
+		mainStage.hide();
+	}
+	
+	public void toggleHidden() {
+		Platform.runLater(() -> {
+			if ( closeToSystemTray.get() ) {
+				if ( !mainStage.isShowing() ) {
+					restoreWindow();
+				} else {
+					hideMainWindow();
+				} 
+			} else {
+				toggleMinimized();
+			}
+		});
 	}
 
 	public void updatePlaylistMenuItems ( ObservableList <MenuItem> items, EventHandler <ActionEvent> eventHandler ) {
@@ -1203,6 +1221,8 @@ public class FXUI implements PlayerListener {
 		retMe.put ( Setting.ART_CURRENT_SPLIT_PERCENT, getCurrentListSplitPercent() );
 		retMe.put ( Setting.ART_SPLIT_PERCENT, getArtSplitPercent() );
 		retMe.put ( Setting.PROMPT_BEFORE_OVERWRITE, promptBeforeOverwrite.getValue() );
+		retMe.put ( Setting.SHOW_SYSTEM_TRAY_ICON, showSystemTray.getValue() );
+		retMe.put ( Setting.CLOSE_TO_SYSTEM_TRAY, closeToSystemTray.getValue() );
 		retMe.put ( Setting.SHOW_INOTIFY_ERROR_POPUP, showINotifyPopup.getValue() );
 		retMe.put ( Setting.SHOW_UPDATE_AVAILABLE_IN_MAIN_WINDOW, showUpdateAvailableInUI.getValue() );
 		retMe.put ( Setting.THEME, theme );
@@ -1322,6 +1342,14 @@ public class FXUI implements PlayerListener {
 								break;
 						}
 						settings.remove ( setting );
+						break;
+					
+					case SHOW_SYSTEM_TRAY_ICON: 
+						showSystemTray.setValue( Boolean.valueOf( value ) );
+						break;
+						
+					case CLOSE_TO_SYSTEM_TRAY: 
+						closeToSystemTray.setValue( Boolean.valueOf( value ) );
 						break;
 						
 					case PROMPT_BEFORE_OVERWRITE:

@@ -5,14 +5,6 @@ Hotkeys
 	https://stackoverflow.com/questions/858766/generate-manifest-class-path-from-classpath-in-ant
 
 System Tray
-	All
-		Persist new settings in settings tab
-		
-	Linux
-		When they click "show/hide" or click on systray icon, close the main window
-		Maybe add a "minimize to System tray " option too
-		Testing
-		
 	Windows
 		Implement
 		Testing	

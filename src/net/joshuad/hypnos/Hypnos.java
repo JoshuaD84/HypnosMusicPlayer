@@ -515,7 +515,7 @@ public class Hypnos extends Application {
 					audioSystem.previous();
 					break;
 				case SHOW_HIDE_UI:
-					ui.toggleMinimized();
+					ui.toggleHidden();
 					break;
 				case SKIP_BACK:
 					long target = audioSystem.getPositionMS() - 5000 ;

@@ -718,7 +718,7 @@ public class SettingsWindow extends Stage {
 		
 		CheckBox toTrayCheckBox = new CheckBox ();
 		toTrayCheckBox.setPadding( checkBoxInsets );
-		showSystemTrayCheckBox.selectedProperty().bindBidirectional( ui.closeToSystemTrayProperty() );
+		toTrayCheckBox.selectedProperty().bindBidirectional( ui.closeToSystemTrayProperty() );
 		
 		ui.showSystemTrayProperty().addListener( ( ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue ) -> {
 			if ( newValue ) {

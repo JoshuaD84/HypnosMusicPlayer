@@ -1,6 +1,5 @@
 package net.joshuad.hypnos.trayicon;
 
-import java.io.File;
 import java.io.IOException;
 
 import net.joshuad.hypnos.Hypnos;
@@ -32,29 +31,33 @@ public class LinuxTrayIcon extends NativeTrayIcon {
 		this.ui = ui;
 		this.audioSystem = audioSystem;
 		
-		System.load( new File( "stage/lib/nix/tray_icon_jni.so" ).getCanonicalPath() );
-		// System.load ( Hypnos.getRootDirectory().resolve(
-		// "lib/nix/tray_icon_jni.so" ).toFile().getCanonicalPath() );
+		System.load ( Hypnos.getRootDirectory().resolve( "lib/nix/tray_icon_jni64.so" ).toFile().getCanonicalPath() );
 		Thread gtkThread = new Thread( () -> {
-			initTrayIcon( "/d/programming/workspace/MusicPlayer/stage/resources/icon.png" );
-		} );
+			initTrayIcon( Hypnos.getRootDirectory().resolve( "resources/icon.png" ).toFile().getAbsoluteFile().toString() );
+		});
 
 		gtkThread.setName( "GTK Tray Icon Thread" );
 		gtkThread.setDaemon( true );
 
 		doneInit = false;
 		gtkThread.start();
-		while ( !doneInit ) {
+		int pauseTime = 0;
+		while ( !doneInit && pauseTime < 1000 ) {
 			try {
+				pauseTime += 5;
 				Thread.sleep( 5 );
 			} catch ( InterruptedException e ) {
 			}
 		}
 		
+		if ( !doneInit ) {
+			throw new IOException ( "Unable to init tray icon. Aborted after 1 second." );
+		}
+		
 		Thread enacterThread = new Thread( () -> {
 			while ( true ) {
 					if ( exitRequested ) Hypnos.exit( ExitCode.NORMAL );
-					if ( toggleUIRequested ) ui.toggleMinimized();
+					if ( toggleUIRequested ) ui.toggleHidden();
 					if ( playRequested ) audioSystem.play();
 					if ( pauseRequested ) audioSystem.pause();
 					if ( previousRequested ) audioSystem.previous();
