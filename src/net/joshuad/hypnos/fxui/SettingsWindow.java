@@ -465,7 +465,7 @@ public class SettingsWindow extends Stage {
 		
 		Tab settingsTab = new Tab ( "Settings" );
 		settingsTab.setClosable( false );
-		VBox settingsPane = new VBox( 40 );
+		VBox settingsPane = new VBox( 20 );
 		settingsTab.setContent ( settingsPane );
 		settingsPane.setAlignment( Pos.TOP_CENTER );		
 		settingsPane.setPadding( new Insets ( 10 ) );
@@ -706,7 +706,45 @@ public class SettingsWindow extends Stage {
 
 		shuffleGrid.setAlignment( Pos.TOP_CENTER );	
 		
-		settingsPane.getChildren().addAll( shuffleGrid, themeBox, warnBox, updateInUIBox );
+		Label showSystemTrayLabel = new Label ( "Show System Tray Icon" );
+		showSystemTrayLabel.setPadding( labelInsets );
+		
+		CheckBox showSystemTrayCheckBox = new CheckBox ();
+		showSystemTrayCheckBox.setPadding( checkBoxInsets );
+		showSystemTrayCheckBox.selectedProperty().bindBidirectional( ui.showSystemTrayProperty() );
+		
+		Label toTrayLabel = new Label ( "Minimize to System Tray on Close" );
+		toTrayLabel.setPadding( labelInsets );
+		
+		CheckBox toTrayCheckBox = new CheckBox ();
+		toTrayCheckBox.setPadding( checkBoxInsets );
+		showSystemTrayCheckBox.selectedProperty().bindBidirectional( ui.closeToSystemTrayProperty() );
+		
+		ui.showSystemTrayProperty().addListener( ( ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue ) -> {
+			if ( newValue ) {
+				toTrayLabel.setDisable( false );
+				toTrayCheckBox.setDisable( false );
+			} else {
+				toTrayLabel.setDisable( true );
+				toTrayCheckBox.setSelected( false );
+				toTrayCheckBox.setDisable( true );
+			}
+		});
+		
+		if ( ui.showSystemTrayProperty().get() ) {
+			toTrayLabel.setDisable( false );
+			toTrayCheckBox.setDisable( false );
+		} else {
+			toTrayLabel.setDisable( true );
+			toTrayCheckBox.setSelected( false );
+			toTrayCheckBox.setDisable( true );
+		}
+				
+		HBox systemTrayBox = new HBox();
+		systemTrayBox.setAlignment( Pos.TOP_CENTER );
+		systemTrayBox.getChildren().addAll( showSystemTrayCheckBox, showSystemTrayLabel, toTrayCheckBox, toTrayLabel );
+		
+		settingsPane.getChildren().addAll( shuffleGrid, themeBox, warnBox, updateInUIBox, systemTrayBox );
 		
 		return settingsTab;
 	}

@@ -67,11 +67,13 @@ import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.CurrentList;
 import net.joshuad.hypnos.CurrentList.Mode;
+import net.joshuad.hypnos.Hypnos.ExitCode;
 import net.joshuad.hypnos.CurrentListState;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.Hypnos;
@@ -89,6 +91,7 @@ import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
 import net.joshuad.hypnos.audio.AudioSystem.StopReason;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
+import net.joshuad.hypnos.trayicon.TrayIcon;
 
 public class FXUI implements PlayerListener {
 	private static final Logger LOGGER = Logger.getLogger( FXUI.class.getName() );
@@ -120,6 +123,7 @@ public class FXUI implements PlayerListener {
 	TrackInfoWindow trackInfoWindow;
 	LyricsWindow lyricsWindow;
 	ExportPlaylistPopup exportPopup;
+	TrayIcon trayIcon;
 	
 	final AudioSystem audioSystem;
 	final Library library;
@@ -153,6 +157,8 @@ public class FXUI implements PlayerListener {
 	
 	//TODO: these don't really belong in the UI, but we don't have a better place atm. 
 	private SimpleBooleanProperty promptBeforeOverwrite = new SimpleBooleanProperty ( true );
+	private SimpleBooleanProperty showSystemTray = new SimpleBooleanProperty ( false );
+	private SimpleBooleanProperty closeToSystemTray = new SimpleBooleanProperty ( false );
 	private SimpleBooleanProperty showINotifyPopup = new SimpleBooleanProperty ( true );
 	
 	private SimpleBooleanProperty showUpdateAvailableInUI = new SimpleBooleanProperty ( true ); 
@@ -160,6 +166,8 @@ public class FXUI implements PlayerListener {
 	SimpleBooleanProperty showLastFMWidgets = new SimpleBooleanProperty ( false );
 	
 	boolean doPlaylistSaveWarning = true;
+	
+	private double currentListSplitPanePosition = -1;
 	
 	public FXUI ( Stage stage, Library library, AudioSystem audioSystem, GlobalHotkeys hotkeys ) {
 		mainStage = stage;
@@ -408,6 +416,27 @@ public class FXUI implements PlayerListener {
 		mainStage.widthProperty().addListener( windowSizeListener );
 		mainStage.heightProperty().addListener( windowSizeListener );
 		
+		TrayIcon trayIcon = new TrayIcon ( this, audioSystem );
+		
+		this.showSystemTray.addListener( ( ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue ) -> {
+			if ( newValue ) {
+				trayIcon.show();
+			} else {
+				trayIcon.hide();
+			}
+		});
+		
+		Platform.setImplicitExit( false );
+		
+		mainStage.setOnCloseRequest( (WindowEvent t) -> {
+			if ( closeToSystemTray.get() ) {
+				currentListSplitPanePosition = currentListSplitPane.getDividerPositions()[0];
+				mainStage.hide();
+			} else {
+				Hypnos.exit( ExitCode.NORMAL );
+			}
+		});
+		
 		audioSystem.addPlayerListener ( this );
 	}
 	
@@ -599,12 +628,19 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public void toggleMinimized() {
-		if ( mainStage.isIconified() ) {
-			mainStage.setIconified( false );
-			mainStage.toFront();
-		} else {
-			mainStage.setIconified( true );
-		}
+		Platform.runLater( () -> {
+			if ( !mainStage.isShowing() ) {
+				mainStage.show();
+				mainStage.setIconified( false );
+				mainStage.toFront();
+				currentListSplitPane.setDividerPosition( 0, currentListSplitPanePosition );
+			} else if ( mainStage.isIconified() ) {
+				mainStage.setIconified( false );
+				mainStage.toFront();
+			} else {
+				mainStage.setIconified( true );
+			}
+		});
 	}
 	
 	public void restoreWindow() {
@@ -660,9 +696,18 @@ public class FXUI implements PlayerListener {
 		return promptBeforeOverwrite;
 	}
 	
+	public BooleanProperty closeToSystemTrayProperty ( ) {
+		return closeToSystemTray;
+	}
+	
+	public BooleanProperty showSystemTrayProperty ( ) {
+		return showSystemTray;
+	}
+
 	public BooleanProperty showUpdateAvailableInUIProperty ( ) {
 		return showUpdateAvailableInUI;
 	}
+	
 	public BooleanProperty updateAvailableProperty ( ) {
 		return updateAvailable;
 	}
