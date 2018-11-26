@@ -2,7 +2,7 @@ Hotkeys
 	windows intellitype work
 	Can we get hotkeys for wierd buttons on linux?
 
-	https://stackoverflow.com/questions/858766/generate-manifest-class-path-from-classpath-in-ant
+https://stackoverflow.com/questions/858766/generate-manifest-class-path-from-classpath-in-ant
 
 System Tray
 	Windows
@@ -10,6 +10,8 @@ System Tray
 		Testing	
 
 Sync the jvm arguments in my various launch scripts, including within eclipse
+
+Change lyric window content on select track
 
 Features that need System-by-System attention
 
@@ -47,8 +49,6 @@ Future
    Support for other scrobbling services. Dropdown box in the lastfm tab. Rename it "Scrobbling" or something
 
    Maybe an artist tab on media library?
-
-   Maybe change lyric window content on select track
 
 	Can I expand encoding information display using vlc?
       mediaPlayer.getMedia*

@@ -746,6 +746,12 @@ public class SettingsWindow extends Stage {
 		
 		settingsPane.getChildren().addAll( shuffleGrid, themeBox, warnBox, updateInUIBox, systemTrayBox );
 		
+		ui.getTrayIcon().systemTraySupportedProperty().addListener( ( observable, oldValue, newValue ) -> {
+			systemTrayBox.setVisible( newValue );
+		});
+		
+		systemTrayBox.setVisible( ui.getTrayIcon().systemTraySupportedProperty().get() );
+		
 		return settingsTab;
 	}
 	

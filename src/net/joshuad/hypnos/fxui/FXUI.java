@@ -188,6 +188,16 @@ public class FXUI implements PlayerListener {
 		}
 
 		loadImages();
+		
+		trayIcon = new TrayIcon ( this, audioSystem );
+		
+		this.showSystemTray.addListener( ( ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue ) -> {
+			if ( newValue ) {
+				trayIcon.show();
+			} else {
+				trayIcon.hide();
+			}
+		});
 
 		libraryPane = new LibraryTabPane( this, audioSystem, library );
 		transport = new Transport( this, audioSystem );
@@ -416,21 +426,10 @@ public class FXUI implements PlayerListener {
 		mainStage.widthProperty().addListener( windowSizeListener );
 		mainStage.heightProperty().addListener( windowSizeListener );
 		
-		TrayIcon trayIcon = new TrayIcon ( this, audioSystem );
-		
-		this.showSystemTray.addListener( ( ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue ) -> {
-			if ( newValue ) {
-				trayIcon.show();
-			} else {
-				trayIcon.hide();
-			}
-		});
-		
 		Platform.setImplicitExit( false );
 		
 		mainStage.setOnCloseRequest( (WindowEvent t) -> {
-			System.out.println ( closeToSystemTray.get() );
-			if ( closeToSystemTray.get() ) {
+			if ( closeToSystemTray.get() && trayIcon.isSupported() ) {
 				hideMainWindow();
 			} else {
 				Hypnos.exit( ExitCode.NORMAL );
@@ -1768,6 +1767,10 @@ public class FXUI implements PlayerListener {
 				return;
 			});
 		}
+	}
+
+	public TrayIcon getTrayIcon () {
+		return trayIcon;
 	}
 }
 

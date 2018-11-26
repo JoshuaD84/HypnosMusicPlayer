@@ -46,6 +46,14 @@ public class TrayIcon {
 		systemTraySupported.set( nativeTrayIcon != null );
 	}
 	
+	public boolean isSupported() {
+		return systemTraySupported.get();
+	}
+	
+	public BooleanProperty systemTraySupportedProperty() {
+		return systemTraySupported;
+	}
+	
 	public void show() {
 		if ( nativeTrayIcon != null ) {
 			nativeTrayIcon.show();
