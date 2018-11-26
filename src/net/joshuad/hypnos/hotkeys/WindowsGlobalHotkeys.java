@@ -17,7 +17,7 @@ public class WindowsGlobalHotkeys extends SystemHotkeys {
 		this.parent = parent;
 		
 		try {
-			String location = Hypnos.getRootDirectory().resolve( "lib\\win\\jintellitype\\JIntellitype64.dll" )
+			String location = Hypnos.getRootDirectory().resolve( "lib\\win\\jintellitype\\JIntellitype-64.dll" )
 					.toFile().getCanonicalFile().toString();
 			JIntellitype.setLibraryLocation( location );
 			JIntellitype.getInstance().addHotKeyListener( ( int hotkeyID ) -> {

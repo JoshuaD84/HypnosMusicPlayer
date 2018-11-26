@@ -28,7 +28,7 @@
 	<classpathentry kind="lib" path="packaging/jres/linux-64bit-full/jfx/javafx.web.jar"/>
 	<classpathentry kind="lib" path="packaging/jres/linux-64bit-full/jfx/javafx-swt.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JavaFX11"/>
-	<classpathentry kind="lib" path="stage/lib/jintellitype-1.3.9.jar"/>
 	<classpathentry kind="lib" path="stage/lib/win/swt/swt-win.jar"/>
+	<classpathentry kind="lib" path="D:/programming/workspace-win/Hypnos-Win/stage/lib/win/jintellitype/jintellitype-1.3.9.jar"/>
 	<classpathentry kind="output" path="stage/bin"/>
 </classpath>
