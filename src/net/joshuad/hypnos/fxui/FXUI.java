@@ -1663,10 +1663,21 @@ public class FXUI implements PlayerListener {
 
 	public void trackSelected ( Track newSelection ) {
 		artSplitPane.trackSelected( newSelection );
+		if ( lyricsWindow.isShowing() ) {
+			lyricsWindow.setTrack( newSelection );
+		}
+		
+		if ( trackInfoWindow.isShowing() ) {
+			trackInfoWindow.setTrack( newSelection );
+		}
 	}
 	
 	public void albumSelected ( Album album ) {
 		artSplitPane.albumSelected( album );
+		
+		if ( albumInfoWindow.isShowing() ) {
+			albumInfoWindow.setAlbum( album );
+		}
 	}
 
 	public LibraryTabPane getLibraryPane () {

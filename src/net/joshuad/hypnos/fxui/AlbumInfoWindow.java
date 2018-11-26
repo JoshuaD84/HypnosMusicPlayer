@@ -102,11 +102,9 @@ public class AlbumInfoWindow extends Stage {
 		locationBox.prefWidthProperty().bind( primaryPane.widthProperty() );
 	
 		primaryPane.getChildren().addAll( locationBox, trackTable );
-	
 		
 		primaryPane.prefWidthProperty().bind( root.widthProperty() );
 		primaryPane.prefHeightProperty().bind( root.heightProperty() );
-		
 
 		setWidth ( 700 );
 		setHeight ( 500 );
@@ -184,6 +182,10 @@ public class AlbumInfoWindow extends Stage {
 		trackTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
 		trackTable.setEditable( true );
 		trackTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
+		
+		trackTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
+			ui.trackSelected ( newSelection );
+		});
 		
 		trackTable.prefWidthProperty().bind( primaryPane.widthProperty() );
 		trackTable.prefHeightProperty().bind( primaryPane.heightProperty() );

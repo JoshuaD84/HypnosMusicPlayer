@@ -128,6 +128,10 @@ public class PlaylistInfoWindow extends Stage {
 			}
 		} );
 		
+		trackTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
+			ui.trackSelected ( newSelection );
+		});
+		
 		trackTable.setOnDragDropped( event -> {
 			Dragboard db = event.getDragboard();
 			if ( db.hasContent( FXUI.DRAGGED_TRACKS ) ) {

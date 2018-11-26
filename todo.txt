@@ -1,12 +1,44 @@
-Media Buttons on Linux
+Linux: Media Buttons
+
+Queue doesn't seem to update track info window
+
+Linux: Dynamic menu titles in system tray
+
+Libre FM support https://libre.fm/ 
+
+Windows Pinning Issues
+	https://stackoverflow.com/questions/53457524/jni-native-interface-and-javafx-noclassdeffounderror
 
 https://stackoverflow.com/questions/858766/generate-manifest-class-path-from-classpath-in-ant
 
 Sync the jvm arguments in my various launch scripts, including within eclipse
 
-Change lyric window content on select track
+Right click menu settings for playlists -- shuffle, repeat, etc.
+	RadioMenuItem noChange = new RadioMenuItem ( "None" );
+	RadioMenuItem sequential = new RadioMenuItem ( "Sequential" );
+	RadioMenuItem shuffle = new RadioMenuItem ( "Shuffle" );
 
-Change track info content on select track - only works sometimes
+	ToggleGroup shuffleGroup = new ToggleGroup();
+	noChange.setToggleGroup( shuffleGroup );
+	sequential.setToggleGroup( shuffleGroup );
+	shuffle.setToggleGroup( shuffleGroup );
+
+	Menu shuffleMode = new Menu ( "Shuffle Mode" );
+	shuffleMode.getItems().addAll( noChange, sequential, shuffle );
+	
+An artist tab on media library
+	
+Show in tag edit window when a file doesn't support a particular tag type	
+
+https://stackoverflow.com/questions/51851572/java-fx-button-is-staying-pressed-after-drag-event
+
+Drag and Drop to Playlist Info update current list if it is that playlist unchanged
+
+File name in tag window somewhere
+	I tried doing what I have on the album track list window. It looked ugly and cluttered.
+	
+
+::::::::::::::
 
 Features that need System-by-System attention
 
@@ -15,20 +47,9 @@ Features that need System-by-System attention
          Linux auto converts them to wavs, but I can't drag directly from the disc. Need to copy waves to local file
          system
 
-		Windows
-			Does not work
-
-	Executable Wrapping
-		Linux - I'm happy with appimages
-			Need to reduce size of appimage by testing on various systems and getting rid of unnecessary libraries
-
-		Windows
-			EXE Wrapper doesn't behave well with pinning.  Try changing icon in javaw.exe
-			https://www.howtogeek.com/75983/stupid-geek-tricks-how-to-modify-the-icon-of-an-.exe-file/
+		Windows - Does not work
 
 	System Integration
-		Linux - Seems good
-
 		Windows
 			Select Multiple Files in explorer - No Option to play in Hypnos. Add that
 			"Open with" causes the current track button to not show the current track's name.
@@ -36,54 +57,20 @@ Features that need System-by-System attention
 				Send a file via command line when hypnos isn't playing -- it starts
 				Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on current list
 
+::::::::::::::
 
 Future
-   Sometimes the art pane can become non-responsive. I dragged and dropped an image frm google and it stopped changing
+   Sometimes the art pane can become non-responsive. I dragged and dropped an image from google and it stopped changing
       I've seen it a few other times too.
-
-   Support for other scrobbling services. Dropdown box in the lastfm tab. Rename it "Scrobbling" or something
-
-   Maybe an artist tab on media library?
 
 	Can I expand encoding information display using vlc?
       mediaPlayer.getMedia*
-
-	All
-		Right click menu settings for playlists -- shuffle, repeat, etc.
-
-			RadioMenuItem noChange = new RadioMenuItem ( "None" );
-			RadioMenuItem sequential = new RadioMenuItem ( "Sequential" );
-			RadioMenuItem shuffle = new RadioMenuItem ( "Shuffle" );
-
-			ToggleGroup shuffleGroup = new ToggleGroup();
-			noChange.setToggleGroup( shuffleGroup );
-			sequential.setToggleGroup( shuffleGroup );
-			shuffle.setToggleGroup( shuffleGroup );
-
-			Menu shuffleMode = new Menu ( "Shuffle Mode" );
-			shuffleMode.getItems().addAll( noChange, sequential, shuffle );
-
-		Show in tag edit window when a file doesn't support a particular tag type
-
-		Make a collection of test files.
-
-		https://stackoverflow.com/questions/51851572/java-fx-button-is-staying-pressed-after-drag-event
-
-	Drag and Drop to Playlist Info update current list if it is that playlist unchanged
 
 	Windows - First hover over the love button makes it shift positions
 		Launch Hypnos without lastfm widgets showing
 		turn on last fm widgets
 		hover over love button -- it shifts
 		If you launch with lastfm showing, doesn't happen
-
-	Improve library checker
-		Log
-		some controls, maybe
-		use the diskTimeStamp variables I added
-
-	File name in tag window somewhere
-		I tried doing what I have on the album track list window. It looked ugly and cluttered.
 
 	KDE Neon
 		Can't drag ad drop an mp3 into hypnos
@@ -108,76 +95,10 @@ Future
 
 	Playlist throttled filter, but who's going to have over 1000 playlists?
 
-
-:::: Java / JavaFX stuff ::::
-	Scroll speed on lyrics scroll pane when the lyrics almost-but-dont-quite fit one full screen is really slow.
-
-	Try to fit all data in current list table by adjusting columns that aren't no-resize on setCurrentList, if not possible, do nothing
-		I did some work on this. It conflicts with our FormattedAlbumCell because there, to keep it from wrapping
-		we setminwidth to double.max, causing the fit function to fail.
-		I used the reflection stuff from this thread, and I think it would've worked if not for this issue:
-			https://stackoverflow.com/questions/23284437/javafx-tablecolumn-resize-to-fit-cell-content
-		Of course, I would have to then check table width, fail gracefully and revert, or distribute excess space.
-
-	Resize Policy
-		Windowed mode, shrink window until a scrollbar appears. Maximize window so scrollbar disappears -- Scrollbar width is still accounted for
-
-		Scrollbar width is calculated wrong by 4 pixels. I have it hardcoded, but I posted a SE question
-			https://stackoverflow.com/questions/47852175/get-full-width-of-scrollbar-for-a-tableview
-
-	Double clicking on table-column dividers doesn't call resize:
-		https://stackoverflow.com/questions/47852239/customresizepolicy-not-triggering-when-a-columns-headers-divider-is-double-cli
-		not fixed in java 11 / javafx11
-
-	Tiny drop shadow on transport buttons when in dark theme. It's the line HBox, VBox, #transport { ... -fx-background-color: #222222 ... }
-
-	Showing any dialog prevents window drag resize in ubuntu / other linux
-		http://bugs.java.com/bugdatabase/view_bug.do?bug_id=8140491
-		https://stackoverflow.com/questions/33134791/javafx-stage-cant-be-resized-after-showing-a-dialog
-		Not fixed in java 11 / javafx11
-
-	While loading the library, the table view scrolls a little bit.
-		https://stackoverflow.com/questions/47950917/stop-tableview-small-scroll-when-adding-content-to-bottom-of-table
+	Maybe allow a filter for file type and lossy vs not lossy
+		Maybe just a special search text "type:mp3", "type:lossy"
+		I dunno making search box script is alot.
 		
-		1/2/18 - Bug submitted to bugs.java.com
-			https://bugs.java.com/bugdatabase/view_bug.do?bug_id=JDK-8194328
-		
-		11/26/18 - not fixed in java 11 / javafx11
-
-:::: Refactor / organize my code ::::
- 	Make LibraryUpdater part of Library. Is there a way to abstract out the Platform -> RunLater part? I feel like we're just stuck w/ that, which kind of ties to us JavaFX
-
- 		Maybe ui.runMe ( Runnable ), and then the UI can decide whether to launch a new thread, have a thread idling, do it on this thread, or use something like Platform.runLater()
-
-	a better structure for hotkey commands (maybe combine with commandline commands?)
-
-
-	Refactor Library
-
-		An album will form from tracks if you edit them and they aren't currently an album. But an album won't split if you edit tags and make it not be an album.
-			Is this desired behavior? I feel like probably no -- it can create different states based on the same disk contents, which doesn't make sense
-
-		Sometimes there are duplicated tracks in the track list
-
-		When removing all sources, it takes a long time to remove everything (5+ seconds)
-			This is because of the processWatcherEvents function taking lots of time on load.
-
-		Setup a currentList.updateAlbum and updatePlaylist system
-			Doesn't change artwork
-			CurrentplayingTrack is the same one
-			updates data and locations
-
-		Library load and unload time
-
-		Maybe allow a filter for file type and lossy vs not lossy
-			Maybe just a special search text "type:mp3", "type:lossy"
-			I dunno making search box script is alot.
-			
-			
-:::: OS Specific ::::
-
-	https://stackoverflow.com/questions/17305524/simplicity-for-executing-java-from-c
-
 	Windows
 		NSIS
 			Version number dynamically assigned
@@ -192,119 +113,26 @@ Future
 
 		https://sourceforge.net/p/launch4j/discussion/332684/thread/75bbbd93/
 		https://stackoverflow.com/questions/7506329/embed-java-into-a-c-application
+		
+:::: Refactor / organize my code ::::
 
-::::: watch list :::::
-	2018/01/28 - "VM Thread" causing spikes in CPU usage and stutters in playback.
+	a better structure for hotkey commands (maybe combine with commandline commands?)
 
+	Refactor Library
+		Make LibraryUpdater part of Library. Is there a way to abstract out the Platform -> RunLater part? I feel like we're just stuck w/ that, which kind of ties to us JavaFX
+ 			Maybe ui.runMe ( Runnable ), and then the UI can decide whether to launch a new thread, have a thread idling, do it on this thread, or use something like Platform.runLater()
+	
+		An album will form from tracks if you edit them and they aren't currently an album. But an album won't split if you edit tags and make it not be an album.
+			Is this desired behavior? I feel like probably no -- it can create different states based on the same disk contents, which doesn't make sense
 
-::::
+		Sometimes there are duplicated tracks in the track list
 
-Add file crash, ubuntu 16.04
+		Setup a currentList.updateAlbum and updatePlaylist system
+			Doesn't change artwork
+			CurrentplayingTrack is the same one
+			updates data and locations
 
-JNA: Callback uk.co.caprica.vlcj.player.DefaultMediaPlayer$EventCallback@6269409b threw the following exception:
-java.lang.IllegalArgumentException: No field of type class uk.co.caprica.vlcj.binding.internal.media_player_chapter_changed in libvlc_event_u(native@0x7f2465abcd00) (16 bytes) {
-  media_meta_changed media_meta_changed@0=media_meta_changed(native@0x0) (4 bytes) {
-    int meta_type@0=0
-  }
-  media_subitem_added media_subitem_added@0=media_subitem_added(native@0x0) (8 bytes) {
-    libvlc_media_t new_child@0=NULL
-  }
-  media_duration_changed media_duration_changed@0=media_duration_changed(native@0x0) (8 bytes) {
-    long new_duration@0=0
-  }
-  media_parsed_changed media_parsed_changed@0=media_parsed_changed(native@0x0) (4 bytes) {
-    int new_status@0=0
-  }
-  media_freed media_freed@0=media_freed(native@0x0) (8 bytes) {
-    libvlc_media_t md@0=NULL
-  }
-  media_state_changed media_state_changed@0=media_state_changed(native@0x0) (4 bytes) {
-    int new_state@0=0
-  }
-  media_player_buffering media_player_buffering@0=media_player_buffering(native@0x0) (4 bytes) {
-    float new_cache@0=0.0
-  }
-  media_player_position_changed media_player_position_changed@0=media_player_position_changed(native@0x0) (4 bytes) {
-    float new_position@0=0.0
-  }
-  media_player_time_changed media_player_time_changed@0=media_player_time_changed(native@0x0) (8 bytes) {
-    long new_time@0=0
-  }
-  media_player_title_changed media_player_title_changed@0=media_player_title_changed(native@0x0) (4 bytes) {
-    int new_title@0=0
-  }
-  media_player_seekable_changed media_player_seekable_changed@0=media_player_seekable_changed(native@0x0) (4 bytes) {
-    int new_seekable@0=0
-  }
-  media_player_pausable_changed media_player_pausable_changed@0=media_player_pausable_changed(native@0x0) (4 bytes) {
-    int new_pausable@0=0
-  }
-  media_player_vout media_player_vout@0=media_player_vout(native@0x0) (4 bytes) {
-    int new_count@0=0
-  }
-  media_list_item_added media_list_item_added@0=media_list_item_added(native@0x0) (16 bytes) {
-    libvlc_media_t item@0=NULL
-    int index@8=0
-  }
-  media_list_will_add_item media_list_will_add_item@0=media_list_will_add_item(native@0x0) (16 bytes) {
-    libvlc_media_t item@0=NULL
-    int index@8=0
-  }
-  media_list_item_deleted media_list_item_deleted@0=media_list_item_deleted(native@0x0) (16 bytes) {
-    libvlc_media_t item@0=NULL
-    int index@8=0
-  }
-  media_list_will_delete_item media_list_will_delete_item@0=media_list_will_delete_item(native@0x0) (16 bytes) {
-    libvlc_media_t item@0=NULL
-    int index@8=0
-  }
-  media_list_player_next_item_set media_list_player_next_item_set@0=media_list_player_next_item_set(native@0x0) (8 bytes) {
-    libvlc_media_t item@0=NULL
-  }
-  media_player_snapshot_taken media_player_snapshot_taken@0=media_player_snapshot_taken(native@0x0) (8 bytes) {
-    String filename@0=null
-  }
-  media_player_length_changed media_player_length_changed@0=media_player_length_changed(native@0x0) (8 bytes) {
-    long new_length@0=0
-  }
-  vlm_media_event vlm_media_event@0=vlm_media_event(native@0x0) (16 bytes) {
-    String psz_media_name@0=null
-    String psz_instance_name@8=null
-  }
-  media_player_media_changed media_player_media_changed@0=media_player_media_changed(native@0x0) (8 bytes) {
-    libvlc_media_t md@0=NULL
-  }
-  media_player_scrambled_changed media_player_scrambled_changed@0=media_player_scrambled_changed(native@0x0) (4 bytes) {
-    int new_scrambled@0=0
-  }
-  media_player_es_changed media_player_es_changed@0=media_player_es_changed(native@0x0) (8 bytes) {
-    int i_type@0=0
-    int i_id@4=0
-  }
-  media_subitemtree_added media_subitemtree_added@0=media_subitemtree_added(native@0x0) (8 bytes) {
-    libvlc_media_t item@0=NULL
-  }
-  media_player_audio_volume media_player_audio_volume@0=media_player_audio_volume(native@0x0) (4 bytes) {
-    float volume@0=0.0
-  }
-  media_player_audio_device media_player_audio_device@0=media_player_audio_device(native@0x0) (8 bytes) {
-    String device@0=null
-  }
-}
-memory dump
-[01000000]
-[247f0000]
-[709c76d0]
-[247f0000]
-	at com.sun.jna.Union.getTypedValue(Union.java:155)
-	at uk.co.caprica.vlcj.player.events.MediaPlayerEventFactory.createEvent(MediaPlayerEventFactory.java:263)
-	at uk.co.caprica.vlcj.player.DefaultMediaPlayer$EventCallback.callback(DefaultMediaPlayer.java:2216)
-	at sun.reflect.GeneratedMethodAccessor2.invoke(Unknown Source)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:498)
-	at com.sun.jna.CallbackReference$DefaultCallbackProxy.invokeCallback(CallbackReference.java:455)
-	at com.sun.jna.CallbackReference$DefaultCallbackProxy.callback(CallbackReference.java:485)
-Nov 5, 2018 22:56:22 PM net.joshuad.hypnos.Hypnos lambda$start$6
-INFO: Hypnos finished loading.
+		Library load and unload time
 
-hypnos: ../nptl/pthread_mutex_lock.c:352: __pthread_mutex_lock_full: Assertion `INTERNAL_SYSCALL_ERRNO (e, __err) != ESRCH || !robust' failed.
+			
+

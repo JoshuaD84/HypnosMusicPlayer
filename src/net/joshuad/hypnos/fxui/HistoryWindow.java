@@ -81,6 +81,10 @@ public class HistoryWindow extends Stage {
 		emptyLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
 		emptyLabel.setWrapText( true );
 		emptyLabel.setTextAlignment( TextAlignment.CENTER );
+		
+		historyTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
+			ui.trackSelected ( newSelection );
+		});
 
 		historyTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
 		historyTable.setPlaceholder( emptyLabel );

@@ -925,7 +925,6 @@ public class LibraryTabPane extends StretchedTabPane {
 			
 		    if ( newSelection != null ) {
 		    	ui.albumSelected ( newSelection );
-		    	ui.albumInfoWindow.setAlbum ( newSelection );
 		    	
 		    } else if ( audioSystem.getCurrentTrack() != null ) {
 		    	ui.trackSelected ( audioSystem.getCurrentTrack() );
@@ -1315,7 +1314,6 @@ public class LibraryTabPane extends StretchedTabPane {
 		trackTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
 		    if (newSelection != null) {
 		    	ui.trackSelected ( newSelection );
-		    	ui.trackInfoWindow.setTrack( newSelection );
 		    	
 		    } else if ( audioSystem.getCurrentTrack() != null ) {
 		    	ui.trackSelected ( audioSystem.getCurrentTrack() );

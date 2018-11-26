@@ -103,6 +103,10 @@ public class QueueWindow extends Stage {
 			}
 		});
 		
+		queueTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
+			ui.trackSelected ( newSelection );
+		});
+		
 		//TODO: I Don't like this <Track, Track> thing, it's inaccurate. 
 		//However, if we make it <Track, Integer> or <Track, String>, I get  cast error when add something
 		//to th queue and display the queue window. Gotta sort this out. 

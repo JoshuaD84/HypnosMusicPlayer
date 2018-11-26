@@ -897,6 +897,10 @@ public class SettingsWindow extends Stage {
 		tagTable.prefWidthProperty().bind( pane.widthProperty() );
 		tagTable.prefHeightProperty().bind( pane.heightProperty() );
 		
+		tagTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
+			ui.trackSelected ( newSelection.getTrack() );
+		});
+		
 		Menu lastFMMenu = new Menu( "LastFM" );
 		MenuItem loveMenuItem = new MenuItem ( "Love" );
 		MenuItem unloveMenuItem = new MenuItem ( "Unlove" );
