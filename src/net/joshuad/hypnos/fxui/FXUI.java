@@ -641,7 +641,6 @@ public class FXUI implements PlayerListener {
 	
 	public void restoreWindow() {
 		mainStage.show();
-		mainStage.setIconified( false );
 		mainStage.toFront();
 		currentListSplitPane.setDividerPosition( 0, currentListSplitPanePosition );
 	}
@@ -657,6 +656,7 @@ public class FXUI implements PlayerListener {
 				if ( !mainStage.isShowing() ) {
 					restoreWindow();
 				} else {
+					mainStage.setIconified( false ); //This is necessary for at least windows, seems good to keep it for every system
 					hideMainWindow();
 				} 
 			} else {
@@ -1345,10 +1345,12 @@ public class FXUI implements PlayerListener {
 					
 					case SHOW_SYSTEM_TRAY_ICON: 
 						showSystemTray.setValue( Boolean.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 						
 					case CLOSE_TO_SYSTEM_TRAY: 
 						closeToSystemTray.setValue( Boolean.valueOf( value ) );
+						settings.remove ( setting );
 						break;
 						
 					case PROMPT_BEFORE_OVERWRITE:

@@ -77,6 +77,7 @@ public class SingleInstanceController {
 			ObjectOutputStream out = new ObjectOutputStream( clientSocket.getOutputStream() );
 			ObjectInputStream in = new ObjectInputStream( clientSocket.getInputStream() );
 		){
+			//TODO: This timeout isn't working on windows
 			clientSocket.setSoTimeout( 100 );
 			out.writeObject( commands );
 			Object dataIn = in.readObject();

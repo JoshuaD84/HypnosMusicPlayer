@@ -539,7 +539,7 @@ public class Persister {
 			}
 
 		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to read settings from disk, continuing.", e );
+			LOGGER.log( Level.WARNING, "Unable to read settings from disk, continuing." );
 		}
 		
 		return settings;

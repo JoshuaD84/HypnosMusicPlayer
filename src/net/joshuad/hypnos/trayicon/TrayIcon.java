@@ -37,6 +37,7 @@ public class TrayIcon {
 			case WIN_UNKNOWN:
 			case WIN_VISTA:
 			case WIN_XP:
+				nativeTrayIcon = new WindowsTrayIcon( ui, audioSystem );
 				break;
 
 			case UNKNOWN:
@@ -64,5 +65,9 @@ public class TrayIcon {
 		if ( nativeTrayIcon != null ) {
 			nativeTrayIcon.hide();
 		}	
+	}
+
+	public void prepareToExit() {
+		nativeTrayIcon.prepareToExit();
 	}
 }

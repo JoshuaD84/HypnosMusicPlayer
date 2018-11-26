@@ -4,4 +4,5 @@ public abstract class NativeTrayIcon {
 	
 	public abstract void show();
 	public abstract void hide();
+	protected abstract void prepareToExit();
 }

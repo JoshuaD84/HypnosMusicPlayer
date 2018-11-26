@@ -131,4 +131,9 @@ public class LinuxTrayIcon extends NativeTrayIcon {
 	void jni_requestMute () {
 			muteRequested = true;
 	}
+
+	@Override
+	protected void prepareToExit() {
+		// TODO Auto-generated method stub
+	}
 }

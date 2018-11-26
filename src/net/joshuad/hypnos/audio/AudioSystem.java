@@ -402,6 +402,10 @@ public class AudioSystem {
 	public void setVolumePercent ( double percent ) {
 		player.requestVolumePercent( percent );
 	}
+	
+	public double getVolumePercent () {
+		return player.getVolumePercent();
+	}
 
 	public void decrementVolume () {
 		double target = player.getVolumePercent() - .05;

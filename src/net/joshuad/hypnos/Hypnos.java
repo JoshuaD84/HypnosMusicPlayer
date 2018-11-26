@@ -667,6 +667,8 @@ public class Hypnos extends Application {
 			globalHotkeys.prepareToExit();
 		}
 		
+		ui.getTrayIcon().prepareToExit();
+		
 		if ( audioSystem != null && ui != null ) {
 			EnumMap <Setting, ? extends Object> fromAudioSystem = audioSystem.getSettings();
 			EnumMap <Setting, ? extends Object> fromUI = ui.getSettings();
