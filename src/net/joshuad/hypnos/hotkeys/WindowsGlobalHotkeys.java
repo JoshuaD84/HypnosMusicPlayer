@@ -2,16 +2,27 @@ package net.joshuad.hypnos.hotkeys;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 import com.melloware.jintellitype.JIntellitype;
 
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys.Hotkey;
 
 public class WindowsGlobalHotkeys extends SystemHotkeys {
+
+	private static final Logger LOGGER = Logger.getLogger( WindowsGlobalHotkeys.class.getName() );
+	
+	private static final int LAST_KEY_PRESS_EXPIRES_IN_MS = 50;
 	
 	GlobalHotkeys parent;
+	
+	Object lock = new Object();
+	int lastIntellitypeCommand = -1;
+	long lastIntellitypePressedMS = 0;
+	String lastIntellitypeName = "";
 	
 	public WindowsGlobalHotkeys( GlobalHotkeys parent ) throws HotkeyException {
 		this.parent = parent;
@@ -27,86 +38,118 @@ public class WindowsGlobalHotkeys extends SystemHotkeys {
 				}
 			});
 			JIntellitype.getInstance().addIntellitypeListener( ( int command ) -> {
-				onIntellitype ( command );
+				recordLastCommand ( command );
+				for ( Hotkey hotkey : parent.getMap().keySet() ) {
+					HotkeyState registeredHotkeyState = parent.getMap().get( hotkey );
+					if ( registeredHotkeyState instanceof IntellitypeHotkeyState ) {
+						IntellitypeHotkeyState registeredIntellitypeHotkeyState = (IntellitypeHotkeyState)registeredHotkeyState;
+						if ( command == registeredIntellitypeHotkeyState.getIntellitypeCommand() ) {
+							parent.systemHotkeyEventHappened ( hotkey );
+						}
+					}
+				}
 			});
 			
 		} catch ( IOException | RuntimeException e ) {
 			throw new HotkeyException( "Unable to load Hotkey Library for Windows: " + e );
 		}
 	}
+	
+	@Override
+	protected HotkeyState createJustPressedState( KeyEvent keyEvent ) {
+		synchronized ( lock ) {
+			if ( System.currentTimeMillis() - LAST_KEY_PRESS_EXPIRES_IN_MS < lastIntellitypePressedMS ) {
+				return null;
+			}
+			
+			HotkeyState retMe = new IntellitypeHotkeyState ( keyEvent, lastIntellitypeCommand, lastIntellitypeName );
+			return retMe;
+		}
+	}
 
-	private void onIntellitype ( int aCommand ) {
+	private void recordLastCommand ( int aCommand ) {
+		synchronized ( lock ) {
+			lastIntellitypeCommand = aCommand;
+			lastIntellitypePressedMS = System.currentTimeMillis();
 
-		switch (aCommand) {
-		case JIntellitype.APPCOMMAND_BROWSER_BACKWARD:
-			System.out.println( "BROWSER_BACKWARD message received " + Integer.toString( aCommand ) );
-			break;
-		case JIntellitype.APPCOMMAND_BROWSER_FAVOURITES:
-			System.out.println( "BROWSER_FAVOURITES message received " + Integer.toString( aCommand ) );
-			break;
-		case JIntellitype.APPCOMMAND_BROWSER_FORWARD:
-			System.out.println( "BROWSER_FORWARD message received " + Integer.toString( aCommand ) );
-			break;
-		case JIntellitype.APPCOMMAND_BROWSER_HOME:
-			System.out.println( "BROWSER_HOME message received " + Integer.toString( aCommand ) );
-			break;
-		case JIntellitype.APPCOMMAND_BROWSER_REFRESH:
-			System.out.println( "BROWSER_REFRESH message received " + Integer.toString( aCommand ) );
-			break;
-		case JIntellitype.APPCOMMAND_BROWSER_SEARCH:
-			System.out.println( "BROWSER_SEARCH message received " + Integer.toString( aCommand ) );
-			break;
-		case JIntellitype.APPCOMMAND_BROWSER_STOP:
-			System.out.println( "BROWSER_STOP message received " + Integer.toString( aCommand ) );
-			break;
-		case JIntellitype.APPCOMMAND_LAUNCH_APP1:
-			System.out.println( "LAUNCH_APP1 message received " + Integer.toString( aCommand ) );
-			break;
-		case JIntellitype.APPCOMMAND_LAUNCH_APP2:
-			System.out.println( "LAUNCH_APP2 message received " + Integer.toString( aCommand ) );
-			break;
-		case JIntellitype.APPCOMMAND_LAUNCH_MAIL:
-			System.out.println( "LAUNCH_MAIL message received " + Integer.toString( aCommand ) );
-			break;
-		case JIntellitype.APPCOMMAND_MEDIA_NEXTTRACK:
-			System.out.println( "MEDIA_NEXTTRACK message received " + Integer.toString( aCommand ) );
-			break;
-		case JIntellitype.APPCOMMAND_MEDIA_PLAY_PAUSE:
-			System.out.println( "MEDIA_PLAY_PAUSE message received " + Integer.toString( aCommand ) );
-			break;
-		case JIntellitype.APPCOMMAND_MEDIA_PREVIOUSTRACK:
-			System.out.println( "MEDIA_PREVIOUSTRACK message received " + Integer.toString( aCommand ) );
-			break;
-		case JIntellitype.APPCOMMAND_MEDIA_STOP:
-			System.out.println( "MEDIA_STOP message received " + Integer.toString( aCommand ) );
-			break;
-		case JIntellitype.APPCOMMAND_VOLUME_DOWN:
-			System.out.println( "VOLUME_DOWN message received " + Integer.toString( aCommand ) );
-			break;
-		case JIntellitype.APPCOMMAND_VOLUME_UP:
-			System.out.println( "VOLUME_UP message received " + Integer.toString( aCommand ) );
-			break;
-		case JIntellitype.APPCOMMAND_VOLUME_MUTE:
-			System.out.println( "VOLUME_MUTE message received " + Integer.toString( aCommand ) );
-			break;
-		default:
-			System.out.println( "Undefined INTELLITYPE message caught " + Integer.toString( aCommand ) );
-			break;
+			switch (aCommand) {
+			case JIntellitype.APPCOMMAND_BROWSER_BACKWARD:
+				lastIntellitypeName = "Browser Back";
+				break;
+			case JIntellitype.APPCOMMAND_BROWSER_FAVOURITES:
+				lastIntellitypeName = "Browser Favorites";
+				break;
+			case JIntellitype.APPCOMMAND_BROWSER_FORWARD:
+				lastIntellitypeName = "Browser Forward";
+				break;
+			case JIntellitype.APPCOMMAND_BROWSER_HOME:
+				lastIntellitypeName = "Browser Home";
+				break;
+			case JIntellitype.APPCOMMAND_BROWSER_REFRESH:
+				lastIntellitypeName = "Browser Refresh";
+				break;
+			case JIntellitype.APPCOMMAND_BROWSER_SEARCH:
+				lastIntellitypeName = "Browser Search";
+				break;
+			case JIntellitype.APPCOMMAND_BROWSER_STOP:
+				lastIntellitypeName = "Browser Stop";
+				break;
+			case JIntellitype.APPCOMMAND_LAUNCH_APP1:
+				lastIntellitypeName = "Launch App 1";
+				break;
+			case JIntellitype.APPCOMMAND_LAUNCH_APP2:
+				lastIntellitypeName = "Launch App 2";
+				break;
+			case JIntellitype.APPCOMMAND_LAUNCH_MAIL:
+				lastIntellitypeName = "Launch Mail";
+				break;
+			case JIntellitype.APPCOMMAND_MEDIA_NEXTTRACK:
+				lastIntellitypeName = "Next";
+				break;
+			case JIntellitype.APPCOMMAND_MEDIA_PLAY_PAUSE:
+				lastIntellitypeName = "Play/Pause";
+				break;
+			case JIntellitype.APPCOMMAND_MEDIA_PREVIOUSTRACK:
+				lastIntellitypeName = "Previous";
+				break;
+			case JIntellitype.APPCOMMAND_MEDIA_STOP:
+				lastIntellitypeName = "Stop";
+				break;
+			case JIntellitype.APPCOMMAND_VOLUME_DOWN:
+				lastIntellitypeName = "Volume Down";
+				break;
+			case JIntellitype.APPCOMMAND_VOLUME_UP:
+				lastIntellitypeName = "Volume Up";
+				break;
+			case JIntellitype.APPCOMMAND_VOLUME_MUTE:
+				lastIntellitypeName = "Volume Mute";
+				break;
+			default:
+				lastIntellitypeCommand = -1;
+				lastIntellitypePressedMS = 0;
+				LOGGER.info( "Undefined INTELLITYPE message caught " + Integer.toString( aCommand ) );
+				break;
+			}
 		}
 	}
 
 	@Override
-	boolean registerHotkey ( Hotkey hotkey, HotkeyState event ) {
-		
+	boolean registerHotkey ( Hotkey hotkey, HotkeyState state ) {
+
 		int mod = 0;
-		if ( event.isMetaDown() ) mod += JIntellitype.MOD_WIN;
-		if ( event.isAltDown() ) mod += JIntellitype.MOD_ALT;
-		if ( event.isControlDown() ) mod += JIntellitype.MOD_CONTROL;
-		if ( event.isShiftDown() ) mod += JIntellitype.MOD_SHIFT;
+		if ( state.isMetaDown() ) mod += JIntellitype.MOD_WIN;
+		if ( state.isAltDown() ) mod += JIntellitype.MOD_ALT;
+		if ( state.isControlDown() ) mod += JIntellitype.MOD_CONTROL;
+		if ( state.isShiftDown() ) mod += JIntellitype.MOD_SHIFT;
 		
-		int keyCode = keyCodeToAWTKeyEvent ( event.getCode() );
-		
-		JIntellitype.getInstance().registerHotKey( hotkey.ordinal(), mod, keyCode );
+		if ( state instanceof IntellitypeHotkeyState ) {
+			return true;
+			
+		} else {
+			int keyCode = keyCodeToAWTKeyEvent ( state.getCode() );
+			
+			JIntellitype.getInstance().registerHotKey( hotkey.ordinal(), mod, keyCode );
+		}
 		return true;
 	}
 
@@ -305,5 +348,6 @@ public class WindowsGlobalHotkeys extends SystemHotkeys {
 		keycodetoAWTMap.put( KeyCode.COMPOSE, java.awt.event.KeyEvent.VK_COMPOSE );
 		keycodetoAWTMap.put( KeyCode.ALT_GRAPH, java.awt.event.KeyEvent.VK_ALT_GRAPH );
 		keycodetoAWTMap.put( KeyCode.BEGIN, java.awt.event.KeyEvent.VK_BEGIN );
+		keycodetoAWTMap.put( KeyCode.UNDEFINED, -1 );
 	}
 }

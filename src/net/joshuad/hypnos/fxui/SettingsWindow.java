@@ -293,8 +293,10 @@ public class SettingsWindow extends Stage {
 			field.setOnKeyPressed( ( KeyEvent keyEvent ) -> { 
 				String hotkeyText = HotkeyState.getDisplayText( keyEvent );
 				
-				boolean registered = false;
-				if ( keyEvent.getCode().equals( KeyCode.ESCAPE ) ) {
+				if ( keyEvent.getCode().equals ( KeyCode.UNDEFINED ) ) {
+					//Do nothing, it's handled during key release
+				
+				} else if ( keyEvent.getCode().equals( KeyCode.ESCAPE ) ) {
 					field.setText( "" );
 					hotkeys.clearHotkey ( hotkey );
 					
@@ -306,7 +308,7 @@ public class SettingsWindow extends Stage {
 					//Do nothing, javafx automatically focus cycles
 					
 				} else {
-					registered = hotkeys.registerFXHotkey( hotkey, keyEvent );
+					boolean registered = hotkeys.registerFXHotkey( hotkey, keyEvent );
 					if ( registered ) {
 						field.setText( hotkeyText );
 						refreshHotkeyFields();
@@ -334,7 +336,16 @@ public class SettingsWindow extends Stage {
 				//not sure if it'll work on configurations other than xubuntu
 			} );
 			
-			field.setOnKeyReleased( ( KeyEvent e ) -> {
+			field.setOnKeyReleased( ( KeyEvent keyEvent ) -> {
+				if ( keyEvent.getCode().equals ( KeyCode.UNDEFINED ) ) {
+					HotkeyState state = hotkeys.createJustPressedState ( keyEvent );
+					boolean registered = hotkeys.registerHotkey( hotkey, state );
+					if ( registered ) {
+						field.setText( state.getDisplayText() );
+						refreshHotkeyFields();
+					}
+				} 
+
 				refreshHotkeyFields();
 				field.positionCaret( 0 );
 			});

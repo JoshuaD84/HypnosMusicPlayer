@@ -1,17 +1,12 @@
-Hotkeys
-	windows intellitype work
-	Can we get hotkeys for wierd buttons on linux?
+Media Buttons on Linux
 
 https://stackoverflow.com/questions/858766/generate-manifest-class-path-from-classpath-in-ant
-
-System Tray
-	Windows
-		Implement
-		Testing	
 
 Sync the jvm arguments in my various launch scripts, including within eclipse
 
 Change lyric window content on select track
+
+Change track info content on select track - only works sometimes
 
 Features that need System-by-System attention
 
@@ -83,7 +78,7 @@ Future
 		If you launch with lastfm showing, doesn't happen
 
 	Improve library checker
-		Log / status
+		Log
 		some controls, maybe
 		use the diskTimeStamp variables I added
 
@@ -134,14 +129,6 @@ Future
 		https://stackoverflow.com/questions/47852239/customresizepolicy-not-triggering-when-a-columns-headers-divider-is-double-cli
 		not fixed in java 11 / javafx11
 
-	Tray Icon
-		I have a few demos that are all terrible. It looks like we need to wait for JavaFX to get this going for us.
-		Or maybe just show an icon with no menus. Kinda hate that. How do we exit?
-		Gnome 3 doesn't support. Code works but creates a bad entry on taskbar.
-		What systems do support?
-		What other systems don't support? How to handle?
-		https://stackoverflow.com/questions/29995727/java-systemtray-icon-does-not-always-work
-
 	Tiny drop shadow on transport buttons when in dark theme. It's the line HBox, VBox, #transport { ... -fx-background-color: #222222 ... }
 
 	Showing any dialog prevents window drag resize in ubuntu / other linux
@@ -151,11 +138,11 @@ Future
 
 	While loading the library, the table view scrolls a little bit.
 		https://stackoverflow.com/questions/47950917/stop-tableview-small-scroll-when-adding-content-to-bottom-of-table
+		
 		1/2/18 - Bug submitted to bugs.java.com
-		not fixed in java 11 / javafx11
-
-	Inconsistent KeyEvent consumption - https://stackoverflow.com/questions/48054928/inconsistent-keyevent-consumption-by-textfield
-		Resolved in java 9 apparently
+			https://bugs.java.com/bugdatabase/view_bug.do?bug_id=JDK-8194328
+		
+		11/26/18 - not fixed in java 11 / javafx11
 
 :::: Refactor / organize my code ::::
  	Make LibraryUpdater part of Library. Is there a way to abstract out the Platform -> RunLater part? I feel like we're just stuck w/ that, which kind of ties to us JavaFX
@@ -185,6 +172,8 @@ Future
 		Maybe allow a filter for file type and lossy vs not lossy
 			Maybe just a special search text "type:mp3", "type:lossy"
 			I dunno making search box script is alot.
+			
+			
 :::: OS Specific ::::
 
 	https://stackoverflow.com/questions/17305524/simplicity-for-executing-java-from-c

@@ -106,10 +106,10 @@ public class GlobalHotkeys {
 	
 	public boolean registerFXHotkey ( Hotkey hotkey, KeyEvent event ) {
 		if ( isDisabled() ) return false;
-		return registerFXHotkey ( hotkey, new HotkeyState ( event ) );
+		return registerHotkey ( hotkey, new HotkeyState ( event ) );
 	}
 
-	public boolean registerFXHotkey ( Hotkey hotkey, HotkeyState keystate ) {
+	public boolean registerHotkey ( Hotkey hotkey, HotkeyState keystate ) {
 		if ( isDisabled() ) return false;
 		if ( keystate == null ) return false;
 		
@@ -182,7 +182,7 @@ public class GlobalHotkeys {
 
 		if ( isDisabled() ) return;
 		for ( Hotkey hotkey : map.keySet() ) {
-			registerFXHotkey ( hotkey, map.get( hotkey ) );
+			registerHotkey ( hotkey, map.get( hotkey ) );
 		}
 	}
 
@@ -197,9 +197,13 @@ public class GlobalHotkeys {
 	}
 
 	void systemHotkeyEventHappened ( Hotkey hotkey ) {
-		if ( isDisabled() ) return;
+		if ( isDisabled() || inEditMode ) return;
 		for ( GlobalHotkeyListener listener : listeners ) {
 			listener.hotkeyPressed ( hotkey );
 		}
+	}
+
+	public HotkeyState createJustPressedState ( KeyEvent keyEvent ) {
+		return system.createJustPressedState ( keyEvent );
 	}
 }

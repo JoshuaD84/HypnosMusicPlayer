@@ -1,5 +1,6 @@
 package net.joshuad.hypnos.hotkeys;
 
+import javafx.scene.input.KeyEvent;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys.Hotkey;
 
 public class DummyGlobalHotkeys extends SystemHotkeys {
@@ -13,4 +14,9 @@ public class DummyGlobalHotkeys extends SystemHotkeys {
 	
 	@Override
 	void unregisterHotkey ( Hotkey key ) {}
+
+	@Override
+	protected HotkeyState createJustPressedState(KeyEvent keyEvent) {
+		return null;
+	}
 }

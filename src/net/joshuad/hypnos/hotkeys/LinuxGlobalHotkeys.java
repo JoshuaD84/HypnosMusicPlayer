@@ -2,6 +2,7 @@ package net.joshuad.hypnos.hotkeys;
 
 import java.io.IOException;
 
+import javafx.scene.input.KeyEvent;
 import jxgrabkey.HotkeyConflictException;
 import jxgrabkey.JXGrabKey;
 import jxgrabkey.X11KeysymDefinitions;
@@ -47,5 +48,10 @@ public class LinuxGlobalHotkeys extends SystemHotkeys {
 		}
 		
 		return true;
+	}
+
+	@Override
+	protected HotkeyState createJustPressedState( KeyEvent keyEvent ) {
+		return null;
 	}
 }
