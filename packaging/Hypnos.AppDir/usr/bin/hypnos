@@ -3,15 +3,15 @@
 ROOT=$PWD
 DIR="$(dirname "$(readlink -f "$0")")"
 cd $DIR
-exec ./jre/bin/hypnos -Xmx600m -XX:+UseG1GC -XX:+UseStringDeduplication \
-	-XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=30 \
+exec ./jre/bin/hypnos 
+	-Xmx600m \
+	-XX:+UseG1GC \
+	-XX:+UseStringDeduplication \
+	-XX:GCTimeRatio=19 \
+	-XX:MinHeapFreeRatio=20 \
+	-XX:MaxHeapFreeRatio=30 \
 	--module-path ./jre/jfx \
 	--add-modules=javafx.controls,javafx.swing \
 	--add-opens javafx.controls/javafx.scene.control=ALL-UNNAMED \
 	-Djdk.gtk.version=2 \
 	-jar  hypnos.jar "$@" --base-dir="$ROOT"
-
-
-# For consideration
-#-XX:GCTimeRatio=19 
-#https://blog.codecentric.de/en/2013/01/useful-jvm-flags-part-6-throughput-collector/
