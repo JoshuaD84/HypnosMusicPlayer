@@ -27,15 +27,28 @@ public class Playlist implements Serializable {
 	private static final Logger LOGGER = Logger.getLogger( Playlist.class.getName() );
 	
 	private static final long serialVersionUID = 1L;
+	
+	public enum PlaylistShuffleMode {
+		USE_DEFAULT,
+		SEQUENTIAL,
+		SHUFFLE,
+	}
+	
+	public enum PlaylistRepeatMode {
+		USE_DEFAULT,
+		PLAY_ONCE,
+		REPEAT
+	}
 
 	//This is only used and accurate during serialization
 	private List <Track> trackDataForSerialization = new ArrayList<Track>(); 
-	
 	private transient ObservableList <Track> tracks = FXCollections.observableArrayList( trackDataForSerialization );
+	private transient boolean hasUnsavedData = true;
 	
 	private String name;
 	
-	private transient boolean hasUnsavedData = true;
+	private PlaylistShuffleMode shuffleMode = PlaylistShuffleMode.USE_DEFAULT;
+	private PlaylistRepeatMode repeatMode = PlaylistRepeatMode.USE_DEFAULT;
 	
 	public Playlist ( String name ) {
 		this ( name, new ArrayList <Track> () );
@@ -103,6 +116,15 @@ public class Playlist implements Serializable {
 						if ( line.startsWith( "#Name:" ) ) {
 							String name = line.split( ":" )[1].trim(); 
 							playlist.setName( name );
+							
+						} else if ( line.startsWith( "#RepeatMode:" ) ) {
+							PlaylistRepeatMode repeatMode = PlaylistRepeatMode.valueOf( line.split( ":" )[1].trim() ); 
+							playlist.setRepeatMode( repeatMode );
+							
+						} else if ( line.startsWith( "#ShuffleMode:" ) ) {
+							PlaylistShuffleMode repeatMode = PlaylistShuffleMode.valueOf( line.split( ":" )[1].trim() ); 
+							playlist.setShuffleMode( repeatMode );
+							
 						} else if ( line.isEmpty() ) {
 							//Do nothing
 							
@@ -131,6 +153,28 @@ public class Playlist implements Serializable {
 		this.name = newName;
 	}
 	
+	public PlaylistRepeatMode getRepeatMode() {
+		return repeatMode;
+	}
+	
+	public void setRepeatMode( PlaylistRepeatMode repeatMode ) {
+		if ( this.repeatMode != repeatMode ) {
+			this.repeatMode = repeatMode;
+			hasUnsavedData = true;
+		}
+	}
+	
+	public PlaylistShuffleMode getShuffleMode() {
+		return shuffleMode;
+	}
+	
+	public void setShuffleMode ( PlaylistShuffleMode shuffleMode ) {
+		if ( this.shuffleMode != shuffleMode ) {
+			this.shuffleMode = shuffleMode;
+			hasUnsavedData = true;
+		}
+	}
+
 	public int getLength() {
 		int retMe = 0;
 		for ( Track track : tracks ) {
@@ -178,7 +222,10 @@ public class Playlist implements Serializable {
 			PrintWriter playlistOut = new PrintWriter( new BufferedWriter( new OutputStreamWriter ( fileOut, "UTF8" ) ) );
 			playlistOut.println( "#EXTM3U" );
 			
-			playlistOut.printf( "#Name: %s%s%s", getName(), System.lineSeparator(), System.lineSeparator()  );
+			playlistOut.printf( "#Name: %s%s", getName(), System.lineSeparator() );
+			playlistOut.printf( "#RepeatMode: %s%s", getRepeatMode(), System.lineSeparator() );
+			playlistOut.printf( "#ShuffleMode: %s%s", getShuffleMode(), System.lineSeparator() );
+			playlistOut.printf( "%s", System.lineSeparator() );
 
 			for ( Track track : getTracks() ) {
 				playlistOut.printf( "#EXTINF:%d,%s - %s%s", track.getLengthS(), track.getArtist(), track.getTitle(), System.lineSeparator() );

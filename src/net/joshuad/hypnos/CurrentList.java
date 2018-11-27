@@ -810,6 +810,7 @@ public class CurrentList {
 		}
 	}
 	
+	//TODO: these nested case statements are ugly
 	private void updateDefaultModes() {
 		
 		DefaultShuffleMode shuffleTarget;
@@ -823,8 +824,17 @@ public class CurrentList {
 				break;
 				
 			case PLAYLIST:
-				shuffleTarget = playlistShuffleMode;
-				repeatTarget = playlistRepeatMode;
+				switch ( getCurrentPlaylist().getShuffleMode() ) {
+					case SEQUENTIAL: shuffleTarget = DefaultShuffleMode.SEQUENTIAL; break;
+					case SHUFFLE: shuffleTarget = DefaultShuffleMode.SHUFFLE; break;
+					case USE_DEFAULT: default: shuffleTarget = playlistShuffleMode; break;
+				}
+				
+				switch ( getCurrentPlaylist().getRepeatMode() ) {
+					case PLAY_ONCE: repeatTarget = DefaultRepeatMode.PLAY_ONCE; break;
+					case REPEAT: repeatTarget = DefaultRepeatMode.REPEAT; break;
+					case USE_DEFAULT: default: repeatTarget = playlistRepeatMode; break;
+				}
 				break;
 				
 			case PLAYLIST_UNSAVED:
@@ -833,7 +843,6 @@ public class CurrentList {
 				shuffleTarget = trackShuffleMode;
 				repeatTarget = trackRepeatMode;
 				break;
-			
 		}
 		
 		switch ( shuffleTarget ) {
@@ -846,7 +855,6 @@ public class CurrentList {
 			case SHUFFLE:
 				audioSystem.setShuffleMode( ShuffleMode.SHUFFLE );
 				break;
-			
 		}
 		
 		switch ( repeatTarget ) {
@@ -882,19 +890,11 @@ public class CurrentList {
 			notifyListenersStateChanged();
 			return;
 		
-		} else if ( playlists.size() == 1 ) {
+		} else if ( playlists.size() >= 1 ) {
 			mode = Mode.PLAYLIST;
-			updateDefaultModes();
-			currentAlbums.clear();
 			currentPlaylist = playlists.get( 0 );
-			notifyListenersStateChanged();
-			return;
-
-		} else {
-			mode = Mode.PLAYLIST;
 			updateDefaultModes();
 			currentAlbums.clear();
-			currentPlaylist = null;
 			notifyListenersStateChanged();
 			return;
 		}

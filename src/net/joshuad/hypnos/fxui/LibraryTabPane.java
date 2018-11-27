@@ -35,6 +35,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableCell;
@@ -44,6 +45,7 @@ import javafx.scene.control.TableView.ResizeFeatures;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -54,6 +56,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -65,6 +68,8 @@ import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.MusicSearchLocation;
 import net.joshuad.hypnos.Persister;
 import net.joshuad.hypnos.Playlist;
+import net.joshuad.hypnos.Playlist.PlaylistRepeatMode;
+import net.joshuad.hypnos.Playlist.PlaylistShuffleMode;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.audio.AudioSystem;
@@ -1468,7 +1473,6 @@ public class LibraryTabPane extends StretchedTabPane {
 		emptyPlaylistLabel.setTextAlignment( TextAlignment.CENTER );
 		emptyPlaylistLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
 		playlistTable.setPlaceholder( emptyPlaylistLabel );
-		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem appendMenuItem = new MenuItem( "Append" );		
 		MenuItem playNextMenuItem = new MenuItem( "Play Next" );
@@ -1479,9 +1483,68 @@ public class LibraryTabPane extends StretchedTabPane {
 		MenuItem exportFolderMenuItem = new MenuItem ( "Export as Folder" );
 		MenuItem removeMenuItem = new MenuItem( "Remove" );
 		
+		RadioMenuItem shuffleNoChange = new RadioMenuItem ( "Use Default" );
+		RadioMenuItem shuffleSequential = new RadioMenuItem ( "Sequential" );
+		RadioMenuItem shuffleShuffle = new RadioMenuItem ( "Shuffle" );
+		Menu shuffleMode = new Menu ( "Shuffle Mode" );
+		shuffleMode.getItems().addAll( shuffleNoChange, shuffleSequential, shuffleShuffle );
+
+		ToggleGroup shuffleGroup = new ToggleGroup();
+		shuffleNoChange.setToggleGroup( shuffleGroup );
+		shuffleSequential.setToggleGroup( shuffleGroup );
+		shuffleShuffle.setToggleGroup( shuffleGroup );
 		
+		shuffleGroup.selectedToggleProperty().addListener( ( observale, oldValue, newValue ) -> {
+			PlaylistShuffleMode targetMode;
+			if ( newValue.equals( shuffleSequential ) )  {
+				targetMode = PlaylistShuffleMode.SEQUENTIAL;
+			} else if ( newValue.equals( shuffleShuffle ) )  {
+				targetMode = PlaylistShuffleMode.SHUFFLE;
+			} else {
+				targetMode = PlaylistShuffleMode.USE_DEFAULT;
+			}
+			playlistTable.getSelectionModel().getSelectedItem().setShuffleMode( targetMode );
+		});
+		
+		RadioMenuItem repeatNoChange = new RadioMenuItem ( "Use Default" );
+		RadioMenuItem repeatPlayOnce = new RadioMenuItem ( "Play Once" );
+		RadioMenuItem repeatRepeat = new RadioMenuItem ( "Repeat" );
+		Menu repeatMode = new Menu ( "Repeat Mode" );
+		repeatMode.getItems().addAll( repeatNoChange, repeatPlayOnce, repeatRepeat );
+
+		ToggleGroup repeatGroup = new ToggleGroup();
+		repeatNoChange.setToggleGroup( repeatGroup );
+		repeatPlayOnce.setToggleGroup( repeatGroup );
+		repeatRepeat.setToggleGroup( repeatGroup );
+		
+		shuffleGroup.selectedToggleProperty().addListener( ( observable, oldValue, newValue ) -> {
+			PlaylistShuffleMode targetMode;
+			if ( newValue.equals( shuffleSequential ) )  {
+				targetMode = PlaylistShuffleMode.SEQUENTIAL;
+			} else if ( newValue.equals( shuffleShuffle ) )  {
+				targetMode = PlaylistShuffleMode.SHUFFLE;
+			} else {
+				targetMode = PlaylistShuffleMode.USE_DEFAULT;
+			}
+			playlistTable.getSelectionModel().getSelectedItem().setShuffleMode( targetMode );
+		});
+
+		repeatGroup.selectedToggleProperty().addListener( ( observable, oldValue, newValue ) -> {
+			PlaylistRepeatMode targetMode;
+			if ( newValue.equals( repeatPlayOnce ) )  {
+				targetMode = PlaylistRepeatMode.PLAY_ONCE;
+			} else if ( newValue.equals( repeatRepeat ) )  {
+				targetMode = PlaylistRepeatMode.REPEAT;
+			} else {
+				targetMode = PlaylistRepeatMode.USE_DEFAULT;
+			}
+			playlistTable.getSelectionModel().getSelectedItem().setRepeatMode( targetMode );
+		});
+
+		ContextMenu contextMenu = new ContextMenu();
 		contextMenu.getItems().addAll( playMenuItem, appendMenuItem, playNextMenuItem, enqueueMenuItem, 
-				renameMenuItem, infoMenuItem, exportM3UMenuItem, exportFolderMenuItem, removeMenuItem );
+			shuffleMode, repeatMode, renameMenuItem, infoMenuItem, exportM3UMenuItem, exportFolderMenuItem, 
+			removeMenuItem );
 
 		playMenuItem.setOnAction( ( ActionEvent event ) -> {
 			if ( ui.okToReplaceCurrentList() ) {
@@ -1672,6 +1735,37 @@ public class LibraryTabPane extends StretchedTabPane {
 					boolean doOverwrite = ui.okToReplaceCurrentList();
 					if ( doOverwrite ) {
 						audioSystem.getCurrentList().setAndPlayPlaylist( row.getItem() );
+					}
+				} else if ( event.getButton() == MouseButton.SECONDARY ) {
+					Playlist playlist = playlistTable.getSelectionModel().getSelectedItem();
+					if ( playlist != null ) {
+						switch ( playlist.getShuffleMode() ) {
+							case SEQUENTIAL:
+								shuffleGroup.selectToggle( shuffleSequential );
+								break;
+							case SHUFFLE:
+								shuffleGroup.selectToggle( shuffleShuffle );
+								break;
+							case USE_DEFAULT:
+								shuffleGroup.selectToggle( shuffleNoChange );
+								break;
+							default:
+								break;
+						}
+						
+						switch ( playlist.getRepeatMode() ) {
+							case PLAY_ONCE:
+								repeatGroup.selectToggle ( repeatPlayOnce );
+								break;
+							case REPEAT:
+								repeatGroup.selectToggle ( repeatRepeat );
+								break;
+							case USE_DEFAULT:
+								repeatGroup.selectToggle ( repeatNoChange );
+								break;
+							default:
+								break;
+						}
 					}
 				}
 			});

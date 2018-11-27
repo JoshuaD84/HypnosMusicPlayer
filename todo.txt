@@ -1,6 +1,6 @@
-Linux: Media Buttons
+Trying to run a second instance on Linux (maybe windows too) causes art split pane to go full height
 
-Queue doesn't seem to update track info window
+Linux: Media Buttons
 
 Linux: Dynamic menu titles in system tray
 
@@ -12,19 +12,6 @@ Windows Pinning Issues
 https://stackoverflow.com/questions/858766/generate-manifest-class-path-from-classpath-in-ant
 
 Sync the jvm arguments in my various launch scripts, including within eclipse
-
-Right click menu settings for playlists -- shuffle, repeat, etc.
-	RadioMenuItem noChange = new RadioMenuItem ( "None" );
-	RadioMenuItem sequential = new RadioMenuItem ( "Sequential" );
-	RadioMenuItem shuffle = new RadioMenuItem ( "Shuffle" );
-
-	ToggleGroup shuffleGroup = new ToggleGroup();
-	noChange.setToggleGroup( shuffleGroup );
-	sequential.setToggleGroup( shuffleGroup );
-	shuffle.setToggleGroup( shuffleGroup );
-
-	Menu shuffleMode = new Menu ( "Shuffle Mode" );
-	shuffleMode.getItems().addAll( noChange, sequential, shuffle );
 	
 An artist tab on media library
 	
