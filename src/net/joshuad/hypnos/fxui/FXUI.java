@@ -640,9 +640,11 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public void restoreWindow() {
-		mainStage.show();
+		if ( !mainStage.isShowing() ) {
+			mainStage.show();
+			currentListSplitPane.setDividerPosition( 0, currentListSplitPanePosition );
+		}
 		mainStage.toFront();
-		currentListSplitPane.setDividerPosition( 0, currentListSplitPanePosition );
 	}
 	
 	public void hideMainWindow() {

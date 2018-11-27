@@ -1,5 +1,3 @@
-Trying to run a second instance on Linux (maybe windows too) causes art split pane to go full height
-
 Linux: Media Buttons
 
 Linux: Dynamic menu titles in system tray
