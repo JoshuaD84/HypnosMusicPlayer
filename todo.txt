@@ -17,8 +17,6 @@ https://stackoverflow.com/questions/51851572/java-fx-button-is-staying-pressed-a
 
 Drag and Drop to Playlist Info update current list if it is that playlist unchanged
 
-Albums with one track report on .getPath() the track location rather than the album folder
-
 ::::::::::::::
 
 Features that need System-by-System attention

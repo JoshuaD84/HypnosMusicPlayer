@@ -26,7 +26,6 @@ public class Album implements Serializable, AlbumInfoSource {
 
 	public Album ( Path albumDirectory ) throws Exception {
 		this.directory = albumDirectory.toFile();
-		
 		updateData();
 	}
 	

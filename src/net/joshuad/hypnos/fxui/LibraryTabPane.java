@@ -1845,35 +1845,37 @@ public class LibraryTabPane extends StretchedTabPane {
 	}
 	
 	public void updateLibraryListPlaceholder() {
-		if ( library.getAlbums().isEmpty() ) {
-			if ( albumTable.getPlaceholder() != emptyAlbumListLabel ) {
-				albumTable.setPlaceholder( emptyAlbumListLabel );
+		Platform.runLater( () -> {
+			if ( library.getAlbums().isEmpty() ) {
+				if ( albumTable.getPlaceholder() != emptyAlbumListLabel ) {
+					albumTable.setPlaceholder( emptyAlbumListLabel );
+				}
+			} else {
+				if ( !albumTable.getPlaceholder().equals( filteredAlbumListLabel ) ) {
+					albumTable.setPlaceholder( filteredAlbumListLabel );
+				}
 			}
-		} else {
-			if ( !albumTable.getPlaceholder().equals( filteredAlbumListLabel ) ) {
-				albumTable.setPlaceholder( filteredAlbumListLabel );
+			
+			if ( library.getTracks().isEmpty() ) {
+				if ( trackTable.getPlaceholder() != emptyTrackListLabel ) {
+					trackTable.setPlaceholder( emptyTrackListLabel );
+				}
+			} else {
+				if ( !trackTable.getPlaceholder().equals( filteredTrackListLabel ) ) {
+					trackTable.setPlaceholder( filteredTrackListLabel );
+				}
 			}
-		}
-		
-		if ( library.getTracks().isEmpty() ) {
-			if ( trackTable.getPlaceholder() != emptyTrackListLabel ) {
-				trackTable.setPlaceholder( emptyTrackListLabel );
+			
+			if ( library.getPlaylists().isEmpty() ) {
+				if ( !playlistTable.getPlaceholder().equals( emptyPlaylistLabel ) ) {
+					playlistTable.setPlaceholder( emptyPlaylistLabel );
+				}
+			} else {
+				if ( !playlistTable.getPlaceholder().equals( filteredPlaylistLabel ) ) {
+					playlistTable.setPlaceholder( filteredPlaylistLabel );
+				}
 			}
-		} else {
-			if ( !trackTable.getPlaceholder().equals( filteredTrackListLabel ) ) {
-				trackTable.setPlaceholder( filteredTrackListLabel );
-			}
-		}
-		
-		if ( library.getPlaylists().isEmpty() ) {
-			if ( !playlistTable.getPlaceholder().equals( emptyPlaylistLabel ) ) {
-				playlistTable.setPlaceholder( emptyPlaylistLabel );
-			}
-		} else {
-			if ( !playlistTable.getPlaceholder().equals( filteredPlaylistLabel ) ) {
-				playlistTable.setPlaceholder( filteredPlaylistLabel );
-			}
-		}
+		});
 	}
 
 	public void doAfterShowProcessing () {
