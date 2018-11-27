@@ -710,14 +710,14 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 						retMe = baos.toByteArray();
 						
 					} catch ( IOException e ) {
-						LOGGER.log ( Level.WARNING, "Unable to pull image from internet (" + db.getContent( textContentFormat ) + ")", e );
+						LOGGER.log( Level.WARNING, "Unable to pull image from internet (" + db.getContent( textContentFormat ) + ")", e );
 					}
 				} else {
-					LOGGER.warning( "Received drop of a non-image file, ignored: " + db.getContent( textContentFormat ) );
+					LOGGER.info( "Received drop of a non-image file, ignored: " + db.getContent( textContentFormat ) );
 				}
 				
 			} catch ( MalformedURLException e1 ) {
-				LOGGER.warning( "Unable to parse url: " + db.getContent( textContentFormat ) );
+				LOGGER.info( "Unable to parse url: " + db.getContent( textContentFormat ) );
 			}
 		} 
 		
