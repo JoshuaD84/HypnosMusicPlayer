@@ -31,6 +31,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableCell;
@@ -38,6 +39,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
@@ -47,6 +49,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
@@ -94,7 +97,10 @@ public class TagWindow extends Stage {
 	Button previousButton;
 	Button nextButton;
 	
-	FXUI ui;
+	private TextField locationField;
+	private HBox locationBox;
+	
+	private FXUI ui;
 	
 	public TagWindow( FXUI ui ) {
 		super();
@@ -365,11 +371,37 @@ public class TagWindow extends Stage {
 		imageTagPane.prefWidthProperty().bind( tabPane.widthProperty() );
 		imageTagPane.prefHeightProperty().bind( tabPane.heightProperty() );
 		
-		VBox primaryPane = new VBox();
+		Label label = new Label ( "Location: " );
+		label.setAlignment( Pos.CENTER_RIGHT );
 		
-		primaryPane.getChildren().addAll( tabPane, controlPanel );
+		locationField = new TextField();
+		locationField.setEditable( false );
+		locationField.setMaxWidth( Double.MAX_VALUE );
+		
+		HBox.setHgrow( locationField, Priority.ALWAYS );
+		Button browseButton = new Button( "Browse" );
+		browseButton.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				if ( tracks.size() == 1 ) {
+					ui.openFileBrowser( tracks.get( 0 ).getPath() );
+				}
+			}
+		});
+		
+		locationBox = new HBox();
+		locationBox.getChildren().addAll( label, locationField, browseButton );
+		label.prefHeightProperty().bind( locationBox.heightProperty() );
+		
+		VBox primaryPane = new VBox();
+		primaryPane.getChildren().addAll( tabPane, locationBox, controlPanel );
+		locationBox.prefWidthProperty().bind( primaryPane.widthProperty() );
 		tabPane.prefWidthProperty().bind( primaryPane.widthProperty() );
-		tabPane.prefHeightProperty().bind( primaryPane.heightProperty().subtract( controlPanel.heightProperty() ) );
+		tabPane.prefHeightProperty().bind( 
+			primaryPane.heightProperty()
+			.subtract( controlPanel.heightProperty() )
+			.subtract( locationBox.heightProperty() ) 
+		);
 		
 		root.getChildren().add ( primaryPane );
 		primaryPane.prefWidthProperty().bind( root.widthProperty() );
@@ -540,18 +572,23 @@ public class TagWindow extends Stage {
 			nextButton.setDisable ( false );
 			previousButton.setVisible( true );
 			nextButton.setVisible( true );
+			locationField.setText( tracks.get( 0 ).getPath().toString() );
+			locationBox.setVisible( true );
 			
 		} else if ( albums != null && albums.size() == 1 ) {
 			previousButton.setDisable( false );
 			nextButton.setDisable ( false );
 			previousButton.setVisible( true );
 			nextButton.setVisible( true );
+			locationField.setText( albums.get( 0 ).getPath().toString() );
+			locationBox.setVisible( true );
 			
 		} else {
 			previousButton.setDisable( true );
 			nextButton.setDisable ( true );
 			previousButton.setVisible( false );
 			nextButton.setVisible( false );
+			locationBox.setVisible( false );
 		}
 		
 		try {

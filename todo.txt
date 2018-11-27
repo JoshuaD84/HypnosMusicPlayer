@@ -4,7 +4,7 @@ Linux: Dynamic menu titles in system tray
 
 Libre FM support https://libre.fm/ 
 
-Windows Pinning Issues
+Windows: Pinning Issues
 	https://stackoverflow.com/questions/53457524/jni-native-interface-and-javafx-noclassdeffounderror
 
 https://stackoverflow.com/questions/858766/generate-manifest-class-path-from-classpath-in-ant
@@ -14,14 +14,12 @@ Sync the jvm arguments in my various launch scripts, including within eclipse
 An artist tab on media library
 	
 Show in tag edit window when a file doesn't support a particular tag type	
-
+   
 https://stackoverflow.com/questions/51851572/java-fx-button-is-staying-pressed-after-drag-event
 
 Drag and Drop to Playlist Info update current list if it is that playlist unchanged
 
-File name in tag window somewhere
-	I tried doing what I have on the album track list window. It looked ugly and cluttered.
-	
+Albums with one track report on .getPath() the track location rather than the album folder
 
 ::::::::::::::
 
