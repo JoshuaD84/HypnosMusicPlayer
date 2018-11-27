@@ -316,7 +316,7 @@ public class Transport extends VBox {
 		volumeSlider.setMin( 0 );
 		volumeSlider.setMax( 100 );
 		volumeSlider.setValue( 100 );
-		volumeSlider.setPrefWidth( 150 );
+		volumeSlider.setPrefWidth( 130 );
 		volumeSlider.setMinWidth( 80 );
 	
 		volumeSlider.setTooltip( new Tooltip ( "Control Volume" ) );
