@@ -84,6 +84,7 @@ public class LibraryTabPane extends StretchedTabPane {
 	AudioSystem audioSystem;
 	Library library;
 
+	LibraryArtistTab artistTab;
 	Tab trackTab, albumTab, playlistTab;
 	
 	ImageView albumFilterClearImage, trackFilterClearImage, playlistFilterClearImage;
@@ -111,9 +112,7 @@ public class LibraryTabPane extends StretchedTabPane {
 	
 	TableColumn<Album, String> albumArtistColumn, albumYearColumn, albumAddedDateColumn, albumAlbumColumn;
 	
-	CheckMenuItem showAlbums; 
-	CheckMenuItem showTracks;
-	CheckMenuItem showPlaylists;
+	CheckMenuItem showArtists, showAlbums, showTracks, showPlaylists;
 	
 	Label emptyPlaylistLabel = new Label( 
 		"You haven't created any playlists, make a playlist on the right and click the save button." );
@@ -168,6 +167,8 @@ public class LibraryTabPane extends StretchedTabPane {
 		playlistPane.setTop( playlistFilterPane );
 		playlistPane.setCenter( playlistTable );
 		
+		artistTab = new LibraryArtistTab ( ui, audioSystem, library );
+		
 		albumTab = new Tab( "Albums" );
 		albumTab.setContent( albumListPane );
 		albumTab.setClosable( false );
@@ -205,14 +206,20 @@ public class LibraryTabPane extends StretchedTabPane {
 		});
 		
 		tabMenu = new ContextMenu();
+		showArtists = new CheckMenuItem ( "Artists" );
 		showAlbums = new CheckMenuItem ( "Albums" );
 		showTracks = new CheckMenuItem ( "Tracks" );
 		showPlaylists = new CheckMenuItem ( "Playlists" );
-		tabMenu.getItems().addAll( showAlbums, showTracks, showPlaylists );
+		tabMenu.getItems().addAll( showArtists, showAlbums, showTracks, showPlaylists );
 
+		showArtists.setSelected( true );
 		showAlbums.setSelected( true );
 		showTracks.setSelected( true );
 		showPlaylists.setSelected( true );
+		
+		showArtists.selectedProperty().addListener( ( observable, oldValue, newValue ) -> {
+			setArtistsVisible ( newValue );
+		});
 		
 		showAlbums.selectedProperty().addListener( ( observable, oldValue, newValue ) -> {
 			setAlbumsVisible ( newValue );
@@ -225,12 +232,13 @@ public class LibraryTabPane extends StretchedTabPane {
 		showPlaylists.selectedProperty().addListener( ( observable, oldValue, newValue ) -> {
 			setPlaylistsVisible ( newValue );
 		});
-		
+
+		artistTab.setContextMenu( tabMenu );
 		albumTab.setContextMenu( tabMenu );
 		trackTab.setContextMenu( tabMenu );
 		playlistTab.setContextMenu( tabMenu );
 
-		getTabs().addAll( albumTab, trackTab, playlistTab );
+		getTabs().addAll( artistTab, albumTab, trackTab, playlistTab );
 		setSide( Side.BOTTOM );
 		setStyle("-fx-open-tab-animation: NONE; -fx-close-tab-animation: NONE;");
 		
@@ -241,6 +249,11 @@ public class LibraryTabPane extends StretchedTabPane {
 		List<Tab> reorderedTabs = new ArrayList<> ( tabs.size() );
 		
 		int index = 0;
+		
+		if ( tabs.contains( artistTab ) ) {
+			reorderedTabs.add( index++, artistTab );
+		}
+		
 		if ( tabs.contains( albumTab ) ) {
 			reorderedTabs.add( index++, albumTab );
 		}
@@ -255,6 +268,24 @@ public class LibraryTabPane extends StretchedTabPane {
 		
 		this.getTabs().clear();
 		getTabs().addAll( reorderedTabs );
+	}
+	
+	public void setArtistsVisible ( boolean visible ) {
+		if ( visible ) {
+			if ( !getTabs().contains( artistTab ) ) {
+				getTabs().add( artistTab );
+				showArtists.setSelected( true );
+				fixTabOrder();
+			}
+		} else {
+			if ( this.getTabs().size() >= 2 ) {
+				getTabs().remove( artistTab );
+				fixTabOrder();
+				showArtists.setSelected( false );
+			} else {
+				showArtists.setSelected( true );
+			}
+		}
 	}
 	
 	public void setAlbumsVisible ( boolean visible ) {
@@ -691,8 +722,8 @@ public class LibraryTabPane extends StretchedTabPane {
 		albumAlbumColumn = new TableColumn<Album, String>( "Album" );
 		albumAddedDateColumn = new TableColumn<Album, String> ( "Added" );
 
-		albumArtistColumn.setComparator( new AlphanumComparator<String>( CaseHandling.CASE_INSENSITIVE ) );
-		albumAlbumColumn.setComparator( new AlphanumComparator<String>( CaseHandling.CASE_INSENSITIVE ) );
+		albumArtistColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
+		albumAlbumColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
 
 		albumArtistColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "albumArtist" ) );
 		albumYearColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "year" ) );
@@ -988,7 +1019,7 @@ public class LibraryTabPane extends StretchedTabPane {
 						}
 					}
 					
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( null, tracks, albums, null, DragSource.ALBUM_LIST );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( null, tracks, albums, null, null, DragSource.ALBUM_LIST );
 					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
@@ -1043,9 +1074,9 @@ public class LibraryTabPane extends StretchedTabPane {
 		trackAlbumColumn = new TableColumn<Track, String>( "Album" );
 		trackTitleColumn = new TableColumn<Track, String>( "Title" );
 		
-		trackArtistColumn.setComparator( new AlphanumComparator<String>( CaseHandling.CASE_INSENSITIVE ) );
-		trackTitleColumn.setComparator( new AlphanumComparator<String>( CaseHandling.CASE_INSENSITIVE ) );
-		trackLengthColumn.setComparator( new AlphanumComparator<String>( CaseHandling.CASE_INSENSITIVE ) );
+		trackArtistColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
+		trackTitleColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
+		trackLengthColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
 
 		trackArtistColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Artist" ) );
 		trackTitleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
@@ -1394,7 +1425,7 @@ public class LibraryTabPane extends StretchedTabPane {
 				if ( !row.isEmpty() ) {
 					ArrayList <Integer> indices = new ArrayList <Integer>( trackTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( trackTable.getSelectionModel().getSelectedItems() );
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, null, DragSource.TRACK_LIST );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, null, null, DragSource.TRACK_LIST );
 					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
@@ -1433,7 +1464,7 @@ public class LibraryTabPane extends StretchedTabPane {
 		playlistLengthColumn = new TableColumn<Playlist, String>( "Length" );
 		playlistTracksColumn = new TableColumn<Playlist, Integer>( "Tracks" );
 
-		playlistLengthColumn.setComparator( new AlphanumComparator<String>( CaseHandling.CASE_INSENSITIVE ) );
+		playlistLengthColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
 		
 		//TODO: Are these the right types? Integer/String look wrong. 
 		playlistNameColumn.setCellValueFactory( new PropertyValueFactory <Playlist, String>( "Name" ) );
@@ -1781,7 +1812,7 @@ public class LibraryTabPane extends StretchedTabPane {
 						tracks.addAll ( playlist.getTracks() );
 					}
 					
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( null, tracks, null, serializableList, DragSource.PLAYLIST_LIST );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( null, tracks, null, serializableList, null, DragSource.PLAYLIST_LIST );
 					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();

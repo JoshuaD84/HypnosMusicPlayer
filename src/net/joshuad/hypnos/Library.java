@@ -14,6 +14,7 @@ import java.nio.file.WatchKey;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +47,10 @@ public class Library {
 	
 	// These are all three representations of the same data. Add stuff to the
 	// Observable List, the other two can't accept add.
+	final ObservableList <Artist> artists = FXCollections.observableArrayList( new ArrayList <Artist>() );
+	final FilteredList <Artist> artistsFiltered = new FilteredList <Artist>( artists, p -> true );
+	final SortedList <Artist> artistsSorted = new SortedList <Artist>( artistsFiltered );
+	
 	final ObservableList <Album> albums = FXCollections.observableArrayList( new ArrayList <Album>() );
 	final FilteredList <Album> albumsFiltered = new FilteredList <Album>( albums, p -> true );
 	final SortedList <Album> albumsSorted = new SortedList <Album>( albumsFiltered );
@@ -429,6 +434,9 @@ public class Library {
 				synchronized ( albumsToUpdate ) {
 					albumsToRemove.clear();
 				}
+				synchronized ( artists ) {
+					artists.clear();
+				}
 				synchronized ( albums ) {
 					albums.clear();
 				}
@@ -492,6 +500,7 @@ public class Library {
 				countDone++;
 				Hypnos.getUI().setLibraryLoaderStatus( message, countDone / (double)totalCount );
 			}
+			purgeArtists();
 		}
 
 		if ( musicSearchLocations.isEmpty() ) {
@@ -598,6 +607,20 @@ public class Library {
 		}
 		return changed;
 	}
+	
+	private boolean purgeArtists() {
+		boolean changed = false;
+		List<Artist> artistsCopy = new ArrayList<> ( artists );
+		for ( Artist artist : artistsCopy ) {
+			if ( artist.getTrackCount() == 0 ) {
+				artists.remove( artist );
+				changed = true;
+			}
+		}
+		
+		return changed;		
+	}
+		
 	
 	private boolean purgeOrphans () {
 		boolean changed = false;
@@ -769,21 +792,17 @@ public class Library {
 	public FilteredList <Playlist> getPlaylistsFiltered () {
 		return playlistsFiltered;
 	}
-
-	public FilteredList <Track> getTracksFiltered () {
-		return tracksFiltered;
-	}
 	
-	public FilteredList <Album> getAlbumsFiltered() {
-		return albumsFiltered;
+	public ObservableList <Album> getAlbums () {
+		return albums;
 	}
 	
 	public SortedList <Album> getAlbumsSorted() {
 		return albumsSorted;
 	}
 	
-	public ObservableList <Album> getAlbums () {
-		return albums;
+	public FilteredList <Album> getAlbumsFiltered() {
+		return albumsFiltered;
 	}
 	
 	public ObservableList <Track> getTracks () {
@@ -793,9 +812,91 @@ public class Library {
 	public SortedList <Track> getTracksSorted () {
 		return tracksSorted;
 	}
+
+	public FilteredList <Track> getTracksFiltered () {
+		return tracksFiltered;
+	}
+	
+	public ObservableList <Artist> getArtists () {
+		return artists;
+	}
+	
+	public SortedList <Artist> getArtistsSorted() {
+		return artistsSorted;
+	}
+	
+	public FilteredList <Artist> getArtistsFiltered() {
+		return artistsFiltered;
+	} 
 	
 	public SortedList <TagError> getTagErrorsSorted () {
 		return tagErrorsSorted;
+	}
+
+	public void addArtist ( Artist artist ) {
+		// TODO this is just a placeholder
+		artists.add( artist );
+	}
+
+	
+	public void regenerateArtists () {
+		
+		artists.clear();
+
+		AlphanumComparator comparator = new AlphanumComparator ( AlphanumComparator.CaseHandling.CASE_INSENSITIVE );
+		Album[] albumArray = albums.toArray( new Album[ albums.size() ] );
+		
+		Arrays.sort( albumArray, Comparator.comparing( Album::getAlbumArtist, comparator ) );
+		
+		Artist lastArtist = null;
+		for ( Album album : albumArray ) {
+			if ( lastArtist != null && lastArtist.getName().equals( album.getAlbumArtist() ) ) {
+				lastArtist.addAlbum ( album );
+			} else {
+				Artist artist = getArtist ( album.getAlbumArtist() );
+				if ( artist == null ) {
+					artist = new Artist ( album.getAlbumArtist() );
+					artists.add( artist );
+				}
+				artist.addAlbum ( album );
+				lastArtist = artist;
+			}
+		}
+		
+		List<Track> looseTracks = new ArrayList<>();
+		for ( Track track : tracks ) {
+			if ( !track.hasAlbumDirectory() ) {
+				looseTracks.add( track );
+			}
+		}
+		
+		Track[] trackArray = looseTracks.toArray( new Track[ looseTracks.size() ] );
+		
+		Arrays.sort( trackArray, Comparator.comparing( Track::getAlbumArtist, comparator ) );
+		
+		lastArtist = null;
+		for ( Track track : trackArray ) {
+			if ( lastArtist != null && lastArtist.getName().equals( track.getAlbumArtist() ) ) {
+				lastArtist.addLooseTrack ( track );
+			} else {
+				Artist artist = getArtist ( track.getAlbumArtist() );
+				if ( artist == null ) {
+					artist = new Artist ( track.getAlbumArtist() );
+					artists.add( artist );
+				}
+				artist.addLooseTrack ( track );
+				lastArtist = artist;
+			}
+		}
+	}
+	
+	public Artist getArtist ( String name ) {
+		for ( Artist artist : artists ) {
+			if ( artist.getName().equalsIgnoreCase( name ) ) {
+				return artist;
+			}
+		}
+		return null;
 	}
 }
 

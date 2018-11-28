@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -17,6 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -32,6 +34,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.joshuad.hypnos.Album;
+import net.joshuad.hypnos.Artist;
 import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
@@ -39,18 +42,18 @@ import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 
-public class PlaylistInfoWindow extends Stage {
+public class ArtistInfoWindow extends Stage {
 	
-	private static final Logger LOGGER = Logger.getLogger( PlaylistInfoWindow.class.getName() );
+	private static final Logger LOGGER = Logger.getLogger( ArtistInfoWindow.class.getName() );
 	
-	Playlist playlist;
+	Artist artist;
 	TableView <Track> trackTable;
 	TextField locationField;
 	FXUI ui;
 	Library library;
 	AudioSystem audioSystem;
 	
-	public PlaylistInfoWindow( FXUI ui, Library library, AudioSystem audioSystem ) {
+	public ArtistInfoWindow( FXUI ui, Library library, AudioSystem audioSystem ) {
 		super();
 		this.ui = ui;
 		this.library = library;
@@ -85,38 +88,59 @@ public class PlaylistInfoWindow extends Stage {
 		});
 	}
 
-	public void setPlaylist ( Playlist playlist ) { 
-		this.playlist = playlist;
-		if ( playlist != null ) {
-			trackTable.setItems( playlist.getTracks() );
-			this.setTitle( "Playlist Info: " + playlist.getName() );
+	public void setArtist ( Artist artist ) { 
+		this.artist = artist;
+		if ( artist != null ) {
+			trackTable.setItems( FXCollections.observableArrayList ( artist.getAllTracks() ) );
+			this.setTitle( "Artist: " + artist.getName() );
 		}
 	}
 	
 	private void setupPlaylistTable ( VBox primaryPane ) {
 		
-		TableColumn<Track, String> artistColumn = new TableColumn<Track, String>( "Artist" );
+		TableColumn<Track, String> albumColumn = new TableColumn<Track, String>( "Album" );
+		TableColumn<Track, Integer> trackNumberColumn = new TableColumn<Track, Integer>( "#" );
 		TableColumn<Track, String> titleColumn = new TableColumn<Track, String>( "Title" );
 		TableColumn<Track, Integer> lengthColumn = new TableColumn<Track, Integer>( "Length" );
-		
-		artistColumn.setMaxWidth( 400000 );
+
+		trackNumberColumn.setMaxWidth( 70000 );
+		albumColumn.setMaxWidth( 400000 );
 		titleColumn.setMaxWidth( 500000 );
 		lengthColumn.setMaxWidth( 90000 );
-		
-		artistColumn.setEditable( false );
+
+		trackNumberColumn.setEditable( false );
+		albumColumn.setEditable( false );
 		titleColumn.setEditable( false );
 		lengthColumn.setEditable( false );
 		
-		artistColumn.setReorderable( false );
+		trackNumberColumn.setReorderable( false );
+		albumColumn.setReorderable( false );
 		titleColumn.setReorderable( false );
 		lengthColumn.setReorderable( false );
-		
-		artistColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Artist" ) );
+
+		trackNumberColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "trackNumber" ) );
+		albumColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "AlbumTitle" ) );
 		titleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
 		lengthColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "LengthDisplay" ) );
 		
+		trackNumberColumn.setCellFactory( column -> {
+			return new TableCell <Track, Integer>() {
+				@Override
+				protected void updateItem ( Integer value, boolean empty ) {
+					super.updateItem( value, empty );
+
+					if ( value == null || value.equals( Track.NO_TRACK_NUMBER ) || empty ) {
+						setText( null );
+						setStyle( "" );
+					} else {
+						setText( value.toString() );
+					}
+				}
+			};
+		});
+		
 		trackTable = new TableView<Track> ();
-		trackTable.getColumns().addAll( artistColumn, titleColumn, lengthColumn );
+		trackTable.getColumns().addAll( albumColumn, trackNumberColumn, titleColumn, lengthColumn );
 		trackTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
 		trackTable.setEditable( true );
 		trackTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
@@ -261,11 +285,10 @@ public class PlaylistInfoWindow extends Stage {
 		MenuItem goToAlbumMenuItem = new MenuItem( "Go to Album" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
-		MenuItem removeMenuItem = new MenuItem ( "Remove" );
 		contextMenu.getItems().addAll ( 
 			playMenuItem, appendMenuItem, playNextMenuItem, enqueueMenuItem, editTagMenuItem, 
 			infoMenuItem, lyricsMenuItem, goToAlbumMenuItem, browseMenuItem, addToPlaylistMenuItem, 
-			lastFMMenu, removeMenuItem 
+			lastFMMenu 
 		);
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
@@ -337,10 +360,6 @@ public class PlaylistInfoWindow extends Stage {
 			} else if ( e.getCode() == KeyCode.ENTER && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				appendMenuItem.fire();
-				
-			} else if ( e.getCode() == KeyCode.DELETE
-			&& !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && !e.isMetaDown() ) {
-				removeMenuItem.fire();
 			}
 		});
 		
@@ -382,19 +401,6 @@ public class PlaylistInfoWindow extends Stage {
 			ui.getCurrentListPane().currentListTable.getItems().addAll( Utils.convertTrackList( trackTable.getSelectionModel().getSelectedItems() ) );
 		});
 
-		removeMenuItem.setOnAction( event -> {
-			List <Track> removeMe = new ArrayList<> ();
-			
-			for ( int k = 0; k < playlist.getTracks().size(); k++ ) {
-				if ( trackTable.getSelectionModel().getSelectedIndices().contains( k ) ) {
-					removeMe.add( playlist.getTracks().get( k ) );
-				}
-			}
-
-			trackTable.getSelectionModel().clearSelection();
-			playlist.getTracks().removeAll( removeMe );
-		});
-		
 		playMenuItem.setOnAction( event -> {
 			List <Track> selectedItems =  new ArrayList<Track> ( trackTable.getSelectionModel().getSelectedItems() );
 			
@@ -436,135 +442,6 @@ public class PlaylistInfoWindow extends Stage {
 					event.consume();
 				}
 			});
-			
-			row.setOnDragOver( event -> {
-				Dragboard db = event.getDragboard();
-				if ( db.hasContent( FXUI.DRAGGED_TRACKS ) || db.hasFiles() ) {
-					event.acceptTransferModes( TransferMode.COPY );
-					event.consume();
-				}
-			} );
-
-			row.setOnDragDropped( event -> {
-				Dragboard db = event.getDragboard();
-				if ( db.hasContent( FXUI.DRAGGED_TRACKS ) ) {
-
-					DraggedTrackContainer container = (DraggedTrackContainer) db.getContent( FXUI.DRAGGED_TRACKS );
-					int dropIndex = row.isEmpty() ? dropIndex = trackTable.getItems().size() : row.getIndex();
-					
-					switch ( container.getSource() ) {
-						case PLAYLIST_LIST: {
-							if ( container.getPlaylists() == null ) {
-								LOGGER.fine ( "Recieved null data from playlist list, ignoring." );
-								
-							} else {
-								List <Track> tracksToCopy = new ArrayList<Track>();
-								for ( Playlist playlist : container.getPlaylists() ) {
-									if ( playlist == null ) {
-										LOGGER.fine ( "Recieved null playlist from playlist list, ignoring." );
-									} else {
-										tracksToCopy.addAll( playlist.getTracks() );
-									}
-										
-								}
-								trackTable.getItems().addAll ( tracksToCopy );
-							}
-						} break;
-						
-						case ALBUM_LIST: {
-							if ( container.getAlbums() == null ) {
-								LOGGER.fine ( "Recieved null data from playlist list, ignoring." );
-								
-							} else {
-								List <Track> tracksToCopy = new ArrayList<Track>();
-								for ( Album album : container.getAlbums() ) {
-									if ( album == null ) {
-										LOGGER.fine ( "Null album dropped in playlist window, ignoring." );
-									} else {
-										tracksToCopy.addAll( album.getTracks() );
-									}
-								}
-								trackTable.getItems().addAll ( dropIndex, tracksToCopy );
-							}
-						} break;
-
-						case ARTIST_LIST:
-						case TRACK_LIST:
-						case ALBUM_INFO:
-						case HISTORY: 
-						case CURRENT_LIST:
-						case TAG_ERROR_LIST:
-						case QUEUE:
-						case CURRENT_TRACK: {
-							List <Track> tracksToCopy = container.getTracks();
-							trackTable.getItems().addAll( dropIndex, tracksToCopy );
-						} break;
-						
-						case PLAYLIST_INFO: {
-							List <Integer> draggedIndices = container.getIndices();
-							ArrayList <Track> tracksToMove = new ArrayList <Track> ( draggedIndices.size() );
-							for ( int index : draggedIndices ) {
-								if ( index >= 0 && index < trackTable.getItems().size() ) {
-									tracksToMove.add( trackTable.getItems().get( index ) );
-								}
-							}
-							
-							for ( int k = draggedIndices.size() - 1; k >= 0; k-- ) {
-								int index = draggedIndices.get( k ).intValue();
-								if ( index >= 0 && index < trackTable.getItems().size() ) {
-									trackTable.getItems().remove ( index );
-								}
-							}
-							
-							dropIndex = Math.min( trackTable.getItems().size(), row.getIndex() );
-							
-							trackTable.getItems().addAll( dropIndex, tracksToMove );
-							
-							trackTable.getSelectionModel().clearSelection();
-							for ( int k = 0; k < draggedIndices.size(); k++ ) {
-								trackTable.getSelectionModel().select( dropIndex + k );
-							}
-
-							playlist.setTracks( new ArrayList <Track> ( trackTable.getItems() ) );
-						} break;
-					}
-
-					event.setDropCompleted( true );
-					event.consume();
-
-				} else if ( db.hasFiles() ) {
-					ArrayList <Path> pathsToAdd = new ArrayList<Path> ();
-					
-					for ( File file : db.getFiles() ) {
-						Path droppedPath = Paths.get( file.getAbsolutePath() );
-						if ( Utils.isMusicFile( droppedPath ) ) {
-							pathsToAdd.add( droppedPath );
-						
-						} else if ( Files.isDirectory( droppedPath ) ) {
-							pathsToAdd.addAll( Utils.getAllTracksInDirectory( droppedPath ) );
-						
-						} else if ( Utils.isPlaylistFile ( droppedPath ) ) {
-							List<Path> paths = Playlist.getTrackPaths( droppedPath );
-							pathsToAdd.addAll( paths );
-						}
-					}
-					
-					ArrayList <Track> tracksToAdd = new ArrayList<Track> ( pathsToAdd.size() );
-					
-					for ( Path path : pathsToAdd ) {
-						tracksToAdd.add( new Track ( path ) );
-					}
-					
-					if ( !tracksToAdd.isEmpty() ) {
-						int dropIndex = row.isEmpty() ? dropIndex = trackTable.getItems().size() : row.getIndex();
-						trackTable.getItems().addAll( Math.min( dropIndex, trackTable.getItems().size() ), tracksToAdd );
-					}
-
-					event.setDropCompleted( true );
-					event.consume();
-				}
-			});
-		
 
 			return row;
 		});

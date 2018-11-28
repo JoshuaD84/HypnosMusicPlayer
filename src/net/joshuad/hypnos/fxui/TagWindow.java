@@ -181,8 +181,6 @@ public class TagWindow extends Stage {
 		imageValueColumn.setSortable( false );
 		imageDeleteColumn.setSortable ( false );
 		
-		
-		
 		imageValueColumn.setCellFactory( new Callback <TableColumn <MultiFileTextTagPair, byte[]>, TableCell <MultiFileTextTagPair, byte[]>> () {
 			@Override
 			public TableCell <MultiFileTextTagPair, byte[]> call ( TableColumn <MultiFileTextTagPair, byte[]> param ) {
@@ -339,7 +337,6 @@ public class TagWindow extends Stage {
 			};
 
 		imageDeleteColumn.setCellFactory( deleteCellFactory );
-		
 		
 		TableView <MultiFileImageTagPair> imageTagTable = new TableView<MultiFileImageTagPair> ();
 		imageTagTable.setItems ( imageTagPairs );
@@ -553,7 +550,11 @@ public class TagWindow extends Stage {
 		saverThread.start();
 	}
 	
-	public void setTracks ( List <Track> tracks, List <Album> albumsToRefresh, FieldKey ... hiddenTags ) { 
+	public void setTracks ( List <Track> tracks, List <Album> albumsToRefresh, FieldKey ... hiddenTags ) {
+		setTracks ( tracks, albumsToRefresh, false, hiddenTags );
+	}
+	
+	public void setTracks ( List <Track> tracks, List <Album> albumsToRefresh, boolean hideCoverArt, FieldKey ... hiddenTags ) { 
 		
 		List <Track> nonMissing = new ArrayList <Track> ();
 		for ( Track track : tracks ) if ( Utils.isMusicFile( track.getPath() ) ) nonMissing.add( track );
@@ -677,7 +678,13 @@ public class TagWindow extends Stage {
 			
 			for ( MultiFileImageTagPair tagPair : imageTagPairs ) {
 				
-				if ( tagPair.getKey() == ImageFieldKey.ALBUM_FRONT || tagPair.getKey() == ImageFieldKey.ARTIST ) continue;
+				if ( tagPair.getKey() == ImageFieldKey.ALBUM_FRONT && hideCoverArt ) {
+					hideMe.add ( tagPair );
+				}
+						
+				if ( tagPair.getKey() == ImageFieldKey.ALBUM_FRONT || tagPair.getKey() == ImageFieldKey.ARTIST ) {
+					continue;
+				}
 				
 				if ( tagPair.getImageData() == null ) {
 					hideMe.add ( tagPair );

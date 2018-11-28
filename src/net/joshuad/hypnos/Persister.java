@@ -218,6 +218,7 @@ public class Persister {
 		try ( ObjectInputStream dataIn = new ObjectInputStream( new GZIPInputStream( new FileInputStream( dataFile ) ) ) ) {
 			library.albums.addAll( (ArrayList <Album>) dataIn.readObject() );
 			library.tracks.addAll( (ArrayList <Track>) dataIn.readObject() );
+			library.regenerateArtists();
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to read library data from disk, continuing." );
 		}
@@ -355,12 +356,13 @@ public class Persister {
 
 	public void saveAlbumsAndTracks () {
 		/*
-		 * Some notes for future Josh (2017/05/14): 1. For some reason, keeping
-		 * the ByteArrayOutputStream in the middle makes things take ~2/3 the
-		 * amount of time. 2. I tried removing tracks that have albums (since
-		 * they're being written twice) but it didn't create any savings. I
-		 * guess compression is handling that 3. I didn't try regular zip. GZIP
-		 * was easier.
+		 * Some notes for future Josh (2017/05/14): 
+		 * 1. For some reason, keepingthe ByteArrayOutputStream in the middle 
+		 * makes things take ~2/3 the amount of time. 
+		 * 2. I tried removing tracks that have albums (since they're being 
+		 * written twice) but it didn't create any savings. I guess compression
+		 * is handling that.
+		 * 3. I didn't try regular zip. GZIP was easier.
 		 */
 
 		File tempDataFile = new File ( dataFile.toString() + ".temp" );

@@ -176,4 +176,20 @@ public class Queue {
 		
 		queue.clear();
 	}
+
+	public void queueAllArtists ( ObservableList <Artist> artists, int index ) {
+		List<Track> tracks = new ArrayList<> ();
+		for ( Artist artist : artists ) {
+			tracks.addAll( artist.getAllTracks() );
+		}
+		queueAllTracks ( tracks, index );
+	}
+
+	public void queueAllArtists ( List <Artist> artists ) {
+		List<Track> tracks = new ArrayList<> ();
+		for ( Artist artist : artists ) {
+			tracks.addAll( artist.getAllTracks() );
+		}
+		queueAllTracks ( tracks );
+	}
 }

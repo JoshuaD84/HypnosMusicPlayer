@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import net.joshuad.hypnos.Album;
+import net.joshuad.hypnos.Artist;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
 
@@ -13,6 +14,7 @@ public class DraggedTrackContainer implements Serializable {
 
 	public enum DragSource {
 		CURRENT_LIST,
+		ARTIST_LIST,
 		ALBUM_LIST,
 		TRACK_LIST,
 		PLAYLIST_LIST,
@@ -31,7 +33,8 @@ public class DraggedTrackContainer implements Serializable {
 	
 	private DragSource source;
 	
-	public DraggedTrackContainer( List<Integer> indices, List<Track> tracks, List<Album> albums, List<Playlist> playlists, DragSource source ) {
+	public DraggedTrackContainer( List<Integer> indices, List<Track> tracks, List<Album> albums, 
+		List<Playlist> playlists, List<Artist> artists, DragSource source ) {
 		this.indices = indices;
 		this.source = source;
 		this.tracks = tracks;

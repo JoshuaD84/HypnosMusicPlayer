@@ -267,7 +267,7 @@ public class QueueWindow extends Stage {
 				if ( !row.isEmpty() ) {
 					ArrayList <Integer> indices = new ArrayList <Integer>( queueTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( queueTable.getSelectionModel().getSelectedItems() );
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, null, DragSource.QUEUE );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, null, null, DragSource.QUEUE );
 					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
@@ -295,6 +295,7 @@ public class QueueWindow extends Stage {
 					int dropIndex = row.isEmpty() ? dropIndex = audioSystem.getQueue().size() : row.getIndex();
 					
 					switch ( container.getSource() ) {
+						case ARTIST_LIST:
 						case ALBUM_LIST:
 						case PLAYLIST_LIST:
 						case HISTORY: 
@@ -413,6 +414,7 @@ public class QueueWindow extends Stage {
 				
 				switch ( container.getSource() ) {
 
+					case ARTIST_LIST:
 					case ALBUM_LIST:
 					case PLAYLIST_LIST:
 					case HISTORY: 

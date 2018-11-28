@@ -1009,4 +1009,38 @@ public class CurrentList {
 	public void setFilter ( String newValue, boolean b ) {
 		currentListTableFilter.setFilter( newValue, false );
 	}
+
+	public void insertArtists ( int targetIndex, ObservableList <Artist> artists ) {
+		List<Track> tracks = new ArrayList<> ();
+		for ( Artist artist : artists ) {
+			tracks.addAll( artist.getAllTracks() );
+		}
+		insertTracks ( targetIndex, tracks );
+		
+	}
+
+	public void setAndPlayArtists ( List <Artist> artists ) {
+		List<Track> tracks = new ArrayList<> ();
+		for ( Artist artist : artists ) {
+			tracks.addAll( artist.getAllTracks() );
+		}
+		setTracks ( tracks );
+		audioSystem.next( false );
+		
+	}
+
+	public void appendArtists ( ObservableList <Artist> artists ) {
+		for ( Artist artist : artists ) {
+			appendArtist ( artist );
+		}
+	}
+
+	public void setAndPlayArtist ( Artist artist ) {
+		setTracks ( artist.getAllTracks() );
+		audioSystem.next( false );
+	}
+
+	public void appendArtist ( Artist artist ) {
+		appendTracks ( artist.getAllTracks() );
+	}
 }

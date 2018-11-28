@@ -42,7 +42,7 @@ import java.util.Comparator;
  *   Use the static "sort" method from the java.util.Collections class:
  *   Collections.sort(your list, new AlphanumComparator());
  */
-public class AlphanumComparator<T> implements Comparator<String>
+public class AlphanumComparator implements Comparator<String>
 {
 	
 	CaseHandling caseHandling = CaseHandling.CASE_SENSITIVE;

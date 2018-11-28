@@ -103,7 +103,7 @@ public class LibraryUpdater {
 					synchronized ( library.albumsToRemove ) {
 						if ( !library.albumsToRemove.isEmpty() ) {
 							while ( changeCount < maxChangesPerUpdate && !library.albumsToRemove.isEmpty() ) {
-								library.albums.remove( library.albumsToRemove.remove( 0 ) );
+								removeAlbum ( library.albumsToRemove.remove( 0 ) );
 								changeCount++;
 							}
 							
@@ -119,7 +119,7 @@ public class LibraryUpdater {
 					synchronized ( library.albumsToAdd ) {
 						if ( !library.albumsToAdd.isEmpty() ) {
 							while ( changeCount < maxChangesPerUpdate && !library.albumsToAdd.isEmpty() ) {
-								library.albums.add( library.albumsToAdd.remove( 0 ) );
+								addAlbum ( library.albumsToAdd.remove( 0 ) );
 								changeCount++;
 							}
 							
@@ -140,17 +140,22 @@ public class LibraryUpdater {
 									
 									if ( library.albums.contains( updateSource ) ) {
 										Album updateMe = library.albums.get( library.albums.indexOf( updateSource ) );
+										Artist oldArtist = library.getArtist( updateMe.getAlbumArtist() );
+										oldArtist.removeAlbum( updateMe );
+										
 										try {
 											updateMe.updateData();
 										} catch ( Exception e ) {
 											try {
-												library.albums.remove( updateMe );
+												removeAlbum ( updateMe );
 											} catch ( Exception e2 ) {}
 										}
 										
-										List <Album> currentListAlbums = audioSystem.getCurrentList().getState().getAlbums();
-										
+										Artist newArtist = library.getArtist( updateMe.getAlbumArtist() );
+										newArtist.addAlbum( updateMe );
+
 										//TODO: handle this when we have multiple discs loaded
+										List <Album> currentListAlbums = audioSystem.getCurrentList().getState().getAlbums();
 										if ( audioSystem.getCurrentList().allowAlbumReload() == true ) {
 											if ( currentListAlbums.size() == 1 && updateMe.equals( currentListAlbums.get( 0 ) )
 											&& audioSystem.getCurrentList().getState().getMode() == CurrentList.Mode.ALBUM
@@ -178,7 +183,7 @@ public class LibraryUpdater {
 											}
 										}
 									} else {
-										library.albums.add( updateSource );
+										addAlbum( updateSource );
 									}
 									
 									changeCount += 2; //We charge two here because this is a costly transaction
@@ -198,8 +203,7 @@ public class LibraryUpdater {
 								Track removeMe = library.tracksToRemove.remove( 0 );
 								
 								if ( removeMe != null ) {
-									boolean removed = library.tracks.remove( removeMe );
-									library.tagErrors.removeAll( removeMe.getTagErrors() );
+									boolean removed = removeTrack ( removeMe );
 									
 									if ( removed ) {
 										changeCount++;
@@ -221,8 +225,7 @@ public class LibraryUpdater {
 							while ( changeCount < maxChangesPerUpdate && !library.tracksToAdd.isEmpty() ) {
 								Track track = library.tracksToAdd.remove( 0 );
 								if ( !library.containsTrack( track ) ) {
-									library.tracks.add( track );
-									library.tagErrors.addAll( track.getTagErrors() );
+									addTrack ( track );
 								}
 								changeCount+=2;
 							}
@@ -251,10 +254,13 @@ public class LibraryUpdater {
 								
 								library.tagErrors.removeAll( removeMe );
 								
+								Artist oldArtist = library.getArtist( track.getAlbumArtist() );
+								
 								try { 
 									track.refreshTagData();
 								} catch ( Exception e ) {
 									LOGGER.log ( Level.INFO, "Error updating track info.", e );
+									oldArtist.removeTrack ( track );
 								} 
 								
 								library.tagErrors.addAll( track.getTagErrors() );
@@ -276,6 +282,63 @@ public class LibraryUpdater {
 					runLaterPending = false;
 				}
 			});
+		}
+	}
+
+	private void addTrack ( Track track ) {
+		library.tracks.add( track );
+		library.tagErrors.addAll( track.getTagErrors() );
+		
+		if ( !track.hasAlbumDirectory() ) {
+			Artist artist = library.getArtist( track.getArtist() );
+			if ( artist == null ) {
+				artist = new Artist ( track.getAlbumArtist() );
+				library.addArtist( artist );
+			}
+			
+			if ( artist != null ) {
+				artist.addLooseTrack ( track );
+			}
+		}
+	}
+
+	private boolean removeTrack ( Track removeMe ) {
+		boolean removed = library.tracks.remove( removeMe );
+		library.tagErrors.removeAll( removeMe.getTagErrors() );
+		
+		Artist artist = library.getArtist( removeMe.getAlbumArtist() );
+		
+		if ( artist != null ) {
+			artist.removeTrack ( removeMe );
+			
+			if ( artist.getTrackCount() == 0 ) {
+				library.artists.remove( artist );
+			}
+		}
+		
+		return removed;
+	}
+
+	private void addAlbum ( Album addMe ) {
+		library.albums.add( addMe );
+		
+		Artist artist = library.getArtist ( addMe.getAlbumArtist() );
+		if ( artist == null ) {
+			artist = new Artist ( addMe.getAlbumArtist() );
+			library.addArtist( artist );
+		}
+		
+		artist.addAlbum( addMe );
+	}
+
+	private void removeAlbum ( Album removeMe ) {
+		library.albums.remove( removeMe );
+		Artist artist = library.getArtist( removeMe.getAlbumArtist() );
+		if ( artist != null ) {
+			artist.removeAlbum ( removeMe );
+			if ( artist.getTrackCount() == 0 ) {
+				library.artists.remove( artist );
+			}
 		}
 	}
 }

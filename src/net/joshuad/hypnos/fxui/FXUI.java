@@ -71,6 +71,7 @@ import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import net.joshuad.hypnos.Album;
+import net.joshuad.hypnos.Artist;
 import net.joshuad.hypnos.CurrentList;
 import net.joshuad.hypnos.CurrentList.Mode;
 import net.joshuad.hypnos.Hypnos.ExitCode;
@@ -115,6 +116,7 @@ public class FXUI implements PlayerListener {
 	
 	QueueWindow queueWindow;
 	TagWindow tagWindow;
+	ArtistInfoWindow artistInfoWindow;
 	PlaylistInfoWindow playlistInfoWindow;
 	AlbumInfoWindow albumInfoWindow;
 	LibraryLocationWindow libraryLocationWindow;
@@ -209,6 +211,7 @@ public class FXUI implements PlayerListener {
 		queueWindow = new QueueWindow ( this, library, audioSystem, tagWindow );
 		albumInfoWindow = new AlbumInfoWindow ( this, library, audioSystem );
 		playlistInfoWindow = new PlaylistInfoWindow ( this, library, audioSystem );
+		artistInfoWindow = new ArtistInfoWindow ( this, library, audioSystem );
 		historyWindow = new HistoryWindow ( this, library, audioSystem );
 		settingsWindow = new SettingsWindow ( this, library, hotkeys, audioSystem );
 		trackInfoWindow = new TrackInfoWindow ( this );
@@ -474,6 +477,7 @@ public class FXUI implements PlayerListener {
 		queueWindow.getScene().getStylesheets().add( fontSheet );
 		tagWindow.getScene().getStylesheets().add( fontSheet );
 		playlistInfoWindow.getScene().getStylesheets().add( fontSheet );
+		artistInfoWindow.getScene().getStylesheets().add( fontSheet );
 		albumInfoWindow.getScene().getStylesheets().add( fontSheet );
 		libraryLocationWindow.getScene().getStylesheets().add( fontSheet );
 		historyWindow.getScene().getStylesheets().add( fontSheet );
@@ -514,6 +518,7 @@ public class FXUI implements PlayerListener {
 		queueWindow.getScene().getStylesheets().add( baseSheet );
 		tagWindow.getScene().getStylesheets().add( baseSheet );
 		playlistInfoWindow.getScene().getStylesheets().add( baseSheet );
+		artistInfoWindow.getScene().getStylesheets().add( baseSheet );
 		albumInfoWindow.getScene().getStylesheets().add( baseSheet );
 		libraryLocationWindow.getScene().getStylesheets().add( baseSheet );
 		historyWindow.getScene().getStylesheets().add( baseSheet );
@@ -540,6 +545,7 @@ public class FXUI implements PlayerListener {
 			queueWindow.getScene().getStylesheets().add( darkSheet );
 			tagWindow.getScene().getStylesheets().add( darkSheet );
 			playlistInfoWindow.getScene().getStylesheets().add( darkSheet );
+			artistInfoWindow.getScene().getStylesheets().add( darkSheet );
 			albumInfoWindow.getScene().getStylesheets().add( darkSheet );
 			libraryLocationWindow.getScene().getStylesheets().add( darkSheet );
 			historyWindow.getScene().getStylesheets().add( darkSheet );
@@ -571,6 +577,7 @@ public class FXUI implements PlayerListener {
 		queueWindow.getScene().getStylesheets().remove( darkSheet );
 		tagWindow.getScene().getStylesheets().remove( darkSheet );
 		playlistInfoWindow.getScene().getStylesheets().remove( darkSheet );
+		artistInfoWindow.getScene().getStylesheets().remove( darkSheet );
 		albumInfoWindow.getScene().getStylesheets().remove( darkSheet );
 		libraryLocationWindow.getScene().getStylesheets().remove( darkSheet );
 		historyWindow.getScene().getStylesheets().remove( darkSheet );
@@ -1192,7 +1199,9 @@ public class FXUI implements PlayerListener {
 			libraryPane.albumTable.refresh();
 			libraryPane.playlistTable.refresh();
 			libraryPane.trackTable.refresh();
+			libraryPane.artistTab.artistTable.refresh();
 			libraryPane.fixTabs();
+			
 		});
 	}
 
@@ -1680,6 +1689,10 @@ public class FXUI implements PlayerListener {
 		if ( albumInfoWindow.isShowing() ) {
 			albumInfoWindow.setAlbum( album );
 		}
+	}
+	
+	public void artistSelected ( Artist artist ) {
+		//TODO: 
 	}
 
 	public LibraryTabPane getLibraryPane () {

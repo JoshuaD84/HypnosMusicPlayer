@@ -9,13 +9,31 @@ Windows: Pinning Issues
 
 https://stackoverflow.com/questions/858766/generate-manifest-class-path-from-classpath-in-ant
 	
-An artist tab on media library
+artist tab on media library
+   Persist hidden column settings and column width settings
+   Fix reset to default view
+   add ctrl + 4 to hotkeys
+   Some single tracks aren't getting put in the right artist, instead being put in "music"
 	
+Add a soft link to scanner, the bar doesn't work right
+   I probably count directories with no follow shortcuts on or something
+
 Show in tag edit window when a file doesn't support a particular tag type	
    
 https://stackoverflow.com/questions/51851572/java-fx-button-is-staying-pressed-after-drag-event
 
 Drag and Drop to Playlist Info update current list if it is that playlist unchanged
+
+Minimize to System Tray option
+
+Add "search for album art" and "search for artist art" as context menu options in art pane 
+
+Add a button to clear the current list filter box
+
+change the file location on track info window to be like album info window
+
+add GTK C code to repository
+
 
 ::::::::::::::
 

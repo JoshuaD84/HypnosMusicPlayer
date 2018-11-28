@@ -431,7 +431,7 @@ public class Transport extends VBox {
 		currentTrackButton.setOnDragDetected( event -> {
 			if ( audioSystem.getCurrentTrack() != null ) {
 				ArrayList <Track> tracks = new ArrayList<> ( Arrays.asList( audioSystem.getCurrentTrack() ) );
-				DraggedTrackContainer dragObject = new DraggedTrackContainer( null, tracks, null, null, DragSource.CURRENT_TRACK );
+				DraggedTrackContainer dragObject = new DraggedTrackContainer( null, tracks, null, null, null, DragSource.CURRENT_TRACK );
 				Dragboard db = currentTrackButton.startDragAndDrop( TransferMode.COPY );
 				db.setDragView( currentTrackButton.snapshot( null, null ) );
 				ClipboardContent cc = new ClipboardContent();

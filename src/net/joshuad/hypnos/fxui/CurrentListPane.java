@@ -591,9 +591,9 @@ public class CurrentListPane extends BorderPane {
 		numberColumn = new TableColumn<CurrentListTrack, Integer>( "#" );
 		lengthColumn = new TableColumn<CurrentListTrack, String>( "Length" );
 		
-		albumColumn.setComparator( new AlphanumComparator<String>( CaseHandling.CASE_INSENSITIVE ) );
-		artistColumn.setComparator( new AlphanumComparator<String>( CaseHandling.CASE_INSENSITIVE ) );
-		titleColumn.setComparator( new AlphanumComparator<String>( CaseHandling.CASE_INSENSITIVE ) );
+		albumColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
+		artistColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
+		titleColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
 		
 		playingColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, CurrentListTrackState>( "displayState" ) );
 		artistColumn.setCellValueFactory( new PropertyValueFactory <CurrentListTrack, String>( "artist" ) );
@@ -696,6 +696,7 @@ public class CurrentListPane extends BorderPane {
 				DraggedTrackContainer container = (DraggedTrackContainer) db.getContent( FXUI.DRAGGED_TRACKS );
 				
 				switch ( container.getSource() ) {
+					case ARTIST_LIST:
 					case TRACK_LIST:
 					case ALBUM_INFO:
 					case PLAYLIST_INFO:
@@ -1050,7 +1051,7 @@ public class CurrentListPane extends BorderPane {
 				if ( !row.isEmpty() ) {
 					ArrayList <Integer> indices = new ArrayList <Integer>( currentListTable.getSelectionModel().getSelectedIndices() );
 					ArrayList <Track> tracks = new ArrayList <Track>( currentListTable.getSelectionModel().getSelectedItems() );
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, null, DragSource.CURRENT_LIST );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, null, null, DragSource.CURRENT_LIST );
 					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
@@ -1081,7 +1082,8 @@ public class CurrentListPane extends BorderPane {
 							currentListTable.getSortOrder().clear();
 							audioSystem.getCurrentList().insertAlbums( dropIndex, container.getAlbums() );
 						} break;
-						
+
+						case ARTIST_LIST:
 						case PLAYLIST_LIST:
 						case TRACK_LIST:
 						case ALBUM_INFO:

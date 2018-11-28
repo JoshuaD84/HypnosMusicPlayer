@@ -1165,7 +1165,7 @@ public class SettingsWindow extends Stage {
 							tracks.add( error.getTrack() );
 						}
 					}
-					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, null, DragSource.TAG_ERROR_LIST );
+					DraggedTrackContainer dragObject = new DraggedTrackContainer( indices, tracks, null, null, null, DragSource.TAG_ERROR_LIST );
 					Dragboard db = row.startDragAndDrop( TransferMode.COPY );
 					db.setDragView( row.snapshot( null, null ) );
 					ClipboardContent cc = new ClipboardContent();
