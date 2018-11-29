@@ -1,20 +1,35 @@
 package net.joshuad.hypnos.fxui;
 
+import java.io.FileInputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javafx.beans.property.StringProperty;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.ColorAdjust;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import net.joshuad.hypnos.Hypnos;
 
 public class InfoFilterHybrid extends BorderPane {
+	private static final Logger LOGGER = Logger.getLogger( LibraryArtistTab.class.getName() );
 	private Label info;
 	private TextField filter;
+	
+	private HBox filterBox;
+	private Button clearButton;
 	
 	private TableView <?> table;
 	
@@ -25,6 +40,10 @@ public class InfoFilterHybrid extends BorderPane {
 	private boolean switchOnHover = false; 
 	
 	private boolean registeredSceneFilter = false;
+	
+	private ImageView filterClearImage;
+	
+	private FXUI ui;
 	
 	//Used for the text box and for the associated filtered tableview
 	private EventHandler <? super KeyEvent> textBoxKeyFilter = ( KeyEvent e ) -> { 
@@ -46,11 +65,34 @@ public class InfoFilterHybrid extends BorderPane {
 		}
 	};
 	
-	public InfoFilterHybrid( String text ) {
+	public InfoFilterHybrid( FXUI ui ) {
 		super();
 		
-		info = new Label ( text );
+		this.ui = ui;
+		
+		info = new Label ( );
 		filter = new TextField ();
+		
+		clearButton = new Button ();		
+		try {	
+			Image clearImage = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/clear.png" ).toFile() ) );
+			filterClearImage = new ImageView ( clearImage );
+			filterClearImage.setFitWidth( 12 );
+			filterClearImage.setFitHeight( 12 );
+			clearButton.setGraphic( filterClearImage );
+			
+		} catch ( Exception e ) {
+			LOGGER.log( Level.WARNING, "Unable to load clear icon: resources/clear.png", e );
+			clearButton.setText( "X" ); //TODO: Do this in other places that have a clear button or an add button, why not? 
+		}
+		
+		clearButton.setOnAction( ( ActionEvent e ) -> {
+			stopEditing();
+		});
+
+		filterBox = new HBox();
+		filterBox.getChildren().addAll( filter, clearButton );
+		filter.prefWidthProperty().bind( filterBox.widthProperty().subtract( clearButton.widthProperty() ) );
 
 		//info.setPrefHeight( 30 );
 		info.setAlignment( Pos.CENTER );
@@ -87,6 +129,11 @@ public class InfoFilterHybrid extends BorderPane {
 		filter.setOnMouseClicked ( ( MouseEvent e ) -> beginEditing() );
 		info.setOnMouseClicked ( ( MouseEvent e ) -> beginEditing() );
 	}
+	
+	public void applyButtonColorAdjust ( ColorAdjust buttonColor ) {
+		if ( filterClearImage != null ) filterClearImage.setEffect( buttonColor );
+	}
+
 	
 	public String getText () {
 		return filter.getText();
@@ -135,7 +182,7 @@ public class InfoFilterHybrid extends BorderPane {
 		
 	private void updateDisplay() {
 		if ( ( hasHover && switchOnHover ) || editing || hasFocus || filter.getText().length() > 0 ) {
-			setCenter( filter );
+			setCenter( filterBox );
 		} else {
 			setCenter( info );
 		}

@@ -344,7 +344,7 @@ public class CurrentListPane extends BorderPane {
 			}
 		});
 		
-		infoLabelAndFilter = new InfoFilterHybrid ( "" );
+		infoLabelAndFilter = new InfoFilterHybrid ( ui );
 		infoLabelAndFilter.prefWidthProperty().bind( currentListControls.widthProperty() );
 		infoLabelAndFilter.setFilteredTable( currentListTable );
 		
@@ -1217,6 +1217,7 @@ public class CurrentListPane extends BorderPane {
 		if ( shuffleImage != null ) shuffleImage.setEffect( darkThemeButtons );
 		if ( menuImage != null ) menuImage.setEffect( darkThemeButtons );
 		if ( queueImage != null ) queueImage.setEffect( darkThemeButtons );
+		infoLabelAndFilter.applyButtonColorAdjust( darkThemeButtons );
 		
 		currentListTable.refresh();
 	}
@@ -1229,6 +1230,7 @@ public class CurrentListPane extends BorderPane {
 		if ( shuffleImage != null ) shuffleImage.setEffect( ui.lightThemeButtonEffect );
 		if ( menuImage != null ) menuImage.setEffect( ui.lightThemeButtonEffect );
 		if ( queueImage != null ) queueImage.setEffect( ui.lightThemeButtonEffect );
+		infoLabelAndFilter.applyButtonColorAdjust( ui.lightThemeButtonEffect );
 		
 		currentListTable.refresh();
 	}
