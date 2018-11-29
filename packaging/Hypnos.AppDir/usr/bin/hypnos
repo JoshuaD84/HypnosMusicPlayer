@@ -3,7 +3,7 @@
 ROOT=$PWD
 DIR="$(dirname "$(readlink -f "$0")")"
 cd $DIR
-exec ./jre/bin/hypnos 
+exec ./jre/bin/hypnos \
 	-Xmx600m \
 	-XX:+UseG1GC \
 	-XX:+UseStringDeduplication \
