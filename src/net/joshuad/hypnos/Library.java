@@ -512,7 +512,7 @@ public class Library {
 	}
 	
 	private long getDirectoryCount ( Path dir ) throws IOException {
-	    return Files.walk(dir).parallel().filter(p -> p.toFile().isDirectory()).count();
+	    return Files.walk( dir, FileVisitOption.FOLLOW_LINKS ).parallel().filter( p -> p.toFile().isDirectory() ).count();
 	}
 	
 	private void loadOneSource() {
