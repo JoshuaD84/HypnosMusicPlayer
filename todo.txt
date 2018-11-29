@@ -12,7 +12,6 @@ https://stackoverflow.com/questions/858766/generate-manifest-class-path-from-cla
 artist tab on media library
    Persist hidden column settings and column width settings
    Fix reset to default view
-   Some single tracks aren't getting put in the right artist, instead being put in "music"
    apply theme to image colors on artist tab
 	
 Add a soft link to scanner, the bar doesn't work right

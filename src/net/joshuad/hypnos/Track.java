@@ -260,7 +260,6 @@ public class Track implements Serializable, AlbumInfoSource {
 			if ( hasAlbumDirectory() ) {
 				fnArtist = trackFile.toPath().getParent().getParent().getFileName().toString();
 			} 
-				
 		} catch ( Exception e ) { 
 			//No need to log this
 		}
