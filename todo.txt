@@ -1,5 +1,9 @@
 Linux: Media Buttons
 
+Allow reordering of library tabs
+
+There's a significant delay after close is hit until hypnos window closes
+
 Linux: Dynamic menu titles in system tray
 
 Libre FM support https://libre.fm/ 
@@ -8,11 +12,6 @@ Windows: Pinning Issues
 	https://stackoverflow.com/questions/53457524/jni-native-interface-and-javafx-noclassdeffounderror
 
 https://stackoverflow.com/questions/858766/generate-manifest-class-path-from-classpath-in-ant
-	
-artist tab on media library
-   Persist hidden column settings and column width settings
-   Fix reset to default view
-   apply theme to image colors on artist tab
 	
 Add a soft link to scanner, the bar doesn't work right
    I probably count directories with no follow shortcuts on or something
@@ -109,6 +108,8 @@ Future
 		https://stackoverflow.com/questions/7506329/embed-java-into-a-c-application
 		
 :::: Refactor / organize my code ::::
+
+   separate album, track, and playlist tabs like we did for artistTab
 
 	a better structure for hotkey commands (maybe combine with commandline commands?)
 

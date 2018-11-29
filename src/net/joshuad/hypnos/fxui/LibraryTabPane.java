@@ -1930,6 +1930,7 @@ public class LibraryTabPane extends StretchedTabPane {
 		if ( addSourceTracksImage != null ) addSourceTracksImage.setEffect( buttonColor );
 		if ( addSourceAlbumsImage != null ) addSourceAlbumsImage.setEffect( buttonColor );
 		if ( addSourcePlaylistsImage != null ) addSourcePlaylistsImage.setEffect( buttonColor );
+		artistTab.applyDarkTheme ( buttonColor );
 	}
 
 	public void applyLightTheme () {
@@ -1939,6 +1940,7 @@ public class LibraryTabPane extends StretchedTabPane {
 		if ( addSourceTracksImage != null ) addSourceTracksImage.setEffect( ui.lightThemeButtonEffect );
 		if ( addSourceAlbumsImage != null ) addSourceAlbumsImage.setEffect( ui.lightThemeButtonEffect );
 		if ( addSourcePlaylistsImage != null ) addSourcePlaylistsImage.setEffect( ui.lightThemeButtonEffect );
+		artistTab.applyLightTheme();
 	}
 
 	public void focusFilterOfCurrentTab () {
@@ -2262,6 +2264,8 @@ public class LibraryTabPane extends StretchedTabPane {
 				LOGGER.log( Level.INFO, "Unable to apply setting: " + setting + " to UI.", e );
 			}
 		});
+		
+		artistTab.applySettingsBeforeWindowShown ( settings );
 	}
 
 	@SuppressWarnings("incomplete-switch")
@@ -2269,6 +2273,10 @@ public class LibraryTabPane extends StretchedTabPane {
 		settings.forEach( ( setting, value )-> {
 			try {
 				switch ( setting ) {
+					case LIBRARY_TAB_ARTISTS_VISIBLE:
+						setArtistsVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
+						break;
 					case LIBRARY_TAB_ALBUMS_VISIBLE:
 						setAlbumsVisible( Boolean.valueOf ( value ) );
 						settings.remove ( setting );
@@ -2402,12 +2410,18 @@ public class LibraryTabPane extends StretchedTabPane {
 		retMe.put ( Setting.PL_TABLE_PLAYLIST_COLUMN_WIDTH, playlistNameColumn.getPrefWidth() );
 		retMe.put ( Setting.PL_TABLE_TRACKS_COLUMN_WIDTH, playlistTracksColumn.getPrefWidth() );
 		retMe.put ( Setting.PL_TABLE_LENGTH_COLUMN_WIDTH, playlistLengthColumn.getPrefWidth() );
-		
+
+		retMe.put ( Setting.LIBRARY_TAB_ARTISTS_VISIBLE, getTabs().contains( artistTab ) );
 		retMe.put ( Setting.LIBRARY_TAB_ALBUMS_VISIBLE, getTabs().contains( albumTab ) );
 		retMe.put ( Setting.LIBRARY_TAB_TRACKS_VISIBLE, getTabs().contains( trackTab ) );
 		retMe.put ( Setting.LIBRARY_TAB_PLAYLISTS_VISIBLE, getTabs().contains( playlistTab ) );
 		
 		retMe.put ( Setting.HIDE_ALBUM_TRACKS, trackListCheckBox.isSelected() );
+		
+		EnumMap <Persister.Setting, ? extends Object> artistTabSettings = artistTab.getSettings();
+		for ( Persister.Setting setting : artistTabSettings.keySet() ) {
+			retMe.put( setting, artistTabSettings.get( setting ) );
+		}
 		
 		return retMe;
 	}

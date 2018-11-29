@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,8 +33,10 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.TableColumn.SortType;
 import javafx.scene.control.TableView.ResizeFeatures;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
@@ -48,10 +51,12 @@ import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.AlphanumComparator;
 import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.MusicSearchLocation;
+import net.joshuad.hypnos.Persister;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.AlphanumComparator.CaseHandling;
+import net.joshuad.hypnos.Persister.Setting;
 import net.joshuad.hypnos.Artist;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.audio.AudioSystem;
@@ -69,7 +74,7 @@ public class LibraryArtistTab extends Tab {
 	TextField filterBox;
 	
 	TableView<Artist> artistTable;	
-	TableColumn<Artist, String> nameColumn;
+	TableColumn<Artist, String> artistColumn;
 	TableColumn<Artist, Integer> tracksColumn, albumsColumn, lengthColumn;
 	
 	Label emptyListLabel = new Label( 
@@ -97,45 +102,52 @@ public class LibraryArtistTab extends Tab {
 		
 		this.setClosable( false );
 		this.setContent( content );
+		resetTableSettingsToDefault();
 	}
 	
 	public void resetTableSettingsToDefault() {
-		nameColumn.setVisible( true );
-		albumsColumn.setVisible( false );
+		artistColumn.setVisible( true );
+		albumsColumn.setVisible( true );
 		tracksColumn.setVisible( true );
 		lengthColumn.setVisible( true );
 		
-		artistTable.getColumns().remove( nameColumn );
-		artistTable.getColumns().add( nameColumn );
-		artistTable.getColumns().remove( tracksColumn );
-		artistTable.getColumns().add( tracksColumn );
+		artistTable.getColumns().remove( artistColumn );
+		artistTable.getColumns().add( artistColumn );
 		artistTable.getColumns().remove( albumsColumn );
 		artistTable.getColumns().add( albumsColumn );
+		artistTable.getColumns().remove( tracksColumn );
+		artistTable.getColumns().add( tracksColumn );
 		artistTable.getColumns().remove( lengthColumn );
 		artistTable.getColumns().add( lengthColumn );
 
-		artistTable.getSortOrder().add( nameColumn );
-		artistTable.getSortOrder().add( tracksColumn );
-		artistTable.getSortOrder().add( lengthColumn );
+		artistTable.getSortOrder().add( artistColumn );
 		
-		nameColumn.setPrefWidth( 100 );
-		tracksColumn.setPrefWidth( 60 );
-		lengthColumn.setPrefWidth( 100 );
-		albumsColumn.setPrefWidth ( 90 );
+		artistColumn.setPrefWidth( 300 );
+		albumsColumn.setPrefWidth( 40 );
+		tracksColumn.setPrefWidth( 40 );
+		lengthColumn.setPrefWidth( 80 );
 		
 		artistTable.getColumnResizePolicy().call( new ResizeFeatures<Artist> ( artistTable, null, 0d ) );
 	}
 	
 	
 	private TableView<Artist> setupArtistTable () {
-		nameColumn = new TableColumn<Artist, String>( "Artist" );
-		albumsColumn = new TableColumn<Artist, Integer>( "Albums" );
-		tracksColumn = new TableColumn<Artist, Integer> ( "Tracks" );
+		artistColumn = new TableColumn<Artist, String>( "Artist" );
+		albumsColumn = new TableColumn<Artist, Integer>( );
+		tracksColumn = new TableColumn<Artist, Integer> ( );
 		lengthColumn = new TableColumn<Artist, Integer> ( "Length" );
+		
+		Label tracksLabel = new Label( "T" );
+		tracksLabel.setTooltip( new Tooltip( "Tracks" ) );
+		tracksColumn.setGraphic( tracksLabel );
+		
+		Label albumsLabel = new Label( "A" );
+		albumsLabel.setTooltip( new Tooltip( "Albums" ) );
+		albumsColumn.setGraphic( albumsLabel );
 
-		nameColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
+		artistColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
 
-		nameColumn.setCellValueFactory( new PropertyValueFactory <Artist, String>( "Name" ) );
+		artistColumn.setCellValueFactory( new PropertyValueFactory <Artist, String>( "Name" ) );
 		albumsColumn.setCellValueFactory( new PropertyValueFactory <Artist, Integer>( "albumCount" ) );
 		tracksColumn.setCellValueFactory( new PropertyValueFactory <Artist, Integer>( "trackCount" ) );
 		lengthColumn.setCellValueFactory( new PropertyValueFactory <Artist, Integer>( "length" ) );
@@ -159,23 +171,19 @@ public class LibraryArtistTab extends Tab {
 		CheckMenuItem lengthMenuItem = new CheckMenuItem ( "Show Length Column" );
 		MenuItem defaultMenuItem = new MenuItem ( "Reset to Default View" );
 		
-		nameMenuItem.setSelected( true );
-		albumsMenuItem.setSelected( true );
-		tracksMenuItem.setSelected( true );
-		lengthMenuItem.setSelected( false );
 		columnSelectorMenu.getItems().addAll( nameMenuItem, albumsMenuItem, tracksMenuItem, lengthMenuItem, defaultMenuItem );
-		nameColumn.setContextMenu( columnSelectorMenu );
+		artistColumn.setContextMenu( columnSelectorMenu );
 		albumsColumn.setContextMenu( columnSelectorMenu );
 		tracksColumn.setContextMenu( columnSelectorMenu );
 		lengthColumn.setContextMenu( columnSelectorMenu );
-		nameMenuItem.selectedProperty().bindBidirectional( nameColumn.visibleProperty() );
+		nameMenuItem.selectedProperty().bindBidirectional( artistColumn.visibleProperty() );
 		albumsMenuItem.selectedProperty().bindBidirectional( albumsColumn.visibleProperty() );
 		tracksMenuItem.selectedProperty().bindBidirectional( tracksColumn.visibleProperty() );
 		lengthMenuItem.selectedProperty().bindBidirectional( lengthColumn.visibleProperty() );
 		defaultMenuItem.setOnAction( e -> this.resetTableSettingsToDefault() );
 
 		TableView<Artist> retMe = new TableView<Artist>();
-		retMe.getColumns().addAll( nameColumn, albumsColumn, tracksColumn, lengthColumn );
+		retMe.getColumns().addAll( artistColumn, albumsColumn, tracksColumn, lengthColumn );
 		retMe.setEditable( false );
 		retMe.setItems( library.getArtistsSorted() );
 		retMe.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
@@ -183,9 +191,6 @@ public class LibraryArtistTab extends Tab {
 		HypnosResizePolicy resizePolicy = new HypnosResizePolicy();
 		retMe.setColumnResizePolicy( resizePolicy );
 		resizePolicy.registerFixedWidthColumns( albumsColumn, tracksColumn, lengthColumn );
-		albumsColumn.setPrefWidth( 50 );
-		tracksColumn.setPrefWidth( 50 );
-		lengthColumn.setPrefWidth( 80 );
 
 		library.getArtistsSorted().comparatorProperty().bind( retMe.comparatorProperty() );
 		
@@ -548,5 +553,166 @@ public class LibraryArtistTab extends Tab {
 		clearButton.setTooltip( new Tooltip( "Clear the filter text" ) );
 
 		filterPane.getChildren().addAll( libraryButton, filterBox, clearButton );
+	}
+	
+	public void applyDarkTheme ( ColorAdjust buttonColor ) {
+		if ( filterClearImage != null ) filterClearImage.setEffect( buttonColor );
+		if ( addSourceImage != null ) addSourceImage.setEffect( buttonColor );
+	}
+
+	public void applyLightTheme () {
+		if ( filterClearImage != null ) filterClearImage.setEffect( ui.lightThemeButtonEffect );
+		if ( addSourceImage != null ) addSourceImage.setEffect( ui.lightThemeButtonEffect );
+	}
+	
+	@SuppressWarnings("incomplete-switch")
+	public void applySettingsBeforeWindowShown ( EnumMap<Persister.Setting, String> settings ) {
+		settings.forEach( ( setting, value )-> {
+			try {
+				switch ( setting ) {
+					case AR_TABLE_ARTIST_COLUMN_SHOW:
+						artistColumn.setVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
+						break;
+					case AR_TABLE_ALBUMS_COLUMN_SHOW:
+						albumsColumn.setVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
+						break;
+					case AR_TABLE_TRACKS_COLUMN_SHOW:
+						tracksColumn.setVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
+						break;					
+					case AR_TABLE_LENGTH_COLUMN_SHOW:
+						lengthColumn.setVisible( Boolean.valueOf ( value ) );
+						settings.remove ( setting );
+						break;
+						
+					case AR_TABLE_ARTIST_COLUMN_WIDTH: 
+						artistColumn.setPrefWidth( Double.valueOf( value ) );
+						settings.remove ( setting );
+						break;
+					case AR_TABLE_ALBUMS_COLUMN_WIDTH: 
+						albumsColumn.setPrefWidth( Double.valueOf( value ) );
+						settings.remove ( setting );
+						break;
+					case AR_TABLE_TRACKS_COLUMN_WIDTH: 
+						tracksColumn.setPrefWidth( Double.valueOf( value ) );
+						settings.remove ( setting );
+						break;
+					case AR_TABLE_LENGTH_COLUMN_WIDTH: 
+						lengthColumn.setPrefWidth( Double.valueOf( value ) );
+						settings.remove ( setting );
+						break;
+						
+					case ARTIST_COLUMN_ORDER: {
+						String[] order = value.split( " " );
+						int newIndex = 0;
+						
+						for ( String columnName : order ) {
+							try {
+								if ( columnName.equals( "artist" ) ) {
+									artistTable.getColumns().remove( artistColumn );
+									artistTable.getColumns().add( newIndex, artistColumn );
+								} else if ( columnName.equals( "albums" ) ) {
+									artistTable.getColumns().remove( albumsColumn );
+									artistTable.getColumns().add( newIndex, albumsColumn );
+								} else if ( columnName.equals( "tracks" ) ) {
+									artistTable.getColumns().remove( tracksColumn );
+									artistTable.getColumns().add( newIndex, tracksColumn );
+								} else if ( columnName.equals( "length" ) ) {
+									artistTable.getColumns().remove( lengthColumn );
+									artistTable.getColumns().add( newIndex, lengthColumn );
+								}
+								newIndex++;
+							} catch ( Exception e ) {
+								LOGGER.log( Level.INFO, "Unable to set album table column order: '" + value + "'", e );
+							}
+							
+						}
+						settings.remove ( setting );
+						break;
+					}
+					
+					case ARTIST_SORT_ORDER: {
+						artistTable.getSortOrder().clear();
+						
+						if ( !value.equals( "" ) ) {
+							String[] order = value.split( " " );
+							for ( String fullValue : order ) {
+								try {
+									String columnName = fullValue.split( "-" )[0];
+									SortType sortType = SortType.valueOf( fullValue.split( "-" )[1] );
+									
+									if ( columnName.equals( "artist" ) ) {
+										artistTable.getSortOrder().add( artistColumn );
+										artistColumn.setSortType( sortType );
+									} else if ( columnName.equals( "albums" ) ) {
+										artistTable.getSortOrder().add( albumsColumn );
+										albumsColumn.setSortType( sortType );
+									} else if ( columnName.equals( "tracks" ) ) {
+										artistTable.getSortOrder().add( tracksColumn );
+										tracksColumn.setSortType( sortType );
+									} else if ( columnName.equals( "length" ) ) {
+										artistTable.getSortOrder().add( lengthColumn );
+										lengthColumn.setSortType( sortType );
+									}
+								} catch ( Exception e ) {
+									LOGGER.log( Level.INFO, "Unable to set album table sort order: '" + value + "'", e );
+								}
+							}
+						}
+						settings.remove ( setting );
+						break;
+					}
+				}
+			} catch ( Exception e ) {
+				LOGGER.log( Level.INFO, "Unable to apply setting: " + setting + " to UI.", e );
+			}
+		});
+	}
+	
+	public EnumMap<Persister.Setting, ? extends Object> getSettings () {
+
+		EnumMap <Persister.Setting, Object> retMe = new EnumMap <Persister.Setting, Object> ( Persister.Setting.class );
+		
+		String columnOrderValue = "";
+		for ( TableColumn<Artist, ?> column : artistTable.getColumns() ) {
+			if ( column == artistColumn ) {
+				columnOrderValue += "artist ";
+			} else if ( column == albumsColumn ) {
+				columnOrderValue += "albums ";
+			} else if ( column == tracksColumn ) {
+				columnOrderValue += "tracks ";
+			} else if ( column == lengthColumn ) {
+				columnOrderValue += "length ";
+			}
+		}
+		retMe.put ( Setting.ARTIST_COLUMN_ORDER, columnOrderValue );
+		
+		String sortValue = "";
+		for ( TableColumn<Artist, ?> column : artistTable.getSortOrder() ) {
+			if ( column == artistColumn ) {
+				sortValue += "artist-" + artistColumn.getSortType() + " ";
+			} else if ( column == albumsColumn ) {
+				sortValue += "albums-" + albumsColumn.getSortType() + " ";
+			} else if ( column == tracksColumn ) {
+				sortValue += "tracks-" + tracksColumn.getSortType() + " ";
+			} else if ( column == lengthColumn ) {
+				sortValue += "length-" + lengthColumn.getSortType() + " ";
+			}
+		}
+		retMe.put ( Setting.ALBUM_SORT_ORDER, sortValue );
+		
+		retMe.put ( Setting.AR_TABLE_ARTIST_COLUMN_SHOW, artistColumn.isVisible() );
+		retMe.put ( Setting.AR_TABLE_ALBUMS_COLUMN_SHOW, albumsColumn.isVisible() );
+		retMe.put ( Setting.AR_TABLE_TRACKS_COLUMN_SHOW, tracksColumn.isVisible() );
+		retMe.put ( Setting.AR_TABLE_LENGTH_COLUMN_SHOW, lengthColumn.isVisible() );
+		                     
+		retMe.put ( Setting.AR_TABLE_ARTIST_COLUMN_WIDTH, artistColumn.getPrefWidth() );
+		retMe.put ( Setting.AR_TABLE_ALBUMS_COLUMN_WIDTH, albumsColumn.getPrefWidth() );
+		retMe.put ( Setting.AR_TABLE_TRACKS_COLUMN_WIDTH, tracksColumn.getPrefWidth() );
+		retMe.put ( Setting.AR_TABLE_LENGTH_COLUMN_WIDTH, lengthColumn.getPrefWidth() );
+				
+		return retMe;
 	}
 }
