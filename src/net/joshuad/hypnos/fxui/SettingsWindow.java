@@ -717,43 +717,61 @@ public class SettingsWindow extends Stage {
 
 		shuffleGrid.setAlignment( Pos.TOP_CENTER );	
 		
-		Label showSystemTrayLabel = new Label ( "Show System Tray Icon" );
+		Label showSystemTrayLabel = new Label ( "Show in System Tray" );
 		showSystemTrayLabel.setPadding( labelInsets );
 		
 		CheckBox showSystemTrayCheckBox = new CheckBox ();
 		showSystemTrayCheckBox.setPadding( checkBoxInsets );
 		showSystemTrayCheckBox.selectedProperty().bindBidirectional( ui.showSystemTrayProperty() );
 		
-		Label toTrayLabel = new Label ( "Minimize to System Tray on Close" );
-		toTrayLabel.setPadding( labelInsets );
+		Label closeToTrayLabel = new Label ( "Close to System Tray" );
+		closeToTrayLabel.setPadding( labelInsets );
 		
-		CheckBox toTrayCheckBox = new CheckBox ();
-		toTrayCheckBox.setPadding( checkBoxInsets );
-		toTrayCheckBox.selectedProperty().bindBidirectional( ui.closeToSystemTrayProperty() );
+		CheckBox closeToTrayCheckBox = new CheckBox ();
+		closeToTrayCheckBox.setPadding( checkBoxInsets );
+		closeToTrayCheckBox.selectedProperty().bindBidirectional( ui.closeToSystemTrayProperty() );
+		
+		Label minToTrayLabel = new Label ( "Minimize to System Tray" );
+		minToTrayLabel.setPadding( labelInsets );
+		
+		CheckBox minToTrayCheckBox = new CheckBox ();
+		minToTrayCheckBox.setPadding( checkBoxInsets );
+		minToTrayCheckBox.selectedProperty().bindBidirectional( ui.minimizeToSystemTrayProperty() );
 		
 		ui.showSystemTrayProperty().addListener( ( ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue ) -> {
 			if ( newValue ) {
-				toTrayLabel.setDisable( false );
-				toTrayCheckBox.setDisable( false );
+				closeToTrayLabel.setDisable( false );
+				closeToTrayCheckBox.setDisable( false );
+				minToTrayLabel.setDisable( false );
+				minToTrayCheckBox.setDisable( false );
 			} else {
-				toTrayLabel.setDisable( true );
-				toTrayCheckBox.setSelected( false );
-				toTrayCheckBox.setDisable( true );
+				closeToTrayLabel.setDisable( true );
+				closeToTrayCheckBox.setSelected( false );
+				closeToTrayCheckBox.setDisable( true );
+				minToTrayLabel.setDisable( true );
+				minToTrayCheckBox.setSelected( false );
+				minToTrayCheckBox.setDisable( true );
 			}
 		});
 		
 		if ( ui.showSystemTrayProperty().get() ) {
-			toTrayLabel.setDisable( false );
-			toTrayCheckBox.setDisable( false );
+			closeToTrayLabel.setDisable( false );
+			closeToTrayCheckBox.setDisable( false );
+			minToTrayLabel.setDisable( false );
+			minToTrayCheckBox.setDisable( false );
 		} else {
-			toTrayLabel.setDisable( true );
-			toTrayCheckBox.setSelected( false );
-			toTrayCheckBox.setDisable( true );
+			closeToTrayLabel.setDisable( true );
+			closeToTrayCheckBox.setSelected( false );
+			closeToTrayCheckBox.setDisable( true );
+			minToTrayLabel.setDisable( true );
+			minToTrayCheckBox.setSelected( false );
+			minToTrayCheckBox.setDisable( true );
 		}
 				
 		HBox systemTrayBox = new HBox();
 		systemTrayBox.setAlignment( Pos.TOP_CENTER );
-		systemTrayBox.getChildren().addAll( showSystemTrayCheckBox, showSystemTrayLabel, toTrayCheckBox, toTrayLabel );
+		systemTrayBox.getChildren().addAll( showSystemTrayCheckBox, showSystemTrayLabel, 
+			minToTrayCheckBox, minToTrayLabel, closeToTrayCheckBox, closeToTrayLabel );
 		
 		settingsPane.getChildren().addAll( shuffleGrid, themeBox, warnBox, updateInUIBox, systemTrayBox );
 		

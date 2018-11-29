@@ -161,6 +161,7 @@ public class FXUI implements PlayerListener {
 	private SimpleBooleanProperty promptBeforeOverwrite = new SimpleBooleanProperty ( true );
 	private SimpleBooleanProperty showSystemTray = new SimpleBooleanProperty ( false );
 	private SimpleBooleanProperty closeToSystemTray = new SimpleBooleanProperty ( false );
+	private SimpleBooleanProperty minimizeToSystemTray = new SimpleBooleanProperty ( false );
 	private SimpleBooleanProperty showINotifyPopup = new SimpleBooleanProperty ( true );
 	
 	private SimpleBooleanProperty showUpdateAvailableInUI = new SimpleBooleanProperty ( true ); 
@@ -446,6 +447,20 @@ public class FXUI implements PlayerListener {
 			}
 		});
 		
+		mainStage.iconifiedProperty().addListener( ( obs, oldValue, newValue ) -> {
+			if ( newValue  && trayIcon.isSupported() && minimizeToSystemTray.get() ) {
+				hideMainWindow();
+			}
+		});
+		
+		mainStage.setOnCloseRequest( (WindowEvent t) -> {
+			if ( closeToSystemTray.get() && trayIcon.isSupported() ) {
+				hideMainWindow();
+			} else {
+				Hypnos.exit( ExitCode.NORMAL );
+			}
+		});
+		
 		audioSystem.addPlayerListener ( this );
 	}
 	
@@ -655,6 +670,7 @@ public class FXUI implements PlayerListener {
 	
 	public void restoreWindow() {
 		if ( !mainStage.isShowing() ) {
+			mainStage.setIconified( false );
 			mainStage.show();
 			currentListSplitPane.setDividerPosition( 0, currentListSplitPanePosition );
 		}
@@ -731,6 +747,10 @@ public class FXUI implements PlayerListener {
 	
 	public BooleanProperty closeToSystemTrayProperty ( ) {
 		return closeToSystemTray;
+	}
+	
+	public BooleanProperty minimizeToSystemTrayProperty ( ) {
+		return minimizeToSystemTray;
 	}
 	
 	public BooleanProperty showSystemTrayProperty ( ) {
@@ -1240,6 +1260,7 @@ public class FXUI implements PlayerListener {
 		retMe.put ( Setting.PROMPT_BEFORE_OVERWRITE, promptBeforeOverwrite.getValue() );
 		retMe.put ( Setting.SHOW_SYSTEM_TRAY_ICON, showSystemTray.getValue() );
 		retMe.put ( Setting.CLOSE_TO_SYSTEM_TRAY, closeToSystemTray.getValue() );
+		retMe.put ( Setting.MINIMIZE_TO_SYSTEM_TRAY, minimizeToSystemTray.getValue() );
 		retMe.put ( Setting.SHOW_INOTIFY_ERROR_POPUP, showINotifyPopup.getValue() );
 		retMe.put ( Setting.SHOW_UPDATE_AVAILABLE_IN_MAIN_WINDOW, showUpdateAvailableInUI.getValue() );
 		retMe.put ( Setting.THEME, theme );
@@ -1368,6 +1389,11 @@ public class FXUI implements PlayerListener {
 						
 					case CLOSE_TO_SYSTEM_TRAY: 
 						closeToSystemTray.setValue( Boolean.valueOf( value ) );
+						settings.remove ( setting );
+						break;
+						
+					case MINIMIZE_TO_SYSTEM_TRAY: 
+						minimizeToSystemTray.setValue( Boolean.valueOf( value ) );
 						settings.remove ( setting );
 						break;
 						
