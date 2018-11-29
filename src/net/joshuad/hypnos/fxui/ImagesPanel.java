@@ -39,6 +39,7 @@ import javafx.stage.FileChooser;
 import net.joshuad.hypnos.Album;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.Hypnos;
+import net.joshuad.hypnos.HypnosURLS;
 import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.Track.ArtistTagImagePriority;
@@ -95,12 +96,13 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 		ContextMenu menu = new ContextMenu();
 		
 		MenuItem setImage = new MenuItem ( "Set Album Image" );
-		MenuItem exportImage = new MenuItem ( "Export Image" );
+		MenuItem exportImage = new MenuItem ( "Export Album Image" );
+		MenuItem searchForAlbumImage = new MenuItem ( "Search for Album Image" );
 
 		Label dragAndDropLabel = new Label ( "Drop Album Image Here" );
 		dragAndDropLabel.getStyleClass().add( "dragAndDropLabel" );
 		
-		menu.getItems().addAll( setImage, exportImage );
+		menu.getItems().addAll( setImage, exportImage, searchForAlbumImage );
 
 		setImage.setOnAction( ( ActionEvent event ) -> {
 				
@@ -120,6 +122,23 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 			track.setAndSaveAlbumImage ( targetFile.toPath(), audioSystem );
 
 			setImages ( currentImagesTrack ); //We set it to current because it might've changed since we assigned Track track. 
+		});
+		
+		searchForAlbumImage.setOnAction( ( ActionEvent event ) -> {
+			String artist = null;
+			String album = null;
+			if ( currentImagesTrack != null ) {
+				artist = currentImagesTrack.getArtist();
+				album = currentImagesTrack.getAlbumTitle();
+			} else if ( currentImagesAlbum != null ) {
+				artist = currentImagesAlbum.getAlbumArtist();
+				album = currentImagesTrack.getAlbumTitle();
+			}
+			if ( artist != null && album != null ) {
+				artist = artist.replaceAll( "&", "and" );
+				album = album.replaceAll( "&", "and" );
+				ui.openWebBrowser( HypnosURLS.DDG_IMAGE_SEARCH + artist + "+" + album );
+			}
 		});
 			
 		exportImage.setOnAction( ( ActionEvent event ) -> {
@@ -164,6 +183,7 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 			boolean disableMenus = ( currentImagesTrack == null );
 			setImage.setDisable( disableMenus );
 			exportImage.setDisable( disableMenus );
+			searchForAlbumImage.setDisable( disableMenus );
 			
 			menu.show( albumImagePane, e.getScreenX(), e.getScreenY() );
 		});
@@ -294,8 +314,10 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 		MenuItem setAlbumArtistImage = new MenuItem ( "Set Artist Image for this Album" );
 		MenuItem setTrackArtistImage = new MenuItem ( "Set Artist Image for this Track" );
 		MenuItem exportImage = new MenuItem ( "Export Image" );
+		MenuItem searchForArtistImage = new MenuItem ( "Search for Artist Image" );
 		
-		menu.getItems().addAll( setArtistImage, setAlbumArtistImage, setTrackArtistImage, exportImage );
+		menu.getItems().addAll( setArtistImage, setAlbumArtistImage, setTrackArtistImage,
+			exportImage, searchForArtistImage );
 		
 		artistImagePane = new BorderPane();	
 		artistImagePane.setMinWidth( 0 );
@@ -303,6 +325,23 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 		artistImagePane.getStyleClass().add( "artpane" );
 		Label dragAndDropLabel = new Label ( "Drop Artist Image Here" );
 		dragAndDropLabel.getStyleClass().add( "dragAndDropLabel" );
+		
+		searchForArtistImage.setOnAction( ( ActionEvent event ) -> {
+			String artist = null;
+			String year = null;
+			if ( currentImagesTrack != null ) {
+				artist = currentImagesTrack.getArtist();
+				year = currentImagesTrack.getYear();
+			} else if ( currentImagesAlbum != null ) {
+				artist = currentImagesAlbum.getAlbumArtist();
+				year = currentImagesTrack.getYear();
+			}
+			if ( artist != null && year != null ) {
+				artist = artist.replaceAll( "&", "and" );
+				year = year.replaceAll( "&", "and" );
+				ui.openWebBrowser( HypnosURLS.DDG_IMAGE_SEARCH + artist + "+" + year );
+			}
+		});
 		
 		artistImagePane.setOnContextMenuRequested( ( ContextMenuEvent e ) -> {
 			boolean disableAllMenus = false;
@@ -321,9 +360,11 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 			}
 			
 			setTrackArtistImage.setDisable( disableAllMenus );
+			searchForArtistImage.setDisable ( disableAllMenus );
 			setAlbumArtistImage.setDisable( disableAllMenus || disableAlbum );
 			setArtistImage.setDisable( disableAllMenus || disableArtist );
 			exportImage.setDisable( disableAllMenus );
+			
 			
 			menu.show( artistImagePane, e.getScreenX(), e.getScreenY() );
 		});

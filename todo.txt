@@ -22,8 +22,6 @@ https://stackoverflow.com/questions/51851572/java-fx-button-is-staying-pressed-a
 
 Drag and Drop to Playlist Info update current list if it is that playlist unchanged
 
-Add "search for album art" and "search for artist art" as context menu options in art pane 
-
 Add a button to clear the current list filter box
 
 change the file location on track info window to be like album info window
