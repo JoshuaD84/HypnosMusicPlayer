@@ -66,7 +66,7 @@ public class LibraryArtistTab extends Tab {
 	
 	private BorderPane content;
 	private HBox filterPane;
-	private TextField filterBox;
+	TextField filterBox;
 	
 	TableView<Artist> artistTable;	
 	TableColumn<Artist, String> nameColumn;

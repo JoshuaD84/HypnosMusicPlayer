@@ -303,6 +303,13 @@ public class FXUI implements PlayerListener {
 				libraryPane.getSelectionModel().select( 2 );
 				Platform.runLater( () -> libraryPane.focusFilterOfCurrentTab() );
 				
+			} else if ( e.getCode() == KeyCode.DIGIT4 /* With or without control */
+			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
+				e.consume();
+				setLibraryCollapsed( false );
+				libraryPane.getSelectionModel().select( 3 );
+				Platform.runLater( () -> libraryPane.focusFilterOfCurrentTab() );
+					
 			} else if ( e.getCode() == KeyCode.F
 			&& !e.isControlDown() && !e.isShiftDown() && !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();

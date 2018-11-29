@@ -1942,7 +1942,12 @@ public class LibraryTabPane extends StretchedTabPane {
 	}
 
 	public void focusFilterOfCurrentTab () {
-		if( getSelectionModel().getSelectedItem() == albumTab ) {
+		if( getSelectionModel().getSelectedItem() == artistTab ) {
+			artistTab.artistTable.requestFocus();
+			artistTab.filterBox.requestFocus();
+			artistTab.artistTable.getSelectionModel().clearSelection();
+			
+		} else if( getSelectionModel().getSelectedItem() == albumTab ) {
 			albumTable.requestFocus();
 			albumFilterBox.requestFocus();
 			albumTable.getSelectionModel().clearSelection();

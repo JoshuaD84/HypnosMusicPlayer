@@ -1458,6 +1458,7 @@ public class SettingsWindow extends Stage {
 		"    Filter the First Tab in Library          1 or Ctrl + 1\n" +
 		"    Filter the Second Tab in Library         2 or Ctrl + 2\n" +
 		"    Filter the Third Tab in Library          3 or Ctrl + 3\n" +	
+		"    Filter the Fourth Tab in Library         4 or Ctrl + 4\n" +	
 		"    Filter whichever table has focus         Ctrl + F\n" +							
 		"\n" +
 		"Playlists, Albums, Tracks\n" +

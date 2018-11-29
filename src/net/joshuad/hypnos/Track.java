@@ -106,7 +106,6 @@ public class Track implements Serializable, AlbumInfoSource {
 
 	private int length = 0;
 	private File trackFile;
-	private boolean hasAlbum = false;
 	
 	File albumDirectory = null;
 	
@@ -139,7 +138,6 @@ public class Track implements Serializable, AlbumInfoSource {
 	public Track ( Track track ) {
 		this.length = track.length;
 		this.trackFile = track.trackFile;
-		this.hasAlbum = track.hasAlbum;
 		this.albumDirectory = track.albumDirectory;
 		this.artist = track.artist;
 		this.title = track.title;
@@ -259,7 +257,10 @@ public class Track implements Serializable, AlbumInfoSource {
 		String fnTitle = "";
 		
 		try {
-			fnArtist = trackFile.toPath().getParent().getParent().getFileName().toString();
+			if ( hasAlbumDirectory() ) {
+				fnArtist = trackFile.toPath().getParent().getParent().getFileName().toString();
+			} 
+				
 		} catch ( Exception e ) { 
 			//No need to log this
 		}
@@ -269,7 +270,11 @@ public class Track implements Serializable, AlbumInfoSource {
 			String[] parentParts = parentName.split( " - " );
 			
 			if ( parentParts.length == 1 ) {
-				fnAlbum = parentParts [ 0 ];
+				if ( hasAlbumDirectory() ) {
+					fnAlbum = parentParts [ 0 ];
+				} else {
+					fnArtist = parentParts [ 0 ];
+				}
 				
 			} else if ( parentParts.length == 2 ) { 
 				if ( parentParts [ 0 ].matches( "^[0-9]{4}[a-zA-Z]{0,1}" ) ) {
