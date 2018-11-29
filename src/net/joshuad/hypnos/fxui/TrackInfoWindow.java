@@ -5,15 +5,22 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.logging.Logger;
 
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -28,6 +35,9 @@ public class TrackInfoWindow extends Stage {
 	private Track track = null;
 	
 	private TableView <TrackFieldPair> table;
+
+	Button browseButton;
+	TextField locationField;
 	
 	public TrackInfoWindow ( FXUI ui ) {
 		super();
@@ -46,12 +56,35 @@ public class TrackInfoWindow extends Stage {
 			LOGGER.warning( "Unable to load program icon: resources/icon.png" );
 		}
 		
-		Pane root = new Pane();
+		BorderPane root = new BorderPane();
 		Scene scene = new Scene( root );
 		
 		VBox primaryPane = new VBox();
 		primaryPane.prefWidthProperty().bind( root.widthProperty() );
 		primaryPane.prefHeightProperty().bind( root.heightProperty() );
+		
+		Label label = new Label ( "Location: " );
+		label.setAlignment( Pos.CENTER_RIGHT );
+		
+		locationField = new TextField();
+		locationField.setEditable( false );
+		locationField.setMaxWidth( Double.MAX_VALUE );
+		
+		HBox.setHgrow( locationField, Priority.ALWAYS );
+		browseButton = new Button( "Browse" );
+		browseButton.setOnAction( new EventHandler <ActionEvent>() {
+			@Override
+			public void handle ( ActionEvent event ) {
+				if ( track != null ) {
+					ui.openFileBrowser( track.getPath() );
+				}
+			}
+		});
+		
+		HBox locationBox = new HBox();
+		locationBox.getChildren().addAll( label, locationField, browseButton );
+		label.prefHeightProperty().bind( locationBox.heightProperty() );
+		locationBox.prefWidthProperty().bind( primaryPane.widthProperty() );
 		
 		table = new TableView <> ();
 		table.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
@@ -78,7 +111,8 @@ public class TrackInfoWindow extends Stage {
 		
 		primaryPane.getChildren().add( table );
 		
-		root.getChildren().add( primaryPane );
+		root.setTop ( locationBox );
+		root.setCenter ( primaryPane );
 		setScene( scene );
 		
 		scene.addEventFilter( KeyEvent.KEY_PRESSED, new EventHandler <KeyEvent>() {
@@ -99,6 +133,8 @@ public class TrackInfoWindow extends Stage {
 		table.getItems().clear();
 		
 		if ( track == null ) return;
+		
+		locationField.setText( track.getPath().toString() );
 
 		table.getItems().add ( new TrackFieldPair ( "Title", track.getTitle() ) );
 		table.getItems().add ( new TrackFieldPair ( "Artist", track.getArtist() ) );
@@ -106,7 +142,6 @@ public class TrackInfoWindow extends Stage {
 		table.getItems().add ( new TrackFieldPair ( "Year", track.getYear() ) );
 		table.getItems().add ( new TrackFieldPair ( "Length", track.getLengthDisplay() ) );
 		table.getItems().add ( new TrackFieldPair ( "File Name", track.getPath().getFileName().toString() ) );
-		table.getItems().add ( new TrackFieldPair ( "File Location", track.getPath().getParent().toString() ) );
 		table.getItems().add ( new TrackFieldPair ( "Encoding", track.getShortEncodingString() ) );
 	}
 }

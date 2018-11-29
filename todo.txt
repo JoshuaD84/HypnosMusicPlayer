@@ -1,7 +1,5 @@
 Linux: Media Buttons
 
-There's a significant delay after close is hit until hypnos window closes
-
 Linux: Dynamic menu titles in system tray
 
 Libre FM support https://libre.fm/ 
@@ -12,12 +10,6 @@ Windows: Pinning Issues
 https://stackoverflow.com/questions/858766/generate-manifest-class-path-from-classpath-in-ant
 	
 Show in tag edit window when a file doesn't support a particular tag type	
-   
-https://stackoverflow.com/questions/51851572/java-fx-button-is-staying-pressed-after-drag-event
-
-Drag and Drop to Playlist Info update current list if it is that playlist unchanged
-
-change the file location on track info window to be like album info window
 
 ::::::::::::::
 
@@ -41,6 +33,12 @@ Features that need System-by-System attention
 ::::::::::::::
 
 Future
+   Drag and Drop to Playlist Info update current list if it is that playlist unchanged
+
+   https://stackoverflow.com/questions/51851572/java-fx-button-is-staying-pressed-after-drag-event
+
+   There's a significant delay after close is hit until hypnos window closes
+
    Allow reordering of library tabs
 
    Sometimes the art pane can become non-responsive. I dragged and dropped an image from google and it stopped changing
