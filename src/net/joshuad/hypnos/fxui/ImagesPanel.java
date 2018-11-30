@@ -213,6 +213,9 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 		});
 		
 		albumImagePane.setOnDragDropped( event -> {
+
+			event.setDropCompleted( true );
+			event.consume();
 			
 			Track track = currentImagesTrack;
 			
@@ -222,8 +225,6 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 			
 			if ( db.hasFiles() ) {
 				List <File> files = db.getFiles();
-				event.setDropCompleted( true );
-				event.consume();
 				
 				for ( File file : files ) {
 					if ( Utils.isImageFile( file ) ) {
@@ -261,8 +262,6 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 				setImages ( currentImagesTrack );
 			}
 			
-			event.setDropCompleted( true );
-			event.consume();
 		});
 	}
 	
@@ -567,7 +566,6 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 					ui.notifyUserError( message );
 				}
 			}
-			
 			event.setDropCompleted( true );
 			event.consume();		
 		});

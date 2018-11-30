@@ -28,6 +28,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -738,8 +739,25 @@ public class SettingsWindow extends Stage {
 		minToTrayCheckBox.setPadding( checkBoxInsets );
 		minToTrayCheckBox.selectedProperty().bindBidirectional( ui.minimizeToSystemTrayProperty() );
 		
-		ui.showSystemTrayProperty().addListener( ( ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue ) -> {
-			if ( newValue ) {
+		if ( ui.getTrayIcon().systemTraySupportedProperty().get() ) {
+			ui.showSystemTrayProperty().addListener( ( ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue ) -> {
+				if ( newValue ) {
+					closeToTrayLabel.setDisable( false );
+					closeToTrayCheckBox.setDisable( false );
+					minToTrayLabel.setDisable( false );
+					minToTrayCheckBox.setDisable( false );
+				} else {
+					closeToTrayLabel.setDisable( true );
+					closeToTrayCheckBox.setSelected( false );
+					closeToTrayCheckBox.setDisable( true );
+					minToTrayLabel.setDisable( true );
+					minToTrayCheckBox.setSelected( false );
+					minToTrayCheckBox.setDisable( true );
+				}
+			});
+			
+			
+			if ( ui.showSystemTrayProperty().get() ) {
 				closeToTrayLabel.setDisable( false );
 				closeToTrayCheckBox.setDisable( false );
 				minToTrayLabel.setDisable( false );
@@ -752,34 +770,26 @@ public class SettingsWindow extends Stage {
 				minToTrayCheckBox.setSelected( false );
 				minToTrayCheckBox.setDisable( true );
 			}
-		});
-		
-		if ( ui.showSystemTrayProperty().get() ) {
-			closeToTrayLabel.setDisable( false );
-			closeToTrayCheckBox.setDisable( false );
-			minToTrayLabel.setDisable( false );
-			minToTrayCheckBox.setDisable( false );
-		} else {
-			closeToTrayLabel.setDisable( true );
-			closeToTrayCheckBox.setSelected( false );
-			closeToTrayCheckBox.setDisable( true );
-			minToTrayLabel.setDisable( true );
-			minToTrayCheckBox.setSelected( false );
-			minToTrayCheckBox.setDisable( true );
 		}
 				
 		HBox systemTrayBox = new HBox();
 		systemTrayBox.setAlignment( Pos.TOP_CENTER );
 		systemTrayBox.getChildren().addAll( showSystemTrayCheckBox, showSystemTrayLabel, 
 			minToTrayCheckBox, minToTrayLabel, closeToTrayCheckBox, closeToTrayLabel );
+
+		//We create this container so we can disable systemTrayBox but still have a tooltip on it
+		HBox systemTrayBoxContainer = new HBox(); 
+		systemTrayBoxContainer.setAlignment( Pos.TOP_CENTER );
+		systemTrayBoxContainer.getChildren().add( systemTrayBox );
 		
-		settingsPane.getChildren().addAll( shuffleGrid, themeBox, warnBox, updateInUIBox, systemTrayBox );
+		settingsPane.getChildren().addAll( shuffleGrid, themeBox, warnBox, updateInUIBox, systemTrayBoxContainer );
 		
-		ui.getTrayIcon().systemTraySupportedProperty().addListener( ( observable, oldValue, newValue ) -> {
-			systemTrayBox.setVisible( newValue );
-		});
-		
-		systemTrayBox.setVisible( ui.getTrayIcon().systemTraySupportedProperty().get() );
+		if ( !ui.getTrayIcon().isSupported() ) {
+			systemTrayBox.setDisable( true );
+			Tooltip.install( systemTrayBoxContainer, new Tooltip ( 
+				"System Tray not supported for your desktop environment, sorry!" ) 
+			);
+		}
 		
 		return settingsTab;
 	}

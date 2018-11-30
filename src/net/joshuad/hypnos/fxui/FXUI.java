@@ -194,7 +194,7 @@ public class FXUI implements PlayerListener {
 		
 		trayIcon = new TrayIcon ( this, audioSystem );
 		
-		this.showSystemTray.addListener( ( ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue ) -> {
+		showSystemTray.addListener( ( ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue ) -> {
 			if ( newValue ) {
 				trayIcon.show();
 			} else {

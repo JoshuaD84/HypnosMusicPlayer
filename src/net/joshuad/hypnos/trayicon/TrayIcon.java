@@ -1,6 +1,5 @@
 package net.joshuad.hypnos.trayicon;
 
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,7 +22,7 @@ public class TrayIcon {
 				try {
 					nativeTrayIcon = new LinuxTrayIcon( ui, audioSystem );
 					nativeTrayIcon.hide();
-				} catch ( IOException e ) {
+				} catch ( Exception | UnsatisfiedLinkError e ) {
 					LOGGER.log( Level.INFO, "Unable to initialize linux tray icon.", e );
 					nativeTrayIcon = null;
 				}
@@ -68,6 +67,8 @@ public class TrayIcon {
 	}
 
 	public void prepareToExit() {
-		nativeTrayIcon.prepareToExit();
+		if ( nativeTrayIcon != null ) {
+			nativeTrayIcon.prepareToExit();
+		}
 	}
 }

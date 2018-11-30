@@ -1,8 +1,7 @@
 Linux: Media Buttons
+   https://stackoverflow.com/questions/53550397/javafx-keyevent-is-it-possible-to-get-more-info-for-undefined-events
 
 Linux: Dynamic menu titles in system tray
-
-Libre FM support https://libre.fm/ 
 
 Windows: Pinning Issues
 	https://stackoverflow.com/questions/53457524/jni-native-interface-and-javafx-noclassdeffounderror
@@ -11,19 +10,10 @@ https://stackoverflow.com/questions/858766/generate-manifest-class-path-from-cla
 	
 Show in tag edit window when a file doesn't support a particular tag type	
 
-try consuming drop events once we're in our function rather than at the end. It might make it feel better
-   after an image is dropped. the content wont' stick to the mouse for so long
-
 ::::::::::::::
 
-Features that need System-by-System attention
-
+Future
 	Mounted Audio CDs
-		Linux
-         Linux auto converts them to wavs, but I can't drag directly from the disc. Need to copy waves to local file
-         system
-
-		Windows - Does not work
 
 	System Integration
 		Windows
@@ -33,9 +23,8 @@ Features that need System-by-System attention
 				Send a file via command line when hypnos isn't playing -- it starts
 				Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on current list
 
-::::::::::::::
+   Libre FM support https://libre.fm/ 
 
-Future
    Drag and Drop to Playlist Info update current list if it is that playlist unchanged
 
    https://stackoverflow.com/questions/51851572/java-fx-button-is-staying-pressed-after-drag-event
