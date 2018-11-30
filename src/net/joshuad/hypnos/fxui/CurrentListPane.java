@@ -240,7 +240,11 @@ public class CurrentListPane extends BorderPane {
 		
 		showQueueButton.setOnAction ( new EventHandler <ActionEvent>() {
 			public void handle ( ActionEvent e ) {
-				ui.queueWindow.show();
+				if ( ui.queueWindow.isShowing() ) {
+					ui.queueWindow.hide();
+				} else {
+					ui.queueWindow.show();
+				}
 			}
 		});
 		

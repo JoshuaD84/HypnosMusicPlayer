@@ -373,7 +373,13 @@ public class Transport extends VBox {
 		showSettingsButton.setGraphic( settingsImage );
 		showSettingsButton.getStyleClass().add( "settingsButton" );
 		showSettingsButton.setTooltip( new Tooltip( "Configuration and Information" ) );
-		showSettingsButton.setOnAction ( e -> ui.settingsWindow.show() );
+		showSettingsButton.setOnAction ( e -> {
+			if ( ui.settingsWindow.isShowing() ) {
+				ui.settingsWindow.hide();
+			} else {
+				ui.settingsWindow.show();
+			}
+		} );
 		showSettingsButton.hoverProperty().addListener( ( obserable, oldValue, newValue ) -> {
 			applyHover ( settingsImage, newValue );
 		});

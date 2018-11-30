@@ -6,7 +6,7 @@ Windows: Pinning Issues
 
 https://stackoverflow.com/questions/858766/generate-manifest-class-path-from-classpath-in-ant
 
-If you click config button and window is showing, hide it
+Disable context menus if the row is empty. All the tables
 
 ::::::::::::::
 
