@@ -675,8 +675,10 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 		requestedAlbum = null;
 		currentImagesTrack = null;
 		currentImagesAlbum = null;
-		setAlbumImage ( null );
-		setArtistImage ( null );
+		Platform.runLater( () -> {
+			setAlbumImage ( null );
+			setArtistImage ( null );
+		});
 	}
 	
 	private void setImages ( Track track, Album album ) {

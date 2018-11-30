@@ -1,18 +1,19 @@
 Linux: Media Buttons
    https://stackoverflow.com/questions/53550397/javafx-keyevent-is-it-possible-to-get-more-info-for-undefined-events
 
-Linux: Dynamic menu titles in system tray
-
 Windows: Pinning Issues
 	https://stackoverflow.com/questions/53457524/jni-native-interface-and-javafx-noclassdeffounderror
 
 https://stackoverflow.com/questions/858766/generate-manifest-class-path-from-classpath-in-ant
-	
-Show in tag edit window when a file doesn't support a particular tag type	
+
+If you click config button and window is showing, hide it
 
 ::::::::::::::
 
 Future
+   Linux: Dynamic menu titles in system tray
+      This is kind of a pain because of the icons and because I'm bad at C
+
 	Mounted Audio CDs
 
 	System Integration
