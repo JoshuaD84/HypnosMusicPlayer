@@ -122,7 +122,7 @@ public class HistoryWindow extends Stage {
 			ui.audioSystem.getLastFM().scrobbleTrack( historyTable.getSelectionModel().getSelectedItem() );
 		});
 		
-		ContextMenu trackContextMenu = new ContextMenu();
+		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem appendMenuItem = new MenuItem( "Append" );
 		MenuItem playNextMenuItem = new MenuItem( "Play Next" );
@@ -134,7 +134,7 @@ public class HistoryWindow extends Stage {
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		MenuItem removeMenuItem = new MenuItem( "Remove from History" );
-		trackContextMenu.getItems().addAll( 
+		contextMenu.getItems().addAll( 
 			playMenuItem, appendMenuItem, playNextMenuItem, enqueueMenuItem,
 			editTagMenuItem, infoMenuItem, lyricsMenuItem, goToAlbumMenuItem, 
 			browseMenuItem, addToPlaylistMenuItem, lastFMMenu, removeMenuItem 
@@ -208,8 +208,15 @@ public class HistoryWindow extends Stage {
 		});
 		
 		historyTable.setRowFactory( tv -> {
-			TableRow <Track> row = new TableRow <>();
-			row.setContextMenu( trackContextMenu );
+			TableRow <Track> row = new TableRow <>();		
+			
+			row.itemProperty().addListener( (obs, oldValue, newValue ) -> {
+				if ( newValue != null ) {
+					row.setContextMenu( contextMenu );
+				} else {
+					row.setContextMenu( null );
+				}
+			});
 			
 			row.setOnContextMenuRequested( event -> { 
 				goToAlbumMenuItem.setDisable( row.getItem().getAlbumPath() == null );
@@ -232,7 +239,6 @@ public class HistoryWindow extends Stage {
 					cc.put( FXUI.DRAGGED_TRACKS, dragObject );
 					db.setContent( cc );
 					event.consume();
-
 				}
 			} );
 			

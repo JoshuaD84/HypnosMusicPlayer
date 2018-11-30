@@ -4,9 +4,10 @@ Linux: Media Buttons
 Windows: Pinning Issues
 	https://stackoverflow.com/questions/53457524/jni-native-interface-and-javafx-noclassdeffounderror
 
-https://stackoverflow.com/questions/858766/generate-manifest-class-path-from-classpath-in-ant
-
-Disable context menus if the row is empty. All the tables
+Maybe try to make the tab pane tabs on library full width and no spacing. Maybe replace with buttons
+   .tab-header-area {
+      -fx-padding: 0 0 0 0;
+   }
 
 ::::::::::::::
 
@@ -89,6 +90,8 @@ Future
 		https://stackoverflow.com/questions/7506329/embed-java-into-a-c-application
 		
 :::: Refactor / organize my code ::::
+
+   switch to a grundle build system
 
    separate album, track, and playlist tabs like we did for artistTab
 

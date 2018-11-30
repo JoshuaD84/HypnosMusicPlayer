@@ -1017,8 +1017,6 @@ public class CurrentListPane extends BorderPane {
 		currentListTable.setRowFactory( tv -> {
 			TableRow <CurrentListTrack> row = new TableRow <>();
 
-			row.setContextMenu( contextMenu );
-			
 			row.setOnContextMenuRequested( event -> { 
 				goToAlbumMenuItem.setDisable( row.getItem().getAlbumPath() == null );
 			});
@@ -1030,6 +1028,11 @@ public class CurrentListPane extends BorderPane {
 			});
 			
 			row.itemProperty().addListener( (obs, oldValue, newValue ) -> {
+				if ( newValue != null ) {
+					row.setContextMenu( contextMenu );
+				} else {
+					row.setContextMenu( null );
+				}
 				if ( newValue != null && row != null ) {
 			        if ( newValue.isMissingFile() ) {
 			            row.getStyleClass().add( "file-missing" );

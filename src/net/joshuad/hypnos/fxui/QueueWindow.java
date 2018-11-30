@@ -251,13 +251,14 @@ public class QueueWindow extends Stage {
 		
 		queueTable.setRowFactory( tv -> {
 			TableRow <Track> row = new TableRow <>();
-			row.setContextMenu( contextMenu );
 			
-			row.setOnMouseClicked( event -> {
-				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					audioSystem.playTrack( row.getItem(), false );
+			row.itemProperty().addListener( (obs, oldValue, newValue ) -> {
+				if ( newValue != null ) {
+					row.setContextMenu( contextMenu );
+				} else {
+					row.setContextMenu( null );
 				}
-			} );
+			});
 			
 			row.setOnContextMenuRequested( event -> { 
 				goToAlbumMenuItem.setDisable( row.getItem().getAlbumPath() == null );

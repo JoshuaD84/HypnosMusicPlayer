@@ -411,7 +411,13 @@ public class PlaylistInfoWindow extends Stage {
 		trackTable.setRowFactory( tv -> {
 			TableRow <Track> row = new TableRow <>();
 
-			row.setContextMenu( contextMenu );
+			row.itemProperty().addListener( (obs, oldValue, newValue ) -> {
+				if ( newValue != null ) {
+					row.setContextMenu( contextMenu );
+				} else {
+					row.setContextMenu( null );
+				}
+			});
 			
 			row.setOnContextMenuRequested( event -> { 
 				goToAlbumMenuItem.setDisable( row.getItem().getAlbumPath() == null );

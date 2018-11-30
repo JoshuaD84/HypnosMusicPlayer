@@ -948,7 +948,7 @@ public class SettingsWindow extends Stage {
 			ui.audioSystem.getLastFM().scrobbleTrack( tagTable.getSelectionModel().getSelectedItem().getTrack() );
 		});
 		
-		ContextMenu trackContextMenu = new ContextMenu();
+		ContextMenu contextMenu = new ContextMenu();
 		MenuItem playMenuItem = new MenuItem( "Play" );
 		MenuItem playNextMenuItem = new MenuItem( "Play Next" );
 		MenuItem appendMenuItem = new MenuItem( "Append" );
@@ -959,7 +959,7 @@ public class SettingsWindow extends Stage {
 		MenuItem goToAlbumMenuItem = new MenuItem( "Go to Album" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
-		trackContextMenu.getItems().addAll( 
+		contextMenu.getItems().addAll( 
 				playMenuItem, playNextMenuItem, appendMenuItem, enqueueMenuItem, 
 				editTagMenuItem, infoMenuItem, lyricsMenuItem, goToAlbumMenuItem, 
 				browseMenuItem, addToPlaylistMenuItem, lastFMMenu );
@@ -1169,7 +1169,13 @@ public class SettingsWindow extends Stage {
 		tagTable.setRowFactory( tv -> {
 			TableRow <TagError> row = new TableRow <>();
 
-			row.setContextMenu( trackContextMenu );
+			row.itemProperty().addListener( (obs, oldValue, newValue ) -> {
+				if ( newValue != null ) {
+					row.setContextMenu( contextMenu );
+				} else {
+					row.setContextMenu( null );
+				}
+			});
 			
 			row.setOnContextMenuRequested( event -> { 
 				goToAlbumMenuItem.setDisable( row.getItem().getTrack().getAlbumPath() == null );

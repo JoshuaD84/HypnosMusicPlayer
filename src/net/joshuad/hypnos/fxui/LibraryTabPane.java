@@ -974,7 +974,13 @@ public class LibraryTabPane extends StretchedTabPane {
 		albumTable.setRowFactory( tv -> {
 			TableRow <Album> row = new TableRow <>();
 			
-			row.setContextMenu( contextMenu );
+			row.itemProperty().addListener( (obs, oldValue, newValue ) -> {
+				if ( newValue != null ) {
+					row.setContextMenu( contextMenu );
+				} else {
+					row.setContextMenu( null );
+				}
+			});
 
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
@@ -1387,7 +1393,13 @@ public class LibraryTabPane extends StretchedTabPane {
 
 			TableRow <Track> row = new TableRow <>();
 			
-			row.setContextMenu( trackContextMenu );
+			row.itemProperty().addListener( (obs, oldValue, newValue ) -> {
+				if ( newValue != null ) {
+					row.setContextMenu( trackContextMenu );
+				} else {
+					row.setContextMenu( null );
+				}
+			});
 			
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
@@ -1759,7 +1771,13 @@ public class LibraryTabPane extends StretchedTabPane {
 		playlistTable.setRowFactory( tv -> {
 			TableRow <Playlist> row = new TableRow <>();
 			
-			row.setContextMenu ( contextMenu );
+			row.itemProperty().addListener( (obs, oldValue, newValue ) -> {
+				if ( newValue != null ) {
+					row.setContextMenu( contextMenu );
+				} else {
+					row.setContextMenu( null );
+				}
+			});
 
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && !row.isEmpty() ) {

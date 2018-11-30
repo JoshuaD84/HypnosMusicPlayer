@@ -342,7 +342,13 @@ public class AlbumInfoWindow extends Stage {
 		trackTable.setRowFactory( tv -> {
 			TableRow <Track> row = new TableRow <>();
 
-			row.setContextMenu( contextMenu );
+			row.itemProperty().addListener( (obs, oldValue, newValue ) -> {
+				if ( newValue != null ) {
+					row.setContextMenu( contextMenu );
+				} else {
+					row.setContextMenu( null );
+				}
+			});
 
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
