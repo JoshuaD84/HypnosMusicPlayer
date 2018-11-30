@@ -11,6 +11,9 @@ https://stackoverflow.com/questions/858766/generate-manifest-class-path-from-cla
 	
 Show in tag edit window when a file doesn't support a particular tag type	
 
+try consuming drop events once we're in our function rather than at the end. It might make it feel better
+   after an image is dropped. the content wont' stick to the mouse for so long
+
 ::::::::::::::
 
 Features that need System-by-System attention
