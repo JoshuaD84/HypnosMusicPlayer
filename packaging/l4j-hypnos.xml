@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
-  <headerType>gui</headerType>
+  <headerType>console</headerType>
   <chdir>.</chdir>
   <priority>normal</priority>
   <stayAlive>false</stayAlive>
@@ -11,14 +11,14 @@
     <bundledJre64Bit>true</bundledJre64Bit>
     <jdkPreference>preferJre</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
-    <opt>-Djava.library.path=&quot;lib&quot;;&quot;lib/win/jintellitype&quot;</opt>	
+    <opt>-Djava.library.path=lib;lib/win/jintellitype;lib/win/swt</opt>	
 	<opt>-Xmx600m</opt>
 	<opt>-XX:+UseG1GC</opt>
 	<opt>-XX:+UseStringDeduplication</opt>
 	<opt>-XX:GCTimeRatio=19</opt>
 	<opt>-XX:MinHeapFreeRatio=20</opt>
 	<opt>-XX:MaxHeapFreeRatio=30</opt>
-	<opt>--module-path ./jre/jfx</opt>
+	<opt>--module-path ./jre/jfx/lib</opt>
 	<opt>--add-modules=javafx.controls,javafx.swing</opt>
 	<opt>--add-opens javafx.controls/javafx.scene.control=ALL-UNNAMED</opt>
 	<opt>-Djdk.gtk.version=2</opt>

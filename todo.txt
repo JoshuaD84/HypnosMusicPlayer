@@ -17,15 +17,12 @@ Future
 
 	Mounted Audio CDs
 
-	System Integration
-		Windows
+	Windows	System Integration
 			Select Multiple Files in explorer - No Option to play in Hypnos. Add that
 			"Open with" causes the current track button to not show the current track's name.
 			Commandline Interface
 				Send a file via command line when hypnos isn't playing -- it starts
 				Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on current list
-
-   Libre FM support https://libre.fm/ 
 
    Drag and Drop to Playlist Info update current list if it is that playlist unchanged
 
