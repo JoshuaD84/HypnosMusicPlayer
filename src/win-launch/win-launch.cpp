@@ -80,10 +80,11 @@ int main ( int argc, char** argv ) {
    
    if (main != NULL) {
       jclass classString = env->FindClass("java/lang/String");
-      jobjectArray argsToJava = env->NewObjectArray( argc, classString, NULL );
-		for ( int i = 0; i < argc; i++ ) {
+      jobjectArray argsToJava = env->NewObjectArray( argc-1, classString, NULL );
+		for ( int i = 1; i < argc; i++ ) {
+			printf ( "Converting: %s",  argv[i] );
 			jstring arg = env->NewStringUTF( argv[i] ); 
-			env->SetObjectArrayElement( argsToJava, 0, arg );
+			env->SetObjectArrayElement( argsToJava, i-1, arg );
 		}
 						
       env->CallStaticVoidMethod( cls, main, argsToJava );
