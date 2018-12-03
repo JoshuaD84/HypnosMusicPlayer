@@ -36,7 +36,7 @@
 	</target>
 
 	<target name="compile" depends="init" description="compile the source">
-		<javac fork="yes" target="11" source ="11" includeantruntime="false" srcdir="." destdir="${build}">
+		<javac fork="yes" target="11" source ="11" includeantruntime="false" srcdir="." destdir="${build}" encoding="utf-8">
 			<classpath refid="class.path" />
 			<classpath>
 				<fileset dir="${packaging}/jres/linux-64bit/jfx/">
@@ -120,13 +120,6 @@
 			<delete dir="${temp}" />
 		</sequential>
 	</target>
-
-	<property name="launch4j.dir" location="/home/joshua/.local/opt/launch4j" />
-	<taskdef 
-		name="launch4j" 
-		classname="net.sf.launch4j.ant.Launch4jTask" 
-		classpath="${launch4j.dir}/launch4j.jar:${launch4j.dir}/lib/xstream.jar"  
-	/>
 			
 	<target name="dist-win" depends="jar" description="Make an installer for windows.">
 		

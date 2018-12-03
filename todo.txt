@@ -1,8 +1,6 @@
 Linux: Media Buttons
    https://stackoverflow.com/questions/53550397/javafx-keyevent-is-it-possible-to-get-more-info-for-undefined-events
 
-Windows - Did it get sluggish?  Not in IDE but maybe on drive? test
-
 Maybe try to make the tab pane tabs on library full width and no spacing. Maybe replace with buttons
    .tab-header-area {
       -fx-padding: 0 0 0 0;
