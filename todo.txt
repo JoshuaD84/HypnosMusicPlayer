@@ -15,8 +15,6 @@ Windows: Artist tab column widths don't resize right when you change the window 
 
 Windows: bring to front on new launch doesn't work
 
-Windows Launcher: move hypnos.jar to lib
-
 Track table -> reset to default view. Make it better. 
 
 Drag and drop to art pane -- should work, doesn't. rmove ?w=1200 and it does
@@ -25,6 +23,9 @@ https://consequenceofsound.files.wordpress.com/2014/06/andrew-bird-things-are-gr
 ::::::::::::::
 
 Future
+   Windows Launcher: move hypnos.jar to lib
+      This apparently messes w/ the root directory for java. Let's do this next release
+
    Linux: Dynamic menu titles in system tray
       This is kind of a pain because of the icons and because I'm bad at C
 
