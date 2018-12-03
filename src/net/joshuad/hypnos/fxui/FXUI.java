@@ -450,6 +450,8 @@ public class FXUI implements PlayerListener {
 		mainStage.iconifiedProperty().addListener( ( obs, oldValue, newValue ) -> {
 			if ( newValue  && trayIcon.isSupported() && minimizeToSystemTray.get() ) {
 				hideMainWindow();
+			}else if ( !newValue  && trayIcon.isSupported() && minimizeToSystemTray.get() ) {
+				showMainWindow();
 			}
 		});
 		
