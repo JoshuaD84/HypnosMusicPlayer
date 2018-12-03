@@ -13,7 +13,7 @@ import net.joshuad.hypnos.lyrics.Lyrics;
 import net.joshuad.hypnos.lyrics.LyricsFetcher;
 
 public class MetroScraper extends AbstractScraper {
-
+	@SuppressWarnings("unused")
 	private static transient final Logger LOGGER = Logger.getLogger( MetroScraper.class.getName() );
 	
 	public MetroScraper() {

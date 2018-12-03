@@ -603,8 +603,6 @@ public class CurrentList {
 	public void setAlbums ( List<Album> albums, boolean clearQueue ) {
 		List <Track> addMe = new ArrayList <Track> ();
 		
-		int albumsAdded = 0;
-		
 		List <Album> missing = new ArrayList <Album> ();
 		
 		for ( Album album : albums ) {
@@ -616,7 +614,6 @@ public class CurrentList {
 				
 			} else {
 				addMe.addAll ( album.getTracks() );
-				albumsAdded++;
 			}
 		}
 		

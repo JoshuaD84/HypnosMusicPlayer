@@ -1,8 +1,9 @@
 Linux: Media Buttons
    https://stackoverflow.com/questions/53550397/javafx-keyevent-is-it-possible-to-get-more-info-for-undefined-events
 
-Windows: Pinning Issues
-	https://stackoverflow.com/questions/53457524/jni-native-interface-and-javafx-noclassdeffounderror
+Windows - Did it get sluggish?  Not in IDE but maybe on drive? test
+
+Windows - Bring to front doesn't work right with minimize and system tray
 
 Maybe try to make the tab pane tabs on library full width and no spacing. Maybe replace with buttons
    .tab-header-area {

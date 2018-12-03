@@ -31,8 +31,6 @@ public class InfoFilterHybrid extends BorderPane {
 	private HBox filterBox;
 	private Button clearButton;
 	
-	private TableView <?> table;
-	
 	private boolean hasHover = false;
 	private boolean editing = false;
 	private boolean hasFocus = false;
@@ -42,8 +40,6 @@ public class InfoFilterHybrid extends BorderPane {
 	private boolean registeredSceneFilter = false;
 	
 	private ImageView filterClearImage;
-	
-	private FXUI ui;
 	
 	//Used for the text box and for the associated filtered tableview
 	private EventHandler <? super KeyEvent> textBoxKeyFilter = ( KeyEvent e ) -> { 
@@ -67,8 +63,6 @@ public class InfoFilterHybrid extends BorderPane {
 	
 	public InfoFilterHybrid( FXUI ui ) {
 		super();
-		
-		this.ui = ui;
 		
 		info = new Label ( );
 		filter = new TextField ();
@@ -215,10 +209,6 @@ public class InfoFilterHybrid extends BorderPane {
 		if ( table != null ) {
 			table.removeEventFilter( KeyEvent.KEY_PRESSED, tableKeyFilter );
 		}
-
-		this.table = table;
-		
 		table.addEventFilter( KeyEvent.KEY_PRESSED, tableKeyFilter );
 	}
-
 }

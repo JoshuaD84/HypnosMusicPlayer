@@ -26,7 +26,6 @@ public class WindowsTrayIcon extends NativeTrayIcon implements PlayerListener {
 	private static final Logger LOGGER = Logger.getLogger( WindowsTrayIcon.class.getName() );
 	
 	private FXUI ui;
-	private AudioSystem audioSystem;
 	
 	private Display swtDisplay; 
 	private TrayItem trayIcon;
@@ -49,7 +48,6 @@ public class WindowsTrayIcon extends NativeTrayIcon implements PlayerListener {
 	
 	public WindowsTrayIcon ( FXUI ui, AudioSystem audioSystem ) {
 		this.ui = ui;
-		this.audioSystem = audioSystem;
 		
 		Thread t = new Thread (() -> {
 			swtDisplay = new Display();

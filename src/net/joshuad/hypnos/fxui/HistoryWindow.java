@@ -48,17 +48,11 @@ public class HistoryWindow extends Stage {
 
 	private static final Logger LOGGER = Logger.getLogger( HistoryWindow.class.getName() );
 	
-	private FXUI ui;
-	private AudioSystem audioSystem;
-	private Library library;
 
 	private TableView <Track> historyTable;
 	
 	public HistoryWindow ( FXUI ui, Library library, AudioSystem audioSystem ) {
 		super();
-		this.ui = ui;
-		this.audioSystem = audioSystem;
-		this.library = library;
 		
 		initModality( Modality.NONE );
 		initOwner( ui.getMainStage() );
@@ -111,15 +105,15 @@ public class HistoryWindow extends Stage {
 		lastFMMenu.visibleProperty().bind( ui.showLastFMWidgets );
 		
 		loveMenuItem.setOnAction( ( event ) -> {
-			ui.audioSystem.getLastFM().loveTrack( historyTable.getSelectionModel().getSelectedItem() );
+			audioSystem.getLastFM().loveTrack( historyTable.getSelectionModel().getSelectedItem() );
 		});
 		
 		unloveMenuItem.setOnAction( ( event ) -> {
-			ui.audioSystem.getLastFM().unloveTrack( historyTable.getSelectionModel().getSelectedItem() );
+			audioSystem.getLastFM().unloveTrack( historyTable.getSelectionModel().getSelectedItem() );
 		});
 		
 		scrobbleMenuItem.setOnAction( ( event ) -> {
-			ui.audioSystem.getLastFM().scrobbleTrack( historyTable.getSelectionModel().getSelectedItem() );
+			audioSystem.getLastFM().scrobbleTrack( historyTable.getSelectionModel().getSelectedItem() );
 		});
 		
 		ContextMenu contextMenu = new ContextMenu();

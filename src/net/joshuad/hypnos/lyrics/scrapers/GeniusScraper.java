@@ -14,6 +14,7 @@ import net.joshuad.hypnos.lyrics.Lyrics;
 import net.joshuad.hypnos.lyrics.LyricsFetcher;
 
 public class GeniusScraper extends AbstractScraper {
+	@SuppressWarnings("unused")
 	private static transient final Logger LOGGER = Logger.getLogger( GeniusScraper.class.getName() );
 	
 	public GeniusScraper() {

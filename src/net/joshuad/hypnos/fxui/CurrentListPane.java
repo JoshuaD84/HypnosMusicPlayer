@@ -275,15 +275,6 @@ public class CurrentListPane extends BorderPane {
 			}
 		});
 
-		EventHandler<ActionEvent> savePlaylistHandler = new EventHandler <ActionEvent>() {
-			@Override
-			public void handle ( ActionEvent event ) {
-				String playlistName = ((Playlist) ((MenuItem) event.getSource()).getUserData()).getName();
-				Playlist playlist = new Playlist( playlistName, new ArrayList <Track>( audioSystem.getCurrentList().getItems() ) );
-				library.addPlaylist( playlist );
-			}
-		};
-
 		currentListControls = new HBox();
 		currentListControls.setAlignment( Pos.CENTER_RIGHT );
 		currentListControls.setId( "currentListControls" );
@@ -986,7 +977,6 @@ public class CurrentListPane extends BorderPane {
 			public void handle ( ActionEvent event ) {
 				ObservableList <Integer> selectedIndexes = currentListTable.getSelectionModel().getSelectedIndices();
 				List <Integer> removeMe = new ArrayList<> ( selectedIndexes );
-				int selectAfterDelete = selectedIndexes.get( 0 ) - 1;
 				currentListTable.getSelectionModel().clearSelection();
 				ui.removeFromCurrentList ( removeMe );
 			}

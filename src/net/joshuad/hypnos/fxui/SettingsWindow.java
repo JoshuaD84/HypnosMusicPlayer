@@ -811,6 +811,7 @@ public class SettingsWindow extends Stage {
 		TextArea logView = new TextArea();
 		logView.setEditable( false );
 		logView.prefHeightProperty().bind( root.heightProperty() );
+		logView.getStyleClass().add( "monospaced" );
 		logView.setWrapText( true );
 		
 		Thread logReader = new Thread( () -> {
@@ -1297,6 +1298,7 @@ public class SettingsWindow extends Stage {
 		logView.setWrapText( true );
 		logView.prefHeightProperty().bind( root.heightProperty() );
 		logView.prefWidthProperty().bind( root.widthProperty() );
+		logView.getStyleClass().add( "monospaced" );
 		
 		Timeline lastFMUpdater = new Timeline();
 		lastFMUpdater.setCycleCount( Timeline.INDEFINITE );

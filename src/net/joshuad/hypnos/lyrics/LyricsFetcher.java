@@ -12,6 +12,7 @@ import net.joshuad.hypnos.lyrics.scrapers.MetroScraper;
 import net.joshuad.hypnos.lyrics.scrapers.MusixScraper;
 
 public class LyricsFetcher {
+	@SuppressWarnings("unused")
 	private static transient final Logger LOGGER = Logger.getLogger( LyricsFetcher.class.getName() );
 	
 	public enum LyricSite {

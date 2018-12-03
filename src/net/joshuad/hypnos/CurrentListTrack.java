@@ -13,7 +13,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 public class CurrentListTrack extends Track {
-	
+	@SuppressWarnings("unused")
 	private static final Logger LOGGER = Logger.getLogger( CurrentListTrack.class.getName() );
 	
 	private static final long serialVersionUID = 1L;

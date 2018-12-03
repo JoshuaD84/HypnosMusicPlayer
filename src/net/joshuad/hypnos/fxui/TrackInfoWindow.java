@@ -30,8 +30,6 @@ import net.joshuad.hypnos.Track;
 public class TrackInfoWindow extends Stage {
 	private static final Logger LOGGER = Logger.getLogger( TrackInfoWindow.class.getName() );
 	
-	private FXUI ui;
-	
 	private Track track = null;
 	
 	private TableView <TrackFieldPair> table;
@@ -41,8 +39,6 @@ public class TrackInfoWindow extends Stage {
 	
 	public TrackInfoWindow ( FXUI ui ) {
 		super();
-		
-		this.ui = ui;
 		
 		initModality( Modality.NONE );
 		initOwner( ui.getMainStage() );

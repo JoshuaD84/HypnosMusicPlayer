@@ -87,8 +87,8 @@ public class TagWindow extends Stage {
 	
 	BorderPane controlPanel = new BorderPane();
 	
-	TableColumn textTagColumn;
-	TableColumn textValueColumn;
+	TableColumn<MultiFileTextTagPair, String> textTagColumn;
+	TableColumn<MultiFileTextTagPair, String> textValueColumn;
 	
 	TableColumn imageTagColumn;
 	TableColumn imageValueColumn;
@@ -121,8 +121,8 @@ public class TagWindow extends Stage {
 		
 		VBox textTagPane = new VBox();
 		
-		textTagColumn = new TableColumn( "Tag" );
-		textValueColumn = new TableColumn( "Value" );
+		textTagColumn = new TableColumn<>( "Tag" );
+		textValueColumn = new TableColumn<>( "Value" );
 		
 		textTagColumn.setStyle( "-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold; -fx-padding: 0 10 0 0; ");
 		

@@ -24,10 +24,6 @@ import net.joshuad.hypnos.lyrics.LyricsFetcher;
 
 public class LyricsWindow extends Stage {
 	
-	private FXUI ui;
-
-	private Track track;
-	
 	private LyricsFetcher lyricsParser = new LyricsFetcher();
 	
 	private TextArea lyricsArea;
@@ -39,8 +35,6 @@ public class LyricsWindow extends Stage {
 	
 	public LyricsWindow ( FXUI ui ) {
 		super();
-		
-		this.ui = ui;
 		
 		initModality( Modality.NONE );
 		initOwner( ui.getMainStage() );
@@ -65,6 +59,7 @@ public class LyricsWindow extends Stage {
 		lyricsArea.setWrapText( true );
 		lyricsArea.getStyleClass().add( "lyricsTextArea" );
 		lyricsArea.setStyle("-fx-focus-color: transparent; -fx-faint-focus-color: transparent");
+		lyricsArea.getStyleClass().add( "lyrics" );
 		lyricsPane.getChildren().add( lyricsArea );
 		
 		sourceHyperlink = new Hyperlink ( "" );
@@ -104,11 +99,9 @@ public class LyricsWindow extends Stage {
 				}
 			}
 		});
-		
 	}
 	
 	public void setTrack ( Track track ) {
-		this.track = track;
 		if ( track == null ) return;
 
 		headerLabel.setText( track.getArtist() + " - " + track.getTitle() );

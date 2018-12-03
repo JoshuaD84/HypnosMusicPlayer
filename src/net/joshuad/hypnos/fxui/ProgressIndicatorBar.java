@@ -9,7 +9,6 @@ class ProgressIndicatorBar extends StackPane {
 
 	final private ProgressBar bar = new ProgressBar();
 	final private Label text = new Label();
-	final private static int DEFAULT_LABEL_PADDING = 5;
 
 	ProgressIndicatorBar ( ) {
 

@@ -249,11 +249,11 @@ public class Track implements Serializable, AlbumInfoSource {
 	}
 	
 	private void parseFileName () {
+		//TODO: Look at parsing track number from file name too
 		
 		String fnArtist = "";
 		String fnYear = "";
 		String fnAlbum = "";
-		String fnTrackNumber = "";
 		String fnTitle = "";
 		
 		try {
@@ -296,13 +296,12 @@ public class Track implements Serializable, AlbumInfoSource {
 			//PENDING: We get an exception with albums that have [] and maybe {} in their directory structure 
 		}
 
-		boolean setByFileName = false;
 		//TODO: Some error checking, only do this if we're pretty sure it's good. 
-		if ( artist.equals( "" ) && !fnArtist.equals( "" ) ) { artist = fnArtist; setByFileName = true; }
-		if ( albumArtist.equals( "" ) && !fnArtist.equals( "" ) ) { albumArtist = fnArtist; setByFileName = true; }
-		if ( album.equals( "" ) && !fnAlbum.equals( "" ) ) { album = fnAlbum; setByFileName = true; }
-		if ( date.equals( "" ) && !fnYear.equals( "" ) ) { date = fnYear; setByFileName = true; }
-		if ( title.equals( "" ) && !fnTitle.equals( "" )  ) { title = fnTitle; setByFileName = true; }
+		if ( artist.equals( "" ) && !fnArtist.equals( "" ) ) { artist = fnArtist; }
+		if ( albumArtist.equals( "" ) && !fnArtist.equals( "" ) ) { albumArtist = fnArtist; }
+		if ( album.equals( "" ) && !fnAlbum.equals( "" ) ) { album = fnAlbum; }
+		if ( date.equals( "" ) && !fnYear.equals( "" ) ) { date = fnYear; }
+		if ( title.equals( "" ) && !fnTitle.equals( "" )  ) { title = fnTitle; }
 	}
 	
 	private void parseArtist( Tag tag ) {
