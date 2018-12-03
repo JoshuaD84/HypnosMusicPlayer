@@ -679,13 +679,16 @@ public class FXUI implements PlayerListener {
 	
 	public void hideMainWindow() {
 		currentListSplitPanePosition = currentListSplitPane.getDividerPositions()[0];
+		mainStage.setIconified( false );
 		mainStage.hide();
 	}
 	
 	public void toggleHidden() {
 		Platform.runLater(() -> {
 			if ( closeToSystemTray.get() ) {
-				if ( !mainStage.isShowing() ) {
+				if ( mainStage.isIconified() ) {
+					mainStage.setIconified( false );
+				} else if ( !mainStage.isShowing() ) {
 					restoreWindow();
 				} else {
 					mainStage.setIconified( false ); //This is necessary for at least windows, seems good to keep it for every system

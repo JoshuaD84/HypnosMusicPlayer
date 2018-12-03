@@ -3,8 +3,6 @@ Linux: Media Buttons
 
 Windows - Did it get sluggish?  Not in IDE but maybe on drive? test
 
-Windows - Bring to front doesn't work right with minimize and system tray
-
 Maybe try to make the tab pane tabs on library full width and no spacing. Maybe replace with buttons
    .tab-header-area {
       -fx-padding: 0 0 0 0;
