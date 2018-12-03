@@ -28,6 +28,7 @@ public class CurrentList {
 	private static final Logger LOGGER = Logger.getLogger( CurrentList.class.getName() );
 	
 	public enum Mode {
+		ARTIST,
 		ALBUM,
 		ALBUM_REORDERED,
 		PLAYLIST,
@@ -46,6 +47,7 @@ public class CurrentList {
 	Mode mode = Mode.EMPTY;
 	final List <Album> currentAlbums = new ArrayList <Album> ();
 	Playlist currentPlaylist;
+	Artist currentArtist;
 	
 	private final ObservableList <CurrentListTrack> items = FXCollections.observableArrayList(); 
 	private final FilteredList <CurrentListTrack> currentListFiltered = new FilteredList <CurrentListTrack>( items, p -> true );
@@ -189,7 +191,7 @@ public class CurrentList {
 	}
 		
 	public CurrentListState getState () {
-		return new CurrentListState ( new ArrayList<CurrentListTrack>( items ), currentAlbums, currentPlaylist, mode );
+		return new CurrentListState ( new ArrayList<CurrentListTrack>( items ), currentArtist, currentAlbums, currentPlaylist, mode );
 	}
 	
 	public void setDefaultAlbumShuffleMode ( DefaultShuffleMode mode ) {
@@ -248,6 +250,7 @@ public class CurrentList {
 		currentAlbums.addAll( state.getAlbums() );
 		
 		currentPlaylist = state.getPlaylist();
+		currentArtist = state.getArtist();
 		
 		mode = state.getMode();
 		
@@ -897,6 +900,14 @@ public class CurrentList {
 		}
 	}
 	
+	public void artistSet () {
+		mode = Mode.ARTIST;
+		updateDefaultModes();
+		currentAlbums.clear();
+		currentPlaylist = null;
+		notifyListenersStateChanged();
+	}
+	
 	public void tracksSet () {
 		mode = Mode.PLAYLIST_UNSAVED;
 		updateDefaultModes();
@@ -907,7 +918,10 @@ public class CurrentList {
 	
 	public void tracksAdded () {
 		
-		if ( mode == Mode.PLAYLIST ) {
+		if ( mode == Mode.ARTIST ) {
+			mode = Mode.PLAYLIST_UNSAVED;
+			
+		} else if ( mode == Mode.PLAYLIST ) {
 			
 			if ( currentPlaylist.getTracks().equals( items ) ) {
 				mode = Mode.PLAYLIST;			
@@ -925,7 +939,11 @@ public class CurrentList {
 	}
 	
 	public void tracksRemoved () {
-		if ( mode == Mode.PLAYLIST ) {
+
+		if ( mode == Mode.ARTIST ) {
+			mode = Mode.PLAYLIST_UNSAVED;
+			
+		} else if ( mode == Mode.PLAYLIST ) {
 			mode = Mode.PLAYLIST_UNSAVED;
 			
 		} else if ( mode == Mode.ALBUM ) {
@@ -946,7 +964,11 @@ public class CurrentList {
 	}
 
 	public void listReordered () {
-		if ( mode == Mode.ALBUM ) {
+		
+		if ( mode == Mode.ARTIST ) {
+			mode = Mode.PLAYLIST_UNSAVED;
+			
+		} else if ( mode == Mode.ALBUM ) {
 			mode = Mode.ALBUM_REORDERED;
 			
 		} else if ( mode == Mode.PLAYLIST ) {
@@ -1026,18 +1048,35 @@ public class CurrentList {
 		
 	}
 
-	public void appendArtists ( ObservableList <Artist> artists ) {
+	public void appendArtists ( List <Artist> artists ) {
+		boolean startedEmpty = items.isEmpty();
 		for ( Artist artist : artists ) {
-			appendArtist ( artist );
+			appendTracks ( artist.getAllTracks() );
+		}
+		
+		if ( startedEmpty && artists.size() == 1 && !items.isEmpty() ) {
+			this.currentArtist = artists.get( 0 );
+			artistSet();
 		}
 	}
 
 	public void setAndPlayArtist ( Artist artist ) {
 		setTracks ( artist.getAllTracks() );
 		audioSystem.next( false );
+		
+		if ( !items.isEmpty() ) {
+			this.currentArtist = artist;
+			artistSet();
+		}
 	}
 
 	public void appendArtist ( Artist artist ) {
+		boolean startedEmpty = items.isEmpty();
 		appendTracks ( artist.getAllTracks() );
+		
+		if ( startedEmpty && !items.isEmpty() ) {
+			this.currentArtist = artist;
+			artistSet();
+		}
 	}
 }

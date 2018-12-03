@@ -1929,16 +1929,39 @@ public class LibraryTabPane extends StretchedTabPane {
 
 	public void doAfterShowProcessing () {
 		Node blankPlaylistHeader = playlistTable.lookup(".column-header-background");
-		blankPlaylistHeader.setOnContextMenuRequested ( 
-			event -> playlistColumnSelectorMenu.show( blankPlaylistHeader, event.getScreenX(), event.getScreenY() ) );
-		
+		if ( blankPlaylistHeader != null ) {
+			blankPlaylistHeader.setOnContextMenuRequested ( 
+				event -> playlistColumnSelectorMenu.show( blankPlaylistHeader, event.getScreenX(), event.getScreenY() ) );
+		} else {
+			//TODO: Add the columSelectorMenu using some listener. 
+		}
+			
 		Node blankTrackHeader = trackTable.lookup(".column-header-background");
-		blankTrackHeader.setOnContextMenuRequested ( 
-			event -> trackColumnSelectorMenu.show( blankTrackHeader, event.getScreenX(), event.getScreenY() ) );
-		
+		if ( blankTrackHeader != null ) {
+			blankTrackHeader.setOnContextMenuRequested ( 
+				event -> trackColumnSelectorMenu.show( blankTrackHeader, event.getScreenX(), event.getScreenY() ) 
+			);
+		} else {
+			//TODO: Add the columSelectorMenu using some listener. 
+		}
+			
 		Node blankAlbumHeader = albumTable.lookup(".column-header-background");
-		blankAlbumHeader.setOnContextMenuRequested ( 
-			event -> albumColumnSelectorMenu.show( blankAlbumHeader, event.getScreenX(), event.getScreenY() ) );
+		if ( blankAlbumHeader != null ) {
+			blankAlbumHeader.setOnContextMenuRequested ( 
+				event -> albumColumnSelectorMenu.show( blankAlbumHeader, event.getScreenX(), event.getScreenY() ) 
+			);
+		} else {
+			//TODO: Add the columSelectorMenu using some listener. 
+		}
+		
+		Node blankArtistHeader = artistTab.artistTable.lookup(".column-header-background");
+		if ( blankArtistHeader != null ) {
+			blankArtistHeader.setOnContextMenuRequested ( 
+				event -> albumColumnSelectorMenu.show( blankArtistHeader, event.getScreenX(), event.getScreenY() ) 
+			);
+		} else {
+			//TODO: Add the columSelectorMenu using some listener. 
+		}
 	}
 
 	public void applyDarkTheme ( ColorAdjust buttonColor ) {

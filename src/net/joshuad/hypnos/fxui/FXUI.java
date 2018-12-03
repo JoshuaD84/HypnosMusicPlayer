@@ -450,8 +450,6 @@ public class FXUI implements PlayerListener {
 		mainStage.iconifiedProperty().addListener( ( obs, oldValue, newValue ) -> {
 			if ( newValue  && trayIcon.isSupported() && minimizeToSystemTray.get() ) {
 				hideMainWindow();
-			}else if ( !newValue  && trayIcon.isSupported() && minimizeToSystemTray.get() ) {
-				showMainWindow();
 			}
 		});
 		
@@ -462,7 +460,6 @@ public class FXUI implements PlayerListener {
 				Hypnos.exit( ExitCode.NORMAL );
 			}
 		});
-		
 		audioSystem.addPlayerListener ( this );
 	}
 	
@@ -887,9 +884,9 @@ public class FXUI implements PlayerListener {
 			CurrentListState state = audioSystem.getCurrentList().getState();
 			CurrentListState newState;
 			if ( state.getMode() == Mode.PLAYLIST || state.getMode() == Mode.PLAYLIST_UNSAVED ) {
-				newState = new CurrentListState ( state.getItems(), state.getAlbums(), updatedPlaylist, CurrentList.Mode.PLAYLIST );
+				newState = new CurrentListState ( state.getItems(), state.getArtist(), state.getAlbums(), updatedPlaylist, CurrentList.Mode.PLAYLIST );
 			} else {
-				newState = new CurrentListState ( state.getItems(), state.getAlbums(), null, state.getMode() );
+				newState = new CurrentListState ( state.getItems(), state.getArtist(), state.getAlbums(), null, state.getMode() );
 			}
 			
 			audioSystem.getCurrentList().setState( newState );

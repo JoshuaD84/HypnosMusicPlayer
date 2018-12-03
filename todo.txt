@@ -6,6 +6,22 @@ Maybe try to make the tab pane tabs on library full width and no spacing. Maybe 
       -fx-padding: 0 0 0 0;
    }
 
+Library tabs needs context menu if it's blank
+
+Windows: Move to next monitor with ultramon and minimize to system tray dont play well together
+   User can just disable minimize to system tray and still close to system tray, so whatever nbd
+
+Windows: Artist tab column widths don't resize right when you change the window size right as the program starts
+
+Windows: bring to front on new launch doesn't work
+
+Windows Launcher: move hypnos.jar to lib
+
+Track table -> reset to default view. Make it better. 
+
+Drag and drop to art pane -- should work, doesn't. rmove ?w=1200 and it does
+https://consequenceofsound.files.wordpress.com/2014/06/andrew-bird-things-are-great-here-sort-of.jpg?w=1200
+
 ::::::::::::::
 
 Future
@@ -31,6 +47,7 @@ Future
 
    Sometimes the art pane can become non-responsive. I dragged and dropped an image from google and it stopped changing
       I've seen it a few other times too.
+      It happened as i was scrolling quickly though Josh radio, around Joanna newsom
 
 	Can I expand encoding information display using vlc?
       mediaPlayer.getMedia*

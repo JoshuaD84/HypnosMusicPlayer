@@ -13,11 +13,12 @@ public class CurrentListState implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private Mode mode;
+	private Artist artist;
 	private Playlist playlist;
 	private List<Album> albums;
 	private List<CurrentListTrack> tracks;
 	
-	public CurrentListState ( List<CurrentListTrack> tracks, List<Album> albums, Playlist playlist, Mode mode ) {
+	public CurrentListState ( List<CurrentListTrack> tracks, Artist artist, List<Album> albums, Playlist playlist, Mode mode ) {
 		if ( tracks == null ) {
 			this.tracks = null;
 		} else {
@@ -30,6 +31,7 @@ public class CurrentListState implements Serializable {
 			this.albums = new ArrayList<Album> ( albums );
 		}
 		
+		this.artist = artist;
 		this.playlist = playlist;
 		this.mode = mode;
 	}
@@ -46,6 +48,10 @@ public class CurrentListState implements Serializable {
 		return Collections.unmodifiableList( albums );
 	}
 	
+	public Artist getArtist() {
+		return artist;
+	}
+	
 	public List<CurrentListTrack> getItems() {
 		return Collections.unmodifiableList( tracks );
 	}
@@ -54,7 +60,10 @@ public class CurrentListState implements Serializable {
 
 		String retMe = "";
 		
-		if ( mode == Mode.ALBUM || mode == Mode.ALBUM_REORDERED ) {
+		if ( mode == Mode.ARTIST ) {
+			retMe = "Artist - " + artist.getName();
+		
+		} else if ( mode == Mode.ALBUM || mode == Mode.ALBUM_REORDERED ) {
 		
 			if ( albums.size() == 0 ) {
 				

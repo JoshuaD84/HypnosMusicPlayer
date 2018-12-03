@@ -524,6 +524,7 @@ public class CurrentListPane extends BorderPane {
 			Playlist saveMe = null; 
 		
 			switch ( state.getMode() ) {
+				case ARTIST:
 				case ALBUM:
 				case ALBUM_REORDERED: {
 					saveMe = new Playlist( targetFile.getName(), Utils.convertCurrentTrackList( state.getItems() ) );
@@ -691,7 +692,6 @@ public class CurrentListPane extends BorderPane {
 				DraggedTrackContainer container = (DraggedTrackContainer) db.getContent( FXUI.DRAGGED_TRACKS );
 				
 				switch ( container.getSource() ) {
-					case ARTIST_LIST:
 					case TRACK_LIST:
 					case ALBUM_INFO:
 					case PLAYLIST_INFO:
@@ -704,14 +704,18 @@ public class CurrentListPane extends BorderPane {
 							currentListTable.getSortOrder().clear();
 							audioSystem.getCurrentList().appendTracks( tracks );
 						}
-					
 					} break;
 
 					case PLAYLIST_LIST: {
 						audioSystem.getCurrentList().setItemsToSortedOrder();
 						currentListTable.getSortOrder().clear();
 						audioSystem.getCurrentList().appendPlaylists( container.getPlaylists() );
-						
+					} break;
+
+					case ARTIST_LIST: {
+						audioSystem.getCurrentList().setItemsToSortedOrder();
+						currentListTable.getSortOrder().clear();
+						audioSystem.getCurrentList().appendArtists( container.getArtists() );
 					} break;
 					
 					case ALBUM_LIST: {

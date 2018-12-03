@@ -29,6 +29,7 @@ public class DraggedTrackContainer implements Serializable {
 	private List<Track> tracks;
 	private List<Integer> indices;
 	private List<Album> albums;
+	private List<Artist> artists;
 	private List<Playlist> playlists;
 	
 	private DragSource source;
@@ -39,6 +40,7 @@ public class DraggedTrackContainer implements Serializable {
 		this.source = source;
 		this.tracks = tracks;
 		this.albums = albums;
+		this.artists = artists;
 		this.playlists = playlists;
 	}
 	
@@ -48,6 +50,10 @@ public class DraggedTrackContainer implements Serializable {
 	
 	public DragSource getSource() {
 		return source;
+	}
+	
+	public List<Artist> getArtists() {
+		return artists;
 	}
 	
 	public List<Track> getTracks() {
