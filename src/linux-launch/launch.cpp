@@ -24,7 +24,7 @@ int main( int argc, char** argv ) {
    index++;
    options[index].optionString = (char *)"-XX:MaxHeapFreeRatio=30";
    index++;
-   options[index].optionString = (char *)"--module-path=./jre/jfx";
+   options[index].optionString = (char *)"--module-path=./jfx";
    index++;
    options[index].optionString = (char *)"--add-modules=javafx.controls,javafx.swing";
    index++;
@@ -42,7 +42,7 @@ int main( int argc, char** argv ) {
    void *handle = dlopen ( location.c_str(), RTLD_LAZY );
 
    if ( !handle ) {
-      printf ( "Unable to load %s, exiting", location.c_str() );
+      printf ( "Unable to load %s, exiting\n", location.c_str() );
       return 0;
    }
 

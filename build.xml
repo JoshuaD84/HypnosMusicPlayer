@@ -5,7 +5,7 @@
 	<property name="version-tag" value="${version}" />
 	
 	<property name="src" location="src"/>
-	<property name="build" location="bin"/>
+	<property name="build" location="stage/bin"/>
 	<property name="stage" location="stage" />
 	
 	<property name="dist" location="distribution/" />
@@ -78,14 +78,6 @@
 			<fileset dir="${stage}" includes="*.jar" />
 		</delete>
 	</target>
-
-    <target name="run" depends="jar" description="Run Hypnos">
-      	<java jar="${jarFile}" fork="true">
-      		<sysproperty key="hypnos.standalone" value="true" />
-      		<sysproperty key="hypnos.developing" value="true" />
-      		<sysproperty key="hypnos.disableglobalhotkeys" value="true" />
-      	</java>
-    </target>
 	
 	<target name="dist-nix-64bit" depends="jar" description="Make an AppImage for 64 bit Linux">
 		<sequential>
@@ -104,13 +96,18 @@
 					<exclude name="**/lib/osx/" />
 					<exclude name="**/lib/nix/vlc/.git/" />
 				</fileset>
+				<fileset dir="bin-native/linux-launch" />
 			</copy>
 			
 			<copy todir="${temp}/Hypnos.AppDir/usr/bin/jre" >
-				<fileset dir="${packaging}/jres/linux-64bit" >
-					<exclude name="${packaging}/jres/linux-64bit/.git/" />
-				</fileset>
+				<fileset dir="${packaging}/jres/linux" />
 			</copy>
+			<copy todir="${temp}/Hypnos.AppDir/usr/bin/jfx" >
+				<fileset dir="${packaging}/jres/linux-jfx" />
+			</copy>
+			
+			<chmod file="${temp}/Hypnos.AppDir/AppRun" perm="+x" />
+			<chmod file="${temp}/Hypnos.AppDir/usr/bin/hypnos" perm="+x" />
 			
 			<exec executable="${appImageTool}">
 				<arg value="-n" />
