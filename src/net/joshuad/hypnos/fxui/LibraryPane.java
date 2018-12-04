@@ -93,7 +93,12 @@ public class LibraryPane extends BorderPane {
 		albumsButton.setContextMenu( tabMenu );
 		tracksButton.setContextMenu( tabMenu );
 		playlistsButton.setContextMenu( tabMenu );
-    	
+		
+		artistsButton.setPrefHeight( 32 );
+		albumsButton.setPrefHeight( 32 );
+		tracksButton.setPrefHeight( 32 );
+		playlistsButton.setPrefHeight( 32 );
+		
     	artistsButton.setOnAction( e -> { 
     		setCenter( artistPane ); 
     		artistsButton.setSelected ( true ); 

@@ -1,3 +1,4 @@
+On linux the library pane gets stuck on "loading..." after "Unable to read source directory from disk"
 
 ::::::::::::::
 
