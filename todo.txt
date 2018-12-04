@@ -1,3 +1,8 @@
+Beta 5:
+   Linux - Strip JRE
+   Windows - Strip JRE
+   Windows - Build Process
+
 Testing:
    Windows: Make sure minimize works properly with system tray
 

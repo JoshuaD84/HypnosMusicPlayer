@@ -70,16 +70,7 @@
 		</jar>
 	</target>
 	
-	<target name="clean" description="Clean the workspace" >
-		<delete dir="${stage}/config" />
-		<delete dir="${build}" />
-		<delete dir="${dist}" />
-		<delete>
-			<fileset dir="${stage}" includes="*.jar" />
-		</delete>
-	</target>
-	
-	<target name="dist-nix-64bit" depends="jar" description="Make an AppImage for 64 bit Linux">
+	<target name="dist-linux" depends="jar" description="Make an AppImage for 64 bit Linux">
 		<sequential>
 			<delete dir="${temp}" />
 			<mkdir dir="${temp}/" />
@@ -122,26 +113,19 @@
 		
 		<delete dir="${temp}" />
 		<mkdir dir="${temp}/Hypnos/" />
-		
-		<launch4j jarPath="${jarFile}" configFile="${packaging}/l4j-hypnos.xml" outfile="${temp}/Hypnos/Hypnos.exe" />
-			
-		<exec executable="${packaging}/editl4jjavaw.sh">
-			<arg value="${temp}/Hypnos/Hypnos.exe" />
-			<arg value="${temp}" />
-		</exec>
-		
+					
 		<copy todir="${temp}/Hypnos/" >
 			<fileset dir="stage" >
 				<exclude name="**/config/**" />
 				<exclude name="**/bin/**" />
 				<exclude name="**/lib/nix/" />
 				<exclude name="**/lib/osx/" />
-				<exclude name="hypnos.jar" />
 			</fileset>
-			<mappedresources>
-				<fileset dir="${packaging}/jres/win" />
-				<globmapper from="*" to="jre/*" />
-			</mappedresources>
+			<fileset file="bin-native/win-launch/Hypnos.exe" />
+		</copy>
+		
+		<copy todir="${temp}/Hypnos/jre" >
+			<fileset dir="${packaging}/jres/win" />
 		</copy>
 		
 		<exec executable="makensis">
@@ -156,7 +140,7 @@
 		
 	</target>
 	
-	<target name="dist-all" depends="dist-nix-64bit, dist-win" description="Make all distribution files.">
+	<target name="dist-all" depends="dist-linux, dist-win" description="Make all distribution files.">
 	</target>
 </project>
 

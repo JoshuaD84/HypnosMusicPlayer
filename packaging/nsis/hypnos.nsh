@@ -4,7 +4,7 @@
 !define MENU_DIR_NAME "Hypnos Music Player"
 !define MENU_SHORTCUT_NAME "Hypnos"
 # These three must be integers?
-# !define VERSIONMAJOR Beta3
+# !define VERSIONMAJOR Beta5
 # !define VERSIONBUILD 1
 # These will be displayed by the "Click here for support information" link in "Add/Remove Programs"
 # It is possible to use "mailto:" links in here to open the email client
