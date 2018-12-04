@@ -15,6 +15,7 @@ public class MusicSearchLocation implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private File file;
+	@SuppressWarnings("unused")
 	private transient boolean hadInotifyError; //TODO: Show this in the UI
 
 	private transient BooleanProperty isValidSearchLocation = new SimpleBooleanProperty ( true );

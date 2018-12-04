@@ -1926,42 +1926,55 @@ public class LibraryTabPane extends StretchedTabPane {
 			}
 		});
 	}
-
-	public void doAfterShowProcessing () {
-		Node blankPlaylistHeader = playlistTable.lookup(".column-header-background");
-		if ( blankPlaylistHeader != null ) {
-			blankPlaylistHeader.setOnContextMenuRequested ( 
-				event -> playlistColumnSelectorMenu.show( blankPlaylistHeader, event.getScreenX(), event.getScreenY() ) );
-		} else {
-			//TODO: Add the columSelectorMenu using some listener. 
-		}
-			
-		Node blankTrackHeader = trackTable.lookup(".column-header-background");
-		if ( blankTrackHeader != null ) {
-			blankTrackHeader.setOnContextMenuRequested ( 
-				event -> trackColumnSelectorMenu.show( blankTrackHeader, event.getScreenX(), event.getScreenY() ) 
-			);
-		} else {
-			//TODO: Add the columSelectorMenu using some listener. 
-		}
-			
-		Node blankAlbumHeader = albumTable.lookup(".column-header-background");
-		if ( blankAlbumHeader != null ) {
-			blankAlbumHeader.setOnContextMenuRequested ( 
-				event -> albumColumnSelectorMenu.show( blankAlbumHeader, event.getScreenX(), event.getScreenY() ) 
-			);
-		} else {
-			//TODO: Add the columSelectorMenu using some listener. 
+	
+	
+	/* Begin: These three methods go together */
+		private boolean attachEmptySelectorMenu( Tab tab, TableView<?> table, ContextMenu menu ) {
+			Node blankHeader = table.lookup(".column-header-background");
+			if ( blankHeader != null ) {
+				blankHeader.setOnContextMenuRequested ( event -> {
+					menu.show( blankHeader, event.getScreenX(), event.getScreenY() );
+				});
+				return true;
+			} else {
+				return false;
+			}
 		}
 		
-		Node blankArtistHeader = artistTab.artistTable.lookup(".column-header-background");
-		if ( blankArtistHeader != null ) {
-			blankArtistHeader.setOnContextMenuRequested ( 
-				event -> albumColumnSelectorMenu.show( blankArtistHeader, event.getScreenX(), event.getScreenY() ) 
-			);
-		} else {
-			//TODO: Add the columSelectorMenu using some listener. 
+		private void attachEmptySelectorMenuLater(  Tab tab, TableView<?> table, ContextMenu menu ) {
+			final ChangeListener<Tab> listener = new ChangeListener<Tab>() {
+				public void changed ( ObservableValue< ? extends Tab> obs, Tab oldTab, Tab newTab ) {
+					System.out.println( "Change heard: " + tab.getText() ); //TODO: DD
+					if ( newTab == tab ) {
+						System.out.println( "It's me: " + tab.getText() ); //TODO: DD
+						boolean attached = attachEmptySelectorMenu ( tab, table, menu );
+						System.out.println( "Attached: " +  attached );
+						getSelectionModel().selectedItemProperty().removeListener( this );
+					}
+				}
+			};
+			
+			this.getSelectionModel().selectedItemProperty().addListener( listener );
 		}
+		
+		private void setupEmptyTableHeaderConextMenu ( Tab tab, TableView<?> table, ContextMenu menu ) {
+			boolean artistAttached = attachEmptySelectorMenu ( tab, table, menu );
+			
+			if ( !artistAttached ) {
+				System.out.println( "Attaching later: " + tab.getText() ); //TODO: DD
+				attachEmptySelectorMenuLater ( tab, table, menu );
+			} else {
+				System.out.println( "Attached: " + tab.getText() ); //TODO: DD
+			}
+				
+		}
+	/* End: These three methods go together */
+	
+	public void doAfterShowProcessing () {
+		setupEmptyTableHeaderConextMenu ( artistTab, artistTab.artistTable, artistTab.columnSelectorMenu );
+		setupEmptyTableHeaderConextMenu ( albumTab, albumTable, albumColumnSelectorMenu );
+		setupEmptyTableHeaderConextMenu ( trackTab, trackTable, trackColumnSelectorMenu );
+		setupEmptyTableHeaderConextMenu ( playlistTab, playlistTable, playlistColumnSelectorMenu );
 	}
 
 	public void applyDarkTheme ( ColorAdjust buttonColor ) {

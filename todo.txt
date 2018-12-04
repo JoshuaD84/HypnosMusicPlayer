@@ -1,11 +1,13 @@
-Linux: Media Buttons
-   https://stackoverflow.com/questions/53550397/javafx-keyevent-is-it-possible-to-get-more-info-for-undefined-events
-
 Library tabs needs context menu if it's blank
+
+track tab default - move # after Album
 
 ::::::::::::::
 
 Future
+   Linux: Media Buttons
+      https://stackoverflow.com/questions/53550397/javafx-keyevent-is-it-possible-to-get-more-info-for-undefined-events
+
    column widths don't resize right when you change the window size right as the program starts
       Confirmed with configuration Cols A B C D, with B C D being no-resize via hypnosresizepolicy
 

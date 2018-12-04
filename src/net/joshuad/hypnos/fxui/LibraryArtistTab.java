@@ -77,6 +77,8 @@ public class LibraryArtistTab extends Tab {
 	TableColumn<Artist, String> artistColumn;
 	TableColumn<Artist, Integer> tracksColumn, albumsColumn, lengthColumn;
 	
+	ContextMenu columnSelectorMenu;
+	
 	Label emptyListLabel = new Label( 
 		"No artists loaded. To add to your library, click on the + button or drop folders here." );
 	Label filteredListLabel = new Label( "No artists match." );
@@ -101,6 +103,15 @@ public class LibraryArtistTab extends Tab {
 		content.setCenter( artistTable );
 		
 		this.setClosable( false );
+		Tooltip tabTooltip = new Tooltip ( "Artist Count: " + library.getArtists().size() );
+		setTooltip( tabTooltip );
+		
+		library.getArtists().addListener( new ListChangeListener<Artist> () {
+			public void onChanged ( Change <? extends Artist> changed ) {
+				tabTooltip.setText( "Artist Count: " + library.getArtists().size() );
+			}
+		});
+		
 		this.setContent( content );
 		resetTableSettingsToDefault();
 	}
@@ -164,7 +175,7 @@ public class LibraryArtistTab extends Tab {
 			}
 		});
 		
-		ContextMenu columnSelectorMenu = new ContextMenu ();
+		columnSelectorMenu = new ContextMenu ();
 		CheckMenuItem nameMenuItem = new CheckMenuItem ( "Show Name Column" );
 		CheckMenuItem albumsMenuItem = new CheckMenuItem ( "Show Albums Column" );
 		CheckMenuItem tracksMenuItem = new CheckMenuItem ( "Show Tracks Column" );
