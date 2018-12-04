@@ -116,25 +116,27 @@ public class LibraryPlaylistPane extends BorderPane {
 	}
 	
 	public void updatePlaceholders() {
-		boolean someVisible = false;
-		for ( TableColumn<?,?> column : playlistTable.getColumns() ) {
-			if ( column.isVisible() ) {
-				someVisible = true;
-				break;
+		Platform.runLater( () -> {
+			boolean someVisible = false;
+			for ( TableColumn<?,?> column : playlistTable.getColumns() ) {
+				if ( column.isVisible() ) {
+					someVisible = true;
+					break;
+				}
 			}
-		}
-		
-		if ( !someVisible ) {
-			playlistTable.setPlaceholder( noColumnsLabel );
-		} else if ( library.getAlbums().isEmpty() ) {
-			if ( playlistTable.getPlaceholder() != emptyLabel ) {
-				playlistTable.setPlaceholder( emptyLabel );
+			
+			if ( !someVisible ) {
+				playlistTable.setPlaceholder( noColumnsLabel );
+			} else if ( library.getAlbums().isEmpty() ) {
+				if ( playlistTable.getPlaceholder() != emptyLabel ) {
+					playlistTable.setPlaceholder( emptyLabel );
+				}
+			} else {
+				if ( !playlistTable.getPlaceholder().equals( filteredLabel ) ) {
+					playlistTable.setPlaceholder( filteredLabel );
+				}
 			}
-		} else {
-			if ( !playlistTable.getPlaceholder().equals( filteredLabel ) ) {
-				playlistTable.setPlaceholder( filteredLabel );
-			}
-		}
+		});
 	}
 	
 	public void setupPlaylistFilterPane () {

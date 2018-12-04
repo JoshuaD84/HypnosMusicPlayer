@@ -113,25 +113,27 @@ private static final Logger LOGGER = Logger.getLogger( LibraryArtistPane.class.g
 	}
 	
 	public void updatePlaceholders() {
-		boolean someVisible = false;
-		for ( TableColumn<?,?> column : albumTable.getColumns() ) {
-			if ( column.isVisible() ) {
-				someVisible = true;
-				break;
+		Platform.runLater( () -> {
+			boolean someVisible = false;
+			for ( TableColumn<?,?> column : albumTable.getColumns() ) {
+				if ( column.isVisible() ) {
+					someVisible = true;
+					break;
+				}
 			}
-		}
-		
-		if ( !someVisible ) {
-			albumTable.setPlaceholder( noColumnsLabel );
-		} else if ( library.getAlbums().isEmpty() ) {
-			if ( albumTable.getPlaceholder() != emptyListLabel ) {
-				albumTable.setPlaceholder( emptyListLabel );
+			
+			if ( !someVisible ) {
+				albumTable.setPlaceholder( noColumnsLabel );
+			} else if ( library.getAlbums().isEmpty() ) {
+				if ( albumTable.getPlaceholder() != emptyListLabel ) {
+					albumTable.setPlaceholder( emptyListLabel );
+				}
+			} else {
+				if ( !albumTable.getPlaceholder().equals( filteredListLabel ) ) {
+					albumTable.setPlaceholder( filteredListLabel );
+				}
 			}
-		} else {
-			if ( !albumTable.getPlaceholder().equals( filteredListLabel ) ) {
-				albumTable.setPlaceholder( filteredListLabel );
-			}
-		}
+		});
 	}
 	
 	public void resetTableSettingsToDefault() {

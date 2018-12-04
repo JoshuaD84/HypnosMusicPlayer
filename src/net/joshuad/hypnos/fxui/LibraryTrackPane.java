@@ -111,25 +111,27 @@ public class LibraryTrackPane extends BorderPane {
 	}
 	
 	public void updatePlaceholders() {
-		boolean someVisible = false;
-		for ( TableColumn<?,?> column : trackTable.getColumns() ) {
-			if ( column.isVisible() ) {
-				someVisible = true;
-				break;
+		Platform.runLater( () -> {
+			boolean someVisible = false;
+			for ( TableColumn<?,?> column : trackTable.getColumns() ) {
+				if ( column.isVisible() ) {
+					someVisible = true;
+					break;
+				}
 			}
-		}
-		
-		if ( !someVisible ) {
-			trackTable.setPlaceholder( noColumnsLabel );
-		} else if ( library.getAlbums().isEmpty() ) {
-			if ( trackTable.getPlaceholder() != emptyListLabel ) {
-				trackTable.setPlaceholder( emptyListLabel );
+			
+			if ( !someVisible ) {
+				trackTable.setPlaceholder( noColumnsLabel );
+			} else if ( library.getAlbums().isEmpty() ) {
+				if ( trackTable.getPlaceholder() != emptyListLabel ) {
+					trackTable.setPlaceholder( emptyListLabel );
+				}
+			} else {
+				if ( !trackTable.getPlaceholder().equals( filteredListLabel ) ) {
+					trackTable.setPlaceholder( filteredListLabel );
+				}
 			}
-		} else {
-			if ( !trackTable.getPlaceholder().equals( filteredListLabel ) ) {
-				trackTable.setPlaceholder( filteredListLabel );
-			}
-		}
+		});
 	}
 	
 	public void setupCheckBox() {

@@ -117,25 +117,27 @@ public class LibraryArtistPane extends BorderPane {
 	}
 	
 	public void updatePlaceholders() {
-		boolean someVisible = false;
-		for ( TableColumn<?,?> column : artistTable.getColumns() ) {
-			if ( column.isVisible() ) {
-				someVisible = true;
-				break;
+		Platform.runLater( () -> {
+			boolean someVisible = false;
+			for ( TableColumn<?,?> column : artistTable.getColumns() ) {
+				if ( column.isVisible() ) {
+					someVisible = true;
+					break;
+				}
 			}
-		}
-		
-		if ( !someVisible ) {
-			artistTable.setPlaceholder( noColumnsLabel );
-		} else if ( library.getAlbums().isEmpty() ) {
-			if ( artistTable.getPlaceholder() != emptyListLabel ) {
-				artistTable.setPlaceholder( emptyListLabel );
+			
+			if ( !someVisible ) {
+				artistTable.setPlaceholder( noColumnsLabel );
+			} else if ( library.getAlbums().isEmpty() ) {
+				if ( artistTable.getPlaceholder() != emptyListLabel ) {
+					artistTable.setPlaceholder( emptyListLabel );
+				}
+			} else {
+				if ( !artistTable.getPlaceholder().equals( filteredListLabel ) ) {
+					artistTable.setPlaceholder( filteredListLabel );
+				}
 			}
-		} else {
-			if ( !artistTable.getPlaceholder().equals( filteredListLabel ) ) {
-				artistTable.setPlaceholder( filteredListLabel );
-			}
-		}
+		});
 	}
 	
 	public void resetTableSettingsToDefault() {
