@@ -1,7 +1,13 @@
+Testing:
+   Windows: Make sure minimize works properly with system tray
 
 ::::::::::::::
 
 Future
+   Remove WinXP not supported by Jfx
+
+   Linux: Right click on table headers causes resort
+
    Scroll Wheel on track position slider
 
    Linux: Media Buttons

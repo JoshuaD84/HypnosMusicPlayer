@@ -673,9 +673,27 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public void hideMainWindow() {
-		currentListSplitPanePosition = currentListSplitPane.getDividerPositions()[0];
-		mainStage.setIconified( false );
-		mainStage.hide();
+		switch ( Hypnos.getOS() ) {
+		case NIX:
+			currentListSplitPanePosition = currentListSplitPane.getDividerPositions()[0];
+			mainStage.hide();
+			break;
+			
+		case WIN_10:
+		case WIN_7:
+		case WIN_8:
+		case WIN_UNKNOWN:
+		case WIN_VISTA:
+		case WIN_XP:
+			currentListSplitPanePosition = currentListSplitPane.getDividerPositions()[0];
+			mainStage.setIconified( false );
+			mainStage.hide();
+			break;
+			
+		default:
+			break;
+		
+		}
 	}
 	
 	public void toggleHidden() {
