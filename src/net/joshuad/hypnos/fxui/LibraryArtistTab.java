@@ -190,7 +190,7 @@ public class LibraryArtistTab extends Tab {
 		
 		HypnosResizePolicy resizePolicy = new HypnosResizePolicy();
 		retMe.setColumnResizePolicy( resizePolicy );
-		resizePolicy.registerFixedWidthColumns( albumsColumn, tracksColumn, lengthColumn );
+		resizePolicy.registerFixedWidthColumns( albumsColumn, tracksColumn /*, lengthColumn*/ );
 
 		library.getArtistsSorted().comparatorProperty().bind( retMe.comparatorProperty() );
 		

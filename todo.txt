@@ -3,13 +3,12 @@ Linux: Media Buttons
 
 Library tabs needs context menu if it's blank
 
-Windows: Artist tab column widths don't resize right when you change the window size right as the program starts
-
-Track table -> reset to default view. Make it better. 
-
 ::::::::::::::
 
 Future
+   column widths don't resize right when you change the window size right as the program starts
+      Confirmed with configuration Cols A B C D, with B C D being no-resize via hypnosresizepolicy
+
    Windows: Move to next monitor with ultramon and minimize to system tray dont play well together
       User can just disable minimize to system tray and still close to system tray, so whatever nbd
 

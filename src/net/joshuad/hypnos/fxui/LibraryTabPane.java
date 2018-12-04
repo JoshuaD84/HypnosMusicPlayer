@@ -1041,21 +1041,21 @@ public class LibraryTabPane extends StretchedTabPane {
 	
 	public void resetTrackTableSettingsToDefault() {
 		trackArtistColumn.setVisible( true );
-		trackLengthColumn.setVisible( true );
+		trackLengthColumn.setVisible( false );
 		trackNumberColumn.setVisible( true );
 		trackAlbumColumn.setVisible( true );
 		trackTitleColumn.setVisible( true );
 		
 		trackTable.getColumns().remove( trackArtistColumn );
 		trackTable.getColumns().add( trackArtistColumn );
-		trackTable.getColumns().remove( trackLengthColumn );
-		trackTable.getColumns().add( trackLengthColumn );
 		trackTable.getColumns().remove( trackNumberColumn );
 		trackTable.getColumns().add( trackNumberColumn );
 		trackTable.getColumns().remove( trackAlbumColumn );
 		trackTable.getColumns().add( trackAlbumColumn );
 		trackTable.getColumns().remove( trackTitleColumn );
 		trackTable.getColumns().add( trackTitleColumn );
+		trackTable.getColumns().remove( trackLengthColumn );
+		trackTable.getColumns().add( trackLengthColumn );
 
 		trackTable.getSortOrder().clear();
 		trackTable.getSortOrder().add( trackArtistColumn );
