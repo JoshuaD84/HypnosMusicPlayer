@@ -1,7 +1,10 @@
 package net.joshuad.hypnos.fxui;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
@@ -19,6 +22,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -37,6 +41,7 @@ import net.joshuad.hypnos.LibraryUpdater.LoaderSpeed;
 import net.joshuad.hypnos.MusicSearchLocation;
 
 public class LibraryLocationWindow extends Stage {
+	private static final Logger LOGGER = Logger.getLogger( LibraryLocationWindow.class.getName() );
 
 	TableView <MusicSearchLocation> musicSourceTable;
 	
@@ -59,6 +64,13 @@ public class LibraryLocationWindow extends Stage {
 		setHeight( 500 );
 		Pane root = new Pane();
 		scene = new Scene( root );
+		
+		try {
+			getIcons().add( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) ) );
+		} catch ( FileNotFoundException e ) {
+			LOGGER.warning( "Unable to load program icon: resources/icon.png" );
+		}
+		
 		VBox primaryPane = new VBox();
 
 		musicSourceTable = new TableView<MusicSearchLocation> ();

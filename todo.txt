@@ -1,8 +1,9 @@
-Windows - Music Location Window doesn't have icon
 
 ::::::::::::::
 
 Future
+   Scroll Wheel on track position slider
+
    Linux: Media Buttons
       https://stackoverflow.com/questions/53550397/javafx-keyevent-is-it-possible-to-get-more-info-for-undefined-events
 
