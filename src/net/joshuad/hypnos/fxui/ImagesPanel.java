@@ -728,7 +728,6 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 		}
 	}
 	
-	
 	private byte[] getImageBytesFromDragboard ( Dragboard db ) {
 		byte[] retMe = null;
 		
@@ -736,9 +735,10 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 			URL url;
 			try {
 				String file = (String) db.getContent( textContentFormat );
+				file = file.replaceAll( "\\?.*$",  "" );//Get rid of everything after ? in a url, because who cares about arguments
 				
 				if ( Utils.hasImageExtension( file ) ) {
-					url = new URL( (String) db.getContent( textContentFormat ) );
+					url = new URL( file );
 					ByteArrayOutputStream baos = new ByteArrayOutputStream();
 					try ( InputStream is = url.openStream () ) {
 						byte[] byteChunk = new byte [ 4096 ]; 
