@@ -443,6 +443,7 @@ public class FXUI implements PlayerListener {
 			if ( closeToSystemTray.get() && trayIcon.isSupported() ) {
 				hideMainWindow();
 			} else {
+				mainStage.hide();
 				Hypnos.exit( ExitCode.NORMAL );
 			}
 		});
@@ -453,13 +454,6 @@ public class FXUI implements PlayerListener {
 			}
 		});
 		
-		mainStage.setOnCloseRequest( (WindowEvent t) -> {
-			if ( closeToSystemTray.get() && trayIcon.isSupported() ) {
-				hideMainWindow();
-			} else {
-				Hypnos.exit( ExitCode.NORMAL );
-			}
-		});
 		audioSystem.addPlayerListener ( this );
 	}
 	
