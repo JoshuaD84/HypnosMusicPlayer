@@ -67,7 +67,8 @@ public class InfoFilterHybrid extends BorderPane {
 		info = new Label ( );
 		filter = new TextField ();
 		
-		clearButton = new Button ();		
+		clearButton = new Button ();	
+		clearButton.setMinSize ( 33, 26 );
 		try {	
 			Image clearImage = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/clear.png" ).toFile() ) );
 			filterClearImage = new ImageView ( clearImage );

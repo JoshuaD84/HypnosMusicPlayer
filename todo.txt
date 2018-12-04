@@ -1,7 +1,5 @@
 Windows - Music Location Window doesn't have icon
 
-Windows - Current list filter x button height should be set
-
 ::::::::::::::
 
 Future
