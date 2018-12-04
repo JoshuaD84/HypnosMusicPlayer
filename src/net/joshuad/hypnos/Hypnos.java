@@ -661,7 +661,7 @@ public class Hypnos extends Application {
 	}
 
 	public static void exit ( ExitCode exitCode ) {
-		LOGGER.info( "Exit requested: " + exitCode.toString() );
+		Platform.runLater( () -> ui.getMainStage().hide() );
 		
 		if ( globalHotkeys != null ) {
 			globalHotkeys.prepareToExit();
