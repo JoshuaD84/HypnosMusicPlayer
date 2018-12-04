@@ -648,10 +648,10 @@ public class LibraryTrackPane extends BorderPane {
 		
 		trackTable.getColumns().remove( artistColumn );
 		trackTable.getColumns().add( artistColumn );
-		trackTable.getColumns().remove( numberColumn );
-		trackTable.getColumns().add( numberColumn );
 		trackTable.getColumns().remove( albumColumn );
 		trackTable.getColumns().add( albumColumn );
+		trackTable.getColumns().remove( numberColumn );
+		trackTable.getColumns().add( numberColumn );
 		trackTable.getColumns().remove( titleColumn );
 		trackTable.getColumns().add( titleColumn );
 		trackTable.getColumns().remove( lengthColumn );
