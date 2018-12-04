@@ -13,8 +13,6 @@ Windows: Move to next monitor with ultramon and minimize to system tray dont pla
 
 Windows: Artist tab column widths don't resize right when you change the window size right as the program starts
 
-Windows: bring to front on new launch doesn't work
-
 Track table -> reset to default view. Make it better. 
 
 Drag and drop to art pane -- should work, doesn't. rmove ?w=1200 and it does

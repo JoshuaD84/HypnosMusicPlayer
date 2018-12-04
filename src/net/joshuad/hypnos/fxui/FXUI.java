@@ -673,6 +673,7 @@ public class FXUI implements PlayerListener {
 			mainStage.show();
 			currentListSplitPane.setDividerPosition( 0, currentListSplitPanePosition );
 		}
+		mainStage.setIconified( false );
 		mainStage.toFront();
 	}
 	
