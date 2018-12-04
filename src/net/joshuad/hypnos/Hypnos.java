@@ -746,7 +746,7 @@ public class Hypnos extends Application {
 							persister.loadPlaylists();
 							persister.loadHotkeys();
 							
-							//TODO: can I remove? Platform.runLater( () -> ui.getLibraryPane().updateLibraryListPlaceholder() );
+							Platform.runLater( () -> ui.getLibraryPane().updatePlaceholder() );
 							
 							ui.refreshHotkeyList();
 							

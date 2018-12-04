@@ -494,4 +494,11 @@ public class LibraryPane extends BorderPane {
 	public void showAndSelectAlbumTab() {
 		albumsButton.fire();
 	}
+
+	public void updatePlaceholder() {
+		artistPane.updatePlaceholders();
+		albumPane.updatePlaceholders();
+		trackPane.updatePlaceholders();
+		playlistPane.updatePlaceholders();
+	}
 }
