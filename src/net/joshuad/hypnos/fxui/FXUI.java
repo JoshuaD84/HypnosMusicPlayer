@@ -104,7 +104,7 @@ public class FXUI implements PlayerListener {
 	SplitPane primarySplitPane;
 	SplitPane currentListSplitPane;
 	private ImagesPanel artSplitPane; 
-	private LibraryTabPane libraryPane; 
+	private LibraryPane libraryPane; 
 	private CurrentListPane currentListPane; 
 	
 	Image warningAlertImageSource;
@@ -202,7 +202,7 @@ public class FXUI implements PlayerListener {
 			}
 		});
 
-		libraryPane = new LibraryTabPane( this, audioSystem, library );
+		libraryPane = new LibraryPane( this, audioSystem, library );
 		transport = new Transport( this, audioSystem );
 		artSplitPane = new ImagesPanel ( this, audioSystem );
 		currentListPane = new CurrentListPane( this, audioSystem, library );
@@ -282,33 +282,33 @@ public class FXUI implements PlayerListener {
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
 				settingsWindow.show();
-
-			} else if ( e.getCode() == KeyCode.DIGIT1 /* With or without control */
+			 
+			} else if ( e.getCode() == KeyCode.DIGIT1 // With or without control
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
 				setLibraryCollapsed( false );
-				libraryPane.getSelectionModel().select( 0 );
+				libraryPane.selectPane( 0 );
 				Platform.runLater( () -> libraryPane.focusFilterOfCurrentTab() );
 
-			} else if ( e.getCode() == KeyCode.DIGIT2 /* With or without control */
+			} else if ( e.getCode() == KeyCode.DIGIT2 // With or without control
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
 				setLibraryCollapsed( false );
-				libraryPane.getSelectionModel().select( 1 );
+				libraryPane.selectPane( 1 );
 				Platform.runLater( () -> libraryPane.focusFilterOfCurrentTab() );
 	
-			} else if ( e.getCode() == KeyCode.DIGIT3 /* With or without control */
+			} else if ( e.getCode() == KeyCode.DIGIT3 // With or without control
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
 				setLibraryCollapsed( false );
-				libraryPane.getSelectionModel().select( 2 );
+				libraryPane.selectPane( 2 );
 				Platform.runLater( () -> libraryPane.focusFilterOfCurrentTab() );
 				
-			} else if ( e.getCode() == KeyCode.DIGIT4 /* With or without control */
+			} else if ( e.getCode() == KeyCode.DIGIT4 // With or without control
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
 				setLibraryCollapsed( false );
-				libraryPane.getSelectionModel().select( 3 );
+				libraryPane.selectPane( 3 );
 				Platform.runLater( () -> libraryPane.focusFilterOfCurrentTab() );
 					
 			} else if ( e.getCode() == KeyCode.F
@@ -319,13 +319,14 @@ public class FXUI implements PlayerListener {
 					currentListPane.infoLabelAndFilter.beginEditing();
 					currentListPane.currentListTable.getSelectionModel().clearSelection();
 				});
-				
+			
+			
 			} else if ( e.getCode() == KeyCode.F && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
 				
-				if ( libraryPane.isFocused() || libraryPane.albumTable.isFocused()
-				|| libraryPane.trackTable.isFocused() || libraryPane.playlistTable.isFocused() ) {
+				if ( libraryPane.isFocused() || libraryPane.albumPane.isFocused()
+				|| libraryPane.trackPane.isFocused() || libraryPane.playlistPane.isFocused() ) {
 					libraryPane.focusFilterOfCurrentTab();
 					
 				} else {
@@ -355,16 +356,16 @@ public class FXUI implements PlayerListener {
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
 				queueWindow.show();
-
+			
 			} else if ( e.getCode() == KeyCode.L && e.isShiftDown()
 			&& !e.isAltDown() && !e.isControlDown() && !e.isMetaDown() ) {
-				if ( !libraryPane.trackFilterBox.isFocused() && !libraryPane.albumFilterBox.isFocused()
-				&& !libraryPane.playlistFilterBox.isFocused() ) {
+				if ( !libraryPane.trackPane.filterBox.isFocused() && !libraryPane.albumPane.filterBox.isFocused()
+				&& !libraryPane.playlistPane.filterBox.isFocused() ) {
 					e.consume();
 					lyricsWindow.setTrack( audioSystem.getCurrentTrack() );
 					lyricsWindow.show();
 				}
-
+			
 			} else if ( e.getCode() == KeyCode.L && e.isControlDown() 
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
@@ -730,7 +731,7 @@ public class FXUI implements PlayerListener {
 	//REFACTOR: This function probably belongs in Library
 	public void addToPlaylist ( List <Track> tracks, Playlist playlist ) {
 		playlist.getTracks().addAll( tracks );
-		libraryPane.playlistTable.refresh(); 
+		libraryPane.playlistPane.playlistTable.refresh(); 
 		
 		//TODO: playlist.equals ( playlist ) instead of name .equals ( name ) ?
 		if ( audioSystem.getCurrentPlaylist() != null && audioSystem.getCurrentPlaylist().getName().equals( playlist.getName() ) ) {
@@ -866,7 +867,7 @@ public class FXUI implements PlayerListener {
 				if ( test.getName().equals( enteredName ) ) {
 					test.setTracks( tracks );
 					updatedPlaylist = test;
-					libraryPane.playlistTable.refresh(); 
+					libraryPane.playlistPane.playlistTable.refresh(); 
 					break;
 				}
 			}
@@ -912,7 +913,7 @@ public class FXUI implements PlayerListener {
 		library.removePlaylist( playlist );
 		playlist.setName ( rawName );
 		library.addPlaylist( playlist );
-		libraryPane.playlistTable.refresh();
+		libraryPane.playlistPane.playlistTable.refresh();
 		Hypnos.getPersister().saveLibraryPlaylists();
 		Hypnos.getPersister().deletePlaylistFile( oldFileBasename );
 	}
@@ -1220,12 +1221,10 @@ public class FXUI implements PlayerListener {
 	
 	public void fixTables() {
 		Platform.runLater( () -> {
-			libraryPane.albumTable.refresh();
-			libraryPane.playlistTable.refresh();
-			libraryPane.trackTable.refresh();
-			libraryPane.artistTab.artistTable.refresh();
-			libraryPane.fixTabs();
-			
+			libraryPane.albumPane.albumTable.refresh();
+			libraryPane.playlistPane.playlistTable.refresh();
+			libraryPane.trackPane.trackTable.refresh();
+			libraryPane.artistPane.artistTable.refresh();
 		});
 	}
 
@@ -1300,11 +1299,11 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public void refreshAlbumTable () {
-		libraryPane.albumTable.refresh();
+		libraryPane.albumPane.albumTable.refresh();
 	}
 
 	public void refreshTrackTable () {
-		libraryPane.trackTable.refresh();
+		libraryPane.trackPane.trackTable.refresh();
 	}
 
 	public void applySettingsAfterWindowShown ( EnumMap<Persister.Setting, String> settings ) {
@@ -1686,13 +1685,13 @@ public class FXUI implements PlayerListener {
 		for ( Album album : library.getAlbums() ) {
 			if ( album.getPath().equals( albumPath ) ) {
 				libraryPane.clearAlbumFilter();
-				libraryPane.albumTable.getSelectionModel().clearSelection();
-				libraryPane.albumTable.getSelectionModel().select( album );
-				libraryPane.albumTable.requestFocus();
-				libraryPane.albumTable.scrollTo( album );
+				libraryPane.albumPane.albumTable.getSelectionModel().clearSelection();
+				libraryPane.albumPane.albumTable.getSelectionModel().select( album );
+				libraryPane.albumPane.albumTable.requestFocus();
+				libraryPane.albumPane.albumTable.scrollTo( album );
 				libraryPane.setAlbumsVisible( true );
 				if ( isLibraryCollapsed() ) setLibraryCollapsed( false );
-				libraryPane.getSelectionModel().select( libraryPane.albumTab );
+				libraryPane.showAndSelectAlbumTab();
 				break;
 			}
 		}
@@ -1725,7 +1724,7 @@ public class FXUI implements PlayerListener {
 		//TODO: 
 	}
 
-	public LibraryTabPane getLibraryPane () {
+	public LibraryPane getLibraryPane () {
 		return libraryPane;
 	}
 

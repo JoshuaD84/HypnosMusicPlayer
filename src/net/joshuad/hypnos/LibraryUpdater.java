@@ -82,7 +82,7 @@ public class LibraryUpdater {
 						}
 						
 						library.playlistsToRemove.clear();
-						ui.getLibraryPane().updateLibraryListPlaceholder();
+						//TODO: can I remove? ui.getLibraryPane().updateLibraryListPlaceholder();
 					}
 				
 					synchronized ( library.playlistsToAdd ) {
@@ -98,7 +98,7 @@ public class LibraryUpdater {
 					
 					library.playlistsToUpdate.clear(); //PENDING: update playlists. 
 
-					ui.getLibraryPane().updateLibraryListPlaceholder();
+					//TODO: can I remove? ui.getLibraryPane().updateLibraryListPlaceholder();
 					
 					synchronized ( library.albumsToRemove ) {
 						if ( !library.albumsToRemove.isEmpty() ) {
@@ -107,7 +107,7 @@ public class LibraryUpdater {
 								changeCount++;
 							}
 							
-							ui.getLibraryPane().updateLibraryListPlaceholder();
+							//TODO: can I remove? ui.getLibraryPane().updateLibraryListPlaceholder();
 
 							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshAlbumTable(); //TODO: this may not be necessary. 
@@ -123,7 +123,7 @@ public class LibraryUpdater {
 								changeCount++;
 							}
 							
-							ui.getLibraryPane().updateLibraryListPlaceholder();
+							//TODO: can I remove? ui.getLibraryPane().updateLibraryListPlaceholder();
 
 							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshAlbumTable();  //TODO: this may not be necessary. 
@@ -211,7 +211,7 @@ public class LibraryUpdater {
 								}
 							}
 
-							ui.getLibraryPane().updateLibraryListPlaceholder();
+							//TODO: can I remove? ui.getLibraryPane().updateLibraryListPlaceholder();
 							
 							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshTrackTable(); //TODO: this may not be necessary. 
@@ -231,7 +231,7 @@ public class LibraryUpdater {
 							}
 
 
-							ui.getLibraryPane().updateLibraryListPlaceholder();
+							//TODO: can I remove? ui.getLibraryPane().updateLibraryListPlaceholder();
 							
 							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshTrackTable(); //TODO: this may not be necessary. 
@@ -268,8 +268,7 @@ public class LibraryUpdater {
 								changeCount ++;
 							}
 
-
-							ui.getLibraryPane().updateLibraryListPlaceholder();
+							//TODO: can I remove? ui.getLibraryPane().updateLibraryListPlaceholder();
 							
 							if ( changeCount >= maxChangesPerUpdate ) {
 								ui.refreshTrackTable(); //TODO: this may not be necessary. 

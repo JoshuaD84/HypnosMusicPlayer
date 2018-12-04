@@ -485,7 +485,7 @@ public class Transport extends VBox {
 			}
 		};
 		
-		ui.library.getPlaylistSorted().addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
+		ui.library.getPlaylistsSorted().addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
 			ui.updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		} );
 

@@ -1,6 +1,8 @@
-Library tabs needs context menu if it's blank
-
 track tab default - move # after Album
+
+Windows - Music Location Window doesn't have icon
+
+Windows - Current list filter x button height should be set
 
 ::::::::::::::
 
@@ -98,10 +100,6 @@ Future
 		
 :::: Refactor / organize my code ::::
 
-   switch to a grundle build system
-
-   separate album, track, and playlist tabs like we did for artistTab
-
 	a better structure for hotkey commands (maybe combine with commandline commands?)
 
 	Refactor Library
@@ -117,8 +115,5 @@ Future
 			Doesn't change artwork
 			CurrentplayingTrack is the same one
 			updates data and locations
-
-		Library load and unload time
-
 			
 

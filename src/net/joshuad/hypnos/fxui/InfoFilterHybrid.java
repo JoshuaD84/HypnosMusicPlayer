@@ -24,7 +24,7 @@ import javafx.scene.layout.HBox;
 import net.joshuad.hypnos.Hypnos;
 
 public class InfoFilterHybrid extends BorderPane {
-	private static final Logger LOGGER = Logger.getLogger( LibraryArtistTab.class.getName() );
+	private static final Logger LOGGER = Logger.getLogger( LibraryArtistPane.class.getName() );
 	private Label info;
 	private TextField filter;
 	

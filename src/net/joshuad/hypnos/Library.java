@@ -507,7 +507,7 @@ public class Library {
 			Hypnos.getUI().libraryCleared();
 		}
 		
-		Hypnos.getUI().getLibraryPane().updateLibraryListPlaceholder(); //REFACTOR: This desn't really belong here. 
+		//TODO: can I remove? Hypnos.getUI().getLibraryPane().updateLibraryListPlaceholder(); //REFACTOR: This desn't really belong here. 
 		Hypnos.getUI().setLibraryLoaderStatusToStandby();
 	}
 	
@@ -777,7 +777,7 @@ public class Library {
 		return name;
 	}
 
-	public SortedList <Playlist> getPlaylistSorted () {
+	public SortedList <Playlist> getPlaylistsSorted () {
 		return playlistsSorted;
 	}
 

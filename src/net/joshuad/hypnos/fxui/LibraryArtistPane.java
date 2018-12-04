@@ -26,7 +26,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -62,14 +61,13 @@ import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 
-public class LibraryArtistTab extends Tab {
-	private static final Logger LOGGER = Logger.getLogger( LibraryArtistTab.class.getName() );
+public class LibraryArtistPane extends BorderPane {
+	private static final Logger LOGGER = Logger.getLogger( LibraryArtistPane.class.getName() );
 	
 	private FXUI ui;
 	private AudioSystem audioSystem;
 	private Library library;
 	
-	private BorderPane content;
 	private HBox filterPane;
 	TextField filterBox;
 	
@@ -82,14 +80,14 @@ public class LibraryArtistTab extends Tab {
 	Label emptyListLabel = new Label( 
 		"No artists loaded. To add to your library, click on the + button or drop folders here." );
 	Label filteredListLabel = new Label( "No artists match." );
+	Label noColumnsLabel = new Label( "All columns hidden." );
 	Label loadingListLabel = new Label( "Loading..." );
 	
 	private ThrottledArtistFilter tableFilter;
 	
 	private ImageView addSourceImage, filterClearImage;
 	
-	public LibraryArtistTab ( FXUI ui, AudioSystem audioSystem, Library library ) {
-		super ( "Artists" );
+	public LibraryArtistPane ( FXUI ui, AudioSystem audioSystem, Library library ) {
 		this.ui = ui;
 		this.audioSystem = audioSystem;
 		this.library = library;
@@ -97,23 +95,47 @@ public class LibraryArtistTab extends Tab {
 		setupFilterPane();
 		artistTable = setupArtistTable();
 		
-		content = new BorderPane();
 		filterPane.prefWidthProperty().bind( filterPane.widthProperty() );
-		content.setTop( filterPane );
-		content.setCenter( artistTable );
+		setTop( filterPane );
+		setCenter( artistTable );
+
+		resetTableSettingsToDefault();
 		
-		this.setClosable( false );
-		Tooltip tabTooltip = new Tooltip ( "Artist Count: " + library.getArtists().size() );
-		setTooltip( tabTooltip );
-		
-		library.getArtists().addListener( new ListChangeListener<Artist> () {
-			public void onChanged ( Change <? extends Artist> changed ) {
-				tabTooltip.setText( "Artist Count: " + library.getArtists().size() );
+		library.getArtistsSorted().addListener( new ListChangeListener<Artist>() {
+			@Override
+			public void onChanged(Change<? extends Artist> arg0) {
+				updatePlaceholders();
 			}
 		});
 		
-		this.setContent( content );
+		artistColumn.visibleProperty().addListener( e -> updatePlaceholders() );
+		tracksColumn.visibleProperty().addListener( e -> updatePlaceholders() );
+		albumsColumn.visibleProperty().addListener( e -> updatePlaceholders() );
+		lengthColumn.visibleProperty().addListener( e -> updatePlaceholders() );
+		
 		resetTableSettingsToDefault();
+	}
+	
+	public void updatePlaceholders() {
+		boolean someVisible = false;
+		for ( TableColumn<?,?> column : artistTable.getColumns() ) {
+			if ( column.isVisible() ) {
+				someVisible = true;
+				break;
+			}
+		}
+		
+		if ( !someVisible ) {
+			artistTable.setPlaceholder( noColumnsLabel );
+		} else if ( library.getAlbums().isEmpty() ) {
+			if ( artistTable.getPlaceholder() != emptyListLabel ) {
+				artistTable.setPlaceholder( emptyListLabel );
+			}
+		} else {
+			if ( !artistTable.getPlaceholder().equals( filteredListLabel ) ) {
+				artistTable.setPlaceholder( filteredListLabel );
+			}
+		}
 	}
 	
 	public void resetTableSettingsToDefault() {
@@ -311,7 +333,7 @@ public class LibraryArtistTab extends Tab {
 			}
 		};
 
-		library.getPlaylistSorted().addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
+		library.getPlaylistsSorted().addListener( ( ListChangeListener.Change <? extends Playlist> change ) -> {
 			ui.updatePlaylistMenuItems( addToPlaylistMenuItem.getItems(), addToPlaylistHandler );
 		} );
 
@@ -516,26 +538,28 @@ public class LibraryArtistTab extends Tab {
 		float height = 26;
 
 		filterBox.setPrefHeight( height );
+		String addLocation = "resources/add.png";
+		String clearLocation = "resources/clear.png";
 		try {		
 			double currentListControlsButtonFitWidth = 15;
 			double currentListControlsButtonFitHeight = 15;
-			Image image = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/add.png" ).toFile() ) );
+			Image image = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( addLocation ).toFile() ) );
 			addSourceImage = new ImageView ( image );
 			addSourceImage.setFitWidth( currentListControlsButtonFitWidth );
 			addSourceImage.setFitHeight( currentListControlsButtonFitHeight );
 			
 		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load add icon: resources/add.png", e );
+			LOGGER.log( Level.WARNING, "Unable to load add icon: " + addLocation, e );
 		}
 		
 		try {
-			Image clearImage = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources/clear.png" ).toFile() ) );
+			Image clearImage = new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( clearLocation ).toFile() ) );
 			filterClearImage = new ImageView ( clearImage );
 			filterClearImage.setFitWidth( 12 );
 			filterClearImage.setFitHeight( 12 );
 			
 		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to load clear icon: resources/clear.png", e );
+			LOGGER.log( Level.WARNING, "Unable to load clear icon: " + clearLocation, e );
 		}
 		
 		Button libraryButton = new Button( );
@@ -731,5 +755,11 @@ public class LibraryArtistTab extends Tab {
 		retMe.put ( Setting.AR_TABLE_LENGTH_COLUMN_WIDTH, lengthColumn.getPrefWidth() );
 				
 		return retMe;
+	}
+	
+	public void focusFilter() {
+		artistTable.requestFocus();
+		filterBox.requestFocus();
+		artistTable.getSelectionModel().clearSelection();
 	}
 }
