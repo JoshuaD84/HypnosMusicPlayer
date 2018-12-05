@@ -73,7 +73,6 @@ int main( int argc, char** argv ) {
       jobjectArray argsToJava = env->NewObjectArray( argc-1, classString, NULL );
 
       for ( int i = 1; i < argc; i++ ) {
-         printf ( "Converting: %s",  argv[i] );
          jstring arg = env->NewStringUTF( argv[i] );
          env->SetObjectArrayElement( argsToJava, i-1, arg );
       }
@@ -81,7 +80,7 @@ int main( int argc, char** argv ) {
       env->CallStaticVoidMethod( cls, main, argsToJava );
 
    } else {
-      printf("main method not found") ;
+      printf("main method not found\n") ;
    }
 
    jvm->DestroyJavaVM();
