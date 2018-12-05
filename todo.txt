@@ -1,14 +1,12 @@
 Beta 5:
    Linux - Strip JRE
    Windows - Strip JRE
-   Windows - Build Process
-
-Testing:
-   Windows: Make sure minimize works properly with system tray
 
 ::::::::::::::
 
 Future
+   Windows - Build Process
+
    Remove WinXP not supported by Jfx
 
    Linux: Right click on table headers causes resort
