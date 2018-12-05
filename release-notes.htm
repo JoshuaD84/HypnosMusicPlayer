@@ -1,8 +1,72 @@
 <html>
 <head>
-<title>Hypnos Beta 4 Release Notes</title>
+<title>Hypnos Beta 5 Release Notes</title>
 </head>
-<body style="max-width: 1000px; margin: 20 auto">
+<body style="background-color: #D9D9D9; margin: 0px;">
+<div style="max-width: 800px; margin: 0 auto; padding:20px 20px; line-height: 1.5em; background-color: #FFFFFF">
+
+   <h1>Hypnos - Beta 5 Release Notes</h1>
+   <p><a target="_blank" href="http://hypnosplayer.org">Released: 2018-12-05</a></p>
+   <p>Hypnos beta 5 is here. My last release notes were wrong; I'm not releasing version 1 yet. There are a lot of minor issues and bugs I want to address before calling it a stable release.</p>
+   <h2>New Features</h2>
+   <ul>
+      <li>System Tray support on both Linux and Windows.</li>
+      <li>Improved Hotkeys for both Windows and Linux:
+         <ul>
+            <li>Windows: No more issues with start menu sometimes appearing with hotkeys based on the windows key.</li>
+            <li>Windows: Support for Media keys on keyboard.</li>
+            <li>Linux: Hotkeys are now consumed on press. No need for the user to fiddle with their desktop environment to get them consumed.</li>
+         </ul>
+      </li>
+      <li>Artist view for Library.</li>
+      <li>Allow each playlist to specify its own shuffle / repeat setting.</li>
+      <li>Library Loader status bar in Music Search Locations window.</li>
+      <li>Improved buttons at bottom of library pane.</li>
+      <li>"Search for Artwork" menu options on image panes - opens web browser at ddg image search.</li>
+      <li>Show missing or invalid library source locations in red.</li>
+      <li>Increased volume slider bar length.</li>
+      <li>Automatically refresh any popup windows (info, lyrics, etc.) when selecting items in library.</li>
+      <li>File name and browse button on tag window when editing single tags.</li>
+      <li>Add clear button to current list filter.</li>
+      <li>Standardized layout of popup info windows.</li>
+      <li>Better default layout for track table.</li>
+   </ul>
+   <h2>Bugs Fixed</h2>
+   <ul>
+      <li>Windows: Pinning now works properly.</li>
+      <li>Better drag and drop from web to image panes, particularly ddg and google image search pages</li>
+      <li>Clear album search box when "Go to Album" is selected.</li>
+      <li>Remove mp4 from valid extensions; those are usually videos.</li>
+      <li>Dont get hung up on missing tracks, play through.</li>
+      <li>Repair MusixMatch lyrics scraper.</li>
+      <li>Linux: notify user when inotify limit is reached, present a solution.</li>
+      <li>Improve library code a bit to avoid corner cases when deleting sources.</li>
+      <li>Show artist image on non-album tracks now.</li>
+      <li>Respect volume at launch better.</li>
+      <li>Windows: Show hypnos icon on music search locations window.</li>
+      <li>Disable context menus on empty rows.</li>
+      <li>Moved to Java 11, so there are a small handful of issues that got addressed by that.</li>
+   </ul>
+   <h2>Known Bugs</h2>
+   <p>If you run into any bugs that aren't listed here, please <a href="https://github.com/JoshuaD84/HypnosMusicPlayer" target="_blank">report them</a>, so I can fix them!</p>
+   <ul>
+      <li>Ubuntu 16.04, Fedora 27.1.6, and other version of linux - Opening system file location dialog sometimes crashes the program.  Please use drag and drop and avoid native file search windows for now. I'm working on a solution. </li>
+      <li>Linux: If it's paused in the middle of the track after the program starts, it may not make sound. Need to start playing a new track to get sound.</li>
+      <li>Linux: Right click on table headers causes re-sort</li>
+      <li>Windows: If you use ultramon and the "move to next monitor" hotkey along with Hypnos's "minimize to system tray" option, if Hypnos is maximized it will disappear to tray icon when you activate the ultramon hotkey. Disable "minimize to system tray" to address this for now. Looking for a better solution.</li>
+      <li>Linux/Gnome 3: Title on task bar is net.joshuad.hypnos.Hypnos instead of just Hypnos</li>
+      <li>Sometimes the art pane gets stuck and stops updating until hypnos is restarted</li>
+      <li>Audio playback still isn't as good as I'd like for it to be.</li>
+      <li>Linux/KDE Neon - Drag and drop from OS to Hypnos doesn't work well.  Browse button does not work properly.</li>
+      <li>JavaFX - Tables scrolls slightly while loading content. Slightly annoying, hard to fix.</li>
+      <li>Linux - If you open a native file search window, you cannot drag-resize hypnos. Can still maximize/restore</li>
+      <li>Double clicking on table header dividers has some minor bugs</li>
+      <li>There may be seek bar issues on some ACC files</li>
+   </ul>
+<br>
+<br>
+<br>
+<hr>
 
 <h1>Hypnos - Beta 4 Release Notes</h1>
 <p>Released: 2018-11-09</p>
@@ -17,7 +81,7 @@ apologize to any users that are on a slow internet connection.</p>
 
 <p><strong>Note: Hypnos Beta 4 will not load your old library data, and will instead do a single rescan of your entire
 library.</strong> Playlists and settings will not be lost. It just has to rescan your library to pickup some additional
-metadata we are using.</p> 
+metadata we are using.</p>
 
 <h2>New Features</h2>
 <ul>
@@ -46,10 +110,9 @@ metadata we are using.</p>
    <li>32-bit linux version not released. I don't think anyone is using it, and it's alot more work to curate the
    necessary libraries, test on 32-bit machines, make the builds, etc.  If there's an actual demand I could look at
    bringing this back down the road, but I just don't think there are very many 32-bit desktop linux users still out
-   there.</li>   
+   there.</li>
 </ul>
-	
-<hr>
+
 <br>
 <br>
 <br>
@@ -84,7 +147,7 @@ metadata we are using.</p>
 	<li>Escape now closes all popup windows</li>
 	<li>Improved misc. error notifications for the user</li>
 </ul>
-	
+
 <h2>Bugs Fixed</h2>
 <ul>
 	<li>m4a playback speed fixed.</li>
@@ -99,10 +162,10 @@ metadata we are using.</p>
 	<li>Loading images from tags wasn't always working. Is now.</li>
 	<li>Show that the current list has been shuffled if a subset of tracks are shuffled</li>
 </ul>
-	
+
 <h2>Roadmap</h2>
 <p>I hope to release one more beta and then finally version 1. I have a handful of remaining issues I know about, and I'm sure there are plenty of bugs I haven't found yet.</p>
-	
+
 <h3>Pending Issues</h3>
 <ul>
 	<li>ALAC support</li>
@@ -117,7 +180,7 @@ metadata we are using.</p>
 	<li>Fix a big pile of small bugs</li>
 	<li>Windows - Pinning to taskbar doesn't seem to work great at the moment.</li>
 </ul>
-	
+
 <h1>Hypnos - Beta 2 Release Notes</h1>
 <p>Released: 2017-12-28</p>
 <h2>New Features</h2>
@@ -137,7 +200,7 @@ metadata we are using.</p>
 	<li>Unified hotkeys across program with tab in settings to list</li>
 	<li>Fix volume max on windows. </li>
 	<li>Fix volume slider feel (now logarithmic) for linux and windows. </li>
-</ul>	
+</ul>
 
 <h2>Changes / Improvements</h2>
 <ul>
@@ -170,7 +233,7 @@ metadata we are using.</p>
 	<li>Current list play/pause buttons changes theme immediately</li>
 	<li>Global hotkey bring to front toggle now is two steps instead of three (linux 64 bit, windows and 32bit next release)</li>
 </ul>
-	
+
 <h2>Known Issues</h2>
 <ul>
 	<li><strong>OSX not supported for the time being.</strong>  I don't have an OSX development / testing machine, and seeing all of the small bugs I had to fix in windows made me convinced that it's not responsible to write software for an OS that I can't test on myself.  I'd like to work on an OSX version and I bet it wouldn't be too hard to get hypnos running well there, but I need regular access to the platform to do that.</li>
@@ -187,7 +250,6 @@ metadata we are using.</p>
 <br />
 <br />
 
-<hr />
 
 <h1>Hypnos - Beta 1 Release Notes</h1>
 <p>Released: 2017-11-11</p>
@@ -222,5 +284,6 @@ metadata we are using.</p>
 	<li>Tables scroll a little bit while library is loading</li>
 	<li>Linux Only - After a dialog appears, main window cannot be drag-resized. Known javafx bug, looking for workaround</li>
 </ul>
+</div>
 </body>
 </html>

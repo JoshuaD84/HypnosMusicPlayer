@@ -1,11 +1,25 @@
 Beta 5:
-   Linux - Strip JRE
    Windows - Strip JRE
+   
+
+   Ubuntu 16.04 - Open File Dialog
+   Fedora 27.1.6 - Open File Dialog
 
 ::::::::::::::
 
 Future
+   remove Icon.ico from resources. Put it in packaging. Update NSIS Script 
+ 
+   Sometimes it doesn't make sound after restarting into the paused state.  
+
+   Maybe get rid of log output when calling it at the commandline with switches to control current version
+      try hypnos --next and see output, I don't love it
+   
+   Look at getting completely off swing, we can shave a lot out of the jres if we do
+
    Windows - Build Process
+
+   Tom Waits - Blue Valentines - Buggy on my 18.04? 
 
    Remove WinXP not supported by Jfx
 
@@ -22,15 +36,15 @@ Future
    Windows: Move to next monitor with ultramon and minimize to system tray dont play well together
       User can just disable minimize to system tray and still close to system tray, so whatever nbd
 
-   Maybe try to make the tab pane tabs on library full width and no spacing. Maybe replace with buttons
-      .tab-header-area {
-      -fx-padding: 0 0 0 0;
-   }
    Windows Launcher: move hypnos.jar to lib
       This apparently messes w/ the root directory for java. Let's do this next release
 
    Linux: Dynamic menu titles in system tray
       This is kind of a pain because of the icons and because I'm bad at C
+
+   Gnome - title on taskbar is set as net.joshuad.hypnos.Hypnos
+
+   Gnome - See how sys tray interacts w/ topiconsplus extension
 
 	Mounted Audio CDs
 
