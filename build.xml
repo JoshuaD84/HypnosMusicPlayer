@@ -138,7 +138,7 @@
 		</exec>
 		<move
 			file="${dist}/Hypnos-Installer.exe"
-			tofile="${dist}/Hypnos-Win-${version-simple}_${TODAY}_b${build.number}.exe" 
+			tofile="${dist}/Hypnos-win-${version-simple}_${TODAY}_b${build.number}.exe" 
 		/>
 		
 		<delete dir="${temp}" />

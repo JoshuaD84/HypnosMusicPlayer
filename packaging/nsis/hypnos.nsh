@@ -48,6 +48,13 @@ function .onInit
 functionEnd
  
 section "install"
+	rmDir /r /REBOOTOK $INSTDIR\jre
+	rmDir /r /REBOOTOK $INSTDIR\lib
+	rmDir /r /REBOOTOK $INSTDIR\jfx
+	rmDir /r /REBOOTOK $INSTDIR\resources
+    delete $INSTDIR\hypnos.jar
+    delete $INSTDIR\Hypnos.exe
+	
 	# Files for the install directory - to build the installer, these should be in the same directory as the install script (this file)
 	setOutPath $INSTDIR
 
@@ -110,7 +117,7 @@ section "uninstall"
 	rmDir /r /REBOOTOK $INSTDIR\jre
 	rmDir /r /REBOOTOK $INSTDIR\lib
 	rmDir /r /REBOOTOK $INSTDIR\resources
-   delete $INSTDIR\Hypnos.exe
+    delete $INSTDIR\Hypnos.exe
  
 	# Always delete uninstaller as the last action
 	delete $INSTDIR\uninstall.exe
