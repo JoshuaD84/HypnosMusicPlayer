@@ -22,7 +22,7 @@ InstallDir "$PROGRAMFILES64\${APP_DIR_NAME}"
 LicenseData "..\..\LICENSE"
 # This will be in the installer/uninstaller's title bar
 Name "${APPNAME}"
-Icon "..\..\stage\resources\icon.ico"
+Icon "..\..\packaging\icon.ico"
 outFile "..\..\distribution\Hypnos-Installer.exe"
  
 !include LogicLib.nsh
