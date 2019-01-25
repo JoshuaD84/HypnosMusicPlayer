@@ -1,6 +1,69 @@
-Beta 5:
-   Linux - Strip JRE
-   Windows - Strip JRE
+Get from VLC backend to something more lightweight
+   Windows stutters at beginning of each track
+
+Drag and Drop to Playlist Info update current list if it is that playlist unchanged
+
+JavaFX / Linux Open File Dialog causes crash
+
+Linux: Right click on table headers causes resort
+
+Improve memory usage if possible, particularly look at library i think that's a big cause
+
+Maybe get rid of log output when calling it at the commandline with switches to control current version
+   try hypnos --next and see output, I don't love it
+   
+Remove WinXP not supported by Jfx
+
+Gnome - title on taskbar is set as net.joshuad.hypnos.Hypnos
+
+Gnome - See how sys tray interacts w/ topiconsplus extension
+
+Add a place to drag and drop folders (or navigate to them) to demand that they be rescanned immediately.
+   Maybe add a right click > rescan button on library window
+
+Sometimes it doesn't make sound after restarting into the paused state.  
+
+Build jxgrabhotkey as a seperate jar
+   
+Look at getting completely off swing, we can shave a lot out of the jres if we do
+
+windows button sizes are sometimes off a bit
+
+"show only non-album tracks" checkbox isn't centered right
+   
+Sometimes the art pane can become non-responsive. I dragged and dropped an image from google and it stopped changing
+   I've seen it a few other times too.
+   It happened as i was scrolling quickly though Josh radio, around Joanna newsom
+
+Can we use Java's Jigsaw to reduce distribution size somehow? We had issues w/ circular dependencies, but can we work
+through that?
+
+There's a significant delay after close is hit until hypnos window closes
+
+improve library scanner
+   Accidental Sebiards - Live at the watermark
+   The Smiths - Louder than Bombs
+   Onymous - Untitled
+   Mahler - 4th Symphony
+
+   Don't add an artist that has no name, just those tracks don't get grouped into an artist
+
+   An album will form from tracks if you edit them and they aren't currently an album. But an album won't split if you edit tags and make it not be an album.
+      Is this desired behavior? I feel like probably no -- it can create different states based on the same disk contents, which doesn't make sense
+
+Windows System Integration
+      Select Multiple Files in explorer - No Option to play in Hypnos. Add that
+      "Open with" causes the current track button to not show the current track's name.
+      Commandline Interface
+         Send a file via command line when hypnos isn't playing -- it starts
+         Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on current list
+
+If something gets dropped into config/playlists folders, update the UI to include it?
+
+Linux: Dynamic menu titles in system tray
+   This is kind of a pain because of the icons and because I'm bad at C
+
+
 
 Windows - Trailing Spaces in File Name
       Right now it panics and restarts scan. Just keep going, ignore the problem, log it. 
@@ -30,13 +93,11 @@ java.nio.file.InvalidPathException: Trailing char < > at index 70: D:\music\Soun
 ::::::::::::::
 
 Future
+   visual position slider
+
    Windows - Build Process
 
-   Remove WinXP not supported by Jfx
-
-   Linux: Right click on table headers causes resort
-
-   Scroll Wheel on track position slider
+   Tom Waits - Blue Valentines - Buggy on my 18.04? 
 
    Linux: Media Buttons
       https://stackoverflow.com/questions/53550397/javafx-keyevent-is-it-possible-to-get-more-info-for-undefined-events
@@ -47,39 +108,11 @@ Future
    Windows: Move to next monitor with ultramon and minimize to system tray dont play well together
       User can just disable minimize to system tray and still close to system tray, so whatever nbd
 
-   Maybe try to make the tab pane tabs on library full width and no spacing. Maybe replace with buttons
-      .tab-header-area {
-      -fx-padding: 0 0 0 0;
-   }
-   Windows Launcher: move hypnos.jar to lib
-      This apparently messes w/ the root directory for java. Let's do this next release
-
-   Linux: Dynamic menu titles in system tray
-      This is kind of a pain because of the icons and because I'm bad at C
-
 	Mounted Audio CDs
-
-	Windows	System Integration
-			Select Multiple Files in explorer - No Option to play in Hypnos. Add that
-			"Open with" causes the current track button to not show the current track's name.
-			Commandline Interface
-				Send a file via command line when hypnos isn't playing -- it starts
-				Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on current list
-
-   Drag and Drop to Playlist Info update current list if it is that playlist unchanged
 
    https://stackoverflow.com/questions/51851572/java-fx-button-is-staying-pressed-after-drag-event
 
-   There's a significant delay after close is hit until hypnos window closes
-
-   Allow reordering of library tabs
-
-   Sometimes the art pane can become non-responsive. I dragged and dropped an image from google and it stopped changing
-      I've seen it a few other times too.
-      It happened as i was scrolling quickly though Josh radio, around Joanna newsom
-
 	Can I expand encoding information display using vlc?
-      mediaPlayer.getMedia*
 
 	Windows - First hover over the love button makes it shift positions
 		Launch Hypnos without lastfm widgets showing
@@ -94,9 +127,6 @@ Future
 		User said it opened the track instead of opening folder. Confirmed on KDE Neon image on my computer, it opened gwenview
 			https://stackoverflow.com/questions/48131760/desktop-getdesktop-open-folder-in-kde-opens-up-gwenview-instead-of-dolphin
 
-	Add a place to drag and drop folders (or navigate to them) to demand that they be rescanned immediately.
-		Maybe add a right click > rescan button on library window
-
 	Drag and drop from misc places to system
 		playlist table -> m3u
 		track table, history, queue, info windows, current table -> copy single tracks
@@ -105,8 +135,6 @@ Future
 
 	Maybe add sorting of roman numerals?
 		https://gist.github.com/julienhaversano/9197588
-
-	If something gets dropped into config/playlists folders, update the UI to include it?
 
 	Playlist throttled filter, but who's going to have over 1000 playlists?
 
@@ -126,21 +154,12 @@ Future
 
 		When you launch show busy mouse cursor
 
-		https://sourceforge.net/p/launch4j/discussion/332684/thread/75bbbd93/
-		https://stackoverflow.com/questions/7506329/embed-java-into-a-c-application
-		
 :::: Refactor / organize my code ::::
 
 	a better structure for hotkey commands (maybe combine with commandline commands?)
 
 	Refactor Library
-		Make LibraryUpdater part of Library. Is there a way to abstract out the Platform -> RunLater part? I feel like we're just stuck w/ that, which kind of ties to us JavaFX
- 			Maybe ui.runMe ( Runnable ), and then the UI can decide whether to launch a new thread, have a thread idling, do it on this thread, or use something like Platform.runLater()
-	
-		An album will form from tracks if you edit them and they aren't currently an album. But an album won't split if you edit tags and make it not be an album.
-			Is this desired behavior? I feel like probably no -- it can create different states based on the same disk contents, which doesn't make sense
-
-		Sometimes there are duplicated tracks in the track list
+		Make LibraryUpdater part of Library. 
 
 		Setup a currentList.updateAlbum and updatePlaylist system
 			Doesn't change artwork

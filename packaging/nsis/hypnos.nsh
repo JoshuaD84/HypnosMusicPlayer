@@ -22,7 +22,7 @@ InstallDir "$PROGRAMFILES64\${APP_DIR_NAME}"
 LicenseData "..\..\LICENSE"
 # This will be in the installer/uninstaller's title bar
 Name "${APPNAME}"
-Icon "..\..\stage\resources\icon.ico"
+Icon "..\..\packaging\icon.ico"
 outFile "..\..\distribution\Hypnos-Installer.exe"
  
 !include LogicLib.nsh
@@ -48,6 +48,13 @@ function .onInit
 functionEnd
  
 section "install"
+	rmDir /r /REBOOTOK $INSTDIR\jre
+	rmDir /r /REBOOTOK $INSTDIR\lib
+	rmDir /r /REBOOTOK $INSTDIR\jfx
+	rmDir /r /REBOOTOK $INSTDIR\resources
+    delete $INSTDIR\hypnos.jar
+    delete $INSTDIR\Hypnos.exe
+	
 	# Files for the install directory - to build the installer, these should be in the same directory as the install script (this file)
 	setOutPath $INSTDIR
 
@@ -110,7 +117,7 @@ section "uninstall"
 	rmDir /r /REBOOTOK $INSTDIR\jre
 	rmDir /r /REBOOTOK $INSTDIR\lib
 	rmDir /r /REBOOTOK $INSTDIR\resources
-   delete $INSTDIR\Hypnos.exe
+    delete $INSTDIR\Hypnos.exe
  
 	# Always delete uninstaller as the last action
 	delete $INSTDIR\uninstall.exe

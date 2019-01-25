@@ -1,7 +1,7 @@
 <project name="Hypnos Music Player" default="compile" basedir=".">
 	
-	<property name="version" value="Nightly" />
-	<property name="version-simple" value="nightly" />
+	<property name="version" value="Beta 5" />
+	<property name="version-simple" value="beta5" />
 	<property name="version-tag" value="${version}" />
 	
 	<property name="src" location="src"/>
@@ -120,6 +120,7 @@
 				<exclude name="**/bin/**" />
 				<exclude name="**/lib/nix/" />
 				<exclude name="**/lib/osx/" />
+				<exclude name="**/lib/jintellitype-1.3.9.jar" />
 			</fileset>
 			<fileset file="bin-native/win-launch/Hypnos.exe" />
 		</copy>
@@ -128,12 +129,16 @@
 			<fileset dir="${packaging}/jres/win" />
 		</copy>
 		
+		<copy todir="${temp}/Hypnos/jfx" >
+			<fileset dir="${packaging}/jres/win-jfx" />
+		</copy>
+		
 		<exec executable="makensis">
 			<arg value="${packaging}/nsis/hypnos.nsh" />
 		</exec>
 		<move
 			file="${dist}/Hypnos-Installer.exe"
-			tofile="${dist}/Hypnos-Win-${version-simple}_${TODAY}_b${build.number}.exe" 
+			tofile="${dist}/Hypnos-win-${version-simple}_${TODAY}_b${build.number}.exe" 
 		/>
 		
 		<delete dir="${temp}" />
