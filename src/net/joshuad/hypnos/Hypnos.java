@@ -149,8 +149,6 @@ public class Hypnos extends Application {
 	
 	private static ByteArrayOutputStream logBuffer; //Used to store log info until log file is initialized
 	
-	private static Handler consoleHandler;
-	
 	private static Formatter logFormat = new Formatter() {
 		SimpleDateFormat dateFormat = new SimpleDateFormat ( "MMM d, yyyy HH:mm:ss aaa" );
 		public String format ( LogRecord record ) {
@@ -270,23 +268,16 @@ public class Hypnos extends Application {
 		
 	}
 	
-	private static void setupInitialLoggerFormat () {
-		consoleHandler = new ConsoleHandler();
-		consoleHandler.setFormatter( logFormat );
-		Logger.getLogger( "" ).getHandlers()[0].setFormatter( logFormat );
-	}
-	
 	private static void startLogToBuffer() {
 		originalOut = System.out;
 		originalErr = System.err;
 		
 		logBuffer = new ByteArrayOutputStream();
 		
-		TeeOutputStream bufferOutTee = new TeeOutputStream ( originalOut, new PrintStream ( logBuffer ) );
-		TeeOutputStream bufferErrTee = new TeeOutputStream ( originalErr, new PrintStream ( logBuffer ) );
-		
-		System.setOut( new PrintStream ( bufferOutTee ) );
-		System.setErr( new PrintStream ( bufferErrTee ) );
+		System.setOut( new PrintStream ( logBuffer ) );
+		System.setErr( new PrintStream ( logBuffer ) );
+
+		Logger.getLogger( "" ).getHandlers()[0].setFormatter( logFormat );
 	}
 	
 	private void parseSystemProperties() {
@@ -478,7 +469,9 @@ public class Hypnos extends Application {
 		
 		try {
 			PrintWriter logOut = new PrintWriter ( new FileOutputStream ( logFile.toFile(), false ) );
-			logOut.print( logBuffer.toString() );
+			String logBufferS = logBuffer.toString();
+			logOut.print( logBufferS );
+			originalErr.print ( logBufferS );
 			logOut.close();
 			
 		} catch ( Exception e ) {
@@ -486,11 +479,22 @@ public class Hypnos extends Application {
 		}
 		
 		try {
+			//Remove the existing console handler
+			Logger.getLogger( "" ).removeHandler( Logger.getLogger( "" ).getHandlers()[0] );
+						
+			//restore system out and system err, but put all of them to the err channel
+			System.setOut( originalErr );
+			System.setErr( originalErr );
+			
+			//Add a file handler to output to logFile			
 			FileHandler fileHandler = new FileHandler( logFile.toString(), true );     
 			fileHandler.setFormatter( logFormat );
+	        Logger.getLogger( "" ).addHandler( fileHandler );
 			
-			Logger.getLogger( "" ).removeHandler( consoleHandler );
-	        Logger.getLogger("").addHandler( fileHandler );
+			//Create console output
+			ConsoleHandler consoleHandler = new ConsoleHandler();    
+			consoleHandler.setFormatter( logFormat );
+	        Logger.getLogger( "" ).addHandler( consoleHandler );
 	        
 		} catch ( IOException e ) {
 			LOGGER.log( Level.WARNING, "Unable to setup file handler for logger.", e );
@@ -688,7 +692,6 @@ public class Hypnos extends Application {
 	public void start ( Stage stage ) {
 		try {
 			startLogToBuffer();
-			setupInitialLoggerFormat();
 			parseSystemProperties();
 			determineOS();
 			setupRootDirectory(); 
@@ -830,13 +833,13 @@ public class Hypnos extends Application {
 			} else {
 				boolean gotResponse = singleInstanceController.sendCommandsThroughSocket( commands );
 				if ( commands.size() > 0 ) {
-					System.out.println ( "Commands sent to currently running Hypnos." );
+					originalOut.println ( "Commands sent to currently running Hypnos." );
 					
 				} else if ( gotResponse ) {
 					singleInstanceController.sendCommandsThroughSocket( Arrays.asList(
 						new SocketCommand ( SocketCommand.CommandType.CONTROL, SocketCommand.SHOW )
 					));
-					System.out.println ( "Hypnos is already running, brought to front." );
+					originalOut.println ( "Hypnos is already running, brought to front." );
 					
 				} else {
 					FXUI.notifyUserHypnosNonResponsive();
