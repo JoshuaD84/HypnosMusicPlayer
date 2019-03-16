@@ -141,7 +141,9 @@ public class LibraryUpdater {
 									if ( library.albums.contains( updateSource ) ) {
 										Album updateMe = library.albums.get( library.albums.indexOf( updateSource ) );
 										Artist oldArtist = library.getArtist( updateMe.getAlbumArtist() );
-										oldArtist.removeAlbum( updateMe );
+										if ( oldArtist != null ) {
+											oldArtist.removeAlbum( updateMe );
+										}
 										
 										try {
 											updateMe.updateData();
@@ -189,8 +191,8 @@ public class LibraryUpdater {
 									changeCount += 2; //We charge two here because this is a costly transaction
 	 							}
 								
-								if ( changeCount >= maxChangesPerUpdate ) {
-									ui.refreshAlbumTable();  //this may not be necessary. 
+								if ( changeCount >= maxChangesPerUpdate || library.albumsToUpdate.isEmpty() ) {
+									ui.refreshAlbumTable();  
 									return;
 								}
 							}
