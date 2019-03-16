@@ -1,6 +1,5 @@
 Scanner
-   Add a right click > rescan option to library panes and library location pane
-      seems to be working for albums. Test more and see and then expand to other systems
+   Rescan option for artists and tracks?
 
    allow the order of the library locations to be changed
    Can we make it smarter / faster?
@@ -12,17 +11,18 @@ Scanner
       Mahler - 4th Symphony
 
    Don't add an artist that has no name, just those tracks don't get grouped into an artist
+      Or maybe have a special artist group for all the tracks/albums with no artist name
 
    An album will form from tracks if you edit them and they aren't currently an album. But an album won't split if you edit tags and make it not be an album.
       Is this desired behavior? I feel like probably no -- it can create different states based on the same disk contents, which doesn't make sense
 
 Decoder  
-   Windows - better decoder, stutters at beginning of each track
+   Windows: better decoder, stutters at beginning of each track
    
    Linux seems fine, and if we do system integration the cost to install vlc isn't as high, so windows is the bigger
    focus
 
-   Sometimes it doesn't make sound after restarting into the paused state.  
+   Linux: Sometimes it doesn't make sound after restarting into the paused state.  
 
 UI
    If you open an album info window for an album where the files are missing, then double click the trac, nothing

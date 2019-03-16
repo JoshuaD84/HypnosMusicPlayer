@@ -154,7 +154,9 @@ public class LibraryUpdater {
 										}
 										
 										Artist newArtist = library.getArtist( updateMe.getAlbumArtist() );
-										newArtist.addAlbum( updateMe );
+										if ( newArtist != null ) {
+											newArtist.addAlbum( updateMe );
+										}
 
 										//TODO: handle this when we have multiple discs loaded
 										List <Album> currentListAlbums = audioSystem.getCurrentList().getState().getAlbums();

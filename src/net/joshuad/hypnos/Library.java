@@ -724,7 +724,7 @@ public class Library {
 
 			WatchEvent <Path> watchEvent = (WatchEvent<Path>)event;
 			Path child = directory.resolve( watchEvent.context() );
-
+			
 			if ( eventKind == StandardWatchEventKinds.ENTRY_CREATE ) {
 				if ( Files.isDirectory( child ) ) {
 					sourceToAdd.add( new MusicSearchLocation ( child ) );  
