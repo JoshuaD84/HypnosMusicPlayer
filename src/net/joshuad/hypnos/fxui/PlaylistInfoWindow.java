@@ -32,6 +32,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.joshuad.hypnos.Album;
+import net.joshuad.hypnos.CurrentList;
 import net.joshuad.hypnos.Library;
 import net.joshuad.hypnos.Playlist;
 import net.joshuad.hypnos.Track;
@@ -533,6 +534,13 @@ public class PlaylistInfoWindow extends Stage {
 
 							playlist.setTracks( new ArrayList <Track> ( trackTable.getItems() ) );
 						} break;
+					}
+					
+					if ( audioSystem.getCurrentList().getState().getMode() == CurrentList.Mode.PLAYLIST ) {
+						Playlist currentListPlaylist = audioSystem.getCurrentList().getState().getPlaylist();
+						if ( currentListPlaylist != null && currentListPlaylist.equals( this.playlist ) ) {
+							audioSystem.getCurrentList().setPlaylist( playlist );
+						}
 					}
 
 					event.setDropCompleted( true );

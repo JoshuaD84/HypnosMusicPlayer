@@ -1,14 +1,16 @@
 Scanner
-   Rescan option for artists and tracks?
+   Manual rescan option for artists and tracks?
 
    allow the order of the library locations to be changed
-   Can we make it smarter / faster?
+   
+   Can we make the scanner smarter / faster?
 
    failed scans 
       Accidental Sebiards - Live at the watermark
       The Smiths - Louder than Bombs
       Onymous - Untitled
       Mahler - 4th Symphony
+      Vangelis - Nocturne, doesn't turn into an album
 
    Don't add an artist that has no name, just those tracks don't get grouped into an artist
       Or maybe have a special artist group for all the tracks/albums with no artist name
@@ -31,21 +33,20 @@ UI
    track. 
 
    Right click -> reset to default view doesn't set ascending/descnding properly
-   windows button sizes are sometimes off a bit
-   Drag and Drop to Playlist Info update current list if it is that playlist unchanged
 
    Sometimes the art pane can become non-responsive. I dragged and dropped an image from google and it stopped changing
       I've seen it a few other times too.
       It happened as i was scrolling quickly though Josh radio, around Joanna newsom
 
    If something gets dropped into config/playlists folders, update the UI to include it?
-   Add a "remove duplicates" to current list drop down menu
-   
 
 Linux
    JavaFX / Linux Open File Dialog causes crash
+   
    Right click on table headers causes resort
+
    Gnome - title on taskbar is set as net.joshuad.hypnos.Hypnos
+
    Gnome - See how sys tray interacts w/ topiconsplus extension
 
    Linux: Dynamic menu titles in system tray
@@ -54,8 +55,11 @@ Linux
 
 Backend
    Improve memory usage if possible, particularly look at library i think that's a big cause
+
    Remove WinXP not supported by Jfx
+
    Build jxgrabhotkey as a seperate jar
+
    Look at getting completely off swing, we can shave a lot out of the jres if we do
 
    Can we use Java's Jigsaw to reduce distribution size somehow? We had issues w/ circular dependencies, but can we work
