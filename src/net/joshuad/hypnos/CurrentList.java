@@ -1082,7 +1082,13 @@ public class CurrentList {
 
 	public void removeDuplicates() {
 		Set<CurrentListTrack> nonDuplicateSet = new LinkedHashSet<> ( items );
+		
+		boolean sameSize = ( items.size() == nonDuplicateSet.size() );
 		items.clear( );
 		items.addAll( nonDuplicateSet );
+		
+		if ( !sameSize ) {
+			tracksRemoved();
+		}
 	}
 }
