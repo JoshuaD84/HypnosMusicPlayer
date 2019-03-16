@@ -4,6 +4,7 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /* Note: this class is not designed for repeat uses. */
@@ -62,9 +63,13 @@ public class InitialScanFileVisitor extends SimpleFileVisitor <Path> {
 				
 			} else {
 				Track track = new Track( file );
-
-				if ( !library.containsTrack( track ) ) {
-					library.addTrack( track );
+				
+				try {
+					if ( !library.containsTrack( track ) ) {
+						library.addTrack( track );
+					}
+				} catch ( Exception e ) {
+					LOGGER.log( Level.INFO, "Error reading track from file, skipping. " + file.toString(), e );
 				}
 
 				return FileVisitResult.CONTINUE;

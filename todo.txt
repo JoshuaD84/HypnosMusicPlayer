@@ -71,31 +71,6 @@ Windows System Integration
          Send a file via command line when hypnos isn't playing -- it starts
          Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on current list
 
-Trailing Spaces in File Name (Confirmed on Windows 7)
-      Right now it panics and restarts scan. Just keep going, ignore the problem, log it. 
-     Dec 23, 2018 22:53:49 PM net.joshuad.hypnos.Library updateOneSource
-WARNING: Unable to load some files in path: D:\music
-java.nio.file.InvalidPathException: Trailing char < > at index 70: D:\music\Soundtrack\2005 - Star Wars Episode III - Revenge of the Sith \01 - Star Wars The Revenge of the Sith.flac
-	at java.base/sun.nio.fs.WindowsPathParser.normalize(WindowsPathParser.java:172)
-	at java.base/sun.nio.fs.WindowsPathParser.parse(WindowsPathParser.java:153)
-	at java.base/sun.nio.fs.WindowsPathParser.parse(WindowsPathParser.java:77)
-	at java.base/sun.nio.fs.WindowsPath.parse(WindowsPath.java:92)
-	at java.base/sun.nio.fs.WindowsFileSystem.getPath(WindowsFileSystem.java:229)
-	at java.base/java.io.File.toPath(File.java:2290)
-	at net.joshuad.hypnos.Track.getPath(Unknown Source)
-	at net.joshuad.hypnos.Track.equals(Unknown Source)
-	at java.base/java.util.ArrayList.indexOfRange(ArrayList.java:330)
-	at java.base/java.util.ArrayList.indexOf(ArrayList.java:317)
-	at java.base/java.util.ArrayList.contains(ArrayList.java:306)
-	at javafx.base/com.sun.javafx.collections.ObservableListWrapper.contains(ObservableListWrapper.java:134)
-	at net.joshuad.hypnos.Library.containsTrack(Unknown Source)
-	at net.joshuad.hypnos.InitialScanFileVisitor.visitFile(Unknown Source)
-	at net.joshuad.hypnos.InitialScanFileVisitor.visitFile(Unknown Source)
-	at java.base/java.nio.file.Files.walkFileTree(Files.java:2724)
-	at net.joshuad.hypnos.Library.updateOneSource(Unknown Source)
-	at net.joshuad.hypnos.Library$1.run(Unknown Source)
-	at java.base/java.lang.Thread.run(Thread.java:834)
-
 ::::::::::::::
 
 Future
