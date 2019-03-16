@@ -35,7 +35,6 @@ UI
    Right click -> reset to default view doesn't set ascending/descnding properly
    windows button sizes are sometimes off a bit
    Drag and Drop to Playlist Info update current list if it is that playlist unchanged
-   "show only non-album tracks" checkbox isn't centered right
 
    Sometimes the art pane can become non-responsive. I dragged and dropped an image from google and it stopped changing
       I've seen it a few other times too.

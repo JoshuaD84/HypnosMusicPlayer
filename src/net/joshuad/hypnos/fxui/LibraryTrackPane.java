@@ -142,6 +142,7 @@ public class LibraryTrackPane extends BorderPane {
 				tableFilter.setFilter( filterBox.getText(), newValue );
 			}
 		});
+		filterAlbumsCheckBox.getStyleClass().add ( "filterAlbumsCheckBox" );
 		
 		filterAlbumsCheckBox.setTooltip( new Tooltip( "Only show tracks not in albums" ) );
 	}

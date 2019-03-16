@@ -219,7 +219,7 @@ public class FXUI implements PlayerListener {
 		lyricsWindow = new LyricsWindow ( this );
 		exportPopup = new ExportPlaylistPopup ( this );
 		
-		setupFont();
+		setupNativeStylesheet();
 		applyBaseTheme();
 		applyDarkTheme();
 		
@@ -458,11 +458,11 @@ public class FXUI implements PlayerListener {
 		audioSystem.addPlayerListener ( this );
 	}
 	
-	private void setupFont() {
+	private void setupNativeStylesheet() {
 		Path stylesheet; 
 		switch ( Hypnos.getOS() ) {
 			case OSX:
-				stylesheet = Hypnos.getRootDirectory().resolve( "resources/style-font-osx.css" );
+				stylesheet = Hypnos.getRootDirectory().resolve( "resources/style-osx.css" );
 				
 			case WIN_10:
 			case WIN_7:
@@ -471,18 +471,18 @@ public class FXUI implements PlayerListener {
 			case WIN_VISTA:
 			case WIN_XP:
 			case UNKNOWN:
-				stylesheet = Hypnos.getRootDirectory().resolve( "resources/style-font-win.css" );
+				stylesheet = Hypnos.getRootDirectory().resolve( "resources/style-win.css" );
 				break;
 				
 			case NIX:
 			default:
-				stylesheet = Hypnos.getRootDirectory().resolve( "resources/style-font-nix.css" );
+				stylesheet = Hypnos.getRootDirectory().resolve( "resources/style-nix.css" );
 				break;
 		}
 		
 		String fontSheet = fileToStylesheetString( stylesheet.toFile() );
 		if ( fontSheet == null ) {
-			LOGGER.log( Level.WARNING, "Unable to load font style sheet, hypnos will not look right." + 
+			LOGGER.log( Level.WARNING, "Unable to load native stylesheet, hypnos will not look right." + 
 				stylesheet.toString()
 			);
 			return;
