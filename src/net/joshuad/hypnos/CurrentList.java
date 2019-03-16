@@ -435,7 +435,7 @@ public class CurrentList {
 		for ( Track track : tracks ) {
 			addMe.add( new CurrentListTrack ( track ) );
 		}
-		
+
 		int targetIndex = index;
 		synchronized ( items ) {
 			if ( index < 0 ) {
@@ -446,7 +446,7 @@ public class CurrentList {
 				targetIndex = items.size();
 			}
 		}
-		
+
 		int tracksAdded = 0;
 		for ( CurrentListTrack track : addMe ) {
 			addItem ( targetIndex, track );
@@ -1022,10 +1022,10 @@ public class CurrentList {
 	}
 	
 	public void setItemsToSortedOrder() {
-		items.setAll( new ArrayList<CurrentListTrack> ( currentListSorted ) );
+		items.setAll( new ArrayList<CurrentListTrack> ( getSortedItemsNoFilter () ) );
 	}
 
-	public void setFilter ( String newValue, boolean b ) {
+	public void setFilter ( String newValue ) { 
 		currentListTableFilter.setFilter( newValue, false );
 	}
 

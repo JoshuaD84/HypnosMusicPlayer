@@ -30,8 +30,6 @@ UI
    setup:  add an album to library. Delete folder contents, but leave folder.  Go to album info window.  Double click a
    track. 
 
-   Modifying current list while it's filtered changes the base content to the filtered content
-
    Right click -> reset to default view doesn't set ascending/descnding properly
    windows button sizes are sometimes off a bit
    Drag and Drop to Playlist Info update current list if it is that playlist unchanged

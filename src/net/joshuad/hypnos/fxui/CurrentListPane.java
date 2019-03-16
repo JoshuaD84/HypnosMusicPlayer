@@ -378,7 +378,7 @@ public class CurrentListPane extends BorderPane {
 			@Override
 			public void changed ( ObservableValue <? extends String> observable, String oldValue, String newValue ) {
 				Platform.runLater( () -> {
-					audioSystem.getCurrentList().setFilter( newValue, false );
+					audioSystem.getCurrentList().setFilter( newValue );
 				});
 			}
 		});
