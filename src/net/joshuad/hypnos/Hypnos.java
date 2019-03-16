@@ -28,12 +28,9 @@ import java.util.jar.Manifest;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
-import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-
-import org.apache.commons.io.output.TeeOutputStream;
 
 import javafx.application.Application;
 import javafx.application.Platform;

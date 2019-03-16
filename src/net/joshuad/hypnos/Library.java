@@ -276,6 +276,16 @@ public class Library {
 		sourceToUpdate.add( path );
 	}
 	
+	public void requestUpdates ( List<Album> albums ) {
+		for ( Album album : albums ) {
+			albumsToUpdate.add( album );
+		}
+	}
+	
+	public void requestUpdate ( Album album ) {
+		albumsToUpdate.add( album );
+	}
+	
 	public void requestUpdateSource ( MusicSearchLocation path ) {
 		requestUpdateSources( Arrays.asList( path ) );
 	}

@@ -1,5 +1,7 @@
 Scanner
    Add a right click > rescan option to library panes and library location pane
+      seems to be working for albums. Test more and see and then expand to other systems
+
    allow the order of the library locations to be changed
    Can we make it smarter / faster?
 
@@ -33,6 +35,8 @@ UI
       It happened as i was scrolling quickly though Josh radio, around Joanna newsom
 
    If something gets dropped into config/playlists folders, update the UI to include it?
+   Add a "remove duplicates" to current list drop down menu
+   
 
 Linux
    JavaFX / Linux Open File Dialog causes crash

@@ -233,6 +233,7 @@ private static final Logger LOGGER = Logger.getLogger( LibraryArtistPane.class.g
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem editTagMenuItem = new MenuItem( "Edit Tag(s)" );
 		MenuItem sortByNewestMenuItem = new MenuItem ( "Sort by Add Date" );
+		MenuItem rescanMenuItem = new MenuItem ( "Rescan" );
 		MenuItem browseMenuItem = new MenuItem( "Browse Folder" );
 		Menu addToPlaylistMenuItem = new Menu( "Add to Playlist" );
 		MenuItem infoMenuItem = new MenuItem( "Track List" );
@@ -289,7 +290,7 @@ private static final Logger LOGGER = Logger.getLogger( LibraryArtistPane.class.g
 		
 		contextMenu.getItems().addAll( 
 			playMenuItem, appendMenuItem, playNextMenuItem, enqueueMenuItem, editTagMenuItem, infoMenuItem, 
-			sortByNewestMenuItem, browseMenuItem, addToPlaylistMenuItem
+			sortByNewestMenuItem, rescanMenuItem, browseMenuItem, addToPlaylistMenuItem
 		);
 		
 		MenuItem newPlaylistButton = new MenuItem( "<New>" );
@@ -377,6 +378,10 @@ private static final Logger LOGGER = Logger.getLogger( LibraryArtistPane.class.g
 		infoMenuItem.setOnAction( event -> {
 			ui.albumInfoWindow.setAlbum( albumTable.getSelectionModel().getSelectedItem() );
 			ui.albumInfoWindow.show();
+		});
+		
+		rescanMenuItem.setOnAction( event -> {
+			library.requestUpdates( albumTable.getSelectionModel().getSelectedItems() );
 		});
 
 		browseMenuItem.setOnAction( event -> {
