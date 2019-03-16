@@ -587,7 +587,11 @@ public class Track implements Serializable, AlbumInfoSource {
 		
 		return ( compareTo.getPath().toAbsolutePath().equals( getPath().toAbsolutePath() ) );
 	}
-
+	
+	public int hashCode() {
+		return getPath().hashCode();
+	}
+	
 	public static void saveArtistImageToTag ( File file, Path imagePath, ArtistTagImagePriority priority, boolean overwriteAll, AudioSystem audioSystem ) {
 		try {
 			byte[] imageBuffer = Files.readAllBytes( imagePath );

@@ -8,8 +8,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -953,14 +955,12 @@ public class CurrentList {
 		}
 		
 		notifyListenersStateChanged();
-		
 	}
 	
 	public void listCleared () {
 		currentAlbums.clear();
 		mode = Mode.EMPTY;
 		notifyListenersStateChanged();
-		
 	}
 
 	public void listReordered () {
@@ -1078,5 +1078,11 @@ public class CurrentList {
 			this.currentArtist = artist;
 			artistSet();
 		}
+	}
+
+	public void removeDuplicates() {
+		Set<CurrentListTrack> nonDuplicateSet = new LinkedHashSet<> ( items );
+		items.clear( );
+		items.addAll( nonDuplicateSet );
 	}
 }

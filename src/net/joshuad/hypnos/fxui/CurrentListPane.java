@@ -449,6 +449,7 @@ public class CurrentListPane extends BorderPane {
 		historyMenuItem = new MenuItem ( "History" );
 		MenuItem currentListShuffle = new MenuItem ( "Shuffle" );
 		MenuItem searchMenuItem = new MenuItem ( "Search" );
+		MenuItem removeDuplicatesMenuItem = new MenuItem ( "Remove Duplicates" );
 		
 		currentListClear.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
@@ -565,12 +566,16 @@ public class CurrentListPane extends BorderPane {
 			ui.exportPopup.export( exportMe );
 		});
 		
+		removeDuplicatesMenuItem.setOnAction( ( ActionEvent e ) -> {
+			audioSystem.getCurrentList().removeDuplicates();		
+		});
+		
 		searchMenuItem.setOnAction( ( ActionEvent e ) -> {
 			infoLabelAndFilter.beginEditing();
 		});
 		
 		currentListMenu.getItems().addAll ( currentListClear, currentListShuffle, searchMenuItem, 
-			exportToM3U, exportToFolder, saveMenuItem, loadMenuItem, historyMenuItem );
+			exportToM3U, exportToFolder, saveMenuItem, loadMenuItem, historyMenuItem, removeDuplicatesMenuItem );
 		
 		currentListControls.getChildren().addAll( toggleShuffleButton, toggleRepeatButton, showQueueButton,
 				infoLabelAndFilter, currentListLength, currentListMenu );
