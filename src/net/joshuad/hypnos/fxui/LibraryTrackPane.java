@@ -661,20 +661,21 @@ public class LibraryTrackPane extends BorderPane {
 		trackTable.getColumns().add( lengthColumn );
 
 		trackTable.getSortOrder().clear();
-		trackTable.getSortOrder().add( artistColumn );
-		trackTable.getSortOrder().add( albumColumn );
-		trackTable.getSortOrder().add( numberColumn );
 		artistColumn.setSortType( SortType.ASCENDING );
 		albumColumn.setSortType( SortType.ASCENDING );
 		numberColumn.setSortType( SortType.ASCENDING );
+		trackTable.getSortOrder().add( artistColumn );
+		trackTable.getSortOrder().add( albumColumn );
+		trackTable.getSortOrder().add( numberColumn );
 		
 		artistColumn.setPrefWidth( 100 );
 		numberColumn.setPrefWidth( 40 );
 		albumColumn.setPrefWidth( 100 );
-		titleColumn.setPrefWidth( 100 );
 		lengthColumn.setPrefWidth( 60 );
+		titleColumn.setPrefWidth( 100 );
 		trackTable.getColumnResizePolicy().call(new ResizeFeatures<Track> ( trackTable, null, 0d ) );
 	}
+	
 	@SuppressWarnings("incomplete-switch")
 	public void applySettingsBeforeWindowShown ( EnumMap<Persister.Setting, String> settings ) {
 		settings.forEach( ( setting, value )-> {

@@ -290,6 +290,9 @@ public class LibraryPlaylistPane extends BorderPane {
 		playlistTable.getColumns().add( tracksColumn );
 
 		playlistTable.getSortOrder().clear();
+		nameColumn.setSortType( SortType.ASCENDING );
+		tracksColumn.setSortType( SortType.ASCENDING );
+		lengthColumn.setSortType( SortType.ASCENDING );
 		
 		nameColumn.setPrefWidth( 100 );
 		tracksColumn.setPrefWidth( 90 );

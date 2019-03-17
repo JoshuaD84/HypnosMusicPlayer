@@ -18,21 +18,16 @@ Scanner
    An album will form from tracks if you edit them and they aren't currently an album. But an album won't split if you edit tags and make it not be an album.
       Is this desired behavior? I feel like probably no -- it can create different states based on the same disk contents, which doesn't make sense
 
-Decoder  
-   Windows: better decoder, stutters at beginning of each track
-   
-   Linux seems fine, and if we do system integration the cost to install vlc isn't as high, so windows is the bigger
-   focus
-
-   Linux: Sometimes it doesn't make sound after restarting into the paused state.  
 
 UI
+   Improve tag editor UI. It's clunky.  Single clicks good
+
+   File-Tree view for library
+
    If you open an album info window for an album where the files are missing, then double click the trac, nothing
    happens and the user is confused. 
    setup:  add an album to library. Delete folder contents, but leave folder.  Go to album info window.  Double click a
    track. 
-
-   Right click -> reset to default view doesn't set ascending/descnding properly
 
    Sometimes the art pane can become non-responsive. I dragged and dropped an image from google and it stopped changing
       I've seen it a few other times too.
@@ -40,8 +35,9 @@ UI
 
    If something gets dropped into config/playlists folders, update the UI to include it?
 
+
 Linux
-   JavaFX / Linux Open File Dialog causes crash
+   JavaFX / Linux Open File Dialog sometimes causes jvm crash, depends on system, and doesn't happen always
    
    Right click on table headers causes resort
 
@@ -54,6 +50,8 @@ Linux
 
 
 Backend
+   Sometimes the tags dont save when you hit save
+
    Improve memory usage if possible, particularly look at library i think that's a big cause
 
    Remove WinXP not supported by Jfx
@@ -74,6 +72,18 @@ Windows System Integration
       Commandline Interface
          Send a file via command line when hypnos isn't playing -- it starts
          Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on current list
+
+
+Decoder  
+   I found an MP3 that Hypnos refuses to play. VLC plays it.
+   http://traffic.libsyn.com/fash-the-nation/FTN_020319.mp3
+
+   Windows: better decoder, stutters at beginning of each track
+   
+   Linux seems fine, and if we do system integration the cost to install vlc isn't as high, so windows is the bigger
+   focus
+
+   Linux: Sometimes it doesn't make sound after restarting into the paused state.  
 
 ::::::::::::::
 

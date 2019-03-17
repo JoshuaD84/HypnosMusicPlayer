@@ -155,6 +155,9 @@ public class LibraryArtistPane extends BorderPane {
 		artistTable.getColumns().remove( lengthColumn );
 		artistTable.getColumns().add( lengthColumn );
 
+		//Note: setSortType needs to be called before getSortOrder().add
+		artistTable.getSortOrder().clear();
+		artistColumn.setSortType( SortType.ASCENDING );
 		artistTable.getSortOrder().add( artistColumn );
 		
 		artistColumn.setPrefWidth( 300 );

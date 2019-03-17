@@ -151,6 +151,13 @@ private static final Logger LOGGER = Logger.getLogger( LibraryArtistPane.class.g
 		albumTable.getColumns().remove( albumColumn );
 		albumTable.getColumns().add( albumColumn );
 
+		//Note: setSortType needs to be called before getSortOrder().add
+		artistColumn.setSortType( SortType.ASCENDING );
+		albumColumn.setSortType( SortType.ASCENDING );
+		yearColumn.setSortType( SortType.ASCENDING );
+		addedDateColumn.setSortType( SortType.ASCENDING );
+		
+		albumTable.getSortOrder().clear();
 		albumTable.getSortOrder().add( artistColumn );
 		albumTable.getSortOrder().add( yearColumn );
 		albumTable.getSortOrder().add( albumColumn );
