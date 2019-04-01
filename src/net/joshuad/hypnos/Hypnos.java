@@ -35,13 +35,17 @@ import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
-import net.joshuad.hypnos.LibraryUpdater.LoaderSpeed;
 import net.joshuad.hypnos.Persister.Setting;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.StopReason;
 import net.joshuad.hypnos.fxui.FXUI;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys.Hotkey;
+import net.joshuad.library.Album;
+import net.joshuad.library.Library;
+import net.joshuad.library.Library.LoaderSpeed;
+import net.joshuad.library.Playlist;
+import net.joshuad.library.Track;
 
 public class Hypnos extends Application {
 
@@ -135,7 +139,6 @@ public class Hypnos extends Application {
 	private static Persister persister;
 	private static AudioSystem audioSystem;
 	private static FXUI ui;
-	private static LibraryUpdater libraryUpdater;
 	private static Library library;
 	private static GlobalHotkeys globalHotkeys;
 	
@@ -223,18 +226,20 @@ public class Hypnos extends Application {
 		return ui;
 	}
 	
+	
 	public static LoaderSpeed getLoaderSpeed ( ) {
 		return loaderSpeed;
 	}
 	
 	public static void setLoaderSpeed ( LoaderSpeed speed ) {
+		return;
 		/*Items that have background loading threads
 		 * CurrentList -> updates missing tracks, relinks files, updates track data, etc. on current list.
 		 * Library -> LoaderThread
 		 * LibraryUpdater -> updaterThread
 		 * MusicFileVisitor -> has a sleep increment
 		 * AudioPlayer -> PlayerThread
-		 */
+		 *
 		
 		loaderSpeed = speed;
 		
@@ -262,8 +267,9 @@ public class Hypnos extends Application {
 		}
 		
 		ui.setLoaderSpeedDisplay ( speed );
-		
+		*/
 	}
+  
 	
 	private static void startLogToBuffer() {
 		originalOut = System.out;
@@ -709,7 +715,6 @@ public class Hypnos extends Application {
 				globalHotkeys.addListener( Hypnos::doHotkeyAction );
 				ui = new FXUI ( stage, library, audioSystem, globalHotkeys );
 				audioSystem.setUI ( ui );
-				libraryUpdater = new LibraryUpdater ( library, audioSystem, ui );
 				persister = new Persister ( ui, library, audioSystem, globalHotkeys );
 				
 				switch ( getOS() ) {
@@ -752,10 +757,10 @@ public class Hypnos extends Application {
 							
 							applyCLICommands( commands );
 							singleInstanceController.startCLICommandListener ( this );
+
+							library.setUI( ui );
+							library.startThreads();
 			
-							libraryUpdater.start();
-							library.startLoader( persister );
-							
 							LOGGER.info( "Hypnos finished loading." );
 							
 							UpdateChecker updater = new UpdateChecker();
@@ -810,11 +815,12 @@ public class Hypnos extends Application {
 						
 						applyCLICommands( commands );
 						singleInstanceController.startCLICommandListener ( this );
+
+						library.setUI( ui );
+						library.startThreads();
 		
-						libraryUpdater.start();
-						library.startLoader( persister );
 						ui.showMainWindow();
-						//TODO: can I remove? ui.getLibraryPane().updateLibraryListPlaceholder();
+						//TODO: can I remove? ui.getLibraryPane().updateListPlaceholder();
 						ui.fixTables();
 						ui.settingsWindow.refreshHotkeyFields();
 						

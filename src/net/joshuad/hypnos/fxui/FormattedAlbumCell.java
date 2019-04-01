@@ -5,7 +5,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableRow;
 import javafx.scene.text.TextFlow;
-import net.joshuad.hypnos.AlbumInfoSource;
+import net.joshuad.library.AlbumInfoSource;
 
 public class FormattedAlbumCell<T extends AlbumInfoSource> extends TableCell<T, String> {
 

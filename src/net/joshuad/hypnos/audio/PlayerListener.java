@@ -1,6 +1,6 @@
 package net.joshuad.hypnos.audio;
 
-import net.joshuad.hypnos.Track;
+import net.joshuad.library.Track;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
 import net.joshuad.hypnos.audio.AudioSystem.StopReason;

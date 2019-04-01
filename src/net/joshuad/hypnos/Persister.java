@@ -30,6 +30,11 @@ import net.joshuad.hypnos.fxui.FXUI;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys.Hotkey;
 import net.joshuad.hypnos.hotkeys.HotkeyState;
+import net.joshuad.library.Album;
+import net.joshuad.library.Library;
+import net.joshuad.library.MusicRoot;
+import net.joshuad.library.Playlist;
+import net.joshuad.library.Track;
 
 public class Persister {
 
@@ -162,12 +167,11 @@ public class Persister {
 
 	public boolean loadSources () {
 		try ( ObjectInputStream sourcesIn = new ObjectInputStream( new FileInputStream( sourcesFile ) ); ) {
-			ArrayList <MusicSearchLocation> searchLocations = (ArrayList <MusicSearchLocation>) sourcesIn.readObject();
-			for ( MusicSearchLocation locations : searchLocations ) {
-				library.requestUpdateSource( locations );
+			ArrayList <MusicRoot> musicRoots = (ArrayList <MusicRoot>) sourcesIn.readObject();
+			for ( MusicRoot musicRoot : musicRoots ) {
+				library.requestRescan( musicRoot.getPath() );
 			}
 
-			library.setSourcesHasUnsavedData( false );
 			return true;
 			
 		} catch ( Exception e ) {
@@ -224,9 +228,9 @@ public class Persister {
 
 	public void loadAlbumsAndTracks () {
 		try ( ObjectInputStream dataIn = new ObjectInputStream( new GZIPInputStream( new FileInputStream( dataFile ) ) ) ) {
-			library.albums.addAll( (ArrayList <Album>) dataIn.readObject() );
-			library.tracks.addAll( (ArrayList <Track>) dataIn.readObject() );
-			library.regenerateArtists();
+		    ArrayList <Album> albums = (ArrayList <Album>) dataIn.readObject();
+		    ArrayList <Track> tracks = (ArrayList <Track>) dataIn.readObject();
+		    library.setDataOnInitialLoad ( tracks, albums );
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to read library data from disk, continuing." );
 		}
@@ -251,13 +255,13 @@ public class Persister {
 		if ( !library.sourcesHasUnsavedData() ) return;
 		File tempSourcesFile = new File ( sourcesFile.toString() + ".temp" );
 		try ( ObjectOutputStream sourcesOut = new ObjectOutputStream( new FileOutputStream( tempSourcesFile ) ); ) {
-			sourcesOut.writeObject( new ArrayList <MusicSearchLocation> ( library.musicSearchLocations ) );
+			sourcesOut.writeObject( new ArrayList <MusicRoot> ( library.getMusicRoots() ) );
 			sourcesOut.flush();
 			sourcesOut.close();
 
 			Files.move( tempSourcesFile.toPath(), sourcesFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 			
-			library.setSourcesHasUnsavedData( false );
+			library.setRootsHasUnsavedData( false );
 			
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to save library source directory list to disk, continuing." );
@@ -380,8 +384,8 @@ public class Persister {
 			ByteArrayOutputStream byteWriter = new ByteArrayOutputStream();
 			ObjectOutputStream bytesOut = new ObjectOutputStream( byteWriter );
 
-			bytesOut.writeObject( new ArrayList <Album>( Arrays.asList( library.albums.toArray( new Album [ library.albums.size() ] ) ) ) );
-			bytesOut.writeObject( new ArrayList <Track>( Arrays.asList( library.tracks.toArray( new Track [ library.tracks.size() ] ) ) ) );
+			bytesOut.writeObject( new ArrayList <Album>( Arrays.asList( library.getAlbums().toArray( new Album [ library.getAlbums().size() ] ) ) ) );
+			bytesOut.writeObject( new ArrayList <Track>( Arrays.asList( library.getTracks().toArray( new Track [ library.getTracks().size() ] ) ) ) );
 
 			compressedOut.write( byteWriter.toByteArray() );
 			compressedOut.flush();
@@ -512,7 +516,7 @@ public class Persister {
 				settingsOut.printf( "%s: %s%s", key, valueOut, System.lineSeparator() );
 			} );
 			
-			settingsOut.printf( "%s: %s%s", Setting.LOADER_SPEED, Hypnos.getLoaderSpeed(), System.lineSeparator() );
+			//TODO: settingsOut.printf( "%s: %s%s", Setting.LOADER_SPEED, Hypnos.getLoaderSpeed(), System.lineSeparator() );
 
 			settingsOut.flush();
 			settingsOut.close();

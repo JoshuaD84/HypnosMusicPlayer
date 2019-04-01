@@ -28,7 +28,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.joshuad.hypnos.Hypnos;
-import net.joshuad.hypnos.Track;
+import net.joshuad.library.Track;
 import net.joshuad.hypnos.Utils;
 
 public class ExportPlaylistPopup extends Stage {

@@ -1,4 +1,4 @@
-package net.joshuad.hypnos;
+package net.joshuad.library;
 
 public interface AlbumInfoSource {
 	

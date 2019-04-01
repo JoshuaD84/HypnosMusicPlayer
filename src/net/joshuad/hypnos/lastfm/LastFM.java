@@ -103,7 +103,7 @@ public class LastFM {
 		}
 	}
 
-	public void scrobbleTrack ( net.joshuad.hypnos.Track track ) {
+	public void scrobbleTrack ( net.joshuad.library.Track track ) {
 		String timeStamp = timeStampFormat.format( new Date ( System.currentTimeMillis() ) );
 		
 		if ( track == null ) {
@@ -136,7 +136,7 @@ public class LastFM {
 		return;
 	}	
 	
-	public void loveTrack ( net.joshuad.hypnos.Track track ) {
+	public void loveTrack ( net.joshuad.library.Track track ) {
 		String timeStamp = timeStampFormat.format( new Date ( System.currentTimeMillis() ) );
 		
 		if ( track == null ) {
@@ -168,7 +168,7 @@ public class LastFM {
 		notifyUserIfNeeded( success );
 	}
 	
-	public void unloveTrack ( net.joshuad.hypnos.Track track ) {
+	public void unloveTrack ( net.joshuad.library.Track track ) {
 		String timeStamp = timeStampFormat.format( new Date ( System.currentTimeMillis() ) );
 		if ( track == null ) {
 			log.append ( "[" + timeStamp + "] Asked to unlove a null track, ignoring.\n" );
@@ -199,7 +199,7 @@ public class LastFM {
 		if ( success ) notifiedUserOfFailedAttempt = false;
 	}
 	
-	public LovedState isLoved ( net.joshuad.hypnos.Track track, boolean fromCache ) {
+	public LovedState isLoved ( net.joshuad.library.Track track, boolean fromCache ) {
 		if ( track == null ) return LovedState.FALSE;
 		if ( fromCache && track.getLovedState() != LovedState.NOT_SET ) return track.getLovedState();
 		
@@ -232,7 +232,7 @@ public class LastFM {
 		return LovedState.FALSE;
 	}
 
-	public void toggleLoveTrack ( net.joshuad.hypnos.Track track ) {
+	public void toggleLoveTrack ( net.joshuad.library.Track track ) {
 		switch ( isLoved ( track, false ) ) {
 			case FALSE:
 				loveTrack( track );

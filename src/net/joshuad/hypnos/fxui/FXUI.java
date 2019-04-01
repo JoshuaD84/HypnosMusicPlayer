@@ -70,8 +70,6 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import javafx.util.Duration;
-import net.joshuad.hypnos.Album;
-import net.joshuad.hypnos.Artist;
 import net.joshuad.hypnos.CurrentList;
 import net.joshuad.hypnos.CurrentList.Mode;
 import net.joshuad.hypnos.Hypnos.ExitCode;
@@ -79,11 +77,7 @@ import net.joshuad.hypnos.CurrentListState;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.HypnosURLS;
-import net.joshuad.hypnos.Library;
-import net.joshuad.hypnos.LibraryUpdater.LoaderSpeed;
 import net.joshuad.hypnos.Persister;
-import net.joshuad.hypnos.Playlist;
-import net.joshuad.hypnos.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.Persister.Setting;
 import net.joshuad.hypnos.audio.AudioSystem;
@@ -93,6 +87,12 @@ import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
 import net.joshuad.hypnos.audio.AudioSystem.StopReason;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
 import net.joshuad.hypnos.trayicon.TrayIcon;
+import net.joshuad.library.Album;
+import net.joshuad.library.Artist;
+import net.joshuad.library.Library;
+import net.joshuad.library.Library.LoaderSpeed;
+import net.joshuad.library.Track;
+import net.joshuad.library.Playlist;
 
 public class FXUI implements PlayerListener {
 	private static final Logger LOGGER = Logger.getLogger( FXUI.class.getName() );
@@ -1562,7 +1562,7 @@ public class FXUI implements PlayerListener {
 			});
 		}
 	}
-	
+
 	public void warnUserAlbumsMissing ( List <Album> missing ) {
 		Platform.runLater( () -> {
 
@@ -1694,25 +1694,20 @@ public class FXUI implements PlayerListener {
 	}
 
 	public void goToAlbumOfTrack ( Track track ) {
-		Path albumPath = track.getAlbumPath();
-		if ( albumPath == null ) {
+		Album album = track.getAlbum();
+		if ( album == null ) {
 			LOGGER.info( "Requested to 'go to album' of a track that is not part of an album, ignoring." );
 			return;
 		}
 		
-		for ( Album album : library.getAlbums() ) {
-			if ( album.getPath().equals( albumPath ) ) {
-				libraryPane.clearAlbumFilter();
-				libraryPane.albumPane.albumTable.getSelectionModel().clearSelection();
-				libraryPane.albumPane.albumTable.getSelectionModel().select( album );
-				libraryPane.albumPane.albumTable.requestFocus();
-				libraryPane.albumPane.albumTable.scrollTo( album );
-				libraryPane.setAlbumsVisible( true );
-				if ( isLibraryCollapsed() ) setLibraryCollapsed( false );
-				libraryPane.showAndSelectAlbumTab();
-				break;
-			}
-		}
+		libraryPane.clearAlbumFilter();
+		libraryPane.albumPane.albumTable.getSelectionModel().clearSelection();
+		libraryPane.albumPane.albumTable.getSelectionModel().select( album );
+		libraryPane.albumPane.albumTable.requestFocus();
+		libraryPane.albumPane.albumTable.scrollTo( album );
+		libraryPane.setAlbumsVisible( true );
+		if ( isLibraryCollapsed() ) setLibraryCollapsed( false );
+		libraryPane.showAndSelectAlbumTab();
 	}
 
 	public void setLibraryLabelsToLoading () {

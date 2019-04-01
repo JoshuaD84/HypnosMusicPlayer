@@ -72,10 +72,10 @@ import javafx.util.Duration;
 import net.joshuad.hypnos.CurrentList.DefaultRepeatMode;
 import net.joshuad.hypnos.CurrentList.DefaultShuffleMode;
 import net.joshuad.hypnos.Hypnos;
-import net.joshuad.hypnos.Library;
-import net.joshuad.hypnos.Playlist;
-import net.joshuad.hypnos.TagError;
-import net.joshuad.hypnos.Track;
+import net.joshuad.library.Library;
+import net.joshuad.library.Playlist;
+import net.joshuad.library.TagError;
+import net.joshuad.library.Track;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys.Hotkey;
 import net.joshuad.hypnos.hotkeys.HotkeyState;
@@ -1179,7 +1179,7 @@ public class SettingsWindow extends Stage {
 			});
 			
 			row.setOnContextMenuRequested( event -> { 
-				goToAlbumMenuItem.setDisable( row.getItem().getTrack().getAlbumPath() == null );
+				goToAlbumMenuItem.setDisable( row.getItem().getTrack().getAlbum() == null );
 			});
 			
 			row.setOnMouseClicked( event -> {

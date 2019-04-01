@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 import com.sun.jna.NativeLibrary;
 
 import net.joshuad.hypnos.Hypnos;
-import net.joshuad.hypnos.Track;
+import net.joshuad.library.Track;
 import net.joshuad.hypnos.Hypnos.ExitCode;
 import net.joshuad.hypnos.audio.AudioSystem.StopReason;
 import net.joshuad.hypnos.fxui.FXUI;

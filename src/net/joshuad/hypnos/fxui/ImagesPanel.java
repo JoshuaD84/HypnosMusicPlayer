@@ -36,13 +36,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
-import net.joshuad.hypnos.Album;
+import net.joshuad.library.Album;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.HypnosURLS;
-import net.joshuad.hypnos.Track;
+import net.joshuad.library.Track;
 import net.joshuad.hypnos.Utils;
-import net.joshuad.hypnos.Track.ArtistTagImagePriority;
+import net.joshuad.library.Track.ArtistTagImagePriority;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
@@ -350,10 +350,10 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 			if ( currentImagesTrack == null ) {
 				disableAllMenus = true;
 				
-			} else if ( currentImagesTrack.hasAlbumDirectory() ) {
+			} else if ( currentImagesTrack.getAlbum() != null ) {
 				disableAlbum = false;
 				
-				if ( Utils.isArtistDirectory( currentImagesTrack.getAlbumPath().getParent() ) ) {
+				if ( Utils.isArtistDirectory( currentImagesTrack.getAlbum().getPath().getParent() ) ) {
 					disableArtist = false;
 				}
 			}
@@ -431,9 +431,9 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 				
 				//REFACTOR: put this code in a function, it's duplciated below. 
 				
-				if ( !track.hasAlbumDirectory() ) return;
+				if ( track.getAlbum() == null ) return;
 				
-				Path albumPath = track.getAlbumPath();
+				Path albumPath = track.getAlbum().getPath();
 			
 				Utils.saveImageToDisk( albumPath.resolve( "artist.png" ), buffer );
 				setImages ( currentImagesTrack );
@@ -471,9 +471,9 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 				
 				//REFACTOR: put this code in a function, it's duplicated below. 
 				
-				if ( !Utils.isArtistDirectory( currentImagesTrack.getAlbumPath().getParent() ) ) return;
+				if ( !Utils.isArtistDirectory( currentImagesTrack.getAlbum().getPath().getParent() ) ) return;
 				
-				Path artistPath = track.getAlbumPath().getParent();
+				Path artistPath = track.getAlbum().getPath().getParent();
 			
 				Utils.saveImageToDisk( artistPath.resolve( "artist.png" ), buffer );
 				setImages ( currentImagesTrack );
@@ -576,7 +576,7 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 		
 		if ( targetTrack != null ) {
 			
-			Path albumPath = targetTrack.getAlbumPath();
+			Path albumPath = targetTrack.getAlbum().getPath();
 			Path artistPath = null;
 			
 			if ( albumPath != null && Utils.isArtistDirectory( albumPath.getParent() ) ) {
@@ -667,7 +667,9 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 	}
 	
 	private void setImages ( Album album ) {
-		setImages ( album.getTracks().get( 0 ), album );
+		if ( album.getTracks() != null && album.getTracks().size() > 0 ) {
+			setImages ( album.getTracks().get( 0 ), album );
+		}
 	}
 	
 	private void clearImages() {

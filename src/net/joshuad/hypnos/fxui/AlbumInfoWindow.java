@@ -38,11 +38,11 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import net.joshuad.hypnos.Album;
+import net.joshuad.library.Album;
 import net.joshuad.hypnos.Hypnos;
-import net.joshuad.hypnos.Library;
-import net.joshuad.hypnos.Playlist;
-import net.joshuad.hypnos.Track;
+import net.joshuad.library.Library;
+import net.joshuad.library.Playlist;
+import net.joshuad.library.Track;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 

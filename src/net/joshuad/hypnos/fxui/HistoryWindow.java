@@ -38,9 +38,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import net.joshuad.hypnos.Hypnos;
-import net.joshuad.hypnos.Library;
-import net.joshuad.hypnos.Playlist;
-import net.joshuad.hypnos.Track;
+import net.joshuad.library.Library;
+import net.joshuad.library.Playlist;
+import net.joshuad.library.Track;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 
@@ -213,7 +213,7 @@ public class HistoryWindow extends Stage {
 			});
 			
 			row.setOnContextMenuRequested( event -> { 
-				goToAlbumMenuItem.setDisable( row.getItem().getAlbumPath() == null );
+				goToAlbumMenuItem.setDisable( row.getItem().getAlbum() == null );
 			});
 			
 			row.setOnMouseClicked( event -> {

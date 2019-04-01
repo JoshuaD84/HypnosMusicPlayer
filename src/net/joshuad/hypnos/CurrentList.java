@@ -24,6 +24,10 @@ import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
 import net.joshuad.hypnos.fxui.ThrottledTrackFilter;
+import net.joshuad.library.Album;
+import net.joshuad.library.Artist;
+import net.joshuad.library.Playlist;
+import net.joshuad.library.Track;
 
 public class CurrentList {
 
@@ -511,7 +515,7 @@ public class CurrentList {
 				//TODO: This is really bad practice, but it works for now. Refactor
 				//This fixes two problems -- red rows in current list not being white after deleting and D&D
 				//and the table not refreshing after drag & drop of folder
-				Hypnos.getUI().refreshCurrentList();
+				//TODO: Is this still a problem or did new library fix it? Hypnos.getUI().refreshCurrentList();
 				
 				if ( doAfterLoad != null ) {
 					doAfterLoad.run();
@@ -990,7 +994,9 @@ public class CurrentList {
 	public void setAndPlayAlbums ( List <Album> albums ) {
 		setAlbums( albums );
 		audioSystem.next( false );
-		Hypnos.getLibrary().albumsToUpdate.addAll( albums );  //TODO: pass library in don't call Hypnos.get()
+		for ( Album album : albums ) {
+		  Hypnos.getLibrary().requestRescan ( album.getPath() );
+		}
 	}
 	
 	public void setAndPlayPlaylist ( Playlist playlist ) {

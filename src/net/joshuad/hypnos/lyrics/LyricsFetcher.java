@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import net.joshuad.hypnos.Track;
+import net.joshuad.library.Track;
 import net.joshuad.hypnos.lyrics.scrapers.AZScraper;
 import net.joshuad.hypnos.lyrics.scrapers.AbstractScraper;
 import net.joshuad.hypnos.lyrics.scrapers.GeniusScraper;

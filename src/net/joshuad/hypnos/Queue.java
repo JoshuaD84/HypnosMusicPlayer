@@ -8,6 +8,10 @@ import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import net.joshuad.library.Album;
+import net.joshuad.library.Artist;
+import net.joshuad.library.Playlist;
+import net.joshuad.library.Track;
 
 public class Queue {
 	private static final Logger LOGGER = Logger.getLogger( Queue.class.getName() );

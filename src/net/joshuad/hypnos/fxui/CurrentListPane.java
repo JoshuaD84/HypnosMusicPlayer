@@ -56,14 +56,14 @@ import net.joshuad.hypnos.CurrentListState;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.CurrentListTrackState;
 import net.joshuad.hypnos.Hypnos;
-import net.joshuad.hypnos.Library;
+import net.joshuad.library.Library;
 import net.joshuad.hypnos.Persister;
-import net.joshuad.hypnos.Playlist;
-import net.joshuad.hypnos.Track;
+import net.joshuad.library.Playlist;
+import net.joshuad.library.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.AlphanumComparator.CaseHandling;
 import net.joshuad.hypnos.Persister.Setting;
-import net.joshuad.hypnos.Track.Format;
+import net.joshuad.library.Track.Format;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
@@ -1017,7 +1017,7 @@ public class CurrentListPane extends BorderPane {
 			TableRow <CurrentListTrack> row = new TableRow <>();
 
 			row.setOnContextMenuRequested( event -> { 
-				goToAlbumMenuItem.setDisable( row.getItem().getAlbumPath() == null );
+				goToAlbumMenuItem.setDisable( row.getItem().getAlbum() == null );
 			});
 			
 			row.setOnMouseClicked( event -> {

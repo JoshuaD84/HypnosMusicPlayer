@@ -1,8 +1,7 @@
-package net.joshuad.hypnos;
+package net.joshuad.library;
 import java.nio.file.Path;
 
 public class TagError {
-
 	
 	public enum TagErrorType {
 		MISSING_ARTIST ( "No artist name." ),

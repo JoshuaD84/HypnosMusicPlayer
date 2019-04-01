@@ -36,14 +36,14 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import net.joshuad.hypnos.Hypnos;
-import net.joshuad.hypnos.Library;
-import net.joshuad.hypnos.LibraryUpdater.LoaderSpeed;
-import net.joshuad.hypnos.MusicSearchLocation;
+import net.joshuad.library.Library;
+import net.joshuad.library.Library.LoaderSpeed;
+import net.joshuad.library.MusicRoot;
 
 public class LibraryLocationWindow extends Stage {
 	private static final Logger LOGGER = Logger.getLogger( LibraryLocationWindow.class.getName() );
 
-	TableView <MusicSearchLocation> musicSourceTable;
+	TableView <MusicRoot> musicSourceTable;
 	
 	Library library;
 
@@ -73,7 +73,7 @@ public class LibraryLocationWindow extends Stage {
 		
 		VBox primaryPane = new VBox();
 
-		musicSourceTable = new TableView<MusicSearchLocation> ();
+		musicSourceTable = new TableView<MusicRoot> ();
 		Label emptyLabel = new Label( "No directories in your library. Either '+ Add' or drop directories here." );
 		emptyLabel.setPadding( new Insets( 20, 10, 20, 10 ) );
 		emptyLabel.setWrapText( true );
@@ -97,12 +97,12 @@ public class LibraryLocationWindow extends Stage {
 			}
 		} );
 
-		TableColumn <MusicSearchLocation, String> dirListColumn = new TableColumn<> ( "Location" );
+		TableColumn <MusicRoot, String> dirListColumn = new TableColumn<> ( "Location" );
 		dirListColumn.setCellValueFactory( 
-			new Callback <TableColumn.CellDataFeatures <MusicSearchLocation, String>, ObservableValue <String>>() {
+			new Callback <TableColumn.CellDataFeatures <MusicRoot, String>, ObservableValue <String>>() {
 
 			@Override
-			public ObservableValue <String> call ( TableColumn.CellDataFeatures <MusicSearchLocation, String> p ) {
+			public ObservableValue <String> call ( TableColumn.CellDataFeatures <MusicRoot, String> p ) {
 				if ( p.getValue() != null ) {
 					return new SimpleStringProperty( p.getValue().getPath().toAbsolutePath().toString() );
 				} else {
@@ -112,7 +112,7 @@ public class LibraryLocationWindow extends Stage {
 		} );
 		
 		musicSourceTable.setRowFactory( tv -> {
-			TableRow <MusicSearchLocation> row = new TableRow <>();
+			TableRow <MusicRoot> row = new TableRow <>();
 
 			row.itemProperty().addListener( (obs, oldValue, newValue ) -> {
 				if ( newValue != null && row != null ) {
@@ -144,7 +144,7 @@ public class LibraryLocationWindow extends Stage {
 				List <File> files = db.getFiles();
 				
 				for ( File file : files ) {
-					library.requestAddSource( new MusicSearchLocation ( file.toPath() ) );
+					library.addMusicRoot( file.toPath() );
 				}
 
 				event.setDropCompleted( true );
@@ -182,7 +182,7 @@ public class LibraryLocationWindow extends Stage {
 			public void handle ( ActionEvent e ) {
 				File selectedFile = chooser.showDialog( me );
 				if ( selectedFile != null ) {
-					library.requestAddSource( new MusicSearchLocation ( selectedFile.toPath() ) );
+					library.addMusicRoot( selectedFile.toPath() );
 				}
 			}
 		});
@@ -190,7 +190,9 @@ public class LibraryLocationWindow extends Stage {
 		removeButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				library.requestRemoveSources( musicSourceTable.getSelectionModel().getSelectedItems() );
+			    for (MusicRoot musicRoot : musicSourceTable.getSelectionModel().getSelectedItems() ) {
+			    	library.removeMusicRoot( musicRoot );
+			    }
 				musicSourceTable.getSelectionModel().clearSelection();	
 			}
 		});
@@ -199,7 +201,9 @@ public class LibraryLocationWindow extends Stage {
 			@Override
 			public void handle ( final KeyEvent keyEvent ) {
 				if ( keyEvent.getCode().equals( KeyCode.DELETE ) ) {
-					library.requestRemoveSources( musicSourceTable.getSelectionModel().getSelectedItems() );
+					for (MusicRoot musicRoot : musicSourceTable.getSelectionModel().getSelectedItems() ) {
+			    	library.removeMusicRoot( musicRoot );
+			    }
 				}
 			}
 		});

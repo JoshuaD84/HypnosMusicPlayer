@@ -56,12 +56,12 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import net.joshuad.hypnos.Album;
+import net.joshuad.library.Album;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.MultiFileImageTagPair;
 import net.joshuad.hypnos.MultiFileTextTagPair;
-import net.joshuad.hypnos.Track;
+import net.joshuad.library.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.MultiFileImageTagPair.ImageFieldKey;
 
@@ -532,7 +532,7 @@ public class TagWindow extends Stage {
 			if ( saveMe != null ) {
 				for ( Track track : saveMe ) {
 					track.updateTagsAndSave( saveMeTextPairs, saveMeImagePairs, ui.audioSystem );
-					ui.library.addTrack( track ); //TODO: This just causes the track to be updated, probably should rename the function
+					ui.library.requestRescan( track.getPath() );
 				}
 			}
 			

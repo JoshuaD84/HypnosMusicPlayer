@@ -53,15 +53,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.TextAlignment;
 import net.joshuad.hypnos.AlphanumComparator;
 import net.joshuad.hypnos.Hypnos;
-import net.joshuad.hypnos.Library;
+import net.joshuad.library.Library;
 import net.joshuad.hypnos.Persister;
-import net.joshuad.hypnos.Playlist;
-import net.joshuad.hypnos.Track;
+import net.joshuad.library.Playlist;
+import net.joshuad.library.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.AlphanumComparator.CaseHandling;
 import net.joshuad.hypnos.Persister.Setting;
-import net.joshuad.hypnos.Playlist.PlaylistRepeatMode;
-import net.joshuad.hypnos.Playlist.PlaylistShuffleMode;
+import net.joshuad.library.Playlist.PlaylistRepeatMode;
+import net.joshuad.library.Playlist.PlaylistShuffleMode;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 
@@ -504,7 +504,9 @@ public class LibraryPlaylistPane extends BorderPane {
 			Optional <ButtonType> result = alert.showAndWait();
 			
 			if ( result.get() == ButtonType.OK ) {
-				library.removePlaylists( playlistTable.getSelectionModel().getSelectedItems() );
+				for ( Playlist playlist : playlistTable.getSelectionModel().getSelectedItems() ) {
+					library.removePlaylist( playlist );
+				}
 				playlistTable.getSelectionModel().clearSelection();
 			}
 		});
@@ -587,8 +589,8 @@ public class LibraryPlaylistPane extends BorderPane {
 					}
 				}
 				
-				if ( !playlistsToAdd.isEmpty() ) {
-					library.addPlaylists( playlistsToAdd );
+				for ( Playlist playlist : playlistsToAdd ) {
+					library.addPlaylist( playlist );
 				}
 
 				event.setDropCompleted( true );
@@ -709,8 +711,8 @@ public class LibraryPlaylistPane extends BorderPane {
 						}
 					}
 					
-					if ( !playlistsToAdd.isEmpty() ) {
-						library.addPlaylists( playlistsToAdd );
+					for ( Playlist playlist : playlistsToAdd ) {
+						library.addPlaylist( playlist );
 					}
 
 					event.setDropCompleted( true );

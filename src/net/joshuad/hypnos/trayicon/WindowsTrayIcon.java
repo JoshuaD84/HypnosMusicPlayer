@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.TrayItem;
 
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Hypnos.ExitCode;
-import net.joshuad.hypnos.Track;
+import net.joshuad.library.Track;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;

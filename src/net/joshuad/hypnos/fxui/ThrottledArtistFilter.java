@@ -3,7 +3,7 @@ package net.joshuad.hypnos.fxui;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import javafx.collections.transformation.FilteredList;
-import net.joshuad.hypnos.Artist;
+import net.joshuad.library.Artist;
 
 public class ThrottledArtistFilter {
 	

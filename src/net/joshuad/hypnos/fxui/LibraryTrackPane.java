@@ -45,11 +45,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.TextAlignment;
 import net.joshuad.hypnos.AlphanumComparator;
 import net.joshuad.hypnos.Hypnos;
-import net.joshuad.hypnos.Library;
-import net.joshuad.hypnos.MusicSearchLocation;
+import net.joshuad.library.Library;
+import net.joshuad.library.MusicRoot;
 import net.joshuad.hypnos.Persister;
-import net.joshuad.hypnos.Playlist;
-import net.joshuad.hypnos.Track;
+import net.joshuad.library.Playlist;
+import net.joshuad.library.Track;
 import net.joshuad.hypnos.AlphanumComparator.CaseHandling;
 import net.joshuad.hypnos.Persister.Setting;
 import net.joshuad.hypnos.audio.AudioSystem;
@@ -572,7 +572,7 @@ public class LibraryTrackPane extends BorderPane {
 				List <File> files = db.getFiles();
 				
 				for ( File file : files ) {
-					library.requestAddSource( new MusicSearchLocation ( file.toPath() ) );
+                  library.addMusicRoot( file.toPath() );
 				}
 
 				event.setDropCompleted( true );
@@ -599,7 +599,7 @@ public class LibraryTrackPane extends BorderPane {
 			});
 			
 			row.setOnContextMenuRequested( event -> { 
-				goToAlbumMenuItem.setDisable( row.getItem().getAlbumPath() == null );
+				goToAlbumMenuItem.setDisable( row.getItem().getAlbum() == null );
 			});
 			
 			row.setOnDragOver( event -> {
@@ -616,7 +616,7 @@ public class LibraryTrackPane extends BorderPane {
 					List <File> files = db.getFiles();
 					
 					for ( File file : files ) {
-						library.requestAddSource( new MusicSearchLocation ( file.toPath() ) );
+	                    library.addMusicRoot( file.toPath() );
 					}
 
 					event.setDropCompleted( true );

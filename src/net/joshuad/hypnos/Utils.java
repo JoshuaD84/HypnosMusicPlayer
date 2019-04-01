@@ -21,7 +21,9 @@ import javax.imageio.ImageIO;
 
 
 import me.xdrop.fuzzywuzzy.FuzzySearch;
-import net.joshuad.hypnos.Track.Format;
+import net.joshuad.library.Album;
+import net.joshuad.library.Track;
+import net.joshuad.library.Track.Format;
 
 public class Utils {
 
@@ -99,6 +101,12 @@ public class Utils {
 	}
 	
 	public static boolean isMusicFile ( Path testFile ) {
+		
+		if ( testFile == null ) {
+			LOGGER.info( "Asked if a null path was a music file, returning false." );
+			return false;
+		}
+		
 		String fileName = testFile.getFileName().toString();
 		
 		if ( !Files.exists( testFile ) ) {
@@ -197,7 +205,10 @@ public class Utils {
 	}
 	
 	public static boolean isArtistDirectory ( Path path ) {
-		if ( !Files.isDirectory( path ) ) return false;
+	  //TODO: This method goes away
+	  return false;
+	  /*
+	  if ( !Files.isDirectory( path ) ) return false;
 		
 		String directoryName = prepareArtistForCompare ( path.getFileName().toString() );
 		
@@ -232,9 +243,10 @@ public class Utils {
 		} else {
 			return false;
 		}
+		*/
 	}
 	
-	private static String prepareArtistForCompare ( String string ) {
+	public static String prepareArtistForCompare ( String string ) {
 		return string
 			.toLowerCase()
 			.replaceAll( " & ", " and " )
@@ -251,7 +263,7 @@ public class Utils {
 		;
 	}
 	
-	private static String prepareAlbumForCompare ( String string ) {
+	public static String prepareAlbumForCompare ( String string ) {
 		return string.toLowerCase();
 	}
 	

@@ -25,7 +25,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.joshuad.hypnos.Hypnos;
-import net.joshuad.hypnos.Track;
+import net.joshuad.library.Track;
 
 public class TrackInfoWindow extends Stage {
 	private static final Logger LOGGER = Logger.getLogger( TrackInfoWindow.class.getName() );

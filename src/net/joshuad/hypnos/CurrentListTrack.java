@@ -11,6 +11,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import net.joshuad.library.Track;
 
 public class CurrentListTrack extends Track {
 	@SuppressWarnings("unused")
@@ -31,14 +32,10 @@ public class CurrentListTrack extends Track {
 	
 	public CurrentListTrack ( Path source ) {
 		super ( source );
-		if ( Utils.isAlbumDirectory( source.getParent() ) ) {
-			this.albumDirectory = source.getParent().toFile();
-		}
 	}
 	
 	public CurrentListTrack ( Track source ) {
 		super ( source );		
-		this.albumDirectory = getPath().getParent().toFile();
 		needsUpdateFromDisk = true;
 	}
 	
@@ -52,13 +49,6 @@ public class CurrentListTrack extends Track {
 	
 	public void update() {
 		refreshTagData();
-		
-		if ( Utils.isAlbumDirectory( getPath().getParent() ) ) {
-			this.albumDirectory = getPath().getParent().toFile();
-		} else {
-			this.albumDirectory = null;
-		}
-
 		needsUpdateFromDisk = false;
 	}
 	

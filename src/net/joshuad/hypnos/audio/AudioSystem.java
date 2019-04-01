@@ -20,10 +20,10 @@ import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.History;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Persister;
-import net.joshuad.hypnos.Playlist;
+import net.joshuad.library.Playlist;
 import net.joshuad.hypnos.PreviousStack;
 import net.joshuad.hypnos.Queue;
-import net.joshuad.hypnos.Track;
+import net.joshuad.library.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.fxui.FXUI;
 import net.joshuad.hypnos.lastfm.LastFM;
@@ -478,7 +478,8 @@ public class AudioSystem {
 					if ( Utils.isAlbumDirectory( trackPath.toAbsolutePath().getParent() ) ) {
 						albumPath = trackPath.toAbsolutePath().getParent();
 					}
-					Track track = new Track ( trackPath, albumPath );
+					//TODO: Deal with album path
+					Track track = new Track ( trackPath );
 					ui.trackSelected( track ); 
 					playTrack( track, true );
 					settings.remove ( setting );

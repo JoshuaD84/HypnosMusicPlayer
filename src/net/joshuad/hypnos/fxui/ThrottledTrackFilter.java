@@ -3,7 +3,7 @@ package net.joshuad.hypnos.fxui;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import javafx.collections.transformation.FilteredList;
-import net.joshuad.hypnos.Track;
+import net.joshuad.library.Track;
 
 public class ThrottledTrackFilter {
 	
@@ -55,7 +55,7 @@ public class ThrottledTrackFilter {
 	
 	private void setPredicate ( String filterText, boolean hideAlbumTracks ) {
 		filteredList.setPredicate( ( Track track ) -> {
-			if ( track.hasAlbumDirectory() && hideAlbumTracks ) return false;
+			if ( track.getAlbum() != null && hideAlbumTracks ) return false;
 			if ( interruptFiltering ) return true;
 			if ( filterText.isEmpty() ) return true;
 	
