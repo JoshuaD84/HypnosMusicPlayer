@@ -28,22 +28,23 @@ public class Album implements Serializable, AlbumInfoSource {
 		}
 	}
 	
-	void setData( Album album ) {
-		this.directory = album.directory;
+	void setData( Album newData ) {
+		this.directory = newData.directory;
 		
-		List<Track> newTracks = new ArrayList<>( album.tracks.size() );
+		List<Track> newTracks = new ArrayList<>( 5000 );
 		
-		for( int k = 0; k < newTracks.size(); k++ ) {
-			int indexOfDuplicate = tracks.indexOf( newTracks.get( k ) );
+		for( int k = 0; k < newData.tracks.size(); k++ ) {
+			int indexOfDuplicate = tracks.indexOf( newData.tracks.get( k ) );
 			
 			if( indexOfDuplicate != -1 ) {
-				tracks.get( indexOfDuplicate ).setData( album.tracks.get( k ) );
-				newTracks.set( k, tracks.get( indexOfDuplicate ) );
+				tracks.get( indexOfDuplicate ).setData( newData.tracks.get( k ) );
+				newTracks.add( k, tracks.get( indexOfDuplicate ) );
 			} else {
-				newTracks.set( k, album.tracks.get( k ) );
+				newTracks.add( k, newData.tracks.get( k ) );
 			}
 		}
 		
+		System.out.println( "New Tracks size: " + newTracks.size() );
 		this.tracks = newTracks;
 	}
 	

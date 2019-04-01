@@ -20,7 +20,7 @@ public class LibraryMerger {
 
   private boolean runLaterPending = false;
 
-  private int sleepTimeMS = 15;
+  private int sleepTimeMS = 400;
 
   public LibraryMerger(Library library) {
     this.library = library;
@@ -84,6 +84,11 @@ public class LibraryMerger {
                 case REMOVE_ALBUM:
                   library.albums.remove((Album) action.getItem());
                   break;
+                case UPDATE_ALBUM: 
+                	Album updateMe = (Album)(((Object[])action.getItem())[0]);
+                	Album newData = (Album)(((Object[])action.getItem())[1]);
+                	updateMe.setData( newData );
+                	break;
                 case ADD_TRACK:
                   library.tracks.add((Track) action.getItem());
                   break;
@@ -219,16 +224,13 @@ public class LibraryMerger {
 
       int existingLibraryIndex = library.albums.indexOf(album);
       if (existingLibraryIndex != -1) {
+      	pendingActions.add(new UpdateAction(new Object[]{ library.albums.get(existingLibraryIndex), album }, ActionType.UPDATE_ALBUM));
         //We can do updates to data off the javafx thread because the values aren't observable. 
-        library.albums.get(existingLibraryIndex).setData(album);
-        library.setDataNeedsToBeSavedToDisk(true);
         didUpdate = true;
       }
 
       if (!didUpdate) {
         pendingActions.add(new UpdateAction(album, ActionType.ADD_ALBUM));
-      } else {
-        pendingActions.add(new UpdateAction(null, ActionType.REFRESH_ALBUM_TABLE));
       }
     }
   }
