@@ -38,7 +38,7 @@ public class Main extends Application {
 		Library library = new Library();
 		library.loader.start();
 		library.merger.start();
-		library.loader.queueScanMusicRoot( Paths.get ( "D:\\music" ) );
+		library.loader.addMusicRoot( Paths.get ( "D:\\music" ) );
 
         
 	}

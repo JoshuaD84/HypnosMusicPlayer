@@ -15,8 +15,14 @@ public class MusicRoot implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private File file;
+	
+	private boolean needsRescan = true;
+
 	@SuppressWarnings("unused")
-	private transient boolean hadInotifyError; //TODO: Show this in the UI
+	private boolean failedScan = false; //TODO: Show this in the UI
+	
+	@SuppressWarnings("unused")
+	private transient boolean hadInotifyError = false; //TODO: Show this in the UI
 
 	private transient BooleanProperty isValidSearchLocation = new SimpleBooleanProperty ( true );
 	
@@ -26,6 +32,14 @@ public class MusicRoot implements Serializable {
 	
 	public Path getPath() {
 		return file.toPath();
+	}
+	
+	public void setNeedsRescan( boolean needsRescan ) {
+		this.needsRescan = needsRescan;
+	}
+	
+	public boolean needsRescan() {
+		return needsRescan;
 	}
 	
 	public void setHadInotifyError( boolean hadError ) {
@@ -61,5 +75,9 @@ public class MusicRoot implements Serializable {
 	private void readObject ( ObjectInputStream in ) throws IOException, ClassNotFoundException {
 		in.defaultReadObject();
 		isValidSearchLocation = new SimpleBooleanProperty ( true );
+	}
+
+	public void setFailedScan(boolean failed) {
+		this.failedScan = failed;
 	}
 }

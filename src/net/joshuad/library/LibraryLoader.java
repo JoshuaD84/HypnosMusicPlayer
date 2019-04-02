@@ -1,5 +1,6 @@
 package net.joshuad.library;
 
+import java.io.PrintStream;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,7 +14,6 @@ import javafx.application.Platform;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.fxui.FXUI;
-import net.joshuad.library.DiskReader.ScanCompletionStatus;
 
 class LibraryLoader {
 
@@ -52,11 +52,12 @@ class LibraryLoader {
 		this.clearOrphans = true;
 	}
 
-	public void queueScanMusicRoot(Path path) {
+	public void addMusicRoot(Path path) {
 		if (Platform.isFxApplicationThread()) {
 			library.musicRoots.add(new MusicRoot(path));
+		} else {
+			musicRootsToAdd.add(path);
 		}
-		musicRootsToAdd.add(path);
 	}
 
 	public void queueUpdatePath(Path path) {
@@ -85,18 +86,18 @@ class LibraryLoader {
 					}
 
 					if (!musicRootsToAdd.isEmpty()) {
-						Path loadMe;
 						synchronized (musicRootsToAdd) {
-							loadMe = musicRootsToAdd.remove(0);
-						}
-						ScanCompletionStatus scanCompletionStatus = diskReader.loadMusicRoot(loadMe);
-						if ( scanCompletionStatus == ScanCompletionStatus.INTERRUPTED ) {
-							for ( MusicRoot root : library.musicRoots ) {
-								if ( root.getPath().equals( loadMe ) ) {
-									musicRootsToAdd.add( loadMe );
-									break;
-								}
+							for (Path path : musicRootsToAdd) {
+								library.musicRoots.add(new MusicRoot(path));
 							}
+							musicRootsToAdd.clear();
+						}
+					}
+					
+					List<MusicRoot> libraryRoots = new ArrayList<>(library.musicRoots);
+					for (MusicRoot root : libraryRoots) {
+						if (root.needsRescan()) {
+							diskReader.scanMusicRoot(root);
 						}
 					}
 
@@ -140,14 +141,14 @@ class LibraryLoader {
 		if (!Files.exists(path)) {
 			for (Track track : library.tracks) {
 				if (track.getPath().toAbsolutePath().startsWith(path)) {
-					System.out.println("[LibraryLoader] Removing track data at: " + track.getPath());
+					library.getLog().println("[LibraryLoader] Removing track data at: " + track.getPath());
 					library.merger.removeTrack(track);
 				}
 			}
 
 			for (Album album : library.albums) {
 				if (album.getPath().toAbsolutePath().startsWith(path)) {
-					System.out.println("[LibraryLoader] Removing album data at: " + path);
+					library.getLog().println("[LibraryLoader] Removing album data at: " + path);
 					library.merger.removeAlbum(album);
 					library.diskWatcher.stopWatching(album.getPath());
 				}
@@ -163,7 +164,7 @@ class LibraryLoader {
 			}
 
 			if (existingTrackAtPath != null) {
-				System.out.println("[LibraryLoader] Updating track data at: " + path);
+				library.getLog().println("[LibraryLoader] Updating track data at: " + path);
 				existingTrackAtPath.refreshTagData();
 
 				// This will make sure that any existing album gets updated, and if the
@@ -171,19 +172,19 @@ class LibraryLoader {
 				pathsToUpdate.add(existingTrackAtPath.getPath().getParent());
 
 			} else {
-				System.out.println("[LibraryLoader] new track found at: " + path);
+				library.getLog().println("[LibraryLoader] new track found at: " + path);
 				Track newTrack = new Track(path);
 				library.merger.removeTrack(newTrack);
 			}
 
 		} else if (Files.isDirectory(path)) {
-			System.out.println("[LibraryLoader] Doing directory rescan at: " + path);
+			library.getLog().println("[LibraryLoader] Doing directory rescan at: " + path);
 
 			List<Path> childrenOfPath = new ArrayList<>();
 			for (Path futureUpdate : pathsToUpdate) {
 				if (isChildOf(futureUpdate, path)) {
 					childrenOfPath.add(futureUpdate);
-					System.out.println("[LibraryLoader] - Removing future scan, its a child: " + path);
+					library.getLog().println("[LibraryLoader] - Removing future scan, its a child: " + path);
 				}
 			}
 
@@ -216,10 +217,12 @@ class LibraryLoader {
 		return retMe;
 	}
 
-	static boolean isAlbum(FileTreeNode node) {
+	static boolean isAlbum(FileTreeNode node, PrintStream out) {
 
-		if (!Files.isDirectory(node.getPath()))
+		if (!Files.isDirectory(node.getPath())) {
+			out.println( "[LibraryLoader] Album rejected, not a directory: " + node.getPath() );
 			return false;
+		}
 
 		String albumName = null;
 		String artistName = null;
@@ -228,10 +231,12 @@ class LibraryLoader {
 
 		for (FileTreeNode child : node.getChildren()) {
 			if (child.getAlbum() != null) {
+				out.println( "[LibraryLoader] Album rejected, subdirectory is an album: " + node.getPath() );
 				return false;
 			}
 
 			if (child.getArtist() != null) {
+				out.println( "[LibraryLoader] Album rejected, no artist specified: " + node.getPath() );
 				return false;
 			}
 
@@ -253,6 +258,7 @@ class LibraryLoader {
 						albumMatchPercent = FuzzySearch.ratio(albumName,
 								Utils.prepareAlbumForCompare(child.getTrack().getAlbumTitle()));
 					if (albumMatchPercent < 90) {
+						out.println( "[LibraryLoader] Album rejected, album name in tags too different: " + node.getPath() );
 						return false;
 					}
 
@@ -262,6 +268,8 @@ class LibraryLoader {
 						albumMatchPercent = FuzzySearch.ratio(artistName,
 								Utils.prepareAlbumForCompare(child.getTrack().getAlbumArtist()));
 					if (artistMatchPercent < 90) {
+
+						out.println( "[LibraryLoader] Album rejected, artist name in tags too different: " + node.getPath() );
 						return false;
 					}
 				}
@@ -269,6 +277,7 @@ class LibraryLoader {
 		}
 
 		if (childTrackCount == 0) {
+			out.println( "[LibraryLoader] Album rejected, no tracks: " + node.getPath() );
 			return false;
 		}
 
@@ -326,8 +335,11 @@ class LibraryLoader {
 	}
 
 	public void removeMusicRoot(MusicRoot musicRoot) {
-		diskReader.interrupt();
+		if (Platform.isFxApplicationThread()) {
+			library.musicRoots.remove(musicRoot);
+		}
 		library.merger.removeMusicRoot(musicRoot);
+		diskReader.interrupt();
 		requestClearOrphans();
 	}
 }

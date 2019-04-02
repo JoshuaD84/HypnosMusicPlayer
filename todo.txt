@@ -25,22 +25,13 @@ Library & Scanner Rebuild
    Deal with Overflow in LibraryDiskWatcher
 
 Scanner Bugs
-   Can't double click albums/tracks when scanner is running. Enter and right-click -> play work
-
-   If you add a path, interrupt the scan, and then it starts scanning, the albums that already scanned
-   have no content on album table
-
-   Track Filter doesn't work
-
-
+   Filtered track list doesn't update after changes are processed in library
 
 Scanner
    Manual rescan option for artists and tracks?
 
    allow the order of the library locations to be changed
    
-   Can we make the scanner smarter / faster?
-
    failed scans 
       Accidental Sebiards - Live at the watermark
       The Smiths - Louder than Bombs
@@ -51,12 +42,11 @@ Scanner
    Don't add an artist that has no name, just those tracks don't get grouped into an artist
       Or maybe have a special artist group for all the tracks/albums with no artist name
 
-   An album will form from tracks if you edit them and they aren't currently an album. But an album won't split if you edit tags and make it not be an album.
-      Is this desired behavior? I feel like probably no -- it can create different states based on the same disk contents, which doesn't make sense
-
    It locks artist folders on windows. Surpsingly not album folders, just artist
 
 UI
+   Track Filter doesn't work
+
    Right clicking on library buttons changes library tab, only left click should
 
    Improve tag editor UI. It's clunky.  Single clicks good

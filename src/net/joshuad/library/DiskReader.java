@@ -21,12 +21,6 @@ class DiskReader implements FileVisitor <Path> {
 
 	private FileTreeNode currentDirectoryNode = null;
 	
-	enum ScanCompletionStatus {
-		FINISHED,
-		INTERRUPTED,
-		FAILED
-	}
-	
 	private boolean interrupted = false;
 	private boolean interruptRequested = false;
 	private long directoriesVisited = 0;
@@ -42,7 +36,6 @@ class DiskReader implements FileVisitor <Path> {
 	}
 	
 	void setUI( FXUI ui ) {
-		System.out.println ( "UI set: " + ui );
 		this.ui = ui;
 	}
 	
@@ -59,44 +52,33 @@ class DiskReader implements FileVisitor <Path> {
 		currentRootPath = null;
 	}
 	
-	public ScanCompletionStatus loadMusicRoot( Path rootPath ) {
-		ScanCompletionStatus scanCompletionStatus;
-		
-		System.out.println( "[MusicRootLoader] Loading root: " + rootPath.toString() );
+	public void scanMusicRoot( MusicRoot musicRoot ) {
+		library.getLog().println( "[MusicRootLoader] Loading root: " + musicRoot.getPath().toString() );
 		resetState();
 		
-		directoriesToScan = LibraryLoader.getDirectoryCount ( rootPath );
+		directoriesToScan = LibraryLoader.getDirectoryCount ( musicRoot.getPath() );
 		
-		currentRootPath = rootPath;
+		currentRootPath = musicRoot.getPath();
 		
-		MusicRoot musicRoot = new MusicRoot ( rootPath );
-
-		library.diskWatcher.watchAll( musicRoot );
-		library.merger.addMusicRoot( musicRoot );
+		library.diskWatcher.watchAll( musicRoot.getPath() );
 		
 		try {
-			Files.walkFileTree( rootPath, EnumSet.of( FileVisitOption.FOLLOW_LINKS ), Integer.MAX_VALUE, this );
-			if ( interrupted ) {
-				scanCompletionStatus = ScanCompletionStatus.INTERRUPTED;
-			} else {
-				scanCompletionStatus = ScanCompletionStatus.FINISHED;
-			}
+			Files.walkFileTree( musicRoot.getPath(), EnumSet.of( FileVisitOption.FOLLOW_LINKS ), Integer.MAX_VALUE, this );
+			musicRoot.setNeedsRescan( interrupted );
 			
 		}  catch ( Exception e ) {
-			LOGGER.log( Level.INFO, "Scan failed or incomplete for path, giving up: " + rootPath, e );
+			LOGGER.log( Level.INFO, "Scan failed or incomplete for path, giving up: " + musicRoot.getPath(), e );
 			//TODO: Make the UI show this status somehow. 
-			scanCompletionStatus = ScanCompletionStatus.FAILED;
+			musicRoot.setNeedsRescan( false );
+			musicRoot.setFailedScan( true );
 		}
 	
 		if ( ui != null ) {
 			ui.setLibraryLoaderStatusToStandby();
 		}
-		
-		return scanCompletionStatus;
 	}
 	
-	public ScanCompletionStatus updatePath( Path path ) {
-		ScanCompletionStatus scanCompletionStatus;
+	public void updatePath( Path path ) {
 		resetState();
 		directoriesToScan = LibraryLoader.getDirectoryCount ( path );
 	
@@ -105,18 +87,15 @@ class DiskReader implements FileVisitor <Path> {
 		
 		try {
 			Files.walkFileTree( path, EnumSet.of( FileVisitOption.FOLLOW_LINKS ), Integer.MAX_VALUE, this );
-			scanCompletionStatus = ScanCompletionStatus.FINISHED;
 			
 		}  catch ( Exception e ) {
 			//TODO: Decide what to do here
 			LOGGER.log( Level.INFO, "Scan failed or incomplete for " + path, e );
-			scanCompletionStatus = ScanCompletionStatus.FAILED;
 		}
 	
 		if ( ui != null ) {
 			ui.setLibraryLoaderStatusToStandby();
 		}
-		return scanCompletionStatus;
 	}
 	
 	@Override
@@ -145,7 +124,6 @@ class DiskReader implements FileVisitor <Path> {
 		if ( Utils.isMusicFile ( filePath ) ) {
 			Track track = new Track ( filePath );
 			currentDirectoryNode.addChild ( new FileTreeNode ( filePath, currentDirectoryNode, track ) );
-			library.merger.addOrUpdateTrack( track );
 		}
 		return FileVisitResult.CONTINUE;
 	}
@@ -155,7 +133,7 @@ class DiskReader implements FileVisitor <Path> {
 		
 		directoriesVisited++;
 		
-		if ( LibraryLoader.isAlbum ( currentDirectoryNode ) ) {	
+		if ( LibraryLoader.isAlbum ( currentDirectoryNode, library.getLog() ) ) {	
 			List<Track> tracks = new ArrayList<> ();
 			for ( FileTreeNode child : currentDirectoryNode.getChildren() ) {
 				if ( child.getTrack() != null ) {
@@ -165,11 +143,25 @@ class DiskReader implements FileVisitor <Path> {
 		
 			Album album = new Album( currentDirectoryNode.getPath(), tracks );
 			
-			System.out.println( "[MusicRootLoader] Loading album: " + album.getAlbumArtist() + " - " + album.getAlbumTitle() );
+			
+			library.getLog().println( "[MusicRootLoader] Loading album: " + album.getAlbumArtist() + " - " + album.getAlbumTitle() );
 			
 			currentDirectoryNode.setAlbum( album );
+			
+			for ( Track track : tracks ) {
+				library.merger.addOrUpdateTrack( track );
+			}
 			library.merger.addOrUpdateAlbum( album );
+			
+		} else {
+			for ( FileTreeNode child : currentDirectoryNode.getChildren() ) {
+				if ( child.getTrack() != null ) {
+					library.merger.addOrUpdateTrack( child.getTrack() );
+				}
+			}
+			library.merger.notAnAlbum( currentDirectoryNode.getPath() );
 		}
+			
 		
 		if ( currentDirectoryNode.getParent() != null ) {
 			currentDirectoryNode = currentDirectoryNode.getParent();

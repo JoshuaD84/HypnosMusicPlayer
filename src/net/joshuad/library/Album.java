@@ -44,7 +44,6 @@ public class Album implements Serializable, AlbumInfoSource {
 			}
 		}
 		
-		System.out.println( "New Tracks size: " + newTracks.size() );
 		this.tracks = newTracks;
 	}
 	

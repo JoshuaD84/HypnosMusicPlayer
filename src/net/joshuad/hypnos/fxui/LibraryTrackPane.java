@@ -46,7 +46,6 @@ import javafx.scene.text.TextAlignment;
 import net.joshuad.hypnos.AlphanumComparator;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.library.Library;
-import net.joshuad.library.MusicRoot;
 import net.joshuad.hypnos.Persister;
 import net.joshuad.library.Playlist;
 import net.joshuad.library.Track;

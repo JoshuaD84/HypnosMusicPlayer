@@ -1,5 +1,7 @@
 package net.joshuad.library;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -136,15 +138,15 @@ public class Library {
   public Collection<MusicRoot> getMusicRoots() {
     return musicRoots;
   }
-
-  public void requestRescan(List<Album> albums) {
-    for (Album album : albums) {
-      requestRescan( album.getPath() );
-    }
-  }
+  
+	public void requestRescan(List<Album> albums) {
+		for (Album album : albums) {
+			requestRescan(album.getPath());
+		}
+	}
 
 	public void addMusicRoot(Path path) {
-		loader.queueScanMusicRoot(path);
+		loader.addMusicRoot(path);
 	}
 
 	public void removeMusicRoot(MusicRoot musicRoot) {
@@ -170,6 +172,11 @@ public class Library {
 	
 	public String getUniquePlaylistName() {
 		return getUniquePlaylistName ( "New Playlist" );
+	}
+	
+	private PrintStream dummy = new PrintStream(OutputStream.nullOutputStream());
+	PrintStream getLog() {
+		return dummy;
 	}
 	
 	public String getUniquePlaylistName( String base ) {

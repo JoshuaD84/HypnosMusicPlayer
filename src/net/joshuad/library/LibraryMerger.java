@@ -1,5 +1,8 @@
 package net.joshuad.library;
 
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -138,9 +141,9 @@ public class LibraryMerger {
   /* These methods are run off the JavaFX thread, and help prepare fast merges */
   /*---------------------------------------------------------------------------*/
 
-  public void addOrUpdateTrack(Track track) {
+  void addOrUpdateTrack(Track track) {
     if (track == null) {
-      System.out.println("[Merger] Asked to add a null track to library, ignoring");
+    	library.getLog().println("[Merger] Asked to add a null track to library, ignoring");
       return;
     }
     
@@ -174,7 +177,7 @@ public class LibraryMerger {
   
   public void addOrUpdatePlaylist(Playlist playlist) {
     if (playlist == null) {
-      System.out.println("[Merger] Asked to add a null playlist to library, ignoring");
+    	library.getLog().println("[Merger] Asked to add a null playlist to library, ignoring");
       return;
     }
     
@@ -206,48 +209,77 @@ public class LibraryMerger {
 
   void addOrUpdateAlbum(Album album) {
     if (album == null) {
-      System.out.println("[Merger] Asked to add/update a null album to library, ignoring");
+    	library.getLog().println("[Merger] Asked to add/update a null album to library, ignoring");
       return;
     }
     
+    boolean didUpdate = false;
     synchronized (pendingActions) {
-      boolean didUpdate = false;
-      for (int k= 0; k < pendingActions.size(); k++) {
-        UpdateAction action = pendingActions.get(k);
-        if (action.getActionType() == ActionType.ADD_ALBUM && album.equals(action.getItem())) {
-          //We can do updates to data off the javafx thread because the values aren't observable. 
-          ((Album)action.getItem()).setData(album);
-          library.setDataNeedsToBeSavedToDisk(true);
-          didUpdate = true;
-        }
-      }
+	    for (int k= 0; k < pendingActions.size(); k++) {
+	      UpdateAction action = pendingActions.get(k);
+	      if (action.getActionType() == ActionType.ADD_ALBUM && album.equals(action.getItem())) {
+	        //We can do updates to data off the javafx thread because the values aren't observable. 
+	        ((Album)action.getItem()).setData(album);
+	        library.setDataNeedsToBeSavedToDisk(true);
+	        didUpdate = true;
+	      }
+	    }
+    }
 
-      int existingLibraryIndex = library.albums.indexOf(album);
-      if (existingLibraryIndex != -1) {
-      	pendingActions.add(new UpdateAction(new Object[]{ library.albums.get(existingLibraryIndex), album }, ActionType.UPDATE_ALBUM));
-        //We can do updates to data off the javafx thread because the values aren't observable. 
-        didUpdate = true;
-      }
+    int existingLibraryIndex = library.albums.indexOf(album);
+    if (existingLibraryIndex != -1) {
+    	pendingActions.add(new UpdateAction(new Object[]{ library.albums.get(existingLibraryIndex), album }, ActionType.UPDATE_ALBUM));
+      //We can do updates to data off the javafx thread because the values aren't observable. 
+      didUpdate = true;
+    }
 
-      if (!didUpdate) {
-        pendingActions.add(new UpdateAction(album, ActionType.ADD_ALBUM));
-      }
+    if (!didUpdate) {
+      pendingActions.add(new UpdateAction(album, ActionType.ADD_ALBUM));
     }
   }
+
+	void notAnAlbum(Path path) {
+		Album foundAlbum = null;
+		for (UpdateAction action : pendingActions) {
+			if (action.getActionType() == ActionType.ADD_ALBUM) {
+				if (((Album)action.getItem()).getPath().equals(path)) {
+					foundAlbum = (Album)action.getItem();
+					//Not breaking intentionally; imagine a queue that has add, remove, add at same path. 
+				}
+			}
+		}
+		
+		if (foundAlbum == null) {
+			List<Album> libraryAlbums = new ArrayList<>(library.albums);
+			for (Album album : libraryAlbums) {
+				if(album.getPath().equals(path)) {
+					foundAlbum = album;
+					break;
+				}
+			}
+		}
+		
+		if ( foundAlbum != null) {
+			for (Track track : foundAlbum.getTracks()) {
+				track.setAlbum( null );
+			}
+			removeAlbum(foundAlbum);
+		}
+	}
   
-  public void addMusicRoot(MusicRoot musicRoot) {    
+	void addMusicRoot(MusicRoot musicRoot) {    
     pendingActions.add(new UpdateAction(musicRoot, ActionType.ADD_MUSIC_ROOT));
   }
   
-  public void removeMusicRoot(MusicRoot musicRoot) {    
+	void removeMusicRoot(MusicRoot musicRoot) {    
     pendingActions.add(new UpdateAction(musicRoot, ActionType.REMOVE_MUSIC_ROOT));
   }
   
-  public void removeTrack(Track track) {
+  void removeTrack(Track track) {
     pendingActions.add(new UpdateAction(track, ActionType.REMOVE_TRACK));
   }
 
-  public void removeAlbum(Album album) {
+  void removeAlbum(Album album) {
     pendingActions.add(new UpdateAction(album, ActionType.REMOVE_ALBUM));
   }
   

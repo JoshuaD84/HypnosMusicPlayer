@@ -28,13 +28,17 @@ class LibraryDiskWatcher {
 	private static final Logger LOGGER = Logger.getLogger( LibraryDiskWatcher.class.getName() );
 
 	private WatchService watcher;
-    private final HashMap<WatchKey,Path> keys = new HashMap <WatchKey,Path> ();
-    
-    private DelayedUpdateThread delayedUpdater;
-    
-    private FXUI ui;
-    
+	private final HashMap<WatchKey, Path> keys = new HashMap<WatchKey, Path>();
+
+	private DelayedUpdateThread delayedUpdater;
+
+	private FXUI ui;
+	
+	private Library library;
+
 	LibraryDiskWatcher( Library library ) {
+		
+		this.library = library;
 		
 		delayedUpdater = new DelayedUpdateThread( library );
 		
@@ -55,7 +59,7 @@ class LibraryDiskWatcher {
 	public void stopWatching( Path path ) {
 		for( WatchKey key : keys.keySet() ) {
 			if( keys.get( key ).equals( path ) ) {
-				System.out.println( "[Watcher] stopping watch on: " + path.toString() );
+				library.getLog().println( "[Watcher] stopping watch on: " + path.toString() );
 				key.cancel();
 			}
 		}
@@ -135,15 +139,15 @@ class LibraryDiskWatcher {
 			Path child = directory.resolve( watchEvent.context() );
 			
 			if ( eventKind == StandardWatchEventKinds.ENTRY_CREATE ) {
-				System.out.println( "[Watcher] Heard create: " + child );
+				library.getLog().println( "[Watcher] Heard create: " + child );
 				delayedUpdater.addUpdateItem( child );
 				
 			} else if ( eventKind == StandardWatchEventKinds.ENTRY_DELETE ) {
-				System.out.println( "[Watcher] heard delete: " + child );
+				library.getLog().println( "[Watcher] heard delete: " + child );
 				delayedUpdater.addUpdateItem( child );
 				
 			} else if ( eventKind == StandardWatchEventKinds.ENTRY_MODIFY ) {
-				System.out.println( "[Watcher] heard modify: " + child );
+				library.getLog().println( "[Watcher] heard modify: " + child );
 				delayedUpdater.addUpdateItem( child );
 			
 			} else if ( eventKind == StandardWatchEventKinds.OVERFLOW ) {

@@ -3,6 +3,7 @@ package net.joshuad.hypnos.fxui;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -190,10 +191,11 @@ public class LibraryLocationWindow extends Stage {
 		removeButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-			    for (MusicRoot musicRoot : musicSourceTable.getSelectionModel().getSelectedItems() ) {
+					List <MusicRoot> removeMe = new ArrayList<>(musicSourceTable.getSelectionModel().getSelectedItems());
+			    for (MusicRoot musicRoot : removeMe ) {
 			    	library.removeMusicRoot( musicRoot );
 			    }
-				musicSourceTable.getSelectionModel().clearSelection();	
+			    musicSourceTable.getSelectionModel().clearSelection();	
 			}
 		});
 
