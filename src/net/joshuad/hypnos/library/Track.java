@@ -1,4 +1,4 @@
-package net.joshuad.library;
+package net.joshuad.hypnos.library;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -41,7 +41,7 @@ import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.StopReason;
 import net.joshuad.hypnos.lastfm.LastFM.LovedState;
-import net.joshuad.library.TagError.TagErrorType;
+import net.joshuad.hypnos.library.TagError.TagErrorType;
 
 public class Track implements Serializable, AlbumInfoSource {
 	private static transient final Logger LOGGER = Logger.getLogger( Track.class.getName() );

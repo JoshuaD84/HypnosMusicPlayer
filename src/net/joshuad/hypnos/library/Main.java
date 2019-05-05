@@ -1,4 +1,4 @@
-package net.joshuad.library;
+package net.joshuad.hypnos.library;
 
 import java.nio.file.Paths;
 

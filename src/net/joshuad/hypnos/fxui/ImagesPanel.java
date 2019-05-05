@@ -36,17 +36,17 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
-import net.joshuad.library.Album;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.HypnosURLS;
-import net.joshuad.library.Track;
 import net.joshuad.hypnos.Utils;
-import net.joshuad.library.Track.ArtistTagImagePriority;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
 import net.joshuad.hypnos.audio.AudioSystem.StopReason;
+import net.joshuad.hypnos.library.Album;
+import net.joshuad.hypnos.library.Track;
+import net.joshuad.hypnos.library.Track.ArtistTagImagePriority;
 import net.joshuad.hypnos.audio.PlayerListener;
 
 public class ImagesPanel extends SplitPane implements PlayerListener {

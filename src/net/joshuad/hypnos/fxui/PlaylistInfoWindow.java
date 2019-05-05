@@ -31,14 +31,14 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import net.joshuad.library.Album;
 import net.joshuad.hypnos.CurrentList;
-import net.joshuad.library.Library;
-import net.joshuad.library.Playlist;
-import net.joshuad.library.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
+import net.joshuad.hypnos.library.Album;
+import net.joshuad.hypnos.library.Library;
+import net.joshuad.hypnos.library.Playlist;
+import net.joshuad.hypnos.library.Track;
 
 public class PlaylistInfoWindow extends Stage {
 	

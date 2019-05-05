@@ -56,14 +56,14 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import net.joshuad.library.Album;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.MultiFileImageTagPair;
 import net.joshuad.hypnos.MultiFileTextTagPair;
-import net.joshuad.library.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.MultiFileImageTagPair.ImageFieldKey;
+import net.joshuad.hypnos.library.Album;
+import net.joshuad.hypnos.library.Track;
 
 
 @SuppressWarnings("rawtypes")

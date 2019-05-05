@@ -29,12 +29,12 @@ import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.FXUI;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys.Hotkey;
+import net.joshuad.hypnos.library.Album;
+import net.joshuad.hypnos.library.Library;
+import net.joshuad.hypnos.library.MusicRoot;
+import net.joshuad.hypnos.library.Playlist;
+import net.joshuad.hypnos.library.Track;
 import net.joshuad.hypnos.hotkeys.HotkeyState;
-import net.joshuad.library.Album;
-import net.joshuad.library.Library;
-import net.joshuad.library.MusicRoot;
-import net.joshuad.library.Playlist;
-import net.joshuad.library.Track;
 
 public class Persister {
 

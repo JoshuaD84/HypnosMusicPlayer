@@ -14,13 +14,13 @@ import org.eclipse.swt.widgets.TrayItem;
 
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Hypnos.ExitCode;
-import net.joshuad.library.Track;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
 import net.joshuad.hypnos.audio.AudioSystem.StopReason;
 import net.joshuad.hypnos.audio.PlayerListener;
 import net.joshuad.hypnos.fxui.FXUI;
+import net.joshuad.hypnos.library.Track;
 
 public class WindowsTrayIcon extends NativeTrayIcon implements PlayerListener {
 	private static final Logger LOGGER = Logger.getLogger( WindowsTrayIcon.class.getName() );

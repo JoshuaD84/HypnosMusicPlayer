@@ -1,4 +1,4 @@
-package net.joshuad.library;
+package net.joshuad.hypnos.library;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -22,23 +22,23 @@ public class Library {
 
   // These are all three representations of the same data. Add stuff to the
   // Observable List, the other two can't accept add.
-  final ObservableList<Track> tracks = FXCollections.observableArrayList(new ArrayList<Track>());
+  private final ObservableList<Track> tracks = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(new ArrayList<Track>()));
   final FilteredList<Track> tracksFiltered = new FilteredList<>(tracks, p -> true);
   final SortedList<Track> tracksSorted = new SortedList<>(tracksFiltered);
 
-  final ObservableList<Album> albums = FXCollections.observableArrayList(new ArrayList<Album>());
+  final ObservableList<Album> albums = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(new ArrayList<Album>()));
   final FilteredList<Album> albumsFiltered = new FilteredList<>(albums, p -> true);
   final SortedList<Album> albumsSorted = new SortedList<>(albumsFiltered);
 
-  final ObservableList<Artist> artists = FXCollections.observableArrayList(new ArrayList<Artist>());
+  final ObservableList<Artist> artists = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(new ArrayList<Artist>()));
   final FilteredList<Artist> artistsFiltered = new FilteredList<>(artists, p -> true);
   final SortedList<Artist> artistsSorted = new SortedList<>(artistsFiltered);
 
-  final ObservableList<Playlist> playlists = FXCollections.observableArrayList(new ArrayList<Playlist>());
+  final ObservableList<Playlist> playlists = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(new ArrayList<Playlist>()));
   final FilteredList<Playlist> playlistsFiltered = new FilteredList<>(playlists, p -> true);
   final SortedList<Playlist> playlistsSorted = new SortedList<>(playlistsFiltered);
 
-  final ObservableList<TagError> tagErrors = FXCollections.observableArrayList(new ArrayList<TagError>());
+  final ObservableList<TagError> tagErrors = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(new ArrayList<TagError>()));
   final FilteredList<TagError> tagErrorsFiltered = new FilteredList<>(tagErrors, p -> true);
   final SortedList<TagError> tagErrorsSorted = new SortedList<>(tagErrorsFiltered);
 
@@ -126,6 +126,10 @@ public class Library {
       return tagErrorsSorted;
   }
 
+  public List<Track> getTracksCopy() {
+  		return new ArrayList<>(tracks); 
+  }
+  
   public void requestRescan(Path path) {
     loader.queueUpdatePath(path);
   }

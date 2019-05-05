@@ -45,13 +45,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.Hypnos;
-import net.joshuad.library.Playlist;
-import net.joshuad.library.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.StopReason;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 import net.joshuad.hypnos.lastfm.LastFM.LovedState;
+import net.joshuad.hypnos.library.Playlist;
+import net.joshuad.hypnos.library.Track;
 
 public class Transport extends VBox {
 	private static final Logger LOGGER = Logger.getLogger( Transport.class.getName() );

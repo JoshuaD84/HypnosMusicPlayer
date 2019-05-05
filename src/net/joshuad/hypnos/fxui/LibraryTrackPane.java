@@ -45,14 +45,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.TextAlignment;
 import net.joshuad.hypnos.AlphanumComparator;
 import net.joshuad.hypnos.Hypnos;
-import net.joshuad.library.Library;
 import net.joshuad.hypnos.Persister;
-import net.joshuad.library.Playlist;
-import net.joshuad.library.Track;
 import net.joshuad.hypnos.AlphanumComparator.CaseHandling;
 import net.joshuad.hypnos.Persister.Setting;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
+import net.joshuad.hypnos.library.Library;
+import net.joshuad.hypnos.library.Playlist;
+import net.joshuad.hypnos.library.Track;
 
 public class LibraryTrackPane extends BorderPane {
 	private static final Logger LOGGER = Logger.getLogger( LibraryTrackPane.class.getName() );

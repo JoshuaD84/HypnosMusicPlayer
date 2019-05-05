@@ -20,13 +20,13 @@ import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.History;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Persister;
-import net.joshuad.library.Playlist;
 import net.joshuad.hypnos.PreviousStack;
 import net.joshuad.hypnos.Queue;
-import net.joshuad.library.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.fxui.FXUI;
 import net.joshuad.hypnos.lastfm.LastFM;
+import net.joshuad.hypnos.library.Playlist;
+import net.joshuad.hypnos.library.Track;
 import net.joshuad.hypnos.Persister.Setting;
 
 public class AudioSystem {

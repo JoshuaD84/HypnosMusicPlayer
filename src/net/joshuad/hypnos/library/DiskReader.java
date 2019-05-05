@@ -1,4 +1,4 @@
-package net.joshuad.library;
+package net.joshuad.hypnos.library;
 
 import java.io.IOException;
 import java.nio.file.FileVisitOption;
@@ -67,8 +67,8 @@ class DiskReader implements FileVisitor <Path> {
 			musicRoot.setNeedsRescan( interrupted );
 			
 		}  catch ( Exception e ) {
-			LOGGER.log( Level.INFO, "Scan failed or incomplete for path, giving up: " + musicRoot.getPath(), e );
-			//TODO: Make the UI show this status somehow. 
+			library.getLog().println("[DiskReader] Scan failed or incomplete for path, giving up: " + musicRoot.getPath() );
+			e.printStackTrace( library.getLog() );
 			musicRoot.setNeedsRescan( false );
 			musicRoot.setFailedScan( true );
 		}
@@ -89,8 +89,14 @@ class DiskReader implements FileVisitor <Path> {
 			Files.walkFileTree( path, EnumSet.of( FileVisitOption.FOLLOW_LINKS ), Integer.MAX_VALUE, this );
 			
 		}  catch ( Exception e ) {
-			//TODO: Decide what to do here
-			LOGGER.log( Level.INFO, "Scan failed or incomplete for " + path, e );
+			library.getLog().println("[DiskReader] Scan failed or incomplete for path, giving up: " + path );
+			e.printStackTrace( library.getLog() );
+			List<MusicRoot> roots = new ArrayList<>(library.musicRoots);
+			for (MusicRoot root : roots) {
+				if (Utils.isChildOf(path, root.getPath())) {
+					root.setFailedScan( true );
+				}
+			}
 		}
 	
 		if ( ui != null ) {

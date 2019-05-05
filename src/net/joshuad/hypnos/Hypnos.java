@@ -41,11 +41,11 @@ import net.joshuad.hypnos.audio.AudioSystem.StopReason;
 import net.joshuad.hypnos.fxui.FXUI;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys;
 import net.joshuad.hypnos.hotkeys.GlobalHotkeys.Hotkey;
-import net.joshuad.library.Album;
-import net.joshuad.library.Library;
-import net.joshuad.library.Library.LoaderSpeed;
-import net.joshuad.library.Playlist;
-import net.joshuad.library.Track;
+import net.joshuad.hypnos.library.Album;
+import net.joshuad.hypnos.library.Library;
+import net.joshuad.hypnos.library.Playlist;
+import net.joshuad.hypnos.library.Track;
+import net.joshuad.hypnos.library.Library.LoaderSpeed;
 
 public class Hypnos extends Application {
 

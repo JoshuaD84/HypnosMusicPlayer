@@ -11,7 +11,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import net.joshuad.library.Track;
+import net.joshuad.hypnos.library.Track;
 
 public class CurrentListTrack extends Track {
 	@SuppressWarnings("unused")

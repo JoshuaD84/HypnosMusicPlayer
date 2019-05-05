@@ -3,10 +3,10 @@ package net.joshuad.hypnos.fxui;
 import java.io.Serializable;
 import java.util.List;
 
-import net.joshuad.library.Album;
-import net.joshuad.library.Artist;
-import net.joshuad.library.Playlist;
-import net.joshuad.library.Track;
+import net.joshuad.hypnos.library.Album;
+import net.joshuad.hypnos.library.Artist;
+import net.joshuad.hypnos.library.Playlist;
+import net.joshuad.hypnos.library.Track;
 
 public class DraggedTrackContainer implements Serializable {
 	

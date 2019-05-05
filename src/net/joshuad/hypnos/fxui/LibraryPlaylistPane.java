@@ -53,17 +53,17 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.TextAlignment;
 import net.joshuad.hypnos.AlphanumComparator;
 import net.joshuad.hypnos.Hypnos;
-import net.joshuad.library.Library;
 import net.joshuad.hypnos.Persister;
-import net.joshuad.library.Playlist;
-import net.joshuad.library.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.AlphanumComparator.CaseHandling;
 import net.joshuad.hypnos.Persister.Setting;
-import net.joshuad.library.Playlist.PlaylistRepeatMode;
-import net.joshuad.library.Playlist.PlaylistShuffleMode;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
+import net.joshuad.hypnos.library.Library;
+import net.joshuad.hypnos.library.Playlist;
+import net.joshuad.hypnos.library.Track;
+import net.joshuad.hypnos.library.Playlist.PlaylistRepeatMode;
+import net.joshuad.hypnos.library.Playlist.PlaylistShuffleMode;
 
 public class LibraryPlaylistPane extends BorderPane {
 	private static final Logger LOGGER = Logger.getLogger( LibraryPlaylistPane.class.getName() );

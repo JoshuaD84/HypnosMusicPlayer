@@ -38,11 +38,11 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import net.joshuad.hypnos.Hypnos;
-import net.joshuad.library.Library;
-import net.joshuad.library.Playlist;
-import net.joshuad.library.Track;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
+import net.joshuad.hypnos.library.Library;
+import net.joshuad.hypnos.library.Playlist;
+import net.joshuad.hypnos.library.Track;
 
 public class HistoryWindow extends Stage {
 

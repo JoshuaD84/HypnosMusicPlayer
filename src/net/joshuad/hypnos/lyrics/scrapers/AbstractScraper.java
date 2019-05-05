@@ -1,6 +1,6 @@
 package net.joshuad.hypnos.lyrics.scrapers;
 
-import net.joshuad.library.Track;
+import net.joshuad.hypnos.library.Track;
 import net.joshuad.hypnos.lyrics.Lyrics;
 
 public abstract class AbstractScraper {

@@ -21,9 +21,8 @@ import javax.imageio.ImageIO;
 
 
 import me.xdrop.fuzzywuzzy.FuzzySearch;
-import net.joshuad.library.Album;
-import net.joshuad.library.Track;
-import net.joshuad.library.Track.Format;
+import net.joshuad.hypnos.library.Track;
+import net.joshuad.hypnos.library.Track.Format;
 
 public class Utils {
 
@@ -50,8 +49,20 @@ public class Utils {
 		
 		return false;
 	}
+
+	public static boolean isChildOf(Path potentialChild, Path parent) {
+		parent = parent.normalize().toAbsolutePath();
+
+		Path test = potentialChild.getParent();
+		while (test != null) {
+			if (test.equals(parent)) {
+				return true;
+			}
+			test = test.getParent();
+		}
+		return false;
+	}
 		
-	
 	public static boolean isImageFile ( File testFile ) {
 		return isImageFile ( testFile.toPath() );
 	}

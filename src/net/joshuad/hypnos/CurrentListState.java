@@ -7,9 +7,9 @@ import java.util.List;
 
 import net.joshuad.hypnos.CurrentList.Mode;
 import net.joshuad.hypnos.Hypnos.OS;
-import net.joshuad.library.Album;
-import net.joshuad.library.Artist;
-import net.joshuad.library.Playlist;
+import net.joshuad.hypnos.library.Album;
+import net.joshuad.hypnos.library.Artist;
+import net.joshuad.hypnos.library.Playlist;
 
 public class CurrentListState implements Serializable {
 	

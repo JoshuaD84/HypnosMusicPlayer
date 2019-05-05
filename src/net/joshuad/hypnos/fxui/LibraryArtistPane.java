@@ -46,20 +46,20 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.TextAlignment;
-import net.joshuad.library.Album;
 import net.joshuad.hypnos.AlphanumComparator;
-import net.joshuad.library.Library;
-import net.joshuad.library.MusicRoot;
 import net.joshuad.hypnos.Persister;
-import net.joshuad.library.Playlist;
-import net.joshuad.library.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.AlphanumComparator.CaseHandling;
 import net.joshuad.hypnos.Persister.Setting;
-import net.joshuad.library.Artist;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
+import net.joshuad.hypnos.library.Album;
+import net.joshuad.hypnos.library.Artist;
+import net.joshuad.hypnos.library.Library;
+import net.joshuad.hypnos.library.MusicRoot;
+import net.joshuad.hypnos.library.Playlist;
+import net.joshuad.hypnos.library.Track;
 
 public class LibraryArtistPane extends BorderPane {
 	private static final Logger LOGGER = Logger.getLogger( LibraryArtistPane.class.getName() );

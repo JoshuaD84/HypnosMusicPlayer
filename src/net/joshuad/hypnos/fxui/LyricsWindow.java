@@ -18,7 +18,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import net.joshuad.library.Track;
+import net.joshuad.hypnos.library.Track;
 import net.joshuad.hypnos.lyrics.Lyrics;
 import net.joshuad.hypnos.lyrics.LyricsFetcher;
 

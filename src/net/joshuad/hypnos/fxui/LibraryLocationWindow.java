@@ -37,9 +37,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import net.joshuad.hypnos.Hypnos;
-import net.joshuad.library.Library;
-import net.joshuad.library.Library.LoaderSpeed;
-import net.joshuad.library.MusicRoot;
+import net.joshuad.hypnos.library.Library;
+import net.joshuad.hypnos.library.MusicRoot;
+import net.joshuad.hypnos.library.Library.LoaderSpeed;
 
 public class LibraryLocationWindow extends Stage {
 	private static final Logger LOGGER = Logger.getLogger( LibraryLocationWindow.class.getName() );

@@ -24,10 +24,10 @@ import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
 import net.joshuad.hypnos.fxui.ThrottledTrackFilter;
-import net.joshuad.library.Album;
-import net.joshuad.library.Artist;
-import net.joshuad.library.Playlist;
-import net.joshuad.library.Track;
+import net.joshuad.hypnos.library.Album;
+import net.joshuad.hypnos.library.Artist;
+import net.joshuad.hypnos.library.Playlist;
+import net.joshuad.hypnos.library.Track;
 
 public class CurrentList {
 

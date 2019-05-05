@@ -1,4 +1,4 @@
-package net.joshuad.library;
+package net.joshuad.hypnos.library;
 
 import java.io.PrintStream;
 import java.nio.file.FileVisitOption;
@@ -139,7 +139,7 @@ class LibraryLoader {
 		path = path.toAbsolutePath();
 
 		if (!Files.exists(path)) {
-			for (Track track : library.tracks) {
+			for (Track track : library.getTracksCopy()) {
 				if (track.getPath().toAbsolutePath().startsWith(path)) {
 					library.getLog().println("[LibraryLoader] Removing track data at: " + track.getPath());
 					library.merger.removeTrack(track);
@@ -156,7 +156,7 @@ class LibraryLoader {
 
 		} else if (Utils.isMusicFile(path)) {
 			Track existingTrackAtPath = null;
-			for (Track track : library.tracks) {
+			for (Track track : library.getTracksCopy()) {
 				if (track.getPath().equals(path)) {
 					existingTrackAtPath = track;
 					break;
@@ -182,7 +182,7 @@ class LibraryLoader {
 
 			List<Path> childrenOfPath = new ArrayList<>();
 			for (Path futureUpdate : pathsToUpdate) {
-				if (isChildOf(futureUpdate, path)) {
+				if (Utils.isChildOf(futureUpdate, path)) {
 					childrenOfPath.add(futureUpdate);
 					library.getLog().println("[LibraryLoader] - Removing future scan, its a child: " + path);
 				}
@@ -191,19 +191,6 @@ class LibraryLoader {
 			pathsToUpdate.removeAll(childrenOfPath);
 			diskReader.updatePath(path);
 		}
-	}
-
-	private static boolean isChildOf(Path potentialChild, Path parent) {
-		parent = parent.normalize().toAbsolutePath();
-
-		Path test = potentialChild.getParent();
-		while (test != null) {
-			if (test.equals(parent)) {
-				return true;
-			}
-			test = test.getParent();
-		}
-		return false;
 	}
 
 	static long getDirectoryCount(Path dir) {
@@ -297,7 +284,7 @@ class LibraryLoader {
 			for (Album album : library.albums) {
 				boolean hasRoot = false;
 				for (MusicRoot root : library.musicRoots) {
-					if (isChildOf(album.getPath(), root.getPath())) {
+					if (Utils.isChildOf(album.getPath(), root.getPath())) {
 						hasRoot = true;
 						break;
 					}
@@ -315,12 +302,12 @@ class LibraryLoader {
 			}
 		}
 
-		List<Track> libraryTracks = new ArrayList<>( library.tracks );
+		List<Track> libraryTracks = library.getTracksCopy();
 		List<Track> removeMeTracks = new ArrayList<>();
 		for (Track track : libraryTracks) {
 			boolean hasRoot = false;
 			for (MusicRoot root : library.musicRoots) {
-				if (isChildOf(track.getPath(), root.getPath())) {
+				if (Utils.isChildOf(track.getPath(), root.getPath())) {
 					hasRoot = true;
 					break;
 				}

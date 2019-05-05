@@ -1,14 +1,17 @@
-package net.joshuad.library;
+package net.joshuad.hypnos.library;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
+import net.joshuad.hypnos.AlphanumComparator;
 import net.joshuad.hypnos.fxui.FXUI;
-import net.joshuad.library.UpdateAction.ActionType;
+import net.joshuad.hypnos.library.UpdateAction.ActionType;
 
 public class LibraryMerger {
   private static final Logger LOGGER = Logger.getLogger(LibraryMerger.class.getName());
@@ -23,7 +26,7 @@ public class LibraryMerger {
 
   private boolean runLaterPending = false;
 
-  private int sleepTimeMS = 400;
+  private final int sleepTimeMS = 400;
 
   public LibraryMerger(Library library) {
     this.library = library;
@@ -31,7 +34,11 @@ public class LibraryMerger {
     mergerThread = new Thread(() -> {
       while (true) {
         if (!runLaterPending) {
+        	int actionsInQueueBeforeUpdate = pendingActions.size();
           updateLibrary();
+          if (actionsInQueueBeforeUpdate > 0) {
+          		regenerateArtistList();
+          }
         }
 
         try {
@@ -57,9 +64,83 @@ public class LibraryMerger {
       LOGGER.log(Level.INFO, "Library Merger thread asked to start, but it's already running, request ignored.");
     }
   }
+  
+  private void regenerateArtistList() {
+  	
+  	List<Artist> newArtistList = new ArrayList<>();
+		
+		List<Album> libraryAlbums = new ArrayList<>(library.albums);
+		Album[] albumArray = libraryAlbums.toArray( new Album[ libraryAlbums.size() ] );
 
-  public void setSleepTimeMS(int timeMS) {
-    this.sleepTimeMS = timeMS;
+		AlphanumComparator comparator = new AlphanumComparator ( AlphanumComparator.CaseHandling.CASE_INSENSITIVE );
+		Arrays.sort( albumArray, Comparator.comparing( Album::getAlbumArtist, comparator ) );
+		
+		Artist lastArtist = null;
+		for ( Album album : albumArray ) {
+			if ( lastArtist != null && lastArtist.getName().equals( album.getAlbumArtist() ) ) {
+				lastArtist.addAlbum ( album );
+			} else {
+				Artist artist = null;
+				
+				for ( Artist test : newArtistList ) {
+					if ( test.getName().equalsIgnoreCase( album.getAlbumArtist() ) ) {
+						artist = test;
+						break;
+					}
+				}
+				
+				if ( artist == null ) {
+					artist = new Artist ( album.getAlbumArtist() );
+					newArtistList.add( artist );
+				}
+				artist.addAlbum ( album );
+				lastArtist = artist;
+			}
+		}
+		
+		List<Track> libraryTracks = library.getTracksCopy();
+		List<Track> looseTracks = new ArrayList<>();
+		for ( Track track : libraryTracks ) {
+			if ( track.getAlbum() == null ) {
+				looseTracks.add( track );
+			}
+		}
+		
+		Track[] trackArray = looseTracks.toArray( new Track[ looseTracks.size() ] );
+		Arrays.sort( trackArray, Comparator.comparing( Track::getAlbumArtist, comparator ) );
+		
+		lastArtist = null;
+		for ( Track track : trackArray ) {
+			if ( lastArtist != null && lastArtist.getName().equals( track.getAlbumArtist() ) ) {
+				lastArtist.addLooseTrack ( track );
+			} else {
+				Artist artist = null;
+				
+				for ( Artist test : newArtistList ) {
+					if ( test.getName().equalsIgnoreCase( track.getAlbumArtist()  ) ) {
+						artist = test;
+						break;
+					}
+				}
+				
+				if ( artist == null ) {
+					artist = new Artist ( track.getAlbumArtist() );
+					newArtistList.add( artist );
+				}
+				artist.addLooseTrack ( track );
+				lastArtist = artist;
+			}
+		}
+		
+		runLaterPending = true;
+
+    Platform.runLater(() -> {
+      try {
+    		library.getArtists().setAll( newArtistList );
+      } finally {
+        runLaterPending = false;
+      }
+    });
   }
 
   private void updateLibrary() {
@@ -93,13 +174,13 @@ public class LibraryMerger {
                 	updateMe.setData( newData );
                 	break;
                 case ADD_TRACK:
-                  library.tracks.add((Track) action.getItem());
+                  library.getTracks().add((Track) action.getItem());
                   break;
                 case REMOVE_TRACK:
-                  library.tracks.remove((Track) action.getItem());
+                  library.getTracks().remove((Track) action.getItem());
                   break;
                 case CLEAR_ALL:
-                	library.tracks.clear();
+                	library.getTracks().clear();
                 	library.albums.clear();
                 	library.artists.clear();
                 	ui.libraryCleared();
@@ -158,7 +239,10 @@ public class LibraryMerger {
           didUpdate = true;
         }
       }
-
+      
+      //TODO: This is potentially buggy, need to fix.
+      // existingLibraryIndex can change from when we call indexOf to when we use the info
+      /*
       int existingLibraryIndex = library.tracks.indexOf(track);
       if (existingLibraryIndex != -1) {
         //We can do updates to data off the javafx thread because the values aren't observable. 
@@ -166,6 +250,7 @@ public class LibraryMerger {
         library.setDataNeedsToBeSavedToDisk (true);
         didUpdate = true;
       }
+      */
 
       if (!didUpdate) {
         pendingActions.add(new UpdateAction(track, ActionType.ADD_TRACK));

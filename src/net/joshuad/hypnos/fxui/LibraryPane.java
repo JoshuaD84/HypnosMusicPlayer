@@ -22,9 +22,9 @@ import javafx.scene.effect.ColorAdjust;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import net.joshuad.library.Library;
 import net.joshuad.hypnos.Persister;
 import net.joshuad.hypnos.audio.AudioSystem;
+import net.joshuad.hypnos.library.Library;
 import net.joshuad.hypnos.Persister.Setting;
 
 public class LibraryPane extends BorderPane {

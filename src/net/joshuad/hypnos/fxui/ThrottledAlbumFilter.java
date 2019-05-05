@@ -4,7 +4,7 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 
 import javafx.collections.transformation.FilteredList;
-import net.joshuad.library.Album;
+import net.joshuad.hypnos.library.Album;
 
 public class ThrottledAlbumFilter {
 	private String requestedFilter = "";

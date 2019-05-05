@@ -56,18 +56,18 @@ import net.joshuad.hypnos.CurrentListState;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.CurrentListTrackState;
 import net.joshuad.hypnos.Hypnos;
-import net.joshuad.library.Library;
 import net.joshuad.hypnos.Persister;
-import net.joshuad.library.Playlist;
-import net.joshuad.library.Track;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.AlphanumComparator.CaseHandling;
 import net.joshuad.hypnos.Persister.Setting;
-import net.joshuad.library.Track.Format;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
+import net.joshuad.hypnos.library.Library;
+import net.joshuad.hypnos.library.Playlist;
+import net.joshuad.hypnos.library.Track;
+import net.joshuad.hypnos.library.Track.Format;
 
 public class CurrentListPane extends BorderPane {
 	private static final Logger LOGGER = Logger.getLogger( CurrentListPane.class.getName() );
