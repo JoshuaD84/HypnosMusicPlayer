@@ -41,8 +41,8 @@ import net.joshuad.hypnos.library.Library;
 import net.joshuad.hypnos.library.MusicRoot;
 import net.joshuad.hypnos.library.Library.LoaderSpeed;
 
-public class LibraryLocationWindow extends Stage {
-	private static final Logger LOGGER = Logger.getLogger( LibraryLocationWindow.class.getName() );
+public class MusicRootWindow extends Stage {
+	private static final Logger LOGGER = Logger.getLogger( MusicRootWindow.class.getName() );
 
 	TableView <MusicRoot> musicSourceTable;
 	
@@ -54,7 +54,7 @@ public class LibraryLocationWindow extends Stage {
 
 	private final ProgressIndicatorBar progressBar;
 	
-	public LibraryLocationWindow ( Stage mainStage, Library library ) {
+	public MusicRootWindow ( Stage mainStage, Library library ) {
 		super();
 		this.library = library;
 		
@@ -177,7 +177,7 @@ public class LibraryLocationWindow extends Stage {
 		addButton.setMinWidth( 100 );
 		removeButton.setMinWidth( 100 );
 
-		LibraryLocationWindow me = this;
+		MusicRootWindow me = this;
 		addButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {

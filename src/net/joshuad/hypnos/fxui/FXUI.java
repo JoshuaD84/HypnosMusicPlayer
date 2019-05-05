@@ -119,7 +119,7 @@ public class FXUI implements PlayerListener {
 	ArtistInfoWindow artistInfoWindow;
 	PlaylistInfoWindow playlistInfoWindow;
 	AlbumInfoWindow albumInfoWindow;
-	LibraryLocationWindow libraryLocationWindow;
+	MusicRootWindow libraryLocationWindow;
 	HistoryWindow historyWindow;
 	public SettingsWindow settingsWindow;
 	TrackInfoWindow trackInfoWindow;
@@ -207,7 +207,7 @@ public class FXUI implements PlayerListener {
 		artSplitPane = new ImagesPanel ( this, audioSystem );
 		currentListPane = new CurrentListPane( this, audioSystem, library );
 		
-		libraryLocationWindow = new LibraryLocationWindow ( mainStage, library );
+		libraryLocationWindow = new MusicRootWindow ( mainStage, library );
 		tagWindow = new TagWindow ( this ); 
 		queueWindow = new QueueWindow ( this, library, audioSystem, tagWindow );
 		albumInfoWindow = new AlbumInfoWindow ( this, library, audioSystem );
