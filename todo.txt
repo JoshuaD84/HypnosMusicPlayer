@@ -1,18 +1,20 @@
 Library & Scanner Rebuild
    Deal with Overflow in LibraryDiskWatcher
+
+   Sometimes the new scanner causes the UI to stutter 
    
    Code is a bit messy
-
-   change text to "rescanning" on load, make it more deferential to adds
 
    Album art gets changed away 
       Add a music root, switch to artist tab, switch to album tab.  Select an album
 
-   Rescan mistake
-      Start with music added, remove it during scan, it still does a rescan
-
    Dont do the artist regeneration on the fx thread.
    
+   Add scanner log to UI
+
+   Add removing a musicroot status updates to UI
+
+
 
 Live at the Watermark
    WARNING: Unable to set data for tag window.

@@ -2,14 +2,11 @@ package net.joshuad.hypnos.library;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
-import net.joshuad.hypnos.AlphanumComparator;
 import net.joshuad.hypnos.fxui.FXUI;
 import net.joshuad.hypnos.library.UpdateAction.ActionType;
 
@@ -145,7 +142,8 @@ public class LibraryMerger {
 	          }
 	          
 	          if ( regenerateArtists ) {
-	          	library.artists.setAll( library.generateArtists() );
+	          	//TODO: Do this off the FX thread, it's causing lag
+	          	//library.artists.setAll( library.generateArtists() );
 	          }
           }
 
@@ -162,7 +160,7 @@ public class LibraryMerger {
 
   void addOrUpdateTrack(Track track) {
     if (track == null) {
-    	library.getLog().println("[Merger] Asked to add a null track to library, ignoring");
+    	library.getLibraryLog().println("[Merger] Asked to add a null track to library, ignoring");
       return;
     }
     
@@ -200,7 +198,7 @@ public class LibraryMerger {
   
   public void addOrUpdatePlaylist(Playlist playlist) {
     if (playlist == null) {
-    	library.getLog().println("[Merger] Asked to add a null playlist to library, ignoring");
+    	library.getLibraryLog().println("[Merger] Asked to add a null playlist to library, ignoring");
       return;
     }
     
@@ -232,7 +230,7 @@ public class LibraryMerger {
 
   void addOrUpdateAlbum(Album album) {
     if (album == null) {
-    	library.getLog().println("[Merger] Asked to add/update a null album to library, ignoring");
+    	library.getLibraryLog().println("[Merger] Asked to add/update a null album to library, ignoring");
       return;
     }
     

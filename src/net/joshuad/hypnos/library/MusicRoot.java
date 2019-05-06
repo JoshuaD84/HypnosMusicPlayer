@@ -16,7 +16,8 @@ public class MusicRoot implements Serializable {
 	
 	private File file;
 	
-	private boolean needsRescan = true;
+	private boolean needsInitialScan = true;
+	private transient boolean needsRescan = false;
 
 	@SuppressWarnings("unused")
 	private boolean failedScan = false; //TODO: Show this in the UI
@@ -32,6 +33,14 @@ public class MusicRoot implements Serializable {
 	
 	public Path getPath() {
 		return file.toPath();
+	}
+	
+	public void setNeedsInitialScan( boolean needsInitialScan ) {
+		this.needsInitialScan = needsInitialScan;
+	}
+
+	public boolean needsInitialScan() {
+		return needsInitialScan;
 	}
 	
 	public void setNeedsRescan( boolean needsRescan ) {

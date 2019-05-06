@@ -53,6 +53,10 @@ class LibraryLoader {
 	}
 
 	public void addMusicRoot(Path path) {
+		if ( diskReader.isRescanning() ) {
+				diskReader.interrupt();
+		}
+		
 		if (Platform.isFxApplicationThread()) {
 			library.musicRoots.add(new MusicRoot(path));
 		} else {
@@ -96,8 +100,15 @@ class LibraryLoader {
 					
 					List<MusicRoot> libraryRoots = new ArrayList<>(library.musicRoots);
 					for (MusicRoot root : libraryRoots) {
+						if (root.needsInitialScan()) {
+							diskReader.scanMusicRoot(root, DiskReader.ScanMode.INITIAL_SCAN);
+						}
+					}
+					
+					libraryRoots = new ArrayList<>(library.musicRoots);
+					for (MusicRoot root : libraryRoots) {
 						if (root.needsRescan()) {
-							diskReader.scanMusicRoot(root);
+							diskReader.scanMusicRoot(root, DiskReader.ScanMode.RESCAN);
 						}
 					}
 
@@ -141,14 +152,14 @@ class LibraryLoader {
 		if (!Files.exists(path)) {
 			for (Track track : library.getTracksCopy()) {
 				if (track.getPath().toAbsolutePath().startsWith(path)) {
-					library.getLog().println("[LibraryLoader] Removing track data at: " + track.getPath());
+					library.getLibraryLog().println("[LibraryLoader] Removing track data at: " + track.getPath());
 					library.merger.removeTrack(track);
 				}
 			}
 
 			for (Album album : library.albums) {
 				if (album.getPath().toAbsolutePath().startsWith(path)) {
-					library.getLog().println("[LibraryLoader] Removing album data at: " + path);
+					library.getLibraryLog().println("[LibraryLoader] Removing album data at: " + path);
 					library.merger.removeAlbum(album);
 					library.diskWatcher.stopWatching(album.getPath());
 				}
@@ -164,7 +175,7 @@ class LibraryLoader {
 			}
 
 			if (existingTrackAtPath != null) {
-				library.getLog().println("[LibraryLoader] Updating track data at: " + path);
+				library.getLibraryLog().println("[LibraryLoader] Updating track data at: " + path);
 				existingTrackAtPath.refreshTagData();
 
 				// This will make sure that any existing album gets updated, and if the
@@ -172,19 +183,19 @@ class LibraryLoader {
 				pathsToUpdate.add(existingTrackAtPath.getPath().getParent());
 
 			} else {
-				library.getLog().println("[LibraryLoader] new track found at: " + path);
+				library.getLibraryLog().println("[LibraryLoader] new track found at: " + path);
 				Track newTrack = new Track(path);
 				library.merger.removeTrack(newTrack);
 			}
 
 		} else if (Files.isDirectory(path)) {
-			library.getLog().println("[LibraryLoader] Doing directory rescan at: " + path);
+			library.getLibraryLog().println("[LibraryLoader] Doing directory rescan at: " + path);
 
 			List<Path> childrenOfPath = new ArrayList<>();
 			for (Path futureUpdate : pathsToUpdate) {
 				if (Utils.isChildOf(futureUpdate, path)) {
 					childrenOfPath.add(futureUpdate);
-					library.getLog().println("[LibraryLoader] - Removing future scan, its a child: " + path);
+					library.getLibraryLog().println("[LibraryLoader] - Removing future scan, its a child: " + path);
 				}
 			}
 

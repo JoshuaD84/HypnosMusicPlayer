@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -48,22 +47,12 @@ public class Library {
   final SortedList<TagError> tagErrorsSorted = new SortedList<>(tagErrorsFiltered);
 
   final ObservableList<MusicRoot> musicRoots = FXCollections.observableArrayList();
-  
-  {
-  	musicRoots.addListener( new ListChangeListener<MusicRoot>() {
-  		public void onChanged ( Change<? extends MusicRoot> change ) {
-  			rootsNeedToBeSavedToDisk = true;
-  			System.out.println( "Change heard in roots" );
-  		}
-  	});
-  }
-  
+
   final LibraryLoader loader;
   final LibraryDiskWatcher diskWatcher;
   final LibraryMerger merger;
   
   private boolean dataNeedsToBeSavedToDisk = false;
-  private boolean rootsNeedToBeSavedToDisk = false;
 
   public Library() {
     loader = new LibraryLoader(this);
@@ -150,6 +139,9 @@ public class Library {
   }
   
   public void setMusicRootsOnInitialLoad( ArrayList<MusicRoot> roots ) {
+		for ( MusicRoot musicRoot : roots ) {
+			musicRoot.setNeedsRescan( true );
+		}
   	musicRoots.setAll( roots );
   }
 
@@ -185,20 +177,12 @@ public class Library {
 		merger.addOrUpdatePlaylist(playlist);
 	}
 
-	public boolean rootsHaveUnsavedData() {
-		return rootsNeedToBeSavedToDisk;
-	}
-	
-	public void setRootsHasUnsavedData( boolean b ) {
-		rootsNeedToBeSavedToDisk = b;
-	}
-
 	public String getUniquePlaylistName() {
 		return getUniquePlaylistName ( "New Playlist" );
 	}
 	
 	private PrintStream dummy = new PrintStream(OutputStream.nullOutputStream());
-	PrintStream getLog() {
+	PrintStream getLibraryLog() {
 		return dummy;
 	}
 	
@@ -238,7 +222,6 @@ public class Library {
 		
 		Artist lastArtist = null;
 		for ( Album album : albumArray ) {
-			System.out.println ( "album.getAlbumArtist(): '" +  album.getAlbumArtist() + "'" );
 			if ( album.getAlbumArtist().isBlank() ) continue;
 			
 			if ( lastArtist != null && lastArtist.getName().equals( album.getAlbumArtist() ) ) {

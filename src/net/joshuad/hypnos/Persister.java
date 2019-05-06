@@ -170,11 +170,15 @@ public class Persister {
 	public boolean loadRoots () {
 		try ( ObjectInputStream rootsIn = new ObjectInputStream( new FileInputStream( sourcesFile ) ); ) {
 			ArrayList <MusicRoot> musicRoots = (ArrayList <MusicRoot>) rootsIn.readObject();
-			library.setMusicRootsOnInitialLoad( musicRoots );
-			for ( MusicRoot musicRoot : musicRoots ) {
-				library.requestRescan( musicRoot.getPath() );
+			
+			//TODO: DD
+			for ( MusicRoot root : musicRoots ) {
+				System.out.println( "Root: " + root.getPath() );
+				System.out.println("Needs Initial: " + root.needsInitialScan() );
+				System.out.println("Needs Re: " + root.needsRescan() );
 			}
-
+			
+			library.setMusicRootsOnInitialLoad( musicRoots );
 			return true;
 			
 		} catch ( Exception e ) {
@@ -256,16 +260,13 @@ public class Persister {
 	}
 
 	public void saveRoots () {
-		if ( !library.rootsHaveUnsavedData() ) return;
 		File tempSourcesFile = new File ( sourcesFile.toString() + ".temp" );
 		try ( ObjectOutputStream sourcesOut = new ObjectOutputStream( new FileOutputStream( tempSourcesFile ) ); ) {
 			sourcesOut.writeObject( new ArrayList <MusicRoot> ( library.getMusicRoots() ) );
 			sourcesOut.flush();
 			sourcesOut.close();
 
-			Files.move( tempSourcesFile.toPath(), sourcesFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
-			
-			library.setRootsHasUnsavedData( false );
+			Files.move( tempSourcesFile.toPath(), sourcesFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE );
 			
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to save library source directory list to disk, continuing." );
@@ -588,7 +589,7 @@ public class Persister {
 					       saveAlbumsAndTracks();
 					       library.setDataNeedsToBeSavedToDisk( false );
 					    }
-
+					    
 							saveRoots();
 							saveCurrentList();
 							saveQueue();
