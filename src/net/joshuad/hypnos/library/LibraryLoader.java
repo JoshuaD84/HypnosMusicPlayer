@@ -304,6 +304,7 @@ class LibraryLoader {
 					}
 				}
 				if (!hasRoot) {
+					library.getLibraryLog().println( "[LibraryLoader] Orphan album pruned, no root: " + album.getPath() );
 					removeMe.add(album);
 				}
 			}
@@ -328,6 +329,7 @@ class LibraryLoader {
 			}
 			if (!hasRoot) {
 				removeMeTracks.add(track);
+				library.getLibraryLog().println( "[LibraryLoader] Orphan track pruned, no root: " + track.getPath() );
 			}
 		}
 		for (Track track : removeMeTracks) {

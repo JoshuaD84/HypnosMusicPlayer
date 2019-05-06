@@ -101,7 +101,7 @@ class DiskReader implements FileVisitor <Path> {
 		}
 	
 		if ( ui != null ) {
-			ui.setLibraryLoaderStatusToStandby();
+			ui.setLibraryLoaderStatusToStandby( this );
 		}
 	}
 	
@@ -130,7 +130,7 @@ class DiskReader implements FileVisitor <Path> {
 		}
 	
 		if ( ui != null ) {
-			ui.setLibraryLoaderStatusToStandby();
+			ui.setLibraryLoaderStatusToStandby(this);
 		}
 	}
 	
@@ -149,7 +149,8 @@ class DiskReader implements FileVisitor <Path> {
 		currentDirectoryNode = directoryNode;
 
 		if ( ui != null ) {
-			ui.setLibraryLoaderStatus( scanMode.getStatusPrefix() + " " + currentRootPath.toString() + "...", directoriesVisited / (double)directoriesToScan );
+			ui.setLibraryLoaderStatus( scanMode.getStatusPrefix() + " " + currentRootPath.toString() + "...", 
+					directoriesVisited / (double)directoriesToScan, this );
 		}
 		
 		return FileVisitResult.CONTINUE;

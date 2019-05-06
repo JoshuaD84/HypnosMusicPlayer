@@ -1748,17 +1748,24 @@ public class FXUI implements PlayerListener {
 	public void setCurrentListFilterText ( String string ) {
 		currentListPane.infoLabelAndFilter.setText ( string );
 	}
-
-	public void setLibraryLoaderStatus ( String message, double percentDone ) {
+	
+	/* Give it a source for the UI change so only that source can set it to standby
+	 * Avoiding overlapping modifications issues w/ threads terminating after other ones start */
+	private Object statusSource = null;
+	public void setLibraryLoaderStatus ( String message, double percentDone, Object source ) {
 		Platform.runLater( () -> {
 			this.libraryLocationWindow.setLoaderStatus ( message, percentDone );
+			statusSource = source;
 		});		
 	}
 
-	public void setLibraryLoaderStatusToStandby () {
-		Platform.runLater( () -> {
-			this.libraryLocationWindow.setLibraryLoaderStatusToStandby ( );
-		});	
+	//The programmer can send a null source in if he wants to force a standby status
+	public void setLibraryLoaderStatusToStandby ( Object source ) {
+		if ( statusSource == null || source == null || statusSource == source ) {
+			Platform.runLater( () -> {
+				this.libraryLocationWindow.setLibraryLoaderStatusToStandby ( );
+			});	
+		}
 	}
 
 	public void notifyUserLinuxInotifyIssue () {
