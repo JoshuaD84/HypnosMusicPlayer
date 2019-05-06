@@ -34,11 +34,7 @@ public class LibraryMerger {
     mergerThread = new Thread(() -> {
       while (true) {
         if (!runLaterPending) {
-        	int actionsInQueueBeforeUpdate = pendingActions.size();
           updateLibrary();
-          if (actionsInQueueBeforeUpdate > 0) {
-          		regenerateArtistList();
-          }
         }
 
         try {
@@ -66,7 +62,6 @@ public class LibraryMerger {
   }
   
   private void regenerateArtistList() {
-  	
   	List<Artist> newArtistList = new ArrayList<>();
 		
 		List<Album> libraryAlbums = new ArrayList<>(library.albums);
@@ -151,6 +146,7 @@ public class LibraryMerger {
         long startTime = System.currentTimeMillis();
         try {
           synchronized (pendingActions) {
+          	boolean regenerateArtists = false;
 	          while ( pendingActions.size() > 0 && System.currentTimeMillis() - startTime < 500 ) {
 	          	UpdateAction action = pendingActions.remove( 0 );
               switch (action.getActionType()) {
@@ -164,20 +160,25 @@ public class LibraryMerger {
                   break;
                 case ADD_ALBUM:
                   library.albums.add((Album) action.getItem());
+                  regenerateArtists = true;
                   break;
                 case REMOVE_ALBUM:
                   library.albums.remove((Album) action.getItem());
+                  regenerateArtists = true;
                   break;
                 case UPDATE_ALBUM: 
                 	Album updateMe = (Album)(((Object[])action.getItem())[0]);
                 	Album newData = (Album)(((Object[])action.getItem())[1]);
                 	updateMe.setData( newData );
+                  regenerateArtists = true;
                 	break;
                 case ADD_TRACK:
                   library.getTracks().add((Track) action.getItem());
+                  regenerateArtists = true;
                   break;
                 case REMOVE_TRACK:
                   library.getTracks().remove((Track) action.getItem());
+                  regenerateArtists = true;
                   break;
                 case CLEAR_ALL:
                 	library.getTracks().clear();
@@ -208,6 +209,10 @@ public class LibraryMerger {
 									break;
               }
 	            library.setDataNeedsToBeSavedToDisk (true);
+	          }
+	          
+	          if ( regenerateArtists ) {
+	          	this.regenerateArtistList();
 	          }
           }
 

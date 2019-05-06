@@ -22,7 +22,7 @@ public class Library {
 
   // These are all three representations of the same data. Add stuff to the
   // Observable List, the other two can't accept add.
-  private final ObservableList<Track> tracks = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(new ArrayList<Track>()));
+  final ObservableList<Track> tracks = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(new ArrayList<Track>()));
   final FilteredList<Track> tracksFiltered = new FilteredList<>(tracks, p -> true);
   final SortedList<Track> tracksSorted = new SortedList<>(tracksFiltered);
 

@@ -276,6 +276,9 @@ class LibraryLoader {
 		synchronized (library.musicRoots) {
 			if (library.musicRoots.size() == 0) {
 				library.merger.clearAll();
+				library.albums.clear();
+				library.tracks.clear();
+				library.artists.clear();
 			}
 		}
 		
