@@ -1,3 +1,19 @@
+Library & Scanner Rebuild
+   Deal with Overflow in LibraryDiskWatcher
+   
+   Code is a bit messy
+
+   change text to "rescanning" on load, make it more deferential to adds
+
+   Album art gets changed away 
+      Add a music root, switch to artist tab, switch to album tab.  Select an album
+
+   Rescan mistake
+      Start with music added, remove it during scan, it still does a rescan
+
+   Dont do the artist regeneration on the fx thread.
+   
+
 Live at the Watermark
    WARNING: Unable to set data for tag window.
 org.jaudiotagger.audio.exceptions.CannotReadException: This file does not appear to be an Mp4  file
@@ -55,31 +71,6 @@ org.jaudiotagger.audio.exceptions.CannotReadException: This file does not appear
 
 
 
-Library & Scanner Rebuild
-   Persister code needs to get moved from old library to persister, get its own thread
-      if ( System.currentTimeMillis() - lastSaveTime > SAVE_ALL_INTERVAL ) {
-         if ( albumTrackDataChangedSinceLastSave ) {
-            persister.saveAlbumsAndTracks();
-            albumTrackDataChangedSinceLastSave = false;
-         }
-         
-         persister.saveSources();
-         persister.saveCurrentList();
-         persister.saveQueue();
-         persister.saveHistory();
-         persister.saveLibraryPlaylists();
-         persister.saveHotkeys();
-
-         //there's no easy way to check if settings changed right now, so we just don't bother
-         //it's not a big deal if they are lost. 
-         //persister.saveSettings(); 
-         
-         lastSaveTime = System.currentTimeMillis();
-      }
-					
-   Library flags for persister
-
-   Deal with Overflow in LibraryDiskWatcher
 
 Scanner Bugs
    Filtered track list doesn't update after changes are processed in library

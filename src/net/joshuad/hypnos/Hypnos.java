@@ -740,7 +740,7 @@ public class Hypnos extends Application {
 								persister.logUnusedSettings ( pendingSettings );
 							});
 
-							boolean sourcesLoaded = persister.loadSources();
+							boolean sourcesLoaded = persister.loadRoots();
 							if ( sourcesLoaded ) {
 								persister.loadAlbumsAndTracks();
 							}
@@ -751,7 +751,7 @@ public class Hypnos extends Application {
 							persister.loadPlaylists();
 							persister.loadHotkeys();
 							
-							Platform.runLater( () -> ui.getLibraryPane().updatePlaceholder() );
+							Platform.runLater( () -> ui.getLibraryPane().updatePlaceholders() );
 							
 							ui.refreshHotkeyList();
 							
@@ -802,7 +802,7 @@ public class Hypnos extends Application {
 						
 						persister.logUnusedSettings ( pendingSettings );
 						
-						boolean sourcesLoaded = persister.loadSources();
+						boolean sourcesLoaded = persister.loadRoots();
 						if ( sourcesLoaded ) {
 							persister.loadAlbumsAndTracks();
 						}
@@ -818,17 +818,20 @@ public class Hypnos extends Application {
 
 						library.setUI( ui );
 						library.startThreads();
+						persister.startThread();
 		
 						ui.showMainWindow();
-						//TODO: can I remove? ui.getLibraryPane().updateListPlaceholder();
+						ui.getLibraryPane().updatePlaceholders();
 						ui.fixTables();
 						ui.settingsWindow.refreshHotkeyFields();
 						
 						LOGGER.info( "Hypnos finished loading." );
 
 						UpdateChecker updater = new UpdateChecker();
-						boolean updateAvailable = updater.updateAvailable();
-						if ( updateAvailable ) LOGGER.info( "Updates available" );
+						if ( updater.updateAvailable() ) {
+							LOGGER.info( "Updates available" );
+						}
+						
 					} 
 					break;
 				}

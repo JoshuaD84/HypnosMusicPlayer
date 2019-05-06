@@ -39,6 +39,8 @@ import net.joshuad.hypnos.hotkeys.HotkeyState;
 public class Persister {
 
 	private static final Logger LOGGER = Logger.getLogger( Persister.class.getName() );
+	
+	private static final int SAVE_ALL_INTERVAL = 10000;
 
 	public enum Setting {
 		SHUFFLE, REPEAT, HIDE_ALBUM_TRACKS, WINDOW_MAXIMIZED, PRIMARY_SPLIT_PERCENT, 
@@ -150,7 +152,7 @@ public class Persister {
 	public void saveAllData( EnumMap <Setting, ? extends Object> fromAudioSystem, EnumMap <Setting, ? extends Object> fromUI ) {
 		createNecessaryFolders();
 		saveAlbumsAndTracks();
-		saveSources();
+		saveRoots();
 		saveCurrentList();
 		saveQueue();
 		saveHistory();
@@ -165,9 +167,10 @@ public class Persister {
 		saveSettings ( fromAudioSystem, fromUI );
 	}
 
-	public boolean loadSources () {
-		try ( ObjectInputStream sourcesIn = new ObjectInputStream( new FileInputStream( sourcesFile ) ); ) {
-			ArrayList <MusicRoot> musicRoots = (ArrayList <MusicRoot>) sourcesIn.readObject();
+	public boolean loadRoots () {
+		try ( ObjectInputStream rootsIn = new ObjectInputStream( new FileInputStream( sourcesFile ) ); ) {
+			ArrayList <MusicRoot> musicRoots = (ArrayList <MusicRoot>) rootsIn.readObject();
+			library.setMusicRootsOnInitialLoad( musicRoots );
 			for ( MusicRoot musicRoot : musicRoots ) {
 				library.requestRescan( musicRoot.getPath() );
 			}
@@ -175,7 +178,7 @@ public class Persister {
 			return true;
 			
 		} catch ( Exception e ) {
-			LOGGER.warning( "Unable to read library source directory list from disk, continuing." );
+			LOGGER.warning( "Unable to read library directory list from disk, continuing." );
 		}
 		
 		return false;
@@ -227,6 +230,7 @@ public class Persister {
 	}
 
 	public void loadAlbumsAndTracks () {
+		System.out.println( "Loading tracks and albums" );
 		try ( ObjectInputStream dataIn = new ObjectInputStream( new GZIPInputStream( new FileInputStream( dataFile ) ) ) ) {
 		    ArrayList <Album> albums = (ArrayList <Album>) dataIn.readObject();
 		    ArrayList <Track> tracks = (ArrayList <Track>) dataIn.readObject();
@@ -251,8 +255,8 @@ public class Persister {
 		}
 	}
 
-	public void saveSources () {
-		if ( !library.sourcesHasUnsavedData() ) return;
+	public void saveRoots () {
+		if ( !library.rootsHaveUnsavedData() ) return;
 		File tempSourcesFile = new File ( sourcesFile.toString() + ".temp" );
 		try ( ObjectOutputStream sourcesOut = new ObjectOutputStream( new FileOutputStream( tempSourcesFile ) ); ) {
 			sourcesOut.writeObject( new ArrayList <MusicRoot> ( library.getMusicRoots() ) );
@@ -569,5 +573,47 @@ public class Persister {
 		}
 		
 		LOGGER.info ( "Some settings were read from disk but not applied:\n" + message );
+	}
+
+	public void startThread() {
+		Thread persisterThread = new Thread() {
+			public void run() {
+				long lastSaveTime = System.currentTimeMillis();
+				while ( true ) {
+					 if ( System.currentTimeMillis() - lastSaveTime > SAVE_ALL_INTERVAL ) {
+
+							createNecessaryFolders();
+							
+					    if ( library.dataNeedsToBeSavedToDisk() ) {
+					       saveAlbumsAndTracks();
+					       library.setDataNeedsToBeSavedToDisk( false );
+					    }
+
+							saveRoots();
+							saveCurrentList();
+							saveQueue();
+							saveHistory();
+							saveLibraryPlaylists();
+							saveHotkeys();	
+
+					    //there's no easy way to check if settings changed right now, so we just don't bother
+					    //it's not a big deal if they are lost due to a crash. They are saved on close
+					    //persister.saveSettings();
+
+					    lastSaveTime = System.currentTimeMillis();
+					 }
+					
+					
+					try {
+						Thread.sleep( 100 );
+					} catch (InterruptedException e) {
+						LOGGER.info( "Persister thread interrupted, ignoring." );
+					}
+				}
+			}
+		};
+		
+		persisterThread.setName( "Persister Thread" );
+		persisterThread.start();
 	}
 }

@@ -61,83 +61,6 @@ public class LibraryMerger {
     }
   }
   
-  private void regenerateArtistList() {
-  	List<Artist> newArtistList = new ArrayList<>();
-		
-		List<Album> libraryAlbums = new ArrayList<>(library.albums);
-		Album[] albumArray = libraryAlbums.toArray( new Album[ libraryAlbums.size() ] );
-
-		AlphanumComparator comparator = new AlphanumComparator ( AlphanumComparator.CaseHandling.CASE_INSENSITIVE );
-		Arrays.sort( albumArray, Comparator.comparing( Album::getAlbumArtist, comparator ) );
-		
-		Artist lastArtist = null;
-		for ( Album album : albumArray ) {
-			if ( lastArtist != null && lastArtist.getName().equals( album.getAlbumArtist() ) ) {
-				lastArtist.addAlbum ( album );
-			} else {
-				Artist artist = null;
-				
-				for ( Artist test : newArtistList ) {
-					if ( test.getName().equalsIgnoreCase( album.getAlbumArtist() ) ) {
-						artist = test;
-						break;
-					}
-				}
-				
-				if ( artist == null ) {
-					artist = new Artist ( album.getAlbumArtist() );
-					newArtistList.add( artist );
-				}
-				artist.addAlbum ( album );
-				lastArtist = artist;
-			}
-		}
-		
-		List<Track> libraryTracks = library.getTracksCopy();
-		List<Track> looseTracks = new ArrayList<>();
-		for ( Track track : libraryTracks ) {
-			if ( track.getAlbum() == null ) {
-				looseTracks.add( track );
-			}
-		}
-		
-		Track[] trackArray = looseTracks.toArray( new Track[ looseTracks.size() ] );
-		Arrays.sort( trackArray, Comparator.comparing( Track::getAlbumArtist, comparator ) );
-		
-		lastArtist = null;
-		for ( Track track : trackArray ) {
-			if ( lastArtist != null && lastArtist.getName().equals( track.getAlbumArtist() ) ) {
-				lastArtist.addLooseTrack ( track );
-			} else {
-				Artist artist = null;
-				
-				for ( Artist test : newArtistList ) {
-					if ( test.getName().equalsIgnoreCase( track.getAlbumArtist()  ) ) {
-						artist = test;
-						break;
-					}
-				}
-				
-				if ( artist == null ) {
-					artist = new Artist ( track.getAlbumArtist() );
-					newArtistList.add( artist );
-				}
-				artist.addLooseTrack ( track );
-				lastArtist = artist;
-			}
-		}
-		
-		runLaterPending = true;
-
-    Platform.runLater(() -> {
-      try {
-    		library.getArtists().setAll( newArtistList );
-      } finally {
-        runLaterPending = false;
-      }
-    });
-  }
-
   private void updateLibrary() {
     if (!pendingActions.isEmpty()) {
       runLaterPending = true;
@@ -154,37 +77,48 @@ public class LibraryMerger {
                 	if ( !library.musicRoots.contains( (MusicRoot) action.getItem() ) ) {
                 		library.musicRoots.add((MusicRoot) action.getItem());
                 	}
+    	            library.setDataNeedsToBeSavedToDisk (true);
                   break;
                 case REMOVE_MUSIC_ROOT:
                   library.musicRoots.remove((MusicRoot) action.getItem());
+    	            library.setDataNeedsToBeSavedToDisk (true);
                   break;
                 case ADD_ALBUM:
                   library.albums.add((Album) action.getItem());
                   regenerateArtists = true;
+    	            library.setDataNeedsToBeSavedToDisk (true);
                   break;
                 case REMOVE_ALBUM:
                   library.albums.remove((Album) action.getItem());
                   regenerateArtists = true;
+    	            library.setDataNeedsToBeSavedToDisk (true);
                   break;
                 case UPDATE_ALBUM: 
                 	Album updateMe = (Album)(((Object[])action.getItem())[0]);
                 	Album newData = (Album)(((Object[])action.getItem())[1]);
                 	updateMe.setData( newData );
                   regenerateArtists = true;
+    	            library.setDataNeedsToBeSavedToDisk (true);
                 	break;
                 case ADD_TRACK:
-                  library.getTracks().add((Track) action.getItem());
+                  library.getTracks().add((Track)action.getItem());
                   regenerateArtists = true;
+    	            library.setDataNeedsToBeSavedToDisk (true);
                   break;
                 case REMOVE_TRACK:
-                  library.getTracks().remove((Track) action.getItem());
+                  library.getTracks().remove((Track)action.getItem());
                   regenerateArtists = true;
+    	            library.setDataNeedsToBeSavedToDisk (true);
                   break;
+                case SET_ARTISTS:
+                	library.getArtists().setAll((List<Artist>)action.getItem());
+                	break;
                 case CLEAR_ALL:
                 	library.getTracks().clear();
                 	library.albums.clear();
                 	library.artists.clear();
                 	ui.libraryCleared();
+    	            library.setDataNeedsToBeSavedToDisk(true);
                 	break;
                 case REFRESH_TRACK_TABLE: 
                 	if (ui != null) {
@@ -208,11 +142,10 @@ public class LibraryMerger {
 								default:
 									break;
               }
-	            library.setDataNeedsToBeSavedToDisk (true);
 	          }
 	          
 	          if ( regenerateArtists ) {
-	          	this.regenerateArtistList();
+	          	library.artists.setAll( library.generateArtists() );
 	          }
           }
 
@@ -377,7 +310,11 @@ public class LibraryMerger {
     pendingActions.add(new UpdateAction(playlist, ActionType.REMOVE_PLAYLIST));
   }
 
-	public void clearAll() {
+	void clearAll() {
     pendingActions.add(new UpdateAction(null, ActionType.CLEAR_ALL));
+	}
+
+	void setArtists(List<Artist> newArtistList) {
+    pendingActions.add(new UpdateAction(newArtistList, ActionType.SET_ARTISTS));
 	}
 }

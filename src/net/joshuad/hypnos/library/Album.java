@@ -7,12 +7,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javafx.scene.image.Image;
 
 public class Album implements Serializable, AlbumInfoSource {
-	private static transient final Logger LOGGER = Logger.getLogger( Album.class.getName() );
+	//private static transient final Logger LOGGER = Logger.getLogger( Album.class.getName() );
 	
 	private static final long serialVersionUID = 2L;
 

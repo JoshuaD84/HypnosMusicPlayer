@@ -54,7 +54,6 @@ import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 import net.joshuad.hypnos.library.Album;
 import net.joshuad.hypnos.library.Library;
-import net.joshuad.hypnos.library.MusicRoot;
 import net.joshuad.hypnos.library.Playlist;
 import net.joshuad.hypnos.library.Track;
 

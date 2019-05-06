@@ -495,7 +495,7 @@ public class LibraryPane extends BorderPane {
 		albumsButton.fire();
 	}
 
-	public void updatePlaceholder() {
+	public void updatePlaceholders() {
 		artistPane.updatePlaceholders();
 		albumPane.updatePlaceholders();
 		trackPane.updatePlaceholders();
