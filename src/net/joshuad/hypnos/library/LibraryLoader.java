@@ -132,7 +132,7 @@ class LibraryLoader {
 						}
 					}
 
-					library.diskWatcher.processWatcherEvents();
+					library.getDiskWatcher().processWatcherEvents();
 
 					try {
 						Thread.sleep(50);
@@ -153,15 +153,15 @@ class LibraryLoader {
 			for (Track track : library.getTracksCopy()) {
 				if (track.getPath().toAbsolutePath().startsWith(path)) {
 					library.getLibraryLog().println("[LibraryLoader] Removing track data at: " + track.getPath());
-					library.merger.removeTrack(track);
+					library.getMerger().removeTrack(track);
 				}
 			}
 
 			for (Album album : library.albums) {
 				if (album.getPath().toAbsolutePath().startsWith(path)) {
 					library.getLibraryLog().println("[LibraryLoader] Removing album data at: " + path);
-					library.merger.removeAlbum(album);
-					library.diskWatcher.stopWatching(album.getPath());
+					library.getMerger().removeAlbum(album);
+					library.getDiskWatcher().stopWatching(album.getPath());
 				}
 			}
 
@@ -185,7 +185,7 @@ class LibraryLoader {
 			} else {
 				library.getLibraryLog().println("[LibraryLoader] new track found at: " + path);
 				Track newTrack = new Track(path);
-				library.merger.removeTrack(newTrack);
+				library.getMerger().removeTrack(newTrack);
 			}
 
 		} else if (Files.isDirectory(path)) {
@@ -286,7 +286,7 @@ class LibraryLoader {
 		
 		synchronized (library.musicRoots) {
 			if (library.musicRoots.size() == 0) {
-				library.merger.clearAll();
+				library.getMerger().clearAll();
 				library.albums.clear();
 				library.tracks.clear();
 				library.artists.clear();
@@ -310,9 +310,9 @@ class LibraryLoader {
 			}
 
 			for (Album album : removeMe) {
-				library.merger.removeAlbum(album);
+				library.getMerger().removeAlbum(album);
 				for (Track track : album.getTracks()) {
-					library.merger.removeTrack(track);
+					library.getMerger().removeTrack(track);
 				}
 			}
 		}
@@ -333,7 +333,7 @@ class LibraryLoader {
 			}
 		}
 		for (Track track : removeMeTracks) {
-			library.merger.removeTrack(track);
+			library.getMerger().removeTrack(track);
 		}
 	}
 
@@ -341,7 +341,7 @@ class LibraryLoader {
 		if (Platform.isFxApplicationThread()) {
 			library.musicRoots.remove(musicRoot);
 		}
-		library.merger.removeMusicRoot(musicRoot);
+		library.getMerger().removeMusicRoot(musicRoot);
 		diskReader.interrupt();
 		requestClearOrphans();
 	}

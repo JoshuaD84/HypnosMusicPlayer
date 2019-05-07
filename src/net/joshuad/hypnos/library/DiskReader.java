@@ -45,6 +45,7 @@ class DiskReader implements FileVisitor <Path> {
 	private Library library;
 	private FXUI ui;
 	
+	
 	DiskReader( Library library ) {
 		this.library = library;
 	}
@@ -75,7 +76,7 @@ class DiskReader implements FileVisitor <Path> {
 		
 		directoriesToScan = LibraryLoader.getDirectoryCount( musicRoot.getPath() );
 		currentRootPath = musicRoot.getPath();
-		library.diskWatcher.watchAll( musicRoot.getPath() );
+		library.getDiskWatcher().watchAll( musicRoot.getPath() );
 		
 		if(scanMode == ScanMode.INITIAL_SCAN) {
 			musicRoot.setNeedsRescan(false);
@@ -113,7 +114,7 @@ class DiskReader implements FileVisitor <Path> {
 		directoriesToScan = LibraryLoader.getDirectoryCount ( path );
 	
 		currentRootPath = path;
-		library.diskWatcher.watchAll( path );
+		library.getDiskWatcher().watchAll( path );
 		
 		try {
 			Files.walkFileTree( path, EnumSet.of( FileVisitOption.FOLLOW_LINKS ), Integer.MAX_VALUE, this );
@@ -186,17 +187,17 @@ class DiskReader implements FileVisitor <Path> {
 			currentDirectoryNode.setAlbum( album );
 			
 			for ( Track track : tracks ) {
-				library.merger.addOrUpdateTrack( track );
+				library.getMerger().addOrUpdateTrack( track );
 			}
-			library.merger.addOrUpdateAlbum( album );
+			library.getMerger().addOrUpdateAlbum( album );
 			
 		} else {
 			for ( FileTreeNode child : currentDirectoryNode.getChildren() ) {
 				if ( child.getTrack() != null ) {
-					library.merger.addOrUpdateTrack( child.getTrack() );
+					library.getMerger().addOrUpdateTrack( child.getTrack() );
 				}
 			}
-			library.merger.notAnAlbum( currentDirectoryNode.getPath() );
+			library.getMerger().notAnAlbum( currentDirectoryNode.getPath() );
 		}
 			
 		

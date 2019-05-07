@@ -47,18 +47,18 @@ public class Library {
 
   final ObservableList<MusicRoot> musicRoots = FXCollections.observableArrayList();
 
-  final LibraryLoader loader;
-  final LibraryDiskWatcher diskWatcher;
-  final LibraryMerger merger;
+  private final LibraryLoader loader;
+  private final LibraryDiskWatcher diskWatcher;
+  private final LibraryMerger merger;
   
   private boolean dataNeedsToBeSavedToDisk = false;
 
   public Library() {
-    loader = new LibraryLoader(this);
-    diskWatcher = new LibraryDiskWatcher(this);
     merger = new LibraryMerger(this);
+    diskWatcher = new LibraryDiskWatcher(this);
+    loader = new LibraryLoader(this);
   }
-
+  
   public void setUI(FXUI ui) {
     loader.setUI(ui);
     diskWatcher.setUI(ui);
@@ -180,6 +180,11 @@ public class Library {
 		return getUniquePlaylistName ( "New Playlist" );
 	}
 	
+	public void startThreads() {
+		loader.start();
+		merger.start();
+	}
+	
 	private PrintStream dummy = new PrintStream(OutputStream.nullOutputStream());
 	PrintStream getLibraryLog() {
 		return dummy;
@@ -281,10 +286,16 @@ public class Library {
 		return newArtistList;
   }
 
-	public void startThreads() {
-		loader.start();
-		merger.start();
+	LibraryLoader getLoader() {
+		return loader;
 	}
-	
+
+	LibraryDiskWatcher getDiskWatcher() {
+		return diskWatcher;
+	}
+
+	LibraryMerger getMerger() {
+		return merger;
+	}
 }
 

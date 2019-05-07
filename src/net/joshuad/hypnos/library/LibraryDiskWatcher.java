@@ -194,7 +194,7 @@ class DelayedUpdateThread extends Thread {
 			} else {
 				Vector <Path> copyUpdateItems = new Vector<Path> ( updateItems );
 				for ( Path location : copyUpdateItems ) {
-					library.loader.queueUpdatePath ( location );
+					library.getLoader().queueUpdatePath ( location );
 					updateItems.remove( location );
 				}
 			}

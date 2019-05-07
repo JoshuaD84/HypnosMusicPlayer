@@ -1,4 +1,7 @@
 Library & Scanner Rebuild
+   Figure out where to add generateArtist calls
+      Dont do the artist regeneration on the fx thread.
+   
    Deal with Overflow in LibraryDiskWatcher
 
    Sometimes the new scanner causes the UI to stutter 
@@ -8,8 +11,6 @@ Library & Scanner Rebuild
    Album art gets changed away 
       Add a music root, switch to artist tab, switch to album tab.  Select an album
       I think this is somehow being caused by generateArtists()
-
-   Dont do the artist regeneration on the fx thread.
    
    Add scanner log to UI
 
