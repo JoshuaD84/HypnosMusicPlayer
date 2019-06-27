@@ -5,6 +5,7 @@ Library & Scanner Rebuild
    Deal with Overflow in LibraryDiskWatcher
 
    Sometimes the new scanner causes the UI to stutter 
+      Changing LibraryMerger updateLibrary() threshold fixes this
    
    Code is a bit messy
 

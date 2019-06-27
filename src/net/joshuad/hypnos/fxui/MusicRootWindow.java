@@ -54,8 +54,10 @@ public class MusicRootWindow extends Stage {
 
 	private final ProgressIndicatorBar progressBar;
 	
-	public MusicRootWindow ( Stage mainStage, Library library ) {
+	FXUI ui;
+	public MusicRootWindow ( FXUI ui, Stage mainStage, Library library ) {
 		super();
+		this.ui = ui;
 		this.library = library;
 		
 		initModality( Modality.NONE );
@@ -248,6 +250,13 @@ public class MusicRootWindow extends Stage {
 			}
 		} );
 		
+		
+		Button libraryLogButton = new Button ( "?" );
+		libraryLogButton.setOnAction( e -> ui.libraryLogWindow.show() );
+		
+		HBox progressBox = new HBox();
+		progressBox.getChildren().addAll ( progressBar, libraryLogButton );
+		
 		HBox priorityBox = new HBox();
 		priorityBox.getChildren().addAll( priorityLabel, prioritySlider);
 		priorityBox.setAlignment( Pos.CENTER );
@@ -259,10 +268,10 @@ public class MusicRootWindow extends Stage {
 		musicSourceTable.prefHeightProperty().bind( 
 			root.heightProperty()
 			.subtract( controlBox.heightProperty() )
-			.subtract( progressBar.heightProperty() )
+			.subtract( progressBox.heightProperty() )
 			.subtract( priorityBox.heightProperty() ) );
 
-		primaryPane.getChildren().addAll( musicSourceTable, progressBar, priorityBox, controlBox );
+		primaryPane.getChildren().addAll( musicSourceTable, progressBox, priorityBox, controlBox );
 		root.getChildren().add( primaryPane );
 		setScene( scene );
 		

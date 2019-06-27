@@ -67,7 +67,7 @@ public class LibraryMerger {
         try {
           synchronized (pendingActions) {
           	boolean regenerateArtists = false;
-	          while ( pendingActions.size() > 0 && System.currentTimeMillis() - startTime < 500 ) {
+	          while ( pendingActions.size() > 0 && System.currentTimeMillis() - startTime < 200 ) {
 	          	UpdateAction action = pendingActions.remove( 0 );
               switch (action.getActionType()) {
                 case ADD_MUSIC_ROOT:
@@ -160,7 +160,7 @@ public class LibraryMerger {
 
   void addOrUpdateTrack(Track track) {
     if (track == null) {
-    	library.getLibraryLog().println("[Merger] Asked to add a null track to library, ignoring");
+    	library.getScanLogger().println("[Merger] Asked to add a null track to library, ignoring");
       return;
     }
     
@@ -198,7 +198,7 @@ public class LibraryMerger {
   
   public void addOrUpdatePlaylist(Playlist playlist) {
     if (playlist == null) {
-    	library.getLibraryLog().println("[Merger] Asked to add a null playlist to library, ignoring");
+    	library.getScanLogger().println("[Merger] Asked to add a null playlist to library, ignoring");
       return;
     }
     
@@ -230,7 +230,7 @@ public class LibraryMerger {
 
   void addOrUpdateAlbum(Album album) {
     if (album == null) {
-    	library.getLibraryLog().println("[Merger] Asked to add/update a null album to library, ignoring");
+    	library.getScanLogger().println("[Merger] Asked to add/update a null album to library, ignoring");
       return;
     }
     

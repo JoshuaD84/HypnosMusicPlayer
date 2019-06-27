@@ -126,6 +126,7 @@ public class FXUI implements PlayerListener {
 	LyricsWindow lyricsWindow;
 	ExportPlaylistPopup exportPopup;
 	TrayIcon trayIcon;
+	LibraryLogWindow libraryLogWindow;
 	
 	final AudioSystem audioSystem;
 	final Library library;
@@ -207,7 +208,7 @@ public class FXUI implements PlayerListener {
 		artSplitPane = new ImagesPanel ( this, audioSystem );
 		currentListPane = new CurrentListPane( this, audioSystem, library );
 		
-		libraryLocationWindow = new MusicRootWindow ( mainStage, library );
+		libraryLocationWindow = new MusicRootWindow ( this, mainStage, library );
 		tagWindow = new TagWindow ( this ); 
 		queueWindow = new QueueWindow ( this, library, audioSystem, tagWindow );
 		albumInfoWindow = new AlbumInfoWindow ( this, library, audioSystem );
@@ -218,6 +219,7 @@ public class FXUI implements PlayerListener {
 		trackInfoWindow = new TrackInfoWindow ( this );
 		lyricsWindow = new LyricsWindow ( this );
 		exportPopup = new ExportPlaylistPopup ( this );
+		libraryLogWindow = new LibraryLogWindow ( this );
 		
 		setupNativeStylesheet();
 		applyBaseTheme();
@@ -495,9 +497,8 @@ public class FXUI implements PlayerListener {
 		playlistInfoWindow.getScene().getStylesheets().add( fontSheet );
 		artistInfoWindow.getScene().getStylesheets().add( fontSheet );
 		albumInfoWindow.getScene().getStylesheets().add( fontSheet );
-		libraryLocationWindow.getScene().getStylesheets().add( fontSheet );
+		libraryLogWindow.getScene().getStylesheets().add( fontSheet );
 		historyWindow.getScene().getStylesheets().add( fontSheet );
-		settingsWindow.getScene().getStylesheets().add( fontSheet );
 		trackInfoWindow.getScene().getStylesheets().add( fontSheet );
 		lyricsWindow.getScene().getStylesheets().add( fontSheet );
 		exportPopup.getScene().getStylesheets().add( fontSheet );
@@ -536,9 +537,8 @@ public class FXUI implements PlayerListener {
 		playlistInfoWindow.getScene().getStylesheets().add( baseSheet );
 		artistInfoWindow.getScene().getStylesheets().add( baseSheet );
 		albumInfoWindow.getScene().getStylesheets().add( baseSheet );
-		libraryLocationWindow.getScene().getStylesheets().add( baseSheet );
+		libraryLogWindow.getScene().getStylesheets().add( baseSheet );
 		historyWindow.getScene().getStylesheets().add( baseSheet );
-		settingsWindow.getScene().getStylesheets().add( baseSheet );
 		trackInfoWindow.getScene().getStylesheets().add( baseSheet );
 		lyricsWindow.getScene().getStylesheets().add( baseSheet );
 		exportPopup.getScene().getStylesheets().add( baseSheet );
@@ -557,13 +557,12 @@ public class FXUI implements PlayerListener {
 			isDarkTheme = true;
 			scene.getStylesheets().add( darkSheet ); 
 			libraryLocationWindow.getScene().getStylesheets().add( darkSheet );
-			settingsWindow.getScene().getStylesheets().add( darkSheet );
 			queueWindow.getScene().getStylesheets().add( darkSheet );
 			tagWindow.getScene().getStylesheets().add( darkSheet );
 			playlistInfoWindow.getScene().getStylesheets().add( darkSheet );
 			artistInfoWindow.getScene().getStylesheets().add( darkSheet );
 			albumInfoWindow.getScene().getStylesheets().add( darkSheet );
-			libraryLocationWindow.getScene().getStylesheets().add( darkSheet );
+			libraryLogWindow.getScene().getStylesheets().add( darkSheet );
 			historyWindow.getScene().getStylesheets().add( darkSheet );
 			settingsWindow.getScene().getStylesheets().add( darkSheet );
 			trackInfoWindow.getScene().getStylesheets().add( darkSheet );
@@ -595,9 +594,8 @@ public class FXUI implements PlayerListener {
 		playlistInfoWindow.getScene().getStylesheets().remove( darkSheet );
 		artistInfoWindow.getScene().getStylesheets().remove( darkSheet );
 		albumInfoWindow.getScene().getStylesheets().remove( darkSheet );
-		libraryLocationWindow.getScene().getStylesheets().remove( darkSheet );
+		libraryLogWindow.getScene().getStylesheets().remove( darkSheet );
 		historyWindow.getScene().getStylesheets().remove( darkSheet );
-		settingsWindow.getScene().getStylesheets().remove( darkSheet );
 		trackInfoWindow.getScene().getStylesheets().remove( darkSheet );
 		lyricsWindow.getScene().getStylesheets().remove( darkSheet );
 		exportPopup.getScene().getStylesheets().remove( darkSheet );

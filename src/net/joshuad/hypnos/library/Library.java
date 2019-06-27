@@ -50,6 +50,7 @@ public class Library {
   private final LibraryLoader loader;
   private final LibraryDiskWatcher diskWatcher;
   private final LibraryMerger merger;
+  private final PrintStream scanLogger = new PrintStream ( OutputStream.nullOutputStream() );
   
   private boolean dataNeedsToBeSavedToDisk = false;
 
@@ -185,9 +186,8 @@ public class Library {
 		merger.start();
 	}
 	
-	private PrintStream dummy = new PrintStream(OutputStream.nullOutputStream());
-	PrintStream getLibraryLog() {
-		return dummy;
+	PrintStream getScanLogger() {
+		return scanLogger;
 	}
 	
 	public String getUniquePlaylistName( String base ) {

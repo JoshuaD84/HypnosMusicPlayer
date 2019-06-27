@@ -59,7 +59,7 @@ class LibraryDiskWatcher {
 	public void stopWatching( Path path ) {
 		for( WatchKey key : keys.keySet() ) {
 			if( keys.get( key ).equals( path ) ) {
-				library.getLibraryLog().println( "[Watcher] stopping watch on: " + path.toString() );
+				library.getScanLogger().println( "[Watcher] stopping watch on: " + path.toString() );
 				key.cancel();
 			}
 		}
@@ -139,15 +139,15 @@ class LibraryDiskWatcher {
 			Path child = directory.resolve( watchEvent.context() );
 			
 			if ( eventKind == StandardWatchEventKinds.ENTRY_CREATE ) {
-				library.getLibraryLog().println( "[Watcher] Heard create: " + child );
+				library.getScanLogger().println( "[Watcher] Heard create: " + child );
 				delayedUpdater.addUpdateItem( child );
 				
 			} else if ( eventKind == StandardWatchEventKinds.ENTRY_DELETE ) {
-				library.getLibraryLog().println( "[Watcher] heard delete: " + child );
+				library.getScanLogger().println( "[Watcher] heard delete: " + child );
 				delayedUpdater.addUpdateItem( child );
 				
 			} else if ( eventKind == StandardWatchEventKinds.ENTRY_MODIFY ) {
-				library.getLibraryLog().println( "[Watcher] heard modify: " + child );
+				library.getScanLogger().println( "[Watcher] heard modify: " + child );
 				delayedUpdater.addUpdateItem( child );
 			
 			} else if ( eventKind == StandardWatchEventKinds.OVERFLOW ) {

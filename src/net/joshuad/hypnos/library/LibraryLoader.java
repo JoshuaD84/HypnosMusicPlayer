@@ -152,14 +152,14 @@ class LibraryLoader {
 		if (!Files.exists(path)) {
 			for (Track track : library.getTracksCopy()) {
 				if (track.getPath().toAbsolutePath().startsWith(path)) {
-					library.getLibraryLog().println("[LibraryLoader] Removing track data at: " + track.getPath());
+					library.getScanLogger().println("[LibraryLoader] Removing track data at: " + track.getPath());
 					library.getMerger().removeTrack(track);
 				}
 			}
 
 			for (Album album : library.albums) {
 				if (album.getPath().toAbsolutePath().startsWith(path)) {
-					library.getLibraryLog().println("[LibraryLoader] Removing album data at: " + path);
+					library.getScanLogger().println("[LibraryLoader] Removing album data at: " + path);
 					library.getMerger().removeAlbum(album);
 					library.getDiskWatcher().stopWatching(album.getPath());
 				}
@@ -175,7 +175,7 @@ class LibraryLoader {
 			}
 
 			if (existingTrackAtPath != null) {
-				library.getLibraryLog().println("[LibraryLoader] Updating track data at: " + path);
+				library.getScanLogger().println("[LibraryLoader] Updating track data at: " + path);
 				existingTrackAtPath.refreshTagData();
 
 				// This will make sure that any existing album gets updated, and if the
@@ -183,19 +183,19 @@ class LibraryLoader {
 				pathsToUpdate.add(existingTrackAtPath.getPath().getParent());
 
 			} else {
-				library.getLibraryLog().println("[LibraryLoader] new track found at: " + path);
+				library.getScanLogger().println("[LibraryLoader] new track found at: " + path);
 				Track newTrack = new Track(path);
 				library.getMerger().removeTrack(newTrack);
 			}
 
 		} else if (Files.isDirectory(path)) {
-			library.getLibraryLog().println("[LibraryLoader] Doing directory rescan at: " + path);
+			library.getScanLogger().println("[LibraryLoader] Doing directory rescan at: " + path);
 
 			List<Path> childrenOfPath = new ArrayList<>();
 			for (Path futureUpdate : pathsToUpdate) {
 				if (Utils.isChildOf(futureUpdate, path)) {
 					childrenOfPath.add(futureUpdate);
-					library.getLibraryLog().println("[LibraryLoader] - Removing future scan, its a child: " + path);
+					library.getScanLogger().println("[LibraryLoader] - Removing future scan, its a child: " + path);
 				}
 			}
 
@@ -304,7 +304,7 @@ class LibraryLoader {
 					}
 				}
 				if (!hasRoot) {
-					library.getLibraryLog().println( "[LibraryLoader] Orphan album pruned, no root: " + album.getPath() );
+					library.getScanLogger().println( "[LibraryLoader] Orphan album pruned, no root: " + album.getPath() );
 					removeMe.add(album);
 				}
 			}
@@ -329,7 +329,7 @@ class LibraryLoader {
 			}
 			if (!hasRoot) {
 				removeMeTracks.add(track);
-				library.getLibraryLog().println( "[LibraryLoader] Orphan track pruned, no root: " + track.getPath() );
+				library.getScanLogger().println( "[LibraryLoader] Orphan track pruned, no root: " + track.getPath() );
 			}
 		}
 		for (Track track : removeMeTracks) {
