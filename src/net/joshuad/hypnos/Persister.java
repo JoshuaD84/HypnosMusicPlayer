@@ -170,14 +170,6 @@ public class Persister {
 	public boolean loadRoots () {
 		try ( ObjectInputStream rootsIn = new ObjectInputStream( new FileInputStream( sourcesFile ) ); ) {
 			ArrayList <MusicRoot> musicRoots = (ArrayList <MusicRoot>) rootsIn.readObject();
-			
-			//TODO: DD
-			for ( MusicRoot root : musicRoots ) {
-				System.out.println( "Root: " + root.getPath() );
-				System.out.println("Needs Initial: " + root.needsInitialScan() );
-				System.out.println("Needs Re: " + root.needsRescan() );
-			}
-			
 			library.setMusicRootsOnInitialLoad( musicRoots );
 			return true;
 			
@@ -234,7 +226,6 @@ public class Persister {
 	}
 
 	public void loadAlbumsAndTracks () {
-		System.out.println( "Loading tracks and albums" );
 		try ( ObjectInputStream dataIn = new ObjectInputStream( new GZIPInputStream( new FileInputStream( dataFile ) ) ) ) {
 		    ArrayList <Album> albums = (ArrayList <Album>) dataIn.readObject();
 		    ArrayList <Track> tracks = (ArrayList <Track>) dataIn.readObject();
