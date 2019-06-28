@@ -1,6 +1,5 @@
 package net.joshuad.hypnos.library;
 
-import java.io.PrintStream;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -215,10 +214,10 @@ class LibraryLoader {
 		return retMe;
 	}
 
-	static boolean isAlbum(FileTreeNode node, PrintStream out) {
+	static boolean isAlbum(FileTreeNode node, LibraryScanLogger libraryLog) {
 
 		if (!Files.isDirectory(node.getPath())) {
-			out.println( "[LibraryLoader] Album rejected, not a directory: " + node.getPath() );
+			libraryLog.println( "[LibraryLoader] Album rejected, not a directory: " + node.getPath() );
 			return false;
 		}
 
@@ -229,12 +228,12 @@ class LibraryLoader {
 
 		for (FileTreeNode child : node.getChildren()) {
 			if (child.getAlbum() != null) {
-				out.println( "[LibraryLoader] Album rejected, subdirectory is an album: " + node.getPath() );
+				libraryLog.println( "[LibraryLoader] Album rejected, subdirectory is an album: " + node.getPath() );
 				return false;
 			}
 
 			if (child.getArtist() != null) {
-				out.println( "[LibraryLoader] Album rejected, no artist specified: " + node.getPath() );
+				libraryLog.println( "[LibraryLoader] Album rejected, no artist specified: " + node.getPath() );
 				return false;
 			}
 
@@ -256,7 +255,7 @@ class LibraryLoader {
 						albumMatchPercent = FuzzySearch.ratio(albumName,
 								Utils.prepareAlbumForCompare(child.getTrack().getAlbumTitle()));
 					if (albumMatchPercent < 90) {
-						out.println( "[LibraryLoader] Album rejected, album name in tags too different: " + node.getPath() );
+						libraryLog.println( "[LibraryLoader] Album rejected, album name in tags too different: " + node.getPath() );
 						return false;
 					}
 
@@ -267,7 +266,7 @@ class LibraryLoader {
 								Utils.prepareAlbumForCompare(child.getTrack().getAlbumArtist()));
 					if (artistMatchPercent < 90) {
 
-						out.println( "[LibraryLoader] Album rejected, artist name in tags too different: " + node.getPath() );
+						libraryLog.println( "[LibraryLoader] Album rejected, artist name in tags too different: " + node.getPath() );
 						return false;
 					}
 				}
@@ -275,7 +274,7 @@ class LibraryLoader {
 		}
 
 		if (childTrackCount == 0) {
-			out.println( "[LibraryLoader] Album rejected, no tracks: " + node.getPath() );
+			libraryLog.println( "[LibraryLoader] Album rejected, no tracks: " + node.getPath() );
 			return false;
 		}
 
@@ -287,9 +286,10 @@ class LibraryLoader {
 		synchronized (library.musicRoots) {
 			if (library.musicRoots.size() == 0) {
 				library.getMerger().clearAll();
-				library.albums.clear();
+				/*library.albums.clear();
 				library.tracks.clear();
 				library.artists.clear();
+				*/
 			}
 		}
 		

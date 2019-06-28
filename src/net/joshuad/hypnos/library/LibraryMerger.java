@@ -66,7 +66,7 @@ public class LibraryMerger {
         long startTime = System.currentTimeMillis();
         try {
           synchronized (pendingActions) {
-	          while ( pendingActions.size() > 0 && System.currentTimeMillis() - startTime < 400 ) {
+	          while ( pendingActions.size() > 0 && System.currentTimeMillis() - startTime < 10 ) {
 	          	UpdateAction action = pendingActions.remove( 0 );
               switch (action.getActionType()) {
                 case ADD_MUSIC_ROOT:
@@ -240,13 +240,17 @@ public class LibraryMerger {
 
 	void notAnAlbum(Path path) {
 		Album foundAlbum = null;
-		for (UpdateAction action : pendingActions) {
-			if (action.getActionType() == ActionType.ADD_ALBUM) {
-				if (((Album)action.getItem()).getPath().equals(path)) {
-					foundAlbum = (Album)action.getItem();
-					//Not breaking intentionally; imagine a queue that has add, remove, add at same path. 
+
+    synchronized (pendingActions) {
+    	for (int k= 0; k < pendingActions.size(); k++) {
+    		UpdateAction action = pendingActions.get( k );
+				if (action.getActionType() == ActionType.ADD_ALBUM) {
+					if (((Album)action.getItem()).getPath().equals(path)) {
+						foundAlbum = (Album)action.getItem();
+						//Not breaking intentionally; imagine a queue that has add, remove, add at same path. 
+					}
 				}
-			}
+    	}
 		}
 		
 		if (foundAlbum == null) {
@@ -288,6 +292,7 @@ public class LibraryMerger {
   }
 
 	void clearAll() {
+		pendingActions.clear();
     pendingActions.add(new UpdateAction(null, ActionType.CLEAR_ALL));
 	}
 

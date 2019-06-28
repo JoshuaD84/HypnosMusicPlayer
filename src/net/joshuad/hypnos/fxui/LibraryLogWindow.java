@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.logging.Logger;
 
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
@@ -15,13 +16,18 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.joshuad.hypnos.Hypnos;
+import net.joshuad.hypnos.library.Library;
 
 public class LibraryLogWindow extends Stage {
 	private static final Logger LOGGER = Logger.getLogger( LibraryLogWindow.class.getName() );
 	TextArea logView;
 	
-	public LibraryLogWindow ( FXUI ui ) {
+	Library library;
+	
+	public LibraryLogWindow ( FXUI ui, Library library ) {
 		super();
+		
+		this.library = library;
 		
 		initModality( Modality.NONE );
 		initOwner( ui.getMainStage() );
@@ -56,6 +62,22 @@ public class LibraryLogWindow extends Stage {
 				}
 			}
 		});
+		
+		Thread logReader = new Thread( () -> {
+			while(true) {
+				String newData = library.getScanLogger().dumpBuffer();
+				Platform.runLater(() -> logView.appendText( newData ) );
+				try {
+					Thread.sleep( 1000 );
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+				}
+			}
+		});
+		
+		logReader.setName( "Library Log UI Text Loader" );
+		logReader.setDaemon( true );
+		logReader.start();
 	}
 }
 

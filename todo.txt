@@ -1,9 +1,6 @@
 Library & Scanner Rebuild
    Deal with Overflow in LibraryDiskWatcher
 
-   Sometimes the new scanner causes the UI to stutter 
-      Changing LibraryMerger updateLibrary() threshold fixes this
-   
    Code is a bit messy
 
    Album art gets changed away 
@@ -15,6 +12,12 @@ Library & Scanner Rebuild
    
    Add removing a musicroot status updates to UI
 
+java.util.ConcurrentModificationException
+   LibraryLoader.286
+
+Start with music added
+   Interrupt scanner by  adding 2
+   remove music
 
 
 Live at the Watermark

@@ -219,7 +219,7 @@ public class FXUI implements PlayerListener {
 		trackInfoWindow = new TrackInfoWindow ( this );
 		lyricsWindow = new LyricsWindow ( this );
 		exportPopup = new ExportPlaylistPopup ( this );
-		libraryLogWindow = new LibraryLogWindow ( this );
+		libraryLogWindow = new LibraryLogWindow ( this, library );
 		
 		setupNativeStylesheet();
 		applyBaseTheme();

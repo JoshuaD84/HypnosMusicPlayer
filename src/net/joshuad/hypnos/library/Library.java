@@ -1,7 +1,5 @@
 package net.joshuad.hypnos.library;
 
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,9 +52,10 @@ public class Library {
   private final LibraryLoader loader;
   private final LibraryDiskWatcher diskWatcher;
   private final LibraryMerger merger;
-  private final PrintStream scanLogger = new PrintStream ( OutputStream.nullOutputStream() );
+  private final LibraryScanLogger scanLogger = new LibraryScanLogger();
   
   private boolean dataNeedsToBeSavedToDisk = false;
+  
   private boolean artistsNeedToBeRegenerated = false;
   private final Object artistSychronizeFlagLock = new Object();
   
@@ -231,7 +230,7 @@ public class Library {
 		merger.start();
 	}
 	
-	PrintStream getScanLogger() {
+	public LibraryScanLogger getScanLogger() {
 		return scanLogger;
 	}
 	
