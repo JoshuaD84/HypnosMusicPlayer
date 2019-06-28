@@ -8,7 +8,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -17,11 +21,11 @@ import net.joshuad.hypnos.AlphanumComparator;
 import net.joshuad.hypnos.fxui.FXUI;
 
 public class Library {
+  private static final Logger LOGGER = Logger.getLogger( Library.class.getName() );
 
 	public enum LoaderSpeed {
 		LOW, MED, HIGH
 	}
-  // private static final Logger LOGGER = Logger.getLogger( Library.class.getName() );
 
   // These are all three representations of the same data. Add stuff to the
   // Observable List, the other two can't accept add.
@@ -53,11 +57,56 @@ public class Library {
   private final PrintStream scanLogger = new PrintStream ( OutputStream.nullOutputStream() );
   
   private boolean dataNeedsToBeSavedToDisk = false;
+  private boolean artistsNeedToBeRegenerated = false;
+  private final Object artistSychronizeFlagLock = new Object();
+  
 
   public Library() {
     merger = new LibraryMerger(this);
     diskWatcher = new LibraryDiskWatcher(this);
     loader = new LibraryLoader(this);
+    
+    InvalidationListener invalidationListener = new InvalidationListener() {
+
+			@Override
+			public void invalidated(Observable arg0) {
+				dataNeedsToBeSavedToDisk = true;
+				synchronized (artistSychronizeFlagLock) {
+					artistsNeedToBeRegenerated = true;
+				}
+			}
+    };
+    
+    tracks.addListener( invalidationListener );
+    albums.addListener( invalidationListener );
+    
+    Thread artistGeneratorThread = new Thread() {
+    	@Override
+    	public void run() {
+    		while ( true ) {
+	    		boolean doRegenerate = false;
+	    		
+	    		synchronized(artistSychronizeFlagLock) { 
+	    			doRegenerate = artistsNeedToBeRegenerated;
+	    			artistsNeedToBeRegenerated = false;
+	    		}
+	    		
+	    		if(doRegenerate) {
+	    			artistsNeedToBeRegenerated = false;
+	    	    merger.setArtists( generateArtists() );
+	    		}
+	    		
+	    		try {
+						Thread.sleep( 2000 );
+					} catch (InterruptedException e) {
+	          LOGGER.log(Level.FINE, "Sleep interupted during wait period.");
+					}
+    		}
+    	}
+    };
+    
+    artistGeneratorThread.setDaemon(true);
+    artistGeneratorThread.start();
   }
   
   public void setUI(FXUI ui) {
@@ -67,13 +116,9 @@ public class Library {
   }
 
   public boolean dataNeedsToBeSavedToDisk() {
-	return dataNeedsToBeSavedToDisk;
+  	return dataNeedsToBeSavedToDisk;
   }
   
-  public void setDataNeedsToBeSavedToDisk(boolean needsSaving) {
-    this.dataNeedsToBeSavedToDisk = needsSaving;
-  }
-
   public SortedList <Playlist> getPlaylistsSorted () {
     return playlistsSorted;
   }
@@ -296,6 +341,10 @@ public class Library {
 
 	LibraryMerger getMerger() {
 		return merger;
+	}
+
+	public void setDataNeedsToBeSavedToDisk(boolean b) {
+		this.dataNeedsToBeSavedToDisk = b;
 	}
 }
 

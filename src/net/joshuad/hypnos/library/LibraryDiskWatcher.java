@@ -56,7 +56,8 @@ class LibraryDiskWatcher {
 		this.ui = ui;
 	}
 
-	public void stopWatching( Path path ) {
+	void stopWatching( Path path ) {
+		//TODO: Should we stop watching recursively? 
 		for( WatchKey key : keys.keySet() ) {
 			if( keys.get( key ).equals( path ) ) {
 				library.getScanLogger().println( "[Watcher] stopping watch on: " + path.toString() );

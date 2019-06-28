@@ -1,7 +1,4 @@
 Library & Scanner Rebuild
-   Figure out where to add generateArtist calls
-      Dont do the artist regeneration on the fx thread.
-   
    Deal with Overflow in LibraryDiskWatcher
 
    Sometimes the new scanner causes the UI to stutter 
@@ -14,7 +11,8 @@ Library & Scanner Rebuild
       I think this is somehow being caused by generateArtists()
    
    Add scanner log to UI
-
+      Change button from ? to something else
+   
    Add removing a musicroot status updates to UI
 
 
@@ -98,6 +96,8 @@ Scanner
    It locks artist folders on windows. Surpsingly not album folders, just artist
 
 UI
+   Artwork gets stuck sometimes. Leonard Cohen - Darker is a good example
+
    Track Filter doesn't work
 
    Right clicking on library buttons changes library tab, only left click should

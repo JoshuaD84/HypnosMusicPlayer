@@ -74,38 +74,31 @@ public class LibraryMerger {
                 	if ( !library.musicRoots.contains( (MusicRoot) action.getItem() ) ) {
                 		library.musicRoots.add((MusicRoot) action.getItem());
                 	}
-    	            library.setDataNeedsToBeSavedToDisk (true);
                   break;
                 case REMOVE_MUSIC_ROOT:
                   library.musicRoots.remove((MusicRoot) action.getItem());
-    	            library.setDataNeedsToBeSavedToDisk (true);
                   break;
                 case ADD_ALBUM:
                   library.albums.add((Album) action.getItem());
                   regenerateArtists = true;
-    	            library.setDataNeedsToBeSavedToDisk (true);
                   break;
                 case REMOVE_ALBUM:
                   library.albums.remove((Album) action.getItem());
                   regenerateArtists = true;
-    	            library.setDataNeedsToBeSavedToDisk (true);
                   break;
                 case UPDATE_ALBUM: 
                 	Album updateMe = (Album)(((Object[])action.getItem())[0]);
                 	Album newData = (Album)(((Object[])action.getItem())[1]);
                 	updateMe.setData( newData );
                   regenerateArtists = true;
-    	            library.setDataNeedsToBeSavedToDisk (true);
                 	break;
                 case ADD_TRACK:
                   library.getTracks().add((Track)action.getItem());
                   regenerateArtists = true;
-    	            library.setDataNeedsToBeSavedToDisk (true);
                   break;
                 case REMOVE_TRACK:
                   library.getTracks().remove((Track)action.getItem());
                   regenerateArtists = true;
-    	            library.setDataNeedsToBeSavedToDisk (true);
                   break;
                 case SET_ARTISTS:
                 	library.getArtists().setAll((List<Artist>)action.getItem());
@@ -115,7 +108,6 @@ public class LibraryMerger {
                 	library.albums.clear();
                 	library.artists.clear();
                 	ui.libraryCleared();
-    	            library.setDataNeedsToBeSavedToDisk(true);
                 	break;
                 case REFRESH_TRACK_TABLE: 
                 	if (ui != null) {
@@ -171,7 +163,6 @@ public class LibraryMerger {
         if (action.getActionType() == ActionType.ADD_TRACK && track.equals(action.getItem())) {
           //We can do updates to data off the javafx thread because the values aren't observable. 
           ((Track)action.getItem()).setData(track);
-          library.setDataNeedsToBeSavedToDisk (true);
           didUpdate = true;
         }
       }
@@ -241,7 +232,6 @@ public class LibraryMerger {
 	      if (action.getActionType() == ActionType.ADD_ALBUM && album.equals(action.getItem())) {
 	        //We can do updates to data off the javafx thread because the values aren't observable. 
 	        ((Album)action.getItem()).setData(album);
-	        library.setDataNeedsToBeSavedToDisk(true);
 	        didUpdate = true;
 	      }
 	    }

@@ -44,7 +44,6 @@ public class LibraryLogWindow extends Stage {
 		logView.setWrapText( true );
 		root.getChildren().add( logView );
 		
-		
 		setScene( scene );
 		
 		scene.addEventFilter( KeyEvent.KEY_PRESSED, new EventHandler <KeyEvent>() {
