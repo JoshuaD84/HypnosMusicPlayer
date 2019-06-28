@@ -66,7 +66,7 @@ public class LibraryMerger {
         long startTime = System.currentTimeMillis();
         try {
           synchronized (pendingActions) {
-	          while ( pendingActions.size() > 0 && System.currentTimeMillis() - startTime < 10 ) {
+	          while ( pendingActions.size() > 0 && System.currentTimeMillis() - startTime < 50 ) {
 	          	UpdateAction action = pendingActions.remove( 0 );
               switch (action.getActionType()) {
                 case ADD_MUSIC_ROOT:

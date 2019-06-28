@@ -3,21 +3,27 @@ Library & Scanner Rebuild
 
    Code is a bit messy
 
-   Album art gets changed away 
-      Add a music root, switch to artist tab, switch to album tab.  Select an album
-      I think this is somehow being caused by generateArtists()
-   
-   Add scanner log to UI
-      Change button from ? to something else
+   Change button from ? to something else
    
    Add removing a musicroot status updates to UI
 
 java.util.ConcurrentModificationException
    LibraryLoader.286
-
+   And probably in alot of other places
+   
 Start with music added
    Interrupt scanner by  adding 2
    remove music
+
+[LibraryLoader] Album rejected, artist name in tags too different: D:\seeding\2\Vangelis - Nocturne (2019) {WEB} [FLAC]
+
+Library Loader Log is slow in the UI with a lot of text in it. 
+
+Clicking on an Artist doesn't change art
+
+it takes a long time to remove "2" if "Music" is added. 
+   The thing keeps finding the same orphans and trying to remove them
+
 
 
 Live at the Watermark

@@ -89,7 +89,6 @@ class DiskReader implements FileVisitor <Path> {
 			Files.walkFileTree( musicRoot.getPath(), EnumSet.of( FileVisitOption.FOLLOW_LINKS ), Integer.MAX_VALUE, this );
 			switch ( scanMode ) {
 				case INITIAL_SCAN:
-					System.out.println( "Setting " + musicRoot.getPath() + " needs initial to: " + interrupted ); //TODO: DD
 					musicRoot.setNeedsInitialScan( interrupted );
 					break;
 				case RESCAN:

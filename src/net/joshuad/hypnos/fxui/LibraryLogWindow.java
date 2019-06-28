@@ -63,10 +63,13 @@ public class LibraryLogWindow extends Stage {
 			}
 		});
 		
+		/* This works fine, but too much text causes the UI to get slow. Need to find an alternative
 		Thread logReader = new Thread( () -> {
 			while(true) {
 				String newData = library.getScanLogger().dumpBuffer();
-				Platform.runLater(() -> logView.appendText( newData ) );
+				if ( !newData.isEmpty() ) {
+					Platform.runLater(() -> logView.appendText( newData ) );
+				}
 				try {
 					Thread.sleep( 1000 );
 				} catch (InterruptedException e1) {
@@ -78,6 +81,7 @@ public class LibraryLogWindow extends Stage {
 		logReader.setName( "Library Log UI Text Loader" );
 		logReader.setDaemon( true );
 		logReader.start();
+		*/
 	}
 }
 
