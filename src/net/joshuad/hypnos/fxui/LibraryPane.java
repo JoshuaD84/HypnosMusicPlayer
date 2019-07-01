@@ -84,10 +84,10 @@ public class LibraryPane extends BorderPane {
 			setPlaylistsVisible ( newValue );
 		});
 		
-    	artistsButton = new ToggleButton( "Artists" );
-    	albumsButton = new ToggleButton( "Albums" );
-    	tracksButton = new ToggleButton( "Tracks" );
-    	playlistsButton = new ToggleButton( "Playlists" );
+  	artistsButton = new ToggleButton( "Artists" );
+  	albumsButton = new ToggleButton( "Albums" );
+  	tracksButton = new ToggleButton( "Tracks" );
+  	playlistsButton = new ToggleButton( "Playlists" );
 
 		artistsButton.setContextMenu( tabMenu );
 		albumsButton.setContextMenu( tabMenu );
@@ -98,52 +98,52 @@ public class LibraryPane extends BorderPane {
 		albumsButton.setPrefHeight( 32 );
 		tracksButton.setPrefHeight( 32 );
 		playlistsButton.setPrefHeight( 32 );
-		
-    	artistsButton.setOnAction( e -> { 
-    		setCenter( artistPane ); 
-    		artistsButton.setSelected ( true ); 
-    	});
-    	
-    	albumsButton.setOnAction( e -> { 
-    		setCenter( albumPane ); 
-    		albumsButton.setSelected ( true ); 
-    	} );
-    	
-    	tracksButton.setOnAction( e -> { 
-    		setCenter( trackPane ); 
-    		tracksButton.setSelected ( true ); 
-    	} );
-    	
-    	playlistsButton.setOnAction( e -> { 
-    		setCenter( playlistPane ); 
-    		playlistsButton.setSelected ( true ); 
-    	} );
-    	
-    	artistsButton.focusedProperty().addListener( event -> artistsButton.fire() );
-    	albumsButton.focusedProperty().addListener( event -> albumsButton.fire() );
-    	tracksButton.focusedProperty().addListener( event -> tracksButton.fire() );
-    	playlistsButton.focusedProperty().addListener( event -> playlistsButton.fire() );
-    	
-    	buttonGroup = new ToggleGroup();
-    	artistsButton.setToggleGroup( buttonGroup );
-    	albumsButton.setToggleGroup( buttonGroup );
-    	tracksButton.setToggleGroup( buttonGroup );
-    	playlistsButton.setToggleGroup( buttonGroup );
-    	
-    	artistsButton.setPrefWidth ( 1000000 );
-    	albumsButton.setPrefWidth ( 1000000 );
-    	tracksButton.setPrefWidth ( 1000000 );
-    	playlistsButton.setPrefWidth ( 1000000 );
-    	
-    	artistsButton.setMinWidth ( 0 );
-    	albumsButton.setMinWidth ( 0 );
-    	tracksButton.setMinWidth ( 0 );
-    	playlistsButton.setMinWidth ( 0 );
+	
+  	artistsButton.setOnAction( e -> { 
+  		setCenter( artistPane ); 
+  		artistsButton.setSelected ( true ); 
+  	});
+  	
+  	albumsButton.setOnAction( e -> { 
+  		setCenter( albumPane ); 
+  		albumsButton.setSelected ( true ); 
+  	} );
+  	
+  	tracksButton.setOnAction( e -> { 
+  		setCenter( trackPane ); 
+  		tracksButton.setSelected ( true ); 
+  	} );
+  	
+  	playlistsButton.setOnAction( e -> { 
+  		setCenter( playlistPane ); 
+  		playlistsButton.setSelected ( true ); 
+  	} );
+  	
+  	artistsButton.focusedProperty().addListener( event -> artistsButton.fire() );
+  	albumsButton.focusedProperty().addListener( event -> albumsButton.fire() );
+  	tracksButton.focusedProperty().addListener( event -> tracksButton.fire() );
+  	playlistsButton.focusedProperty().addListener( event -> playlistsButton.fire() );
+  	
+  	buttonGroup = new ToggleGroup();
+  	artistsButton.setToggleGroup( buttonGroup );
+  	albumsButton.setToggleGroup( buttonGroup );
+  	tracksButton.setToggleGroup( buttonGroup );
+  	playlistsButton.setToggleGroup( buttonGroup );
+  	
+  	artistsButton.setPrefWidth ( 1000000 );
+  	albumsButton.setPrefWidth ( 1000000 );
+  	tracksButton.setPrefWidth ( 1000000 );
+  	playlistsButton.setPrefWidth ( 1000000 );
+  	
+  	artistsButton.setMinWidth ( 0 );
+  	albumsButton.setMinWidth ( 0 );
+  	tracksButton.setMinWidth ( 0 );
+  	playlistsButton.setMinWidth ( 0 );
 
-    	setupTooltip ( artistsButton, library.getArtistDisplayCache(), "Artist Count: " );   
-    	setupTooltip ( albumsButton, library.getAlbumDisplayCache(), "Album Count: " ); 
-    	setupTooltip ( tracksButton, library.getTrackDisplayCache(), "Track Count: " ); 
-    	setupTooltip ( playlistsButton, library.getPlaylistsDisplayCache(), "Playlist Count: " );  	    	    	
+  	setupTooltip ( artistsButton, library.getArtistDisplayCache(), "Artist Count: " );   
+  	setupTooltip ( albumsButton, library.getAlbumDisplayCache(), "Album Count: " ); 
+  	setupTooltip ( tracksButton, library.getTrackDisplayCache(), "Track Count: " ); 
+  	setupTooltip ( playlistsButton, library.getPlaylistsDisplayCache(), "Playlist Count: " );  	    	    	
     	
 		buttonBox = new HBox();
 		buttonBox.getChildren().addAll( artistsButton, albumsButton, tracksButton, playlistsButton );
