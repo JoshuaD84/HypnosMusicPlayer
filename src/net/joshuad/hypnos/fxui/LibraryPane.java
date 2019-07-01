@@ -140,10 +140,10 @@ public class LibraryPane extends BorderPane {
     	tracksButton.setMinWidth ( 0 );
     	playlistsButton.setMinWidth ( 0 );
 
-    	setupTooltip ( artistsButton, library.getArtists(), "Artist Count: " );   
-    	setupTooltip ( albumsButton, library.getAlbums(), "Album Count: " ); 
-    	setupTooltip ( tracksButton, library.getTracks(), "Track Count: " ); 
-    	setupTooltip ( playlistsButton, library.getPlaylists(), "Playlist Count: " );  	    	    	
+    	setupTooltip ( artistsButton, library.getArtistDisplayCache(), "Artist Count: " );   
+    	setupTooltip ( albumsButton, library.getAlbumDisplayCache(), "Album Count: " ); 
+    	setupTooltip ( tracksButton, library.getTrackDisplayCache(), "Track Count: " ); 
+    	setupTooltip ( playlistsButton, library.getPlaylistsDisplayCache(), "Playlist Count: " );  	    	    	
     	
 		buttonBox = new HBox();
 		buttonBox.getChildren().addAll( artistsButton, albumsButton, tracksButton, playlistsButton );

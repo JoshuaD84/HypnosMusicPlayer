@@ -715,7 +715,7 @@ public class FXUI implements PlayerListener {
 
 		items.remove( 1, items.size() );
 
-		for ( Playlist playlist : library.getPlaylists() ) {
+		for ( Playlist playlist : library.getPlaylistData() ) {
 			MenuItem newItem = new MenuItem( playlist.getName() );
 			newItem.setUserData( playlist );
 			newItem.setOnAction( eventHandler );
@@ -879,7 +879,7 @@ public class FXUI implements PlayerListener {
 			String enteredName = result.get().trim();
 			
 			Playlist updatedPlaylist = null;
-			for ( Playlist test : library.getPlaylists() ) {
+			for ( Playlist test : library.getPlaylistData() ) {
 				if ( test.getName().equals( enteredName ) ) {
 					test.setTracks( tracks );
 					updatedPlaylist = test;

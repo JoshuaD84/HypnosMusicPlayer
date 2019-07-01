@@ -57,7 +57,7 @@ class LibraryLoader {
 		}
 		
 		if (Platform.isFxApplicationThread()) {
-			library.musicRoots.add(new MusicRoot(path));
+			library.getMusicRootData().add(new MusicRoot(path));
 		} else {
 			musicRootsToAdd.add(path);
 		}
@@ -74,7 +74,7 @@ class LibraryLoader {
 			public void run() {
 				while (true) {
 
-					for (MusicRoot root : library.musicRoots) {
+					for (MusicRoot root : library.getMusicRootData()) {
 						root.recheckValidity();
 					}
 
@@ -91,20 +91,20 @@ class LibraryLoader {
 					if (!musicRootsToAdd.isEmpty()) {
 						synchronized (musicRootsToAdd) {
 							for (Path path : musicRootsToAdd) {
-								library.musicRoots.add(new MusicRoot(path));
+								library.getMusicRootData().add(new MusicRoot(path));
 							}
 							musicRootsToAdd.clear();
 						}
 					}
 					
-					List<MusicRoot> libraryRoots = new ArrayList<>(library.musicRoots);
+					List<MusicRoot> libraryRoots = new ArrayList<>(library.getMusicRootData());
 					for (MusicRoot root : libraryRoots) {
 						if (root.needsInitialScan()) {
 							diskReader.scanMusicRoot(root, DiskReader.ScanMode.INITIAL_SCAN);
 						}
 					}
 					
-					libraryRoots = new ArrayList<>(library.musicRoots);
+					libraryRoots = new ArrayList<>(library.getMusicRootData());
 					for (MusicRoot root : libraryRoots) {
 						if (root.needsRescan()) {
 							diskReader.scanMusicRoot(root, DiskReader.ScanMode.RESCAN);
@@ -149,24 +149,25 @@ class LibraryLoader {
 		path = path.toAbsolutePath();
 
 		if (!Files.exists(path)) {
-			for (Track track : library.getTracksCopy()) {
+			
+			for (Track track : library.getTrackDataCopy()) {
 				if (track.getPath().toAbsolutePath().startsWith(path)) {
 					library.getScanLogger().println("[LibraryLoader] Removing track data at: " + track.getPath());
-					library.getMerger().removeTrack(track);
+					library.getTrackDataCopy().remove(track);
 				}
 			}
 
-			for (Album album : library.albums) {
+			for (Album album : library.getAlbumData()) {
 				if (album.getPath().toAbsolutePath().startsWith(path)) {
 					library.getScanLogger().println("[LibraryLoader] Removing album data at: " + path);
-					library.getMerger().removeAlbum(album);
+					//TODO: library.getMerger().removeAlbum(album);
 					library.getDiskWatcher().stopWatching(album.getPath());
 				}
 			}
 
 		} else if (Utils.isMusicFile(path)) {
 			Track existingTrackAtPath = null;
-			for (Track track : library.getTracksCopy()) {
+			for (Track track : library.getTrackDataCopy()) {
 				if (track.getPath().equals(path)) {
 					existingTrackAtPath = track;
 					break;
@@ -184,7 +185,7 @@ class LibraryLoader {
 			} else {
 				library.getScanLogger().println("[LibraryLoader] new track found at: " + path);
 				Track newTrack = new Track(path);
-				library.getMerger().removeTrack(newTrack);
+				library.getTrackDataCopy().remove(newTrack);
 			}
 
 		} else if (Files.isDirectory(path)) {
@@ -283,45 +284,45 @@ class LibraryLoader {
 
 	private void clearOrphans() {
 		
-		synchronized (library.musicRoots) {
-			if (library.musicRoots.size() == 0) {
-				library.getMerger().clearAll();
-				/*library.albums.clear();
-				library.tracks.clear();
-				library.artists.clear();
-				*/
-			}
+		if (library.getMusicRootData().size() == 0) {
+			/*
+			 * library.getAlbumData().clear();
+			library.getTrackData().clear();
+			library.getArtistData().clear();
+			*/
 		}
 		
-		synchronized (library.albums) {
-			List<Album> removeMe = new ArrayList<>();
-			for (Album album : library.albums) {
-				boolean hasRoot = false;
-				for (MusicRoot root : library.musicRoots) {
-					if (Utils.isChildOf(album.getPath(), root.getPath())) {
-						hasRoot = true;
-						break;
-					}
+		List<Album> removeMe = new ArrayList<>();
+		for (Album album : library.getAlbumData()) {
+			boolean hasRoot = false;
+			for (MusicRoot root : library.getMusicRootData()) {
+				if (Utils.isChildOf(album.getPath(), root.getPath())) {
+					hasRoot = true;
+					break;
 				}
-				if (!hasRoot) {
-					library.getScanLogger().println( "[LibraryLoader] Orphan album pruned, no root: " + album.getPath() );
-					removeMe.add(album);
+				if(album.getPath().equals(root.getPath())) {
+					hasRoot = true;
+					break;
 				}
 			}
-
-			for (Album album : removeMe) {
-				library.getMerger().removeAlbum(album);
-				for (Track track : album.getTracks()) {
-					library.getMerger().removeTrack(track);
-				}
+			
+			if (!hasRoot) {
+				library.getScanLogger().println( "[LibraryLoader] Orphan album pruned, no root: " + album.getPath() );
+				removeMe.add(album);
 			}
 		}
 
-		List<Track> libraryTracks = library.getTracksCopy();
+		for (Album album : removeMe) {
+			library.getAlbumData().remove(album);
+			for (Track track : album.getTracks()) {
+				library.getTrackDataCopy().remove(track);
+			}
+		}
+
 		List<Track> removeMeTracks = new ArrayList<>();
-		for (Track track : libraryTracks) {
+		for (Track track : library.getTrackDataCopy()) {
 			boolean hasRoot = false;
-			for (MusicRoot root : library.musicRoots) {
+			for (MusicRoot root : library.getMusicRootData()) {
 				if (Utils.isChildOf(track.getPath(), root.getPath())) {
 					hasRoot = true;
 					break;
@@ -333,15 +334,15 @@ class LibraryLoader {
 			}
 		}
 		for (Track track : removeMeTracks) {
-			library.getMerger().removeTrack(track);
+			library.getTrackDataCopy().remove(track);
 		}
+		library.getArtistData().setAll(library.generateArtists());
 	}
 
 	public void removeMusicRoot(MusicRoot musicRoot) {
 		if (Platform.isFxApplicationThread()) {
-			library.musicRoots.remove(musicRoot);
+			library.getMusicRootData().remove(musicRoot);
 		}
-		library.getMerger().removeMusicRoot(musicRoot);
 		diskReader.interrupt();
 		requestClearOrphans();
 	}

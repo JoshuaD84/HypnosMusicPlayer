@@ -6,9 +6,11 @@ import java.io.FileNotFoundException;
 import java.util.logging.Logger;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -20,7 +22,8 @@ import net.joshuad.hypnos.library.Library;
 
 public class LibraryLogWindow extends Stage {
 	private static final Logger LOGGER = Logger.getLogger( LibraryLogWindow.class.getName() );
-	TextArea logView;
+	ListView<String> logView;
+	ObservableList<String> logData = FXCollections.observableArrayList();
 	
 	Library library;
 	
@@ -43,11 +46,11 @@ public class LibraryLogWindow extends Stage {
 		
 		VBox root = new VBox();
 		Scene scene = new Scene( root );
-		logView = new TextArea();
+		logView = new ListView<>(logData);
 		logView.setEditable( false );
 		logView.prefHeightProperty().bind( root.heightProperty() );
 		logView.getStyleClass().add( "monospaced" );
-		logView.setWrapText( true );
+		logView.fixedCellSizeProperty().set(24);
 		root.getChildren().add( logView );
 		
 		setScene( scene );
@@ -63,13 +66,16 @@ public class LibraryLogWindow extends Stage {
 			}
 		});
 		
-		/* This works fine, but too much text causes the UI to get slow. Need to find an alternative
 		Thread logReader = new Thread( () -> {
 			while(true) {
-				String newData = library.getScanLogger().dumpBuffer();
-				if ( !newData.isEmpty() ) {
-					Platform.runLater(() -> logView.appendText( newData ) );
-				}
+				String[] newData = library.getScanLogger().dumpBuffer().split("\n");
+				Platform.runLater(() -> {
+					for( String line : newData ) {
+						if(!line.isBlank()) {
+							logData.add(line);
+						}
+					}
+				});
 				try {
 					Thread.sleep( 1000 );
 				} catch (InterruptedException e1) {
@@ -81,7 +87,6 @@ public class LibraryLogWindow extends Stage {
 		logReader.setName( "Library Log UI Text Loader" );
 		logReader.setDaemon( true );
 		logReader.start();
-		*/
 	}
 }
 

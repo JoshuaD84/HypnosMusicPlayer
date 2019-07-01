@@ -84,7 +84,7 @@ public class MusicRootWindow extends Stage {
 
 		musicSourceTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
 		musicSourceTable.setPlaceholder( emptyLabel );
-		musicSourceTable.setItems( library.getMusicSourcePaths() );
+		musicSourceTable.setItems( library.getMusicRootDisplayCache() );
 		musicSourceTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 
 		musicSourceTable.widthProperty().addListener( new ChangeListener <Number>() {

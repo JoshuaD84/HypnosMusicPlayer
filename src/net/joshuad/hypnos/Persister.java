@@ -253,7 +253,7 @@ public class Persister {
 	public void saveRoots () {
 		File tempSourcesFile = new File ( sourcesFile.toString() + ".temp" );
 		try ( ObjectOutputStream sourcesOut = new ObjectOutputStream( new FileOutputStream( tempSourcesFile ) ); ) {
-			sourcesOut.writeObject( new ArrayList <MusicRoot> ( library.getMusicRoots() ) );
+			sourcesOut.writeObject( new ArrayList <MusicRoot> ( library.getMusicRootData() ) );
 			sourcesOut.flush();
 			sourcesOut.close();
 
@@ -380,8 +380,8 @@ public class Persister {
 			ByteArrayOutputStream byteWriter = new ByteArrayOutputStream();
 			ObjectOutputStream bytesOut = new ObjectOutputStream( byteWriter );
 
-			bytesOut.writeObject( new ArrayList <Album>( Arrays.asList( library.getAlbums().toArray( new Album [ library.getAlbums().size() ] ) ) ) );
-			bytesOut.writeObject( new ArrayList <Track>( Arrays.asList( library.getTracks().toArray( new Track [ library.getTracks().size() ] ) ) ) );
+			bytesOut.writeObject( new ArrayList <Album>( Arrays.asList( library.getAlbumData().toArray( new Album [ library.getAlbumData().size() ] ) ) ) );
+			bytesOut.writeObject( new ArrayList <Track>( Arrays.asList( library.getTrackDataCopy().toArray( new Track [ library.getTrackDataCopy().size() ] ) ) ) );
 
 			compressedOut.write( byteWriter.toByteArray() );
 			compressedOut.flush();
@@ -396,7 +396,7 @@ public class Persister {
 
 	public void saveLibraryPlaylists () {
 		
-		ArrayList <Playlist> playlists = new ArrayList <> ( library.getPlaylists() );
+		ArrayList <Playlist> playlists = new ArrayList <> ( library.getPlaylistData() );
 		
 		ArrayList <Playlist> errors = new ArrayList <> ();
 

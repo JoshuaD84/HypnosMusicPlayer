@@ -798,7 +798,7 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 	}
 	
 	public void currentListCleared() {
-		if ( Hypnos.getLibrary().getAlbums().isEmpty() && Hypnos.getLibrary().getTracks().isEmpty() ) {
+		if ( Hypnos.getLibrary().getAlbumData().isEmpty() && Hypnos.getLibrary().getTrackDataCopy().isEmpty() ) {
 			if ( audioSystem.isPlaying() ) {
 				setImages ( audioSystem.getCurrentTrack() );
 			} else {
@@ -818,8 +818,8 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 	@Override
 	public void playerStopped ( Track track, StopReason reason ) {
 		if ( audioSystem.getCurrentList().getItems().isEmpty()
-		&& Hypnos.getLibrary().getAlbums().isEmpty()
-		&& Hypnos.getLibrary().getTracks().isEmpty() ) {
+		&& Hypnos.getLibrary().getAlbumData().isEmpty()
+		&& Hypnos.getLibrary().getTrackDataCopy().isEmpty() ) {
 			clearImages();
 		}
 	}

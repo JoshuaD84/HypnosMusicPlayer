@@ -123,7 +123,7 @@ private static final Logger LOGGER = Logger.getLogger( LibraryArtistPane.class.g
 			
 			if ( !someVisible ) {
 				albumTable.setPlaceholder( noColumnsLabel );
-			} else if ( library.getAlbums().isEmpty() ) {
+			} else if ( library.getAlbumDisplayCache().isEmpty() ) {
 				if ( albumTable.getPlaceholder() != emptyListLabel ) {
 					albumTable.setPlaceholder( emptyListLabel );
 				}

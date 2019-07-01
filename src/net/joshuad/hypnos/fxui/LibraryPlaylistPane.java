@@ -127,7 +127,7 @@ public class LibraryPlaylistPane extends BorderPane {
 			
 			if ( !someVisible ) {
 				playlistTable.setPlaceholder( noColumnsLabel );
-			} else if ( library.getAlbums().isEmpty() ) {
+			} else if ( library.getPlaylistsDisplayCache().isEmpty() ) {
 				if ( playlistTable.getPlaceholder() != emptyLabel ) {
 					playlistTable.setPlaceholder( emptyLabel );
 				}

@@ -8,6 +8,7 @@ Library & Scanner Rebuild
    Add removing a musicroot status updates to UI
 
 java.util.ConcurrentModificationException
+   LibraryLoader.clearOrphans.298
    LibraryLoader.286
    And probably in alot of other places
    
@@ -24,7 +25,9 @@ Clicking on an Artist doesn't change art
 it takes a long time to remove "2" if "Music" is added. 
    The thing keeps finding the same orphans and trying to remove them
 
+Add a music root, close hypnos, delete that folder, restart hypnos. Fatal failure
 
+Add a single album as a root. It appears then disppears
 
 Live at the Watermark
    WARNING: Unable to set data for tag window.

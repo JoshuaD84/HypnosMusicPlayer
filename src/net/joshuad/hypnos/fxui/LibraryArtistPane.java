@@ -127,7 +127,7 @@ public class LibraryArtistPane extends BorderPane {
 			
 			if ( !someVisible ) {
 				artistTable.setPlaceholder( noColumnsLabel );
-			} else if ( library.getAlbums().isEmpty() ) {
+			} else if ( library.getArtistDisplayCache().isEmpty() ) {
 				if ( artistTable.getPlaceholder() != emptyListLabel ) {
 					artistTable.setPlaceholder( emptyListLabel );
 				}

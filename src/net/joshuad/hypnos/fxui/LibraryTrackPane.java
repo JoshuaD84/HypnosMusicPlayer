@@ -121,7 +121,7 @@ public class LibraryTrackPane extends BorderPane {
 			
 			if ( !someVisible ) {
 				trackTable.setPlaceholder( noColumnsLabel );
-			} else if ( library.getAlbums().isEmpty() ) {
+			} else if ( library.getTrackDisplayCache().isEmpty() ) {
 				if ( trackTable.getPlaceholder() != emptyListLabel ) {
 					trackTable.setPlaceholder( emptyListLabel );
 				}

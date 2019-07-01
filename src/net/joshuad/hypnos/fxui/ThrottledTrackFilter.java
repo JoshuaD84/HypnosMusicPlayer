@@ -2,10 +2,14 @@ package net.joshuad.hypnos.fxui;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javafx.collections.transformation.FilteredList;
 import net.joshuad.hypnos.library.Track;
 
 public class ThrottledTrackFilter {
+	private static final Logger LOGGER = Logger.getLogger(ThrottledTrackFilter.class.getName());
 	
 	private String requestedFilter = "";
 	private boolean requestedHideAlbumTracks = false;
@@ -54,47 +58,51 @@ public class ThrottledTrackFilter {
 	}
 	
 	private void setPredicate ( String filterText, boolean hideAlbumTracks ) {
-		filteredList.setPredicate( ( Track track ) -> {
-			if ( track.getAlbum() != null && hideAlbumTracks ) return false;
-			if ( interruptFiltering ) return true;
-			if ( filterText.isEmpty() ) return true;
-	
-			ArrayList <String> matchableText = new ArrayList <String>();
-	
-			matchableText.add( track.getArtist().toLowerCase() );
-			matchableText.add( track.getTitle().toLowerCase() );
-			matchableText.add( track.getFullAlbumTitle().toLowerCase() );
-			
-			if ( track.getArtist().matches( ".*[^\\p{ASCII}]+.*" ) ) {
-				matchableText.add( Normalizer.normalize( track.getArtist(), Normalizer.Form.NFD )
-					.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-			}
-			
-			if ( track.getTitle().matches( ".*[^\\p{ASCII}]+.*" ) ) {
-				matchableText.add( Normalizer.normalize( track.getTitle(), Normalizer.Form.NFD )
-					.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-			}
-			
-			if ( track.getFullAlbumTitle().matches( ".*[^\\p{ASCII}]+.*" ) ) {
-				matchableText.add( Normalizer.normalize( track.getFullAlbumTitle(), Normalizer.Form.NFD )
-					.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-			}
-			
-			String[] lowerCaseFilterTokens = filterText.toLowerCase().split( "\\s+" );
-			for ( String token : lowerCaseFilterTokens ) {
-				boolean tokenMatches = false;
-				for ( String test : matchableText ) {
-					if ( test.contains( token ) ) {
-						tokenMatches = true;
+		try {
+			filteredList.setPredicate( ( Track track ) -> {
+				if ( track.getAlbum() != null && hideAlbumTracks ) return false;
+				if ( interruptFiltering ) return true;
+				if ( filterText.isEmpty() ) return true;
+		
+				ArrayList <String> matchableText = new ArrayList <String>();
+		
+				matchableText.add( track.getArtist().toLowerCase() );
+				matchableText.add( track.getTitle().toLowerCase() );
+				matchableText.add( track.getFullAlbumTitle().toLowerCase() );
+				
+				if ( track.getArtist().matches( ".*[^\\p{ASCII}]+.*" ) ) {
+					matchableText.add( Normalizer.normalize( track.getArtist(), Normalizer.Form.NFD )
+						.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+				}
+				
+				if ( track.getTitle().matches( ".*[^\\p{ASCII}]+.*" ) ) {
+					matchableText.add( Normalizer.normalize( track.getTitle(), Normalizer.Form.NFD )
+						.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+				}
+				
+				if ( track.getFullAlbumTitle().matches( ".*[^\\p{ASCII}]+.*" ) ) {
+					matchableText.add( Normalizer.normalize( track.getFullAlbumTitle(), Normalizer.Form.NFD )
+						.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+				}
+				
+				String[] lowerCaseFilterTokens = filterText.toLowerCase().split( "\\s+" );
+				for ( String token : lowerCaseFilterTokens ) {
+					boolean tokenMatches = false;
+					for ( String test : matchableText ) {
+						if ( test.contains( token ) ) {
+							tokenMatches = true;
+						}
+					}
+		
+					if ( !tokenMatches ) {
+						return false;
 					}
 				}
-	
-				if ( !tokenMatches ) {
-					return false;
-				}
-			}
-	
-			return true;
-		});
+		
+				return true;
+			});
+		}catch(Exception e) {
+			LOGGER.log(Level.INFO, "Exception caught, ignored.", e); 
+		}
 	}
 }
