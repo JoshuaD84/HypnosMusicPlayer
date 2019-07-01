@@ -28,10 +28,12 @@ class LibraryLoader {
 	private Library library;
 
 	private DiskReader diskReader;
-
-	public LibraryLoader(Library library) {
+	private LibraryScanLogger scanLogger;
+	
+	public LibraryLoader(Library library, LibraryScanLogger scanLogger) {
 		this.library = library;
-		this.diskReader = new DiskReader(library);
+		this.scanLogger = scanLogger;
+		this.diskReader = new DiskReader(library, scanLogger);
 		setupLoaderThread();
 	}
 
@@ -152,14 +154,14 @@ class LibraryLoader {
 			
 			for (Track track : library.getTrackDataCopy()) {
 				if (track.getPath().toAbsolutePath().startsWith(path)) {
-					library.getScanLogger().println("[LibraryLoader] Removing track data at: " + track.getPath());
+					scanLogger.println("[LibraryLoader] Removing track data at: " + track.getPath());
 					library.getTrackDataCopy().remove(track);
 				}
 			}
 
 			for (Album album : library.getAlbumData()) {
 				if (album.getPath().toAbsolutePath().startsWith(path)) {
-					library.getScanLogger().println("[LibraryLoader] Removing album data at: " + path);
+					scanLogger.println("[LibraryLoader] Removing album data at: " + path);
 					//TODO: library.getMerger().removeAlbum(album);
 					library.getDiskWatcher().stopWatching(album.getPath());
 				}
@@ -175,7 +177,7 @@ class LibraryLoader {
 			}
 
 			if (existingTrackAtPath != null) {
-				library.getScanLogger().println("[LibraryLoader] Updating track data at: " + path);
+				scanLogger.println("[LibraryLoader] Updating track data at: " + path);
 				existingTrackAtPath.refreshTagData();
 
 				// This will make sure that any existing album gets updated, and if the
@@ -183,19 +185,19 @@ class LibraryLoader {
 				pathsToUpdate.add(existingTrackAtPath.getPath().getParent());
 
 			} else {
-				library.getScanLogger().println("[LibraryLoader] new track found at: " + path);
+				scanLogger.println("[LibraryLoader] new track found at: " + path);
 				Track newTrack = new Track(path);
 				library.getTrackDataCopy().remove(newTrack);
 			}
 
 		} else if (Files.isDirectory(path)) {
-			library.getScanLogger().println("[LibraryLoader] Doing directory rescan at: " + path);
+			scanLogger.println("[LibraryLoader] Doing directory rescan at: " + path);
 
 			List<Path> childrenOfPath = new ArrayList<>();
 			for (Path futureUpdate : pathsToUpdate) {
 				if (Utils.isChildOf(futureUpdate, path)) {
 					childrenOfPath.add(futureUpdate);
-					library.getScanLogger().println("[LibraryLoader] - Removing future scan, its a child: " + path);
+					scanLogger.println("[LibraryLoader] - Removing future scan, its a child: " + path);
 				}
 			}
 
@@ -307,7 +309,7 @@ class LibraryLoader {
 			}
 			
 			if (!hasRoot) {
-				library.getScanLogger().println( "[LibraryLoader] Orphan album pruned, no root: " + album.getPath() );
+				scanLogger.println( "[LibraryLoader] Orphan album pruned, no root: " + album.getPath() );
 				removeMe.add(album);
 			}
 		}
@@ -330,7 +332,7 @@ class LibraryLoader {
 			}
 			if (!hasRoot) {
 				removeMeTracks.add(track);
-				library.getScanLogger().println( "[LibraryLoader] Orphan track pruned, no root: " + track.getPath() );
+				scanLogger.println( "[LibraryLoader] Orphan track pruned, no root: " + track.getPath() );
 			}
 		}
 		for (Track track : removeMeTracks) {

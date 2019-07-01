@@ -46,9 +46,11 @@ class DiskReader implements FileVisitor<Path> {
 
 	private Library library;
 	private FXUI ui;
-
-	DiskReader(Library library) {
+	LibraryScanLogger scanLogger;
+	
+	DiskReader(Library library, LibraryScanLogger scanLogger) {
 		this.library = library;
+		this.scanLogger = scanLogger;
 	}
 
 	void setUI(FXUI ui) {
@@ -73,7 +75,7 @@ class DiskReader implements FileVisitor<Path> {
 	void scanMusicRoot(MusicRoot musicRoot, ScanMode scanMode) {
 		resetState();
 		this.scanMode = scanMode;
-		library.getScanLogger().println("[MusicRootLoader] " + scanMode.statusPrefix + " root: " + musicRoot.getPath().toString());
+		scanLogger.println("[MusicRootLoader] " + scanMode.statusPrefix + " root: " + musicRoot.getPath().toString());
 
 		directoriesToScan = LibraryLoader.getDirectoryCount(musicRoot.getPath());
 		currentRootPath = musicRoot.getPath();
@@ -95,8 +97,8 @@ class DiskReader implements FileVisitor<Path> {
 			}
 
 		} catch (Exception e) {
-			library.getScanLogger().println("[DiskReader] Scan failed or incomplete for path, giving up: " + musicRoot.getPath());
-			library.getScanLogger().println(ExceptionUtils.getStackTrace(e));
+			scanLogger.println("[DiskReader] Scan failed or incomplete for path, giving up: " + musicRoot.getPath());
+			scanLogger.println(ExceptionUtils.getStackTrace(e));
 			musicRoot.setNeedsRescan(false);
 			musicRoot.setFailedScan(true);
 		}
@@ -120,8 +122,8 @@ class DiskReader implements FileVisitor<Path> {
 			Files.walkFileTree(path, EnumSet.of(FileVisitOption.FOLLOW_LINKS), Integer.MAX_VALUE, this);
 
 		} catch (Exception e) {
-			library.getScanLogger().println("[DiskReader] Scan failed or incomplete for path, giving up: " + path);
-			library.getScanLogger().println(ExceptionUtils.getStackTrace(e));
+			scanLogger.println("[DiskReader] Scan failed or incomplete for path, giving up: " + path);
+			scanLogger.println(ExceptionUtils.getStackTrace(e));
 			List<MusicRoot> roots = new ArrayList<>(library.getMusicRootData());
 			for (MusicRoot root : roots) {
 				if (Utils.isChildOf(path, root.getPath())) {
@@ -171,7 +173,7 @@ class DiskReader implements FileVisitor<Path> {
 
 		directoriesVisited++;
 
-		if (LibraryLoader.isAlbum(currentDirectoryNode, library.getScanLogger())) {
+		if (LibraryLoader.isAlbum(currentDirectoryNode, scanLogger)) {
 			List<Track> tracks = new ArrayList<>();
 			for (FileTreeNode child : currentDirectoryNode.getChildren()) {
 				if (child.getTrack() != null) {
@@ -181,7 +183,7 @@ class DiskReader implements FileVisitor<Path> {
 
 			Album album = new Album(currentDirectoryNode.getPath(), tracks);
 
-			library.getScanLogger().println("[MusicRootLoader] Loading album: " + album.getAlbumArtist() + " - " + album.getAlbumTitle());
+			scanLogger.println("[MusicRootLoader] Loading album: " + album.getAlbumArtist() + " - " + album.getAlbumTitle());
 			currentDirectoryNode.setAlbum(album);
 			library.addTrackData(tracks);
 			library.addAlbumData(album);

@@ -34,12 +34,11 @@ class LibraryDiskWatcher {
 
 	private FXUI ui;
 	
-	private Library library;
+	private LibraryScanLogger scanLogger;
 
-	LibraryDiskWatcher( Library library ) {
+	LibraryDiskWatcher( Library library, LibraryScanLogger scanLogger ) {
 		
-		this.library = library;
-		
+		this.scanLogger = scanLogger;
 		delayedUpdater = new DelayedUpdateThread( library );
 		
 		try {
@@ -60,7 +59,7 @@ class LibraryDiskWatcher {
 		//TODO: Should we stop watching recursively? 
 		for( WatchKey key : keys.keySet() ) {
 			if( keys.get( key ).equals( path ) ) {
-				library.getScanLogger().println( "[Watcher] stopping watch on: " + path.toString() );
+				scanLogger.println( "[Watcher] stopping watch on: " + path.toString() );
 				key.cancel();
 			}
 		}
@@ -140,15 +139,15 @@ class LibraryDiskWatcher {
 			Path child = directory.resolve( watchEvent.context() );
 			
 			if ( eventKind == StandardWatchEventKinds.ENTRY_CREATE ) {
-				library.getScanLogger().println( "[Watcher] Heard create: " + child );
+				scanLogger.println( "[Watcher] Heard create: " + child );
 				delayedUpdater.addUpdateItem( child );
 				
 			} else if ( eventKind == StandardWatchEventKinds.ENTRY_DELETE ) {
-				library.getScanLogger().println( "[Watcher] heard delete: " + child );
+				scanLogger.println( "[Watcher] heard delete: " + child );
 				delayedUpdater.addUpdateItem( child );
 				
 			} else if ( eventKind == StandardWatchEventKinds.ENTRY_MODIFY ) {
-				library.getScanLogger().println( "[Watcher] heard modify: " + child );
+				scanLogger.println( "[Watcher] heard modify: " + child );
 				delayedUpdater.addUpdateItem( child );
 			
 			} else if ( eventKind == StandardWatchEventKinds.OVERFLOW ) {

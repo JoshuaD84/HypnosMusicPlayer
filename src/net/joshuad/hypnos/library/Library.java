@@ -57,8 +57,8 @@ public class Library {
 	private final Object artistSychronizeFlagLock = new Object();
 
 	public Library() {
-		diskWatcher = new LibraryDiskWatcher(this);
-		loader = new LibraryLoader(this);
+		diskWatcher = new LibraryDiskWatcher(this, scanLogger);
+		loader = new LibraryLoader(this, scanLogger);
 
 		InvalidationListener invalidationListener = new InvalidationListener() {
 
@@ -235,7 +235,6 @@ public class Library {
 		loader.start();
 	}
 
-	// TODO: Inject this rather than letting things request it.
 	public LibraryScanLogger getScanLogger() {
 		return scanLogger;
 	}
