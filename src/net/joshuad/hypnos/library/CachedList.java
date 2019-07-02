@@ -138,15 +138,17 @@ public class CachedList<T> {
 	}
 	
 	private void pushChanges() {
-    if (!pendingChanges.isEmpty()) {
-    	runLaterPending = true;
-      Platform.runLater(() -> {
-        long startTime = System.currentTimeMillis();
-        try {
-        	if(itemsLock.tryLock(200, TimeUnit.MILLISECONDS)) {
-	          while ( pendingChanges.size() > 0 && System.currentTimeMillis() - startTime < 400 ) {
-	          	Action<T> action = pendingChanges.remove( 0 );
-	            switch (action.getType()) {
+		if (!pendingChanges.isEmpty()) {
+			runLaterPending = true;
+			Platform.runLater(() -> {
+				long startTime = System.currentTimeMillis();
+				boolean locked = false;
+				try {
+					if (itemsLock.tryLock(200, TimeUnit.MILLISECONDS)) {
+						locked = true;
+						while (pendingChanges.size() > 0 && System.currentTimeMillis() - startTime < 400) {
+							Action<T> action = pendingChanges.remove(0);
+							switch (action.getType()) {
 							case ADD:
 								displayCache.add(action.getItem());
 								break;
@@ -157,17 +159,19 @@ public class CachedList<T> {
 								break;
 							default:
 								break;
-	            }
-	          }
-        	}
-        } catch(Exception e) {
-        	LOGGER.log(Level.INFO, "Exception while trying to acquire lock, continuing.", e);
-        } finally {
-          runLaterPending = false;
-          itemsLock.unlock();
-        }
-      });
-    }
+							}
+						}
+					}
+				} catch (Exception e) {
+					LOGGER.log(Level.INFO, "Exception while trying to acquire lock, continuing.", e);
+				} finally {
+					runLaterPending = false;
+					if (locked) {
+						itemsLock.unlock();
+					}
+				}
+			});
+		}
 	}
 
 	public void addListenerToBase(InvalidationListener listener) {
