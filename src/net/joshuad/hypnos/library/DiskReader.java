@@ -76,16 +76,15 @@ class DiskReader implements FileVisitor<Path> {
 		resetState();
 		this.scanMode = scanMode;
 		scanLogger.println("[MusicRootLoader] " + scanMode.statusPrefix + " root: " + musicRoot.getPath().toString());
-
-		directoriesToScan = LibraryLoader.getDirectoryCount(musicRoot.getPath());
-		currentRootPath = musicRoot.getPath();
-		library.getDiskWatcher().watchAll(musicRoot.getPath());
-
-		if (scanMode == ScanMode.INITIAL_SCAN) {
-			musicRoot.setNeedsRescan(false);
-		}
-
 		try {
+			directoriesToScan = LibraryLoader.getDirectoryCount(musicRoot.getPath());
+			currentRootPath = musicRoot.getPath();
+			library.getDiskWatcher().watchAll(musicRoot.getPath());
+	
+			if (scanMode == ScanMode.INITIAL_SCAN) {
+				musicRoot.setNeedsRescan(false);
+			}
+		
 			Files.walkFileTree(musicRoot.getPath(), EnumSet.of(FileVisitOption.FOLLOW_LINKS), Integer.MAX_VALUE, this);
 			switch (scanMode) {
 			case INITIAL_SCAN:

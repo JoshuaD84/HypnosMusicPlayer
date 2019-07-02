@@ -1,13 +1,3 @@
-Delete an album from a musicroot, it is not removed
-
-Stuff not getting deleted on rescan
-   Load a directory as music root
-   let an album load
-   close hypnos
-   delete that album from disk
-   reopen hypnos, teh album never gets pruned
-
-
 Add buttons to library scan log window
    Clear log
    copy log
@@ -24,70 +14,12 @@ Library & Scanner Rebuild
 
 Clicking on an Artist doesn't change art
 
-Add a music root, close hypnos, delete that folder, restart hypnos. Fatal failure
-
-Live at the Watermark
-   WARNING: Unable to set data for tag window.
-org.jaudiotagger.audio.exceptions.CannotReadException: This file does not appear to be an Mp4  file
-	at org.jaudiotagger.audio.mp4.Mp4InfoReader.read(Mp4InfoReader.java:98)
-	at org.jaudiotagger.audio.mp4.Mp4FileReader.getEncodingInfo(Mp4FileReader.java:41)
-	at org.jaudiotagger.audio.generic.AudioFileReader.read(AudioFileReader.java:109)
-	at org.jaudiotagger.audio.AudioFileIO.readFile(AudioFileIO.java:359)
-	at org.jaudiotagger.audio.AudioFileIO.read(AudioFileIO.java:196)
-	at net.joshuad.hypnos.fxui.TagWindow.setTracks(TagWindow.java:599)
-	at net.joshuad.hypnos.fxui.TagWindow.setTracks(TagWindow.java:554)
-	at net.joshuad.hypnos.fxui.CurrentListPane$18.handle(CurrentListPane.java:945)
-	at net.joshuad.hypnos.fxui.CurrentListPane$18.handle(CurrentListPane.java:1)
-	at javafx.base/com.sun.javafx.event.CompositeEventHandler.dispatchBubblingEvent(CompositeEventHandler.java:86)
-	at javafx.base/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:238)
-	at javafx.base/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:191)
-	at javafx.base/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:58)
-	at javafx.base/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
-	at javafx.base/com.sun.javafx.event.EventUtil.fireEventImpl(EventUtil.java:74)
-	at javafx.base/com.sun.javafx.event.EventUtil.fireEvent(EventUtil.java:49)
-	at javafx.base/javafx.event.Event.fireEvent(Event.java:198)
-	at javafx.controls/javafx.scene.control.MenuItem.fire(MenuItem.java:465)
-	at javafx.controls/com.sun.javafx.scene.control.ContextMenuContent$MenuItemContainer.doSelect(ContextMenuContent.java:1380)
-	at javafx.controls/com.sun.javafx.scene.control.ContextMenuContent$MenuItemContainer.lambda$createChildren$12(ContextMenuContent.java:1333)
-	at javafx.base/com.sun.javafx.event.CompositeEventHandler$NormalEventHandlerRecord.handleBubblingEvent(CompositeEventHandler.java:218)
-	at javafx.base/com.sun.javafx.event.CompositeEventHandler.dispatchBubblingEvent(CompositeEventHandler.java:80)
-	at javafx.base/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:238)
-	at javafx.base/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:191)
-	at javafx.base/com.sun.javafx.event.CompositeEventDispatcher.dispatchBubblingEvent(CompositeEventDispatcher.java:59)
-	at javafx.base/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:58)
-	at javafx.base/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
-	at javafx.base/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
-	at javafx.base/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
-	at javafx.base/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
-	at javafx.base/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
-	at javafx.base/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
-	at javafx.base/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
-	at javafx.base/com.sun.javafx.event.EventUtil.fireEventImpl(EventUtil.java:74)
-	at javafx.base/com.sun.javafx.event.EventUtil.fireEvent(EventUtil.java:54)
-	at javafx.base/javafx.event.Event.fireEvent(Event.java:198)
-	at javafx.graphics/javafx.scene.Scene$MouseHandler.process(Scene.java:3851)
-	at javafx.graphics/javafx.scene.Scene$MouseHandler.access$1200(Scene.java:3579)
-	at javafx.graphics/javafx.scene.Scene.processMouseEvent(Scene.java:1849)
-	at javafx.graphics/javafx.scene.Scene$ScenePeerListener.mouseEvent(Scene.java:2588)
-	at javafx.graphics/com.sun.javafx.tk.quantum.GlassViewEventHandler$MouseEventNotification.run(GlassViewEventHandler.java:397)
-	at javafx.graphics/com.sun.javafx.tk.quantum.GlassViewEventHandler$MouseEventNotification.run(GlassViewEventHandler.java:295)
-	at java.base/java.security.AccessController.doPrivileged(Native Method)
-	at javafx.graphics/com.sun.javafx.tk.quantum.GlassViewEventHandler.lambda$handleMouseEvent$2(GlassViewEventHandler.java:434)
-	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.runWithoutRenderLock(QuantumToolkit.java:390)
-	at javafx.graphics/com.sun.javafx.tk.quantum.GlassViewEventHandler.handleMouseEvent(GlassViewEventHandler.java:433)
-	at javafx.graphics/com.sun.glass.ui.View.handleMouseEvent(View.java:556)
-	at javafx.graphics/com.sun.glass.ui.View.notifyMouse(View.java:942)
-	at javafx.graphics/com.sun.glass.ui.win.WinApplication._runLoop(Native Method)
-	at javafx.graphics/com.sun.glass.ui.win.WinApplication.lambda$runLoop$3(WinApplication.java:174)
-	at java.base/java.lang.Thread.run(Thread.java:834)
-
-
-
-
 Scanner Bugs
    Filtered track list doesn't update after changes are processed in library
 
 Scanner
+   Can I make it more responsive to changes on disk? There's like a 3 second delay
+
    Maybe ignore files starting with '._' Apparently it's some osx thing
 
    Manual rescan option for artists and tracks?
@@ -254,5 +186,67 @@ Future
       Doesn't change artwork
       CurrentplayingTrack is the same one
       updates data and locations
+
+
+
+
 			
+Live at the Watermark
+   WARNING: Unable to set data for tag window.
+org.jaudiotagger.audio.exceptions.CannotReadException: This file does not appear to be an Mp4  file
+	at org.jaudiotagger.audio.mp4.Mp4InfoReader.read(Mp4InfoReader.java:98)
+	at org.jaudiotagger.audio.mp4.Mp4FileReader.getEncodingInfo(Mp4FileReader.java:41)
+	at org.jaudiotagger.audio.generic.AudioFileReader.read(AudioFileReader.java:109)
+	at org.jaudiotagger.audio.AudioFileIO.readFile(AudioFileIO.java:359)
+	at org.jaudiotagger.audio.AudioFileIO.read(AudioFileIO.java:196)
+	at net.joshuad.hypnos.fxui.TagWindow.setTracks(TagWindow.java:599)
+	at net.joshuad.hypnos.fxui.TagWindow.setTracks(TagWindow.java:554)
+	at net.joshuad.hypnos.fxui.CurrentListPane$18.handle(CurrentListPane.java:945)
+	at net.joshuad.hypnos.fxui.CurrentListPane$18.handle(CurrentListPane.java:1)
+	at javafx.base/com.sun.javafx.event.CompositeEventHandler.dispatchBubblingEvent(CompositeEventHandler.java:86)
+	at javafx.base/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:238)
+	at javafx.base/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:191)
+	at javafx.base/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:58)
+	at javafx.base/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base/com.sun.javafx.event.EventUtil.fireEventImpl(EventUtil.java:74)
+	at javafx.base/com.sun.javafx.event.EventUtil.fireEvent(EventUtil.java:49)
+	at javafx.base/javafx.event.Event.fireEvent(Event.java:198)
+	at javafx.controls/javafx.scene.control.MenuItem.fire(MenuItem.java:465)
+	at javafx.controls/com.sun.javafx.scene.control.ContextMenuContent$MenuItemContainer.doSelect(ContextMenuContent.java:1380)
+	at javafx.controls/com.sun.javafx.scene.control.ContextMenuContent$MenuItemContainer.lambda$createChildren$12(ContextMenuContent.java:1333)
+	at javafx.base/com.sun.javafx.event.CompositeEventHandler$NormalEventHandlerRecord.handleBubblingEvent(CompositeEventHandler.java:218)
+	at javafx.base/com.sun.javafx.event.CompositeEventHandler.dispatchBubblingEvent(CompositeEventHandler.java:80)
+	at javafx.base/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:238)
+	at javafx.base/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:191)
+	at javafx.base/com.sun.javafx.event.CompositeEventDispatcher.dispatchBubblingEvent(CompositeEventDispatcher.java:59)
+	at javafx.base/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:58)
+	at javafx.base/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
+	at javafx.base/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
+	at javafx.base/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
+	at javafx.base/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base/com.sun.javafx.event.EventUtil.fireEventImpl(EventUtil.java:74)
+	at javafx.base/com.sun.javafx.event.EventUtil.fireEvent(EventUtil.java:54)
+	at javafx.base/javafx.event.Event.fireEvent(Event.java:198)
+	at javafx.graphics/javafx.scene.Scene$MouseHandler.process(Scene.java:3851)
+	at javafx.graphics/javafx.scene.Scene$MouseHandler.access$1200(Scene.java:3579)
+	at javafx.graphics/javafx.scene.Scene.processMouseEvent(Scene.java:1849)
+	at javafx.graphics/javafx.scene.Scene$ScenePeerListener.mouseEvent(Scene.java:2588)
+	at javafx.graphics/com.sun.javafx.tk.quantum.GlassViewEventHandler$MouseEventNotification.run(GlassViewEventHandler.java:397)
+	at javafx.graphics/com.sun.javafx.tk.quantum.GlassViewEventHandler$MouseEventNotification.run(GlassViewEventHandler.java:295)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at javafx.graphics/com.sun.javafx.tk.quantum.GlassViewEventHandler.lambda$handleMouseEvent$2(GlassViewEventHandler.java:434)
+	at javafx.graphics/com.sun.javafx.tk.quantum.QuantumToolkit.runWithoutRenderLock(QuantumToolkit.java:390)
+	at javafx.graphics/com.sun.javafx.tk.quantum.GlassViewEventHandler.handleMouseEvent(GlassViewEventHandler.java:433)
+	at javafx.graphics/com.sun.glass.ui.View.handleMouseEvent(View.java:556)
+	at javafx.graphics/com.sun.glass.ui.View.notifyMouse(View.java:942)
+	at javafx.graphics/com.sun.glass.ui.win.WinApplication._runLoop(Native Method)
+	at javafx.graphics/com.sun.glass.ui.win.WinApplication.lambda$runLoop$3(WinApplication.java:174)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+
+
+
 
