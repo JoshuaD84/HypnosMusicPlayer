@@ -30,6 +30,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -442,7 +443,7 @@ public class CurrentListPane extends BorderPane {
 		currentListMenu.setTooltip ( new Tooltip ( "Current List Controls" ) );
 		currentListMenu.setGraphic ( menuImage );
 		MenuItem currentListClear = new MenuItem ( "Clear" );
-		saveMenuItem = new MenuItem ( "Save" );
+		saveMenuItem = new MenuItem ( "Save Playlist" );
 		exportToM3U = new MenuItem ( "Export as M3U" );
 		exportToFolder = new MenuItem ( "Export as Folder" );
 		loadMenuItem = new MenuItem ( "Load Files" );
@@ -574,8 +575,9 @@ public class CurrentListPane extends BorderPane {
 			infoLabelAndFilter.beginEditing();
 		});
 		
-		currentListMenu.getItems().addAll ( currentListClear, currentListShuffle, searchMenuItem, 
-			exportToM3U, exportToFolder, saveMenuItem, loadMenuItem, historyMenuItem, removeDuplicatesMenuItem );
+		currentListMenu.getItems().addAll ( currentListClear, currentListShuffle, searchMenuItem, historyMenuItem, 
+				new SeparatorMenuItem(), exportToM3U, exportToFolder, saveMenuItem, loadMenuItem, 
+				new SeparatorMenuItem(), removeDuplicatesMenuItem );
 		
 		currentListControls.getChildren().addAll( toggleShuffleButton, toggleRepeatButton, showQueueButton,
 				infoLabelAndFilter, currentListLength, currentListMenu );
