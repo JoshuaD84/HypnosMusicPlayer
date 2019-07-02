@@ -216,7 +216,7 @@ public class Library {
 	}
 
 	public void removeMusicRoot(MusicRoot musicRoot) {
-		loader.removeMusicRoot(musicRoot);
+		loader.removeMusicRootData(musicRoot);
 	}
 
 	public void removePlaylist(Playlist playlist) {
@@ -275,9 +275,10 @@ public class Library {
 
 		Artist lastArtist = null;
 		for (Album album : albumArray) {
-			if (album.getAlbumArtist().isBlank())
+			if (album.getAlbumArtist().isBlank()) {
 				continue;
-
+			}
+			
 			if (lastArtist != null && lastArtist.getName().equals(album.getAlbumArtist())) {
 				lastArtist.addAlbum(album);
 			} else {
@@ -349,33 +350,33 @@ public class Library {
 	}
 
 	void addTrackData(Track track) {
-		tracks.addOrReplaceItem(track);		
+		tracks.addOrReplaceItem(track);
 	}
 
 	void addTrackData(List<Track> addMe) {
-		for(Track track : addMe) {
+		for (Track track : addMe) {
 			addTrackData(track);
 		}
 	}
-	
+
 	void removeTrack(Track track) {
 		tracks.remove(track);
 	}
-	
+
 	void addAlbumData(Album album) {
-		albums.addOrReplaceItem(album);	
+		albums.addOrReplaceItem(album);
 	}
 
 	void notAnAlbum(Path path) {
-		for(Album album : albums.getItemsCopy()) {
-			if(album.getPath().equals(path)) {
-				albums.remove(album);		
+		for (Album album : albums.getItemsCopy()) {
+			if (album.getPath().equals(path)) {
+				albums.remove(album);
 				break;
 			}
 		}
 	}
 
 	void removeAlbum(Album album) {
-		albums.remove(album);		
+		albums.remove(album);
 	}
 }
