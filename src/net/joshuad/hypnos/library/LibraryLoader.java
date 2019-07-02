@@ -21,7 +21,7 @@ class LibraryLoader {
 	private final Vector<Path> musicRootsToAdd = new Vector<>();
 	private final Vector<Path> pathsToUpdate = new Vector<>();
 
-	private boolean clearOrphans = false;
+	private boolean clearOrphansAndDeleted = false;
 
 	private Thread loaderThread;
 
@@ -50,7 +50,7 @@ class LibraryLoader {
 	}
 
 	void requestClearOrphans() {
-		this.clearOrphans = true;
+		this.clearOrphansAndDeleted = true;
 	}
 
 	public void addMusicRoot(Path path) {
@@ -81,13 +81,14 @@ class LibraryLoader {
 					}
 
 					if (System.currentTimeMillis() - lastOrphanClearMS > 5000) {
-						clearOrphans = true;
+						clearOrphansAndDeleted = true;
 					}
 
-					if (clearOrphans) {
-						clearOrphans = false;
+					if (clearOrphansAndDeleted) {
+						clearOrphansAndDeleted = false;
 						lastOrphanClearMS = System.currentTimeMillis();
 						clearOrphans();
+						clearMissing();
 					}
 
 					if (!musicRootsToAdd.isEmpty()) {
@@ -119,8 +120,7 @@ class LibraryLoader {
 							updateLibraryAtPath(pathToUpdate);
 
 							// remove any sub paths, because they got updated when we called
-							// updateLibraryAtPath(
-							// parent )
+							// updateLibraryAtPath( parent )
 							List<Path> childPaths = new ArrayList<>();
 
 							for (Path path : pathsToUpdate) {
@@ -152,19 +152,29 @@ class LibraryLoader {
 
 		if (!Files.exists(path)) {
 			
+			List<Track> tracksToRemove = new ArrayList<>();
 			for (Track track : library.getTrackDataCopy()) {
 				if (track.getPath().toAbsolutePath().startsWith(path)) {
-					scanLogger.println("[LibraryLoader] Removing track data at: " + track.getPath());
-					library.getTrackDataCopy().remove(track);
+					tracksToRemove.add(track);
 				}
 			}
+			
+			for (Track track : tracksToRemove) {
+				scanLogger.println("[LibraryLoader] Removing track data from track list: " + track.getPath());
+				library.removeTrack(track);
+			}
 
+			List<Album> albumsToRemove = new ArrayList<>();
 			for (Album album : library.getAlbumData()) {
 				if (album.getPath().toAbsolutePath().startsWith(path)) {
-					scanLogger.println("[LibraryLoader] Removing album data at: " + path);
-					//TODO: library.getMerger().removeAlbum(album);
-					library.getDiskWatcher().stopWatching(album.getPath());
+					albumsToRemove.add(album);
 				}
+			}
+			
+			for (Album album : albumsToRemove) {
+				scanLogger.println("[LibraryLoader] Removing album data from album list: " + path);
+				library.removeAlbum(album);
+				library.getDiskWatcher().stopWatching(album.getPath());
 			}
 
 		} else if (Utils.isMusicFile(path)) {
@@ -284,17 +294,32 @@ class LibraryLoader {
 		return true;
 	}
 
-	private void clearOrphans() {
-		
-		if (library.getMusicRootData().size() == 0) {
-			/*
-			 * library.getAlbumData().clear();
-			library.getTrackData().clear();
-			library.getArtistData().clear();
-			*/
+	private void clearMissing() {
+		List<Album> removeMeAlbums = new ArrayList<>();
+		for (Album album : library.getAlbumData()) {
+			if(!Files.isDirectory(album.getPath())) {
+				removeMeAlbums.add(album);
+			}
 		}
+		for (Album album : removeMeAlbums) {
+			library.removeAlbum(album);
+			scanLogger.println( "[LibraryLoader] Album pruned, directory missing from disk: " + album.getPath() );
+			//No need to remove tracks from the album, they'll be removed below
+		}
+		List<Track> removeMeTracks = new ArrayList<>();
+		for (Track track : library.getTrackDataCopy()) {
+			if(!Files.isRegularFile(track.getPath())) {
+				removeMeTracks.add(track);
+			}
+		}
+		for (Track track : removeMeTracks) {
+			library.removeTrack(track);
+			scanLogger.println( "[LibraryLoader] Track pruned, file missing from disk: " + track.getPath() );
+		}
+	}
 		
-		List<Album> removeMe = new ArrayList<>();
+	private void clearOrphans() {
+		List<Album> removeMeAlbums = new ArrayList<>();
 		for (Album album : library.getAlbumData()) {
 			boolean hasRoot = false;
 			for (MusicRoot root : library.getMusicRootData()) {
@@ -309,16 +334,14 @@ class LibraryLoader {
 			}
 			
 			if (!hasRoot) {
-				scanLogger.println( "[LibraryLoader] Orphan album pruned, no root: " + album.getPath() );
-				removeMe.add(album);
+				removeMeAlbums.add(album);
 			}
 		}
 
-		for (Album album : removeMe) {
-			library.getAlbumData().remove(album);
-			for (Track track : album.getTracks()) {
-				library.getTrackDataCopy().remove(track);
-			}
+		for (Album album : removeMeAlbums) {
+			library.removeAlbum(album);
+			//No need to remove tracks from the album, they'll be removed below
+			scanLogger.println( "[LibraryLoader] Orphan album pruned, no root: " + album.getPath() );
 		}
 
 		List<Track> removeMeTracks = new ArrayList<>();
@@ -332,13 +355,12 @@ class LibraryLoader {
 			}
 			if (!hasRoot) {
 				removeMeTracks.add(track);
-				scanLogger.println( "[LibraryLoader] Orphan track pruned, no root: " + track.getPath() );
 			}
 		}
 		for (Track track : removeMeTracks) {
-			library.getTrackDataCopy().remove(track);
+			library.removeTrack(track);
+			scanLogger.println( "[LibraryLoader] Orphan track pruned, no root: " + track.getPath() );
 		}
-		library.getArtistData().setAll(library.generateArtists());
 	}
 
 	public void removeMusicRoot(MusicRoot musicRoot) {

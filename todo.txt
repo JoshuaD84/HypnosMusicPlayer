@@ -1,3 +1,18 @@
+Delete an album from a musicroot, it is not removed
+
+Stuff not getting deleted on rescan
+   Load a directory as music root
+   let an album load
+   close hypnos
+   delete that album from disk
+   reopen hypnos, teh album never gets pruned
+
+
+Add buttons to library scan log window
+   Clear log
+   copy log
+   Maybe select different types of things, like albums rejected, full list, etc. 
+
 Library & Scanner Rebuild
    Deal with Overflow in LibraryDiskWatcher
 
@@ -7,27 +22,9 @@ Library & Scanner Rebuild
    
    Add removing a musicroot status updates to UI
 
-java.util.ConcurrentModificationException
-   LibraryLoader.clearOrphans.298
-   LibraryLoader.286
-   And probably in alot of other places
-   
-Start with music added
-   Interrupt scanner by  adding 2
-   remove music
-
-[LibraryLoader] Album rejected, artist name in tags too different: D:\seeding\2\Vangelis - Nocturne (2019) {WEB} [FLAC]
-
-Library Loader Log is slow in the UI with a lot of text in it. 
-
 Clicking on an Artist doesn't change art
 
-it takes a long time to remove "2" if "Music" is added. 
-   The thing keeps finding the same orphans and trying to remove them
-
 Add a music root, close hypnos, delete that folder, restart hypnos. Fatal failure
-
-Add a single album as a root. It appears then disppears
 
 Live at the Watermark
    WARNING: Unable to set data for tag window.
@@ -91,6 +88,8 @@ Scanner Bugs
    Filtered track list doesn't update after changes are processed in library
 
 Scanner
+   Maybe ignore files starting with '._' Apparently it's some osx thing
+
    Manual rescan option for artists and tracks?
 
    allow the order of the library locations to be changed
@@ -100,7 +99,6 @@ Scanner
       The Smiths - Louder than Bombs
       Onymous - Untitled
       Mahler - 4th Symphony
-      Vangelis - Nocturne, doesn't turn into an album
 
    Don't add an artist that has no name, just those tracks don't get grouped into an artist
       Or maybe have a special artist group for all the tracks/albums with no artist name
@@ -252,12 +250,9 @@ Future
 
 	a better structure for hotkey commands (maybe combine with commandline commands?)
 
-	Refactor Library
-		Make LibraryUpdater part of Library. 
-
-		Setup a currentList.updateAlbum and updatePlaylist system
-			Doesn't change artwork
-			CurrentplayingTrack is the same one
-			updates data and locations
+   Setup a currentList.updateAlbum and updatePlaylist system
+      Doesn't change artwork
+      CurrentplayingTrack is the same one
+      updates data and locations
 			
 

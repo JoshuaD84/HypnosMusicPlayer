@@ -264,7 +264,7 @@ public class Library {
 		return name;
 	}
 
-	List<Artist> generateArtists() {
+	private List<Artist> generateArtists() {
 		List<Artist> newArtistList = new ArrayList<>();
 
 		List<Album> libraryAlbums = new ArrayList<>(albums.getItemsCopy());
@@ -348,26 +348,34 @@ public class Library {
 		this.dataNeedsToBeSavedToDisk = b;
 	}
 
-	public void addTrackData(Track track) {
+	void addTrackData(Track track) {
 		tracks.addOrReplaceItem(track);		
 	}
 
-	public void addTrackData(List<Track> addMe) {
+	void addTrackData(List<Track> addMe) {
 		for(Track track : addMe) {
 			addTrackData(track);
 		}
 	}
-
-	public void addAlbumData(Album album) {
+	
+	void removeTrack(Track track) {
+		tracks.remove(track);
+	}
+	
+	void addAlbumData(Album album) {
 		albums.addOrReplaceItem(album);	
 	}
 
-	public void notAnAlbum(Path path) {
+	void notAnAlbum(Path path) {
 		for(Album album : albums.getItemsCopy()) {
 			if(album.getPath().equals(path)) {
 				albums.remove(album);		
 				break;
 			}
 		}
+	}
+
+	void removeAlbum(Album album) {
+		albums.remove(album);		
 	}
 }
