@@ -10,11 +10,6 @@ Library & Scanner Rebuild
       copy log
       Maybe select different types of things, like albums rejected, full list, etc. 
 
-   When tags are missing I'm not sure I like the way it is being handled, albums won't form, see:
-      The Smiths - Louder than Bombs
-      Onymous - Untitled
-      Mahler - 4th Symphony
-
 Scanner
    Add removing a musicroot status updates to UI
 
@@ -25,6 +20,8 @@ Scanner
    It locks artist folders on windows. Surpsingly not album folders, just artist
 
 UI
+   Change the color of the SeparatorMenuItem in dark skin, posted on SE
+
    When you drag an artist image, you can't select "all albums by this artist."
 
    Artwork gets stuck sometimes. Leonard Cohen - Darker is a good example
