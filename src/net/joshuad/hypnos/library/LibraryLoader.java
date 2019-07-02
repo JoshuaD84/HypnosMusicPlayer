@@ -21,7 +21,7 @@ class LibraryLoader {
 	private final Vector<Path> musicRootsToAdd = new Vector<>();
 	private final Vector<Path> pathsToUpdate = new Vector<>();
 
-	private boolean clearOrphansAndDeleted = false;
+	private boolean clearOrphansAndMissing = false;
 
 	private Thread loaderThread;
 
@@ -50,7 +50,7 @@ class LibraryLoader {
 	}
 
 	void requestClearOrphans() {
-		this.clearOrphansAndDeleted = true;
+		this.clearOrphansAndMissing = true;
 	}
 
 	public void addMusicRoot(Path path) {
@@ -81,11 +81,11 @@ class LibraryLoader {
 					}
 
 					if (System.currentTimeMillis() - lastOrphanClearMS > 5000) {
-						clearOrphansAndDeleted = true;
+						clearOrphansAndMissing = true;
 					}
 
-					if (clearOrphansAndDeleted) {
-						clearOrphansAndDeleted = false;
+					if (clearOrphansAndMissing) {
+						clearOrphansAndMissing = false;
 						lastOrphanClearMS = System.currentTimeMillis();
 						clearOrphans();
 						clearMissing();
@@ -119,8 +119,7 @@ class LibraryLoader {
 							Path pathToUpdate = pathsToUpdate.remove(0).toAbsolutePath();
 							updateLibraryAtPath(pathToUpdate);
 
-							// remove any sub paths, because they got updated when we called
-							// updateLibraryAtPath( parent )
+							// remove any sub paths, because they got updated when we called updateLibraryAtPath( parent )
 							List<Path> childPaths = new ArrayList<>();
 
 							for (Path path : pathsToUpdate) {
