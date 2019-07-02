@@ -212,11 +212,12 @@ public class Library {
 	}
 
 	public void addMusicRoot(Path path) {
-		loader.addMusicRoot(path);
+		musicRoots.addOrReplaceItem(new MusicRoot(path), true);
 	}
 
 	public void removeMusicRoot(MusicRoot musicRoot) {
-		loader.removeMusicRootData(musicRoot);
+		loader.interruptDiskReader();
+		musicRoots.remove(musicRoot, true);
 	}
 
 	public void removePlaylist(Playlist playlist) {

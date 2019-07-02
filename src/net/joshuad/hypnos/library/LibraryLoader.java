@@ -9,7 +9,6 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javafx.application.Platform;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.fxui.FXUI;
@@ -18,7 +17,6 @@ class LibraryLoader {
 
 	private static final Logger LOGGER = Logger.getLogger(LibraryLoader.class.getName());
 
-	private final Vector<Path> musicRootsToAdd = new Vector<>();
 	private final Vector<Path> pathsToUpdate = new Vector<>();
 
 	private boolean clearOrphansAndMissing = false;
@@ -53,18 +51,6 @@ class LibraryLoader {
 		this.clearOrphansAndMissing = true;
 	}
 
-	public void addMusicRoot(Path path) {
-		if ( diskReader.isRescanning() ) {
-				diskReader.interrupt();
-		}
-		
-		if (Platform.isFxApplicationThread()) {
-			library.getMusicRootData().add(new MusicRoot(path));
-		} else {
-			musicRootsToAdd.add(path);
-		}
-	}
-
 	public void queueUpdatePath(Path path) {
 		pathsToUpdate.add(path);
 	}
@@ -75,7 +61,6 @@ class LibraryLoader {
 		loaderThread = new Thread() {
 			public void run() {
 				while (true) {
-
 					for (MusicRoot root : library.getMusicRootData()) {
 						root.recheckValidity();
 					}
@@ -91,15 +76,6 @@ class LibraryLoader {
 						clearMissing();
 					}
 
-					if (!musicRootsToAdd.isEmpty()) {
-						synchronized (musicRootsToAdd) {
-							for (Path path : musicRootsToAdd) {
-								library.getMusicRootData().add(new MusicRoot(path));
-							}
-							musicRootsToAdd.clear();
-						}
-					}
-					
 					List<MusicRoot> libraryRoots = new ArrayList<>(library.getMusicRootData());
 					for (MusicRoot root : libraryRoots) {
 						if (root.needsInitialScan()) {
@@ -362,8 +338,12 @@ class LibraryLoader {
 		}
 	}
 
-	public void removeMusicRootData(MusicRoot musicRoot) {
+	public void removeMusicRoot(MusicRoot musicRoot) {
 		diskReader.interrupt();
 		requestClearOrphans();
+	}
+	
+	void interruptDiskReader() {
+		diskReader.interrupt();
 	}
 }

@@ -72,7 +72,11 @@ public class CachedList<T> {
 	}
 	
 	public void remove(T removeMe) {
-		if(Platform.isFxApplicationThread()) {
+		remove(removeMe, false);
+	}
+		
+	public void remove(T removeMe, boolean fxThreadPermitted) {
+		if(!fxThreadPermitted && Platform.isFxApplicationThread()) {
 			LOGGER.warning("Modifying the base list while on UI Thread. This is likely a bug, but trying to continue.");
 		}
 		if(removeMe == null) {
@@ -89,7 +93,11 @@ public class CachedList<T> {
 	}
 	
 	public void addOrReplaceItem(T addMe) {
-		if(Platform.isFxApplicationThread()) {
+		addOrReplaceItem(addMe, false);
+	}
+	
+	public void addOrReplaceItem(T addMe, boolean fxThreadPermitted) {
+		if(!fxThreadPermitted && Platform.isFxApplicationThread()) {
 			LOGGER.warning("Modifying the base list while on UI Thread. This is likely a bug, but trying to continue.");
 		}
 		if(addMe == null) {
