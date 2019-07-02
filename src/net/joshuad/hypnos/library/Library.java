@@ -221,11 +221,11 @@ public class Library {
 	}
 
 	public void removePlaylist(Playlist playlist) {
-		// TODO: merger.removePlaylist(playlist);
+		playlists.remove(playlist, true);
 	}
 
 	public void addPlaylist(Playlist playlist) {
-		// TODO: merger.addOrUpdatePlaylist(playlist);
+		playlists.addOrReplaceItem(playlist, true);
 	}
 
 	public String getUniquePlaylistName() {

@@ -1,8 +1,6 @@
 Library & Scanner Rebuild
    Code is a bit messy
 
-   Playlists aren't setup yet
-
    Need to check tag errors and other stuff that uses the new CachedList thing
 
    Filtering a track list while scanning throws ArrayIndexOutOfBoundsException, can't be caught normally
