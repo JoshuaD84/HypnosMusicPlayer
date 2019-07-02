@@ -129,7 +129,9 @@ public class Utils {
 		} else if ( fileName.lastIndexOf(".") == -1 || fileName.lastIndexOf(".") == 0 ) {
 			return false;
 			
-		} 
+		} else if ( fileName.startsWith("._") ) {
+			return false;
+		}
 		
 		String testExtension = fileName.substring ( fileName.lastIndexOf( "." ) + 1 ).toLowerCase();
 		

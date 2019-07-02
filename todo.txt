@@ -4,13 +4,9 @@ Add buttons to library scan log window
    Maybe select different types of things, like albums rejected, full list, etc. 
 
 Library & Scanner Rebuild
-   Deal with Overflow in LibraryDiskWatcher
-
    Code is a bit messy
 
    Change button from ? to something else
-   
-   Add removing a musicroot status updates to UI
 
 Clicking on an Artist doesn't change art
 
@@ -18,9 +14,11 @@ Scanner Bugs
    Filtered track list doesn't update after changes are processed in library
 
 Scanner
-   Can I make it more responsive to changes on disk? There's like a 3 second delay
+   Deal with Overflow in LibraryDiskWatcher
 
-   Maybe ignore files starting with '._' Apparently it's some osx thing
+   Add removing a musicroot status updates to UI
+
+   Can I make it more responsive to changes on disk? There's like a 3 second delay
 
    Manual rescan option for artists and tracks?
 

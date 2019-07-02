@@ -138,7 +138,6 @@ class DiskReader implements FileVisitor<Path> {
 
 	@Override
 	public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-
 		if (interruptRequested) {
 			interrupted = true;
 			return FileVisitResult.TERMINATE;

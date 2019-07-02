@@ -364,7 +364,7 @@ class LibraryLoader {
 
 	public void removeMusicRoot(MusicRoot musicRoot) {
 		if (Platform.isFxApplicationThread()) {
-			library.getMusicRootData().remove(musicRoot);
+			library.removeMusicRoot(musicRoot);
 		}
 		diskReader.interrupt();
 		requestClearOrphans();
