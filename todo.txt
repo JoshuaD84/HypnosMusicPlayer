@@ -8,8 +8,6 @@ Library & Scanner Rebuild
 
    Change button from ? to something else
 
-Clicking on an Artist doesn't change art
-
 Scanner Bugs
    Filtered track list doesn't update after changes are processed in library
 
@@ -36,6 +34,8 @@ Scanner
    It locks artist folders on windows. Surpsingly not album folders, just artist
 
 UI
+   When you drag an artist image, you can't select "all albums by this artist."
+
    Artwork gets stuck sometimes. Leonard Cohen - Darker is a good example
 
    Track Filter doesn't work

@@ -1732,7 +1732,11 @@ public class FXUI implements PlayerListener {
 	}
 	
 	public void artistSelected ( Artist artist ) {
-		//TODO: 
+		artSplitPane.artistSelected( artist );
+		
+		if ( artistInfoWindow.isShowing() ) {
+			artistInfoWindow.setArtist( artist );
+		}
 	}
 
 	public LibraryPane getLibraryPane () {

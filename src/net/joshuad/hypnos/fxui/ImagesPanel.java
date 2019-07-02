@@ -45,6 +45,7 @@ import net.joshuad.hypnos.audio.AudioSystem.RepeatMode;
 import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
 import net.joshuad.hypnos.audio.AudioSystem.StopReason;
 import net.joshuad.hypnos.library.Album;
+import net.joshuad.hypnos.library.Artist;
 import net.joshuad.hypnos.library.Track;
 import net.joshuad.hypnos.library.Track.ArtistTagImagePriority;
 import net.joshuad.hypnos.audio.PlayerListener;
@@ -672,6 +673,12 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 		}
 	}
 	
+	private void setImages ( Artist artist ) {
+		if ( artist.getAllTracks().size() > 0 ) {
+			setImages ( artist.getAllTracks().get( 0 ) );
+		}
+	}
+	
 	private void clearImages() {
 		requestedTrack = null;
 		requestedAlbum = null;
@@ -814,6 +821,10 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 	public void albumSelected ( Album selected ) {
 		setImages ( selected );
 	}
+	
+	public void artistSelected ( Artist artist ) {
+		setImages ( artist );
+	}
 
 	@Override
 	public void playerStopped ( Track track, StopReason reason ) {
@@ -856,5 +867,4 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 	public Track getCurrentImagesTrack () {
 		return currentImagesTrack;
 	}
-
 }
