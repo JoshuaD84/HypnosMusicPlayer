@@ -6,6 +6,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -14,10 +15,13 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import net.joshuad.hypnos.HypnosURLS;
 import net.joshuad.hypnos.library.Track;
 import net.joshuad.hypnos.lyrics.Lyrics;
 import net.joshuad.hypnos.lyrics.LyricsFetcher;
@@ -26,12 +30,14 @@ public class LyricsWindow extends Stage {
 	
 	private LyricsFetcher lyricsParser = new LyricsFetcher();
 	
-	private TextArea lyricsArea;
+	private TextArea lyricsArea = new TextArea();
 	private Label headerLabel = new Label ( "" );
 	private Hyperlink sourceHyperlink = new Hyperlink ( "" );
 	private Tooltip sourceTooltip = new Tooltip ( "" );
-	Label sourceLabel = new Label ( "Source:" );
+	private Label sourceLabel = new Label ( "Source:" );
 	private String sourceURL = null;
+	private Button searchWebButton = new Button( "Search on Web" );
+	private Track track;
 	
 	public LyricsWindow ( FXUI ui ) {
 		super();
@@ -54,7 +60,6 @@ public class LyricsWindow extends Stage {
 		headerLabel.setStyle( "-fx-font-size: 16px; -fx-font-weight: bold" );
 		lyricsPane.getChildren().add( headerLabel );
 		
-		lyricsArea = new TextArea();
 		lyricsArea.setEditable( false );
 		lyricsArea.setWrapText( true );
 		lyricsArea.getStyleClass().add( "lyricsTextArea" );
@@ -62,7 +67,6 @@ public class LyricsWindow extends Stage {
 		lyricsArea.getStyleClass().add( "lyrics" );
 		lyricsPane.getChildren().add( lyricsArea );
 		
-		sourceHyperlink = new Hyperlink ( "" );
 		sourceHyperlink.setVisited( true );
 		sourceHyperlink.setTooltip( sourceTooltip );
 		sourceHyperlink.setVisible( false );
@@ -71,11 +75,21 @@ public class LyricsWindow extends Stage {
 				ui.openWebBrowser( sourceURL );
 			}
 		});
+		
+		searchWebButton.setOnAction( ( ActionEvent e ) -> {
+			String searchSlug = null;
+			if ( track != null ) {
+				searchSlug = "lyrics " + track.getAlbumArtist() + " " + track.getAlbumTitle();
+				ui.openWebBrowser(HypnosURLS.getDDGSearchURL(searchSlug));
+			}
+		});
 
 		sourceLabel.setVisible( false );
 		
+		Region spring = new Region();
+		HBox.setHgrow(spring, Priority.ALWAYS);
 		HBox sourceBox = new HBox();
-		sourceBox.getChildren().addAll ( sourceLabel, sourceHyperlink );
+		sourceBox.getChildren().addAll ( sourceLabel, sourceHyperlink, spring, searchWebButton );
 		sourceBox.setAlignment( Pos.CENTER );
 		
 		lyricsPane.getChildren().add( sourceBox );
@@ -102,7 +116,10 @@ public class LyricsWindow extends Stage {
 	}
 	
 	public void setTrack ( Track track ) {
-		if ( track == null ) return;
+		this.track = track;
+		if ( track == null ) {
+			return;
+		}
 
 		headerLabel.setText( track.getArtist() + " - " + track.getTitle() );
 		lyricsArea.setText( "loading..." );

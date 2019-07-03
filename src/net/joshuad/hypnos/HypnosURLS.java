@@ -6,4 +6,9 @@ public class HypnosURLS {
 	
 	public static final String DDG_IMAGE_SEARCH = "https://duckduckgo.com/?iax=images&ia=images&q=";
 
+	public static final String DDG_SEARCH = "https://duckduckgo.com/?q=";
+	
+	public static String getDDGSearchURL(String searchTerms) {
+		return DDG_SEARCH + searchTerms.replaceAll(" ", "+");
+	}
 }

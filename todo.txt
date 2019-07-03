@@ -38,13 +38,6 @@ UI
 
    if up/down aren't consumed by widgets, control volume. If left/right aren't consumed by widgets, control track position
    
-Lyrics
-   Add "try web search" button to lyrics window
-   
-   Failed lyrics:
-      Andrew Bird, all Albums
-      The offspring all albums
-
 Linux
    JavaFX / Linux Open File Dialog sometimes causes jvm crash, depends on system, and doesn't happen always
    

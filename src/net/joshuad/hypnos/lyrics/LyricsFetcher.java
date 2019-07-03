@@ -54,7 +54,7 @@ public class LyricsFetcher {
 		
 		for ( AbstractScraper parser : parseOrder ) {
 			lyrics = parser.getLyrics( track );
-			if ( !lyrics.hadScrapeError() )  break;
+			if ( !lyrics.hadScrapeError() ) break;
 		}
 		
 		if ( lyrics.hadScrapeError() ) {
@@ -128,7 +128,7 @@ public class LyricsFetcher {
 		System.out.println ( artist + " - " + song );
 		System.out.println ( "------------" );
 		System.out.println ( "Metro: " + ( metro.hadScrapeError() ? "Fail - " + metro.getError() + " - " + metro.getSourceURL(): "Success" ) );
-		System.out.println ( "AZ: " + ( az.hadScrapeError() ? "Fail - " + az.getError() + " - " + az.getSourceURL() : "Success" ) );
+		System.out.println ( "AZ: " + ( az.hadScrapeError() ? "Fail - " + az.getError() + " - " + az.getSourceURL() : "Success - " + az.getSourceURL() ) );
 		System.out.println ( "Genius: " + ( genius.hadScrapeError() ? "Fail - " + genius.getError() + " - " + genius.getSourceURL(): "Success" ) );
 		System.out.println ( "Musix: " + ( musix.hadScrapeError() ? "Fail - " + musix.getError() + " - " + musix.getSourceURL(): "Success" ) );
 		System.out.println ( "\n" );
@@ -163,7 +163,7 @@ public class LyricsFetcher {
 		testAll ( "PJ Harvey", "Is This Desire?", true );
 		*/
 		
-		testAll ( "Decemberists", "The Hazards of Love 2", true );
+		testAll ( "Andrew Bird", "Imitosis", true );
 		
 	}
 }
