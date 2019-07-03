@@ -156,3 +156,9 @@ HBox, VBox, #transport {
 .dialog-pane:header .header-panel {
 	-fx-background-color: #242424;
 }
+
+/*Make the horizontal separator on menus light*/
+.context-menu .separator:horizontal .line {
+    -fx-border-color: grey transparent transparent transparent;
+    -fx-border-insets: 1 0 0 0;
+}

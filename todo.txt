@@ -17,11 +17,7 @@ Scanner
 
    Manual rescan option for tracks?
 
-   It locks artist folders on windows. Surpsingly not album folders, just artist
-
 UI
-   Change the color of the SeparatorMenuItem in dark skin, posted on SE
-
    When you drag an artist image, you can't select "all albums by this artist."
 
    Artwork gets stuck sometimes. Leonard Cohen - Darker is a good example
@@ -66,6 +62,9 @@ Linux
    Linux: Dynamic menu titles in system tray
       This is kind of a pain because of the icons and because I'm bad at C
 
+Windows
+   It locks artist folders on windows. Surpsingly not album folders, just artist
+      https://stackoverflow.com/questions/56847367/can-you-prevent-watchservice-from-locking-files-on-windows
 
 Backend
    Sometimes the tags dont save when you hit save

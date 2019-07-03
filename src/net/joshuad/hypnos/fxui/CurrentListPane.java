@@ -446,7 +446,7 @@ public class CurrentListPane extends BorderPane {
 		saveMenuItem = new MenuItem ( "Save Playlist" );
 		exportToM3U = new MenuItem ( "Export as M3U" );
 		exportToFolder = new MenuItem ( "Export as Folder" );
-		loadMenuItem = new MenuItem ( "Load Files" );
+		loadMenuItem = new MenuItem ( "Load File(s)" );
 		historyMenuItem = new MenuItem ( "History" );
 		MenuItem currentListShuffle = new MenuItem ( "Shuffle" );
 		MenuItem searchMenuItem = new MenuItem ( "Search" );
@@ -575,9 +575,10 @@ public class CurrentListPane extends BorderPane {
 			infoLabelAndFilter.beginEditing();
 		});
 		
-		currentListMenu.getItems().addAll ( currentListClear, currentListShuffle, searchMenuItem, historyMenuItem, 
-				new SeparatorMenuItem(), exportToM3U, exportToFolder, saveMenuItem, loadMenuItem, 
-				new SeparatorMenuItem(), removeDuplicatesMenuItem );
+		currentListMenu.getItems().addAll ( loadMenuItem, saveMenuItem, currentListClear, currentListShuffle, 
+				new SeparatorMenuItem(), exportToM3U, exportToFolder, 
+				new SeparatorMenuItem(), searchMenuItem, historyMenuItem, removeDuplicatesMenuItem 
+				);
 		
 		currentListControls.getChildren().addAll( toggleShuffleButton, toggleRepeatButton, showQueueButton,
 				infoLabelAndFilter, currentListLength, currentListMenu );
