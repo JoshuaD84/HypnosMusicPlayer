@@ -1,8 +1,6 @@
 Library & Scanner Rebuild
    Code is a bit messy
 
-   Need to check tag errors and other stuff that uses the new CachedList thing
-
    Filtering a track list while scanning throws ArrayIndexOutOfBoundsException, can't be caught normally
 
    Add buttons to library scan log window
@@ -20,10 +18,6 @@ Scanner
 UI
    When you drag an artist image, you can't select "all albums by this artist."
 
-   Artwork gets stuck sometimes. Leonard Cohen - Darker is a good example
-
-   Track Filter doesn't work
-
    Right clicking on library buttons changes library tab, only left click should
 
    Improve tag editor UI. It's clunky.  Single clicks good
@@ -38,6 +32,7 @@ UI
    Sometimes the art pane can become non-responsive. I dragged and dropped an image from google and it stopped changing
       I've seen it a few other times too.
       It happened as i was scrolling quickly though Josh radio, around Joanna newsom
+      Leonard Cohen - Darker is a good example
 
    If something gets dropped into config/playlists folders, update the UI to include it?
 

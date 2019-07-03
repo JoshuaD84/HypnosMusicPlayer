@@ -352,6 +352,9 @@ public class Library {
 
 	void addTrackData(Track track) {
 		tracks.addOrReplaceItem(track);
+		for (TagError error : track.getTagErrors()) {
+			tagErrors.addOrReplaceItem(error);
+		}
 	}
 
 	void addTrackData(List<Track> addMe) {
@@ -362,6 +365,9 @@ public class Library {
 
 	void removeTrack(Track track) {
 		tracks.remove(track);
+		for (TagError error : track.getTagErrors()) {
+			tagErrors.remove(error);
+		}
 	}
 
 	void addAlbumData(Album album) {
