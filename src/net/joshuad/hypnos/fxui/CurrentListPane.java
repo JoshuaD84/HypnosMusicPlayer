@@ -543,7 +543,6 @@ public class CurrentListPane extends BorderPane {
 				
 				case EMPTY:
 					break;
-				
 			}
 			
 			try {

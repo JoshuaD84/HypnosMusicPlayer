@@ -22,7 +22,6 @@ public class CachedList<T> {
 	
 	ObservableList<T> displayCache = FXCollections.observableArrayList(new ArrayList<T>());
 	List<Action<T>> pendingChanges = new ArrayList<>();
-
 	
 	boolean runLaterPending = false;
 	
