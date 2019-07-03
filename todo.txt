@@ -1,3 +1,9 @@
+If you edit the tags of an album via the current list, the album table doesn't refresh unless you sort it
+
+if you edit the tags of an album on the current list, save them, close hypnos and reopen, it forgets the edits on the
+   current list, even though the tag data has been changed
+
+
 Library & Scanner Rebuild
    Code is a bit messy
 
@@ -35,8 +41,6 @@ UI
       Leonard Cohen - Darker is a good example
 
    If something gets dropped into config/playlists folders, update the UI to include it?
-
-   if up/down aren't consumed by widgets, control volume. If left/right aren't consumed by widgets, control track position
    
 Linux
    JavaFX / Linux Open File Dialog sometimes causes jvm crash, depends on system, and doesn't happen always

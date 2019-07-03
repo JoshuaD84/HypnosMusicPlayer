@@ -26,7 +26,7 @@ public class CachedList<T> {
 	boolean runLaterPending = false;
 	
 	public CachedList() {
-		items.addListener( new ListChangeListener<T>() {
+		items.addListener(new ListChangeListener<T>() {
 			@Override
 			public void onChanged(Change<? extends T> change) {
 				while (change.next()) {
@@ -115,7 +115,6 @@ public class CachedList<T> {
 				}
 			}
 			
-			//TODO: maybe work on an update mechanism rather than this remove/add
 			if(alreadyInList!=null) {
 				items.remove(alreadyInList);
 			} 

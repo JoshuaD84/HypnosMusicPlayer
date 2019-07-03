@@ -75,7 +75,7 @@ class DiskReader implements FileVisitor<Path> {
 	void scanMusicRoot(MusicRoot musicRoot, ScanMode scanMode) {
 		resetState();
 		this.scanMode = scanMode;
-		scanLogger.println("[MusicRootLoader] " + scanMode.statusPrefix + " root: " + musicRoot.getPath().toString());
+		scanLogger.println("[DiskReader] " + scanMode.statusPrefix + " root: " + musicRoot.getPath().toString());
 		try {
 			directoriesToScan = LibraryLoader.getDirectoryCount(musicRoot.getPath());
 			currentRootPath = musicRoot.getPath();
@@ -181,7 +181,7 @@ class DiskReader implements FileVisitor<Path> {
 
 			Album album = new Album(currentDirectoryNode.getPath(), tracks);
 
-			scanLogger.println("[MusicRootLoader] Loading album: " + album.getAlbumArtist() + " - " + album.getAlbumTitle());
+			scanLogger.println("[DiskReader] Loading album: " + album.getAlbumArtist() + " - " + album.getAlbumTitle());
 			currentDirectoryNode.setAlbum(album);
 			library.addTrackData(tracks);
 			library.addAlbumData(album);

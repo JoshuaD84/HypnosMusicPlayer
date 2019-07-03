@@ -327,8 +327,19 @@ public class FXUI implements PlayerListener {
 			&& !e.isAltDown() && !e.isShiftDown() && !e.isMetaDown() ) {
 				e.consume();
 				
-				if ( libraryPane.isFocused() || libraryPane.albumPane.isFocused()
-				|| libraryPane.trackPane.isFocused() || libraryPane.playlistPane.isFocused() ) {
+				boolean libraryPaneHasFocus = false;
+				
+				Node focusedNode = scene.focusOwnerProperty().get();
+				Node parent = focusedNode.getParent();
+				while ( parent != null ) {
+					if ( parent == libraryPane ) {
+						libraryPaneHasFocus = true;
+						break;
+					}
+					parent = parent.getParent();
+				}
+	
+				if ( libraryPaneHasFocus ) {
 					libraryPane.focusFilterOfCurrentTab();
 					
 				} else {
