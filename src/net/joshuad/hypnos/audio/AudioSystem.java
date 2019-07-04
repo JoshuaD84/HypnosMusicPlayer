@@ -25,6 +25,7 @@ import net.joshuad.hypnos.Queue;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.fxui.FXUI;
 import net.joshuad.hypnos.lastfm.LastFM;
+import net.joshuad.hypnos.library.Album;
 import net.joshuad.hypnos.library.Playlist;
 import net.joshuad.hypnos.library.Track;
 import net.joshuad.hypnos.Persister.Setting;
@@ -478,8 +479,9 @@ public class AudioSystem {
 					if ( Utils.isAlbumDirectory( trackPath.toAbsolutePath().getParent() ) ) {
 						albumPath = trackPath.toAbsolutePath().getParent();
 					}
-					//TODO: Deal with album path
 					Track track = new Track ( trackPath );
+					//It's OK to make a dummy album, since .equals in album evaluates path equality. 
+					track.setAlbum(new Album(albumPath, new ArrayList<Track>()));
 					ui.trackSelected( track ); 
 					playTrack( track, true );
 					settings.remove ( setting );

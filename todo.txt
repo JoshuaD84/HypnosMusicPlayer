@@ -23,6 +23,7 @@ Scanner
 
 UI
    When you drag an artist image, you can't select "all albums by this artist."
+      see AudioSystem.java, the issue is in there near a todo
 
    Right clicking on library buttons changes library tab, only left click should
 

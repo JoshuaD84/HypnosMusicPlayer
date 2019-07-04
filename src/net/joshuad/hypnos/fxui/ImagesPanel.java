@@ -471,7 +471,6 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 				byte[] buffer = Files.readAllBytes( imageFile.toPath() );
 				
 				//REFACTOR: put this code in a function, it's duplicated below. 
-				
 				if ( !Utils.isArtistDirectory( currentImagesTrack.getAlbum().getPath().getParent() ) ) return;
 				
 				Path artistPath = track.getAlbum().getPath().getParent();

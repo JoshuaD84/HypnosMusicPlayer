@@ -209,9 +209,9 @@ public class TagWindow extends Stage {
 							setGraphic ( null );
 							setText ( null );
 						}
-							
 					}
 				};
+				
 				return cell;
 			}
 		});
