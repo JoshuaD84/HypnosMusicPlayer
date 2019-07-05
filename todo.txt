@@ -1,12 +1,14 @@
-If you edit the tags of an album via the current list, the album table doesn't refresh unless you sort it
+Observable Issues
+   If you edit the tags of an album via the current list, the album table doesn't refresh unless you sort it
 
-if you edit the tags of an album on the current list, save them, close hypnos and reopen, it forgets the edits on the
-   current list, even though the tag data has been changed
+   if you edit the tags of an album on the current list, save them, close hypnos and reopen, it forgets the edits on the
+      current list, even though the tag data has been changed
+
+   If you open an album info window, then delete a file from the disk from that album, the contents of the window won't
+   change. If you re-open it they change. 
 
 
 Library & Scanner Rebuild
-   Code is a bit messy
-
    Filtering a track list while scanning throws ArrayIndexOutOfBoundsException, can't be caught normally
 
    Add buttons to library scan log window

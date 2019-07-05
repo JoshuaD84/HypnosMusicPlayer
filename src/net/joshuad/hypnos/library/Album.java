@@ -46,7 +46,6 @@ public class Album implements Serializable, AlbumInfoSource {
 		this.tracks = newTracks;
 	}
 	
-
 	public String getAlbumArtist () {
 		if ( tracks.size() == 0 || tracks.get( 0 ) == null ) {
 			return ""; 

@@ -115,11 +115,15 @@ public class CachedList<T> {
 				}
 			}
 			
-			if(alreadyInList!=null) {
-				items.remove(alreadyInList);
-			} 
-				
-			items.add(addMe);
+			if (alreadyInList instanceof Album) {
+				Album updateMe = (Album)alreadyInList;
+				updateMe.setData((Album)addMe);
+			} else {
+				if(alreadyInList!=null) {
+					items.remove(alreadyInList);
+				} 
+				items.add(addMe);
+			}
 
 		} finally {
 			itemsLock.unlock();
