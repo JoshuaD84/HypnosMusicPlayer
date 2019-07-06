@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
 	index++;
 	options[index].optionString = (char *)"-Djava.library.path=lib;lib/win/jintellitype;lib/win/swt";
 	index++;
-	options[index].optionString = (char *)"-Xmx600m";
+	options[index].optionString = (char *)"-Xmx500m";
 	index++;
 	options[index].optionString = (char *)"-XX:+UseG1GC";
 	index++;

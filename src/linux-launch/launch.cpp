@@ -14,7 +14,7 @@ int main( int argc, char** argv ) {
    int index = 0;
    options[index].optionString = (char *)"-Djava.class.path=./hypnos.jar";
    index++;
-   options[index].optionString = (char *)"-Xmx600m";
+   options[index].optionString = (char *)"-Xmx500m";
    index++;
    options[index].optionString = (char *)"-XX:+UseG1GC";
    index++;

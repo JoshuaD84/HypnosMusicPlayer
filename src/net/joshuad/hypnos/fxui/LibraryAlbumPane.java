@@ -33,7 +33,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TableColumn.SortType;
 import javafx.scene.control.TableView.ResizeFeatures;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -180,10 +179,10 @@ private static final Logger LOGGER = Logger.getLogger( LibraryArtistPane.class.g
 		artistColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
 		albumColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
 
-		artistColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "albumArtist" ) );
-		yearColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "year" ) );
-		albumColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "FullAlbumTitle" ) );
-		addedDateColumn.setCellValueFactory( new PropertyValueFactory <Album, String>( "dateAddedString" ) );
+		artistColumn.setCellValueFactory( cellData -> cellData.getValue().getAlbumArtistProperty() );
+		yearColumn.setCellValueFactory( cellData -> cellData.getValue().getYearProperty() );
+		albumColumn.setCellValueFactory( cellData -> cellData.getValue().getFullAlbumTitleProperty() );
+		addedDateColumn.setCellValueFactory( cellData -> cellData.getValue().getDateAddedStringProperty() );
 		
 		albumColumn.setCellFactory( e -> new FormattedAlbumCell<> () );
 		

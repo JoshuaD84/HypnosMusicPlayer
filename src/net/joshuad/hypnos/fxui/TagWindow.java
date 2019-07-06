@@ -532,18 +532,12 @@ public class TagWindow extends Stage {
 			if ( saveMe != null ) {
 				for ( Track track : saveMe ) {
 					track.updateTagsAndSave( saveMeTextPairs, saveMeImagePairs, ui.audioSystem );
-					ui.library.requestRescan( track.getPath() );
 				}
 			}
 			
-			//TODO: it would be nice to get rid of these functions by using observable items. 
-			ui.refreshAlbumTable();
-			ui.refreshTrackTable();
 			ui.refreshCurrentList();
 			ui.refreshQueueList();
-			ui.refreshHistory();
 			ui.refreshImages();
-			
 		});
 		saverThread.setName ( "Tag Window Track Updater" );
 		saverThread.setDaemon( true );

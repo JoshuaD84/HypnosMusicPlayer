@@ -70,7 +70,7 @@ public class LibraryTrackPane extends BorderPane {
 	TableView <Track> trackTable;
 	
 	TableColumn<Track, String> artistColumn, lengthColumn, albumColumn, titleColumn;
-	TableColumn<Track, Integer> numberColumn;
+	TableColumn<Track, Number> numberColumn;
 
 	Label filteredListLabel = new Label( "No tracks match." );
 	Label loadingListLabel = new Label( "Loading..." );
@@ -179,22 +179,25 @@ public class LibraryTrackPane extends BorderPane {
 			!event.isAltDown() && !event.isShiftDown() && !event.isControlDown() && !event.isMetaDown() ) {
 				event.consume();
 				Track playMe = trackTable.getSelectionModel().getSelectedItem();
-				if( playMe == null ) trackTable.getItems().get( 0 );
-				audioSystem.playTrack( playMe );
+				if( playMe != null ) {
+					audioSystem.playTrack( playMe );
+				}
 				
 			} else if ( event.getCode() == KeyCode.ENTER && event.isShiftDown()
 			&& !event.isAltDown() && !event.isControlDown() && !event.isMetaDown() ) {
 				event.consume();
 				Track playMe = trackTable.getSelectionModel().getSelectedItem();
-				if( playMe == null ) trackTable.getItems().get( 0 );
-				audioSystem.getQueue().queueTrack( playMe );
+				if( playMe != null ) {
+					audioSystem.getQueue().queueTrack( playMe );
+				}
 				
 			} else if ( event.getCode() == KeyCode.ENTER && event.isControlDown()
 			&& !event.isAltDown() && !event.isShiftDown() && !event.isMetaDown() ) {
 				event.consume();
 				Track playMe = trackTable.getSelectionModel().getSelectedItem();
-				if( playMe == null ) trackTable.getItems().get( 0 );
-				audioSystem.getCurrentList().appendTrack( playMe );
+				if( playMe != null ) {
+					audioSystem.getCurrentList().appendTrack( playMe );
+				}
 			}
 		});
 		
@@ -266,26 +269,26 @@ public class LibraryTrackPane extends BorderPane {
 	public void setupTrackTable () {
 		artistColumn = new TableColumn<Track, String>( "Artist" );
 		lengthColumn = new TableColumn<Track, String>( "Length" );
-		numberColumn = new TableColumn<Track, Integer>( "#" );
+		numberColumn = new TableColumn<Track, Number>( "#" );
 		albumColumn = new TableColumn<Track, String>( "Album" );
 		titleColumn = new TableColumn<Track, String>( "Title" );
 		
 		artistColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
-		titleColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
+		//titleColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
 		lengthColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
 
-		artistColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Artist" ) );
-		titleColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "Title" ) );
+		artistColumn.setCellValueFactory( cellData -> cellData.getValue().getArtistProperty() );
+		titleColumn.setCellValueFactory( cellData -> cellData.getValue().getTitleProperty() );
 		lengthColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "LengthDisplay" ) );
-		numberColumn.setCellValueFactory( new PropertyValueFactory <Track, Integer>( "TrackNumber" ) );
-		albumColumn.setCellValueFactory( new PropertyValueFactory <Track, String>( "albumTitle" ) );
+		numberColumn.setCellValueFactory( cellData -> cellData.getValue().getTrackNumberProperty() );
+		albumColumn.setCellValueFactory( cellData -> cellData.getValue().getAlbumTitleProperty() );
 		
 		artistColumn.setSortType( TableColumn.SortType.ASCENDING );
 
 		numberColumn.setCellFactory( column -> {
-			return new TableCell <Track, Integer>() {
+			return new TableCell <Track, Number>() {
 				@Override
-				protected void updateItem ( Integer value, boolean empty ) {
+				protected void updateItem ( Number value, boolean empty ) {
 					super.updateItem( value, empty );
 
 					if ( value == null || value.equals( Track.NO_TRACK_NUMBER ) || empty ) {

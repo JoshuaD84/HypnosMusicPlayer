@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.file.DirectoryStream;
@@ -32,6 +33,10 @@ import org.jaudiotagger.tag.id3.ID3v23Tag;
 import org.jaudiotagger.tag.images.Artwork;
 import org.jaudiotagger.tag.images.StandardArtwork;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import net.joshuad.hypnos.MultiFileImageTagPair;
@@ -48,10 +53,6 @@ public class Track implements Serializable, AlbumInfoSource {
 	
 	private static final long serialVersionUID = 1L;
 	public static final int NO_TRACK_NUMBER = -885533;
-	
-	private transient Vector <TagError> tagErrors = new Vector <TagError> ();
-	
-	private transient LovedState lovedState = LovedState.NOT_SET;
 
 	public enum Format {
 		FLAC ( "flac" ),
@@ -111,26 +112,27 @@ public class Track implements Serializable, AlbumInfoSource {
 	private int length = 0;
 	private File trackFile;
 	
-	Album album = null;
-	
-	private String artist = "";
-	private String albumArtist = "";
-	private String title = "";
-	private String albumTitle = "";
-	private String date = "";
-	private String originalDate = "";
-	private int trackNumber = NO_TRACK_NUMBER;
-	private String discSubtitle = null;
-	private Integer discNumber = null;
-	private Integer discCount =  null;
-	private String releaseType = null;
-	
 	private boolean isLossless = false;
 	private long bitRate = -1;
 	private int sampleRate = -1;
 	private boolean isVBR = false;
 	private String encodingType = "";
 	private String format = "";
+	private Album album = null;
+	
+	private transient StringProperty artist;
+	private transient StringProperty albumArtist;
+	private transient StringProperty title;
+	private transient StringProperty albumTitle;
+	private transient StringProperty date;
+	private transient StringProperty originalDate;
+	private transient IntegerProperty trackNumber;
+	private transient StringProperty discSubtitle;
+	private transient IntegerProperty discNumber;
+	private transient IntegerProperty discCount;
+	private transient StringProperty releaseType;
+	private transient Vector <TagError> tagErrors;
+	private transient LovedState lovedState;
 	
 	private static final DirectoryStream.Filter<Path> imageFileFilter = new DirectoryStream.Filter<Path>() {
 		@Override
@@ -139,24 +141,31 @@ public class Track implements Serializable, AlbumInfoSource {
 		}
 	};
 	
+	public Track ( Path trackPath ) {
+		initializeTransientFields();
+		this.trackFile = trackPath.toFile();
+		refreshTagData();
+	}
+	
 	public Track ( Track track ) {
-		setData( track );
+		initializeTransientFields();
+		setData ( track );
 	}
 	
 	public void setData ( Track track ) {
 		this.length = track.length;
 		this.trackFile = track.trackFile;
 		this.album = track.album;
-		this.artist = track.artist;
-		this.title = track.title;
-		this.albumTitle = track.albumTitle;
-		this.date = track.date;
-		this.originalDate = track.originalDate;
-		this.trackNumber = track.trackNumber;
-		this.discSubtitle = track.discSubtitle;
-		this.discNumber = track.discNumber;
-		this.discCount = track.discCount;
-		this.releaseType = track.releaseType;
+		this.artist.set(track.artist.get());
+		this.title.set(track.title.get());
+		this.albumTitle.set(track.albumTitle.get());
+		this.date.set(track.date.get());
+		this.originalDate.set(track.originalDate.get());
+		this.trackNumber.set(track.trackNumber.get());
+		this.discSubtitle.set(track.discSubtitle.get());
+		this.discNumber.set(track.discNumber.get());
+		this.discCount.set(track.discCount.get());
+		this.releaseType.set(track.releaseType.get());
 		this.isLossless = track.isLossless;
 		this.bitRate = track.bitRate;
 		this.sampleRate = track.sampleRate;
@@ -164,12 +173,7 @@ public class Track implements Serializable, AlbumInfoSource {
 		this.encodingType = track.encodingType;
 		this.format = track.format;
 	}
-	
-	public Track ( Path trackPath ) {
-		this.trackFile = trackPath.toFile();
-		refreshTagData();
-	}
-	
+
 	public void setAlbum( Album album ) {
 		this.album = album;
 	}
@@ -234,13 +238,13 @@ public class Track implements Serializable, AlbumInfoSource {
 	private void parseFileName () {
 		//TODO: Look at parsing track number from file name too
 		
-		String fnArtist = "";
-		String fnYear = "";
-		String fnAlbum = "";
-		String fnTitle = "";
+		String filenameArtist = "";
+		String filenameYear = "";
+		String filenameAlbum = "";
+		String filenameTitle = "";
 		
 		try {
-			fnArtist = trackFile.toPath().getParent().getParent().getFileName().toString();
+			filenameArtist = trackFile.toPath().getParent().getParent().getFileName().toString();
 		} catch ( Exception e ) { 
 			//No need to log this
 		}
@@ -251,64 +255,63 @@ public class Track implements Serializable, AlbumInfoSource {
 			
 			if ( parentParts.length == 1 ) {
 				if ( album != null ) {
-					fnAlbum = parentParts [ 0 ];
+					filenameAlbum = parentParts [ 0 ];
 				} else {
-					fnArtist = parentParts [ 0 ];
+					filenameArtist = parentParts [ 0 ];
 				}
 				
 			} else if ( parentParts.length == 2 ) { 
 				if ( parentParts [ 0 ].matches( "^[0-9]{4}[a-zA-Z]{0,1}" ) ) {
-					fnYear = parentParts [ 0 ];
-					fnAlbum = parentParts [ 1 ];
+					filenameYear = parentParts [ 0 ];
+					filenameAlbum = parentParts [ 1 ];
 				} else if ( parentParts [ 1 ].matches( "^[0-9]{4}[a-zA-Z]{0,1}" ) ) {
-					fnYear = parentParts [ 1 ];
-					fnAlbum = parentParts [ 0 ];
+					filenameYear = parentParts [ 1 ];
+					filenameAlbum = parentParts [ 0 ];
 				} else {
-					fnAlbum = parentName;
+					filenameAlbum = parentName;
 				}
 			}
 			//TODO: parse track number
-			
-			fnTitle = trackFile.toPath().getFileName().toString();
-
-			fnTitle = fnTitle.replaceAll( " - ", "" ).replaceAll( fnArtist, "" ).replaceAll( fnAlbum, "" ).replaceAll( fnYear, "" );
+			filenameTitle = trackFile.toPath().getFileName().toString();
+			filenameTitle = filenameTitle.replaceAll(" - ", "").replaceAll(filenameArtist, "").replaceAll(filenameAlbum, "")
+					.replaceAll(filenameYear, "");
 
 		} catch ( Exception e ) { 
 			//PENDING: We get an exception with albums that have [] and maybe {} in their directory structure 
 		}
 
-		//TODO: Some error checking, only do this if we're pretty sure it's good. 
-		if ( artist.equals( "" ) && !fnArtist.equals( "" ) ) { artist = fnArtist; }
-		if ( albumArtist.equals( "" ) && !fnArtist.equals( "" ) ) { albumArtist = fnArtist; }
-		if ( albumTitle.equals( "" ) && !fnAlbum.equals( "" ) ) { albumTitle = fnAlbum; }
-		if ( date.equals( "" ) && !fnYear.equals( "" ) ) { date = fnYear; }
-		if ( title.equals( "" ) && !fnTitle.equals( "" )  ) { title = fnTitle; }
+		//TODO: Add some error checking, only do this if we're pretty sure it's good. 
+		if ( artist.get().equals( "" ) && !filenameArtist.equals( "" ) ) { artist.set(filenameArtist); }
+		if ( albumArtist.get().equals( "" ) && !filenameArtist.equals( "" ) ) { albumArtist.set(filenameArtist); }
+		if ( albumTitle.get().equals( "" ) && !filenameAlbum.equals( "" ) ) { albumTitle.set(filenameAlbum); }
+		if ( date.get().equals( "" ) && !filenameYear.equals( "" ) ) { date.set(filenameYear); }
+		if ( title.get().equals( "" ) && !filenameTitle.equals( "" )  ) { title.set(filenameTitle); }
 	}
 	
 	private void parseArtist( Tag tag ) {
 		// Do we want to do antyhing with FieldKey.ARTISTS or .ALBUM_ARTISTS or .ALBUM_ARTIST_SORT?
 		if ( tag != null ) {
-			albumArtist = tag.getFirst ( FieldKey.ALBUM_ARTIST );
-			artist = tag.getFirst ( FieldKey.ARTIST );
+			albumArtist.set(tag.getFirst ( FieldKey.ALBUM_ARTIST ));
+			artist.set(tag.getFirst ( FieldKey.ARTIST ));
 		}
 		
-		if ( albumArtist.equals( "" ) ) {
-			albumArtist = artist;
+		if ( albumArtist.get().equals( "" ) ) {
+			albumArtist.set(artist.get());
 		}
 		
-		if ( artist.equals( "" ) ) {
+		if ( artist.get().equals( "" ) ) {
 			tagErrors.add( new TagError ( TagErrorType.MISSING_ARTIST, this ) );
 		}
 	}
 	
 	private void parseTitle ( Tag tag ) {
 		if ( tag != null ) {
-			title = tag.getFirst ( FieldKey.TITLE );
+			title.set(tag.getFirst ( FieldKey.TITLE ));
 			
 			try { 
-				if ( title.equals( "" ) ) {
+				if ( title.get().equals( "" ) ) {
 					tagErrors.add( new TagError ( TagErrorType.MISSING_TITLE, this ) );
-					title = tag.getFirst( FieldKey.TITLE_SORT );
+					title.set(tag.getFirst( FieldKey.TITLE_SORT ));
 				}
 			} catch ( UnsupportedOperationException e ) {
 				//No problem, it doesn't exist for this file format
@@ -318,12 +321,12 @@ public class Track implements Serializable, AlbumInfoSource {
 	
 	private void parseAlbum ( Tag tag ) {
 		if ( tag != null ) {
-			albumTitle = tag.getFirst ( FieldKey.ALBUM );
+			albumTitle.set(tag.getFirst ( FieldKey.ALBUM ));
 			try { 
-				if ( albumTitle.equals( "" ) ) {
+				if ( albumTitle.get().equals( "" ) ) {
 					tagErrors.add( new TagError ( TagErrorType.MISSING_ALBUM, this ) );
 					
-					albumTitle = tag.getFirst( FieldKey.ALBUM_SORT );
+					albumTitle.set(tag.getFirst( FieldKey.ALBUM_SORT ));
 				}
 			} catch ( UnsupportedOperationException e ) {}
 		}
@@ -332,15 +335,15 @@ public class Track implements Serializable, AlbumInfoSource {
 	private void parseDate ( Tag tag ) {
 		if ( tag != null ) {
 			try { 
-				originalDate = tag.getFirst ( FieldKey.ORIGINAL_YEAR );
+				originalDate.set(tag.getFirst ( FieldKey.ORIGINAL_YEAR ));
 			} catch ( UnsupportedOperationException e ) {}
 
 			try { 
-				date = tag.getFirst( FieldKey.YEAR );
+				date.set(tag.getFirst( FieldKey.YEAR ));
 			} catch ( UnsupportedOperationException e ) {}
 		}
 		
-		if ( date.equals( "" ) ) {
+		if ( date.get().equals( "" ) ) {
 			tagErrors.add( new TagError ( TagErrorType.MISSING_DATE, this ) );
 		}
 	}
@@ -353,18 +356,18 @@ public class Track implements Serializable, AlbumInfoSource {
 			
 			try { 
 				if ( rawText.matches( "^[0-9]+$" ) ) { // 0, 01, 1010, 2134141, etc.
-					trackNumber = Integer.parseInt( rawText );
+					trackNumber.set(Integer.parseInt( rawText ));
 					
 				} else if ( rawNoWhiteSpace.matches( "^[0-9]+$" ) ) { 
-					trackNumber = Integer.parseInt( rawNoWhiteSpace );
+					trackNumber.set(Integer.parseInt( rawNoWhiteSpace ));
 					tagErrors.add( new TagError ( TagErrorType.TRACK_NUMBER_EXCESS_WHITESPACE, this ) );
 					
 				} else if ( rawText.matches("^[0-9]+/.*") ) {
-					trackNumber = Integer.parseInt( rawText.split("/")[0] );
+					trackNumber.set(Integer.parseInt( rawText.split("/")[0] ));
 					tagErrors.add( new TagError ( TagErrorType.TRACK_NUMBER_HAS_DISC, this ) );
 				
 				} else if ( rawNoWhiteSpace.matches("^[0-9]+/.*") ) {
-					trackNumber = Integer.parseInt( rawNoWhiteSpace.split("/")[0] );
+					trackNumber.set(Integer.parseInt( rawNoWhiteSpace.split("/")[0] ));
 					tagErrors.add( new TagError ( TagErrorType.TRACK_NUMBER_HAS_DISC, this ) );
 					
 				} else {
@@ -382,14 +385,14 @@ public class Track implements Serializable, AlbumInfoSource {
 	private void parseDiscInfo ( Tag tag ) {
 		if ( tag != null ) {
 			try {
-				discSubtitle = tag.getFirst ( FieldKey.DISC_SUBTITLE );
+				discSubtitle.set(tag.getFirst ( FieldKey.DISC_SUBTITLE ));
 			} catch ( UnsupportedOperationException e ) {
 				//No problem, it doesn't exist for this file format
 			}
 			
 			
 			try {
-				discCount = Integer.valueOf( tag.getFirst ( FieldKey.DISC_TOTAL ) );
+				discCount.set(Integer.valueOf( tag.getFirst ( FieldKey.DISC_TOTAL ) ));
 			} catch ( NumberFormatException e ) {
 				if ( ! tag.getFirst ( FieldKey.DISC_TOTAL ).equals( "" ) ) {
 					tagErrors.add( new TagError ( TagErrorType.DISC_COUNT_INVALID_FORMAT, this , tag.getFirst ( FieldKey.DISC_TOTAL ) ) );
@@ -405,27 +408,27 @@ public class Track implements Serializable, AlbumInfoSource {
 				rawNoWhiteSpace = rawText.replaceAll("\\s+","");
 			
 				if ( rawText.matches( "^[0-9]+$" ) ) { // 0, 01, 1010, 2134141, etc.
-					discNumber = Integer.parseInt( rawText );
+					discNumber.set(Integer.parseInt( rawText ));
 					
 				} else if ( rawNoWhiteSpace.matches( "^[0-9]+$" ) ) { 
-					discNumber = Integer.parseInt( rawNoWhiteSpace );
+					discNumber.set(Integer.parseInt( rawNoWhiteSpace ));
 					tagErrors.add( new TagError ( TagErrorType.DISC_NUMBER_EXCESS_WHITESPACE, this ) );
 					
 				} else if ( rawText.matches("^[0-9]+/.*") ) {//if matches 23/<whatever>
-					discNumber = Integer.parseInt( rawText.split("/")[0] );
+					discNumber.set(Integer.parseInt( rawText.split("/")[0] ));
 					
 					if ( discCount == null ) {
-						discCount = Integer.parseInt( rawText.split("/")[1] );
+						discCount.set(Integer.parseInt( rawText.split("/")[1] ));
 					}
 
 					tagErrors.add( new TagError ( TagErrorType.DISC_NUMBER_HAS_TRACK, this ) );
 				
 				} else if ( rawNoWhiteSpace.matches("^[0-9]+/.*") ) {
 					//if matches 23/<whatever>
-					discNumber = Integer.parseInt( rawNoWhiteSpace.split("/")[0] );
+					discNumber.set(Integer.parseInt( rawNoWhiteSpace.split("/")[0] ));
 					
 					if ( discCount == null ) {
-						discCount = Integer.parseInt( rawNoWhiteSpace.split("/")[1] );
+						discCount.set(Integer.parseInt( rawNoWhiteSpace.split("/")[1] ));
 					}
 
 					tagErrors.add( new TagError ( TagErrorType.DISC_NUMBER_HAS_TRACK, this ) );
@@ -447,7 +450,7 @@ public class Track implements Serializable, AlbumInfoSource {
 	private void parseReleaseType ( Tag tag ) {
 		if ( tag != null ) {
 			try {
-				releaseType = tag.getFirst ( FieldKey.MUSICBRAINZ_RELEASE_TYPE );
+				releaseType.set(tag.getFirst ( FieldKey.MUSICBRAINZ_RELEASE_TYPE ));
 			} catch ( UnsupportedOperationException e ) {
 				//No problem, it doesn't exist for this file format
 			}
@@ -455,71 +458,91 @@ public class Track implements Serializable, AlbumInfoSource {
 	}
 		
 	public String getArtist () {
-		return artist;
+		return artist.get();
 	}
 	
 	public String getAlbumArtist() {
-		return albumArtist;
+		return albumArtist.get();
 	}
 	
 	public String getYear () {
-		if ( !originalDate.isEmpty() ) {
-			return originalDate;
+		if ( !originalDate.get().isEmpty() ) {
+			return originalDate.get();
 		} else {
-			return date;
+			return date.get();
 		}
 	}
 	
 	public String getAlbumTitle () {
-		return albumTitle;
+		return albumTitle.get();
 	}
 	
 	public String getFullAlbumTitle () {
-		String retMe = albumTitle;
+		String retMe = albumTitle.get();
 		
-		if ( discSubtitle != null && !discSubtitle.equals( "" ) ) {
+		if ( discSubtitle != null && !discSubtitle.get().equals( "" ) ) {
 			retMe += " (" + discSubtitle + ")";
 			
-		} else if ( discCount != null && discCount > 1 ) {
+		} else if ( discCount != null && discCount.get() > 1 ) {
 			if ( discNumber != null ) retMe += " (Disc " + discNumber + ")";
 			
-		} else if ( discNumber != null && discNumber > 1 ) { 
+		} else if ( discNumber != null && discNumber.get() > 1 ) { 
 			retMe += " (Disc " + discNumber + ")";
 		}
 		
-		if ( releaseType != null && !releaseType.equals("") && !releaseType.matches( "(?i:album)" ) ) {
-			retMe += " [" + Utils.toReleaseTitleCase( releaseType ) + "]";
+		if ( releaseType.get() != null && !releaseType.get().equals("") && !releaseType.get().matches( "(?i:album)" ) ) {
+			retMe += " [" + Utils.toReleaseTitleCase( releaseType.get() ) + "]";
 		}
 		
 		return retMe;
 	}		
 	
 	public Integer getDiscNumber() {
-		return discNumber;
+		return discNumber.get();
 	}
 	
 	public Integer getDiscCount() {
-		return discCount;
+		return discCount.get();
 	}
 	
 	public String getReleaseType () {
-		if ( releaseType != null && !releaseType.matches( "(?i:album)" ) ) {
-			return Utils.toReleaseTitleCase( releaseType );
+		if ( releaseType.get() != null && !releaseType.get().matches( "(?i:album)" ) ) {
+			return Utils.toReleaseTitleCase( releaseType.get() );
 		} else {
 			return null;
 		}
 	}
 	
 	public String getDiscSubtitle () {
-		return discSubtitle;
+		return discSubtitle.get();
 	}
 	
-	public String getTitle () {
+	public StringProperty getTitleProperty() {
 		return title;
 	}
 	
-	public Integer getTrackNumber () {
+	public StringProperty getArtistProperty() {
+		return artist;
+	}
+	
+	public StringProperty getAlbumArtistProperty() {
+		return albumArtist;
+	}
+	
+	public StringProperty getAlbumTitleProperty() {
+		return albumTitle;
+	}
+	
+	public IntegerProperty getTrackNumberProperty() {
 		return trackNumber;
+	}
+	
+	public String getTitle () {
+		return title.get();
+	}
+	
+	public Integer getTrackNumber () {
+		return trackNumber.get();
 	}	
 	
 	public int getLengthS () {
@@ -1015,7 +1038,6 @@ public class Track implements Serializable, AlbumInfoSource {
 			
 			if ( tag == null ) {
 				tag = audioFile.createDefaultTag();
-				
 			} else if ( tag instanceof ID3v1Tag ) {
 				tag = new ID3v23Tag ( (ID3v1Tag)tag );
 			}
@@ -1035,7 +1057,6 @@ public class Track implements Serializable, AlbumInfoSource {
 			
 			for ( MultiFileImageTagPair tagPair : imageTagPairs ) {
 				if ( !tagPair.isMultiValue() && tagPair.imageDataChanged() ) {
-					
 					if ( tagPair.getImageData() == null ) {
 						deleteImageFromID3 ( getPath().toFile(), ImageFieldKey.getIndexFromKey( tagPair.getKey() ), audioSystem );
 					} else {
@@ -1052,10 +1073,35 @@ public class Track implements Serializable, AlbumInfoSource {
 		}
 	}
 	
+	private void writeObject ( ObjectOutputStream out ) throws IOException {
+		out.defaultWriteObject();
+		out.writeObject(artist.get());
+		out.writeObject(albumArtist.get());
+		out.writeObject(title.get());
+		out.writeObject(albumTitle.get());
+		out.writeObject(date.get());
+		out.writeObject(originalDate.get());
+		out.writeInt(trackNumber.get());
+		out.writeObject(discSubtitle.get());
+		out.writeInt(discNumber.get());
+		out.writeInt(discCount.get());
+		out.writeObject(releaseType.get());
+	}
+	
 	private void readObject ( ObjectInputStream in ) throws IOException, ClassNotFoundException {
+		initializeTransientFields();
 		in.defaultReadObject();
-		tagErrors = new Vector <TagError> ();
-		lovedState = LovedState.NOT_SET;
+		artist.set((String)in.readObject());
+		albumArtist.set((String)in.readObject());
+		title.set((String)in.readObject());
+		albumTitle.set((String)in.readObject());
+		date.set((String)in.readObject());
+		originalDate.set((String)in.readObject());
+		trackNumber.set(in.readInt());
+		discSubtitle.set((String)in.readObject());
+		discNumber.set(in.readInt());
+		discCount.set(in.readInt());
+		releaseType.set((String)in.readObject());
 	}
 
 	public LovedState getLovedState () {
@@ -1065,10 +1111,21 @@ public class Track implements Serializable, AlbumInfoSource {
 	public void setLovedState ( LovedState state ) {
 		this.lovedState = state;
 	}
+	
+	private void initializeTransientFields() {
+		artist = new SimpleStringProperty("");
+		albumArtist = new SimpleStringProperty("");
+		title = new SimpleStringProperty("");
+		albumTitle = new SimpleStringProperty("");
+		date = new SimpleStringProperty("");
+		originalDate = new SimpleStringProperty("");
+		trackNumber = new SimpleIntegerProperty(NO_TRACK_NUMBER);
+		discSubtitle = new SimpleStringProperty("");
+		discNumber = new SimpleIntegerProperty();
+		discCount = new SimpleIntegerProperty();
+		releaseType = new SimpleStringProperty("");
+		tagErrors = new Vector <TagError> ();
+		lovedState = LovedState.NOT_SET;
+	}
 }
-
-
-
-
-
 

@@ -58,51 +58,59 @@ public class ThrottledTrackFilter {
 	}
 	
 	private void setPredicate ( String filterText, boolean hideAlbumTracks ) {
-		try {
-			filteredList.setPredicate( ( Track track ) -> {
-				if ( track.getAlbum() != null && hideAlbumTracks ) return false;
-				if ( interruptFiltering ) return true;
-				if ( filterText.isEmpty() ) return true;
-		
-				ArrayList <String> matchableText = new ArrayList <String>();
-		
-				matchableText.add( track.getArtist().toLowerCase() );
-				matchableText.add( track.getTitle().toLowerCase() );
-				matchableText.add( track.getFullAlbumTitle().toLowerCase() );
+			try {
+				filteredList.setPredicate( ( Track track ) -> {
+					try {
+						if ( track.getAlbum() != null && hideAlbumTracks ) return false;
+						if ( interruptFiltering ) return true;
+						if ( filterText.isEmpty() ) return true;
 				
-				if ( track.getArtist().matches( ".*[^\\p{ASCII}]+.*" ) ) {
-					matchableText.add( Normalizer.normalize( track.getArtist(), Normalizer.Form.NFD )
-						.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-				}
+						ArrayList <String> matchableText = new ArrayList <String>();
 				
-				if ( track.getTitle().matches( ".*[^\\p{ASCII}]+.*" ) ) {
-					matchableText.add( Normalizer.normalize( track.getTitle(), Normalizer.Form.NFD )
-						.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-				}
-				
-				if ( track.getFullAlbumTitle().matches( ".*[^\\p{ASCII}]+.*" ) ) {
-					matchableText.add( Normalizer.normalize( track.getFullAlbumTitle(), Normalizer.Form.NFD )
-						.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
-				}
-				
-				String[] lowerCaseFilterTokens = filterText.toLowerCase().split( "\\s+" );
-				for ( String token : lowerCaseFilterTokens ) {
-					boolean tokenMatches = false;
-					for ( String test : matchableText ) {
-						if ( test.contains( token ) ) {
-							tokenMatches = true;
+						matchableText.add( track.getArtist().toLowerCase() );
+						matchableText.add( track.getTitle().toLowerCase() );
+						matchableText.add( track.getFullAlbumTitle().toLowerCase() );
+						
+						if ( track.getArtist().matches( ".*[^\\p{ASCII}]+.*" ) ) {
+							matchableText.add( Normalizer.normalize( track.getArtist(), Normalizer.Form.NFD )
+								.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
 						}
+						
+						if ( track.getTitle().matches( ".*[^\\p{ASCII}]+.*" ) ) {
+							matchableText.add( Normalizer.normalize( track.getTitle(), Normalizer.Form.NFD )
+								.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+						}
+						
+						if ( track.getFullAlbumTitle().matches( ".*[^\\p{ASCII}]+.*" ) ) {
+							matchableText.add( Normalizer.normalize( track.getFullAlbumTitle(), Normalizer.Form.NFD )
+								.replaceAll( "[^\\p{ASCII}]", "" ).toLowerCase() );
+						}
+						
+						String[] lowerCaseFilterTokens = filterText.toLowerCase().split( "\\s+" );
+						for ( String token : lowerCaseFilterTokens ) {
+							boolean tokenMatches = false;
+							for ( String test : matchableText ) {
+								if ( test.contains( token ) ) {
+									tokenMatches = true;
+								}
+							}
+				
+							if ( !tokenMatches ) {
+								return false;
+							}
+						}
+					}catch(ArrayIndexOutOfBoundsException ae) {
+						//This happens if you filter a list while scanning, and then clear the filter.  
+						//It doesn't seem to matter at all, so I'm just ignoring it for now. 
+					}catch(Exception e) {
+						LOGGER.log(Level.INFO, "Exception caught, ignored.", e); 
 					}
-		
-					if ( !tokenMatches ) {
-						return false;
-					}
-				}
-		
-				return true;
-			});
-		}catch(Exception e) {
-			LOGGER.log(Level.INFO, "Exception caught, ignored.", e); 
-		}
+				
+					return true;
+				});
+			} catch ( Exception e ) {
+				LOGGER.log(Level.INFO, "Caught Exception: " + e );
+			}
+
 	}
 }

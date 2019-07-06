@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-
-import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -126,7 +124,7 @@ public class AlbumInfoWindow extends Stage {
 
 	public void setAlbum ( Album album ) { 
 		this.album = album;
-		trackTable.setItems( FXCollections.observableArrayList ( album.getTracks() ) );
+		trackTable.setItems( album.getTracks() );
 		locationField.setText( album.getPath().toString() );
 	}
 	

@@ -394,12 +394,4 @@ public class HistoryWindow extends Stage {
 		setScene( scene );
 		
 	}
-
-	public void refresh () {
-		for ( Track track : historyTable.getItems() ) {
-			try {
-				track.refreshTagData();
-			} catch ( Exception e ) {}
-		}
-	}
 }

@@ -1,32 +1,27 @@
-Observable Issues
-   If you edit the tags of an album via the current list, the album table doesn't refresh unless you sort it
-
-   if you edit the tags of an album on the current list, save them, close hypnos and reopen, it forgets the edits on the
-      current list, even though the tag data has been changed
-
-   If you open an album info window, then delete a file from the disk from that album, the contents of the window won't
-   change. If you re-open it they change. 
-
-
 Library & Scanner Rebuild
-   Filtering a track list while scanning throws ArrayIndexOutOfBoundsException, can't be caught normally
+   Filtering the track or album list causes exceptions which can't just be ignored
 
-   Add buttons to library scan log window
-      Clear log
-      copy log
-      Maybe select different types of things, like albums rejected, full list, etc. 
+   Artist hasn't been converted to the observable paradigm yet, so there are problems
+      If you open an artist window and delete a file, it isn't removed from the artist window list
+      The UI doesn't update all the time
+
+   When you drag an artist image, you can't select "all albums by this artist."
+      see AudioSystem.java, the issue is in there near a todo
+
+Sometimes the art pane can become non-responsive. I dragged and dropped an image from google and it stopped changing
+   I've seen it a few other times too.
+   It happened as i was scrolling quickly though Josh radio, around Joanna newsom
+   Leonard Cohen - Darker is a good example
+      Jul 2, 2019 23:50:00 PM javafx.scene.image imageLoadWarning
+      WARNING: Invalid SOS parameters for sequential JPEG
+
+      Jul 2, 2019 23:50:04 PM javafx.scene.image imageLoadWarning
+      WARNING: Invalid SOS parameters for sequential JPEG
 
 Scanner
    Add removing a musicroot status updates to UI
 
-   Can I make it more responsive to changes on disk? There's like a 3 second delay
-
-   Manual rescan option for tracks?
-
 UI
-   When you drag an artist image, you can't select "all albums by this artist."
-      see AudioSystem.java, the issue is in there near a todo
-
    Right clicking on library buttons changes library tab, only left click should
 
    Improve tag editor UI. It's clunky.  Single clicks good
@@ -38,12 +33,12 @@ UI
    setup:  add an album to library. Delete folder contents, but leave folder.  Go to album info window.  Double click a
    track. 
 
-   Sometimes the art pane can become non-responsive. I dragged and dropped an image from google and it stopped changing
-      I've seen it a few other times too.
-      It happened as i was scrolling quickly though Josh radio, around Joanna newsom
-      Leonard Cohen - Darker is a good example
-
    If something gets dropped into config/playlists folders, update the UI to include it?
+
+   Add buttons to library scan log window
+      Clear log
+      copy log
+      Maybe select different types of things, like albums rejected, full list, etc. 
    
 Linux
    JavaFX / Linux Open File Dialog sometimes causes jvm crash, depends on system, and doesn't happen always
@@ -62,10 +57,6 @@ Windows
       https://stackoverflow.com/questions/56847367/can-you-prevent-watchservice-from-locking-files-on-windows
 
 Backend
-   Sometimes the tags dont save when you hit save
-
-   Improve memory usage if possible, particularly look at library i think that's a big cause
-
    Remove WinXP not supported by Jfx
 
    Build jxgrabhotkey as a seperate jar
@@ -75,16 +66,12 @@ Backend
    Can we use Java's Jigsaw to reduce distribution size somehow? We had issues w/ circular dependencies, but can we work
    through that?
 
-   There's a significant delay after close is hit until hypnos window closes
-
-
 Windows System Integration
       Select Multiple Files in explorer - No Option to play in Hypnos. Add that
       "Open with" causes the current track button to not show the current track's name.
       Commandline Interface
          Send a file via command line when hypnos isn't playing -- it starts
          Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on current list
-
 
 Decoder  
    I found an MP3 that Hypnos refuses to play. VLC plays it.

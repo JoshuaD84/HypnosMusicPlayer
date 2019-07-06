@@ -186,6 +186,7 @@ public class Persister {
 			audioSystem.getCurrentList().setHasUnsavedData( false );
 			
 		} catch ( Exception e ) {
+			e.printStackTrace();
 			try ( ObjectInputStream dataIn = new ObjectInputStream( new GZIPInputStream( new FileInputStream( currentFile ) ) ) ) {
 				audioSystem.getCurrentList().setState ( (CurrentListState)dataIn.readObject() );
 				audioSystem.getCurrentList().setHasUnsavedData( false );

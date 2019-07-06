@@ -20,7 +20,9 @@ public class CachedList<T> {
 	ObservableList<T> items = FXCollections.observableArrayList(new ArrayList<T>());
 	Lock itemsLock = new ReentrantLock();
 	
-	ObservableList<T> displayCache = FXCollections.observableArrayList(new ArrayList<T>());
+	ObservableList<T> displayCache = FXCollections
+			.synchronizedObservableList(FXCollections.observableArrayList(new ArrayList<T>()));
+
 	List<Action<T>> pendingChanges = new ArrayList<>();
 	
 	boolean runLaterPending = false;
@@ -91,11 +93,11 @@ public class CachedList<T> {
 		}
 	}
 	
-	public void addOrReplaceItem(T addMe) {
-		addOrReplaceItem(addMe, false);
+	public void addItem(T addMe) {
+		addItem(addMe, false);
 	}
 	
-	public void addOrReplaceItem(T addMe, boolean fxThreadPermitted) {
+	public void addItem(T addMe, boolean fxThreadPermitted) {
 		if(!fxThreadPermitted && Platform.isFxApplicationThread()) {
 			LOGGER.warning("Modifying the base list while on UI Thread. This is likely a bug, but trying to continue.");
 		}
@@ -106,25 +108,7 @@ public class CachedList<T> {
 		
 		try {
 			itemsLock.lock();	
-			T alreadyInList = null;
-			
-			for (T item : items) {
-				if(addMe.equals(item)) {
-					alreadyInList = item;
-					break;
-				}
-			}
-			
-			if (alreadyInList instanceof Album) {
-				Album updateMe = (Album)alreadyInList;
-				updateMe.setData((Album)addMe);
-			} else {
-				if(alreadyInList!=null) {
-					items.remove(alreadyInList);
-				} 
-				items.add(addMe);
-			}
-
+			items.add(addMe);
 		} finally {
 			itemsLock.unlock();
 		}
@@ -186,6 +170,12 @@ public class CachedList<T> {
 
 	public void addListenerToBase(InvalidationListener listener) {
 		items.addListener(listener);
+	}
+
+	public void setDataOnInitialLoad(List<T> initialItems) {
+		items.addAll(initialItems);
+		displayCache.addAll(initialItems);
+		pendingChanges.clear();
 	}
 }
 

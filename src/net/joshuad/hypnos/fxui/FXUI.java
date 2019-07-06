@@ -1306,10 +1306,6 @@ public class FXUI implements PlayerListener {
 		queueWindow.refresh();
 	}
 	
-	public void refreshHistory() {
-		historyWindow.refresh();
-	}
-	
 	public void refreshImages() {
 		artSplitPane.refreshImages ();
 	}

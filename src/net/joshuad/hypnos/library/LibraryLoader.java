@@ -5,26 +5,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import me.xdrop.fuzzywuzzy.FuzzySearch;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.fxui.FXUI;
 
 class LibraryLoader {
-
 	private static final Logger LOGGER = Logger.getLogger(LibraryLoader.class.getName());
-
-	private final Vector<Path> pathsToUpdate = new Vector<>();
-
+	private final ArrayList<Path> pathsToUpdate = new ArrayList<>();
 	private boolean clearOrphansAndMissing = false;
-
 	private Thread loaderThread;
-
 	private Library library;
-
 	private DiskReader diskReader;
 	private LibraryScanLogger scanLogger;
 	
@@ -41,7 +33,7 @@ class LibraryLoader {
 
 	public void start() {
 		if (!loaderThread.isAlive()) {
-			loaderThread.start();
+			loaderThread.start(); 
 		} else {
 			LOGGER.log(Level.INFO, "Disk Scanner thread asked to start, but it's already running, request ignored.");
 		}
@@ -200,73 +192,6 @@ class LibraryLoader {
 		}
 
 		return retMe;
-	}
-
-	static boolean isAlbum(FileTreeNode node, LibraryScanLogger libraryLog) {
-
-		if (!Files.isDirectory(node.getPath())) {
-			libraryLog.println( "[LibraryLoader] Album rejected, not a directory: " + node.getPath() );
-			return false;
-		}
-
-		String albumName = null;
-		String artistName = null;
-
-		int childTrackCount = 0;
-
-		for (FileTreeNode child : node.getChildren()) {
-			if (child.getAlbum() != null) {
-				libraryLog.println( "[LibraryLoader] Album rejected, subdirectory is an album: " + node.getPath() );
-				return false;
-			}
-
-			if (child.getArtist() != null) {
-				libraryLog.println( "[LibraryLoader] Album rejected, no artist specified: " + node.getPath() );
-				return false;
-			}
-
-			if (child.getTrack() != null) {
-				childTrackCount++;
-
-				if (albumName == null) {
-					albumName = Utils.prepareAlbumForCompare(child.getTrack().getAlbumTitle());
-					artistName = Utils.prepareArtistForCompare(child.getTrack().getAlbumArtist());
-
-				} else {
-					// We usually use weighted ratio, but that can return 0 for album names like ()
-					// even if the strings are identical.
-					// In that case, we switch to straight ratio, which doesn't have this problem
-
-					int albumMatchPercent = FuzzySearch.weightedRatio(albumName,
-							Utils.prepareAlbumForCompare(child.getTrack().getAlbumTitle()));
-					if (albumMatchPercent == 0)
-						albumMatchPercent = FuzzySearch.ratio(albumName,
-								Utils.prepareAlbumForCompare(child.getTrack().getAlbumTitle()));
-					if (albumMatchPercent < 90) {
-						libraryLog.println( "[LibraryLoader] Album rejected, album name in tags too different: " + node.getPath() );
-						return false;
-					}
-
-					int artistMatchPercent = FuzzySearch.weightedRatio(artistName,
-							Utils.prepareArtistForCompare(child.getTrack().getAlbumArtist()));
-					if (artistMatchPercent == 0)
-						albumMatchPercent = FuzzySearch.ratio(artistName,
-								Utils.prepareAlbumForCompare(child.getTrack().getAlbumArtist()));
-					if (artistMatchPercent < 90) {
-
-						libraryLog.println( "[LibraryLoader] Album rejected, artist name in tags too different: " + node.getPath() );
-						return false;
-					}
-				}
-			}
-		}
-
-		if (childTrackCount == 0) {
-			libraryLog.println( "[LibraryLoader] Album rejected, no tracks: " + node.getPath() );
-			return false;
-		}
-
-		return true;
 	}
 
 	private void clearMissing() {

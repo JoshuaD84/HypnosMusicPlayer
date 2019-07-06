@@ -191,6 +191,12 @@ public class Library {
 	public void requestRescan(Path path) {
 		loader.queueUpdatePath(path);
 	}
+	
+	public void requestRescan(List<Album> albums) {
+		for (Album album : albums) {
+			requestRescan(album.getPath());
+		}
+	}
 
 	public void setMusicRootsOnInitialLoad(ArrayList<MusicRoot> roots) {
 		for (MusicRoot musicRoot : roots) {
@@ -200,19 +206,18 @@ public class Library {
 	}
 
 	public void setDataOnInitialLoad(ArrayList<Track> tracks, ArrayList<Album> albums) {
-		this.tracks.getItemsCopy().setAll(tracks);
-		this.albums.getItemsCopy().setAll(albums);
-		this.artists.getItemsCopy().setAll(generateArtists());
-	}
-
-	public void requestRescan(List<Album> albums) {
-		for (Album album : albums) {
-			requestRescan(album.getPath());
-		}
+		this.tracks.setDataOnInitialLoad(tracks);
+		this.albums.setDataOnInitialLoad(albums);
+		this.artists.setDataOnInitialLoad(generateArtists());
 	}
 
 	public void addMusicRoot(Path path) {
-		musicRoots.addOrReplaceItem(new MusicRoot(path), true);
+		for (MusicRoot root : musicRoots.getItemsCopy()) {
+			if(root.getPath().equals(path)) {
+				return;
+			}
+		}
+		musicRoots.addItem(new MusicRoot(path), true);
 	}
 
 	public void removeMusicRoot(MusicRoot musicRoot) {
@@ -225,7 +230,7 @@ public class Library {
 	}
 
 	public void addPlaylist(Playlist playlist) {
-		playlists.addOrReplaceItem(playlist, true);
+		playlists.addItem(playlist, true);
 	}
 
 	public String getUniquePlaylistName() {
@@ -350,16 +355,10 @@ public class Library {
 		this.dataNeedsToBeSavedToDisk = b;
 	}
 
-	void addTrackData(Track track) {
-		tracks.addOrReplaceItem(track);
+	void addTrack(Track track) {
+		tracks.addItem(track);
 		for (TagError error : track.getTagErrors()) {
-			tagErrors.addOrReplaceItem(error);
-		}
-	}
-
-	void addTrackData(List<Track> addMe) {
-		for (Track track : addMe) {
-			addTrackData(track);
+			tagErrors.addItem(error);
 		}
 	}
 
@@ -370,8 +369,8 @@ public class Library {
 		}
 	}
 
-	void addAlbumData(Album album) {
-		albums.addOrReplaceItem(album);
+	void addAlbum(Album album) {
+		albums.addItem(album);
 	}
 
 	void notAnAlbum(Path path) {
