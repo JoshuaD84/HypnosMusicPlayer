@@ -59,11 +59,9 @@ class LibraryLoader {
 					for (MusicRoot root : library.getMusicRootData()) {
 						root.recheckValidity();
 					}
-					
 					if (System.currentTimeMillis() - lastOrphanClearMS > 5000) {
 						clearOrphansAndMissing = true;
 					}
-					
 					if (clearOrphansAndMissing || musicRootRemoved) {
 						String message = musicRootRemoved ? "Removing Items..." : "";
 						musicRootRemoved = false;
@@ -76,41 +74,33 @@ class LibraryLoader {
 						}
 						musicRootRemoved = false;
 					}
-
 					List<MusicRoot> libraryRoots = new ArrayList<>(library.getMusicRootData());
 					for (MusicRoot root : libraryRoots) {
 						if (root.needsInitialScan()) {
 							diskReader.scanMusicRoot(root, DiskReader.ScanMode.INITIAL_SCAN);
 						}
 					}
-					
 					libraryRoots = new ArrayList<>(library.getMusicRootData());
 					for (MusicRoot root : libraryRoots) {
 						if (root.needsRescan()) {
 							diskReader.scanMusicRoot(root, DiskReader.ScanMode.RESCAN);
 						}
 					}
-
 					if (!pathsToUpdate.isEmpty()) {
 						synchronized (pathsToUpdate) {
 							Path pathToUpdate = pathsToUpdate.remove(0).toAbsolutePath();
 							updateLibraryAtPath(pathToUpdate);
-
 							// remove any sub paths, because they got updated when we called updateLibraryAtPath( parent )
 							List<Path> childPaths = new ArrayList<>();
-
 							for (Path path : pathsToUpdate) {
 								if (path.toAbsolutePath().startsWith(pathToUpdate)) {
 									childPaths.add(path);
 								}
 							}
-
 							pathsToUpdate.removeAll(childPaths);
 						}
 					}
-
 					library.getDiskWatcher().processWatcherEvents();
-
 					try {
 						Thread.sleep(50);
 					} catch (InterruptedException e) {
@@ -118,41 +108,34 @@ class LibraryLoader {
 				}
 			}
 		};
-
 		loaderThread.setName("Library Loader");
 		loaderThread.setDaemon(true);
 	}
 
 	public void updateLibraryAtPath(Path path) {
 		path = path.toAbsolutePath();
-
 		if (!Files.exists(path)) {
-			
 			List<Track> tracksToRemove = new ArrayList<>();
 			for (Track track : library.getTrackData()) {
 				if (track.getPath().toAbsolutePath().startsWith(path)) {
 					tracksToRemove.add(track);
 				}
 			}
-			
 			for (Track track : tracksToRemove) {
 				scanLogger.println("[LibraryLoader] Removing track data from track list: " + track.getPath());
 				library.removeTrack(track);
 			}
-
 			List<Album> albumsToRemove = new ArrayList<>();
 			for (Album album : library.getAlbumData()) {
 				if (album.getPath().toAbsolutePath().startsWith(path)) {
 					albumsToRemove.add(album);
 				}
 			}
-			
 			for (Album album : albumsToRemove) {
 				scanLogger.println("[LibraryLoader] Removing album data from album list: " + path);
 				library.removeAlbum(album);
 				library.getDiskWatcher().stopWatching(album.getPath());
 			}
-
 		} else if (Utils.isMusicFile(path)) {
 			Track existingTrackAtPath = null;
 			for (Track track : library.getTrackData()) {
@@ -161,24 +144,19 @@ class LibraryLoader {
 					break;
 				}
 			}
-
 			if (existingTrackAtPath != null) {
 				scanLogger.println("[LibraryLoader] Updating track data at: " + path);
 				existingTrackAtPath.refreshTagData();
-
 				// This will make sure that any existing album gets updated, and if the
 				// album has been destroyed on disk, it is removed from our library
 				pathsToUpdate.add(existingTrackAtPath.getPath().getParent());
-
 			} else {
 				scanLogger.println("[LibraryLoader] new track found at: " + path);
 				Track newTrack = new Track(path);
 				library.getTrackData().remove(newTrack);
 			}
-
 		} else if (Files.isDirectory(path)) {
 			scanLogger.println("[LibraryLoader] Doing directory rescan at: " + path);
-
 			List<Path> childrenOfPath = new ArrayList<>();
 			for (Path futureUpdate : pathsToUpdate) {
 				if (Utils.isChildOf(futureUpdate, path)) {
@@ -186,7 +164,6 @@ class LibraryLoader {
 					scanLogger.println("[LibraryLoader] - Removing future scan, its a child: " + path);
 				}
 			}
-
 			pathsToUpdate.removeAll(childrenOfPath);
 			diskReader.updatePath(path);
 		}
@@ -199,7 +176,6 @@ class LibraryLoader {
 		} catch (Exception e) {
 			LOGGER.log(Level.INFO, "Unable to count subdirectories, loader status bar will not be accurate", e);
 		}
-
 		return retMe;
 	}
 
@@ -228,10 +204,8 @@ class LibraryLoader {
 	}
 		
 	private void clearOrphans(String message) {
-		
 		int totalCount = library.getAlbumData().size() + library.getTrackData().size() + 10; //10 for the removal time
 		int currentCount = 0;
-		
 		List<Album> removeMeAlbums = new ArrayList<>();
 		for (Album album : library.getAlbumData()) {
 			currentCount++;
@@ -249,7 +223,6 @@ class LibraryLoader {
 					break;
 				}
 			}
-			
 			if (!hasRoot) {
 				removeMeAlbums.add(album);
 			}

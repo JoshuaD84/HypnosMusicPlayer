@@ -111,7 +111,6 @@ public class Track implements Serializable, AlbumInfoSource {
 
 	private int length = 0;
 	private File trackFile;
-	
 	private boolean isLossless = false;
 	private long bitRate = -1;
 	private int sampleRate = -1;
@@ -119,7 +118,6 @@ public class Track implements Serializable, AlbumInfoSource {
 	private String encodingType = "";
 	private String format = "";
 	private Album album = null;
-	
 	private transient StringProperty artist;
 	private transient StringProperty albumArtist;
 	private transient StringProperty title;
@@ -189,22 +187,18 @@ public class Track implements Serializable, AlbumInfoSource {
 	public void refreshTagData() {
 		Tag tag = null;
 		Logger.getLogger( "org.jaudiotagger" ).setLevel( Level.OFF ); 
-		
 		try {
 			AudioFile audioFile = getAudioFile();
 			AudioHeader audioHeader = audioFile.getAudioHeader();
 			length = audioHeader.getTrackLength();
 			tag = audioFile.getTag();
-			
 			isLossless = audioHeader.isLossless();
 			bitRate = audioHeader.getBitRateAsNumber();
 			sampleRate = audioHeader.getSampleRateAsNumber();
 			isVBR = audioHeader.isVariableBitRate();
 			encodingType = audioHeader.getEncodingType();
 			format = audioHeader.getFormat();
-			
 			tagErrors.clear();
-
 			parseArtist( tag );
 			parseTitle( tag ); 
 			parseAlbum( tag );
@@ -215,21 +209,17 @@ public class Track implements Serializable, AlbumInfoSource {
 		} catch ( Exception e ) {
 			tagErrors.add( new TagError ( TagErrorType.CANNOT_READ_TAG, this ) );
 		}
-
 		parseFileName();
 	}
 	
 	private AudioFile getAudioFile() throws IOException, CannotReadException, TagException, ReadOnlyFileException, InvalidAudioFrameException {
-		
 		int i = trackFile.toString().lastIndexOf('.');
 		String extension = "";
 		if( i > 0 ) {
 		    extension = trackFile.toString().substring(i+1).toLowerCase();
 		}
-		
 		if ( extension.matches( Format.AAC.getExtension() ) || extension.matches( Format.M4R.getExtension() ) ) {
 			return AudioFileIO.readAs( trackFile, "m4a" );
-			
 		} else {
 			return AudioFileIO.read( trackFile );
 		}
@@ -237,29 +227,24 @@ public class Track implements Serializable, AlbumInfoSource {
 	
 	private void parseFileName () {
 		//TODO: Look at parsing track number from file name too
-		
 		String filenameArtist = "";
 		String filenameYear = "";
 		String filenameAlbum = "";
 		String filenameTitle = "";
-		
 		try {
 			filenameArtist = trackFile.toPath().getParent().getParent().getFileName().toString();
 		} catch ( Exception e ) { 
 			//No need to log this
 		}
-		
 		try {
 			String parentName = trackFile.toPath().getParent().getFileName().toString();
 			String[] parentParts = parentName.split( " - " );
-			
 			if ( parentParts.length == 1 ) {
 				if ( album != null ) {
 					filenameAlbum = parentParts [ 0 ];
 				} else {
 					filenameArtist = parentParts [ 0 ];
 				}
-				
 			} else if ( parentParts.length == 2 ) { 
 				if ( parentParts [ 0 ].matches( "^[0-9]{4}[a-zA-Z]{0,1}" ) ) {
 					filenameYear = parentParts [ 0 ];
@@ -275,11 +260,9 @@ public class Track implements Serializable, AlbumInfoSource {
 			filenameTitle = trackFile.toPath().getFileName().toString();
 			filenameTitle = filenameTitle.replaceAll(" - ", "").replaceAll(filenameArtist, "").replaceAll(filenameAlbum, "")
 					.replaceAll(filenameYear, "");
-
 		} catch ( Exception e ) { 
 			//PENDING: We get an exception with albums that have [] and maybe {} in their directory structure 
 		}
-
 		//TODO: Add some error checking, only do this if we're pretty sure it's good. 
 		if ( artist.get().equals( "" ) && !filenameArtist.equals( "" ) ) { artist.set(filenameArtist); }
 		if ( albumArtist.get().equals( "" ) && !filenameArtist.equals( "" ) ) { albumArtist.set(filenameArtist); }
@@ -294,11 +277,9 @@ public class Track implements Serializable, AlbumInfoSource {
 			albumArtist.set(tag.getFirst ( FieldKey.ALBUM_ARTIST ));
 			artist.set(tag.getFirst ( FieldKey.ARTIST ));
 		}
-		
 		if ( albumArtist.get().equals( "" ) ) {
 			albumArtist.set(artist.get());
 		}
-		
 		if ( artist.get().equals( "" ) ) {
 			tagErrors.add( new TagError ( TagErrorType.MISSING_ARTIST, this ) );
 		}
@@ -307,7 +288,6 @@ public class Track implements Serializable, AlbumInfoSource {
 	private void parseTitle ( Tag tag ) {
 		if ( tag != null ) {
 			title.set(tag.getFirst ( FieldKey.TITLE ));
-			
 			try { 
 				if ( title.get().equals( "" ) ) {
 					tagErrors.add( new TagError ( TagErrorType.MISSING_TITLE, this ) );
@@ -325,7 +305,6 @@ public class Track implements Serializable, AlbumInfoSource {
 			try { 
 				if ( albumTitle.get().equals( "" ) ) {
 					tagErrors.add( new TagError ( TagErrorType.MISSING_ALBUM, this ) );
-					
 					albumTitle.set(tag.getFirst( FieldKey.ALBUM_SORT ));
 				}
 			} catch ( UnsupportedOperationException e ) {}
@@ -336,13 +315,15 @@ public class Track implements Serializable, AlbumInfoSource {
 		if ( tag != null ) {
 			try { 
 				originalDate.set(tag.getFirst ( FieldKey.ORIGINAL_YEAR ));
-			} catch ( UnsupportedOperationException e ) {}
-
+			} catch ( UnsupportedOperationException e ) {
+				//Do nothing
+			}
 			try { 
 				date.set(tag.getFirst( FieldKey.YEAR ));
-			} catch ( UnsupportedOperationException e ) {}
+			} catch ( UnsupportedOperationException e ) {
+				//Do nothing
+			}
 		}
-		
 		if ( date.get().equals( "" ) ) {
 			tagErrors.add( new TagError ( TagErrorType.MISSING_DATE, this ) );
 		}
@@ -350,30 +331,23 @@ public class Track implements Serializable, AlbumInfoSource {
 	
 	private void parseTrackNumber( Tag tag ) {
 		if ( tag != null ) {
-			
 			String rawText = tag.getFirst ( FieldKey.TRACK );
 			String rawNoWhiteSpace = rawText.replaceAll("\\s+","");
-			
 			try { 
 				if ( rawText.matches( "^[0-9]+$" ) ) { // 0, 01, 1010, 2134141, etc.
 					trackNumber.set(Integer.parseInt( rawText ));
-					
 				} else if ( rawNoWhiteSpace.matches( "^[0-9]+$" ) ) { 
 					trackNumber.set(Integer.parseInt( rawNoWhiteSpace ));
 					tagErrors.add( new TagError ( TagErrorType.TRACK_NUMBER_EXCESS_WHITESPACE, this ) );
-					
 				} else if ( rawText.matches("^[0-9]+/.*") ) {
 					trackNumber.set(Integer.parseInt( rawText.split("/")[0] ));
 					tagErrors.add( new TagError ( TagErrorType.TRACK_NUMBER_HAS_DISC, this ) );
-				
 				} else if ( rawNoWhiteSpace.matches("^[0-9]+/.*") ) {
 					trackNumber.set(Integer.parseInt( rawNoWhiteSpace.split("/")[0] ));
 					tagErrors.add( new TagError ( TagErrorType.TRACK_NUMBER_HAS_DISC, this ) );
-					
 				} else {
 					throw new NumberFormatException();
 				}
-				
 			} catch ( NumberFormatException e ) {
 				if ( ! rawNoWhiteSpace.equals( "" ) ) {
 					tagErrors.add( new TagError ( TagErrorType.TRACK_NUMBER_INVALID_FORMAT, this, rawText ) );
@@ -389,8 +363,6 @@ public class Track implements Serializable, AlbumInfoSource {
 			} catch ( UnsupportedOperationException e ) {
 				//No problem, it doesn't exist for this file format
 			}
-			
-			
 			try {
 				discCount.set(Integer.valueOf( tag.getFirst ( FieldKey.DISC_TOTAL ) ));
 			} catch ( NumberFormatException e ) {
@@ -400,43 +372,32 @@ public class Track implements Serializable, AlbumInfoSource {
 			} catch ( UnsupportedOperationException e ) {
 				//No problem, it doesn't exist for this file format
 			}
-			
 			String rawText = "";
 			String rawNoWhiteSpace = "";
 			try {
 				rawText = tag.getFirst ( FieldKey.DISC_NO );
 				rawNoWhiteSpace = rawText.replaceAll("\\s+","");
-			
 				if ( rawText.matches( "^[0-9]+$" ) ) { // 0, 01, 1010, 2134141, etc.
 					discNumber.set(Integer.parseInt( rawText ));
-					
 				} else if ( rawNoWhiteSpace.matches( "^[0-9]+$" ) ) { 
 					discNumber.set(Integer.parseInt( rawNoWhiteSpace ));
 					tagErrors.add( new TagError ( TagErrorType.DISC_NUMBER_EXCESS_WHITESPACE, this ) );
-					
 				} else if ( rawText.matches("^[0-9]+/.*") ) {//if matches 23/<whatever>
 					discNumber.set(Integer.parseInt( rawText.split("/")[0] ));
-					
 					if ( discCount == null ) {
 						discCount.set(Integer.parseInt( rawText.split("/")[1] ));
 					}
-
 					tagErrors.add( new TagError ( TagErrorType.DISC_NUMBER_HAS_TRACK, this ) );
-				
 				} else if ( rawNoWhiteSpace.matches("^[0-9]+/.*") ) {
 					//if matches 23/<whatever>
 					discNumber.set(Integer.parseInt( rawNoWhiteSpace.split("/")[0] ));
-					
 					if ( discCount == null ) {
 						discCount.set(Integer.parseInt( rawNoWhiteSpace.split("/")[1] ));
 					}
-
 					tagErrors.add( new TagError ( TagErrorType.DISC_NUMBER_HAS_TRACK, this ) );
-					
 				} else {
 					throw new NumberFormatException();
 				}
-				
 			} catch ( NumberFormatException e ) {
 				if ( ! rawNoWhiteSpace.equals( "" ) ) {
 					tagErrors.add( new TagError ( TagErrorType.DISC_NUMBER_INVALID_FORMAT, this, rawText ) );
@@ -479,21 +440,16 @@ public class Track implements Serializable, AlbumInfoSource {
 	
 	public String getFullAlbumTitle () {
 		String retMe = albumTitle.get();
-		
 		if ( discSubtitle != null && !discSubtitle.get().equals( "" ) ) {
 			retMe += " (" + discSubtitle + ")";
-			
 		} else if ( discCount != null && discCount.get() > 1 ) {
 			if ( discNumber != null ) retMe += " (Disc " + discNumber + ")";
-			
 		} else if ( discNumber != null && discNumber.get() > 1 ) { 
 			retMe += " (Disc " + discNumber + ")";
 		}
-		
 		if ( releaseType.get() != null && !releaseType.get().equals("") && !releaseType.get().matches( "(?i:album)" ) ) {
 			retMe += " [" + Utils.toReleaseTitleCase( releaseType.get() ) + "]";
 		}
-		
 		return retMe;
 	}		
 	
@@ -583,9 +539,7 @@ public class Track implements Serializable, AlbumInfoSource {
 	
 	public boolean equals( Object o ) {
 		if ( !( o instanceof Track ) ) return false;
-		
 		Track compareTo = (Track) o;
-		
 		return ( compareTo.getPath().toAbsolutePath().equals( getPath().toAbsolutePath() ) );
 	}
 	
@@ -616,119 +570,89 @@ public class Track implements Serializable, AlbumInfoSource {
 		try {
 			AudioFile audioFile = AudioFileIO.read( file );
 			Tag tag = audioFile.getTag();
-
 			if ( tag instanceof ID3v1Tag ) {
 				tag = new ID3v23Tag ( (ID3v1Tag)tag );
 			}
-
 			tag.deleteField( FieldKey.CUSTOM4 );
-
 			List <Artwork> artworkList = tag.getArtworkList();
-
 			tag.deleteArtworkField();
-			
 			for ( Artwork artwork : artworkList ) {
 				if ( artwork.getPictureType() != type ) {
 					tag.addField( artwork );
 				}
 			}
-			
 			boolean pausedPlayer = false;
 			long currentPositionMS = 0;
 			Track currentTrack = null;
-			
 			if ( audioSystem.getCurrentTrack() != null && audioSystem.getCurrentTrack().getPath().equals( file.toPath() ) && audioSystem.isPlaying() ) {
-
 				currentPositionMS = audioSystem.getPositionMS();
 				currentTrack = audioSystem.getCurrentTrack();
 				audioSystem.stop( StopReason.WRITING_TO_TAG );
 				pausedPlayer = true;
 			}
-				
 			audioFile.setTag( tag );
 			AudioFileIO.write( audioFile );
-			
 			if ( pausedPlayer ) {
 				audioSystem.playTrack( currentTrack, true );
 				audioSystem.seekMS( currentPositionMS );
 				audioSystem.unpause();
 			}
-			
 		} catch ( Exception e ) {
 			LOGGER.log( Level.WARNING, "Unable to delete image from tag: " + file, e );
 		}
-		
 	}
 	
 	private static void saveImageToID3 ( File file, byte[] buffer, int type, ArtistTagImagePriority priority, boolean overwriteAll, AudioSystem audioSystem ) {
-
 		try {
 			AudioFile audioFile = AudioFileIO.read( file );
 			Tag tag = audioFile.getTag();
-
 			if ( tag instanceof ID3v1Tag ) {
 				tag = new ID3v23Tag ( (ID3v1Tag)tag );
 			}
-			
 			if ( priority != null && !overwriteAll ) {
 				Integer currentPriority = null;
-				
 				try {
 					currentPriority = ArtistTagImagePriority.valueOf( tag.getFirst( FieldKey.CUSTOM4 ) ).getValue();
 				} catch ( Exception e ) {
 					currentPriority = null;
 				}
-				
 				if ( currentPriority != null && currentPriority > priority.getValue() ) {
 					LOGGER.info( file.getName() + ": Not overwriting tag. Selected priority (" 
 						+ priority.getValue() + ") " + "is less than current priority (" + currentPriority + ")." );
-
 					return;
 				}
 			}
-
 			List <Artwork> artworkList = tag.getArtworkList();
-
 			tag.deleteArtworkField();
-			
 			for ( Artwork artwork : artworkList ) {
 				if ( artwork.getPictureType() != type ) {
 					tag.addField( artwork );
 				}
 			}
-			
 			Artwork artwork = new StandardArtwork();
 			artwork.setBinaryData( buffer );
 			artwork.setPictureType( type ); 
-			
 			tag.addField( artwork );
-			
 			if ( priority != null ) {
 				tag.deleteField( FieldKey.CUSTOM4 );
 				tag.addField( FieldKey.CUSTOM4, priority.toString() );
 			}
-			
 			boolean pausedPlayer = false;
 			long currentPositionMS = 0;
 			Track currentTrack = null;
-			
 			if ( audioSystem.getCurrentTrack() != null && audioSystem.getCurrentTrack().getPath().equals( file.toPath() ) && audioSystem.isPlaying() ) {
-
 				currentPositionMS = audioSystem.getPositionMS();
 				currentTrack = audioSystem.getCurrentTrack();
 				audioSystem.stop( StopReason.WRITING_TO_TAG );
 				pausedPlayer = true;
 			}
-				
 			audioFile.setTag( tag );
 			AudioFileIO.write( audioFile );
-			
 			if ( pausedPlayer ) {
 				audioSystem.playTrack( currentTrack, true );
 				audioSystem.seekMS( currentPositionMS );
 				audioSystem.unpause();
 			}
-			
 		} catch ( Exception e ) {
 			LOGGER.log( Level.WARNING, "Unable to write image to tag: " + file, e );
 		}
@@ -744,48 +668,34 @@ public class Track implements Serializable, AlbumInfoSource {
 	}
 	
 	public void setAndSaveAlbumImage ( byte[] buffer, AudioSystem audioSystem ) {
-		
-		if ( buffer.length < 8 ) return; //png signature is length 8, so might as well use that as an absolute minimum
-
+		if ( buffer.length < 8 ) {
+			return; //png signature is length 8, so might as well use that as an absolute minimum
+		}
 		saveAlbumImageToTag ( getPath().toFile(), buffer, audioSystem );
-		
 		if ( album != null ) {
-			
 			String extension = null;
-			
 			if ( buffer[0] == (byte)0xFF && buffer[1] == (byte)0xD8 ) {
 				extension = ".jpg";
-				
 			} else if ( buffer[0] == (byte)0x89 && buffer[1] == (byte)0x50 && buffer[2] == (byte)0x4e && buffer[3] == (byte)0x47 
 			&& buffer[4] == (byte)0x0d && buffer[5] == (byte)0x0A && buffer[6] == (byte)0x1A && buffer[7] == (byte)0x0A ) {
-			
 				extension = ".png";
-
 			}		
-			
 			if ( extension == null ) {
 				LOGGER.info( "Invalid image file type, not saving." );
 			}
-			
 			Path copyTo = album.getPath().resolve( "front" + extension );
-
 			try {
 				Files.deleteIfExists( album.getPath().resolve( "front.png" ) );
 			} catch ( Exception e ) {
 				LOGGER.log( Level.WARNING, "Unable to delete previous album cover: " + album.getPath().resolve( "front.png" ), e );
 			}
-			
 			try ( FileOutputStream fos = new FileOutputStream ( copyTo.toFile() ) ) {
-				
 				fos.write( buffer );
 				fos.close();
-
 			} catch ( IOException e ) {
 				LOGGER.log( Level.WARNING, "Unable to write album image to disk: " + copyTo, e );
 			}
-			
 			Thread updaterThread = new Thread ( () -> {
-				
 				List <Path> tracks = Utils.getAllTracksInDirectory ( album.getPath() );
 				for ( Path track : tracks ) {
 					if ( !track.toAbsolutePath().equals( getPath().toAbsolutePath() ) ) {
@@ -801,18 +711,14 @@ public class Track implements Serializable, AlbumInfoSource {
 	
 	private Path getPreferredAlbumCoverPath () {
 		if ( album != null ) {
-			
 			if ( this.getPath().getParent() != null ) {
-				
 				ArrayList <Path> preferredFiles = new ArrayList <Path> ();
-
 				preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "front.png" ) );
 				preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "front.jpg" ) );
 				preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "cover.png" ) );
 				preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "cover.jpg" ) );
 				preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "album.png" ) );
 				preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "album.jpg" ) );
-				
 				for ( Path test : preferredFiles ) {
 					if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
 						return test;
@@ -825,7 +731,6 @@ public class Track implements Serializable, AlbumInfoSource {
 	
 	private Path getSecondaryAlbumCoverPath () {
 		if ( album != null ) {
-			
 			if ( this.getPath().getParent() != null ) {
 				ArrayList<Path> otherFiles = new ArrayList<Path>();
 				try {
@@ -835,11 +740,9 @@ public class Track implements Serializable, AlbumInfoSource {
 							otherFiles.add( imagePath ); 
 						}
 					}
-				
 				} catch ( Exception e ) {
 					LOGGER.log( Level.INFO, "Unable to get directory listing: " + this.getPath().getParent(), e ); 
 				}
-				
 				for ( Path test : otherFiles ) {
 					if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
 						return test;
@@ -851,17 +754,14 @@ public class Track implements Serializable, AlbumInfoSource {
 	}
 
 	public Image getAlbumCoverImage ( ) {
-		
 		//Get the tag cover image
 		//then look to folder for key files
 		//then look at tag for any other suitable images
 		//then take any image file from the album folder. 
-		
 		if ( !Files.exists( getPath() ) ) {
 			LOGGER.info( "Track file does not exist."  );
 			return null;
 		}
-		
 		List<Artwork> artworkList = null;
 		try {
 			artworkList = getAudioFile().getTag().getArtworkList(); //This line can throw a NPE
@@ -881,25 +781,20 @@ public class Track implements Serializable, AlbumInfoSource {
 				}			
 			} catch ( ClosedByInterruptException e ) {
 				return null;
-				
 			} catch ( Exception e ) {
 				LOGGER.log( Level.INFO, "Unable to load album image from tag for file: " + getFilename(), e );
 			}
 		}
-		
 		Path bestPath = getPreferredAlbumCoverPath ();
-		
 		if ( bestPath != null ) {
 			return new Image( bestPath.toUri().toString() );
 		}
-		
 		artworkList = null;
 		try {
 			artworkList = getAudioFile().getTag().getArtworkList(); //This line can throw a NPE
 		} catch ( Exception e ) {
 			//Do nothing, there is no artwork in this file, no big deal. 
 		}
-		
 		try {
 			if ( artworkList != null ) {
 				for ( Artwork artwork : artworkList ) {
@@ -912,29 +807,22 @@ public class Track implements Serializable, AlbumInfoSource {
 					}
 				}
 			}			
-			
 		} catch ( ClosedByInterruptException e ) {
 			return null;
-			
 		} catch ( Exception e ) {
 			LOGGER.log( Level.INFO, "Unable to load album image from tag for file: " + getFilename(), e );
 		}
-
 		Path otherPaths = getSecondaryAlbumCoverPath ();
-		
 		if ( otherPaths != null ) {
 			return new Image( otherPaths.toUri().toString() );
 		}
-		
 		return null;
 	}
 
 	private ArtistTagImagePriority tagImagePriority() {
 		try {
 			TagField tagImagePriority = getAudioFile().getTag().getFirstField( FieldKey.CUSTOM4 );
-			
 			return ArtistTagImagePriority.valueOf( tagImagePriority.toString() );
-			
 		} catch ( Exception e ) {
 			return null;
 		}
@@ -945,32 +833,25 @@ public class Track implements Serializable, AlbumInfoSource {
 			List<Artwork> artworkList = getAudioFile().getTag().getArtworkList(); 
 			if ( artworkList != null ) {
 				for ( Artwork artwork : artworkList ) {
-					
 					if ( artwork.getPictureType() == 8 ) {
 						Image artistImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
 						if ( artistImage != null ) return artistImage;
 					}
 				}
 			}			
-	
 		} catch ( Exception e ) {
 			LOGGER.log( Level.INFO, "Unable to load artist image from tag for file: " + getFilename(), e );
 		}
-		
 		return null;
 	}
 	
 	public Image getArtistImage ( ) {
-				
 		if ( tagImagePriority() == ArtistTagImagePriority.TRACK ) {
 			Image tagArtistImage = getTagArtistImage();
 			if ( tagArtistImage != null ) return tagArtistImage;
 		}
-	
 		if ( this.getPath().getParent() != null ) {
-		
 			Path targetPath = this.getPath().toAbsolutePath();
-			
 			ArrayList <Path> possibleFiles = new ArrayList <Path> ();
 			possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.png" ) );
 			possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.jpg" ) );
@@ -980,51 +861,50 @@ public class Track implements Serializable, AlbumInfoSource {
 					possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.jpg" ) );
 				}
 			}
-			
 			for ( Path test : possibleFiles ) {
 				if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
 					return new Image( test.toUri().toString() );
 				}
 			}
 		}
-		
 		if ( tagImagePriority() == ArtistTagImagePriority.ALBUM ) {
 			Image tagArtistImage = getTagArtistImage();
 			if ( tagArtistImage != null ) return tagArtistImage;
 		}
-		
 		List<Artwork> artworkList = null;
 		try {
 			artworkList = getAudioFile().getTag().getArtworkList(); //This line can throw a NPE
 		} catch ( Exception e ) {
 			//Do nothing, there is no artwork in this file, no big deal. 
 		}
-		
 		try {
 			if ( artworkList != null ) {
 				for ( Artwork artwork : artworkList ) {
 					if ( artwork.getPictureType() == 7 ) {
 						Image leadArtistImage = SwingFXUtils.toFXImage( (BufferedImage) artwork.getImage(), null );
-						if ( leadArtistImage != null ) return leadArtistImage;
-					
+						if ( leadArtistImage != null ) {
+							return leadArtistImage;
+						}
 					} else if ( artwork.getPictureType() == 8 ) {
 						Image artistImage = SwingFXUtils.toFXImage((BufferedImage) artwork.getImage(), null);
-						if ( artistImage != null ) return artistImage;
-						
+						if ( artistImage != null ) {
+							return artistImage;
+						}
 					} else if ( artwork.getPictureType() == 12 ) {
 						Image writerImage = SwingFXUtils.toFXImage( (BufferedImage) artwork.getImage(), null );
-						if ( writerImage != null ) return writerImage;
-						
+						if ( writerImage != null ) {
+							return writerImage;
+						}
 					} else if ( artwork.getPictureType() == 13 ) {
 						Image logoImage = SwingFXUtils.toFXImage( (BufferedImage) artwork.getImage(), null );
-						if ( logoImage != null ) return logoImage;
+						if ( logoImage != null ) {
+							return logoImage;
+						}
 					}
 				}
 			}			
-			
 		} catch ( ClosedByInterruptException e ) {
 			return null;
-			
 		} catch ( Exception e ) {
 			LOGGER.log( Level.INFO, "Error when trying to load tag images for file" + getPath(), e );
 		}
@@ -1035,13 +915,11 @@ public class Track implements Serializable, AlbumInfoSource {
 		try {
 			AudioFile audioFile = AudioFileIO.read( getPath().toFile() );
 			Tag tag = audioFile.getTag();
-			
 			if ( tag == null ) {
 				tag = audioFile.createDefaultTag();
 			} else if ( tag instanceof ID3v1Tag ) {
 				tag = new ID3v23Tag ( (ID3v1Tag)tag );
 			}
-			
 			for ( MultiFileTextTagPair tagPair : textTagPairs ) { 
 				if ( !tagPair.isMultiValue() ) {
 					if ( tagPair.getValue().equals( "" ) ) {
@@ -1051,10 +929,8 @@ public class Track implements Serializable, AlbumInfoSource {
 					}
 				}
 			}
-			
 			audioFile.setTag( tag );
 			AudioFileIO.write( audioFile );
-			
 			for ( MultiFileImageTagPair tagPair : imageTagPairs ) {
 				if ( !tagPair.isMultiValue() && tagPair.imageDataChanged() ) {
 					if ( tagPair.getImageData() == null ) {
@@ -1065,9 +941,7 @@ public class Track implements Serializable, AlbumInfoSource {
 					}
 				}
 			}
-			
 			refreshTagData();
-	
 		} catch ( Exception e ) {
 			LOGGER.log( Level.WARNING, "Unable to save updated tag.", e );
 		}

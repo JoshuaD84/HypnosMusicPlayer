@@ -8,8 +8,6 @@ Library & Scanner Rebuild
 UI
    On window, main UI, the "+" and "x" buttons, and a few others, aren't exact right height
 
-   Right clicking on library buttons changes library tab, only left click should
-
    Improve tag editor UI. It's clunky.  Single clicks good
 
    File-Tree view for library
@@ -47,6 +45,8 @@ Backend
    Can we use Java's Jigsaw to reduce distribution size somehow? We had issues w/ circular dependencies, but can we work
    through that?
 
+   Reduce the number of loose threads running as much as possible
+   
 Windows System Integration
       Select Multiple Files in explorer - No Option to play in Hypnos. Add that
       "Open with" causes the current track button to not show the current track's name.

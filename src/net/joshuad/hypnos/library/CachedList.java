@@ -37,7 +37,7 @@ public class CachedList<T> {
 							//I don't care about order, ignoring
 						}
 					} else if (change.wasUpdated()) {
-						// update item
+						// do nothing, this is handled automatically
 					} else {
 						for (T removedItem : change.getRemoved()) {
 							pendingChanges.add(new Action<T>(Action.ChangeType.REMOVE, removedItem));
@@ -53,22 +53,20 @@ public class CachedList<T> {
 		Thread changeExecutor = new Thread() {
 			@Override
 			public void run() {
-				 while (true) {
-		        if (!runLaterPending) {
-		          pushChanges();
-		        }
-
-		        try {
-		          Thread.sleep(100);
-		        } catch (InterruptedException e) {
-		          LOGGER.log(Level.FINE, "Sleep interupted during wait period.");
-		        }
-		      }
-				
+				while (true) {
+					if (!runLaterPending) {
+						pushChanges();
+					}
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						LOGGER.log(Level.FINE, "Sleep interupted during wait period.");
+					}
+				}
 			}
 		};
-		
 		changeExecutor.setDaemon(true);
+		changeExecutor.setName("Library to UI updater");
 		changeExecutor.start();
 	}
 	
@@ -84,7 +82,6 @@ public class CachedList<T> {
 			LOGGER.warning("Asked to remove a null item from list, ignoring.");
 			return;
 		}
-		
 		try {
 			itemsLock.lock();	
 			items.remove(removeMe);
@@ -105,7 +102,6 @@ public class CachedList<T> {
 			LOGGER.warning("Asked to add a null item to list, ignoring.");
 			return;
 		}
-		
 		try {
 			itemsLock.lock();	
 			items.add(addMe);

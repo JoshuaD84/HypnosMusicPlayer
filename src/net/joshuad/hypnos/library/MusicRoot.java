@@ -11,20 +11,14 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
 public class MusicRoot implements Serializable {
-	
 	private static final long serialVersionUID = 1L;
-	
 	private File file;
-	
 	private boolean needsInitialScan = true;
 	private transient boolean needsRescan = false;
-
 	@SuppressWarnings("unused")
 	private boolean failedScan = false; //TODO: Show this in the UI
-	
 	@SuppressWarnings("unused")
 	private transient boolean hadInotifyError = false; //TODO: Show this in the UI
-
 	private transient BooleanProperty isValidSearchLocation = new SimpleBooleanProperty ( true );
 	
 	public MusicRoot ( Path path ) {
@@ -60,9 +54,7 @@ public class MusicRoot implements Serializable {
 		if ( !( other instanceof MusicRoot ) ) {
 			return false;
 		}
-		
 		MusicRoot otherLocation = (MusicRoot)other;
-			
 		return file.toPath().equals( otherLocation.getPath() );
 	}
 	
@@ -75,7 +67,6 @@ public class MusicRoot implements Serializable {
 		if ( !Files.exists( getPath() ) || !Files.isDirectory( getPath() ) || !Files.isReadable( getPath() ) ) {
 			newValue = false;
 		}
-		
 		if ( isValidSearchLocation.get() != newValue ) {
 			isValidSearchLocation.setValue( newValue );
 		}

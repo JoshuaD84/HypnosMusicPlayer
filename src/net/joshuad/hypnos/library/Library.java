@@ -52,9 +52,8 @@ public class Library {
 	private final LibraryLoader loader;
 	private final LibraryDiskWatcher diskWatcher;
 	private final LibraryScanLogger scanLogger = new LibraryScanLogger();
-
+	
 	private boolean dataNeedsToBeSavedToDisk = false;
-
 	private boolean artistsNeedToBeRegenerated = false;
 	private final Object artistSychronizeFlagLock = new Object();
 
@@ -63,7 +62,6 @@ public class Library {
 		loader = new LibraryLoader(this, scanLogger);
 
 		InvalidationListener invalidationListener = new InvalidationListener() {
-
 			@Override
 			public void invalidated(Observable arg0) {
 				dataNeedsToBeSavedToDisk = true;
@@ -250,18 +248,14 @@ public class Library {
 
 	public String getUniquePlaylistName(String base) {
 		String name = base;
-
 		int number = 0;
-
 		while (true) {
-
 			boolean foundMatch = false;
 			for (Playlist playlist : playlists.getItemsCopy()) {
 				if (playlist.getName().toLowerCase().equals(name.toLowerCase())) {
 					foundMatch = true;
 				}
 			}
-
 			if (foundMatch) {
 				number++;
 				name = base + " " + number;
@@ -269,37 +263,30 @@ public class Library {
 				break;
 			}
 		}
-
 		return name;
 	}
 
 	private List<Artist> generateArtists() {
 		List<Artist> newArtistList = new ArrayList<>();
-
 		List<Album> libraryAlbums = new ArrayList<>(albums.getItemsCopy());
 		Album[] albumArray = libraryAlbums.toArray(new Album[libraryAlbums.size()]);
-
 		AlphanumComparator comparator = new AlphanumComparator(AlphanumComparator.CaseHandling.CASE_INSENSITIVE);
 		Arrays.sort(albumArray, Comparator.comparing(Album::getAlbumArtist, comparator));
-
 		Artist lastArtist = null;
 		for (Album album : albumArray) {
 			if (album.getAlbumArtist().isBlank()) {
 				continue;
 			}
-			
 			if (lastArtist != null && lastArtist.getName().equals(album.getAlbumArtist())) {
 				lastArtist.addAlbum(album);
 			} else {
 				Artist artist = null;
-
 				for (Artist test : newArtistList) {
 					if (test.getName().equalsIgnoreCase(album.getAlbumArtist())) {
 						artist = test;
 						break;
 					}
 				}
-
 				if (artist == null) {
 					artist = new Artist(album.getAlbumArtist());
 					newArtistList.add(artist);
@@ -308,17 +295,14 @@ public class Library {
 				lastArtist = artist;
 			}
 		}
-
 		List<Track> looseTracks = new ArrayList<>();
 		for (Track track : tracks.getItemsCopy()) {
 			if (track.getAlbum() == null) {
 				looseTracks.add(track);
 			}
 		}
-
 		Track[] trackArray = looseTracks.toArray(new Track[looseTracks.size()]);
 		Arrays.sort(trackArray, Comparator.comparing(Track::getAlbumArtist, comparator));
-
 		lastArtist = null;
 		for (Track track : trackArray) {
 			if (track.getAlbumArtist().isBlank())
@@ -327,14 +311,12 @@ public class Library {
 				lastArtist.addLooseTrack(track);
 			} else {
 				Artist artist = null;
-
 				for (Artist test : newArtistList) {
 					if (test.getName().equalsIgnoreCase(track.getAlbumArtist())) {
 						artist = test;
 						break;
 					}
 				}
-
 				if (artist == null) {
 					artist = new Artist(track.getAlbumArtist());
 					newArtistList.add(artist);

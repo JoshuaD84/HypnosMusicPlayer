@@ -26,21 +26,14 @@ import net.joshuad.hypnos.Hypnos.OS;
 
 class LibraryDiskWatcher {
 	private static final Logger LOGGER = Logger.getLogger( LibraryDiskWatcher.class.getName() );
-
 	private WatchService watcher;
 	private final HashMap<WatchKey, Path> keys = new HashMap<WatchKey, Path>();
-
 	private DelayedUpdateThread delayedUpdater;
-
 	private FXUI ui;
-	
 	private LibraryScanLogger scanLogger;
-
 	LibraryDiskWatcher( Library library, LibraryScanLogger scanLogger ) {
-		
 		this.scanLogger = scanLogger;
 		delayedUpdater = new DelayedUpdateThread( library );
-		
 		try {
 			watcher = FileSystems.getDefault().newWatchService();
 			delayedUpdater.start();
@@ -90,7 +83,6 @@ class LibraryDiskWatcher {
 								StandardWatchEventKinds.ENTRY_DELETE, 
 								StandardWatchEventKinds.ENTRY_MODIFY 
 							);
-							
 							keys.put( key, dir );
 						}
 						return FileVisitResult.CONTINUE;
@@ -100,19 +92,15 @@ class LibraryDiskWatcher {
 		
 		} catch ( IOException e ) {
 			if ( Hypnos.getOS() == OS.NIX && e.getMessage().matches( ".*inotify.*" ) ) {
-
 				if ( ui != null ) {
 					ui.notifyUserLinuxInotifyIssue();
 				}
-				
 				LOGGER.log( Level.INFO, e.getMessage() + "\nUnable to watch directory for changes: " + musicRoot.getPath().toString() +
 					"\nSee here for how to fix this error on linux: " + HypnosURLS.HELP_INOTIFY 
 				);
-				
 				if ( musicRoot != null ) {
 					musicRoot.setHadInotifyError( true );
 				}
-			
 			} else {
 				LOGGER.log( Level.INFO, e.getMessage() + "\nUnable to watch directory for changes: " + musicRoot.getPath().toString(), e );
 			}
@@ -126,40 +114,31 @@ class LibraryDiskWatcher {
 		} catch ( InterruptedException e ) {
 			return false;
 		}
-		
 		Path directory = keys.get( key );
 		if ( directory == null ) {
 			return false;
 		}
-		
 		for ( WatchEvent <?> event : key.pollEvents() ) {
 			WatchEvent.Kind<?> eventKind = event.kind();
-
 			WatchEvent <Path> watchEvent = (WatchEvent<Path>)event;
 			Path child = directory.resolve( watchEvent.context() );
-			
 			if ( eventKind == StandardWatchEventKinds.ENTRY_CREATE ) {
 				scanLogger.println( "[Watcher] Heard create: " + child );
 				delayedUpdater.addUpdateItem( child );
-				
 			} else if ( eventKind == StandardWatchEventKinds.ENTRY_DELETE ) {
 				scanLogger.println( "[Watcher] heard delete: " + child );
 				delayedUpdater.addUpdateItem( child );
-				
 			} else if ( eventKind == StandardWatchEventKinds.ENTRY_MODIFY ) {
 				scanLogger.println( "[Watcher] heard modify: " + child );
 				delayedUpdater.addUpdateItem( child );
-			
 			} else if ( eventKind == StandardWatchEventKinds.OVERFLOW ) {
 				//TODO: Think about how to handle this
 			}
-
 			boolean valid = key.reset();
 			if ( !valid ) {
 				keys.remove( key );
 			}
 		}
-		
 		return true;
 	}
 }
@@ -168,7 +147,6 @@ class DelayedUpdateThread extends Thread {
 	private final Logger LOGGER = Logger.getLogger( DelayedUpdateThread.class.getName() );
 	public final int DELAY_LENGTH_MS = 3000; 
 	public int counter = DELAY_LENGTH_MS;
-	
 	Vector <Path> updateItems = new Vector <Path> ();
 	Library library;
 	
@@ -186,9 +164,7 @@ class DelayedUpdateThread extends Thread {
 			} catch ( InterruptedException e ) {
 				LOGGER.log ( Level.FINE, "Sleep interupted during wait period." );
 			}
-
 			long sleepTime = System.currentTimeMillis() - startSleepTime;
-			
 			if ( counter > 0 ) {
 				counter -= sleepTime; 
 			} else {
