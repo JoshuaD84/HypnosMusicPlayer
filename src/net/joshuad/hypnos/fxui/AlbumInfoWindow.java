@@ -37,6 +37,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.joshuad.hypnos.Hypnos;
+import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.DraggedTrackContainer.DragSource;
 import net.joshuad.hypnos.library.Album;
@@ -280,7 +281,11 @@ public class AlbumInfoWindow extends Stage {
 			List <Track> selectedItems =  new ArrayList<Track> ( trackTable.getSelectionModel().getSelectedItems() );
 			
 			if ( selectedItems.size() == 1 ) {
-				audioSystem.playItems( selectedItems );
+				if (Utils.isMusicFile(selectedItems.get(0).getPath()) ) {
+					audioSystem.playTrack( selectedItems.get(0) );
+				} else {
+					ui.notifyUserError("Error reading track from disk, cannot play: " + selectedItems.get(0).getPath());
+				}
 				
 			} else if ( selectedItems.size() > 1 ) {
 				if ( ui.okToReplaceCurrentList() ) {
@@ -350,7 +355,11 @@ public class AlbumInfoWindow extends Stage {
 
 			row.setOnMouseClicked( event -> {
 				if ( event.getClickCount() == 2 && (!row.isEmpty()) ) {
-					audioSystem.playTrack( row.getItem() );
+					if (Utils.isMusicFile(row.getItem().getPath()) ) {
+						audioSystem.playTrack( row.getItem(), false );
+					} else {
+						ui.notifyUserError("Error reading track from disk, cannot play: " + row.getItem().getPath() );
+					}
 				}
 			} );
 
