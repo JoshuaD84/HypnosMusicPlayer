@@ -114,6 +114,7 @@ public class CachedList<T> {
 		}
 	}
 	
+	//TODO: Can i just make this public List<T> getItems() {return items;}?  I think so 
 	public ObservableList<T> getItemsCopy() {
 		try {
 			itemsLock.lock();

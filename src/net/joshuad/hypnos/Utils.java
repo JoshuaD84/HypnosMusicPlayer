@@ -217,48 +217,6 @@ public class Utils {
 		return retMe;
 	}
 	
-	public static boolean isArtistDirectory ( Path path ) {
-	  //TODO: This method goes away
-	  return false;
-	  /*
-	  if ( !Files.isDirectory( path ) ) return false;
-		
-		String directoryName = prepareArtistForCompare ( path.getFileName().toString() );
-		
-		int entries = 0;
-		
-		try ( DirectoryStream <Path> stream = Files.newDirectoryStream( path ) ) {
-			for ( Path child : stream ) {
-				if ( isAlbumDirectory ( child ) ) {
-					entries++;
-					try {
-						Album album = new Album ( child );
-						int matchPercent = FuzzySearch.weightedRatio( directoryName, prepareArtistForCompare ( album.getAlbumArtist() ) );
-						if ( matchPercent < 90 ) return false;
-					} catch ( Exception e ) {
-						continue;
-					}					
-					
-				} else if ( isMusicFile( child ) ) {
-					entries++;
-					Track track = new Track ( child );
-					//TODO: maybe check to make sure we could read the tags
-					int matchPercent = FuzzySearch.weightedRatio( directoryName, prepareArtistForCompare ( track.getAlbumArtist() ) );
-					if ( matchPercent < 90 ) return false;
-				}
-			}
-		} catch ( IOException e ) {
-			return false;
-		}
-		
-		if ( entries > 0 ) {
-			return true;
-		} else {
-			return false;
-		}
-		*/
-	}
-	
 	public static String prepareArtistForCompare ( String string ) {
 		return string
 			.toLowerCase()

@@ -13,7 +13,9 @@ import javafx.beans.Observable;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import me.xdrop.fuzzywuzzy.FuzzySearch;
 import net.joshuad.hypnos.AlphanumComparator;
+import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.fxui.FXUI;
 
 public class Library {
@@ -384,5 +386,45 @@ public class Library {
 
 	void removeAlbum(Album album) {
 		albums.remove(album);
+	}
+	
+	public boolean isArtistDirectory(Path path) {
+		String directoryName = Utils.prepareArtistForCompare(path.getFileName().toString());
+		List<Album> albumsInPath = new ArrayList<>();
+		for (Album album : albums.getItemsCopy()) {
+			if (album.getPath().getParent().equals(path)) {
+				albumsInPath.add(album);
+			}
+		}
+		List<Track> tracksInPath = new ArrayList<>();
+		for (Track track : tracks.getItemsCopy()) {
+			if (track.getPath().getParent().equals(path) && track.getAlbum() == null) {
+				tracksInPath.add(track);
+			}
+		}
+		if(albumsInPath.size() == 0 && tracksInPath.size() == 0) {
+			return false;
+		}
+		for (Album album : albumsInPath) {
+			try {
+				int matchPercent = FuzzySearch.weightedRatio(directoryName, Utils.prepareArtistForCompare(album.getAlbumArtist()));
+				if (matchPercent < 90) {
+					return false;
+				}
+			} catch (Exception e) {
+				continue;
+			}
+		}
+		for (Track track : tracksInPath) {
+			try {
+				int matchPercent = FuzzySearch.weightedRatio(directoryName, Utils.prepareArtistForCompare(track.getAlbumArtist()));
+				if (matchPercent < 90) {
+					return false;
+				}
+			} catch (Exception e) {
+				continue;
+			}
+		}
+		return true;
 	}
 }

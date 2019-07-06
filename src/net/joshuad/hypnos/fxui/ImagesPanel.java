@@ -46,6 +46,7 @@ import net.joshuad.hypnos.audio.AudioSystem.ShuffleMode;
 import net.joshuad.hypnos.audio.AudioSystem.StopReason;
 import net.joshuad.hypnos.library.Album;
 import net.joshuad.hypnos.library.Artist;
+import net.joshuad.hypnos.library.Library;
 import net.joshuad.hypnos.library.Track;
 import net.joshuad.hypnos.library.Track.ArtistTagImagePriority;
 import net.joshuad.hypnos.audio.PlayerListener;
@@ -67,9 +68,11 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 	
 	FXUI ui;
 	AudioSystem audioSystem;
+	Library library;
 	
-	public ImagesPanel( FXUI ui, AudioSystem audioSystem ) {
+	public ImagesPanel( FXUI ui, AudioSystem audioSystem, Library library ) {
 		this.ui = ui;
+		this.library = library;
 		this.audioSystem = audioSystem;
 		setupAlbumImage();
 		setupArtistImage();
@@ -354,7 +357,7 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 			} else if ( currentImagesTrack.getAlbum() != null ) {
 				disableAlbum = false;
 				
-				if ( Utils.isArtistDirectory( currentImagesTrack.getAlbum().getPath().getParent() ) ) {
+				if ( library.isArtistDirectory( currentImagesTrack.getAlbum().getPath().getParent() ) ) {
 					disableArtist = false;
 				}
 			}
@@ -364,7 +367,6 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 			setAlbumArtistImage.setDisable( disableAllMenus || disableAlbum );
 			setArtistImage.setDisable( disableAllMenus || disableArtist );
 			exportImage.setDisable( disableAllMenus );
-			
 			
 			menu.show( artistImagePane, e.getScreenX(), e.getScreenY() );
 		});
@@ -471,7 +473,7 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 				byte[] buffer = Files.readAllBytes( imageFile.toPath() );
 				
 				//REFACTOR: put this code in a function, it's duplicated below. 
-				if ( !Utils.isArtistDirectory( currentImagesTrack.getAlbum().getPath().getParent() ) ) return;
+				if ( !library.isArtistDirectory( currentImagesTrack.getAlbum().getPath().getParent() ) ) return;
 				
 				Path artistPath = track.getAlbum().getPath().getParent();
 			
@@ -579,7 +581,7 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 			Path albumPath = targetTrack.getAlbum().getPath();
 			Path artistPath = null;
 			
-			if ( albumPath != null && Utils.isArtistDirectory( albumPath.getParent() ) ) {
+			if ( albumPath != null && library.isArtistDirectory( albumPath.getParent() ) ) {
 				artistPath = albumPath.getParent();
 			}
 			

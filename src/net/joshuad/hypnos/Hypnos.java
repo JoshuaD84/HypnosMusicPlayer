@@ -723,7 +723,6 @@ public class Hypnos extends Application {
 						EnumMap <Setting, String> pendingSettings = persister.loadSettingsFromDisk();
 						persister.loadCurrentList();
 						ui.applySettingsBeforeWindowShown( pendingSettings );
-						audioSystem.applySettings ( pendingSettings );
 						
 						//TODO: This def doesn't belong here. 
 						if ( pendingSettings.containsKey( Setting.LOADER_SPEED ) ) {
@@ -744,6 +743,7 @@ public class Hypnos extends Application {
 							if ( sourcesLoaded ) {
 								persister.loadAlbumsAndTracks();
 							}
+							audioSystem.applySettings ( pendingSettings );
 							
 							persister.loadQueue();
 							audioSystem.linkQueueToCurrentList();

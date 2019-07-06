@@ -205,7 +205,7 @@ public class FXUI implements PlayerListener {
 
 		libraryPane = new LibraryPane( this, audioSystem, library );
 		transport = new Transport( this, audioSystem );
-		artSplitPane = new ImagesPanel ( this, audioSystem );
+		artSplitPane = new ImagesPanel ( this, audioSystem, library );
 		currentListPane = new CurrentListPane( this, audioSystem, library );
 		
 		libraryLocationWindow = new MusicRootWindow ( this, mainStage, library );
