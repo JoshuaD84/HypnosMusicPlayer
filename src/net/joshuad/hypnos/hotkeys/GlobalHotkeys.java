@@ -48,6 +48,7 @@ public class GlobalHotkeys {
 	
 	public GlobalHotkeys( OS operatingSystem, boolean disabled ) {
 		this.disabled = disabled;
+		this.hasUnsavedData = true;
 		try {
 			switch ( operatingSystem ) {
 				case NIX:
