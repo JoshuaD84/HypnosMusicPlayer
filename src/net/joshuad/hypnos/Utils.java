@@ -238,58 +238,6 @@ public class Utils {
 		return string.toLowerCase();
 	}
 	
-	//TODO: This is slow as hell. And in a key place in the library loader
-	public static boolean isAlbumDirectory ( Path path ) {
-		if ( !Files.isDirectory( path ) ) return false;
-		
-		boolean hasChildTrack = false;
-		
-		String albumName = null;
-		String artistName = null;
-		
-		try ( 
-			DirectoryStream <Path> stream = Files.newDirectoryStream( path ); 
-		) {
-			for ( Path child : stream ) {
-				if ( isAlbumDirectory ( child ) ) {
-					return false;
-				}
-				
-				if ( Utils.isMusicFile( child ) ) {
-					Track track = new Track ( child );
-					if ( albumName == null ) {
-						albumName = prepareAlbumForCompare ( track.getAlbumTitle() );
-						artistName = prepareArtistForCompare ( track.getAlbumArtist() );
-						
-					} else {
-						/* We usually use weighted ratio, but that can return 0 for album names like   ()   
-						 * even if the strings are idential. 
-						 * In that case, we switch to straight ratio, which doesn't have this problem
-						 */
-						
-						int albumMatchPercent = FuzzySearch.weightedRatio( albumName, prepareAlbumForCompare ( track.getAlbumTitle() ) );
-						if ( albumMatchPercent == 0 ) albumMatchPercent = FuzzySearch.ratio( albumName, prepareAlbumForCompare ( track.getAlbumTitle() ) );
-						if ( albumMatchPercent < 90 ) {
-							return false;
-						}
-						
-						int artistMatchPercent = FuzzySearch.weightedRatio( artistName, prepareArtistForCompare ( track.getAlbumArtist() ) );
-						if ( artistMatchPercent == 0 ) albumMatchPercent = FuzzySearch.ratio( artistName, prepareAlbumForCompare ( track.getAlbumArtist() ) );
-						if ( artistMatchPercent < 90 ) {
-							return false;
-						}
-					}
-					hasChildTrack = true;
-				}
-			}
-		} catch ( IOException e ) {
-			return false;
-		}
-		
-		if ( hasChildTrack ) return true;
-		else return false;
-	}
-	
 	public static ArrayList <Path> getAllTracksInDirectory ( Path startingDirectory ) {
 		
 		TrackFinder finder = new TrackFinder ();
