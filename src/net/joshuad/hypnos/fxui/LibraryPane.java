@@ -119,11 +119,6 @@ public class LibraryPane extends BorderPane {
   		playlistsButton.setSelected ( true ); 
   	} );
   	
-  	artistsButton.focusedProperty().addListener( event -> artistsButton.fire() );
-  	albumsButton.focusedProperty().addListener( event -> albumsButton.fire() );
-  	tracksButton.focusedProperty().addListener( event -> tracksButton.fire() );
-  	playlistsButton.focusedProperty().addListener( event -> playlistsButton.fire() );
-  	
   	buttonGroup = new ToggleGroup();
   	artistsButton.setToggleGroup( buttonGroup );
   	albumsButton.setToggleGroup( buttonGroup );
