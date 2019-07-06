@@ -382,7 +382,7 @@ public class Persister {
 			ObjectOutputStream bytesOut = new ObjectOutputStream( byteWriter );
 
 			bytesOut.writeObject( new ArrayList <Album>( Arrays.asList( library.getAlbumData().toArray( new Album [ library.getAlbumData().size() ] ) ) ) );
-			bytesOut.writeObject( new ArrayList <Track>( Arrays.asList( library.getTrackDataCopy().toArray( new Track [ library.getTrackDataCopy().size() ] ) ) ) );
+			bytesOut.writeObject( new ArrayList <Track>( Arrays.asList( library.getTrackData().toArray( new Track [ library.getTrackData().size() ] ) ) ) );
 
 			compressedOut.write( byteWriter.toByteArray() );
 			compressedOut.flush();

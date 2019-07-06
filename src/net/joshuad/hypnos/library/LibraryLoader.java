@@ -15,10 +15,12 @@ class LibraryLoader {
 	private static final Logger LOGGER = Logger.getLogger(LibraryLoader.class.getName());
 	private final ArrayList<Path> pathsToUpdate = new ArrayList<>();
 	private boolean clearOrphansAndMissing = false;
+	private boolean musicRootRemoved = false;
 	private Thread loaderThread;
 	private Library library;
 	private DiskReader diskReader;
 	private LibraryScanLogger scanLogger;
+	private FXUI ui;
 	
 	public LibraryLoader(Library library, LibraryScanLogger scanLogger) {
 		this.library = library;
@@ -28,6 +30,7 @@ class LibraryLoader {
 	}
 
 	public void setUI(FXUI ui) {
+		this.ui = ui;
 		diskReader.setUI(ui);
 	}
 
@@ -56,16 +59,22 @@ class LibraryLoader {
 					for (MusicRoot root : library.getMusicRootData()) {
 						root.recheckValidity();
 					}
-
+					
 					if (System.currentTimeMillis() - lastOrphanClearMS > 5000) {
 						clearOrphansAndMissing = true;
 					}
-
-					if (clearOrphansAndMissing) {
+					
+					if (clearOrphansAndMissing || musicRootRemoved) {
+						String message = musicRootRemoved ? "Removing Items..." : "";
+						musicRootRemoved = false;
 						clearOrphansAndMissing = false;
 						lastOrphanClearMS = System.currentTimeMillis();
-						clearOrphans();
+						clearOrphans(message);
 						clearMissing();
+						if (!message.isBlank()) {
+							ui.setLibraryLoaderStatusToStandby(null);
+						}
+						musicRootRemoved = false;
 					}
 
 					List<MusicRoot> libraryRoots = new ArrayList<>(library.getMusicRootData());
@@ -120,7 +129,7 @@ class LibraryLoader {
 		if (!Files.exists(path)) {
 			
 			List<Track> tracksToRemove = new ArrayList<>();
-			for (Track track : library.getTrackDataCopy()) {
+			for (Track track : library.getTrackData()) {
 				if (track.getPath().toAbsolutePath().startsWith(path)) {
 					tracksToRemove.add(track);
 				}
@@ -146,7 +155,7 @@ class LibraryLoader {
 
 		} else if (Utils.isMusicFile(path)) {
 			Track existingTrackAtPath = null;
-			for (Track track : library.getTrackDataCopy()) {
+			for (Track track : library.getTrackData()) {
 				if (track.getPath().equals(path)) {
 					existingTrackAtPath = track;
 					break;
@@ -164,7 +173,7 @@ class LibraryLoader {
 			} else {
 				scanLogger.println("[LibraryLoader] new track found at: " + path);
 				Track newTrack = new Track(path);
-				library.getTrackDataCopy().remove(newTrack);
+				library.getTrackData().remove(newTrack);
 			}
 
 		} else if (Files.isDirectory(path)) {
@@ -207,7 +216,7 @@ class LibraryLoader {
 			//No need to remove tracks from the album, they'll be removed below
 		}
 		List<Track> removeMeTracks = new ArrayList<>();
-		for (Track track : library.getTrackDataCopy()) {
+		for (Track track : library.getTrackData()) {
 			if(!Files.isRegularFile(track.getPath())) {
 				removeMeTracks.add(track);
 			}
@@ -218,9 +227,17 @@ class LibraryLoader {
 		}
 	}
 		
-	private void clearOrphans() {
+	private void clearOrphans(String message) {
+		
+		int totalCount = library.getAlbumData().size() + library.getTrackData().size() + 10; //10 for the removal time
+		int currentCount = 0;
+		
 		List<Album> removeMeAlbums = new ArrayList<>();
 		for (Album album : library.getAlbumData()) {
+			currentCount++;
+			if(!message.isBlank()) {
+				ui.setLibraryLoaderStatus(message, currentCount/(double)totalCount, this);
+			}
 			boolean hasRoot = false;
 			for (MusicRoot root : library.getMusicRootData()) {
 				if (Utils.isChildOf(album.getPath(), root.getPath())) {
@@ -237,7 +254,6 @@ class LibraryLoader {
 				removeMeAlbums.add(album);
 			}
 		}
-
 		for (Album album : removeMeAlbums) {
 			library.removeAlbum(album);
 			//No need to remove tracks from the album, they'll be removed below
@@ -245,7 +261,11 @@ class LibraryLoader {
 		}
 
 		List<Track> removeMeTracks = new ArrayList<>();
-		for (Track track : library.getTrackDataCopy()) {
+		for (Track track : library.getTrackData()) {
+			currentCount++;
+			if(!message.isBlank()) {
+				ui.setLibraryLoaderStatus(message, currentCount/(double)totalCount, this);
+			}
 			boolean hasRoot = false;
 			for (MusicRoot root : library.getMusicRootData()) {
 				if (Utils.isChildOf(track.getPath(), root.getPath())) {
@@ -270,5 +290,9 @@ class LibraryLoader {
 	
 	void interruptDiskReader() {
 		diskReader.interrupt();
+	}
+
+	public void setMusicRootRemoved(boolean b) {
+		musicRootRemoved = b;
 	}
 }

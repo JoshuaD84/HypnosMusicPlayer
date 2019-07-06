@@ -146,7 +146,7 @@ public class Library {
 		return albumsFiltered;
 	}
 
-	public ObservableList<Track> getTrackDataCopy() {
+	public ObservableList<Track> getTrackData() {
 		return tracks.getItemsCopy();
 	}
 
@@ -225,6 +225,7 @@ public class Library {
 	public void removeMusicRoot(MusicRoot musicRoot) {
 		loader.interruptDiskReader();
 		musicRoots.remove(musicRoot, true);
+		loader.setMusicRootRemoved(true);
 	}
 
 	public void removePlaylist(Playlist playlist) {

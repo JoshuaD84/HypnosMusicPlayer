@@ -149,7 +149,7 @@ class DiskReader implements FileVisitor<Path> {
 					directoriesVisited / (double) directoriesToScan, this);
 		}
 		tracksInCurrentDirectory.clear();
-		for ( Track libraryTrack : library.getTrackDataCopy() ) {
+		for ( Track libraryTrack : library.getTrackData() ) {
 			if ( libraryTrack.getPath().startsWith(dir) ) {
 				tracksInCurrentDirectory.add(libraryTrack);
 			}
