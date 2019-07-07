@@ -371,6 +371,10 @@ public class Library {
 		albums.remove(album);
 	}
 	
+	void requestRegenerateArtists() {
+		artistsNeedToBeRegenerated = true;
+	}
+	
 	public boolean isArtistDirectory(Path path) {
 		String directoryName = Utils.prepareArtistForCompare(path.getFileName().toString());
 		List<Album> albumsInPath = new ArrayList<>();

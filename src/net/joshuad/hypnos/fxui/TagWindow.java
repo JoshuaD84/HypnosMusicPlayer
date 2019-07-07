@@ -56,11 +56,13 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import net.joshuad.hypnos.CurrentList;
 import net.joshuad.hypnos.CurrentListTrack;
 import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.MultiFileImageTagPair;
 import net.joshuad.hypnos.MultiFileTextTagPair;
 import net.joshuad.hypnos.Utils;
+import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.MultiFileImageTagPair.ImageFieldKey;
 import net.joshuad.hypnos.library.Album;
 import net.joshuad.hypnos.library.Track;
@@ -101,10 +103,12 @@ public class TagWindow extends Stage {
 	private HBox locationBox;
 	
 	private FXUI ui;
+	AudioSystem audioSystem;
 	
-	public TagWindow( FXUI ui ) {
+	public TagWindow( FXUI ui, AudioSystem audioSystem ) {
 		super();
 		this.ui = ui;
+		this.audioSystem = audioSystem;
 		this.initModality( Modality.NONE );
 		this.initOwner( ui.getMainStage() );
 		this.setTitle( "Tag Editor" );
@@ -534,7 +538,7 @@ public class TagWindow extends Stage {
 					track.updateTagsAndSave( saveMeTextPairs, saveMeImagePairs, ui.audioSystem );
 				}
 			}
-			
+			audioSystem.getCurrentList().setHasUnsavedData(true);
 			ui.refreshCurrentList();
 			ui.refreshQueueList();
 			ui.refreshImages();

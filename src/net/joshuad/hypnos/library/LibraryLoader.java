@@ -150,6 +150,7 @@ class LibraryLoader {
 				// This will make sure that any existing album gets updated, and if the
 				// album has been destroyed on disk, it is removed from our library
 				pathsToUpdate.add(existingTrackAtPath.getPath().getParent());
+				library.requestRegenerateArtists();
 			} else {
 				scanLogger.println("[LibraryLoader] new track found at: " + path);
 				Track newTrack = new Track(path);
