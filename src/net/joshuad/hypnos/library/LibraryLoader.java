@@ -25,7 +25,7 @@ class LibraryLoader {
 	public LibraryLoader(Library library, LibraryScanLogger scanLogger) {
 		this.library = library;
 		this.scanLogger = scanLogger;
-		this.diskReader = new DiskReader(library, scanLogger);
+		this.diskReader = new DiskReader(library, this, scanLogger);
 		setupLoaderThread();
 	}
 
@@ -47,7 +47,9 @@ class LibraryLoader {
 	}
 
 	public void queueUpdatePath(Path path) {
-		pathsToUpdate.add(path);
+		if (!pathsToUpdate.contains(path)) {
+			pathsToUpdate.add(path);
+		}
 	}
 
 	private long lastOrphanClearMS = 0;
@@ -90,14 +92,6 @@ class LibraryLoader {
 						synchronized (pathsToUpdate) {
 							Path pathToUpdate = pathsToUpdate.remove(0).toAbsolutePath();
 							updateLibraryAtPath(pathToUpdate);
-							// remove any sub paths, because they got updated when we called updateLibraryAtPath( parent )
-							List<Path> childPaths = new ArrayList<>();
-							for (Path path : pathsToUpdate) {
-								if (path.toAbsolutePath().startsWith(pathToUpdate)) {
-									childPaths.add(path);
-								}
-							}
-							pathsToUpdate.removeAll(childPaths);
 						}
 					}
 					library.getDiskWatcher().processWatcherEvents();
@@ -268,5 +262,9 @@ class LibraryLoader {
 
 	public void setMusicRootRemoved(boolean b) {
 		musicRootRemoved = b;
+	}
+
+	void pathUpdated(Path path) {
+		pathsToUpdate.remove(path);
 	}
 }

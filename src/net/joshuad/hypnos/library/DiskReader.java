@@ -47,9 +47,11 @@ class DiskReader implements FileVisitor<Path> {
 
 	private Library library;
 	private FXUI ui;
+	LibraryLoader loader;
 	LibraryScanLogger scanLogger;
 	
-	DiskReader(Library library, LibraryScanLogger scanLogger) {
+	DiskReader(Library library, LibraryLoader loader, LibraryScanLogger scanLogger) {
+		this.loader = loader;
 		this.library = library;
 		this.scanLogger = scanLogger;
 	}
@@ -159,6 +161,7 @@ class DiskReader implements FileVisitor<Path> {
 
 	@Override
 	public FileVisitResult visitFile(Path filePath, BasicFileAttributes attr) {
+		loader.pathUpdated(filePath);
 		if (Utils.isMusicFile(filePath)) {
 			Track track = null;
 			for (Track libraryTrack : tracksInCurrentDirectory) {
@@ -181,6 +184,7 @@ class DiskReader implements FileVisitor<Path> {
 	@Override
 	public FileVisitResult postVisitDirectory(Path dir, IOException exception) throws IOException {
 		directoriesVisited++;
+		loader.pathUpdated(dir);
 		if (isAlbum(currentDirectoryNode, scanLogger)) {
 			List<Track> tracks = new ArrayList<>();
 			for (FileTreeNode child : currentDirectoryNode.getChildren()) {
