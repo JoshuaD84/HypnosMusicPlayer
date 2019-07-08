@@ -4,9 +4,6 @@ Library & Scanner Rebuild
       If you open an artist window and delete a file, it isn't removed from the artist window list
 
 UI
-   Ctrl click on playing track -> go to album
-      Alt click on playing track -> go go artist
-
    On window, main UI, the "+" and "x" buttons, and a few others, aren't exact right height
 
    Improve tag editor UI. It's clunky.  Single clicks good

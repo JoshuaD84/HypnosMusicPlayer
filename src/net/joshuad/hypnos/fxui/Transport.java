@@ -426,7 +426,11 @@ public class Transport extends VBox {
 		settingsWidthPadding.minWidthProperty().bind( settingsBox.widthProperty() );
 		
 		currentTrackButton.setOnMouseClicked( ( MouseEvent event ) -> {
-			if ( event.getButton() == MouseButton.PRIMARY ) {
+			if ( event.getButton() == MouseButton.PRIMARY && event.isControlDown() ) {
+				ui.goToAlbumOfTrack(audioSystem.getCurrentTrack()); 
+			} else if ( event.getButton() == MouseButton.PRIMARY && event.isAltDown() ) {
+				ui.goToArtistOfTrack(audioSystem.getCurrentTrack());
+			} else if ( event.getButton() == MouseButton.PRIMARY ) {
 				ui.selectCurrentTrack();
 			}
 		});

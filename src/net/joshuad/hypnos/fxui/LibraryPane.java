@@ -475,6 +475,11 @@ public class LibraryPane extends BorderPane {
 		//TODO: clean this up
 		albumPane.filterBox.setText( "" );
 	}
+	
+	public void clearArtistFilter () {
+		//TODO: clean this up
+		artistPane.filterBox.setText( "" );
+	}
 
 	public void selectPane(int i) {
 		List<Node> children = buttonBox.getChildren();
@@ -488,6 +493,10 @@ public class LibraryPane extends BorderPane {
 
 	public void showAndSelectAlbumTab() {
 		albumsButton.fire();
+	}
+	
+	public void showAndSelectArtistTab() {
+		artistsButton.fire();
 	}
 
 	public void updatePlaceholders() {

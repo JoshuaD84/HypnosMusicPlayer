@@ -1719,6 +1719,32 @@ public class FXUI implements PlayerListener {
 		libraryPane.showAndSelectAlbumTab();
 	}
 
+	public void goToArtistOfTrack ( Track track ) {
+		if ( track == null ) {
+			LOGGER.info( "Requested to 'go to artist' of a track that is null, ignoring." );
+			return;
+		}
+		Artist artist = null;
+		for ( Artist libraryArtist : library.getArtistData() ) {
+			if ( libraryArtist.getName().matches(track.getAlbumArtist()) ) {
+				artist = libraryArtist;
+				break;
+			}
+		}
+		if ( artist == null ) {
+			LOGGER.info( "Requested to 'go to artist' of a track that is not part of an album, ignoring." );
+			return;
+		}
+		libraryPane.clearArtistFilter();
+		libraryPane.artistPane.artistTable.getSelectionModel().clearSelection();
+		libraryPane.artistPane.artistTable.getSelectionModel().select( artist );
+		libraryPane.artistPane.artistTable.requestFocus();
+		libraryPane.artistPane.artistTable.scrollTo( artist );
+		libraryPane.setArtistsVisible ( true );
+		if ( isLibraryCollapsed() ) setLibraryCollapsed( false );
+		libraryPane.showAndSelectArtistTab();
+	}
+	
 	public void setLibraryLabelsToLoading () {
 		libraryPane.setLabelsToLoading();
 	}
