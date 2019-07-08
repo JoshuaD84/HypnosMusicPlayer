@@ -146,6 +146,7 @@ public class Artist implements Serializable {
 		trackCount = new SimpleIntegerProperty(); 
 		albumCount = new SimpleIntegerProperty(); 
 		totalLength = new SimpleIntegerProperty();
+		name = new SimpleStringProperty();
 
 		albums = FXCollections.observableArrayList( albumsForSerialization );
 		looseTracks = FXCollections.observableArrayList( looseTracksForSerialization );
