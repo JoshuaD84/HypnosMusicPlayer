@@ -24,14 +24,14 @@ import net.joshuad.hypnos.HypnosURLS;
 import net.joshuad.hypnos.fxui.FXUI;
 import net.joshuad.hypnos.Hypnos.OS;
 
-class LibraryDiskWatcher {
-	private static final Logger LOGGER = Logger.getLogger( LibraryDiskWatcher.class.getName() );
+class DiskWatcher {
+	private static final Logger LOGGER = Logger.getLogger( DiskWatcher.class.getName() );
 	private WatchService watcher;
 	private final HashMap<WatchKey, Path> keys = new HashMap<WatchKey, Path>();
 	private DelayedUpdateThread delayedUpdater;
 	private FXUI ui;
 	private LibraryScanLogger scanLogger;
-	LibraryDiskWatcher( Library library, LibraryScanLogger scanLogger ) {
+	DiskWatcher( Library library, LibraryScanLogger scanLogger ) {
 		this.scanLogger = scanLogger;
 		delayedUpdater = new DelayedUpdateThread( library );
 		try {

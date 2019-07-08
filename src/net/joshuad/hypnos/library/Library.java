@@ -50,7 +50,7 @@ public class Library {
 	private final CachedList<MusicRoot> musicRoots = new CachedList<>();
 
 	private final LibraryLoader loader;
-	private final LibraryDiskWatcher diskWatcher;
+	private final DiskWatcher diskWatcher;
 	private final LibraryScanLogger scanLogger = new LibraryScanLogger();
 	
 	private boolean dataNeedsToBeSavedToDisk = false;
@@ -58,7 +58,7 @@ public class Library {
 	private final Object artistSychronizeFlagLock = new Object();
 
 	public Library() {
-		diskWatcher = new LibraryDiskWatcher(this, scanLogger);
+		diskWatcher = new DiskWatcher(this, scanLogger);
 		loader = new LibraryLoader(this, scanLogger);
 
 		InvalidationListener invalidationListener = new InvalidationListener() {
@@ -332,7 +332,7 @@ public class Library {
 		return loader;
 	}
 
-	LibraryDiskWatcher getDiskWatcher() {
+	DiskWatcher getDiskWatcher() {
 		return diskWatcher;
 	}
 

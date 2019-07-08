@@ -42,6 +42,12 @@ public class Album implements Serializable, AlbumInfoSource {
 
 	private void initializeTransientFields() {
 		tracks = FXCollections.observableArrayList();
+		this.tracks.addListener(new InvalidationListener() {
+			@Override
+			public void invalidated(Observable arg0) {
+				updateData();
+			}
+		});
 		albumArtistProperty = new SimpleStringProperty("");
 		yearProperty = new SimpleStringProperty("");
 		albumTitleProperty = new SimpleStringProperty("");
@@ -55,12 +61,6 @@ public class Album implements Serializable, AlbumInfoSource {
 
 	public Album(Path albumDirectory, List<Track> tracks) {
 		initializeTransientFields();
-		this.tracks.addListener(new InvalidationListener() {
-			@Override
-			public void invalidated(Observable arg0) {
-				updateData();
-			}
-		});
 		this.directory = albumDirectory.toFile();
 		try {
 			creationTimeMS = Files.readAttributes(directory.toPath(), BasicFileAttributes.class).creationTime().toMillis();
