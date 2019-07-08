@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javafx.application.Platform;
 import javafx.collections.transformation.FilteredList;
 import net.joshuad.hypnos.library.Track;
 
@@ -34,7 +35,7 @@ public class ThrottledTrackFilter {
 				if ( !filter.equals( currentAppliedFilter ) || hide != currentAppliedHideAlbumTracks ) {
 					if ( System.currentTimeMillis() >= timeRequestMadeMS + 100 ) {
 						interruptFiltering = false;
-						setPredicate( filter, hide );
+						Platform.runLater(()->setPredicate( filter, hide ));
 						currentAppliedFilter = filter;
 						currentAppliedHideAlbumTracks = hide;
 					}

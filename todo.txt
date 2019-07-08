@@ -1,11 +1,12 @@
 Library & Scanner Rebuild
-   Filtering the track or album list causes exceptions which can't just be ignored
 
    Artist hasn't been converted to the observable paradigm yet, so there are problems
       If you open an artist window and delete a file, it isn't removed from the artist window list
-      The UI doesn't update all the time
 
 UI
+   Ctrl click on playing track -> go to album
+      Alt click on playing track -> go go artist
+
    On window, main UI, the "+" and "x" buttons, and a few others, aren't exact right height
 
    Improve tag editor UI. It's clunky.  Single clicks good
@@ -36,6 +37,10 @@ Windows
       https://stackoverflow.com/questions/56847367/can-you-prevent-watchservice-from-locking-files-on-windows
 
 Backend
+   Filtering the track or album list causes exceptions which can't just be ignored
+      2019-07-08 - I made it happen way less frequently by wrapping it in a runLater(), but I was still able to get
+      a crash by really spamming the search boxes
+
    Remove WinXP not supported by Jfx
 
    Build jxgrabhotkey as a seperate jar
