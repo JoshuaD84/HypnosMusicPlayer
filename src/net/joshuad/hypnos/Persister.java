@@ -231,6 +231,13 @@ public class Persister {
 		    ArrayList <Album> albums = (ArrayList <Album>) dataIn.readObject();
 		    ArrayList <Track> tracks = (ArrayList <Track>) dataIn.readObject();
 		    library.setDataOnInitialLoad ( tracks, albums );
+		    if ( audioSystem.getCurrentTrack() != null ) {
+			    for ( Track track : library.getTrackData() ) {
+			    	if ( track.equals(audioSystem.getCurrentTrack()) ) {
+			    		audioSystem.getCurrentTrack().setAlbum(track.getAlbum());
+			    	}
+			    }
+		    }
 		} catch ( Exception e ) {
 			LOGGER.warning( "Unable to read library data from disk, continuing." );
 		}
