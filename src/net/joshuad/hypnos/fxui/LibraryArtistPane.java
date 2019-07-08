@@ -34,7 +34,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TableColumn.SortType;
 import javafx.scene.control.TableView.ResizeFeatures;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -72,7 +71,7 @@ public class LibraryArtistPane extends BorderPane {
 	
 	TableView<Artist> artistTable;	
 	TableColumn<Artist, String> artistColumn;
-	TableColumn<Artist, Integer> tracksColumn, albumsColumn, lengthColumn;
+	TableColumn<Artist, Number> tracksColumn, albumsColumn, lengthColumn;
 	
 	ContextMenu columnSelectorMenu;
 	
@@ -170,9 +169,9 @@ public class LibraryArtistPane extends BorderPane {
 	
 	private TableView<Artist> setupArtistTable () {
 		artistColumn = new TableColumn<Artist, String>( "Artist" );
-		albumsColumn = new TableColumn<Artist, Integer>( );
-		tracksColumn = new TableColumn<Artist, Integer> ( );
-		lengthColumn = new TableColumn<Artist, Integer> ( "Length" );
+		albumsColumn = new TableColumn<Artist, Number>( );
+		tracksColumn = new TableColumn<Artist, Number> ( );
+		lengthColumn = new TableColumn<Artist, Number> ( "Length" );
 		
 		Label tracksLabel = new Label( "T" );
 		tracksLabel.setTooltip( new Tooltip( "Tracks" ) );
@@ -184,19 +183,19 @@ public class LibraryArtistPane extends BorderPane {
 
 		artistColumn.setComparator( new AlphanumComparator( CaseHandling.CASE_INSENSITIVE ) );
 
-		artistColumn.setCellValueFactory( new PropertyValueFactory <Artist, String>( "Name" ) );
-		albumsColumn.setCellValueFactory( new PropertyValueFactory <Artist, Integer>( "albumCount" ) );
-		tracksColumn.setCellValueFactory( new PropertyValueFactory <Artist, Integer>( "trackCount" ) );
-		lengthColumn.setCellValueFactory( new PropertyValueFactory <Artist, Integer>( "length" ) );
+		artistColumn.setCellValueFactory( cellData -> cellData.getValue().nameProperty() );
+		albumsColumn.setCellValueFactory( cellData -> cellData.getValue().albumCountProperty() );
+		tracksColumn.setCellValueFactory( cellData -> cellData.getValue().trackCountProperty() );
+		lengthColumn.setCellValueFactory( cellData -> cellData.getValue().lengthProperty() );
 		
-		lengthColumn.setCellFactory( col -> new TableCell<Artist, Integer> () {
+		lengthColumn.setCellFactory( col -> new TableCell<Artist, Number> () {
 			@Override
-			public void updateItem ( Integer length, boolean empty ) {
+			public void updateItem ( Number length, boolean empty ) {
 				super.updateItem( length, empty );
 				if ( empty ) {
 					setText( null );
 				} else {
-					setText( Utils.getLengthDisplay( length ) );
+					setText( Utils.getLengthDisplay( length.intValue() ) );
 				}
 			}
 		});

@@ -1321,6 +1321,10 @@ public class FXUI implements PlayerListener {
 		currentListPane.currentListTable.refresh();
 	}
 	
+	public void refreshArtistTable () {
+		libraryPane.artistPane.artistTable.refresh();
+	}
+	
 	public void refreshAlbumTable () {
 		libraryPane.albumPane.albumTable.refresh();
 	}

@@ -12,6 +12,8 @@ import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -24,7 +26,7 @@ public class Artist implements Serializable {
 	
 	private transient ObservableList <Album> albums = FXCollections.observableArrayList();
 	private transient ObservableList <Track> looseTracks = FXCollections.observableArrayList();
-	String name;
+	private transient StringProperty name = new SimpleStringProperty("");
 	
 	private transient IntegerProperty trackCount = new SimpleIntegerProperty(); 
 	{	
@@ -55,16 +57,20 @@ public class Artist implements Serializable {
 	}
 	
 	public Artist ( String name ) {
-		this.name = name;
+		this.name.set(name);
 	}
 	
 	public Artist ( String name, List<Album> albums, List<Track> looseTracks ) {
-		this.name = name;
+		this.name.set(name);
 		albums.addAll( albums );
 		looseTracks.addAll( looseTracks );
 	}
 	
 	public String getName() {
+		return name.get();
+	}
+	
+	public StringProperty nameProperty() {
 		return name;
 	}
 	

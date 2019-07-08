@@ -86,8 +86,8 @@ public class Library {
 					}
 
 					if (doRegenerate) {
-						artistsNeedToBeRegenerated = false;
 						artists.getItemsCopy().setAll(generateArtists());
+						scanLogger.println("[Library] Changes to library were made, regenerating artist list");
 					}
 
 					try {
