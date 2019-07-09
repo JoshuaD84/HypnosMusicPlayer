@@ -2,6 +2,8 @@ package net.joshuad.hypnos.fxui;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
+
+import javafx.application.Platform;
 import javafx.collections.transformation.FilteredList;
 import net.joshuad.hypnos.library.Artist;
 
@@ -27,7 +29,7 @@ public class ThrottledArtistFilter {
 				if ( !filter.equals( currentAppliedFilter ) ) {
 					if ( System.currentTimeMillis() >= timeRequestMadeMS + 100 ) {
 						interruptFiltering = false;
-						setPredicate( filter );
+						Platform.runLater(()->setPredicate( filter ));
 						currentAppliedFilter = filter;
 					}
 				}

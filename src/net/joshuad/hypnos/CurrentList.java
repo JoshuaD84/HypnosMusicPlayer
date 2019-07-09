@@ -150,7 +150,6 @@ public class CurrentList {
 						if ( track.needsUpdateFromDisk() ) {
 							try {
 								track.update();
-								//Thread.sleep( 10 );
 							} catch ( Exception e ) {
 								//No need to log anything, UI should show it
 							}

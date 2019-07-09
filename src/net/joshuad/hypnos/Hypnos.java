@@ -232,7 +232,6 @@ public class Hypnos extends Application {
 	}
 	
 	public static void setLoaderSpeed ( LoaderSpeed speed ) {
-		(new Exception()).printStackTrace();
 		loaderSpeed = speed;
 		ui.setLoaderSpeedDisplay ( speed );
 	}

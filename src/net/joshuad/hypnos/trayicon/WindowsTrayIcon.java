@@ -180,6 +180,7 @@ public class WindowsTrayIcon extends NativeTrayIcon implements PlayerListener {
 		});
 		
 		t.setDaemon( true );
+		t.setName("SWT Tray Icon Thread");
 		t.start();
 
 		audioSystem.addPlayerListener( this );

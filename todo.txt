@@ -1,7 +1,5 @@
 Build jxgrabhotkey as a seperate jar
 
-Reduce the number of loose threads running as much as possible
-
 On window, main UI, the "+" and "x" buttons, and a few others, aren't exact right height
 
 Improve tag editor UI. It's clunky.  Single clicks good
@@ -52,6 +50,8 @@ Backend
 
    Can we use Java's Jigsaw to reduce distribution size somehow? We had issues w/ circular dependencies, but can we work
    through that?
+
+   Having three different throttled filter classes is really error prone. Clean that up, unify 
 
 Decoder  
    I found an MP3 that Hypnos refuses to play. VLC plays it.
