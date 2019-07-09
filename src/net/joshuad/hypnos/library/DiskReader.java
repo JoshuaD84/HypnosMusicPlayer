@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import me.xdrop.fuzzywuzzy.FuzzySearch;
+import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.Utils;
 import net.joshuad.hypnos.fxui.FXUI;
 
@@ -156,6 +157,25 @@ class DiskReader implements FileVisitor<Path> {
 				tracksInCurrentDirectory.add(libraryTrack);
 			}
 		}	
+		switch(Hypnos.getLoaderSpeed()) {
+			case HIGH:
+			default:
+				break;
+			case MED:
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					LOGGER.info("Interrupted during sleep in disk watcher, if this persists the loader speed may be ignored.");
+				}
+				break;
+			case LOW:
+				try {
+					Thread.sleep(50);
+				} catch (InterruptedException e) {
+					LOGGER.info("Interrupted during sleep in disk watcher, if this persists the loader speed may be ignored.");
+				}
+				break;
+		}
 		return FileVisitResult.CONTINUE;
 	}
 

@@ -520,7 +520,7 @@ public class Persister {
 				settingsOut.printf( "%s: %s%s", key, valueOut, System.lineSeparator() );
 			} );
 			
-			//TODO: settingsOut.printf( "%s: %s%s", Setting.LOADER_SPEED, Hypnos.getLoaderSpeed(), System.lineSeparator() );
+			settingsOut.printf( "%s: %s%s", Setting.LOADER_SPEED, Hypnos.getLoaderSpeed(), System.lineSeparator() );
 
 			settingsOut.flush();
 			settingsOut.close();

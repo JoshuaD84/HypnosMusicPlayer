@@ -43,18 +43,13 @@ import net.joshuad.hypnos.library.Library.LoaderSpeed;
 
 public class MusicRootWindow extends Stage {
 	private static final Logger LOGGER = Logger.getLogger( MusicRootWindow.class.getName() );
-
 	TableView <MusicRoot> musicSourceTable;
-	
 	Library library;
-
 	Scene scene;
-	
 	Slider prioritySlider;
-
 	private final ProgressIndicatorBar progressBar;
-	
 	FXUI ui;
+	
 	public MusicRootWindow ( FXUI ui, Stage mainStage, Library library ) {
 		super();
 		this.ui = ui;

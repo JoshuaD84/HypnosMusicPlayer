@@ -232,44 +232,10 @@ public class Hypnos extends Application {
 	}
 	
 	public static void setLoaderSpeed ( LoaderSpeed speed ) {
-		return;
-		/*Items that have background loading threads
-		 * CurrentList -> updates missing tracks, relinks files, updates track data, etc. on current list.
-		 * Library -> LoaderThread
-		 * LibraryUpdater -> updaterThread
-		 * MusicFileVisitor -> has a sleep increment
-		 * AudioPlayer -> PlayerThread
-		 *
-		
+		(new Exception()).printStackTrace();
 		loaderSpeed = speed;
-		
-		switch ( speed ) {
-			case LOW:
-				InitialScanFileVisitor.setSleepTimeBetweenVisits( 150 );
-				library.setLoaderSleepTimeMS( 250 );
-				libraryUpdater.setMaxChangesPerUpdate ( 500 );
-				libraryUpdater.setSleepTimeMS( 60 );
-				break;
-				
-			case MED:
-				InitialScanFileVisitor.setSleepTimeBetweenVisits( 25 );
-				library.setLoaderSleepTimeMS( 25 );
-				libraryUpdater.setMaxChangesPerUpdate ( 10000 );
-				libraryUpdater.setSleepTimeMS( 10 );
-				break;
-				
-			case HIGH:
-				InitialScanFileVisitor.setSleepTimeBetweenVisits( 0 );
-				library.setLoaderSleepTimeMS( 10 );
-				libraryUpdater.setMaxChangesPerUpdate ( 20000 );
-				libraryUpdater.setSleepTimeMS( 2 );
-				break;
-		}
-		
 		ui.setLoaderSpeedDisplay ( speed );
-		*/
 	}
-  
 	
 	private static void startLogToBuffer() {
 		originalOut = System.out;
@@ -724,10 +690,11 @@ public class Hypnos extends Application {
 						persister.loadCurrentList();
 						ui.applySettingsBeforeWindowShown( pendingSettings );
 						
-						//TODO: This def doesn't belong here. 
 						if ( pendingSettings.containsKey( Setting.LOADER_SPEED ) ) {
 							Hypnos.setLoaderSpeed( LoaderSpeed.valueOf( pendingSettings.get( Setting.LOADER_SPEED ) ) );
 							pendingSettings.remove( Setting.LOADER_SPEED );
+						} else {
+							Hypnos.setLoaderSpeed(LoaderSpeed.HIGH);
 						}
 
 						ui.setLibraryLabelsToLoading();
@@ -789,10 +756,11 @@ public class Hypnos extends Application {
 						persister.loadCurrentList();
 						audioSystem.applySettings ( pendingSettings );
 						
-						//TODO: This def doesn't belong here. 
 						if ( pendingSettings.containsKey( Setting.LOADER_SPEED ) ) {
 							Hypnos.setLoaderSpeed( LoaderSpeed.valueOf( pendingSettings.get( Setting.LOADER_SPEED ) ) );
 							pendingSettings.remove( Setting.LOADER_SPEED );
+						} else {
+							Hypnos.setLoaderSpeed(LoaderSpeed.HIGH);
 						}
 						
 						ui.applySettingsBeforeWindowShown( pendingSettings );

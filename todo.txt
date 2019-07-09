@@ -1,21 +1,27 @@
-Library & Scanner Rebuild
+Build jxgrabhotkey as a seperate jar
 
-   Artist hasn't been converted to the observable paradigm yet, so there are problems
-      If you open an artist window and delete a file, it isn't removed from the artist window list
+Reduce the number of loose threads running as much as possible
 
-UI
-   On window, main UI, the "+" and "x" buttons, and a few others, aren't exact right height
+On window, main UI, the "+" and "x" buttons, and a few others, aren't exact right height
 
-   Improve tag editor UI. It's clunky.  Single clicks good
+Improve tag editor UI. It's clunky.  Single clicks good
+   
+File-Tree view for library
 
-   File-Tree view for library
+If something gets dropped into config/playlists folders, update the UI to include it?
 
-   If something gets dropped into config/playlists folders, update the UI to include it?
+Add buttons to library scan log window
+   Clear log
+   copy log
+   Maybe select different types of things, like albums rejected, full list, etc. 
 
-   Add buttons to library scan log window
-      Clear log
-      copy log
-      Maybe select different types of things, like albums rejected, full list, etc. 
+Windows - It locks artist folders on windows. Surpsingly not album folders, just artist
+   https://stackoverflow.com/questions/56847367/can-you-prevent-watchservice-from-locking-files-on-windows
+   https://stackoverflow.com/questions/6255463/java7-watchservice-access-denied-error-trying-to-delete-recursively-watched-ne
+
+Look at getting completely off swing, we can shave a lot out of the jres if we do
+
+
    
 Linux
    JavaFX / Linux Open File Dialog sometimes causes jvm crash, depends on system, and doesn't happen always
@@ -30,31 +36,22 @@ Linux
       This is kind of a pain because of the icons and because I'm bad at C
 
 Windows
-   It locks artist folders on windows. Surpsingly not album folders, just artist
-      https://stackoverflow.com/questions/56847367/can-you-prevent-watchservice-from-locking-files-on-windows
+   Select Multiple Files in explorer - No Option to play in Hypnos. Add that
+   "Open with" causes the current track button to not show the current track's name.
+   Commandline Interface
+      Send a file via command line when hypnos isn't playing -- it starts
+      Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on current list
 
 Backend
+   Artist hasn't been fully converted to the observable paradigm yet, so there are problems
+      If you open an artist window and delete a file, it isn't removed from the artist window list
+
    Filtering the track or album list causes exceptions which can't just be ignored
       2019-07-08 - I made it happen way less frequently by wrapping it in a runLater(), but I was still able to get
       a crash by really spamming the search boxes
 
-   Remove WinXP not supported by Jfx
-
-   Build jxgrabhotkey as a seperate jar
-
-   Look at getting completely off swing, we can shave a lot out of the jres if we do
-
    Can we use Java's Jigsaw to reduce distribution size somehow? We had issues w/ circular dependencies, but can we work
    through that?
-
-   Reduce the number of loose threads running as much as possible
-   
-Windows System Integration
-      Select Multiple Files in explorer - No Option to play in Hypnos. Add that
-      "Open with" causes the current track button to not show the current track's name.
-      Commandline Interface
-         Send a file via command line when hypnos isn't playing -- it starts
-         Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on current list
 
 Decoder  
    I found an MP3 that Hypnos refuses to play. VLC plays it.
