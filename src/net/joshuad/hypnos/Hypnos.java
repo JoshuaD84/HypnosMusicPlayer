@@ -784,9 +784,7 @@ public class Hypnos extends Application {
 					case WIN_7:
 					case WIN_8:
 					case WIN_UNKNOWN:
-					case WIN_VISTA:
-					case WIN_XP:
-					default: {
+					case WIN_VISTA:{
 						EnumMap <Setting, String> pendingSettings = persister.loadSettingsFromDisk();
 						persister.loadCurrentList();
 						audioSystem.applySettings ( pendingSettings );
@@ -834,6 +832,12 @@ public class Hypnos extends Application {
 						
 					} 
 					break;
+
+					case WIN_XP:
+					default: {
+						LOGGER.log(Level.SEVERE, "Operating System not supported, exiting.");
+						exit(ExitCode.UNSUPPORTED_OS);
+					}
 				}
 
 			} else {
