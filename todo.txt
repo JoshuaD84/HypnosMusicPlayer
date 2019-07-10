@@ -1,7 +1,3 @@
-Build jxgrabhotkey as a seperate jar
-
-On window, main UI, the "+" and "x" buttons, and a few others, aren't exact right height
-
 Improve tag editor UI. It's clunky.  Single clicks good
    
 File-Tree view for library
@@ -19,6 +15,7 @@ Windows - It locks artist folders on windows. Surpsingly not album folders, just
 
 Look at getting completely off swing, we can shave a lot out of the jres if we do
 
+Build jxgrabhotkey as a seperate jar
 
    
 Linux

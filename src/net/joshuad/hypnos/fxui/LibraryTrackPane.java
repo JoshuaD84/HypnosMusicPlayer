@@ -202,7 +202,7 @@ public class LibraryTrackPane extends BorderPane {
 		});
 		
 		double width = 33;
-		double height = 26;
+		float height = Hypnos.getOS().isWindows() ? 28 : 26;
 
 		filterBox.setPrefHeight( height );
 		String addLocation = "resources/add.png";

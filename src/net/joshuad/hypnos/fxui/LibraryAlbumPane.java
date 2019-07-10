@@ -548,7 +548,7 @@ private static final Logger LOGGER = Logger.getLogger( LibraryArtistPane.class.g
 		});
 		
 		float width = 33;
-		float height = 26;
+		float height = Hypnos.getOS().isWindows() ? 28 : 26;
 
 		filterBox.setPrefHeight( height );
 		String addLocation = "resources/add.png";
