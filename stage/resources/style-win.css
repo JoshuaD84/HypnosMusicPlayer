@@ -14,7 +14,6 @@
 	-fx-font-size: 18px !important;
 }
 
-/* This isn't technically related to the font, so we should either rename the file or refactor */
 .filterAlbumsCheckBox {
 	-fx-padding: 0 5 0 0;
 }
