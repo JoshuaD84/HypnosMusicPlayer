@@ -65,9 +65,10 @@ public class VLCAudioPlayer {
 			case WIN_8:
 			case WIN_UNKNOWN:
 			case WIN_VISTA:
-			case WIN_XP:
 				nativeVLCLibPath = Hypnos.getRootDirectory().resolve( "lib/win/vlc" ).toAbsolutePath().toString();
 				break;
+			case WIN_XP:
+				//Do nothing, Windows XP not supported
 			default:
 				LOGGER.severe( "Cannot determine OS, unable to load native VLC libraries. Exiting." );
 				Hypnos.exit( ExitCode.UNSUPPORTED_OS );
@@ -162,9 +163,11 @@ public class VLCAudioPlayer {
 			case WIN_8:
 			case WIN_UNKNOWN:
 			case WIN_VISTA:
-			case WIN_XP:
 				//Assumes filename is an absolute file location. 
 				targetFile = new File( targetFile ).toURI().toASCIIString().replaceFirst( "file:/", "file:///" );
+				break;
+			case WIN_XP:
+				//Do nothing, windows XP not supported
 				break;
 		}
 		

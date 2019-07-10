@@ -693,12 +693,12 @@ public class FXUI implements PlayerListener {
 		case WIN_8:
 		case WIN_UNKNOWN:
 		case WIN_VISTA:
-		case WIN_XP:
 			currentListSplitPanePosition = currentListSplitPane.getDividerPositions()[0];
 			mainStage.setIconified( false );
 			mainStage.hide();
 			break;
-			
+
+		case WIN_XP:
 		default:
 			break;
 		
@@ -1678,9 +1678,7 @@ public class FXUI implements PlayerListener {
 				break;
 			}
 				
-			case WIN_10: case WIN_7: case WIN_8: case WIN_UNKNOWN: case WIN_VISTA: case WIN_XP:
-			case UNKNOWN: {
-				
+			case WIN_10: case WIN_7: case WIN_8: case WIN_UNKNOWN: case WIN_VISTA: case UNKNOWN: {
 				try {
 					Desktop.getDesktop().browse( new URI ( url ) );
 					
@@ -1695,6 +1693,10 @@ public class FXUI implements PlayerListener {
 				}
 				break;
 			}
+			
+			case WIN_XP:
+				//Do nothing, Win XP not supported
+				break;
 		}
 	}
 

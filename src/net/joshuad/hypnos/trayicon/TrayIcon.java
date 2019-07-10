@@ -35,10 +35,11 @@ public class TrayIcon {
 			case WIN_8:
 			case WIN_UNKNOWN:
 			case WIN_VISTA:
-			case WIN_XP:
 				nativeTrayIcon = new WindowsTrayIcon( ui, audioSystem );
 				break;
 
+			case WIN_XP:
+				//Do nothing, windows xp not supported
 			case UNKNOWN:
 			default:
 		}

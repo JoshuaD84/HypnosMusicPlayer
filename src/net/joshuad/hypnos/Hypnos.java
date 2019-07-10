@@ -376,7 +376,8 @@ public class Hypnos extends Application {
 					configDirectory = Paths.get( home + x + "AppData" + x + "Local" + x + "Hypnos" );
 					break;
 				case WIN_XP:
-					configDirectory = Paths.get( home + x + "Local Settings" + x + "Application Data" + x + "Hypnos" );
+					//Do nothing, windows XP not supported
+					//configDirectory = Paths.get( home + x + "Local Settings" + x + "Application Data" + x + "Hypnos" );
 					break;
 				case UNKNOWN: //Fall through
 				default:

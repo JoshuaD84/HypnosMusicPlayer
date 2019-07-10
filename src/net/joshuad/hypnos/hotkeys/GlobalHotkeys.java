@@ -54,19 +54,17 @@ public class GlobalHotkeys {
 				case NIX:
 					system = new LinuxGlobalHotkeys( this );
 					break;
-					
 				case OSX:
 					throw new HotkeyException ( "OSX does not currently support hotkeys." );
-					
 				case WIN_10:
 				case WIN_7:
 				case WIN_8:
 				case WIN_UNKNOWN:
 				case WIN_VISTA:
-				case WIN_XP:
 					system = new WindowsGlobalHotkeys( this );
 					break;
-	
+				case WIN_XP:
+					throw new HotkeyException ( "Windows XP not supported by Hypnos." );
 				case UNKNOWN:
 				default:
 					throw new HotkeyException ( "Cannot recognize operating system." );
