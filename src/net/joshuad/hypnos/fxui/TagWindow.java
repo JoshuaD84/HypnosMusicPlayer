@@ -41,7 +41,6 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -135,18 +134,17 @@ public class TagWindow extends Stage {
 		
 		textTagColumn.setCellValueFactory( new PropertyValueFactory <MultiFileTextTagPair, String>( "TagName" ) );
 		textValueColumn.setCellValueFactory( new PropertyValueFactory <MultiFileTextTagPair, String>( "Value" ) );
+		textValueColumn.setCellFactory(c -> EditOnClickCell.createStringEditCell());
 		
-		textValueColumn.setCellFactory( TextFieldTableCell.forTableColumn() );
 		textValueColumn.setOnEditCommit( new EventHandler <CellEditEvent <MultiFileTextTagPair, String>>() {
 			@Override
 			public void handle ( CellEditEvent <MultiFileTextTagPair, String> t ) {
 				((MultiFileTextTagPair) t.getTableView().getItems().get( t.getTablePosition().getRow() )).setValue( t.getNewValue() );
 			}
-		} );
+		});
 		
 		textTagColumn.setSortable( false );
 		textValueColumn.setSortable( false );
-		
 		textTagColumn.setReorderable( false );
 		textValueColumn.setReorderable( false );
 		
@@ -345,9 +343,7 @@ public class TagWindow extends Stage {
 		imageTagTable.setItems ( imageTagPairs );
 		imageTagTable.getColumns().addAll( imageTagColumn, imageValueColumn, imageDeleteColumn );
 		imageTagTable.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
-		
 		imageTagTable.prefWidthProperty().bind( imageTagPane.widthProperty() );
-		
 		imageTagPane.getChildren().add( imageTagTable );
 		imageTagTable.prefHeightProperty().bind( imageTagPane.heightProperty() );
 		imageTagTable.prefWidthProperty().bind( imageTagPane.widthProperty() );
@@ -450,7 +446,7 @@ public class TagWindow extends Stage {
 		revertButton.setOnAction( new EventHandler <ActionEvent>() {
 			@Override
 			public void handle ( ActionEvent e ) {
-				setTracks ( tracks, albums, (FieldKey[])hiddenTextTagsList.toArray() );
+				setTracks ( tracks, albums, hiddenTextTagsList.toArray(new FieldKey[0]) );
 			}
 		});
 		
@@ -479,8 +475,6 @@ public class TagWindow extends Stage {
 				loadAtOffset ( 1 );
 			}
 		});
-		
-		
 		
 		HBox centerPanel = new HBox();
 		centerPanel.getChildren().addAll ( cancelButton, revertButton, saveButton );
