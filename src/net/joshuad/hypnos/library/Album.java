@@ -77,7 +77,7 @@ public class Album implements Serializable, AlbumInfoSource {
 		}
 	}
 
-	private void updateData() {
+	public void updateData() {
 		albumArtistProperty.set(tracks.get(0).getAlbumArtist());
 		if (tracks.get(0).getYear().length() > 4) {
 			yearProperty.set(tracks.get(0).getYear().substring(0, 4));

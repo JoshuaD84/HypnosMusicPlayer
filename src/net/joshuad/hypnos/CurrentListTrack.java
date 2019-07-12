@@ -106,6 +106,17 @@ public class CurrentListTrack extends Track {
 		return displayState;
 	}
 	
+	@Override
+	public void refreshTagData() {
+		super.refreshTagData();
+		for(Track track : Hypnos.getLibrary().getTrackData()) {
+			if( track.equals(this) ) {
+				track.refreshTagData();
+				track.getAlbum().updateData();
+			}
+		}
+	}
+	
 	private void readObject ( ObjectInputStream in ) throws IOException, ClassNotFoundException {
 		in.defaultReadObject();
 		fileIsMissing = new SimpleBooleanProperty ( false );

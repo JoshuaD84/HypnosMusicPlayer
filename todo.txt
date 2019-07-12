@@ -6,8 +6,6 @@ Make artist tab a tree view:
          + Track
       Loose Track
 
-Apply edits in tag window directly to library on apply, as well as disk. Don't wait for disk, too slow
-
 If something gets dropped into config/playlists folders, update the UI to include it?
 
 Add buttons to library scan log window
