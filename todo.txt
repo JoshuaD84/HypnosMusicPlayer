@@ -8,11 +8,6 @@ Make artist tab a tree view:
 
 If something gets dropped into config/playlists folders, update the UI to include it?
 
-Add buttons to library scan log window
-   Clear log
-   copy log
-   Maybe select different types of things, like albums rejected, full list, etc. 
-
 Windows - It locks artist folders on windows. Surpsingly not album folders, just artist
    https://stackoverflow.com/questions/56847367/can-you-prevent-watchservice-from-locking-files-on-windows
    https://stackoverflow.com/questions/6255463/java7-watchservice-access-denied-error-trying-to-delete-recursively-watched-ne
@@ -45,7 +40,7 @@ Backend
    Artist hasn't been fully converted to the observable paradigm yet, so there are problems
       If you open an artist window and delete a file, it isn't removed from the artist window list
 
-   Filtering the track or album list causes exceptions which can't just be ignored
+   Filtering the track or album list causes exceptions
       2019-07-08 - I made it happen way less frequently by wrapping it in a runLater(), but I was still able to get
       a crash by really spamming the search boxes
 
@@ -64,6 +59,12 @@ Decoder
    focus
 
    Linux: Sometimes it doesn't make sound after restarting into the paused state.  
+
+UI
+   Add buttons to library scan log window
+      Clear log
+      copy log
+      Maybe select different types of things, like albums rejected, full list, etc. 
 
 ::::::::::::::
 

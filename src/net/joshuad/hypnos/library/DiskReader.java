@@ -228,11 +228,6 @@ class DiskReader implements FileVisitor<Path> {
 			}
 			currentDirectoryNode.setAlbum(album);
 		} else {
-			for (FileTreeNode child : currentDirectoryNode.getChildren()) {
-				if (child.getTrack() != null) {
-					library.addTrack(child.getTrack());
-				}
-			}
 			library.notAnAlbum(currentDirectoryNode.getPath());
 		}
 		if (currentDirectoryNode.getParent() != null) {
