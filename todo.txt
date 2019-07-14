@@ -1,22 +1,3 @@
-File-Tree view for library
-
-Make artist tab a tree view:
-   + Artist
-      + Album
-         + Track
-      Loose Track
-
-If something gets dropped into config/playlists folders, update the UI to include it?
-
-Windows - It locks artist folders on windows. Surpsingly not album folders, just artist
-   https://stackoverflow.com/questions/56847367/can-you-prevent-watchservice-from-locking-files-on-windows
-   https://stackoverflow.com/questions/6255463/java7-watchservice-access-denied-error-trying-to-delete-recursively-watched-ne
-
-Look at getting completely off swing, we can shave a lot out of the jres if we do
-
-Build jxgrabhotkey as a seperate jar
-
-   
 Linux
    JavaFX / Linux Open File Dialog sometimes causes jvm crash, depends on system, and doesn't happen always
    
@@ -36,7 +17,22 @@ Windows
       Send a file via command line when hypnos isn't playing -- it starts
       Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on current list
 
+Library
+   If something gets dropped into config/playlists folders, update the UI to include it?
+
 Backend
+   Build jxgrabhotkey as a seperate jar
+
+   Having three different throttled filter classes is really error prone. Clean that up, unify 
+      Playlist throttled filter, but who's going to have over 1000 playlists?
+
+   Look at getting completely off swing, we can shave a lot out of the jres if we do
+      It's currently being used to:
+         * open a file using native program
+         * browse using native browser
+         * Turn an fxImage into a bufferedImage
+         * Turn a bufferedImage into an fxImage
+
    Artist hasn't been fully converted to the observable paradigm yet, so there are problems
       If you open an artist window and delete a file, it isn't removed from the artist window list
 
@@ -47,7 +43,10 @@ Backend
    Can we use Java's Jigsaw to reduce distribution size somehow? We had issues w/ circular dependencies, but can we work
    through that?
 
-   Having three different throttled filter classes is really error prone. Clean that up, unify 
+   Windows - It locks artist folders on windows. Surpsingly not album folders, just artist
+      https://stackoverflow.com/questions/56847367/can-you-prevent-watchservice-from-locking-files-on-windows
+      https://stackoverflow.com/questions/6255463/java7-watchservice-access-denied-error-trying-to-delete-recursively-watched-ne
+
 
 Decoder  
    I found an MP3 that Hypnos refuses to play. VLC plays it.
@@ -59,6 +58,8 @@ Decoder
    focus
 
    Linux: Sometimes it doesn't make sound after restarting into the paused state.  
+   
+   Tom Waits - Blue Valentines - Buggy on my 18.04? 
 
 UI
    Add buttons to library scan log window
@@ -66,14 +67,23 @@ UI
       copy log
       Maybe select different types of things, like albums rejected, full list, etc. 
 
+   File-Tree view for library
+      https://stackoverflow.com/questions/57025089/stop-javafx-treeview-from-jumping-when-an-item-is-expanded
+      https://stackoverflow.com/questions/29402412/how-to-get-javafx-treeview-to-behave-consistently-upon-node-expansion?rq=1
+
+   Make artist tab a tree view:
+      + Artist
+         + Album
+            + Track
+         Loose Track
+
+   visual position slider
+
 ::::::::::::::
 
 Future
-   visual position slider
-
    Windows - Build Process
 
-   Tom Waits - Blue Valentines - Buggy on my 18.04? 
 
    Linux: Media Buttons
       https://stackoverflow.com/questions/53550397/javafx-keyevent-is-it-possible-to-get-more-info-for-undefined-events
@@ -111,8 +121,6 @@ Future
 
 	Maybe add sorting of roman numerals?
 		https://gist.github.com/julienhaversano/9197588
-
-	Playlist throttled filter, but who's going to have over 1000 playlists?
 
 	Maybe allow a filter for file type and lossy vs not lossy
 		Maybe just a special search text "type:mp3", "type:lossy"

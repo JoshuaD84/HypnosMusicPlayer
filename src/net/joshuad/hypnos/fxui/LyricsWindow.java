@@ -1,5 +1,10 @@
 package net.joshuad.hypnos.fxui;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.logging.Logger;
+
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -11,6 +16,7 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
@@ -21,12 +27,14 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.HypnosURLS;
 import net.joshuad.hypnos.library.Track;
 import net.joshuad.hypnos.lyrics.Lyrics;
 import net.joshuad.hypnos.lyrics.LyricsFetcher;
 
 public class LyricsWindow extends Stage {
+	private static final Logger LOGGER = Logger.getLogger( LyricsWindow.class.getName() );
 	
 	private LyricsFetcher lyricsParser = new LyricsFetcher();
 	
@@ -75,6 +83,13 @@ public class LyricsWindow extends Stage {
 				ui.openWebBrowser( sourceURL );
 			}
 		});
+		
+		try {
+			getIcons().add( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) ) );
+		} catch ( FileNotFoundException e ) {
+			LOGGER.warning( "Unable to load program icon: resources/icon.png" );
+		}
+
 		
 		searchWebButton.setOnAction( ( ActionEvent e ) -> {
 			String searchSlug = null;
