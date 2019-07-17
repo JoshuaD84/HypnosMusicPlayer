@@ -42,6 +42,7 @@ public class LyricsFetcher {
 	
 	public LyricsFetcher () {
 		setParseOrder ( LyricSite.GENIUS, LyricSite.AZ, LyricSite.MUSIX, LyricSite.METRO );
+		//TODO: Pretty sure I can delete these four lines: 
 		parseOrder.add ( geniusParser );
 		parseOrder.add ( azParser );
 		parseOrder.add ( metroParser );
@@ -52,10 +53,17 @@ public class LyricsFetcher {
 		
 		Lyrics lyrics = new Lyrics ( "", LyricSite.NONE, "", Lyrics.ScrapeError.NOT_FOUND );
 		
+		List<String> failedUrls = new ArrayList<>();
 		for ( AbstractScraper parser : parseOrder ) {
 			lyrics = parser.getLyrics( track );
-			if ( !lyrics.hadScrapeError() ) break;
+			if ( !lyrics.hadScrapeError() ) {
+				break;
+			} else {
+				failedUrls.add(lyrics.getSourceURL());
+			}
 		}
+		
+		LOGGER.info("Failed to fetch lyrics at the following urls:\n\t" + String.join("\n\t", failedUrls));
 		
 		if ( lyrics.hadScrapeError() ) {
 			String simplifiedTrackTitle = track.getTitle().replaceAll( " ?\\(.*\\)", "" );

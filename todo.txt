@@ -1,3 +1,12 @@
+Playlists don't get deleted from disk when deleted from UI
+
+Tracks loaded from playlists aren't linked to albums in library
+
+Genius Parser and AZ Parsrer don't seem to be working ever
+
+
+
+
 Linux
    JavaFX / Linux Open File Dialog sometimes causes jvm crash, depends on system, and doesn't happen always
    
