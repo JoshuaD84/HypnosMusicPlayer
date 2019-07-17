@@ -506,6 +506,7 @@ public class LibraryPlaylistPane extends BorderPane {
 			if ( result.get() == ButtonType.OK ) {
 				for ( Playlist playlist : playlistTable.getSelectionModel().getSelectedItems() ) {
 					library.removePlaylist( playlist );
+					Hypnos.getPersister().deletePlaylistFile(playlist);
 				}
 				playlistTable.getSelectionModel().clearSelection();
 			}

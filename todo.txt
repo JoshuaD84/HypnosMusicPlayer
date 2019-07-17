@@ -1,5 +1,3 @@
-Playlists don't get deleted from disk when deleted from UI
-
 Lyrics: Genius Parser and AZ Parsrer don't seem to be working ever
 
 Opus and Ape support
