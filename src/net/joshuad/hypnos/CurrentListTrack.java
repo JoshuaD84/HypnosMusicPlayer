@@ -107,7 +107,10 @@ public class CurrentListTrack extends Track {
 		for (Track track : Hypnos.getLibrary().getTrackData()) {
 			if (track.equals(this)) {
 				track.refreshTagData();
-				track.getAlbum().updateData();
+				if(track.getAlbum() != null) {
+					track.getAlbum().updateData();
+				}
+				this.setAlbum(track.getAlbum());
 			}
 		}
 	}
