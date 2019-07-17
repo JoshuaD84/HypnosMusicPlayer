@@ -37,9 +37,7 @@ public class Playlist implements Serializable {
 		USE_DEFAULT, PLAY_ONCE, REPEAT
 	}
 
-	// This is only used and accurate during serialization
-	private List<Track> trackDataForSerialization = new ArrayList<Track>();
-	private transient ObservableList<Track> tracks = FXCollections.observableArrayList(trackDataForSerialization);
+	private transient ObservableList<Track> tracks = FXCollections.observableArrayList();
 	private transient boolean hasUnsavedData = true;
 	private String name;
 	private PlaylistShuffleMode shuffleMode = PlaylistShuffleMode.USE_DEFAULT;
@@ -244,15 +242,12 @@ public class Playlist implements Serializable {
 	}
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
-		trackDataForSerialization.clear();
-		trackDataForSerialization.addAll(tracks);
 		out.defaultWriteObject();
+		out.writeObject(tracks.toArray());
 	}
 
 	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
 		in.defaultReadObject();
-		tracks = FXCollections.observableArrayList(trackDataForSerialization);
-		tracks.clear();
-		tracks.addAll(trackDataForSerialization);
+		tracks = FXCollections.observableArrayList((Track[])in.readObject());
 	}
 }
