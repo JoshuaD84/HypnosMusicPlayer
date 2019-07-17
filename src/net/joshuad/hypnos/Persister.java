@@ -616,4 +616,8 @@ public class Persister {
 		persisterThread.setName( "Persister Thread" );
 		persisterThread.start();
 	}
+
+	public Path getPlaylistDirectory() {
+		return this.playlistsDirectory.toPath();
+	}
 }

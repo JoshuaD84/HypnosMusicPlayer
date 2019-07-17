@@ -351,6 +351,7 @@ public class LibraryPlaylistPane extends BorderPane {
 		MenuItem enqueueMenuItem = new MenuItem( "Enqueue" );
 		MenuItem renameMenuItem = new MenuItem( "Rename" );
 		MenuItem infoMenuItem = new MenuItem( "Track List" );
+		MenuItem goToFolderItem = new MenuItem( "Go to Folder" );
 		MenuItem exportM3UMenuItem = new MenuItem( "Export as M3U" );
 		MenuItem exportFolderMenuItem = new MenuItem ( "Export as Folder" );
 		MenuItem removeMenuItem = new MenuItem( "Remove" );
@@ -415,7 +416,7 @@ public class LibraryPlaylistPane extends BorderPane {
 
 		ContextMenu contextMenu = new ContextMenu();
 		contextMenu.getItems().addAll( playMenuItem, appendMenuItem, playNextMenuItem, enqueueMenuItem, 
-			shuffleMode, repeatMode, renameMenuItem, infoMenuItem, exportM3UMenuItem, exportFolderMenuItem, 
+			shuffleMode, repeatMode, renameMenuItem, infoMenuItem, goToFolderItem, exportM3UMenuItem, exportFolderMenuItem, 
 			removeMenuItem );
 
 		playMenuItem.setOnAction( ( ActionEvent event ) -> {
@@ -443,6 +444,10 @@ public class LibraryPlaylistPane extends BorderPane {
 		infoMenuItem.setOnAction( ( ActionEvent event ) -> {
 			ui.playlistInfoWindow.setPlaylist ( playlistTable.getSelectionModel().getSelectedItem() );
 			ui.playlistInfoWindow.show();
+		});
+		
+		goToFolderItem.setOnAction( ( ActionEvent event ) -> {
+			ui.openFileBrowser(Hypnos.getPersister().getPlaylistDirectory());
 		});
 		
 		exportM3UMenuItem.setOnAction( ( ActionEvent event ) -> {
