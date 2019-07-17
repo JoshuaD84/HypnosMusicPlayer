@@ -15,113 +15,108 @@ import net.joshuad.hypnos.library.Track;
 
 public class CurrentListTrack extends Track {
 	@SuppressWarnings("unused")
-	private static final Logger LOGGER = Logger.getLogger( CurrentListTrack.class.getName() );
-	
+	private static final Logger LOGGER = Logger.getLogger(CurrentListTrack.class.getName());
 	private static final long serialVersionUID = 1L;
-	
-	private boolean isCurrentTrack = false; 
+	private boolean isCurrentTrack = false;
 	private boolean lastCurrentListTrack = false;
-	
-	private List <Integer> queueIndex = new ArrayList <Integer> ();
-	
-	private transient BooleanProperty fileIsMissing = new SimpleBooleanProperty ( false );
-	
-	private transient ObjectProperty <CurrentListTrackState> displayState = new SimpleObjectProperty <CurrentListTrackState> ( new CurrentListTrackState ( isCurrentTrack, queueIndex ) );
-	
+	private List<Integer> queueIndex = new ArrayList<Integer>();
+	private transient BooleanProperty fileIsMissing = new SimpleBooleanProperty(false);
+	private transient ObjectProperty<CurrentListTrackState> displayState = 
+			new SimpleObjectProperty<CurrentListTrackState>(new CurrentListTrackState(isCurrentTrack, queueIndex));
 	private boolean needsUpdateFromDisk = false;
-	
-	public CurrentListTrack ( Path source ) {
-		super ( source );
+
+	public CurrentListTrack(Path source) {
+		super(source);
 	}
-	
-	public CurrentListTrack ( Track source ) {
-		super ( source );		
+
+	public CurrentListTrack(Track source) {
+		super(source);
 		needsUpdateFromDisk = true;
 	}
-	
-	public boolean needsUpdateFromDisk () {
+
+	public boolean needsUpdateFromDisk() {
 		return needsUpdateFromDisk;
 	}
-	
-	public void setNeedsUpdateFromDisk ( boolean needsUpdate ) {
+
+	public void setNeedsUpdateFromDisk(boolean needsUpdate) {
 		this.needsUpdateFromDisk = needsUpdate;
 	}
-	
+
 	public void update() {
 		refreshTagData();
 		needsUpdateFromDisk = false;
 	}
-	
-	public void setIsCurrentTrack ( boolean isCurrentTrack ) {
+
+	public void setIsCurrentTrack(boolean isCurrentTrack) {
 		this.isCurrentTrack = isCurrentTrack;
-		updateDisplayState ();
-	}
-	
-	public boolean getIsCurrentTrack ( ) {
-		return isCurrentTrack;
-	}
-	
-	public void setIsLastCurrentListTrack ( boolean last ) {
-		this.lastCurrentListTrack = last;
-	}
-	
-	public boolean isLastCurrentListTrack ()  {
-		return lastCurrentListTrack;
-	}
-	
-	public List <Integer> getQueueIndices() {
-		return queueIndex;
-	}
-	
-	public void clearQueueIndex () {
-		queueIndex.clear();
-		updateDisplayState ();
+		updateDisplayState();
 	}
 
-	public void addQueueIndex ( Integer index ) {
-		queueIndex.add ( index );
-		updateDisplayState ();
+	public boolean getIsCurrentTrack() {
+		return isCurrentTrack;
+	}
+
+	public void setIsLastCurrentListTrack(boolean last) {
+		this.lastCurrentListTrack = last;
+	}
+
+	public boolean isLastCurrentListTrack() {
+		return lastCurrentListTrack;
+	}
+
+	public List<Integer> getQueueIndices() {
+		return queueIndex;
+	}
+
+	public void clearQueueIndex() {
+		queueIndex.clear();
+		updateDisplayState();
+	}
+
+	public void addQueueIndex(Integer index) {
+		queueIndex.add(index);
+		updateDisplayState();
 	}
 
 	public BooleanProperty fileIsMissingProperty() {
 		return fileIsMissing;
 	}
-	
-	public boolean isMissingFile () {
+
+	public boolean isMissingFile() {
 		return fileIsMissing.getValue();
 	}
-	
-	public void setIsMissingFile ( boolean missing ) {
-		fileIsMissing.set( missing );
-		if ( missing ) {
-			setIsCurrentTrack( false );
+
+	public void setIsMissingFile(boolean missing) {
+		fileIsMissing.set(missing);
+		if (missing) {
+			setIsCurrentTrack(false);
 		}
 	}
-	
-	private void updateDisplayState () {
-		displayState.setValue( new CurrentListTrackState ( isCurrentTrack, queueIndex ) );
+
+	private void updateDisplayState() {
+		displayState.setValue(new CurrentListTrackState(isCurrentTrack, queueIndex));
 	}
-	
-	public ObjectProperty<CurrentListTrackState> displayStateProperty () {
+
+	public ObjectProperty<CurrentListTrackState> displayStateProperty() {
 		return displayState;
 	}
-	
+
 	@Override
 	public void refreshTagData() {
 		super.refreshTagData();
-		for(Track track : Hypnos.getLibrary().getTrackData()) {
-			if( track.equals(this) ) {
+		for (Track track : Hypnos.getLibrary().getTrackData()) {
+			if (track.equals(this)) {
 				track.refreshTagData();
 				track.getAlbum().updateData();
 			}
 		}
 	}
-	
-	private void readObject ( ObjectInputStream in ) throws IOException, ClassNotFoundException {
+
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
 		in.defaultReadObject();
-		fileIsMissing = new SimpleBooleanProperty ( false );
-		queueIndex = new ArrayList <Integer> ();
-		displayState = new SimpleObjectProperty <CurrentListTrackState> ( new CurrentListTrackState ( isCurrentTrack, queueIndex ) );
+		fileIsMissing = new SimpleBooleanProperty(false);
+		queueIndex = new ArrayList<Integer>();
+		displayState = 
+			new SimpleObjectProperty<CurrentListTrackState>(new CurrentListTrackState(isCurrentTrack, queueIndex));
 	}
 }
-	
