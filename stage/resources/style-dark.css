@@ -159,6 +159,6 @@ HBox, VBox, #transport {
 
 /*Make the horizontal separator on menus light*/
 .context-menu .separator:horizontal .line {
-    -fx-border-color: grey transparent transparent transparent;
+    -fx-border-color: HSB( 0, 0%, 25%) transparent transparent transparent;
     -fx-border-insets: 1 0 0 0;
 }
