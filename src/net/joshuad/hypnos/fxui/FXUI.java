@@ -927,10 +927,8 @@ public class FXUI implements PlayerListener {
 		applyCurrentTheme( dialog );
 		setDialogIcon( dialog );
 		Optional <String> result = dialog.showAndWait();
-		
 		if ( result.isPresent() ) {
 			String enteredName = result.get().trim();
-
 			renamePlaylist ( playlist, enteredName );
 		}
 	}
@@ -939,7 +937,8 @@ public class FXUI implements PlayerListener {
 		String oldFileBasename = playlist.getBaseFilename();
 		library.removePlaylist( playlist );
 		playlist.setName ( rawName );
-		library.addPlaylist( playlist );
+		playlist.setHasUnsavedData ( true );
+		library.addPlaylist ( playlist );
 		libraryPane.playlistPane.playlistTable.refresh();
 		Hypnos.getPersister().saveLibraryPlaylists();
 		Hypnos.getPersister().deletePlaylistFile( oldFileBasename );
