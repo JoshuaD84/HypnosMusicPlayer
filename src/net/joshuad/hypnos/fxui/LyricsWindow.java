@@ -94,7 +94,7 @@ public class LyricsWindow extends Stage {
 		searchWebButton.setOnAction( ( ActionEvent e ) -> {
 			String searchSlug = null;
 			if ( track != null ) {
-				searchSlug = "lyrics " + track.getAlbumArtist() + " " + track.getAlbumTitle();
+				searchSlug = "lyrics " + track.getAlbumArtist() + " " + track.getTitle();
 				ui.openWebBrowser(HypnosURLS.getDDGSearchURL(searchSlug));
 			}
 		});

@@ -4,6 +4,9 @@ Opus and Ape support
 
 If something gets dropped into config/playlists folders, update the UI to include it?
 
+If you load it with no music roots (maybe only after an unexpected shutdown) then add a music root, it does not start
+scanning. You have to restart hypnos to get the scanner started. 
+
 Linux
    JavaFX / Linux Open File Dialog sometimes causes jvm crash, depends on system, and doesn't happen always
    
@@ -37,7 +40,7 @@ Backend
          * Turn a bufferedImage into an fxImage
 
    Artist hasn't been fully converted to the observable paradigm yet, so there are problems
-      If you open an artist window and delete a file, it isn't removed from the artist window list
+      If you open an artist window and delete a file, it isn't removed from the currently open artist window list
 
    Filtering the track or album list causes exceptions
       2019-07-08 - I made it happen way less frequently by wrapping it in a runLater(), but I was still able to get
@@ -86,7 +89,6 @@ UI
 
 Future
    Windows - Build Process
-
 
    Linux: Media Buttons
       https://stackoverflow.com/questions/53550397/javafx-keyevent-is-it-possible-to-get-more-info-for-undefined-events
