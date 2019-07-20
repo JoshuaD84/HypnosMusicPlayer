@@ -8,7 +8,9 @@ import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -27,7 +29,6 @@ public class Album implements Serializable, AlbumInfoSource {
 
 	private static final long serialVersionUID = 2L;
 	private File directory;
-	long creationTimeMS = 0;
 
 	private transient ObservableList<Track> tracks;
 	private transient StringProperty albumArtistProperty;
@@ -62,11 +63,6 @@ public class Album implements Serializable, AlbumInfoSource {
 	public Album(Path albumDirectory, List<Track> tracks) {
 		initializeTransientFields();
 		this.directory = albumDirectory.toFile();
-		try {
-			creationTimeMS = Files.readAttributes(directory.toPath(), BasicFileAttributes.class).creationTime().toMillis();
-		} catch (IOException e) {
-			LOGGER.info("Unable to determine file creation time for album, assuming it is very old." + directory.toString());
-		}
 		setTracks(tracks);
 	}
 
@@ -90,6 +86,14 @@ public class Album implements Serializable, AlbumInfoSource {
 		discCountProperty.set(tracks.get(0).getDiscCount());
 		releaseTypeProperty.set(tracks.get(0).getReleaseType());
 		discSubtitleProperty.set(tracks.get(0).getDiscSubtitle());
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			long creationMS = Files.readAttributes(directory.toPath(), BasicFileAttributes.class).creationTime().toMillis();
+			dateAddedStringProperty.setValue(sdf.format(new Date(creationMS)));
+		} catch (IOException e) {
+			dateAddedStringProperty.setValue(sdf.format(new Date()));
+			LOGGER.info("Unable to determine file creation time for album, assuming it is very old." + directory.toString());
+		}
 	}
 
 	public StringProperty getAlbumArtistProperty() {
