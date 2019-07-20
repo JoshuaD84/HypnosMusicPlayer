@@ -458,12 +458,12 @@ public class Hypnos extends Application {
 			//Add a file handler to output to logFile			
 			FileHandler fileHandler = new FileHandler( logFile.toString(), true );     
 			fileHandler.setFormatter( logFormat );
-	        Logger.getLogger( "" ).addHandler( fileHandler );
+	    Logger.getLogger( "" ).addHandler( fileHandler );
 			
 			//Create console output
 			ConsoleHandler consoleHandler = new ConsoleHandler();    
 			consoleHandler.setFormatter( logFormat );
-	        Logger.getLogger( "" ).addHandler( consoleHandler );
+	    Logger.getLogger( "" ).addHandler( consoleHandler );
 	        
 		} catch ( IOException e ) {
 			LOGGER.log( Level.WARNING, "Unable to setup file handler for logger.", e );
