@@ -125,7 +125,7 @@ public class Playlist implements Serializable {
 					}
 				}
 			} catch (Exception e) {
-				LOGGER.info("Error reading playlist file: " + path);
+				LOGGER.log(Level.INFO, "Error reading playlist file: " + path, e);
 				return null;
 			}
 			return playlist;
@@ -243,7 +243,7 @@ public class Playlist implements Serializable {
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.defaultWriteObject();
-		out.writeObject(tracks.toArray());
+		out.writeObject(tracks.toArray(new Track[tracks.size()]));
 	}
 
 	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
