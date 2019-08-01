@@ -58,46 +58,50 @@ class LibraryLoader {
 		loaderThread = new Thread() {
 			public void run() {
 				while (true) {
-					for (MusicRoot root : library.getMusicRootData()) {
-						root.recheckValidity();
-					}
-					if (System.currentTimeMillis() - lastOrphanClearMS > 5000) {
-						clearOrphansAndMissing = true;
-					}
-					if (clearOrphansAndMissing || musicRootRemoved) {
-						String message = musicRootRemoved ? "Removing Items..." : "";
-						musicRootRemoved = false;
-						clearOrphansAndMissing = false;
-						lastOrphanClearMS = System.currentTimeMillis();
-						clearOrphans(message);
-						clearMissing();
-						if (!message.isBlank()) {
-							ui.setLibraryLoaderStatusToStandby(null);
-						}
-						musicRootRemoved = false;
-					}
-					List<MusicRoot> libraryRoots = new ArrayList<>(library.getMusicRootData());
-					for (MusicRoot root : libraryRoots) {
-						if (root.needsInitialScan()) {
-							diskReader.scanMusicRoot(root, DiskReader.ScanMode.INITIAL_SCAN);
-						}
-					}
-					libraryRoots = new ArrayList<>(library.getMusicRootData());
-					for (MusicRoot root : libraryRoots) {
-						if (root.needsRescan()) {
-							diskReader.scanMusicRoot(root, DiskReader.ScanMode.RESCAN);
-						}
-					}
-					if (!pathsToUpdate.isEmpty()) {
-						synchronized (pathsToUpdate) {
-							Path pathToUpdate = pathsToUpdate.remove(0).toAbsolutePath();
-							updateLibraryAtPath(pathToUpdate);
-						}
-					}
-					library.getDiskWatcher().processWatcherEvents();
 					try {
-						Thread.sleep(50);
-					} catch (InterruptedException e) {
+						for (MusicRoot root : library.getMusicRootData()) {
+							root.recheckValidity();
+						}
+						if (System.currentTimeMillis() - lastOrphanClearMS > 5000) {
+							clearOrphansAndMissing = true;
+						}
+						if (clearOrphansAndMissing || musicRootRemoved) {
+							String message = musicRootRemoved ? "Removing Items..." : "";
+							musicRootRemoved = false;
+							clearOrphansAndMissing = false;
+							lastOrphanClearMS = System.currentTimeMillis();
+							clearOrphans(message);
+							clearMissing();
+							if (!message.isBlank()) {
+								ui.setLibraryLoaderStatusToStandby(null);
+							}
+							musicRootRemoved = false;
+						}
+						List<MusicRoot> libraryRoots = new ArrayList<>(library.getMusicRootData());
+						for (MusicRoot root : libraryRoots) {
+							if (root.needsInitialScan()) {
+								diskReader.scanMusicRoot(root, DiskReader.ScanMode.INITIAL_SCAN);
+							}
+						}
+						libraryRoots = new ArrayList<>(library.getMusicRootData());
+						for (MusicRoot root : libraryRoots) {
+							if (root.needsRescan()) {
+								diskReader.scanMusicRoot(root, DiskReader.ScanMode.RESCAN);
+							}
+						}
+						if (!pathsToUpdate.isEmpty()) {
+							synchronized (pathsToUpdate) {
+								Path pathToUpdate = pathsToUpdate.remove(0).toAbsolutePath();
+								updateLibraryAtPath(pathToUpdate);
+							}
+						}
+						library.getDiskWatcher().processWatcherEvents();
+						try {
+							Thread.sleep(50);
+						} catch (InterruptedException e) {
+						}
+					} catch (Exception e) {
+						LOGGER.log(Level.INFO, "Caught an unhandled exception in loader loop, continuing.", e);
 					}
 				}
 			}
