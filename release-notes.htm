@@ -1,9 +1,78 @@
 <html>
 <head>
-<title>Hypnos Beta 5 Release Notes</title>
+<title>Hypnos Beta 6 Release Notes</title>
 </head>
 <body style="background-color: #D9D9D9; margin: 0px;">
 <div style="max-width: 800px; margin: 0 auto; padding:20px 20px; line-height: 1.5em; background-color: #FFFFFF">
+
+   <h1>Hypnos - Beta 6 Release Notes</h1>
+   <p><a target="_blank" href="http://hypnosplayer.org">Released: 2019-07-14</a></p>
+   <p>Hypnos Beta 6 is done.  I have made some nice improvements, and I still have some work to do before version 1.</p>
+   <h2>New Features</h2>
+   <ul>
+      <li>Library scaner log</li>
+      <li>Improved Tag Editor Interface</li>
+      <li>Search web button on lyrics window</li>
+      <li>Tag edits are now immediately displayed in library and current list</li>
+      <li>Reduced memory footprint.  ~50% on Windows and ~30% on GNU/Linux.</li>
+      <li>New Library Scanner - Scan about twice as fast, no more corner case bugs</li>
+      <li>Ctrl+Click on current track to go to album</li>
+      <li>Improved filename parsing for artist name info when tags aren't present</li>
+      <li>Scanner status bar also shows removal progress</li>
+   </ul>
+   <h2>Bugs Fixed</h2>
+   <ul>
+      <li>Prevent the art pane from getting stuck on particular artwork</li>
+      <li>Remove unncessary printlines when communicating with Hypnos via commandline interface</li>
+      <li>Windows: fix centering on 'non-album-tracks-only' checkbox</li>
+      <li>Fix bug where tracks are added incorrectly to filtered current list</li>
+      <li>Reset to default view: sort order is now properly set</li>
+      <li>Prevent right clicks from changing selected library view</li>
+      <li>Ctrl+F now searches in selected pane as intended</li>
+      <li>Prevent crashes when filtering lists during load</li>
+      <li>Immediate failure when trying to run on Windows XP since it is not supported</li>
+      <li>Windows: Fix button sizes</li>
+      <li>Window icon on lyrics window</li>
+      <li>Fix Lyrics search so it works again</li>
+      <li>Improve table scrolling during load. It's not perfect, but now it's much less disruptive</li>
+   </ul>
+   <h2>Known Bugs</h2>
+   <p>If you run into any bugs that aren't listed here, please <a href="https://github.com/JoshuaD84/HypnosMusicPlayer" target="_blank">report them</a>, so I can fix them!</p>
+   <ul>
+      <li>Ubuntu 16.04, Fedora 27.1.6, and other version of linux - Opening system file location dialog sometimes crashes the program.  Please use drag and drop and avoid native file search windows for now. I'm working on a solution. </li>
+      <li>Linux: If it's paused in the middle of the track after the program starts, it may not make sound. Need to start playing a new track to get sound.</li>
+      <li>Linux: Right click on table headers causes re-sort</li>
+      <li>Windows: If you use ultramon and the "move to next monitor" hotkey along with Hypnos's "minimize to system tray" option, if Hypnos is maximized it will disappear to tray icon when you activate the ultramon hotkey. Disable "minimize to system tray" to address this for now. Looking for a better solution.</li>
+      <li>Linux/Gnome 3: Title on task bar is net.joshuad.hypnos.Hypnos instead of just Hypnos</li>
+      <li>Audio playback still isn't as good as I'd like for it to be.</li>
+      <li>Linux/KDE Neon - Drag and drop from OS to Hypnos doesn't work well.  Browse button does not work properly.</li>
+      <li>Linux - If you open a native file search window, you cannot drag-resize hypnos. Can still maximize/restore</li>
+      <li>Double clicking on table header dividers has some minor bugs</li>
+      <li>There may be seek bar issues on some ACC files</li>
+   </ul>
+   <h2>Goals for Future Releases</h2>
+   <p>The big pending project is a rewrite of the audio player engine. VLC was a big improvement on my previous system, but it's large
+   and still doesn't behave well enough, especially on windows.  In the next few releases I will be focusing on
+   replacing the audioplayer engine on each operating system with native decoders.</p>
+   <p>The "Artist" view is still a second class citizen in the backend. You may notice this occasionally as the library
+   loads. I would like to improve the backend for this view and change it from a list to a treeview that is
+   expandable, with albums and tracks nested under Artist names. I'd also like to get a bit more aggressive about trying
+   to find tracks by the artist in things like soundtracks or "featured" on songs.</p>
+   <p>I would like to add a File view, next to Artists, Albums, Tracks, and Playlists. The File view would ignore tags
+   and just be a reflection of the disk. I started work on this, but the JavaFX TreeView class was kinda clunky so I
+   decided to release now and work on this in the next release.</p>
+   <p>I'd also like to work on system integration. There are a handful of bugs on each of the target platforms / desktop
+   environments. This is relatively tedious work, but I'm hoping to make a few fixes here each release.  I'd also like
+   to package Hypnos targeting Ubuntu as a .deb file, which would significantly reduce the download size. Improved drag
+   and drop <em>from</em> Hypnos to the desktop environment would also be nice</p>
+   <p>I'd like to work on reducing the download size and the memory footprint while running.</p>
+   <p>I'd probably like to add a few more color themes, and maybe allow the user to set the themes. They're simple CSS,
+   so it's not too hard for users to create their own.</p>
+<br>
+<br>
+<br>
+<hr>
+
 
    <h1>Hypnos - Beta 5 Release Notes</h1>
    <p><a target="_blank" href="http://hypnosplayer.org">Released: 2018-12-05</a></p>
