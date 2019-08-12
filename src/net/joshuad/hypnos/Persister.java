@@ -247,6 +247,7 @@ public class Persister {
 		try ( DirectoryStream <Path> stream = Files.newDirectoryStream( playlistsDirectory.toPath() ); ) {
 			for ( Path child : stream ) {
 				Playlist playlist = Playlist.loadPlaylist( child );
+				library.linkPlaylistToLibrary(playlist);
 				if ( playlist != null ) {
 					library.addPlaylist( playlist );
 				}

@@ -414,4 +414,14 @@ public class Library {
 		}
 		return true;
 	}
+
+	public void linkPlaylistToLibrary(Playlist playlist) {
+		for (Track libraryTrack : tracks.getItemsCopy()) {
+			for (int k = 0; k < playlist.getTracks().size(); k++ ) {
+				if (libraryTrack.equals(playlist.getTracks().get(k))) {
+					playlist.getTracks().set(k, libraryTrack);
+				}
+			}
+		}
+	}
 }

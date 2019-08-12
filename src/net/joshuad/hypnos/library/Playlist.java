@@ -104,7 +104,7 @@ public class Playlist implements Serializable {
 			Playlist playlist = new Playlist(path.getFileName().toString());
 			try (FileInputStream fileInput = new FileInputStream(path.toFile());) {
 				BufferedReader m3uIn = new BufferedReader(new InputStreamReader(fileInput, "UTF8"));
-				for (String line; (line = m3uIn.readLine()) != null;) {
+				for (String line; (line = m3uIn.readLine()) != null; /**/ ) {
 					try {
 						if (line.startsWith("#Name:")) {
 							String name = line.split(":")[1].trim();
