@@ -1,5 +1,3 @@
-If something gets dropped into config/playlists folders, update the UI to include it?
-
 Just Before Release Testing
    Genius Lyrics doesn't seem to work for actual releases, but works on workbench, why? Maybe AZ Lyrics too
 
@@ -90,6 +88,8 @@ UI
 ::::::::::::::
 
 Future
+   If something gets dropped into config/playlists folders, update the UI to include it?
+
    Windows - Build Process
 
    Linux: Media Buttons
