@@ -1,6 +1,6 @@
-Just Before Release Testing
-   Genius Lyrics doesn't seem to work for actual releases, but works on workbench, why? Maybe AZ Lyrics too
+Search for artist image in other locations in library if not found here.  Make it an option with a checkbox
 
+Just Before Release Testing
    If you load it with no music roots (maybe only after an unexpected shutdown) then add a music root, it does not start
    scanning. You have to restart hypnos to get the scanner started. 
 

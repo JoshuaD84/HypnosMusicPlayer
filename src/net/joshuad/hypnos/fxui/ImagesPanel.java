@@ -265,7 +265,6 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 
 				setImages ( currentImagesTrack );
 			}
-			
 		});
 	}
 	

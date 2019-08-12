@@ -710,19 +710,17 @@ public class Track implements Serializable, AlbumInfoSource {
 	}
 	
 	private Path getPreferredAlbumCoverPath () {
-		if ( album != null ) {
-			if ( this.getPath().getParent() != null ) {
-				ArrayList <Path> preferredFiles = new ArrayList <Path> ();
-				preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "front.png" ) );
-				preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "front.jpg" ) );
-				preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "cover.png" ) );
-				preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "cover.jpg" ) );
-				preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "album.png" ) );
-				preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "album.jpg" ) );
-				for ( Path test : preferredFiles ) {
-					if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
-						return test;
-					}
+		if ( this.getPath().getParent() != null ) {
+			ArrayList <Path> preferredFiles = new ArrayList <Path> ();
+			preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "front.png" ) );
+			preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "front.jpg" ) );
+			preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "cover.png" ) );
+			preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "cover.jpg" ) );
+			preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "album.png" ) );
+			preferredFiles.add( Paths.get ( this.getPath().getParent().toString(), "album.jpg" ) );
+			for ( Path test : preferredFiles ) {
+				if ( Files.exists( test ) && Files.isRegularFile( test ) ) {
+					return test;
 				}
 			}
 		}
@@ -855,11 +853,9 @@ public class Track implements Serializable, AlbumInfoSource {
 			ArrayList <Path> possibleFiles = new ArrayList <Path> ();
 			possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.png" ) );
 			possibleFiles.add( Paths.get ( targetPath.getParent().toString(), "artist.jpg" ) );
-			if ( album != null ) {
-				if ( this.getPath().getParent().getParent() != null ) {
-					possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.png" ) );
-					possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.jpg" ) );
-				}
+			if ( this.getPath().getParent().getParent() != null ) {
+				possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.png" ) );
+				possibleFiles.add( Paths.get ( targetPath.getParent().getParent().toString(), "artist.jpg" ) );
 			}
 			for ( Path test : possibleFiles ) {
 				if ( Files.exists( test ) && Files.isRegularFile( test ) ) {

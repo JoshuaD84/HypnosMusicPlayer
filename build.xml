@@ -39,7 +39,7 @@
 		<javac fork="yes" target="11" source ="11" includeantruntime="false" srcdir="." destdir="${build}" encoding="utf-8">
 			<classpath refid="class.path" />
 			<classpath>
-				<fileset dir="${packaging}/jres/linux-jfx/">
+				<fileset dir="${packaging}/jres/win-jfx-full/lib">
 					<include name="*.jar" />
 				</fileset>
 			</classpath>

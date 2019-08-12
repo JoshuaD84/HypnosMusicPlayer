@@ -226,7 +226,6 @@ public class Hypnos extends Application {
 		return ui;
 	}
 	
-	
 	public static LoaderSpeed getLoaderSpeed ( ) {
 		return loaderSpeed;
 	}
@@ -681,6 +680,7 @@ public class Hypnos extends Application {
 				globalHotkeys.addListener( Hypnos::doHotkeyAction );
 				ui = new FXUI ( stage, library, audioSystem, globalHotkeys );
 				audioSystem.setUI ( ui );
+				library.setAudioSystem ( audioSystem );
 				persister = new Persister ( ui, library, audioSystem, globalHotkeys );
 				
 				switch ( getOS() ) {
@@ -755,49 +755,38 @@ public class Hypnos extends Application {
 						EnumMap <Setting, String> pendingSettings = persister.loadSettingsFromDisk();
 						persister.loadCurrentList();
 						audioSystem.applySettings ( pendingSettings );
-						
 						if ( pendingSettings.containsKey( Setting.LOADER_SPEED ) ) {
 							Hypnos.setLoaderSpeed( LoaderSpeed.valueOf( pendingSettings.get( Setting.LOADER_SPEED ) ) );
 							pendingSettings.remove( Setting.LOADER_SPEED );
 						} else {
 							Hypnos.setLoaderSpeed(LoaderSpeed.HIGH);
 						}
-						
 						ui.applySettingsBeforeWindowShown( pendingSettings );
 						ui.applySettingsAfterWindowShown( pendingSettings );
-						
 						persister.logUnusedSettings ( pendingSettings );
-						
 						boolean sourcesLoaded = persister.loadRoots();
 						if ( sourcesLoaded ) {
 							persister.loadAlbumsAndTracks();
 						}
-						
 						persister.loadQueue();
 						audioSystem.linkQueueToCurrentList();
 						persister.loadHistory();
 						persister.loadPlaylists();
 						persister.loadHotkeys();
-						
 						applyCLICommands( commands );
 						singleInstanceController.startCLICommandListener ( this );
-
 						library.setUI( ui );
 						library.startThreads();
 						persister.startThread();
-		
 						ui.showMainWindow();
 						ui.getLibraryPane().updatePlaceholders();
 						ui.fixTables();
 						ui.settingsWindow.refreshHotkeyFields();
-						
 						LOGGER.info( "Hypnos finished loading." );
-
 						UpdateChecker updater = new UpdateChecker();
 						if ( updater.updateAvailable() ) {
 							LOGGER.info( "Updates available" );
 						}
-						
 					} 
 					break;
 

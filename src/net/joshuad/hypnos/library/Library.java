@@ -16,6 +16,7 @@ import javafx.collections.transformation.SortedList;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 import net.joshuad.hypnos.AlphanumComparator;
 import net.joshuad.hypnos.Utils;
+import net.joshuad.hypnos.audio.AudioSystem;
 import net.joshuad.hypnos.fxui.FXUI;
 
 public class Library {
@@ -49,47 +50,44 @@ public class Library {
 
 	private final CachedList<MusicRoot> musicRoots = new CachedList<>();
 
+	private AudioSystem audioSystem;
 	private final LibraryLoader loader;
 	private final DiskWatcher diskWatcher;
 	private final LibraryScanLogger scanLogger = new LibraryScanLogger();
 	
 	private boolean dataNeedsToBeSavedToDisk = false;
-	private boolean artistsNeedToBeRegenerated = false;
-	private final Object artistSychronizeFlagLock = new Object();
+	private boolean upkeepNeeded = false;
+	private final Object doUpkeepFlagLock = new Object();
 
 	public Library() {
 		diskWatcher = new DiskWatcher(this, scanLogger);
 		loader = new LibraryLoader(this, scanLogger);
-
 		InvalidationListener invalidationListener = new InvalidationListener() {
 			@Override
 			public void invalidated(Observable arg0) {
 				dataNeedsToBeSavedToDisk = true;
-				synchronized (artistSychronizeFlagLock) {
-					artistsNeedToBeRegenerated = true;
+				synchronized (doUpkeepFlagLock) {
+					upkeepNeeded = true;
 				}
 			}
 		};
-
 		tracks.addListenerToBase(invalidationListener);
 		albums.addListenerToBase(invalidationListener);
-
 		Thread artistGeneratorThread = new Thread() {
 			@Override
 			public void run() {
 				while (true) {
-					boolean doRegenerate = false;
-
-					synchronized (artistSychronizeFlagLock) {
-						doRegenerate = artistsNeedToBeRegenerated;
-						artistsNeedToBeRegenerated = false;
+					boolean doUpkeep = false;
+					synchronized (doUpkeepFlagLock) {
+						doUpkeep = upkeepNeeded;
+						upkeepNeeded = false;
 					}
-
-					if (doRegenerate) {
-						artists.getItemsCopy().setAll(generateArtists());
+					if (doUpkeep) {
 						scanLogger.println("[Library] Changes to library were made, regenerating artist list");
+						artists.getItemsCopy().setAll(generateArtists());
+						relinkPlaylistsToLibrary();
+						relinkCurrentListToLibrary();
 					}
-
 					try {
 						Thread.sleep(2000);
 					} catch (InterruptedException e) {
@@ -98,7 +96,7 @@ public class Library {
 				}
 			}
 		};
-
+		artistGeneratorThread.setName("Artist Generator");
 		artistGeneratorThread.setDaemon(true);
 		artistGeneratorThread.start();
 	}
@@ -372,7 +370,7 @@ public class Library {
 	}
 	
 	void requestRegenerateArtists() {
-		artistsNeedToBeRegenerated = true;
+		upkeepNeeded = true;
 	}
 	
 	public boolean isArtistDirectory(Path path) {
@@ -414,14 +412,44 @@ public class Library {
 		}
 		return true;
 	}
-
-	public void linkPlaylistToLibrary(Playlist playlist) {
-		for (Track libraryTrack : tracks.getItemsCopy()) {
-			for (int k = 0; k < playlist.getTracks().size(); k++ ) {
-				if (libraryTrack.equals(playlist.getTracks().get(k))) {
-					playlist.getTracks().set(k, libraryTrack);
+	
+	private void relinkCurrentListToLibrary() {
+		for (int k = 0; k < audioSystem.getCurrentList().getItems().size(); k++ ) {
+			boolean foundInLibrary = false;
+			for (Track libraryTrack : tracks.getItemsCopy()) {
+				if (libraryTrack.equals(audioSystem.getCurrentList().getItems().get(k))) {
+					audioSystem.getCurrentList().getItems().get(k).setData(libraryTrack);
+					foundInLibrary = true;
 				}
 			}
+			if(!foundInLibrary) {
+				audioSystem.getCurrentList().getItems().get(k).setAlbum(null);
+			}
 		}
+	}
+	
+	private void relinkPlaylistsToLibrary() {
+		for (Playlist playlist : playlists.getItemsCopy()) {
+			linkPlaylistToLibrary(playlist);
+		}
+	}
+
+	public void linkPlaylistToLibrary(Playlist playlist) {
+		for (int k = 0; k < playlist.getTracks().size(); k++ ) {
+			boolean foundInLibrary = false;
+			for (Track libraryTrack : tracks.getItemsCopy()) {
+				if (libraryTrack.equals(playlist.getTracks().get(k))) {
+					playlist.getTracks().set(k, libraryTrack);
+					foundInLibrary = true;
+				}
+			}
+			if(!foundInLibrary) {
+				playlist.getTracks().get(k).setAlbum(null);
+			}
+		}
+	}
+
+	public void setAudioSystem(AudioSystem audioSystem) {
+		this.audioSystem = audioSystem;
 	}
 }

@@ -2,6 +2,7 @@ package net.joshuad.hypnos.lyrics.scrapers;
 
 import java.io.IOException;
 import java.text.Normalizer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.text.StringEscapeUtils;
 import org.jsoup.Jsoup;
@@ -30,6 +31,7 @@ public class GeniusScraper extends AbstractScraper {
 			Elements verses = doc.getElementsByClass("lyrics");
 			lyrics = cleanPreserveLineBreaks(verses.html()).replaceAll("\n +", "\n").replaceAll("^\\s*", "");
 		} catch (IOException e) {
+			LOGGER.log(Level.WARNING, "Exception", e); //TODO: DD
 			return new Lyrics("", LyricsFetcher.LyricSite.GENIUS, url, Lyrics.ScrapeError.NOT_FOUND);
 		}
 		return new Lyrics(StringEscapeUtils.unescapeHtml4(lyrics), LyricsFetcher.LyricSite.GENIUS, url);
