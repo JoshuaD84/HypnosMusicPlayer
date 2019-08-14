@@ -14,9 +14,6 @@ Linux
 
    Gnome - See how sys tray interacts w/ topiconsplus extension
 
-   Linux: Dynamic menu titles in system tray
-      This is kind of a pain because of the icons and because I'm bad at C
-
 Windows
    Select Multiple Files in explorer - No Option to play in Hypnos. Add that
    "Open with" causes the current track button to not show the current track's name.
@@ -86,6 +83,9 @@ UI
 ::::::::::::::
 
 Future
+   Linux: Dynamic menu titles in system tray
+      This is kind of a pain because of the icons and because I'm bad at C
+
    If something gets dropped into config/playlists folders, update the UI to include it?
 
    Windows - Build Process

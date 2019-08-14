@@ -77,5 +77,11 @@
 	-fx-text-fill: hsb(260, 75%, 100%); 
 }
 
+/* Choice Box dropdown width for default modes in preferences window */
+.shuffleRepeatChoices {
+	-fx-min-width: 140px
+}
 
-
+.shuffleRepeatChoices .menu-item > .label {
+    -fx-pref-width: 100px;
+}

@@ -713,6 +713,12 @@ public class SettingsWindow extends Stage {
 			}
 		});
 		
+		albumShuffleChoices.getStyleClass().add("shuffleRepeatChoices");
+		albumRepeatChoices.getStyleClass().add("shuffleRepeatChoices");
+		trackShuffleChoices.getStyleClass().add("shuffleRepeatChoices");
+		trackRepeatChoices.getStyleClass().add("shuffleRepeatChoices");
+		playlistShuffleChoices.getStyleClass().add("shuffleRepeatChoices");
+		playlistRepeatChoices.getStyleClass().add("shuffleRepeatChoices");
 		row++;
 
 		shuffleGrid.setAlignment( Pos.TOP_CENTER );	
