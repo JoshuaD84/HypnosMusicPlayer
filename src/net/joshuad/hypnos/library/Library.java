@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -207,6 +208,11 @@ public class Library {
 		this.tracks.setDataOnInitialLoad(tracks);
 		this.albums.setDataOnInitialLoad(albums);
 		this.artists.setDataOnInitialLoad(generateArtists());
+		List<TagError> errors = new ArrayList<>();
+		for(Track track : tracks) {
+			errors.addAll(track.getTagErrors());
+		}
+		this.tagErrors.setDataOnInitialLoad(errors);
 	}
 
 	public void addMusicRoot(Path path) {
@@ -451,5 +457,17 @@ public class Library {
 
 	public void setAudioSystem(AudioSystem audioSystem) {
 		this.audioSystem = audioSystem;
+	}
+
+	public void removeTagErrors(Vector<TagError> errors) {
+		for (TagError error : errors) {
+			tagErrors.remove(error);
+		}
+	}
+	
+	public void addTagErrors(Vector<TagError> errors) {
+		for (TagError error : errors) {
+			tagErrors.addItem(error);
+		}
 	}
 }

@@ -1,8 +1,11 @@
 package net.joshuad.hypnos.library;
+import java.io.Serializable;
 import java.nio.file.Path;
 
-public class TagError {
+public class TagError implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
+
 	public enum TagErrorType {
 		MISSING_ARTIST ( "No artist name" ),
 		MISSING_TITLE ( "No track title" ),

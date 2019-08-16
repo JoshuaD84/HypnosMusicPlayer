@@ -39,6 +39,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
+import net.joshuad.hypnos.Hypnos;
 import net.joshuad.hypnos.MultiFileImageTagPair;
 import net.joshuad.hypnos.MultiFileImageTagPair.ImageFieldKey;
 import net.joshuad.hypnos.MultiFileTextTagPair;
@@ -129,7 +130,7 @@ public class Track implements Serializable, AlbumInfoSource {
 	private transient IntegerProperty discNumber;
 	private transient IntegerProperty discCount;
 	private transient StringProperty releaseType;
-	private transient Vector <TagError> tagErrors;
+	private Vector <TagError> tagErrors;
 	private transient LovedState lovedState;
 	
 	private static final DirectoryStream.Filter<Path> imageFileFilter = new DirectoryStream.Filter<Path>() {
@@ -170,6 +171,8 @@ public class Track implements Serializable, AlbumInfoSource {
 		this.isVBR = track.isVBR;
 		this.encodingType = track.encodingType;
 		this.format = track.format;
+		this.tagErrors.clear();
+		this.tagErrors.addAll(track.tagErrors);
 	}
 
 	public void setAlbum( Album album ) {
@@ -198,6 +201,7 @@ public class Track implements Serializable, AlbumInfoSource {
 			isVBR = audioHeader.isVariableBitRate();
 			encodingType = audioHeader.getEncodingType();
 			format = audioHeader.getFormat();
+			Hypnos.getLibrary().removeTagErrors(tagErrors);
 			tagErrors.clear();
 			parseArtist( tag );
 			parseTitle( tag ); 
@@ -210,6 +214,7 @@ public class Track implements Serializable, AlbumInfoSource {
 			tagErrors.add( new TagError ( TagErrorType.CANNOT_READ_TAG, this ) );
 		}
 		parseFileName();
+		Hypnos.getLibrary().addTagErrors(tagErrors);
 	}
 	
 	private AudioFile getAudioFile() throws IOException, CannotReadException, TagException, ReadOnlyFileException, InvalidAudioFrameException {

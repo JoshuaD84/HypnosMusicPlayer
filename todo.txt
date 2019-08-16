@@ -1,9 +1,5 @@
-Just Before Release Testing
-   If you load it with no music roots (maybe only after an unexpected shutdown) then add a music root, it does not start
+If you load it with no music roots (maybe only after an unexpected shutdown) then add a music root, it does not start
    scanning. You have to restart hypnos to get the scanner started. 
-
-Future Version
-   Opus and Ape support
 
 Linux
    JavaFX / Linux Open File Dialog sometimes causes jvm crash, depends on system, and doesn't happen always
@@ -27,22 +23,8 @@ Backend
    Having three different throttled filter classes is really error prone. Clean that up, unify 
       Playlist throttled filter, but who's going to have over 1000 playlists?
 
-   Look at getting completely off swing, we can shave a lot out of the jres if we do
-      It's currently being used to:
-         * open a file using native program
-         * browse using native browser
-         * Turn an fxImage into a bufferedImage
-         * Turn a bufferedImage into an fxImage
-
    Artist hasn't been fully converted to the observable paradigm yet, so there are problems
       If you open an artist window and delete a file, it isn't removed from the currently open artist window list
-
-   Filtering the track or album list causes exceptions
-      2019-07-08 - I made it happen way less frequently by wrapping it in a runLater(), but I was still able to get
-      a crash by really spamming the search boxes
-
-   Can we use Java's Jigsaw to reduce distribution size somehow? We had issues w/ circular dependencies, but can we work
-   through that?
 
    Windows - It locks artist folders on windows. Surpsingly not album folders, just artist
       https://stackoverflow.com/questions/56847367/can-you-prevent-watchservice-from-locking-files-on-windows
@@ -50,6 +32,8 @@ Backend
 
 
 Decoder  
+   Opus and Ape support
+
    I found an MP3 that Hypnos refuses to play. VLC plays it.
    http://traffic.libsyn.com/fash-the-nation/FTN_020319.mp3
 
@@ -68,6 +52,21 @@ UI
       copy log
       Maybe select different types of things, like albums rejected, full list, etc. 
 
+
+::::::::::::::
+
+Future
+   Filtering the track or album list causes exceptions
+      2019-07-08 - I made it happen way less frequently by wrapping it in a runLater(), but I was still able to get
+      a crash by really spamming the search boxes
+
+   Look at getting completely off swing, we can shave a lot out of the jres if we do
+      It's currently being used to:
+         * open a file using native program
+         * browse using native browser
+         * Turn an fxImage into a bufferedImage
+         * Turn a bufferedImage into an fxImage
+
    File-Tree view for library
       https://stackoverflow.com/questions/57025089/stop-javafx-treeview-from-jumping-when-an-item-is-expanded
       https://stackoverflow.com/questions/29402412/how-to-get-javafx-treeview-to-behave-consistently-upon-node-expansion?rq=1
@@ -80,9 +79,6 @@ UI
 
    visual position slider
 
-::::::::::::::
-
-Future
    Linux: Dynamic menu titles in system tray
       This is kind of a pain because of the icons and because I'm bad at C
 

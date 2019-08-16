@@ -932,7 +932,9 @@ public class SettingsWindow extends Stage {
 		tagTable.prefHeightProperty().bind( pane.heightProperty() );
 		
 		tagTable.getSelectionModel().selectedItemProperty().addListener( ( obs, oldSelection, newSelection ) -> {
-			ui.trackSelected ( newSelection.getTrack() );
+			if ( newSelection != null ) {
+				ui.trackSelected ( newSelection.getTrack() );
+			}
 		});
 		
 		Menu lastFMMenu = new Menu( "LastFM" );
