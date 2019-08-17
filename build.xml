@@ -52,7 +52,6 @@
 		</jar>
 	</target>
 		
-		
 	<target name="jar" depends="compile" description="Create a jar.">
 		<jar destfile="${jarFile}" basedir="${build}" excludes="jxgrabkey/**">
 			<manifest>
