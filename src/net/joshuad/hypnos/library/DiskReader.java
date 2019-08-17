@@ -83,6 +83,7 @@ class DiskReader implements FileVisitor<Path> {
 		try {
 			directoriesToScan = LibraryLoader.getDirectoryCount(musicRoot.getPath());
 			currentRootPath = musicRoot.getPath();
+			ui.setLibraryLoaderStatus(scanMode.getStatusPrefix() + " " + currentRootPath.toString() + "...", 0, this);
 			library.getDiskWatcher().watchAll(musicRoot.getPath());
 	
 			if (scanMode == ScanMode.INITIAL_SCAN) {

@@ -141,5 +141,4 @@ Future
 
 		When you launch show busy mouse cursor
 
-:::: Refactor / organize my code ::::
 	a better structure for hotkey commands (maybe combine with commandline commands?)
