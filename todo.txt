@@ -18,8 +18,6 @@ Windows
       Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on current list
 
 Backend
-   Build jxgrabhotkey as a seperate jar
-
    Having three different throttled filter classes is really error prone. Clean that up, unify 
       Playlist throttled filter, but who's going to have over 1000 playlists?
 
