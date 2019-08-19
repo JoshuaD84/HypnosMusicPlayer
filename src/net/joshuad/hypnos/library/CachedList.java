@@ -96,7 +96,7 @@ public class CachedList<T> {
 	
 	public void addItem(T addMe, boolean fxThreadPermitted) {
 		if(!fxThreadPermitted && Platform.isFxApplicationThread()) {
-			LOGGER.warning("Modifying the base list while on UI Thread. This is likely a bug, but trying to continue.");
+			LOGGER.log(Level.WARNING, "Modifying the base list while on UI Thread. This is likely a bug, but trying to continue.");
 		}
 		if(addMe == null) {
 			LOGGER.warning("Asked to add a null item to list, ignoring.");

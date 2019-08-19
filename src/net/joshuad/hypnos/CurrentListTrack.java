@@ -26,7 +26,7 @@ public class CurrentListTrack extends Track {
 	private boolean needsUpdateFromDisk = false;
 
 	public CurrentListTrack(Path source) {
-		super(source);
+		super(source, false);
 	}
 
 	public CurrentListTrack(Track source) {

@@ -132,6 +132,7 @@ public class Track implements Serializable, AlbumInfoSource {
 	private transient StringProperty releaseType;
 	private Vector <TagError> tagErrors;
 	private transient LovedState lovedState;
+	private boolean logTagErrors;
 	
 	private static final DirectoryStream.Filter<Path> imageFileFilter = new DirectoryStream.Filter<Path>() {
 		@Override
@@ -141,8 +142,13 @@ public class Track implements Serializable, AlbumInfoSource {
 	};
 	
 	public Track ( Path trackPath ) {
+		this (trackPath, false);
+	}
+	
+	public Track ( Path trackPath, boolean logTagErrors ) {
 		initializeTransientFields();
 		this.trackFile = trackPath.toFile();
+		this.logTagErrors = logTagErrors;
 		refreshTagData();
 	}
 	
@@ -172,7 +178,8 @@ public class Track implements Serializable, AlbumInfoSource {
 		this.encodingType = track.encodingType;
 		this.format = track.format;
 		this.tagErrors.clear();
-		this.tagErrors.addAll(track.tagErrors);
+		this.tagErrors.addAll(track.tagErrors);	
+		this.logTagErrors = track.logTagErrors;
 	}
 
 	public void setAlbum( Album album ) {
@@ -214,7 +221,9 @@ public class Track implements Serializable, AlbumInfoSource {
 			tagErrors.add( new TagError ( TagErrorType.CANNOT_READ_TAG, this ) );
 		}
 		parseFileName();
-		Hypnos.getLibrary().addTagErrors(tagErrors);
+		if(this.logTagErrors) {
+			Hypnos.getLibrary().addTagErrors(tagErrors);
+		}
 	}
 	
 	private AudioFile getAudioFile() throws IOException, CannotReadException, TagException, ReadOnlyFileException, InvalidAudioFrameException {

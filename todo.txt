@@ -1,6 +1,8 @@
 If you load it with no music roots (maybe only after an unexpected shutdown) then add a music root, it does not start
    scanning. You have to restart hypnos to get the scanner started. 
 
+Right click table, select play. Menu doesn't disappear
+
 Linux
    JavaFX / Linux Open File Dialog sometimes causes jvm crash, depends on system, and doesn't happen always
    
@@ -18,9 +20,6 @@ Windows
       Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on current list
 
 Backend
-   Having three different throttled filter classes is really error prone. Clean that up, unify 
-      Playlist throttled filter, but who's going to have over 1000 playlists?
-
    Artist hasn't been fully converted to the observable paradigm yet, so there are problems
       If you open an artist window and delete a file, it isn't removed from the currently open artist window list
 
@@ -54,6 +53,9 @@ UI
 ::::::::::::::
 
 Future
+   Having three different throttled filter classes is really error prone. Clean that up, unify 
+      Playlist throttled filter, but who's going to have over 1000 playlists?
+
    Filtering the track or album list causes exceptions
       2019-07-08 - I made it happen way less frequently by wrapping it in a runLater(), but I was still able to get
       a crash by really spamming the search boxes

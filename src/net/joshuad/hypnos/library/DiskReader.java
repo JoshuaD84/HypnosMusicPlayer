@@ -192,7 +192,7 @@ class DiskReader implements FileVisitor<Path> {
 				}
 			}
 			if (track == null) {
-				track = new Track(filePath);
+				track = new Track(filePath, true);
 				library.addTrack(track);
 			} else {
 				track.refreshTagData();

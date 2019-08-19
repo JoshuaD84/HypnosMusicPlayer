@@ -473,7 +473,7 @@ public class AudioSystem {
 				switch ( setting ) {
 				case TRACK:
 					Path trackPath = Paths.get( value );
-					Track track = new Track ( trackPath );
+					Track track = new Track ( trackPath, false );
 					ui.trackSelected( track ); 
 					playTrack( track, true );
 					settings.remove ( setting );

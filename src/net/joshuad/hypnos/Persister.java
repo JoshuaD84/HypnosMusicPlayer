@@ -20,6 +20,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
@@ -245,14 +246,16 @@ public class Persister {
 
 	public void loadPlaylists () {
 		try ( DirectoryStream <Path> stream = Files.newDirectoryStream( playlistsDirectory.toPath() ); ) {
+			List<Playlist> playlists = new ArrayList<>();
 			for ( Path child : stream ) {
 				Playlist playlist = Playlist.loadPlaylist( child );
-				library.linkPlaylistToLibrary(playlist);
 				if ( playlist != null ) {
-					library.addPlaylist( playlist );
+					playlist.setHasUnsavedData( false );
+					library.linkPlaylistToLibrary(playlist);
+					playlists.add( playlist );
 				}
-				playlist.setHasUnsavedData( false );
 			}
+			library.setDataOnInitialLoad( playlists );
 
 		} catch ( IOException e ) {
 			LOGGER.log( Level.WARNING, "Unable to load playlists from disk.", e );

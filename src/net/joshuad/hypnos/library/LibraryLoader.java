@@ -151,7 +151,7 @@ class LibraryLoader {
 				library.requestRegenerateArtists();
 			} else {
 				scanLogger.println("[LibraryLoader] new track found at: " + path);
-				Track newTrack = new Track(path);
+				Track newTrack = new Track(path, true);
 				library.getTrackData().remove(newTrack);
 			}
 		} else if (Files.isDirectory(path)) {

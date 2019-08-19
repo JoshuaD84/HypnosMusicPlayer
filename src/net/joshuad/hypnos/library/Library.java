@@ -197,14 +197,18 @@ public class Library {
 		}
 	}
 
-	public void setMusicRootsOnInitialLoad(ArrayList<MusicRoot> roots) {
+	public void setMusicRootsOnInitialLoad(List<MusicRoot> roots) {
 		for (MusicRoot musicRoot : roots) {
 			musicRoot.setNeedsRescan(true);
 		}
 		musicRoots.getItemsCopy().setAll(roots);
 	}
+	
+	public void setDataOnInitialLoad(List<Playlist> playlists) {
+		this.playlists.setDataOnInitialLoad(playlists);
+	}
 
-	public void setDataOnInitialLoad(ArrayList<Track> tracks, ArrayList<Album> albums) {
+	public void setDataOnInitialLoad(List<Track> tracks, List<Album> albums) {
 		this.tracks.setDataOnInitialLoad(tracks);
 		this.albums.setDataOnInitialLoad(albums);
 		this.artists.setDataOnInitialLoad(generateArtists());
