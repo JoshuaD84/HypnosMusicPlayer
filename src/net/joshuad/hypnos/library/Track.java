@@ -148,6 +148,9 @@ public class Track implements Serializable, AlbumInfoSource {
 	public Track ( Path trackPath, boolean logTagErrors ) {
 		initializeTransientFields();
 		this.trackFile = trackPath.toFile();
+		if ( trackFile == null ) {
+			LOGGER.log(Level.WARNING, "Null path track", new Exception());
+		}
 		this.logTagErrors = logTagErrors;
 		refreshTagData();
 	}

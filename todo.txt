@@ -1,7 +1,14 @@
 If you load it with no music roots (maybe only after an unexpected shutdown) then add a music root, it does not start
    scanning. You have to restart hypnos to get the scanner started. 
 
-Right click table, select play. Menu doesn't disappear
+Make sure we see all system.out in log window
+
+Before beta 7 release
+   check if a beta 6 history causes right click -> play to give exception
+      step 1: install beta 6
+      step 2: play some tracks such that there is a history
+      step 3: close, install beta 7
+      step 4: right click -> play on current list track. Does the menu disappear? Good. If not, address
 
 Linux
    JavaFX / Linux Open File Dialog sometimes causes jvm crash, depends on system, and doesn't happen always
