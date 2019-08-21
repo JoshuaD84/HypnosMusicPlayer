@@ -51,7 +51,7 @@ public class SingleInstanceController {
 					ObjectInputStream in = new ObjectInputStream( clientSocket.getInputStream() );
 					ObjectOutputStream out = new ObjectOutputStream( clientSocket.getOutputStream() );
 					Object dataIn = in.readObject();
-
+					
 					if ( dataIn instanceof List ) {
 						List <SocketCommand> items = (List <SocketCommand>) dataIn;
 						hypnos.applyCLICommands( items );

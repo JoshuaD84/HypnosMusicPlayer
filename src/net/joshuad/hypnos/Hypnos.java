@@ -536,25 +536,23 @@ public class Hypnos extends Application {
 	private long setTracksLastTime = 0;
 	
 	public void applyCLICommands ( List <SocketCommand> commands ) {
-		
-		ArrayList<Path> newList = new ArrayList<Path>();
+		ArrayList<Path> tracksToPlay = new ArrayList<Path>();
 		for ( SocketCommand command : commands ) {
 			if ( command.getType() == SocketCommand.CommandType.SET_TRACKS ) {
-				
 				for ( File file : (List<File>) command.getObject() ) {
 					if ( file.isDirectory() ) {
-						newList.addAll( Utils.getAllTracksInDirectory( file.toPath() ) );
+						tracksToPlay.addAll( Utils.getAllTracksInDirectory( file.toPath() ) );
 						
 					} else if ( Utils.isPlaylistFile( file.toPath() ) ) {
 						//TODO: It's kind of lame to load the tracks here just to discard them and load them again a few seconds later
 						//Maybe modify loadPlaylist so i can just ask for the specified paths, without loading tag data
 						Playlist playlist = Playlist.loadPlaylist( file.toPath() );
 						for ( Track track : playlist.getTracks() ) {
-							newList.add( track.getPath() );
+							tracksToPlay.add( track.getPath() );
 						}
 						
 					} else if ( Utils.isMusicFile( file.toPath() ) ) {
-						newList.add( file.toPath() );
+						tracksToPlay.add( file.toPath() );
 						
 					} else {
 						LOGGER.info( "Recived non-music, non-playlist file, ignoring: " + file );
@@ -563,10 +561,10 @@ public class Hypnos extends Application {
 			}
 		}
 		
-		if ( newList.size() > 0 ) {
+		if ( tracksToPlay.size() > 0 ) {
 			if ( System.currentTimeMillis() - setTracksLastTime > 5000 ) {
 				Platform.runLater( () -> {
-					audioSystem.getCurrentList().setTracksPathList( newList,
+					audioSystem.getCurrentList().setTracksPathList( tracksToPlay,
 						new Runnable() {
 							@Override
 							public void run() {
@@ -577,7 +575,7 @@ public class Hypnos extends Application {
 				});
 			} else {
 				Platform.runLater( () -> {
-					audioSystem.getCurrentList().appendTracksPathList ( newList );
+					audioSystem.getCurrentList().appendTracksPathList ( tracksToPlay );
 				});
 			}
 			setTracksLastTime = System.currentTimeMillis();

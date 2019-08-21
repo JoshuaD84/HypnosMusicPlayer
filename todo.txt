@@ -3,12 +3,18 @@ If you load it with no music roots (maybe only after an unexpected shutdown) the
 
 Make sure we see all system.out in log window
 
-Before beta 7 release
-   check if a beta 6 history causes right click -> play to give exception
-      step 1: install beta 6
-      step 2: play some tracks such that there is a history
-      step 3: close, install beta 7
-      step 4: right click -> play on current list track. Does the menu disappear? Good. If not, address
+Load time feels a little long
+
+Windows CLI Currently not working with the new executable, I don't believe it's passing CLI arguments to JVM
+
+Windows CLI issues
+   Select Multiple Files in explorer - No Option to play in Hypnos. Add that
+
+   Windows CLI - "Open with" causes the current track button to not show the current track's name.
+
+   Commandline Interface
+      Send a file via command line when hypnos isn't playing -- it starts
+      Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on current list
 
 Linux
    JavaFX / Linux Open File Dialog sometimes causes jvm crash, depends on system, and doesn't happen always
@@ -19,13 +25,6 @@ Linux
 
    Gnome - See how sys tray interacts w/ topiconsplus extension
 
-Windows
-   Select Multiple Files in explorer - No Option to play in Hypnos. Add that
-   "Open with" causes the current track button to not show the current track's name.
-   Commandline Interface
-      Send a file via command line when hypnos isn't playing -- it starts
-      Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on current list
-
 Backend
    Artist hasn't been fully converted to the observable paradigm yet, so there are problems
       If you open an artist window and delete a file, it isn't removed from the currently open artist window list
@@ -33,7 +32,6 @@ Backend
    Windows - It locks artist folders on windows. Surpsingly not album folders, just artist
       https://stackoverflow.com/questions/56847367/can-you-prevent-watchservice-from-locking-files-on-windows
       https://stackoverflow.com/questions/6255463/java7-watchservice-access-denied-error-trying-to-delete-recursively-watched-ne
-
 
 Decoder  
    Opus and Ape support
@@ -56,6 +54,12 @@ UI
       copy log
       Maybe select different types of things, like albums rejected, full list, etc. 
 
+Before beta 7 release
+   check if a beta 6 history causes right click -> play to give exception
+      step 1: install beta 6
+      step 2: play some tracks such that there is a history
+      step 3: close, install beta 7
+      step 4: right click -> play on current list track. Does the menu disappear? Good. If not, address
 
 ::::::::::::::
 
