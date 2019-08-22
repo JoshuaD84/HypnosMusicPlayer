@@ -6,6 +6,7 @@ Make sure we see all system.out in log window
 Load time feels a little long
 
 Windows CLI Currently not working with the new executable, I don't believe it's passing CLI arguments to JVM
+   When exported to a jar, it does not get to main().  Something's catching in the exe it seems
 
 Windows CLI issues
    Select Multiple Files in explorer - No Option to play in Hypnos. Add that

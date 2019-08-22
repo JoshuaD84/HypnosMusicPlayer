@@ -32,6 +32,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -194,6 +195,12 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 		
 		albumImagePane.addEventHandler( MouseEvent.MOUSE_PRESSED, ( MouseEvent e ) -> {
 			menu.hide();
+		});
+		
+		albumImagePane.setOnMouseClicked( event -> {
+			if ( event.getButton() == MouseButton.PRIMARY ) {
+				ui.goToAlbumOfTrack(this.currentImagesTrack);
+			}
 		});
 		
 		albumImagePane.setOnDragOver( event -> {
@@ -368,6 +375,12 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 			exportImage.setDisable( disableAllMenus );
 			
 			menu.show( artistImagePane, e.getScreenX(), e.getScreenY() );
+		});
+		
+		artistImagePane.setOnMouseClicked( event -> {
+			if ( event.getButton() == MouseButton.PRIMARY ) {
+				ui.goToArtistOfTrack(this.currentImagesTrack);
+			}
 		});
 
 		exportImage.setOnAction( ( ActionEvent event ) -> {

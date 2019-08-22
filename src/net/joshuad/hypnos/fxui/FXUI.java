@@ -1719,7 +1719,7 @@ public class FXUI implements PlayerListener {
 		if ( isLibraryCollapsed() ) setLibraryCollapsed( false );
 		libraryPane.showAndSelectAlbumTab();
 	}
-
+	
 	public void goToArtistOfTrack ( Track track ) {
 		if ( track == null ) {
 			LOGGER.info( "Requested to 'go to artist' of a track that is null, ignoring." );
