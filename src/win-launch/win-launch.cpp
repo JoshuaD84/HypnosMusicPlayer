@@ -1,14 +1,22 @@
 #include <jni.h> 
 #include <windows.h>
+#include <string>
 
 typedef UINT(CALLBACK* JVMDLLFunction)(JavaVM**, void**, JavaVMInitArgs*);
 
 int main(int argc, char** argv) {
-
+	
+	HMODULE hModule = GetModuleHandleW(NULL);
+	CHAR path[MAX_PATH];
+	GetModuleFileName(hModule, path, MAX_PATH);
+	std::string exeFilePath = path;
+	auto pos = exeFilePath.find_last_of("/\\");
+	std::string hypnosDirectoryString = exeFilePath.substr(0, pos);
+	SetCurrentDirectory(hypnosDirectoryString.c_str());
+	
 	SetDllDirectoryA("jre\\bin");
-
 	HINSTANCE jvmDLL = LoadLibrary(".\\jre\\bin\\server\\jvm.dll");
-
+	
 	if (!jvmDLL) {
 		printf("failed to find jvm.dll at specified location, exiting.\n");
 		return 1;
