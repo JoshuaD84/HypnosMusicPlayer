@@ -562,7 +562,7 @@ public class Hypnos extends Application {
 		}
 		
 		if ( tracksToPlay.size() > 0 ) {
-			if ( System.currentTimeMillis() - setTracksLastTime > 5000 ) {
+			if ( System.currentTimeMillis() - setTracksLastTime > 2000 ) {
 				Platform.runLater( () -> {
 					audioSystem.getCurrentList().setTracksPathList( tracksToPlay,
 						new Runnable() {

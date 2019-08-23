@@ -5,18 +5,6 @@ Make sure we see all system.out in log window
 
 Load time feels a little long
 
-Windows CLI Currently not working with the new executable, I don't believe it's passing CLI arguments to JVM
-   When exported to a jar, it does not get to main().  Something's catching in the exe it seems
-
-Windows CLI issues
-   Select Multiple Files in explorer - No Option to play in Hypnos. Add that
-
-   Windows CLI - "Open with" causes the current track button to not show the current track's name.
-
-   Commandline Interface
-      Send a file via command line when hypnos isn't playing -- it starts
-      Then do it again with hypnos playing, it doesn't start playing the new track, just puts it on current list
-
 Linux
    JavaFX / Linux Open File Dialog sometimes causes jvm crash, depends on system, and doesn't happen always
    
@@ -65,6 +53,10 @@ Before beta 7 release
 ::::::::::::::
 
 Future
+   Windows
+      Change exe to communicate directly through socket, to avoid launching JVM a bunch when doing "open with" on multiple
+      files
+
    Having three different throttled filter classes is really error prone. Clean that up, unify 
       Playlist throttled filter, but who's going to have over 1000 playlists?
 
