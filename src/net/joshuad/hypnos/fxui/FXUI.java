@@ -496,7 +496,7 @@ public class FXUI implements PlayerListener {
 		String fontSheet = fileToStylesheetString( stylesheet.toFile() );
 		if ( fontSheet == null ) {
 			LOGGER.log( Level.WARNING, "Unable to load native stylesheet, hypnos will not look right." + 
-				stylesheet.toString()
+				stylesheet.toString(), new NullPointerException()
 			);
 			return;
 		}
@@ -535,7 +535,7 @@ public class FXUI implements PlayerListener {
 		String baseSheet = fileToStylesheetString( baseStylesheet );
 		if ( baseSheet == null ) {
 			LOGGER.log( Level.WARNING, "Unable to load base style sheet hypnos will not look right." + 
-				baseStylesheet.toString()
+				baseStylesheet.toString(), new NullPointerException()
 			);
 			return;
 		}
@@ -560,7 +560,7 @@ public class FXUI implements PlayerListener {
 			String darkSheet = fileToStylesheetString( darkStylesheet );
 			if ( darkSheet == null ) {
 				LOGGER.log( Level.WARNING, "Unable to load dark style sheet hypnos will not look right." + 
-						darkStylesheet.toString()
+						darkStylesheet.toString(), new NullPointerException()
 				);
 				return;
 			}
@@ -592,7 +592,7 @@ public class FXUI implements PlayerListener {
 		String darkSheet = fileToStylesheetString( darkStylesheet );
 		if ( darkSheet == null ) {
 			LOGGER.log( Level.WARNING, "Unable to load dark style sheet, hypnos will not look right." + 
-					darkStylesheet.toString()
+					darkStylesheet.toString(), new NullPointerException()
 			);
 			return;
 		}
@@ -1097,7 +1097,7 @@ public class FXUI implements PlayerListener {
 		
 		if ( darkSheet == null ) {
 			LOGGER.log( Level.INFO, "Unable to load dark style sheet, alert will not look right." + 
-					darkStylesheet.toString()
+					darkStylesheet.toString(), new NullPointerException()
 			);
 			return;
 		}
@@ -1113,7 +1113,7 @@ public class FXUI implements PlayerListener {
 		String darkSheet = fileToStylesheetString( darkStylesheet );
 		if ( darkSheet == null ) {
 			LOGGER.log( Level.INFO, "Unable to load dark style sheet, input dialog will not look right." + 
-					darkStylesheet.toString()
+					darkStylesheet.toString(), new NullPointerException()
 			);
 			return;
 		}
@@ -1706,7 +1706,8 @@ public class FXUI implements PlayerListener {
 	public void goToAlbumOfTrack ( Track track ) {
 		Album album = track.getAlbum();
 		if ( album == null ) {
-			LOGGER.info( "Requested to 'go to album' of a track that is not part of an album, ignoring." );
+			LOGGER.log(Level.INFO, "Requested to 'go to album' of a track that is not part of an album, ignoring.",
+					new NullPointerException() );
 			return;
 		}
 		
@@ -1722,7 +1723,7 @@ public class FXUI implements PlayerListener {
 	
 	public void goToArtistOfTrack ( Track track ) {
 		if ( track == null ) {
-			LOGGER.info( "Requested to 'go to artist' of a track that is null, ignoring." );
+			LOGGER.log(Level.INFO, "Requested to 'go to artist' of a track that is null, ignoring.", new NullPointerException() );
 			return;
 		}
 		Artist artist = null;
@@ -1733,7 +1734,7 @@ public class FXUI implements PlayerListener {
 			}
 		}
 		if ( artist == null ) {
-			LOGGER.info( "Requested to 'go to artist' of a track that is not part of an album, ignoring." );
+			LOGGER.log(Level.INFO, "Requested to 'go to artist' of a track that is not part of an album, ignoring.", new NullPointerException() );
 			return;
 		}
 		libraryPane.clearArtistFilter();

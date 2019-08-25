@@ -70,7 +70,7 @@ public class VLCAudioPlayer {
 			case WIN_XP:
 				//Do nothing, Windows XP not supported
 			default:
-				LOGGER.severe( "Cannot determine OS, unable to load native VLC libraries. Exiting." );
+				LOGGER.log( Level.SEVERE, "Cannot determine OS, unable to load native VLC libraries. Exiting." );
 				Hypnos.exit( ExitCode.UNSUPPORTED_OS );
 				break;
 		}
@@ -189,12 +189,12 @@ public class VLCAudioPlayer {
 	//VLC accepts 0 ... 200 as range for volume
 	public void requestVolumePercent ( double volumePercent ) { //TODO: allow up to 200% volume, maybe. VLC supports it. 
 		if ( volumePercent < 0 ) {
-			LOGGER.info( "Volume requested to be turned down below 0. Setting to 0 instead." );
+			LOGGER.log( Level.INFO, "Volume requested to be turned down below 0. Setting to 0 instead.", new Exception() );
 			volumePercent = 0;
 		} 
 		
 		if ( volumePercent > 1 ) {
-			LOGGER.info( "Volume requested to be more than 1 (i.e. 100%). Setting to 1 instead." );
+			LOGGER.log( Level.INFO, "Volume requested to be more than 1 (i.e. 100%). Setting to 1 instead.", new Exception() );
 			volumePercent = 1;
 		}
 		

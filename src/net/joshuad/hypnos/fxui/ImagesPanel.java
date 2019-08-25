@@ -173,9 +173,9 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 				byteStream.close();
 				
 				Utils.saveImageToDisk( targetFile.toPath(), imageBytes );
-			} catch ( IOException ex ) {
+			} catch ( IOException e ) {
 				ui.notifyUserError ( "Unable to export image. See log for more information." );
-				LOGGER.log( Level.WARNING, "Unable to export album image.", ex );
+				LOGGER.log( Level.WARNING, "Unable to export album image.", e );
 			}
 		});
 				
@@ -266,7 +266,7 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 						"Cannot save image from dropped source.\n\n" +
 						url + 
 						"Try saving the image to disk and dragging from disk rather than web.";
-					LOGGER.warning( message.replaceAll( "\n\n", " " ) );
+					LOGGER.log( Level.WARNING, message.replaceAll( "\n\n", " " ), new NullPointerException() );
 					ui.notifyUserError( message );
 				}
 
@@ -410,9 +410,9 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 				byteStream.close();
 				
 				Utils.saveImageToDisk( targetFile.toPath(), imageBytes );
-			} catch ( IOException ex ) {
-				ui.notifyUserError ( ex.getClass().getCanonicalName() + ": Unable to export image. See log for more information." );
-				LOGGER.log( Level.WARNING, "Unable to export artist image.", ex );
+			} catch ( IOException e ) {
+				ui.notifyUserError ( e.getClass().getCanonicalName() + ": Unable to export image. See log for more information." );
+				LOGGER.log( Level.WARNING, "Unable to export artist image.", e );
 			}
 		});
 		
@@ -576,7 +576,7 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 						"Cannot pull image from dropped source.\n\n" +
 						url + 
 						"Try saving the image to disk and dragging from disk rather than web.";
-					LOGGER.warning( message.replaceAll( "\n\n", " " ) );
+					LOGGER.log( Level.WARNING, message.replaceAll( "\n\n", " " ), new NullPointerException() );
 					ui.notifyUserError( message );
 				}
 			}
@@ -617,7 +617,7 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 			String darkSheet = ui.fileToStylesheetString( ui.darkStylesheet );
 			if ( darkSheet == null ) {
 				LOGGER.log( Level.INFO, "Unable to load dark style sheet, alert will not look right." + 
-						ui.darkStylesheet.toString()
+						ui.darkStylesheet.toString(), new NullPointerException()
 				);
 			} else {
 				if ( ui.isDarkTheme() ) {
@@ -776,11 +776,11 @@ public class ImagesPanel extends SplitPane implements PlayerListener {
 						LOGGER.log( Level.WARNING, "Unable to pull image from internet (" + db.getContent( textContentFormat ) + ")", e );
 					}
 				} else {
-					LOGGER.info( "Received drop of a non-image file, ignored: " + db.getContent( textContentFormat ) );
+					LOGGER.log( Level.INFO, "Received drop of a non-image file, ignored: " + db.getContent( textContentFormat ), new Exception() );
 				}
 				
 			} catch ( MalformedURLException e1 ) {
-				LOGGER.info( "Unable to parse url: " + db.getContent( textContentFormat ) );
+				LOGGER.log( Level.INFO, "Unable to parse url: " + db.getContent( textContentFormat ), e1 );
 			}
 		} 
 		

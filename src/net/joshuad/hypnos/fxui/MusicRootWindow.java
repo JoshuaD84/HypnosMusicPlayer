@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -66,7 +67,7 @@ public class MusicRootWindow extends Stage {
 		try {
 			getIcons().add( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) ) );
 		} catch ( FileNotFoundException e ) {
-			LOGGER.warning( "Unable to load program icon: resources/icon.png" );
+			LOGGER.log( Level.WARNING, "Unable to load program icon: resources/icon.png", e );
 		}
 		
 		VBox primaryPane = new VBox();

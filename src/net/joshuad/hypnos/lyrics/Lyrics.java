@@ -1,5 +1,6 @@
 package net.joshuad.hypnos.lyrics;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.joshuad.hypnos.lyrics.LyricsFetcher.LyricSite;
@@ -33,7 +34,7 @@ public class Lyrics {
 	
 	public String getLyrics() {
 		if ( error != ScrapeError.NONE ) {
-			LOGGER.warning ( "Asked for lyrics when there was a scrape error." );
+			LOGGER.log ( Level.INFO, "Asked for lyrics when there was a scrape error.", new Exception() );
 		}
 		return lyrics;
 	}

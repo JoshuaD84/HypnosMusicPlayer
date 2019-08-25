@@ -1,6 +1,7 @@
 package net.joshuad.hypnos;
 
 import java.util.Arrays;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class MultiFileImageTagPair {
@@ -86,7 +87,7 @@ public class MultiFileImageTagPair {
 			case ARTIST_LOGO:
 				return "ARTIST LOGO";
 			default:
-				LOGGER.warning( "This should never happen. Key type: " + key.name() );
+				LOGGER.log ( Level.WARNING, "This should never happen. Key type: " + key.name(), new Exception() );
 				return "NO NAME";
 		}
 	}

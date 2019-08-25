@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javafx.scene.input.KeyEvent;
@@ -73,7 +74,7 @@ public class GlobalHotkeys {
 		} catch ( HotkeyException e ) {
 			system = new DummyGlobalHotkeys ( this );
 			disabled = true;
-			LOGGER.info( "Unable to setup global hotkeys, they are disabled: " + e.getMessage() );
+			LOGGER.log( Level.WARNING, "Unable to setup global hotkeys, they will be disabled for this session." + e );
 		}
 	}
 	

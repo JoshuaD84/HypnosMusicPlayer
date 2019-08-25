@@ -60,7 +60,7 @@ public class CachedList<T> {
 					try {
 						Thread.sleep(100);
 					} catch (InterruptedException e) {
-						LOGGER.log(Level.FINE, "Sleep interupted during wait period.");
+						LOGGER.log(Level.INFO, "Sleep interupted during wait period.", e);
 					}
 				}
 			}
@@ -76,10 +76,14 @@ public class CachedList<T> {
 		
 	public void remove(T removeMe, boolean fxThreadPermitted) {
 		if(!fxThreadPermitted && Platform.isFxApplicationThread()) {
-			LOGGER.warning("Modifying the base list while on UI Thread. This is likely a bug, but trying to continue.");
+			LOGGER.log(
+					Level.WARNING, 
+					"Modifying the base list while on UI Thread. This is likely a bug, but trying to continue.",
+					new Exception()
+				);
 		}
 		if(removeMe == null) {
-			LOGGER.warning("Asked to remove a null item from list, ignoring.");
+			LOGGER.log(Level.WARNING, "Asked to remove a null item from list, ignoring.", new Exception());
 			return;
 		}
 		try {
@@ -96,10 +100,16 @@ public class CachedList<T> {
 	
 	public void addItem(T addMe, boolean fxThreadPermitted) {
 		if(!fxThreadPermitted && Platform.isFxApplicationThread()) {
-			LOGGER.log(Level.WARNING, "Modifying the base list while on UI Thread. This is likely a bug, but trying to continue.");
+			LOGGER.log(Level.INFO, 
+					"Modifying the base list while on UI Thread. This is likely a bug, but trying to continue.",
+					new Exception()
+				);
 		}
 		if(addMe == null) {
-			LOGGER.warning("Asked to add a null item to list, ignoring.");
+			LOGGER.log(Level.WARNING,
+					"Asked to add a null item to list, ignoring.",
+					new NullPointerException()
+				);
 			return;
 		}
 		try {
@@ -123,7 +133,10 @@ public class CachedList<T> {
 	
 	public ObservableList<T> getDisplayItems() {
 		if(!Platform.isFxApplicationThread()) {
-			LOGGER.warning("Asked for display items while not on FX thread, this is likely a bug, but continuing.");
+			LOGGER.log(Level.INFO, 
+					"Asked for display items while not on FX thread, this is likely a bug, but continuing.",
+					new Exception()
+				);
 		}
 		return displayCache;
 	}

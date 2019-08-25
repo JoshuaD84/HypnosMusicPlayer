@@ -92,7 +92,7 @@ public class Library {
 					try {
 						Thread.sleep(2000);
 					} catch (InterruptedException e) {
-						LOGGER.log(Level.FINE, "Sleep interupted during wait period.");
+						LOGGER.log(Level.INFO, "Sleep interupted during wait period.", e);
 					}
 				}
 			}

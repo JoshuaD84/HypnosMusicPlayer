@@ -175,7 +175,7 @@ public class Persister {
 			return true;
 			
 		} catch ( Exception e ) {
-			LOGGER.warning( "Unable to read library directory list from disk, continuing." );
+			LOGGER.log( Level.INFO, "Unable to read library directory list from disk, continuing.", e);
 		}
 		
 		return false;
@@ -193,7 +193,7 @@ public class Persister {
 				audioSystem.getCurrentList().setHasUnsavedData( false );
 				
 			} catch ( Exception e2 ) {
-				LOGGER.warning( "Unable to read library data from disk, continuing." );
+				LOGGER.log( Level.INFO, "Unable to read library data from disk, continuing.", e2 );
 			}
 		}
 	}
@@ -204,7 +204,7 @@ public class Persister {
 			audioSystem.getQueue().setHasUnsavedData( false );
 			
 		} catch ( Exception e ) {
-			LOGGER.warning( "Unable to read queue data from disk, continuing." );
+			LOGGER.log( Level.INFO, "Unable to read queue data from disk, continuing.", e );
 		}
 	}
 
@@ -214,7 +214,7 @@ public class Persister {
 			audioSystem.getHistory().setHasUnsavedData( false );
 		
 		} catch ( Exception e ) {
-			LOGGER.warning( "Unable to read history from disk, continuing." );
+			LOGGER.log( Level.INFO, "Unable to read history from disk, continuing.", e );
 		}
 	}
 	
@@ -223,7 +223,7 @@ public class Persister {
 			hotkeys.setMap( (EnumMap <Hotkey, HotkeyState>) hotkeysIn.readObject() );
 			hotkeys.setHasUnsavedData( false );
 		} catch ( Exception e ) {
-			LOGGER.warning( "Unable to read hotkeys from disk, continuing." );
+			LOGGER.log( Level.INFO, "Unable to read hotkeys from disk, continuing.", e );
 		}
 	}
 
@@ -240,7 +240,7 @@ public class Persister {
 			    }
 		    }
 		} catch ( Exception e ) {
-			LOGGER.warning( "Unable to read library data from disk, continuing." );
+			LOGGER.log( Level.INFO, "Unable to read library data from disk, continuing.", e );
 		}
 	}
 
@@ -272,7 +272,7 @@ public class Persister {
 			Files.move( tempSourcesFile.toPath(), sourcesFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE );
 			
 		} catch ( Exception e ) {
-			LOGGER.warning( "Unable to save library source directory list to disk, continuing." );
+			LOGGER.log( Level.WARNING, "Unable to save library source directory list to disk, continuing.", e );
 		}
 	}
 	
@@ -331,7 +331,7 @@ public class Persister {
 			audioSystem.getQueue().setHasUnsavedData( false );
 			
 		} catch ( Exception e ) {
-			LOGGER.warning( "Unable to save queue to disk, continuing." );
+			LOGGER.log( Level.WARNING, "Unable to save queue to disk, continuing.", e );
 		}
 	}
 
@@ -351,7 +351,7 @@ public class Persister {
 			audioSystem.getHistory().setHasUnsavedData( false );
 			
 		} catch ( Exception e ) {
-			LOGGER.warning( "Unable to save history to disk, continuing." );
+			LOGGER.log( Level.WARNING, "Unable to save history to disk, continuing.", e );
 		}
 	}
 	
@@ -370,7 +370,7 @@ public class Persister {
 			hotkeys.setHasUnsavedData( false );
 			
 		} catch ( Exception e ) {
-			LOGGER.warning( "Unable to save hotkeys to disk, continuing." );
+			LOGGER.log( Level.WARNING, "Unable to save hotkeys to disk, continuing.", e );
 		}
 	}
 
@@ -402,7 +402,7 @@ public class Persister {
 			Files.move( tempDataFile.toPath(), dataFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 
 		} catch ( Exception e ) {
-			LOGGER.warning( "Unable to save library data to disk, continuing." );
+			LOGGER.log( Level.WARNING, "Unable to save library data to disk, continuing.", e );
 		}
 	}
 
@@ -414,7 +414,7 @@ public class Persister {
 
 		for ( Playlist playlist : playlists ) {
 			if ( playlist == null ) {
-				LOGGER.info( "Found a null playlist in library.playlists, ignoring." );
+				LOGGER.log( Level.INFO, "Found a null playlist in library.playlists, ignoring.", new NullPointerException() );
 				continue;
 			}
 			
@@ -423,7 +423,7 @@ public class Persister {
 			try {
 				saveLibaryPlaylist ( playlist );
 			} catch ( IOException e ) {
-				LOGGER.warning ( "Unable to save library playlist " + playlist.getName() + ": " + e.getMessage() );
+				LOGGER.log ( Level.WARNING, "Unable to save library playlist " + playlist.getName(), e );
 				errors.add( playlist );
 			}
 			
@@ -463,17 +463,16 @@ public class Persister {
 			savedToTemp = true;
 		} catch ( IOException e ) {
 			savedToTemp = false;
-			LOGGER.info( "Unable to write to a temp file, so I will try writing directly to the playlist file." +
+			LOGGER.log( Level.INFO, "Unable to write to a temp file, so I will try writing directly to the playlist file." +
 				"Your data will be saved in a backup file first. If this process is interrupted, you may need to manually " +
-				"recover the data from the backup file.\n" + e.getMessage() );
+				"recover the data from the backup file.", e );
 			
 			if ( Files.exists( targetFile ) ) {
 				try {
 					Files.move( targetFile, backupFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 				} catch ( IOException e2 ) {
-					LOGGER.info( "Unable to move existing playlist file to backup location (" + backupFile.toString() +
-						") will continue trying to save current playlist, overwriting the existing file." + 
-						"\n" + e2.getMessage() );
+					LOGGER.log( Level.INFO, "Unable to move existing playlist file to backup location (" + backupFile.toString() +
+						") will continue trying to save current playlist, overwriting the existing file.", e2 );
 				}
 			}
 		}
@@ -496,7 +495,7 @@ public class Persister {
 			}
 			
 		} catch ( IOException e ) {
-			LOGGER.info( "Unable to save playlist to file: " + targetFile.toString() + "." );
+			LOGGER.log( Level.WARNING, "Unable to save playlist to file: " + targetFile.toString() + ".", e );
 			throw e;
 			
 		} finally {
@@ -532,7 +531,7 @@ public class Persister {
 			Files.move( tempSettingsFile.toPath(), settingsFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 
 		} catch ( Exception e ) {
-			LOGGER.warning( "Unable to save settings to disk, continuing." );
+			LOGGER.log( Level.WARNING, "Unable to save settings to disk, continuing.", e );
 		}
 	}
 	
@@ -546,7 +545,7 @@ public class Persister {
 				try {
 					setting = Setting.valueOf( line.split( ":\\s+" )[0] );
 				} catch ( IllegalArgumentException e ) {
-					LOGGER.info( "Found invalid setting: " + line.split( ":\\s+" )[0] + ", ignoring." );
+					LOGGER.log( Level.INFO, "Found invalid setting: " + line.split( ":\\s+" )[0] + ", ignoring.", e );
 					continue;
 				}
 				
@@ -561,7 +560,7 @@ public class Persister {
 			}
 
 		} catch ( Exception e ) {
-			LOGGER.log( Level.WARNING, "Unable to read settings from disk, continuing." );
+			LOGGER.log( Level.WARNING, "Unable to read settings from disk, continuing.", e );
 		}
 		
 		return settings;
@@ -576,7 +575,7 @@ public class Persister {
 			message += setting.toString() + ": " + pendingSettings.get( setting );
 		}
 		
-		LOGGER.info ( "Some settings were read from disk but not applied:\n" + message );
+		LOGGER.log ( Level.INFO, "Some settings were read from disk but not applied:\n" + message );
 	}
 
 	public void startThread() {
@@ -611,7 +610,7 @@ public class Persister {
 					try {
 						Thread.sleep( 100 );
 					} catch (InterruptedException e) {
-						LOGGER.info( "Persister thread interrupted, ignoring." );
+						LOGGER.log( Level.INFO, "Persister thread interrupted, ignoring.", e );
 					}
 				}
 			}

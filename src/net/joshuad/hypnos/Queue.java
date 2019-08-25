@@ -3,6 +3,7 @@ package net.joshuad.hypnos;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javafx.collections.FXCollections;
@@ -40,12 +41,15 @@ public class Queue {
 				
 	public synchronized void queueTrack ( int index, Track track ) {
 		if ( index < 0 ) {
-			LOGGER.fine ( "Asked to add a track at index: " + index + ", adding at 0 instead." );
+			LOGGER.log ( Level.INFO, "Asked to add a track at index: " + index + ", adding at 0 instead.", new Exception() );
 			index = 0;
 		}
 		
 		if ( index > queue.size() ) { 
-			LOGGER.fine ( "Asked to add a track at index: " + index + ", which is beyond the end of the queue. Adding at the end instead." );
+			LOGGER.log ( Level.INFO, 
+					"Asked to add a track at index: " + index + ", which is beyond the end of the queue. Adding at the end instead.",
+					new Exception()
+				);
 			index = queue.size();
 		}
 			
@@ -89,12 +93,15 @@ public class Queue {
 	
 	public synchronized void queueAllTracks ( List<? extends Track> tracks, int index ) {
 		if ( index < 0 ) {
-			LOGGER.fine ( "Asked to add a tracks at index: " + index + ", adding at 0 instead." );
+			LOGGER.log ( Level.INFO, "Asked to add a tracks at index: " + index + ", adding at 0 instead.", new Exception() );
 			index = 0;
 		}
 		
 		if ( index > queue.size() ) { 
-			LOGGER.fine ( "Asked to add a tracks at index: " + index + ", which is beyond the end of the queue. Adding at the end instead." );
+			LOGGER.log ( Level.INFO,
+					"Asked to add a tracks at index: " + index + ", which is beyond the end of the queue. Adding at the end instead.",
+					new Exception()
+				);
 			index = queue.size();
 		}
 			

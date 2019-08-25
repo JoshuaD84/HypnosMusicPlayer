@@ -634,8 +634,8 @@ public class Track implements Serializable, AlbumInfoSource {
 					currentPriority = null;
 				}
 				if ( currentPriority != null && currentPriority > priority.getValue() ) {
-					LOGGER.info( file.getName() + ": Not overwriting tag. Selected priority (" 
-						+ priority.getValue() + ") " + "is less than current priority (" + currentPriority + ")." );
+					LOGGER.log( Level.INFO, file.getName() + ": Not overwriting tag. Selected priority (" 
+						+ priority.getValue() + ") " + "is less than current priority (" + currentPriority + ").", new Exception() );
 					return;
 				}
 			}
@@ -698,7 +698,7 @@ public class Track implements Serializable, AlbumInfoSource {
 				extension = ".png";
 			}		
 			if ( extension == null ) {
-				LOGGER.info( "Invalid image file type, not saving." );
+				LOGGER.log( Level.INFO, "Invalid image file type, not saving.", new Exception() );
 			}
 			Path copyTo = album.getPath().resolve( "front" + extension );
 			try {
@@ -774,7 +774,7 @@ public class Track implements Serializable, AlbumInfoSource {
 		//then look at tag for any other suitable images
 		//then take any image file from the album folder. 
 		if ( !Files.exists( getPath() ) ) {
-			LOGGER.info( "Track file does not exist."  );
+			LOGGER.log( Level.INFO, "Track file does not exist: " + getPath(), new Exception() );
 			return null;
 		}
 		List<Artwork> artworkList = null;

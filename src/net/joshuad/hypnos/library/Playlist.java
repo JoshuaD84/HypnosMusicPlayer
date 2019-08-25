@@ -94,7 +94,7 @@ public class Playlist implements Serializable {
 				LOGGER.log(Level.INFO, "Error reading playlist file: " + playlistPath, e);
 			}
 		} else {
-			LOGGER.info("Asked to load a playlist that doesn't have a playlist extension, ignoring.");
+			LOGGER.log(Level.INFO, "Asked to load a playlist that doesn't have a playlist extension, ignoring.", new Exception());
 		}
 		return retMe;
 	}

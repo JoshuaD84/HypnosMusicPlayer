@@ -189,7 +189,7 @@ public class SettingsWindow extends Stage {
 		try {
 			getIcons().add( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) ) );
 		} catch ( FileNotFoundException e ) {
-			LOGGER.warning( "Unable to load program icon: resources/icon.png" );
+			LOGGER.log( Level.WARNING, "Unable to load program icon: resources/icon.png", new NullPointerException() );
 		}
 		
 		this.setOnShowing( ( event ) -> { 

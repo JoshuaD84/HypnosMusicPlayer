@@ -3,6 +3,7 @@ package net.joshuad.hypnos.fxui;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javafx.application.Platform;
@@ -41,7 +42,7 @@ public class LibraryLogWindow extends Stage {
 		try {
 			getIcons().add( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) ) );
 		} catch ( FileNotFoundException e ) {
-			LOGGER.warning( "Unable to load program icon: resources/icon.png" );
+			LOGGER.log( Level.WARNING, "Unable to load program icon: resources/icon.png", e );
 		}
 		
 		VBox root = new VBox();

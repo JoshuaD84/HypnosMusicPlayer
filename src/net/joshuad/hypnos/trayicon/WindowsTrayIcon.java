@@ -1,5 +1,6 @@
 package net.joshuad.hypnos.trayicon;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -166,7 +167,7 @@ public class WindowsTrayIcon extends NativeTrayIcon implements PlayerListener {
 					try {
 						Thread.sleep( 25 );
 					} catch (InterruptedException e1) {
-						LOGGER.info ( "Interrupted during swt sleep loop" );
+						LOGGER.log ( Level.INFO, "Interrupted during swt sleep loop", e1 );
 					}
 				}
 				

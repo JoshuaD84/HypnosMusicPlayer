@@ -98,7 +98,7 @@ public class Utils {
 
 	public static boolean isMusicFile(Path testFile) {
 		if (testFile == null) {
-			LOGGER.info("Asked if a null path was a music file, returning false.");
+			LOGGER.log(Level.INFO, "Asked if a null path was a music file, returning false.", new NullPointerException());
 			return false;
 		}
 		String fileName = testFile.getFileName().toString();

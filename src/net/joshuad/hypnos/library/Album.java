@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javafx.beans.InvalidationListener;
@@ -92,7 +93,7 @@ public class Album implements Serializable, AlbumInfoSource {
 			dateAddedStringProperty.setValue(sdf.format(new Date(creationMS)));
 		} catch (IOException e) {
 			dateAddedStringProperty.setValue(sdf.format(new Date()));
-			LOGGER.info("Unable to determine file creation time for album, assuming it is very old." + directory.toString());
+			LOGGER.log(Level.INFO, "Unable to determine file creation time for album, assuming it is very old." + directory.toString(), e);
 		}
 	}
 

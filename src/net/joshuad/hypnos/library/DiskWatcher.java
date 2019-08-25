@@ -39,7 +39,7 @@ class DiskWatcher {
 			delayedUpdater.start();
 		} catch ( IOException e ) {
 			String message = "Unable to initialize file watcher, changes to file system while running won't be detected";
-			LOGGER.log( Level.WARNING, message );
+			LOGGER.log( Level.WARNING, message, e );
 			ui.notifyUserError( message );
 		}
 	}
@@ -162,7 +162,7 @@ class DelayedUpdateThread extends Thread {
 			try { 
 				Thread.sleep ( 50 ); 
 			} catch ( InterruptedException e ) {
-				LOGGER.log ( Level.FINE, "Sleep interupted during wait period." );
+				LOGGER.log ( Level.INFO, "Sleep interupted during wait period.", e );
 			}
 			long sleepTime = System.currentTimeMillis() - startSleepTime;
 			if ( counter > 0 ) {

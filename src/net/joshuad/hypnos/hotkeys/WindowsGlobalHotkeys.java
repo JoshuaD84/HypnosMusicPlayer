@@ -2,6 +2,7 @@ package net.joshuad.hypnos.hotkeys;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.melloware.jintellitype.JIntellitype;
@@ -127,7 +128,7 @@ public class WindowsGlobalHotkeys extends SystemHotkeys {
 			default:
 				lastIntellitypeCommand = -1;
 				lastIntellitypePressedMS = 0;
-				LOGGER.info( "Undefined INTELLITYPE message caught " + Integer.toString( aCommand ) );
+				LOGGER.log( Level.INFO, "Undefined INTELLITYPE message caught " + Integer.toString( aCommand ), new Exception() );
 				break;
 			}
 		}

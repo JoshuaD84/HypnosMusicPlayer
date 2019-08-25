@@ -417,7 +417,7 @@ public class Hypnos extends Application {
 			try {
 				Files.move( logFileBackup, logFileBackup2, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 			} catch ( Exception e ) {
-				LOGGER.log ( Level.WARNING, "Unable to create 2nd backup logfile" );
+				LOGGER.log ( Level.WARNING, "Unable to create 2nd backup logfile", e );
 			}
 		}
 		
@@ -425,7 +425,7 @@ public class Hypnos extends Application {
 			try {
 				Files.move( logFile, logFileBackup, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE  );
 			} catch ( Exception e ) {
-				LOGGER.log ( Level.WARNING, "Unable to create 1st backup logfile" );
+				LOGGER.log ( Level.WARNING, "Unable to create 1st backup logfile", e );
 			}
 		}
 				
@@ -555,7 +555,7 @@ public class Hypnos extends Application {
 						tracksToPlay.add( file.toPath() );
 						
 					} else {
-						LOGGER.info( "Recived non-music, non-playlist file, ignoring: " + file );
+						LOGGER.log( Level.INFO, "Recived non-music, non-playlist file, ignoring: " + file, new Exception() );
 					}
 				}
 			}

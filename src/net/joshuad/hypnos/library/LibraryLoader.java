@@ -38,7 +38,7 @@ class LibraryLoader {
 		if (!loaderThread.isAlive()) {
 			loaderThread.start(); 
 		} else {
-			LOGGER.log(Level.INFO, "Disk Scanner thread asked to start, but it's already running, request ignored.");
+			LOGGER.log(Level.INFO, "Disk Scanner thread asked to start, but it's already running, request ignored.", new Exception());
 		}
 	}
 

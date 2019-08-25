@@ -163,7 +163,7 @@ public class CurrentList {
 				try {
 					Thread.sleep ( 250 );
 				} catch ( InterruptedException e ) {
-					LOGGER.fine ( "Interrupted while sleeping in current list watcher." );
+					LOGGER.log ( Level.INFO, "Interrupted while sleeping in current list watcher.", e );
 				}
 			}
 		});
@@ -175,10 +175,10 @@ public class CurrentList {
 	
 	public void addListener ( CurrentListListener listener ) {
 		if ( listener == null ) {
-			LOGGER.fine( "Null player listener was attempted to be added, ignoring." );
+			LOGGER.log( Level.INFO, "Null player listener was attempted to be added, ignoring.", new NullPointerException() );
 			
 		} else if ( listeners.contains( listener ) ) {
-			LOGGER.fine( "Null player listener was attempted to be added, ignoring." );
+			LOGGER.log( Level.INFO, "Duplicate listener was attempted to be added, ignoring.", new Exception() );
 			
 		} else {			
 			listeners.add( listener );
@@ -335,12 +335,12 @@ public class CurrentList {
 	
 	public void moveTracks ( List<Integer> fromLocations, int toLocation ) {
 		if ( fromLocations == null ) {
-			LOGGER.fine( "Recieved a null list, ignoring request." );
+			LOGGER.log( Level.INFO, "Recieved a null list, ignoring request.", new NullPointerException() );
 			return;
 		}
 		
 		if ( fromLocations.size() == 0 ) {
-			LOGGER.fine( "Recieved an empty list, ignoring request." );
+			LOGGER.log( Level.INFO, "Recieved an empty list, ignoring request.", new Exception() );
 			return;
 		}
 				
@@ -427,7 +427,7 @@ public class CurrentList {
 	
 	public void insertTracks ( int index, List<? extends Track> tracks ) {
 		if ( tracks == null || tracks.size() <= 0 ) {
-			LOGGER.fine( "Recieved a null or empty track list. No tracks loaded." );
+			LOGGER.log( Level.INFO, "Recieved a null or empty track list. No tracks loaded.", new Exception() );
 			return;
 		}
 		
@@ -442,10 +442,10 @@ public class CurrentList {
 		int targetIndex = index;
 		synchronized ( items ) {
 			if ( index < 0 ) {
-				LOGGER.fine( "Asked to insert tracks at: " + index + ", inserting at 0 instead." );
+				LOGGER.log( Level.INFO, "Asked to insert tracks at: " + index + ", inserting at 0 instead.", new Exception() );
 				targetIndex = 0;
 			} else if ( index > items.size() ) {
-				LOGGER.fine( "Asked to insert tracks past the end of current list. Inserting at end instead." );
+				LOGGER.log( Level.INFO, "Asked to insert tracks past the end of current list. Inserting at end instead.", new Exception() );
 				targetIndex = items.size();
 			}
 		}
@@ -478,17 +478,17 @@ public class CurrentList {
 				boolean startedEmpty = items.isEmpty();
 				
 				if ( paths == null || paths.size() <= 0 ) {
-					LOGGER.fine( "Recieved a null or empty track list. No tracks loaded." );
+					LOGGER.log( Level.INFO, "Recieved a null or empty track list. No tracks loaded.", new NullPointerException() );
 					return;
 				}
 				
 				int targetIndex = index;
 				synchronized ( items ) {
 					if ( index < 0 ) {
-						LOGGER.info( "Asked to insert tracks at: " + index + ", inserting at 0 instead." );
+						LOGGER.log( Level.INFO, "Asked to insert tracks at: " + index + ", inserting at 0 instead.", new Exception() );
 						targetIndex = 0;
 					} else if ( index > items.size() ) {
-						LOGGER.info( "Asked to insert tracks past the end of current list. Inserting at end instead." );
+						LOGGER.log( Level.INFO, "Asked to insert tracks past the end of current list. Inserting at end instead.", new Exception()  );
 						targetIndex = items.size() - 1;
 					}
 				}
@@ -500,7 +500,7 @@ public class CurrentList {
 						targetIndex++;
 						tracksAdded++;
 					} catch ( Exception e ) {
-						LOGGER.info( " -- Couldn't load track: " + path.toString() + ". Skipping." );
+						LOGGER.log( Level.INFO, "Couldn't load track: " + path.toString() + ". Skipping.", e );
 					}
 				}
 				
@@ -533,10 +533,10 @@ public class CurrentList {
 		synchronized ( items ) {
 			int targetIndex = index;
 			if ( index < 0 ) {
-				LOGGER.info( "Asked to insert tracks at: " + index + ", inserting at 0 instead." );
+				LOGGER.log( Level.INFO, "Asked to insert tracks at: " + index + ", inserting at 0 instead.", new Exception() );
 				targetIndex = 0;
 			} else if ( index > items.size() ) {
-				LOGGER.info( "Asked to insert tracks past the end of current list. Inserting at end instead." );
+				LOGGER.log( Level.INFO, "Asked to insert tracks past the end of current list. Inserting at end instead.", new Exception() );
 				targetIndex = items.size() - 1;
 			}
 			items.add( targetIndex, track );
@@ -741,7 +741,7 @@ public class CurrentList {
 			mode = Mode.EMPTY;
 			currentAlbums.clear();
 			currentPlaylist = null;
-			LOGGER.log( Level.FINE, "Recieved an null album list." );
+			LOGGER.log( Level.INFO, "Recieved an null album list.", new NullPointerException() );
 			notifyListenersStateChanged();
 			return;
 		}
@@ -881,7 +881,7 @@ public class CurrentList {
 			mode = Mode.EMPTY;
 			currentAlbums.clear();
 			currentPlaylist = null;
-			LOGGER.log( Level.FINE, "Recieved an null playlist list." );
+			LOGGER.log( Level.INFO, "Recieved an null playlist list.", new NullPointerException() );
 			notifyListenersStateChanged();
 			return;
 		}

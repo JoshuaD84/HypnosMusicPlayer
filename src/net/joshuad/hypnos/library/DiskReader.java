@@ -166,14 +166,14 @@ class DiskReader implements FileVisitor<Path> {
 				try {
 					Thread.sleep(10);
 				} catch (InterruptedException e) {
-					LOGGER.info("Interrupted during sleep in disk watcher, if this persists the loader speed may be ignored.");
+					LOGGER.log(Level.INFO, "Interrupted during sleep in disk watcher, if this persists the loader speed may be ignored.", e);
 				}
 				break;
 			case LOW:
 				try {
 					Thread.sleep(50);
 				} catch (InterruptedException e) {
-					LOGGER.info("Interrupted during sleep in disk watcher, if this persists the loader speed may be ignored.");
+					LOGGER.log(Level.INFO, "Interrupted during sleep in disk watcher, if this persists the loader speed may be ignored.", e);
 				}
 				break;
 		}

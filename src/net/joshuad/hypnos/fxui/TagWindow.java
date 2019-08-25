@@ -118,7 +118,7 @@ public class TagWindow extends Stage {
 		try {
 			getIcons().add( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) ) );
 		} catch ( FileNotFoundException e ) {
-			LOGGER.warning( "Unable to load program icon: resources/icon.png" );
+			LOGGER.log( Level.WARNING, "Unable to load program icon: resources/icon.png", e );
 		}
 		
 		VBox textTagPane = new VBox();
@@ -255,7 +255,7 @@ public class TagWindow extends Stage {
 									((MultiFileImageTagPair)this.getTableRow().getItem()).setImageData( imageBuffer );
 									this.getTableRow().getTableView().refresh();
 								} catch ( IOException e ) {
-									LOGGER.warning( "Unable to read image data from file: " + targetFile );
+									LOGGER.log( Level.WARNING, "Unable to read image data from file: " + targetFile, new NullPointerException() );
 								}
 							} );
 							

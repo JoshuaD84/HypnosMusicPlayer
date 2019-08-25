@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javafx.collections.FXCollections;
@@ -169,17 +170,16 @@ public class ArtistInfoWindow extends Stage {
 				switch ( container.getSource() ) {
 					case PLAYLIST_LIST: {
 						if ( container.getPlaylists() == null ) {
-							LOGGER.fine ( "Recieved null data from playlist list, ignoring." );
+							LOGGER.log ( Level.INFO, "Recieved null data from playlist list, ignoring.", new NullPointerException() );
 							
 						} else {
 							List <Track> tracksToCopy = new ArrayList<Track>();
 							for ( Playlist playlist : container.getPlaylists() ) {
 								if ( playlist == null ) {
-									LOGGER.fine ( "Recieved null playlist from playlist list, ignoring." );
+									LOGGER.log ( Level.INFO, "Recieved null playlist from playlist list, ignoring.", new NullPointerException() );
 								} else {
 									tracksToCopy.addAll( playlist.getTracks() );
 								}
-									
 							}
 							trackTable.getItems().addAll ( tracksToCopy );
 						}
@@ -187,13 +187,13 @@ public class ArtistInfoWindow extends Stage {
 					
 					case ALBUM_LIST: {
 						if ( container.getAlbums() == null ) {
-							LOGGER.fine ( "Recieved null data from playlist list, ignoring." );
+							LOGGER.log ( Level.INFO, "Recieved null data from playlist list, ignoring.", new NullPointerException() );
 							
 						} else {
 							List <Track> tracksToCopy = new ArrayList<Track>();
 							for ( Album album : container.getAlbums() ) {
 								if ( album == null ) {
-									LOGGER.fine ( "Null album dropped in playlist window, ignoring." );
+									LOGGER.log ( Level.INFO, "Null album dropped in playlist window, ignoring.", new NullPointerException() );
 								} else {
 									tracksToCopy.addAll( album.getTracks() );
 								}

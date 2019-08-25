@@ -509,7 +509,7 @@ public class AudioSystem {
 							getCurrentList().getItems().get( tracklistNumber ).setIsCurrentTrack( true );
 						}
 					} catch ( Exception e ) {
-						LOGGER.info( "Error loading current list track number: " + e.getMessage() );
+						LOGGER.log( Level.INFO, "Error loading current list track number: ", e );
 					}
 		
 					settings.remove ( setting );
@@ -578,7 +578,7 @@ public class AudioSystem {
 		if ( listener != null ) {
 			playerListeners.add( listener );
 		} else {
-			LOGGER.info( "Null player listener was attempted to be added, ignoring." );
+			LOGGER.log( Level.INFO, "Null player listener was attempted to be added, ignoring.", new NullPointerException() );
 		}
 	}
 	
@@ -732,7 +732,7 @@ public class AudioSystem {
 				if ( index < queue.size() ) {
 					queue.getData().set( index - 1, track );
 				} else {
-					LOGGER.fine( "Current list had a queue index beyond the length of the queue. Removing." );
+					LOGGER.log( Level.INFO, "Current list had a queue index beyond the length of the queue. Removing.", new Exception() );
 					track.getQueueIndices().remove( Integer.valueOf ( index ) );
 				}
 			}

@@ -86,7 +86,9 @@ public class SingleInstanceController {
 			}
 			
 		} catch ( Exception e ) {
-			LOGGER.log( Level.INFO, "Error sending commands through socket, UI may not accept commands." );
+			//TODO: This log is only called by the second instance of hypnos. Maybe just use printlns instead? 
+			//TODO: Also maybe segregate out code that the second instance uses into its own class
+			LOGGER.log( Level.INFO, "Error sending commands through socket, UI may not accept commands.", e );
 		}
 		return false;
 	}

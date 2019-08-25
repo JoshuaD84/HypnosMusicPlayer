@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javafx.application.Platform;
@@ -58,7 +59,7 @@ public class ExportPlaylistPopup extends Stage {
 		try {
 			getIcons().add( new Image( new FileInputStream ( Hypnos.getRootDirectory().resolve( "resources" + File.separator + "icon.png" ).toFile() ) ) );
 		} catch ( FileNotFoundException e ) {
-			LOGGER.warning( "Unable to load program icon: resources" + File.separator + "icon.png" );
+			LOGGER.log(Level.WARNING, "Unable to load program icon: resources" + File.separator + "icon.png", e );
 		}
 		
 		progressBar = new ProgressBar();
