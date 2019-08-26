@@ -75,7 +75,8 @@ public class CurrentListPane extends BorderPane {
 
 	HBox currentListControls; 
 
-	public TableView <CurrentListTrack> currentListTable;
+	public TableView <CurrentListTrack> currentListTable; //TODO: why public? 
+	private Label currentListLength;
 	
 	TableColumn<CurrentListTrack, String> artistColumn, albumColumn, titleColumn, lengthColumn;
 	TableColumn<CurrentListTrack, CurrentListTrackState> playingColumn;
@@ -280,63 +281,21 @@ public class CurrentListPane extends BorderPane {
 		currentListControls.setAlignment( Pos.CENTER_RIGHT );
 		currentListControls.setId( "currentListControls" );
 		
-		final Label currentListLength = new Label ( "" );
+		currentListLength = new Label ( "" );
 		currentListLength.setMinWidth( Region.USE_PREF_SIZE );
 		currentListLength.setPadding( new Insets ( 0, 10, 0, 10 ) );
 		
 		audioSystem.getCurrentList().getItems().addListener( new ListChangeListener<CurrentListTrack> () {
 			@Override
 			public void onChanged ( Change<? extends CurrentListTrack> changes ) {
-				int lengthS = 0;
-				
-				for ( Track track : audioSystem.getCurrentList().getItems() ) {
-					if ( track != null ) {
-						lengthS += track.getLengthS();
-					}
-				}
-				
-				final int lengthArgument = lengthS;
-				
-				Platform.runLater( () -> {
-					currentListLength.setText( Utils.getLengthDisplay( lengthArgument ) );
-				});
+				updateLengthAndCountDisplay();
 			}
 		});
 		
 		currentListTable.getSelectionModel().getSelectedIndices().addListener ( new ListChangeListener<Integer>() {
 			@Override
 			public void onChanged ( Change<? extends Integer> c ) {
-				List<Integer> selected = currentListTable.getSelectionModel().getSelectedIndices();
-				
-				if ( selected.size() == 0 || selected.size() == 1 ) {
-					int lengthS = 0;
-					for ( Track track : audioSystem.getCurrentList().getItems() ) {
-						if ( track != null ) {
-							lengthS += track.getLengthS();
-						}
-					}
-					
-					final int lengthArgument = lengthS;
-					
-					Platform.runLater( () -> {
-						currentListLength.setText( Utils.getLengthDisplay( lengthArgument ) );
-					});
-					
-				} else {
-					int lengthS = 0;
-					for ( int index : selected ) {
-						if ( index >= 0 && index < audioSystem.getCurrentList().getItems().size() ) {
-							lengthS += audioSystem.getCurrentList().getItems().get( index ).getLengthS();
-						}
-					}
-					
-					final int lengthArgument = lengthS;
-					
-					Platform.runLater( () -> {
-						currentListLength.setText( Utils.getLengthDisplay( lengthArgument ) );
-					});
-					
-				}
+				updateLengthAndCountDisplay();
 			}
 		});
 		
@@ -1416,6 +1375,37 @@ public class CurrentListPane extends BorderPane {
 		retMe.put ( Setting.CL_TABLE_LENGTH_COLUMN_SHOW, lengthColumn.isVisible() );
 		
 		return retMe;
+	}
+	
+	private void updateLengthAndCountDisplay() {
+		int lengthS = 0;
+		int trackCount = 0;
+
+		List<Integer> selected = currentListTable.getSelectionModel().getSelectedIndices();
+		
+		if ( selected.size() == 0 || selected.size() == 1 ) {
+			for ( Track track : audioSystem.getCurrentList().getItems() ) {
+				if ( track != null ) {
+					lengthS += track.getLengthS();
+				}
+			}
+			trackCount = audioSystem.getCurrentList().getItems().size();
+			
+		} else {
+			for ( int index : selected ) {
+				if ( index >= 0 && index < audioSystem.getCurrentList().getItems().size() ) {
+					lengthS += audioSystem.getCurrentList().getItems().get( index ).getLengthS();
+					trackCount++;
+				}
+			}
+		}
+		
+		final int lengthArgument = lengthS;
+		final int trackArgument = trackCount;
+		
+		Platform.runLater( () -> {
+			currentListLength.setText( trackArgument + " / " + Utils.getLengthDisplay( lengthArgument ) );
+		});
 	}
 }
 

@@ -11,8 +11,6 @@ Delete only playlist
       at net.joshuad.hypnos.library.Library.access$7(Library.java:441)
       at net.joshuad.hypnos.library.Library$2.run(Library.java:89)
 
-Show the current list track count somewhere, maybe by the length indicator
-
 Linux
    JavaFX / Linux Open File Dialog sometimes causes jvm crash, depends on system, and doesn't happen always
    
