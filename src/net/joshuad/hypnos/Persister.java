@@ -187,7 +187,6 @@ public class Persister {
 			audioSystem.getCurrentList().setHasUnsavedData( false );
 			
 		} catch ( Exception e ) {
-			e.printStackTrace();
 			try ( ObjectInputStream dataIn = new ObjectInputStream( new GZIPInputStream( new FileInputStream( currentFile ) ) ) ) {
 				audioSystem.getCurrentList().setState ( (CurrentListState)dataIn.readObject() );
 				audioSystem.getCurrentList().setHasUnsavedData( false );
@@ -251,8 +250,8 @@ public class Persister {
 				Playlist playlist = Playlist.loadPlaylist( child );
 				if ( playlist != null ) {
 					playlist.setHasUnsavedData( false );
-					library.linkPlaylistToLibrary(playlist);
 					playlists.add( playlist );
+					library.linkPlaylistToLibrary(playlist);
 				}
 			}
 			library.setDataOnInitialLoad( playlists );

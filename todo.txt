@@ -1,9 +1,17 @@
 If you load it with no music roots (maybe only after an unexpected shutdown) then add a music root, it does not start
    scanning. You have to restart hypnos to get the scanner started. 
 
-Make sure we see all system.out in log window
-
 Load time feels a little long
+   It's persister -> loadPlaylists .... library.linkPlaylistToLibrary()
+
+Delete only playlist
+   Exception in thread "Artist Generator" java.util.NoSuchElementException
+      at java.base/java.util.AbstractList$Itr.next(AbstractList.java:377)
+      at net.joshuad.hypnos.library.Library.relinkPlaylistsToLibrary(Library.java:442)
+      at net.joshuad.hypnos.library.Library.access$7(Library.java:441)
+      at net.joshuad.hypnos.library.Library$2.run(Library.java:89)
+
+Show the current list track count somewhere, maybe by the length indicator
 
 Linux
    JavaFX / Linux Open File Dialog sometimes causes jvm crash, depends on system, and doesn't happen always
@@ -17,10 +25,6 @@ Linux
 Backend
    Artist hasn't been fully converted to the observable paradigm yet, so there are problems
       If you open an artist window and delete a file, it isn't removed from the currently open artist window list
-
-   Windows - It locks artist folders on windows. Surpsingly not album folders, just artist
-      https://stackoverflow.com/questions/56847367/can-you-prevent-watchservice-from-locking-files-on-windows
-      https://stackoverflow.com/questions/6255463/java7-watchservice-access-denied-error-trying-to-delete-recursively-watched-ne
 
 Decoder  
    Opus and Ape support
@@ -53,9 +57,12 @@ Before beta 7 release
 ::::::::::::::
 
 Future
-   Windows
-      Change exe to communicate directly through socket, to avoid launching JVM a bunch when doing "open with" on multiple
-      files
+   Windows - It locks artist folders on windows. Surpsingly not album folders, just artist
+      https://stackoverflow.com/questions/56847367/can-you-prevent-watchservice-from-locking-files-on-windows
+      https://stackoverflow.com/questions/6255463/java7-watchservice-access-denied-error-trying-to-delete-recursively-watched-ne
+
+   Windows - Change exe to communicate directly through socket, to avoid launching JVM a bunch when doing "open with" on
+      multiple files
 
    Having three different throttled filter classes is really error prone. Clean that up, unify 
       Playlist throttled filter, but who's going to have over 1000 playlists?
@@ -137,12 +144,8 @@ Future
 		NSIS
 			Version number dynamically assigned
 
-			Open-with shell integration
-				http://nsis.sourceforge.net/Add_your_app_in_each_EXE_in_the_context_menu
-
-				This is pretty close. It makes an entry but it doesn't work. Could be a lot of different problems.
-				WriteRegStr HKCR ".flac\shell\Hypnos\command" "" "$INSTDIR\Hypnos.exe $\"%1$\""
-
 		When you launch show busy mouse cursor
+
+   Make sure we see all system.out in log window
 
 	a better structure for hotkey commands (maybe combine with commandline commands?)

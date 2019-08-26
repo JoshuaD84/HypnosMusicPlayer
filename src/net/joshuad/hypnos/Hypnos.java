@@ -656,30 +656,83 @@ public class Hypnos extends Application {
 	
 	@Override
 	public void start ( Stage stage ) {
+		long baseStartTime = System.currentTimeMillis();
+		String loadTimeMessage = "Load Time Breakdown\n";
 		try {
+		
+			long thisTaskStart = System.currentTimeMillis();
 			startLogToBuffer();
+			loadTimeMessage += "- Start Log to Buffer: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+			thisTaskStart = System.currentTimeMillis();
+			
+			thisTaskStart = System.currentTimeMillis();
 			parseSystemProperties();
+			loadTimeMessage += "- Parse System Properties: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+			thisTaskStart = System.currentTimeMillis();
+			
+			thisTaskStart = System.currentTimeMillis();
 			determineOS();
+			loadTimeMessage += "- Determine OS " + (System.currentTimeMillis() - thisTaskStart + "\n");
+			thisTaskStart = System.currentTimeMillis();
+			
+			thisTaskStart = System.currentTimeMillis();
 			setupRootDirectory(); 
+			loadTimeMessage += "- Setup Root Directory: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+			thisTaskStart = System.currentTimeMillis();
+			
+			thisTaskStart = System.currentTimeMillis();
 			setupConfigDirectory();
+			loadTimeMessage += "- Setup Config Directory: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+			thisTaskStart = System.currentTimeMillis();
+			
+			thisTaskStart = System.currentTimeMillis();
 			determineVersionInfo();
+			loadTimeMessage += "- Read Version Info: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+			thisTaskStart = System.currentTimeMillis();
 
+			thisTaskStart = System.currentTimeMillis();
 			String[] args = getParameters().getRaw().toArray ( new String[0] );
 			CLIParser parser = new CLIParser( );
 			ArrayList <SocketCommand> commands = parser.parseCommands( args );
+			loadTimeMessage += "- Parse Args: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+			thisTaskStart = System.currentTimeMillis();
 			
+			thisTaskStart = System.currentTimeMillis();
 			SingleInstanceController singleInstanceController = new SingleInstanceController();
 
 			if ( singleInstanceController.isFirstInstance() ) {
+				thisTaskStart = System.currentTimeMillis();
 				setupLogFile();
+				loadTimeMessage += "- Setup Log File: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+				thisTaskStart = System.currentTimeMillis();
+				
+				thisTaskStart = System.currentTimeMillis();
 				library = new Library();
+				loadTimeMessage += "- Initialize Library: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+				thisTaskStart = System.currentTimeMillis();
+				
+				thisTaskStart = System.currentTimeMillis();
 				audioSystem = new AudioSystem();
+				loadTimeMessage += "- Initialize Audio System: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+				thisTaskStart = System.currentTimeMillis();
+				
+				thisTaskStart = System.currentTimeMillis();
 				globalHotkeys = new GlobalHotkeys( getOS(), disableGlobalHotkeysRequestedByProperties );
 				globalHotkeys.addListener( Hypnos::doHotkeyAction );
+				loadTimeMessage += "- Initialize Hotkeys: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+				thisTaskStart = System.currentTimeMillis();
+				
+				thisTaskStart = System.currentTimeMillis();
 				ui = new FXUI ( stage, library, audioSystem, globalHotkeys );
 				audioSystem.setUI ( ui );
 				library.setAudioSystem ( audioSystem );
+				loadTimeMessage += "- Initialize FX UI: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+				thisTaskStart = System.currentTimeMillis();
+				
+				thisTaskStart = System.currentTimeMillis();
 				persister = new Persister ( ui, library, audioSystem, globalHotkeys );
+				loadTimeMessage += "- Initialize Persister: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+				thisTaskStart = System.currentTimeMillis();
 				
 				switch ( getOS() ) {
 					case NIX:
@@ -750,8 +803,17 @@ public class Hypnos extends Application {
 					case WIN_8:
 					case WIN_UNKNOWN:
 					case WIN_VISTA:{
+						thisTaskStart = System.currentTimeMillis();
 						EnumMap <Setting, String> pendingSettings = persister.loadSettingsFromDisk();
+						loadTimeMessage += "- Read Settings from Disk: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+						thisTaskStart = System.currentTimeMillis();
+						
+						thisTaskStart = System.currentTimeMillis();
 						persister.loadCurrentList();
+						loadTimeMessage += "- Read Current List from Disk " + (System.currentTimeMillis() - thisTaskStart + "\n");
+						thisTaskStart = System.currentTimeMillis();
+						
+						thisTaskStart = System.currentTimeMillis();
 						audioSystem.applySettings ( pendingSettings );
 						if ( pendingSettings.containsKey( Setting.LOADER_SPEED ) ) {
 							Hypnos.setLoaderSpeed( LoaderSpeed.valueOf( pendingSettings.get( Setting.LOADER_SPEED ) ) );
@@ -762,24 +824,61 @@ public class Hypnos extends Application {
 						ui.applySettingsBeforeWindowShown( pendingSettings );
 						ui.applySettingsAfterWindowShown( pendingSettings );
 						persister.logUnusedSettings ( pendingSettings );
+						loadTimeMessage += "- Apply Settings: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+
+						thisTaskStart = System.currentTimeMillis();
 						boolean sourcesLoaded = persister.loadRoots();
 						if ( sourcesLoaded ) {
 							persister.loadAlbumsAndTracks();
 						}
+						loadTimeMessage += "- Load Albums and Tracks: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+						
+						thisTaskStart = System.currentTimeMillis();
 						persister.loadQueue();
+						loadTimeMessage += "- Load Queue from Disk: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+						
+						thisTaskStart = System.currentTimeMillis();
 						audioSystem.linkQueueToCurrentList();
+						loadTimeMessage += "- Link Queue to current list: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+						
+						thisTaskStart = System.currentTimeMillis();
 						persister.loadHistory();
+						loadTimeMessage += "- Load History: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+						
+						thisTaskStart = System.currentTimeMillis();
 						persister.loadPlaylists();
+						loadTimeMessage += "- Load Playlists: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+						
+						thisTaskStart = System.currentTimeMillis();
 						persister.loadHotkeys();
+						loadTimeMessage += "- Load Hotkeys: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+						
+						thisTaskStart = System.currentTimeMillis();
 						applyCLICommands( commands );
 						singleInstanceController.startCLICommandListener ( this );
+						loadTimeMessage += "- Apply CLI Commands: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+						
+						thisTaskStart = System.currentTimeMillis();
 						library.setUI( ui );
 						library.startThreads();
 						persister.startThread();
+						loadTimeMessage += "- Start background threads: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+						
+						thisTaskStart = System.currentTimeMillis();
 						ui.showMainWindow();
+						loadTimeMessage += "- Show UI: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+						
+						thisTaskStart = System.currentTimeMillis();
 						ui.getLibraryPane().updatePlaceholders();
 						ui.fixTables();
 						ui.settingsWindow.refreshHotkeyFields();
+						loadTimeMessage += "- Post show UI fixes: " + (System.currentTimeMillis() - thisTaskStart + "\n");
+						
+						loadTimeMessage += "Total Load Time: " + (System.currentTimeMillis() - baseStartTime);
+						
+						LOGGER.info(loadTimeMessage);
+						
+						
 						LOGGER.info( "Hypnos finished loading." );
 						UpdateChecker updater = new UpdateChecker();
 						if ( updater.updateAvailable() ) {
@@ -794,7 +893,8 @@ public class Hypnos extends Application {
 						exit(ExitCode.UNSUPPORTED_OS);
 					}
 				}
-
+				
+				
 			} else {
 				boolean gotResponse = singleInstanceController.sendCommandsThroughSocket( commands );
 				if ( commands.size() > 0 ) {
