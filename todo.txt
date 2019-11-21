@@ -1,3 +1,5 @@
+Have playlist info window and album info window be exclusively open. Make them feel like one window. 
+
 If you load it with no music roots (maybe only after an unexpected shutdown) then add a music root, it does not start
    scanning. You have to restart hypnos to get the scanner started. 
 
@@ -38,6 +40,9 @@ Decoder
    Linux: Sometimes it doesn't make sound after restarting into the paused state.  
    
    Tom Waits - Blue Valentines - Buggy on my 18.04? 
+
+   https://trac.ffmpeg.org/wiki/CompilationGuide/CrossCompilingForWindows
+   https://github.com/acoustid/ffmpeg-build
 
 UI
    Add buttons to library scan log window
