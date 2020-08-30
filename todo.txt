@@ -1,3 +1,7 @@
+Double click on albums/tracks/playlists to clear search box
+
+Clear indicator that playlist export files is complete. 
+
 Have playlist info window and album info window be exclusively open. Make them feel like one window. 
 
 If you load it with no music roots (maybe only after an unexpected shutdown) then add a music root, it does not start
